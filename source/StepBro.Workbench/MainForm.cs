@@ -311,7 +311,7 @@ namespace StepBro.Workbench
             OpenFileDialog openFile = new OpenFileDialog();
 
             openFile.InitialDirectory = Application.ExecutablePath;
-            openFile.Filter = "T# files (*." + Main.StepBroFileExtension + ")|*." + Main.StepBroFileExtension + "|txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            openFile.Filter = "StepBro script files (*." + Main.StepBroFileExtension + ")|*." + Main.StepBroFileExtension + "|txt files (*.txt)|*.txt|All files (*.*)|*.*";
             openFile.FilterIndex = 1;
             openFile.RestoreDirectory = true;
 

@@ -513,9 +513,12 @@ namespace StepBro.Core.ScriptData
 
         public IEnumerable<IObjectContainer> ListObjectContainers()
         {
-            foreach (var fv in m_fileScopeVariables)
+            if (m_fileScopeVariables != null)
             {
-                yield return fv.VariableAccess.Container;
+                foreach (var fv in m_fileScopeVariables)
+                {
+                    yield return fv.VariableAccess.Container;
+                }
             }
         }
     }
