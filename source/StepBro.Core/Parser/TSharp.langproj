@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+Actipro Syntax Language Project (.langproj)
+  For use with Actipro SyntaxEditor and related products.
+  http://www.actiprosoftware.com
+
+'T#' language created by Jan Jørgensen.
+  Copyright (c) 2015-2016 Jan Jørgensen
+
+-->
+<LanguageProject LanguageKey="TSharp" LanguageDescription="T#" OutputLanguageDefinition="False" OutputLanguageKey="CSharp" OutputNamespaceName="TSharpCore.Parser" OutputPath="C:\work\T#\TSharpCore\Parser" Creator="Jan Jørgensen" Copyright="Copyright (c) 2015-2016 Jan Jørgensen" xmlns="http://schemas.actiprosoftware.com/langproj/1.0">
+	<!-- Classification types -->
+	<LanguageProject.ClassificationTypes>
+		<ClassificationType Key="Comment" DefaultStyle="#FF008000" />
+		<ClassificationType Key="CSharpVerbatimString" Description="String (C# @ Verbatim)" DefaultStyle="#FF800000" />
+		<ClassificationType Key="Identifier" />
+		<ClassificationType Key="Keyword" DefaultStyle="#FF0000FF" />
+		<ClassificationType Key="Number" />
+		<ClassificationType Key="Operator" />
+		<ClassificationType Key="PreprocessorKeyword" Description="Preprocessor Keyword" DefaultStyle="#FF0000FF" />
+		<ClassificationType Key="String" DefaultStyle="#FF800000" />
+		<ClassificationType Key="XmlDocumentationComment" Description="XML Doc Comment" DefaultStyle="#FF008000" />
+		<ClassificationType Key="XmlDocumentationTag" Description="XML Doc Tag" DefaultStyle="#FF808080" />
+	</LanguageProject.ClassificationTypes>
+	<!-- Lexer -->
+	<LanguageProject.Lexer>
+		<ProgrammaticLexer IsMergable="False">
+			<ProgrammaticLexer.States>
+				<State Key="Default" Description="Default" />
+			</ProgrammaticLexer.States>
+			<ProgrammaticLexer.TokenDeclarations>
+				<TokenDeclaration Id="1" Key="Whitespace" />
+				<TokenDeclaration Key="LineTerminator" />
+				<TokenDeclaration Key="OpenParenthesis" />
+				<TokenDeclaration Key="CloseParenthesis" />
+				<TokenDeclaration Key="OpenCurlyBrace" />
+				<TokenDeclaration Key="CloseCurlyBrace" />
+				<TokenDeclaration Key="OpenSquareBrace" />
+				<TokenDeclaration Key="CloseSquareBrace" />
+				<TokenDeclaration Key="Punctuation" />
+				<TokenDeclaration Key="Comma" />
+				<TokenDeclaration Key="SemiColon" />
+				<TokenDeclaration Key="Division" />
+				<TokenDeclaration Key="Equality" />
+				<TokenDeclaration Key="Assignment" />
+				<TokenDeclaration Key="Inequality" />
+				<TokenDeclaration Key="Addition" />
+				<TokenDeclaration Key="Subtraction" />
+				<TokenDeclaration Key="Multiplication" />
+				<TokenDeclaration Key="Null" />
+				<TokenDeclaration Key="NativeType" />
+				<TokenDeclaration Key="Boolean" />
+				<TokenDeclaration Key="ReservedWord" />
+				<TokenDeclaration Key="Procedure" />
+				<TokenDeclaration Key="Var" />
+				<TokenDeclaration Key="If" />
+				<TokenDeclaration Key="While" />
+				<TokenDeclaration Key="For" />
+				<TokenDeclaration Key="Foreach" />
+				<TokenDeclaration Key="Do" />
+				<TokenDeclaration Key="Break" />
+				<TokenDeclaration Key="Continue" />
+				<TokenDeclaration Key="Try" />
+				<TokenDeclaration Key="Catch" />
+				<TokenDeclaration Key="Finally" />
+				<TokenDeclaration Key="Await" />
+				<TokenDeclaration Key="On" />
+				<TokenDeclaration Key="Out" />
+				<TokenDeclaration Key="Ref" />
+				<TokenDeclaration Key="True" />
+				<TokenDeclaration Key="False" />
+				<TokenDeclaration Key="Unset" />
+				<TokenDeclaration Key="Pass" />
+				<TokenDeclaration Key="Warning" />
+				<TokenDeclaration Key="Fail" />
+				<TokenDeclaration Key="Error" />
+				<TokenDeclaration Key="Step" />
+				<TokenDeclaration Key="Expect" />
+				<TokenDeclaration Key="Log" />
+				<TokenDeclaration Key="ReservedContextualWord" />
+				<TokenDeclaration Key="Identifier" />
+				<TokenDeclaration Key="Operator" />
+				<TokenDeclaration Key="RealNumber" />
+				<TokenDeclaration Key="IntegerNumber" />
+				<TokenDeclaration Key="HexIntegerNumber" />
+				<TokenDeclaration Key="CharacterStartDelimiter" />
+				<TokenDeclaration Key="CharacterEndDelimiter" />
+				<TokenDeclaration Key="CharacterEscapedCharacter" />
+				<TokenDeclaration Key="CharacterText" />
+				<TokenDeclaration Key="StringText" />
+				<TokenDeclaration Key="StringStartDelimiter" />
+				<TokenDeclaration Key="StringEndDelimiter" />
+				<TokenDeclaration Key="StringEscapedCharacter" />
+				<TokenDeclaration Key="VerbatimStringText" />
+				<TokenDeclaration Key="VerbatimStringStartDelimiter" />
+				<TokenDeclaration Key="VerbatimStringEndDelimiter" />
+				<TokenDeclaration Key="VerbatimStringEscapedDelimiter" />
+				<TokenDeclaration Key="VerbatimStringLineTerminator" />
+				<TokenDeclaration Key="CommentText" />
+				<TokenDeclaration Key="CommentStartDelimiter" />
+				<TokenDeclaration Key="CommentEndDelimiter" />
+				<TokenDeclaration Key="CommentLineTerminator" />
+				<TokenDeclaration Key="MultiLineCommentText" />
+				<TokenDeclaration Key="MultiLineCommentStartDelimiter" />
+				<TokenDeclaration Key="MultiLineCommentEndDelimiter" />
+				<TokenDeclaration Key="MultiLineCommentLineTerminator" />
+				<TokenDeclaration Key="XmlCommentText" />
+				<TokenDeclaration Key="XmlCommentStartDelimiter" />
+				<TokenDeclaration Key="XmlCommentEndDelimiter" />
+				<TokenDeclaration Key="XmlCommentStartTag" />
+				<TokenDeclaration Key="XmlCommentEndTag" />
+				<TokenDeclaration Key="XmlCommentLineTerminator" />
+				<TokenDeclaration Key="CommentDefault" />
+			</ProgrammaticLexer.TokenDeclarations>
+		</ProgrammaticLexer>
+	</LanguageProject.Lexer>
+	<!-- Example text -->
+	<LanguageProject.ExampleText><![CDATA[using System;
+
+public class Foo {
+
+	/// <summary>
+	/// This is a <c>XML</c> documentation comment.
+	/// </summary>
+	public static void Main(string[] args) {
+		Console.WriteLine("Hello, World!");
+		Console.WriteLine("You entered the following {0} command line arguments:", args.Length);
+		for (int i = 0; i < args.Length; i++)
+			Console.WriteLine("{0}", args[i]); 
+	
+	}
+}
+]]></LanguageProject.ExampleText>
+</LanguageProject>

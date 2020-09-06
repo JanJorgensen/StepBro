@@ -1,0 +1,14 @@
+﻿{	id: 1, name: "Foo", price: 123,
+	tags: [ "Bar", "Eek" ],
+	SkipRestOnFail, 
+	errors:
+	{
+		ignore ConnectionTimeout,
+		fail FSSAlertError,
+	}
+	stock: 
+	{ 
+		warehouse: 300, 
+		retail: 20 
+	}
+}

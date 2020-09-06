@@ -1,0 +1,1087 @@
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
+using StepBro.Core.Data;
+using StepBro.Core.Execution;
+using StepBro.Core.ScriptData;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using TSP = StepBro.Core.Parser.TSharp;
+
+namespace StepBro.Core.Parser
+{
+    internal partial class StepBroListener
+    {
+        private TypeReference m_procedureReturnType = null;
+        private bool m_procedureIsFunction = false;
+        private List<ParameterData> m_parameters = null;
+        private Stack<FileProcedure> m_procedureStack = new Stack<FileProcedure>();
+        private FileElement m_currentFileElement = null;    // The file element currently being parsed.
+        private FileProcedure m_currentProcedure = null;    // The procedure currently being parsed.
+        private bool m_inFunctionScope = false;
+        private FileProcedure m_lastProcedure = null;       // The last procedure the parser ended parsing.
+        private ProcedureParsingScope m_procedureBaseScope = null;
+        private Stack<ProcedureParsingScope> m_scopeStack = new Stack<ProcedureParsingScope>();
+        private bool m_enteredLoopStatement = false;
+        private string m_modifiers = null;
+
+        public IFileProcedure LastParsedProcedure { get { return m_lastProcedure; } }
+
+        private SBExpressionData m_callAssignmentTarget = null;
+        private bool m_callAssignmentAwait = false;
+        private Stack<Stack<SBExpressionData>> m_arguments = new Stack<Stack<SBExpressionData>>();
+        private Stack<Stack<SBExpressionData>> m_statementExpressions = new Stack<Stack<SBExpressionData>>();
+        //private Stack<TSExpressionData> m_keywordArguments = null;
+
+        public Stack<SBExpressionData> GetArguments()
+        {
+            return m_arguments.Pop();
+        }
+
+        private void EnterProcedureParsing(string name)
+        {
+            if (m_file != null && m_file.TypeScanIncluded)
+            {
+                var proc = m_file.ListElements().FirstOrDefault(e => e.ElementType == FileElementType.ProcedureDeclaration && e.Name == name);
+                if (proc != null)
+                {
+                    m_currentProcedure = proc as FileProcedure;
+                    m_currentFileElement = proc as FileElement;
+                    if (m_currentProcedure.IsFunction != m_procedureIsFunction) throw new Exception("Procedure from type scanning is different type (procedure/function) than in the current parsing.");
+                }
+                else
+                {
+                    throw new Exception("");    // TODO: convert to parsing error (internal error).
+                }
+            }
+            else
+            {
+                m_currentProcedure = new FileProcedure(m_file, m_elementStart.Line, null, m_currentNamespace, name);
+            }
+            m_currentProcedure.ReturnType = m_procedureReturnType;
+            m_currentProcedure.IsFunction = m_procedureIsFunction;
+
+            m_currentFileElement = m_currentProcedure;
+            m_lastProcedure = m_currentProcedure;
+            m_procedureStack.Push(m_currentProcedure);
+        }
+
+        private void ExitProcedureParsing()
+        {
+            m_lastProcedure = m_currentProcedure;
+            if (m_file != null)
+            {
+                if (!m_file.TypeScanIncluded)
+                {
+                    m_file.AddProcedure(m_currentProcedure);
+                }
+                m_currentProcedure.Compile();   // TODO: Maybe not called here ( and runtime code needs to be added).
+            }
+            m_procedureStack.Pop(); // Pop current. New current is the at the top.
+            m_currentProcedure = (m_procedureStack.Count > 0) ? m_procedureStack.Peek() : null;
+        }
+
+        public override void EnterProcedureDeclaration([NotNull] TSP.ProcedureDeclarationContext context)
+        {
+            //this.EnterProcedureParsing();
+        }
+
+        public override void ExitProcedureDeclaration([NotNull] TSP.ProcedureDeclarationContext context)
+        {
+            this.ExitProcedureParsing();
+        }
+
+        public override void EnterFileElementProcedure([NotNull] TSP.FileElementProcedureContext context)
+        {
+            m_procedureIsFunction = false;  // In case no type scanning hsa beed performed.
+        }
+
+        public override void EnterFileElementFunction([NotNull] TSP.FileElementFunctionContext context)
+        {
+            if (m_file.TypeScanIncluded && m_currentProcedure.IsFunction == true) throw new Exception("Procedure from type scanning is set to be a \"function\" type.");
+            m_procedureIsFunction = true;  // In case no type scanning hsa beed performed.
+        }
+
+        public override void ExitFileElementProcedure([NotNull] TSP.FileElementProcedureContext context)
+        {
+            this.ExitProcedureParsing();
+        }
+
+        public override void ExitFileElementFunction([NotNull] TSP.FileElementFunctionContext context)
+        {
+            this.ExitProcedureParsing();
+        }
+
+        public override void EnterProcedureReturnType([NotNull] TSP.ProcedureReturnTypeContext context)
+        {
+            m_expressionData.PushStackLevel("ReturnType");
+        }
+
+        public override void ExitProcedureReturnType([NotNull] TSP.ProcedureReturnTypeContext context)
+        {
+            m_procedureReturnType = m_typeStack.Pop();  // Must be past the return type. Save here to make it available to the parsing of the body.
+            m_expressionData.PopStackLevel();
+        }
+
+        public override void ExitProcedureName([NotNull] TSP.ProcedureNameContext context)
+        {
+            m_elementStart = context.Start;
+            this.EnterProcedureParsing(context.GetText());
+        }
+
+        public override void EnterFormalParameters([NotNull] TSP.FormalParametersContext context)
+        {
+            m_parameters = new List<ParameterData>();     // If used from the formalParameters rule (could be empty).
+        }
+        public override void EnterFormalParameterDecls([NotNull] TSP.FormalParameterDeclsContext context)
+        {
+            m_parameters = new List<ParameterData>();     // If not used from the formalParameters rule.
+        }
+        public override void EnterFormalParameterDecl([NotNull] TSP.FormalParameterDeclContext context)
+        {
+            m_expressionData.PushStackLevel("Parameter");
+            //m_parameters = new List<Tuple<Type, string>>();     // If not used from the formalParameters rule.
+        }
+        public override void ExitFormalParameterModifiers([NotNull] TSP.FormalParameterModifiersContext context)
+        {
+            m_modifiers = context.GetText();
+        }
+        public override void ExitFormalParameterDecl([NotNull] TSP.FormalParameterDeclContext context)
+        {
+            string name = context.GetChild(context.ChildCount - 1).GetText();
+            TypeReference type = m_typeStack.Pop();
+            var modifiers = (m_modifiers != null) ? m_modifiers.Split(' ') : new string[] { };
+            System.Diagnostics.Debug.Assert(type != null);
+            var typeToken = ((ParserRuleContext)context.children[context.ChildCount - 2]).Start;
+            m_parameters.Add(new ParameterData(modifiers, name, type.Type.Name, type, typeToken));
+            m_expressionData.PopStackLevel();
+        }
+
+        public override void ExitProcedureParameters([NotNull] TSP.ProcedureParametersContext context)
+        {
+            if (!m_file.TypeScanIncluded)
+            {
+                foreach (var p in m_parameters)
+                {
+                    m_currentProcedure.AddParameter(p);
+                }
+            }
+        }
+
+        public override void EnterProcedureBodyOrNothing([NotNull] TSP.ProcedureBodyOrNothingContext context)
+        {
+            if (!m_file.TypeScanIncluded)
+            {
+                m_currentProcedure.HasBody = context.Start.Type != TSP.SEMICOLON;
+                m_currentProcedure.CreateDelegateType();
+            }
+        }
+
+        public override void EnterProcedureBody([NotNull] TSP.ProcedureBodyContext context)
+        {
+            m_scopeStack.Clear();
+            m_procedureBaseScope = null;
+            m_inFunctionScope = true;
+        }
+
+        public override void ExitProcedureBody([NotNull] TSP.ProcedureBodyContext context)
+        {
+            m_inFunctionScope = false;
+            m_currentProcedure.SetProcedureBody(m_procedureBaseScope.GetBlockCode());
+        }
+
+        public override void EnterBlock([NotNull] TSP.BlockContext context)
+        {
+            if (m_scopeStack.Count > 0)
+            {
+                m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "Block", ProcedureParsingScope.ScopeType.Block));
+            }
+            else
+            {
+                m_procedureBaseScope = new ProcedureParsingScope(null, "Procedure", ProcedureParsingScope.ScopeType.Procedure);
+                m_scopeStack.Push(m_procedureBaseScope);
+            }
+            m_expressionData.PushStackLevel("Block");   // "Livrem og seler"
+        }
+
+        public override void ExitBlock([NotNull] TSP.BlockContext context)
+        {
+            m_expressionData.PopStackLevel();   // Just remove the level; it 
+
+            var block = m_scopeStack.Pop();
+            if (block.Type != ProcedureParsingScope.ScopeType.Procedure)
+            {
+                if (m_scopeStack.Peek().Type == ProcedureParsingScope.ScopeType.Block)
+                {
+                    m_scopeStack.Peek().AddStatementCode(block.GetBlockCode());
+                }
+                else
+                {
+                    m_scopeStack.Peek().AddSubStatement(block);
+                }
+            }
+            else
+            {
+                // End of procedure body. Handled in ExitProcedureBody().
+            }
+            //    var sub = m_scopeStack.Pop();
+            //    m_scopeStack.Peek().AddStatementCode(sub.GetBlockCode());
+        }
+
+        public override void EnterSubStatement([NotNull] TSP.SubStatementContext context)
+        {
+            if (m_enteredLoopStatement)
+            {
+                m_scopeStack.Peek().SetupForLoop();
+                m_enteredLoopStatement = false;
+            }
+            m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "sub", ProcedureParsingScope.ScopeType.SubStatement));
+        }
+
+        public override void ExitSubStatement([NotNull] TSP.SubStatementContext context)
+        {
+            var sub = m_scopeStack.Pop();
+            if (sub.StatementCount == 1)   // Just a single statement (not block)
+            {
+                // Add the sub-statement scope (containing the single statement)
+                m_scopeStack.Peek().AddSubStatement(sub);
+            }
+            else if (sub.StatementCount == 0)   // Must be a block statement then.
+            {
+                // Add the block scope saved as a sub-expression in the sub-statement scope.
+                m_scopeStack.Peek().AddSubStatement(sub.GetSubExpressions()[0]);
+            }
+        }
+
+        private Expression CreateEnterStatement(int line, int column)
+        {
+            return Expression.Call(
+                    m_currentProcedure.ContextReferenceInternal,
+                    typeof(IScriptCallContext).GetMethod("EnterStatement"),
+                    Expression.Constant(line),
+                    Expression.Constant(column));
+        }
+
+        private void AddEnterStatement(TSP.StatementContext context, string entryTimeVariable = null)
+        {
+            if (m_scopeStack.Peek().Type <= ProcedureParsingScope.ScopeType.Block)
+            {
+                m_scopeStack.Peek().AddStatementCode(this.CreateEnterStatement(context.Start.Line, context.Start.Column));
+            }
+        }
+
+        public override void EnterBlockStatement([NotNull] TSP.BlockStatementContext context)
+        {
+            m_scopeStack.Peek().SetAttributes();
+            m_enteredLoopStatement = false;
+        }
+
+        public override void ExitBlockStatement([NotNull] TSP.BlockStatementContext context)
+        {
+        }
+
+        public override void ExitBlockStatementAttributes([NotNull] TSP.BlockStatementAttributesContext context)
+        {
+            m_scopeStack.Peek().SetAttributes(m_lastAttributes);
+            m_lastAttributes = null;
+        }
+
+        #region Statements
+
+        #region Normal Procedure Call
+
+        public override void EnterCallStatement([NotNull] TSP.CallStatementContext context)
+        {
+            this.AddEnterStatement(context);
+            m_callAssignmentTarget = null;
+            m_callAssignmentAwait = false;
+        }
+
+        public override void ExitCallStatement([NotNull] TSP.CallStatementContext context)
+        {
+            var left = m_expressionData.Pop();
+            var argumentStack = m_arguments.Pop();
+            var propertyBlock = m_lastElementPropertyBlock;
+            left = this.ResolveIfIdentifier(left, true);        // Now done in EnterMethodArguments() above.
+
+            this.HandleParensExpression(context, true, left, argumentStack, null, propertyBlock);
+        }
+
+        public override void ExitCallAssignment([NotNull] TSP.CallAssignmentContext context)
+        {
+            if (context.ChildCount == 1)
+            {
+                if (context.Start.Type == TSP.AWAIT)
+                {
+                    m_callAssignmentAwait = true;
+                    return;
+                }
+                else if (context.Start.Type == TSP.START)
+                {
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            else if (context.ChildCount == 3)
+            {
+                var child = context.GetChild(2) as Antlr4.Runtime.Tree.TerminalNodeImpl;
+                if (child != null && child.Payload.Type == TSP.AWAIT)
+                {
+                    m_callAssignmentAwait = true;
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            m_callAssignmentTarget = m_expressionData.Pop();
+            m_callAssignmentTarget = this.ResolveIfIdentifier(m_callAssignmentTarget, true);
+        }
+
+        #endregion
+
+        public override void EnterAssertStatement([NotNull] TSP.AssertStatementContext context)
+        {
+            this.AddEnterStatement(context);
+        }
+
+        public override void ExitAssertStatement([NotNull] TSP.AssertStatementContext context)
+        {
+        }
+
+        public override void EnterIfStatement([NotNull] TSP.IfStatementContext context)
+        {
+            this.AddEnterStatement(context);
+            m_expressionData.PushStackLevel("IfStatement");
+        }
+
+        public override void ExitIfStatement([NotNull] TSP.IfStatementContext context)
+        {
+            var stack = m_expressionData.PopStackLevel();
+            var condition = stack.Pop();
+            var subStatements = m_scopeStack.Peek().GetSubExpressions();
+            var attributes = m_scopeStack.Peek().GetAttributes();
+
+            condition = this.ResolveForGetOperation(condition);
+
+            Expression trueStatement;
+            if (subStatements[0].Type == ProcedureParsingScope.ScopeType.Block)
+            {
+                trueStatement = subStatements[0].GetBlockCode();   // TODO: Add some logging and stuff
+            }
+            else
+            {
+                trueStatement = subStatements[0].GetOnlyStatementCode();
+            }
+            Expression falseStatement = null;
+            if (subStatements.Count == 2)
+            {
+                if (subStatements[1].Type == ProcedureParsingScope.ScopeType.Block)
+                {
+                    falseStatement = subStatements[1].GetBlockCode();   // TODO: Add some logging and stuff
+                }
+                else
+                {
+                    falseStatement = subStatements[1].GetOnlyStatementCode();
+                }
+            }
+
+            if (condition.IsValueType && condition.DataType.Type == typeof(bool))
+            {
+                switch (subStatements.Count)
+                {
+                    case 1:     // Without 'else'
+                        m_scopeStack.Peek().AddStatementCode(Expression.IfThen(condition.ExpressionCode, trueStatement));
+                        break;
+                    case 2:     // With 'else'
+                        m_scopeStack.Peek().AddStatementCode(Expression.IfThenElse(condition.ExpressionCode, trueStatement, falseStatement));
+                        break;
+                    default:
+                        throw new NotImplementedException("This should never happen !!!");
+                }
+            }
+            else
+            {
+                throw new NotImplementedException("Something wrong with the condition expression.");
+            }
+        }
+
+        #region Looping
+
+        public override void EnterForStatement([NotNull] TSP.ForStatementContext context)
+        {
+            this.AddEnterStatement(context);
+            //m_lastPropertyBlock = null;
+            m_expressionData.PushStackLevel("ForStatement");
+            m_enteredLoopStatement = true;
+        }
+
+        public override void ExitForStatement([NotNull] TSP.ForStatementContext context)
+        {
+        }
+
+        public override void EnterWhileStatement([NotNull] TSP.WhileStatementContext context)
+        {
+            this.AddEnterStatement(context);
+            //m_lastPropertyBlock = null;
+            m_expressionData.PushStackLevel("WhileStatement");
+            m_enteredLoopStatement = true;
+        }
+
+        public override void ExitWhileStatement([NotNull] TSP.WhileStatementContext context)
+        {
+            var stack = m_expressionData.PopStackLevel();
+            var condition = stack.Pop();
+            var subStatements = m_scopeStack.Peek().GetSubExpressions();
+            var attributes = m_scopeStack.Peek().GetAttributes();
+            ProcedureVariable varLoopIndex = null;
+            ProcedureVariable varEntryTime = null;
+            ProcedureVariable varTimeoutTime = null;
+            Expression timeout = null;
+
+            var props = m_lastElementPropertyBlock;
+            m_lastElementPropertyBlock = null;
+
+            condition = this.ResolveForGetOperation(condition);
+            var conditionExpression = condition.ExpressionCode;
+
+            if (condition.IsValueType && condition.DataType.Type != typeof(bool))
+            {
+                throw new NotImplementedException("Something wrong with the condition expression.");
+            }
+
+            var breakLabel = Expression.Label();
+
+            var isBlockSub = (subStatements[0].Type == ProcedureParsingScope.ScopeType.Block);
+            if (isBlockSub)
+            {
+                breakLabel = m_scopeStack.Peek().BreakLabel;
+            }
+
+            var statementExpressions = new List<Expression>();
+            var loopExpressions = new List<Expression>();
+            loopExpressions.Add(
+                Expression.IfThen(
+                    Expression.Not(conditionExpression),
+                    Expression.Break(breakLabel)));
+
+            varLoopIndex = m_scopeStack.Peek().AddVariable(
+                CreateStatementVariableName(context, "whileLoop_index"),
+                TypeReference.TypeInt64,
+                new SBExpressionData(Expression.Constant(0L)),
+                EntryModifiers.Private);
+            loopExpressions.Add(Expression.Increment(varLoopIndex.VariableExpression));     // index++; therefore index = 1 inside and after first iteration.
+
+            // TODO: Add some logging, interactive break check, timeout and other stuff
+            #region Attribute Handling
+
+            if (m_currentProcedure.IsFunction == false && props != null)
+            {
+                foreach (var property in props)
+                {
+                    if (property.Is("Timeout", PropertyBlockEntryType.Value))
+                    {
+                        object toValue = (((PropertyBlockValue)property).Value);
+                        if (toValue is TimeSpan)
+                        {
+                            timeout = Expression.Constant((TimeSpan)toValue);
+                        }
+                        else
+                        {
+                            throw new NotImplementedException("Timeout data type or expression not implemented or supported.");
+                        }
+
+                        varEntryTime = m_scopeStack.Peek().AddVariable(
+                            CreateStatementVariableName(context, "whileLoop_EntryTime"),
+                            TypeReference.TypeDateTime,
+                            new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
+                            EntryModifiers.Private);
+                        varTimeoutTime = m_scopeStack.Peek().AddVariable(
+                            CreateStatementVariableName(context, "whileLoop_TimeoutTime"),
+                            TypeReference.TypeDateTime,
+                            new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
+                            EntryModifiers.Private);
+                        //loopExpressions.Add(Expression.Assign(varTimeoutTime.VariableExpression,
+                        //    Expression.IfThen(
+                        //        Expression.Not(conditionExpression),
+                        //        Expression.Block(
+                        //            Expression.Break(breakLabel))));
+                        //new TSExpressionData(Expression.Property(null, typeof(DateTime).GetProperty("Now"))),
+                    }
+                }
+            }
+            #endregion
+
+            if (varEntryTime != null)
+            {
+                m_scopeStack.Peek().AddStatementCode(
+                    Expression.Assign(varEntryTime.VariableExpression,
+                    Expression.Property(null, typeof(DateTime).GetProperty("Now"))));
+            }
+            if (varTimeoutTime != null)
+            {
+                m_scopeStack.Peek().AddStatementCode(
+                    Expression.Assign(varTimeoutTime.VariableExpression,
+                    Expression.Add(
+                        varEntryTime.VariableExpression,
+                        timeout)));
+                loopExpressions.Add(
+                    Expression.IfThen(
+                        Expression.Not(conditionExpression),
+                        Expression.Break(breakLabel)));
+                loopExpressions.Add(
+                    Expression.IfThen(
+                        Expression.GreaterThan(
+                            Expression.Property(null, typeof(DateTime).GetProperty("Now")),
+                            varTimeoutTime.VariableExpression),
+                        Expression.Block(
+                            // TODO: log timeout
+                            Expression.Break(breakLabel))));
+                //new TSExpressionData(Expression.Property(null, typeof(DateTime).GetProperty("Now"))),
+            }
+
+            if (isBlockSub)
+            {
+                statementExpressions.Add(
+                    Expression.Loop(
+                        subStatements[0].GetBlockCode(loopExpressions, null),
+                        breakLabel,
+                        subStatements[0].ContinueLabel));
+            }
+            else
+            {
+                loopExpressions.Add(subStatements[0].GetOnlyStatementCode());
+                statementExpressions.Add(
+                    Expression.Loop(
+                        Expression.Block(loopExpressions),
+                        breakLabel));
+            }
+
+            m_scopeStack.Peek().AddStatementCode(statementExpressions.ToArray());
+        }
+
+        public override void EnterDoWhileStatement([NotNull] TSP.DoWhileStatementContext context)
+        {
+            this.AddEnterStatement(context);
+            //m_lastPropertyBlock = null;
+            m_expressionData.PushStackLevel("DoWhileStatement");
+            m_enteredLoopStatement = true;
+        }
+
+        public override void ExitDoWhileStatement([NotNull] TSP.DoWhileStatementContext context)
+        {
+        }
+
+        public override void ExitBreakStatement([NotNull] TSP.BreakStatementContext context)
+        {
+            this.AddEnterStatement(context);
+            var scopeForLoop = this.TryGetLoopScope();
+            if (scopeForLoop != null)
+            {
+                m_scopeStack.Peek().AddStatementCode(Expression.Break(scopeForLoop.BreakLabel));
+            }
+            else
+            {
+                throw new NotImplementedException("Parsing error: loop scope not found.");
+            }
+        }
+
+        public override void ExitContinueStatement([NotNull] TSP.ContinueStatementContext context)
+        {
+            this.AddEnterStatement(context);
+            var scopeForLoop = this.TryGetLoopScope();
+            if (scopeForLoop != null)
+            {
+                m_scopeStack.Peek().AddStatementCode(Expression.Continue(scopeForLoop.ContinueLabel));
+            }
+            else
+            {
+                throw new NotImplementedException("Parsing error: loop scope not found.");
+            }
+        }
+
+        private ProcedureParsingScope TryGetLoopScope()
+        {
+            return m_scopeStack.FirstOrDefault(s => s.BreakLabel != null);
+        }
+
+        #endregion
+
+        #region Using Statement
+
+        public override void EnterUsingStatement([NotNull] TSP.UsingStatementContext context)
+        {
+            // Create a sub-scope in case the using statement contains a variable declaraton. That variable
+            // should only be visible within this statement scope.
+            m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "UsingStatement", ProcedureParsingScope.ScopeType.Block));
+
+            this.AddEnterStatement(context);
+        }
+
+        public override void ExitUsingStatement([NotNull] TSP.UsingStatementContext context)
+        {
+            var subStatements = m_scopeStack.Peek().GetSubExpressions();
+
+            Expression scopeCode = null;
+            if (subStatements[0].Type == ProcedureParsingScope.ScopeType.Block)
+            {
+                scopeCode = subStatements[0].GetBlockCode(null, null);
+            }
+            else
+            {
+                scopeCode = subStatements[0].GetOnlyStatementCode();
+            }
+
+            var usingVariable = m_scopeStack.Peek().AddVariable("usingVariable_" + context.start.Line.ToString(), new TypeReference(typeof(IDisposable)), null, EntryModifiers.Private);
+            var variableAssignment = m_scopeStack.Peek().UsingVariableAssignment;
+            var usingVariableAssignment = Expression.Assign(usingVariable.VariableExpression, variableAssignment);
+
+            var disposeMethod = typeof(IDisposable).GetMethod(nameof(IDisposable.Dispose));
+
+            var usingCode = Expression.TryFinally(
+                Expression.Block(
+                    usingVariableAssignment,
+                    scopeCode
+                ),
+                Expression.Call(usingVariable.VariableExpression, disposeMethod));
+            m_scopeStack.Peek().AddStatementCode(usingCode);
+
+            var statementBlock = m_scopeStack.Pop();
+            m_scopeStack.Peek().AddStatementCode(statementBlock.GetBlockCode());
+        }
+
+        public override void EnterUsingExpression([NotNull] TSP.UsingExpressionContext context)
+        {
+            var child = context.GetChild(0) as Antlr4.Runtime.RuleContext;
+            if (child.RuleIndex == TSP.RULE_simpleVariableDeclaration)
+            {
+            }
+            else if (child.RuleIndex == TSP.RULE_expression)
+            {
+                m_expressionData.PushStackLevel("UsingStatement");
+            }
+            else
+            {
+                throw new NotImplementedException(String.Format("What? Unknown using expression type (rule = {0}).", child.RuleIndex));
+            }
+        }
+
+        public override void ExitUsingExpression([NotNull] TSP.UsingExpressionContext context)
+        {
+            //var usingVariable = m_scopeStack.Peek().AddVariable("usingVariable_" + context.start.Line.ToString(), typeof(IDisposable), null, EntryModifiers.Private);
+
+            Expression usingExpression = null;
+
+            var child = context.GetChild(0) as Antlr4.Runtime.RuleContext;
+            if (child.RuleIndex == TSP.RULE_simpleVariableDeclaration)
+            {
+                if (m_variableInitializer.IsConstant && m_variableInitializer.Value == null)
+                {
+                    // Convert the null value to the type of the variable
+                    if (m_variableType.Type == typeof(string)) m_variableInitializer = new SBExpressionData(TypeReference.TypeString, null);
+                }
+                if (m_variableType == null)
+                {
+                    throw new NotImplementedException();
+                }
+                else if (m_variableType.Type != typeof(VarSpecifiedType))
+                {
+                    if (m_variableInitializer.IsValueType &&
+                        m_variableInitializer.IsConstant &&
+                        m_variableInitializer.Value == null)
+                    {
+                        m_variableInitializer.NarrowGetValueType(m_variableType);
+                    }
+                    else if (m_variableType != m_variableInitializer.DataType && !m_variableType.Type.IsAssignableFrom(m_variableInitializer.DataType.Type))
+                    {
+                        throw new NotImplementedException("Convertion of variable initializer is not implemented.");
+                    }
+                }
+                if (m_variableType.Type == typeof(VarSpecifiedType))
+                {
+                    m_variableType = m_variableInitializer.DataType;
+                }
+
+                var scope = m_scopeStack.Peek();
+                var v = scope.AddVariable(m_variableName, m_variableType, null, EntryModifiers.Private);
+                usingExpression = Expression.Assign(v.VariableExpression, m_variableInitializer.ExpressionCode);
+
+                m_variableName = null;
+                m_variableInitializer = null;
+            }
+            else if (child.RuleIndex == TSP.RULE_expression)
+            {
+                var stack = m_expressionData.PopStackLevel();
+                var exp = stack.Pop();
+
+                exp = this.ResolveForGetOperation(exp);
+
+                if (!exp.IsValueType)
+                {
+                    throw new NotImplementedException("Something wrong with the using expression; it is not an IDisposable type.");
+                }
+
+                usingExpression = exp.ExpressionCode;
+            }
+            else
+            {
+                throw new NotImplementedException(String.Format("What? Unknown using expression type (rule = {0}).", child.RuleIndex));
+            }
+
+            if (!usingExpression.Type.IsClass || !typeof(IDisposable).IsAssignableFrom(usingExpression.Type))
+            {
+                throw new NotImplementedException("Something wrong with the using expression; it is not an IDisposable type.");
+            }
+            m_scopeStack.Peek().UsingVariableAssignment = usingExpression;  // Save for later
+        }
+
+        #endregion
+
+        #region Return
+
+        public override void EnterReturnStatement([NotNull] TSP.ReturnStatementContext context)
+        {
+            this.AddEnterStatement(context);
+            m_expressionData.PushStackLevel("Return Statement");
+        }
+
+        public override void ExitReturnStatement([NotNull] TSP.ReturnStatementContext context)
+        {
+            if (context.ChildCount == 2)
+            {
+                m_scopeStack.Peek().AddStatementCode(Expression.Return(m_currentProcedure.ReturnLabel));
+                return;
+            }
+            if (m_currentProcedure.ReturnType == null)
+            {
+                m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Return value missing.");
+                return;
+            }
+            var stack = m_expressionData.PopStackLevel();
+            if (stack.Count == 0)
+            {
+                m_errors.InternalError(context.Start.Line, context.Start.Column, "");
+                return;
+            }
+
+            var exp = stack.Pop();
+            exp = this.ResolveIfIdentifier(exp, m_inFunctionScope);
+            var code = exp.ExpressionCode;
+            if (exp.IsError())
+            {
+                code = Expression.Default(m_currentProcedure.ReturnType.Type);
+                return;
+            }
+
+            // If container, get the value of teh container
+            if (exp.ExpressionCode.Type.IsGenericType && exp.ExpressionCode.Type.GetGenericTypeDefinition() == typeof(IValueContainer<>))
+            {
+                code = Expression.Call(
+                    code,
+                    code.Type.GetMethod("GetTypedValue"),
+                    Expression.Convert(Expression.Constant(null), typeof(Logging.ILogger)));
+            }
+
+            m_scopeStack.Peek().AddStatementCode(Expression.Return(m_currentProcedure.ReturnLabel, code));
+        }
+
+        #endregion
+
+        #region Throw
+
+        public override void EnterThrowStatement([NotNull] TSP.ThrowStatementContext context)
+        {
+            base.EnterThrowStatement(context);
+        }
+
+        public override void ExitThrowStatement([NotNull] TSP.ThrowStatementContext context)
+        {
+            base.ExitThrowStatement(context);
+        }
+
+        #endregion
+
+        #region Test Step
+
+        private int m_stepIndex;
+        private string m_stepTitle;
+
+        public override void EnterStepStatement([NotNull] TSP.StepStatementContext context)
+        {
+            m_stepIndex = -1;
+            m_stepTitle = "";
+        }
+
+        public override void ExitStepStatement([NotNull] TSP.StepStatementContext context)
+        {
+            if (m_stepIndex > 0)
+            {
+                m_currentProcedure.SetStepIndex(m_stepIndex);
+            }
+            else
+            {
+                m_stepIndex = m_currentProcedure.GetNextStepIndex();
+            }
+            m_scopeStack.Peek().AddStatementCode(
+                Expression.Call(
+                    m_currentProcedure.ContextReferenceInternal,
+                    typeof(IScriptCallContext).GetMethod(nameof(IScriptCallContext.EnterTestStep)),
+                    Expression.Constant(context.Start.Line),
+                    Expression.Constant(context.Start.Column),
+                    Expression.Constant(m_stepIndex),
+                    Expression.Constant(m_stepTitle)));
+        }
+
+        public override void ExitStepIndex([NotNull] TSP.StepIndexContext context)
+        {
+            m_stepIndex = Int32.Parse(context.GetText());
+        }
+
+        public override void ExitStepTitle([NotNull] TSP.StepTitleContext context)
+        {
+            m_stepTitle = ParseStringLiteral(context.GetText(), context);
+        }
+
+        #endregion
+
+        #region Log Statement
+
+        private string m_logStatementModifier;
+
+        public override void EnterLogStatement([NotNull] TSP.LogStatementContext context)
+        {
+            this.AddEnterStatement(context);
+            m_expressionData.PushStackLevel("LogStatement");
+            m_logStatementModifier = null;
+        }
+
+        public override void ExitLogStatement([NotNull] TSP.LogStatementContext context)
+        {
+            var stack = m_expressionData.PopStackLevel();
+            if (stack.Count == 0)
+            {
+                m_errors.InternalError(context.Start.Line, context.Start.Column, "");
+                return;
+            }
+            var exp = stack.Pop();
+            exp = this.ResolveIfIdentifier(exp, m_inFunctionScope);
+            var code = exp.IsError() ? Expression.Constant("<EXPRESSION ERROR>") : exp.ExpressionCode;
+
+            if (code != null)
+            {
+                var propertyBlock = m_lastElementPropertyBlock;
+
+                var resultVar = Expression.Variable(code.Type, "logValue");
+                var assignVar = Expression.Assign(resultVar, code);
+
+                var logValue = code;
+                if (code.Type != typeof(string))
+                {
+                    if (!code.Type.IsPrimitive)
+                    {
+                        logValue = Expression.Condition(
+                            Expression.Equal(resultVar, Expression.Constant(null)),
+                            Expression.Constant("<null>"),
+                            Expression.Call(typeof(string).GetMethod("Concat", new Type[] { typeof(string), typeof(string), typeof(string) }),
+                                    Expression.Property(
+                                        Expression.Call(resultVar, typeof(object).GetMethod("GetType", new Type[] { })),
+                                        "FullName"),
+                                    Expression.Constant(" - "),
+                                    Expression.Call(resultVar, typeof(object).GetMethod("ToString", new Type[] { }))));
+                    }
+                    else
+                    {
+                        logValue = Expression.Condition(
+                            Expression.Equal(resultVar, Expression.Constant(null)),
+                            Expression.Constant("<null>"),
+                            Expression.Call(resultVar, typeof(object).GetMethod("ToString", new Type[] { })));
+                    }
+                }
+                logValue = Expression.Call(
+                    typeof(string).GetMethod("Concat", new Type[] { typeof(string), typeof(string) }),
+                    Expression.Constant("log: "),
+                    logValue);
+
+                var loggingEnabled = Expression.Property(
+                    Expression.Convert(m_currentProcedure.ContextReferenceInternal, typeof(ICallContext)),
+                    typeof(ICallContext).GetProperty("LoggingEnabled"));
+
+                var loggingCall = Expression.Call(
+                    m_currentProcedure.ContextReferenceInternal,
+                    typeof(IScriptCallContext).GetMethod("Log", new Type[] { typeof(string) }),
+                    logValue);
+
+                var statementBlock = Expression.IfThen(
+                    loggingEnabled,
+                    Expression.Block(
+                        new ParameterExpression[] { resultVar },
+                        Expression.TryCatch(
+                            Expression.Block(
+                                assignVar,
+                                loggingCall),
+                            Expression.Catch(
+                                typeof(Exception),
+                                Expression.Empty()))));
+
+                m_scopeStack.Peek().AddStatementCode(statementBlock);
+            }
+        }
+
+        public override void ExitLogModifier([NotNull] TSP.LogModifierContext context)
+        {
+            m_logStatementModifier = context.GetText();
+        }
+
+        #endregion
+
+        #region Expect
+
+        public override void EnterExpectStatement([NotNull] TSP.ExpectStatementContext context)
+        {
+            this.AddEnterStatement(context);
+            m_expressionData.PushStackLevel("ExpectStatement");
+        }
+
+        public override void ExitExpectStatement([NotNull] TSP.ExpectStatementContext context)
+        {
+            var stack = m_expressionData.PopStackLevel();
+            var expression = stack.Pop();
+            expression = this.ResolveForGetOperation(expression);
+            string expressionText = context.GetChild(context.ChildCount - 2).GetChild(1).GetText();
+            string title = String.Empty;
+            if (context.ChildCount > 3)
+            {
+                title = context.GetChild(1).GetText();
+                title = title.Substring(1, title.Length - 2);   // Strip quotes
+            }
+
+            var expectCall = Expression.Call(
+                m_currentProcedure.ContextReferenceInternal,
+                typeof(ICallContext).GetMethod(nameof(ICallContext.ReportExpectResult), new Type[] { typeof(string), typeof(string), typeof(bool) }),
+                Expression.Constant(title),
+                Expression.Constant(expressionText),
+                expression.ExpressionCode);
+
+            var statementBlock = Expression.TryCatch(
+                        expectCall,
+                        Expression.Catch(
+                            typeof(Exception),
+                            Expression.Empty()));       // TODO: Log the exception
+
+            m_scopeStack.Peek().AddStatementCode(statementBlock);
+        }
+
+        #endregion
+
+        public override void ExitEmptyStatement([NotNull] TSP.EmptyStatementContext context)
+        {
+            m_scopeStack.Peek().AddStatementCode(Expression.Default(typeof(void)));
+        }
+
+        #region Local Variable
+
+        public override void EnterLocalVariableDeclarationStatement([NotNull] TSP.LocalVariableDeclarationStatementContext context)
+        {
+            this.AddEnterStatement(context);    // TODO: Not if no initializer, and only for static if setting.
+            m_variableModifier = VariableModifier.None;
+        }
+
+        public override void ExitLocalVariableDeclarationStatement([NotNull] TSP.LocalVariableDeclarationStatementContext context)
+        {
+            TypeReference type = m_variableType;
+            VariableModifier modifier = m_variableModifier;
+            if (type == null)
+            {
+                return;
+            }
+            if (modifier == VariableModifier.None)
+            {
+                if (type.Type == typeof(VarSpecifiedType))
+                {
+                    if (m_variables[0].Value.IsError())
+                    {
+                        return;     // Just leave; no point in spending more time on this variable.
+                    }
+                    else if (m_variables[0].Value.DataType != null)
+                    {
+                        type = m_variables[0].Value.DataType;
+                    }
+                    else if (m_variables[0].Value.ExpressionCode != null)
+                    {
+                        type = new TypeReference(m_variables[0].Value.ExpressionCode.Type);
+                    }
+                    else
+                    {
+                        throw new NotImplementedException("Unknown value type for assignment.");
+                    }
+                }
+                foreach (var variable in m_variables)
+                {
+                    if (!type.Type.IsAssignableFrom(variable.Value.DataType.Type))
+                    {
+                        throw new NotImplementedException("Variables assignment of incompatible type.");
+                    }
+                    if (m_scopeStack.Peek().StatementCount > 0)
+                    {
+                        var scope = m_scopeStack.Peek();
+                        var v = scope.AddVariable(variable.Name, type, null, EntryModifiers.Private);
+                        scope.AddStatementCode(Expression.Assign(v.VariableExpression, variable.Value.ExpressionCode));
+                    }
+                    else
+                    {
+                        m_scopeStack.Peek().AddVariable(variable.Name, type, variable.Value, EntryModifiers.Private);
+                    }
+                }
+            }
+            else    // Some kind of static
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
+
+        public override void EnterExpressionStatement([NotNull] TSP.ExpressionStatementContext context)
+        {
+            m_expressionData.PushStackLevel("ExpressionStatement @" + context.Start.Line.ToString() + ", " + context.Start.Column.ToString());
+        }
+
+        public override void ExitExpressionStatement([NotNull] TSP.ExpressionStatementContext context)
+        {
+            var stack = m_expressionData.PopStackLevel();
+            var expressionStatement = stack.Pop().ExpressionCode;
+            m_scopeStack.Peek().AddStatementCode(
+                Expression.Block(
+                    this.CreateEnterStatement(context.Start.Line, context.Start.Column),
+                    expressionStatement));
+        }
+
+        #endregion
+
+        public override void EnterStatementarguments([NotNull] TSP.StatementargumentsContext context)
+        {
+        }
+
+        public override void ExitStatementarguments([NotNull] TSP.StatementargumentsContext context)
+        {
+        }
+
+        #region Helpers and procedure framework
+
+        private Expression GetContextAccess()
+        {
+            return m_currentProcedure.ContextReference;
+        }
+
+        static private string CreateStatementVariableName(ParserRuleContext context, string name)
+        {
+            return $"_{name}_{context.Start.Line}_{context.Start.Column}";
+        }
+
+        #endregion
+    }
+}

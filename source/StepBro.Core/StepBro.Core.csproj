@@ -1,0 +1,497 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.props" Condition="Exists('packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{DDBC25E2-70D2-4C87-B936-1BF593C1B66E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>StepBro.Core</RootNamespace>
+    <AssemblyName>StepBro.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr4.Runtime, Version=4.6.0.0, Culture=neutral, PublicKeyToken=09abb75b9ed49849, processorArchitecture=MSIL">
+      <HintPath>packages\Antlr4.Runtime.4.6.6\lib\net45\Antlr4.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CommandLine, Version=2.7.82.0, Culture=neutral, PublicKeyToken=5a870481e358d379, processorArchitecture=MSIL">
+      <HintPath>packages\CommandLineParser.2.7.82\lib\net45\CommandLine.dll</HintPath>
+    </Reference>
+    <Reference Include="FastColoredTextBox, Version=2.16.24.0, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL">
+      <HintPath>packages\FCTB.2.16.24\lib\FastColoredTextBox.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Win32.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Win32.Primitives.4.3.0\lib\net46\Microsoft.Win32.Primitives.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.AppContext, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.AppContext.4.3.0\lib\net46\System.AppContext.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Buffers.4.5.0\lib\netstandard1.1\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Console, Version=4.0.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Console.4.3.1\lib\net46\System.Console.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Diagnostics.DiagnosticSource.4.7.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Globalization.Calendars, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Globalization.Calendars.4.3.0\lib\net46\System.Globalization.Calendars.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.IO.Compression, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>packages\System.IO.Compression.4.3.0\lib\net46\System.IO.Compression.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.IO.Compression.ZipFile, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>packages\System.IO.Compression.ZipFile.4.3.0\lib\net46\System.IO.Compression.ZipFile.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.IO.FileSystem, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.IO.FileSystem.4.3.0\lib\net46\System.IO.FileSystem.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.IO.FileSystem.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.IO.FileSystem.Primitives.4.3.0\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Memory.4.5.3\lib\netstandard1.1\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http, Version=4.1.1.3, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Net.Http.4.3.4\lib\net46\System.Net.Http.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Sockets, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Net.Sockets.4.3.0\lib\net46\System.Net.Sockets.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.4.7.0\lib\netstandard1.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Algorithms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.Cryptography.Algorithms.4.3.1\lib\net46\System.Security.Cryptography.Algorithms.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Encoding, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.Cryptography.Encoding.4.3.0\lib\net46\System.Security.Cryptography.Encoding.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.Cryptography.Primitives.4.3.0\lib\net46\System.Security.Cryptography.Primitives.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.X509Certificates, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.Cryptography.X509Certificates.4.3.2\lib\net46\System.Security.Cryptography.X509Certificates.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.ReaderWriter, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Xml.ReaderWriter.4.3.1\lib\net46\System.Xml.ReaderWriter.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Api\DynamicAsyncStepBroObject.cs" />
+    <Compile Include="Api\IDynamicAsyncStepBroObject.cs" />
+    <Compile Include="Api\IDynamicStepBroObject.cs" />
+    <Compile Include="Attributes\AsPropertyAttribute.cs" />
+    <Compile Include="Api\DynamicStepBroObject.cs" />
+    <Compile Include="Api\ModuleLoadAttribute.cs" />
+    <Compile Include="Attributes\ClassPanelAttribute.cs" />
+    <Compile Include="Attributes\ObjectPanelAttribute.cs" />
+    <Compile Include="Controls\ComboboxItem.cs" />
+    <Compile Include="Controls\FCTBRangeStream.cs" />
+    <Compile Include="Controls\ObjectPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ObjectPanel.Designer.cs">
+      <DependentUpon>ObjectPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ParsingErrorListView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ParsingErrorListView.Designer.cs">
+      <DependentUpon>ParsingErrorListView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ScriptFileEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\SimpleLogView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\SimpleLogView.Designer.cs">
+      <DependentUpon>SimpleLogView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SourceCodeEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\TextEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\TextEditor.Designer.cs">
+      <DependentUpon>TextEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Data\ArrayFifo.cs" />
+    <Compile Include="Data\AvailabilityBase.cs" />
+    <Compile Include="Data\DoubleAction.cs" />
+    <Compile Include="Data\DynamicObjectManager.cs" />
+    <Compile Include="Data\IDynamicObjectManager.cs" />
+    <Compile Include="Data\ILogLineSource.cs" />
+    <Compile Include="Data\IObjectContainer.cs" />
+    <Compile Include="Data\IObjectFaultDescriptor.cs" />
+    <Compile Include="Data\IObjectHost.cs" />
+    <Compile Include="Data\IObjectPanelManager.cs" />
+    <Compile Include="Data\IReadBuffer.cs" />
+    <Compile Include="Data\ListElementPicker.cs" />
+    <Compile Include="Data\LogLineData.cs" />
+    <Compile Include="Data\NumericLimitType.cs" />
+    <Compile Include="Data\ObjectPanelCreator.cs" />
+    <Compile Include="Data\ObjectPanelManager.cs" />
+    <Compile Include="Data\ProcedureOutput.cs" />
+    <Compile Include="Data\PropertyBlockFlag.cs" />
+    <Compile Include="Data\TypeReference.cs" />
+    <Compile Include="Execution\ArgumentList.cs" />
+    <Compile Include="Execution\ExecutionFailure.cs" />
+    <Compile Include="Execution\ExecutionResult.cs" />
+    <Compile Include="Execution\FunctionCallContextWrapper.cs" />
+    <Compile Include="Execution\IProcedureReference.cs" />
+    <Compile Include="Execution\IProcedureThis.cs" />
+    <Compile Include="Execution\IScriptExecution.cs" />
+    <Compile Include="Execution\IScriptExecutionManager.cs" />
+    <Compile Include="Execution\RuntimeErrorListener.cs" />
+    <Compile Include="Execution\ScriptExecutionManager.cs" />
+    <Compile Include="Execution\ScriptExecutionTask.cs" />
+    <Compile Include="Execution\ScriptUtils.cs" />
+    <Compile Include="General\DynamicPropertyNotFoundException.cs" />
+    <Compile Include="General\DynamicMethodNotFoundException.cs" />
+    <Compile Include="General\ILoadedFile.cs" />
+    <Compile Include="General\ILoadedFilesManager.cs" />
+    <Compile Include="General\LoadedFileBase.cs" />
+    <Compile Include="General\LoadedFilesManager.cs" />
+    <Compile Include="Interface\IScriptEngine.cs" />
+    <Compile Include="Interface\Main.cs" />
+    <Compile Include="Language\EditorTextStyles.cs" />
+    <Compile Include="Language\IEditorSupport.cs" />
+    <Compile Include="Language\IEditorTextControl.cs" />
+    <Compile Include="Language\TSharpEditorSupport.cs" />
+    <Compile Include="Logging\ILogSink.cs" />
+    <Compile Include="Logging\LogSinkManager.cs" />
+    <Compile Include="Logging\MainLogger.cs" />
+    <Compile Include="Parser\ErrorCollector.cs" />
+    <Compile Include="Parser\ParameterData.cs" />
+    <Compile Include="Parser\SpecialOperators\CoalescingOperator.cs" />
+    <Compile Include="Parser\SpecialOperators\EqualsWithToleranceOperator.cs" />
+    <Compile Include="Parser\SpecialOperators\BetweenOperator.cs" />
+    <Compile Include="Parser\StepBroListener.DataTable.cs" />
+    <Compile Include="Parser\TokenOrSection.cs" />
+    <Compile Include="Parser\TSharpTypeVisitor.cs" />
+    <Compile Include="ScriptData\FileDatatable.cs" />
+    <Compile Include="ScriptData\FileElementPartner.cs" />
+    <Compile Include="ScriptData\FileTestList.cs" />
+    <Compile Include="ScriptData\FileVariableContainer.cs" />
+    <Compile Include="ScriptData\IDatatable.cs" />
+    <Compile Include="ScriptData\IPartner.cs" />
+    <Compile Include="ScriptData\ITestList.cs" />
+    <Compile Include="ScriptData\ITSharpScriptFile.cs" />
+    <Compile Include="Tasks\AsyncResult.cs" />
+    <Compile Include="Tasks\IAsyncResult.cs" />
+    <Compile Include="Tasks\TaskDelegate.cs" />
+    <Compile Include="Tasks\TaskManager.cs" />
+    <Compile Include="Tasks\TaskToAsyncResult.cs" />
+    <Compile Include="Utils\IValueWithDescription.cs" />
+    <Compile Include="Utils\SequenceInspector.cs" />
+    <Compile Include="Utils\ValueWithDescription.cs" />
+    <None Include="CodeGeneration\CodeBuilder.cs" />
+    <Compile Include="Attributes\AliasAttribute.cs" />
+    <Compile Include="CodeGeneration\ProcedureDelegateManager.cs" />
+    <Compile Include="Api\AddonManager.cs" />
+    <Compile Include="Api\IAddonManager.cs" />
+    <Compile Include="Api\KeywordItem.cs" />
+    <Compile Include="Api\NamespaceList.cs" />
+    <Compile Include="Api\PostParseAttribute.cs" />
+    <Compile Include="Api\PreParseAttribute.cs" />
+    <Compile Include="Api\PrivateAttribute.cs" />
+    <Compile Include="Api\PublicAttribute.cs" />
+    <Compile Include="Controls\ButtonActivationType.cs" />
+    <Compile Include="Data\AlphaID.cs" />
+    <Compile Include="Data\ArrayReference.cs" />
+    <Compile Include="Data\ByteArray.cs" />
+    <Compile Include="Data\IAvailability.cs" />
+    <Compile Include="Data\Identifier.cs" />
+    <Compile Include="Data\IDisposing.cs" />
+    <Compile Include="Data\InternalDisposer.cs" />
+    <Compile Include="Data\ISoftEnumManager.cs" />
+    <Compile Include="Data\IValueContainer.cs" />
+    <Compile Include="Data\NamedData.cs" />
+    <Compile Include="Data\NamedString.cs" />
+    <Compile Include="Data\ObjectDisposer.cs" />
+    <Compile Include="Data\ObjectMonitor.cs" />
+    <Compile Include="Data\ObjectMonitorManager.cs" />
+    <Compile Include="Data\PropertyBlock.cs" />
+    <Compile Include="Data\PropertyBlockArray.cs" />
+    <Compile Include="Data\PropertyBlockEntry.cs" />
+    <Compile Include="Data\PropertyBlockEntryType.cs" />
+    <Compile Include="Data\PropertyBlockEvent.cs" />
+    <Compile Include="Data\PropertyBlockValue.cs" />
+    <Compile Include="Data\Range.cs" />
+    <Compile Include="Data\SoftEnumType.cs" />
+    <Compile Include="Data\SoftEnumManager.cs" />
+    <Compile Include="Data\SoftEnum.cs" />
+    <Compile Include="Data\StringUtils.cs" />
+    <Compile Include="Data\TimeUtils.cs" />
+    <Compile Include="Data\TreeDataElement.cs" />
+    <Compile Include="Data\ITreeDataElement.cs" />
+    <Compile Include="Data\TreeDataElementExtensions.cs" />
+    <Compile Include="Execution\CallContext.cs" />
+    <Compile Include="Execution\CallEntry.cs" />
+    <Compile Include="Execution\ExecutionHelperMethods.cs" />
+    <Compile Include="Data\TestResult.cs" />
+    <Compile Include="Execution\IScriptCallContext.cs" />
+    <Compile Include="Execution\IExecutionScopeStatusUpdate.cs" />
+    <Compile Include="Execution\ScriptCallContext.cs" />
+    <Compile Include="Execution\ScriptTaskContext.cs" />
+    <Compile Include="Execution\ExecutionStatusRoot.cs" />
+    <Compile Include="Execution\ExecutionScopeStatusUpdater.cs" />
+    <Compile Include="General\CommandLineParser.cs" />
+    <Compile Include="General\CoreCommandlineOptions.cs" />
+    <Compile Include="General\IInternalDispose.cs" />
+    <Compile Include="Api\ImplicitAttribute.cs" />
+    <Compile Include="General\OperationNotAllowedException.cs" />
+    <Compile Include="Api\OptionalAttribute.cs" />
+    <Compile Include="General\ServiceManager.cs" />
+    <Compile Include="Host\HostAccess.cs" />
+    <Compile Include="Logging\ContextLogOption.cs" />
+    <Compile Include="Messaging\MessageDataDecoder.cs" />
+    <Compile Include="Messaging\IMessageDecoder.cs" />
+    <Compile Include="Messaging\MessageBase.cs" />
+    <Compile Include="Parser\AssignmentOperators\SubAssignmentOperator.cs" />
+    <Compile Include="Parser\AssignmentOperators\AddAssignmentOperator.cs" />
+    <Compile Include="Parser\AssignmentOperators\AssignmentOperatorBase.cs" />
+    <Compile Include="Parser\AssignmentOperators\AssignmentOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\EqualsApproxOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\GreaterThanOrApproxOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\EqualsOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\GreaterThanOrEqualOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\LessThanOrApproxOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\LessThanOrEqualOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\LessThanOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\GreaterThanOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\LogicalAndOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\LogicalOrOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\ModulusOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\MinusOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\DivideOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\MultiplyOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\PlusOperator.cs" />
+    <Compile Include="Parser\BinaryOperators\BinaryOperatorBase.cs" />
+    <Compile Include="Parser\ExpressionStack.cs" />
+    <Compile Include="Data\AccessModifier.cs" />
+    <Compile Include="Parser\ProcedureParsingScope.cs" />
+    <Compile Include="Data\IdentifierInfo.cs" />
+    <Compile Include="Parser\IParsingContext.cs" />
+    <Compile Include="Parser\ParserTestSupport.cs" />
+    <Compile Include="Parser\ProcedureVariable.cs" />
+    <Compile Include="Parser\ProjectParsingScope.cs" />
+    <Compile Include="Parser\ThrowExceptionErrorListener.cs" />
+    <Compile Include="Parser\SBExpressionData.cs" />
+    <Compile Include="Parser\FileBuilder.cs" />
+    <Compile Include="Parser\StepBroListener.Array.cs" />
+    <Compile Include="Parser\StepBroListener.ExpressionLambda.cs" />
+    <Compile Include="Parser\StepBroListener.Variable.cs" />
+    <Compile Include="Parser\StepBroListener.ExpressionMethodCall.cs" />
+    <Compile Include="Parser\StepBroListener.Expression.cs" />
+    <Compile Include="Parser\StepBroListener.Identifier.cs" />
+    <Compile Include="Parser\StepBroListener.Procedure.cs" />
+    <Compile Include="Parser\StepBroListener.PropertyBlock.cs" />
+    <Compile Include="Parser\StepBroListener.cs" />
+    <Compile Include="Parser\StepBroListener.Type.cs" />
+    <Compile Include="Parser\StepBroTypeScanListener.cs" />
+    <Compile Include="Parser\UnaryOperators\DecreaseOperator.cs" />
+    <Compile Include="Parser\UnaryOperators\IncreaseOperator.cs" />
+    <Compile Include="Parser\UnaryOperators\NegateOperator.cs" />
+    <Compile Include="Parser\UnaryOperators\ComplementOperator.cs" />
+    <Compile Include="Parser\UnaryOperators\NotOperator.cs" />
+    <Compile Include="Parser\UnaryOperators\UnaryOperatorBase.cs" />
+    <Compile Include="Parser\UnresolvedProcedureType.cs" />
+    <Compile Include="Parser\VariableModifier.cs" />
+    <Compile Include="Data\DefaultVerdictAttribute.cs" />
+    <Compile Include="Data\ErrorID.cs" />
+    <Compile Include="ScriptData\FileElement.cs" />
+    <Compile Include="ScriptData\FileElementType.cs" />
+    <Compile Include="ScriptData\FileProcedure.cs" />
+    <Compile Include="Data\VariableContainer.cs" />
+    <Compile Include="ScriptData\IFileProcedure.cs" />
+    <Compile Include="ScriptData\ScriptFile.cs" />
+    <Compile Include="General\IService.cs" />
+    <Compile Include="Tasks\BreakOption.cs" />
+    <Compile Include="Tasks\ITaskControl.cs" />
+    <Compile Include="Tasks\ITaskContext.cs" />
+    <Compile Include="Tasks\ITaskStateReporting.cs" />
+    <Compile Include="Tasks\TaskExecutionState.cs" />
+    <None Include="app.config" />
+    <Compile Include="File\CodeFileWriter.cs" />
+    <Compile Include="Logging\ILogger.cs" />
+    <Compile Include="Logging\LogEntry.cs" />
+    <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Logging\LoggerRoot.cs" />
+    <Compile Include="Logging\UniqueInteger.cs" />
+    <Compile Include="Parser\ExpressionToDataTree.cs" />
+    <Compile Include="ScriptData\IFileElement.cs" />
+    <Compile Include="ScriptData\IScriptPropertyCollection.cs" />
+    <Compile Include="ScriptData\IScriptProperty.cs" />
+    <Compile Include="Host\IHost.cs" />
+    <Compile Include="ScriptData\IScriptFile.cs" />
+    <None Include="LatestSyntax.tss" />
+    <None Include="packages.config" />
+    <None Include="Parser\CSharp4.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>TSharpCore.Parser</CustomToolNamespace>
+    </None>
+    <None Include="Parser\CSharp4Lexer.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>TSharpCore.Parser</CustomToolNamespace>
+    </None>
+    <None Include="Parser\Java.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>TSharpCore.Parser</CustomToolNamespace>
+    </None>
+    <Antlr4 Include="Parser\TSharp.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>StepBro.Core.Parser</CustomToolNamespace>
+      <Listener>True</Listener>
+      <Visitor>True</Visitor>
+      <TargetLanguage>CSharp</TargetLanguage>
+    </Antlr4>
+    <Compile Include="Attributes\ObsoleteIgnoredAttribute.cs" />
+    <Compile Include="Attributes\PersistedAsAttribute.cs" />
+    <Compile Include="Attributes\PersistedAttribute.cs" />
+    <Compile Include="Attributes\ReplacesAttribute.cs" />
+    <Compile Include="Data\StringExtensions.cs" />
+    <Compile Include="Data\TypeUtils.cs" />
+    <Compile Include="Data\Verdict.cs" />
+    <Compile Include="File\Exceptions.cs" />
+    <Compile Include="File\FileReference.cs" />
+    <Compile Include="File\XmlTextExtensions.cs" />
+    <Antlr4 Include="Parser\TSharpLexer.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>StepBro.Core.Parser</CustomToolNamespace>
+      <TargetLanguage>CSharp</TargetLanguage>
+      <Listener>False</Listener>
+      <Visitor>False</Visitor>
+    </Antlr4>
+    <None Include="Procedure\ExecutionResult.cs" />
+    <Compile Include="Execution\ICallContext.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\AltAndInterleave.tss" />
+    <None Include="Scripts\ConsoleTest.tss">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\MyProjectBase.tss">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\TestInterfaceTest.tss" />
+    <None Include="Scripts\TestProject.tss">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\TestFramework.tss">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\CAN Test.tss">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\TestSuite Execution.tss">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\Design TestSuite.tss" />
+    <None Include="Scripts\Design Tool Setup.tss" />
+    <None Include="TSharp Example.tss" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Keyword work.txt" />
+    <Content Include="TSharpDataFormat.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Controls\ParsingErrorListView.resx">
+      <DependentUpon>ParsingErrorListView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\SimpleLogView.resx">
+      <DependentUpon>SimpleLogView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TextEditor.resx">
+      <DependentUpon>TextEditor.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.props'))" />
+    <Error Condition="!Exists('packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.targets'))" />
+  </Target>
+  <Import Project="packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.targets" Condition="Exists('packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

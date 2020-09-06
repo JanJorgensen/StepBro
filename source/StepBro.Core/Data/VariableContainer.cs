@@ -1,0 +1,326 @@
+﻿using StepBro.Core.Logging;
+using System;
+
+namespace StepBro.Core.Data
+{
+    public interface IValueContainerOwnerAccess : IAvailability
+    {
+        IValueContainer Container { get; }
+        void SetUniqueID(int id);
+        void SetValue(object value, ILogger logger);
+        bool DataCreated { get; }
+        void SetAccessModifier(AccessModifier access);
+        VariableContainerAction DataResetter { get; set; }
+        VariableContainerAction DataCreator { get; set; }
+        VariableContainerAction DataInitializer { get; set; }
+        object Tag { get; set; }
+    }
+
+    public delegate bool VariableContainerAction(IValueContainerOwnerAccess container, ILogger logger);
+
+    public class VariableContainer<T> : AvailabilityBase, IValueContainer<T>, IValueContainerRich, IObjectContainer
+    {
+        #region Owner Access
+        private class OwnerAccessor : IValueContainerOwnerAccess
+        {
+            private VariableContainer<T> m_container;
+            private bool m_dataIsSet = false;
+
+            public event EventHandler Disposed;
+            public event EventHandler Disposing;
+
+            public OwnerAccessor(VariableContainer<T> container)
+            {
+                m_container = container;
+            }
+
+            public IValueContainer Container
+            {
+                get
+                {
+                    return m_container;
+                }
+            }
+
+            public void SetUniqueID(int id)
+            {
+                m_container.SetID(id);
+            }
+
+            public void SetValue(object value, ILogger logger = null)
+            {
+                m_container.SetValue(value, logger, true);
+                m_dataIsSet = true;
+            }
+
+            public bool DataCreated { get { return m_dataIsSet; } }
+
+            public void SetAccessModifier(AccessModifier access)
+            {
+                m_container.SetAccessModifier(access);
+            }
+
+            public VariableContainerAction DataResetter { get; set; } = null;
+            public VariableContainerAction DataCreator { get; set; } = null;
+            public VariableContainerAction DataInitializer { get; set; } = null;
+
+            public object Tag { get; set; } = null;
+
+            public bool IsStillValid => throw new NotImplementedException();
+
+            #region IDisposable Support
+            private bool disposedValue = false; // To detect redundant calls
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposedValue)
+                {
+                    if (disposing)
+                    {
+                        this.Disposing?.Invoke(this, EventArgs.Empty);
+                        m_container.Dispose();
+                        m_container = null;
+                    }
+                    // TODO: set large fields to null.
+
+                    this.Disposed?.Invoke(this, EventArgs.Empty);
+                    disposedValue = true;
+                }
+            }
+
+            // This code added to correctly implement the disposable pattern.
+            public void Dispose()
+            {
+                // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+                this.Dispose(true);
+            }
+            #endregion
+        }
+        #endregion
+
+        private readonly string m_namespace;
+        private readonly string m_name;
+        private T m_value;
+        private readonly bool m_readonly;
+        private AccessModifier m_access = AccessModifier.None;
+        private int m_valueChangeIndex = 0;
+        private readonly object m_sync = new object();
+        private int m_uniqueID;
+
+        public event EventHandler ValueChanged;
+        public event EventHandler ObjectReplaced;
+
+        public VariableContainer(string @namespace, string name, T value, bool readOnly)
+        {
+            m_namespace = @namespace;
+            m_name = name;
+            m_value = value;
+            m_readonly = readOnly;
+            m_uniqueID = VariableContainer.GetIdentifier();
+        }
+
+        public static IValueContainerOwnerAccess Create(string @namespace, string name, T value, bool readOnly)
+        {
+            var container = new VariableContainer<T>(@namespace, name, value, readOnly);
+            return new OwnerAccessor(container);
+        }
+
+        public string Name
+        {
+            get
+            {
+                return m_name;
+            }
+        }
+
+        public TypeReference DataType
+        {
+            get
+            {
+                return new TypeReference(typeof(T));
+            }
+        }
+
+        public bool IsReadonly { get { return m_readonly; } }
+
+        public AccessModifier AccessProtection { get { return m_access; } }
+
+        public int ValueChangeIndex
+        {
+            get
+            {
+                return m_valueChangeIndex;
+            }
+        }
+
+        public object Sync
+        {
+            get
+            {
+                return m_sync;
+            }
+        }
+
+        public int UniqueID
+        {
+            get
+            {
+                return m_uniqueID;
+            }
+        }
+
+        private void SetID(int id)
+        {
+            m_uniqueID = id;
+        }
+
+        private void SetAccessModifier(AccessModifier access)
+        {
+            m_access = access;
+        }
+
+        public string FullName
+        {
+            get
+            {
+                return String.IsNullOrEmpty(m_namespace) ? m_name : (m_namespace + "." + m_name);
+            }
+        }
+
+        public IdentifierType Type
+        {
+            get
+            {
+                return IdentifierType.VariableContainer;
+            }
+        }
+
+        public object Reference
+        {
+            get
+            {
+                return this;
+            }
+        }
+
+        object IObjectContainer.Object { get { return m_value; } }
+
+        public object GetValue(ILogger logger = null)
+        {
+            return m_value;
+        }
+
+        public void SetValue(object value, ILogger logger = null)
+        {
+            this.SetValue(value, logger, false);
+        }
+
+        internal void SetValue(object value, ILogger logger, bool force)
+        {
+            lock (m_sync)
+            {
+                if (!force && m_readonly)
+                {
+                    throw new NotSupportedException("Setting the variable is not allowed, because it is read-only.");
+                }
+                if (value == null)
+                {
+                    if (typeof(T).IsValueType)
+                    {
+                        throw new ArgumentException("The value is not a compatible type for the container.");
+                    }
+                }
+                else
+                {
+                    if (typeof(T).IsAssignableFrom(value.GetType()) == false)
+                    {
+                        throw new ArgumentException("The value is not a compatible type for the container.");
+                    }
+                }
+                this.SetValueDirect((T)value, logger);
+            }
+        }
+
+        internal void SetValueDirect(T value, ILogger logger = null)
+        {
+            if (typeof(T).IsPrimitive)
+            {
+                if (m_value != null && m_value.Equals(value)) return;
+            }
+            else
+            {
+                if (m_value == null)
+                {
+                    if (value == null) return;
+                }
+                else if (value == null || Object.ReferenceEquals(m_value, value))
+                {
+                    return;
+                }
+            }
+
+            m_value = value;
+            m_valueChangeIndex++;
+            this.ValueChanged?.Invoke(this, EventArgs.Empty);
+            this.ObjectReplaced?.Invoke(this, EventArgs.Empty);
+        }
+
+        public T GetTypedValue(ILogger logger = null)
+        {
+            return m_value;
+        }
+
+        public T Modify(ValueContainerModifier<T> modifier, ILogger logger = null)
+        {
+            lock (m_sync)
+            {
+                if (m_readonly)
+                {
+                    throw new NotSupportedException("Setting the variable is not allowed, because it is read-only.");
+                }
+                T vNew, vRet;
+                vRet = modifier(m_value, out vNew);
+                this.SetValueDirect(vNew);
+                return vRet;
+            }
+        }
+    }
+
+    public static class VariableContainer
+    {
+        private static int m_nextIdentifier = 100;
+        internal static int GetIdentifier()
+        {
+            return m_nextIdentifier++;
+        }
+
+        private static IValueContainerOwnerAccess CreateContainer(string @namespace, string name, TypeReference type, object defaultValue, bool readOnly)
+        {
+            if (type.Equals(typeof(bool))) return VariableContainer<Boolean>.Create(@namespace, name, (bool)defaultValue, readOnly);
+            else if (type.Equals(typeof(long))) return VariableContainer<Int64>.Create(@namespace, name, (long)defaultValue, readOnly);
+            else if (type.Equals(typeof(int))) return VariableContainer<Int32>.Create(@namespace, name, (int)defaultValue, readOnly);
+            else if (type.Equals(typeof(double))) return VariableContainer<Double>.Create(@namespace, name, (double)defaultValue, readOnly);
+            else if (type.Equals(typeof(string))) return VariableContainer<String>.Create(@namespace, name, (string)defaultValue, readOnly);
+            else if (type.Equals(typeof(DateTime))) return VariableContainer<DateTime>.Create(@namespace, name, (DateTime)defaultValue, readOnly);
+            else if (type.Equals(typeof(TimeSpan))) return VariableContainer<TimeSpan>.Create(@namespace, name, (TimeSpan)defaultValue, readOnly);
+            else
+            {
+                Type containertype = typeof(VariableContainer<>).MakeGenericType(type.Type);
+                var method = containertype.GetMethod("Create");
+                var result = method.Invoke(null, new object[] { @namespace, name, defaultValue, readOnly }) as IValueContainerOwnerAccess;
+                if (result == null) throw new NullReferenceException("Created Container");
+                return result;
+            }
+        }
+
+        public static IValueContainerOwnerAccess Create(string @namespace, string name, TypeReference type, bool readOnly)
+        {
+            object defaultValue = null;
+            if (type.Type.IsValueType)
+            {
+                defaultValue = Activator.CreateInstance(type.Type);
+            }
+            return CreateContainer(@namespace, name, type, defaultValue, readOnly);
+        }
+    }
+}

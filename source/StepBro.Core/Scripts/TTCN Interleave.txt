@@ -1,0 +1,77 @@
+interleave 
+{  
+	[] PCO1.receive(MySig1)   
+	{ 
+		PCO1.send(MySig2);    
+		PCO1.receive(MySig3);   
+	}  
+	[] PCO2.receive(MySig4)   
+	{ 
+		PCO2.send(MySig5);    
+		PCO2.send(MySig6);    
+		PCO2.receive(MySig7);   
+	}  
+}
+
+alt 
+{
+	[] PCO1.receive(MySig1)   
+	{
+		PCO1.send(MySig2);
+		alt 
+		{    
+			[] PCO1.receive(MySig3)     
+			{ 
+				PCO2.receive(MySig4);      
+				PCO2.send(MySig5);      
+				PCO2.send(MySig6);      
+				PCO2.receive(MySig7)     
+			}    
+			[] PCO2.receive(MySig4)     
+			{ 
+				PCO2.send(MySig5);      
+				PCO2.send(MySig6);      
+				alt 
+				{      
+					[] PCO1.receive(MySig3) 
+					{        
+						PCO2.receive(MySig7); 
+					}      
+					[] PCO2.receive(MySig7) 
+					{        
+						PCO1.receive(MySig3); 
+					}      
+				}     
+			}    
+		}
+	}
+	[] PCO2.receive(MySig4)   
+	{ 
+		PCO2.send(MySig5);    
+		PCO2.send(MySig6);    
+		alt 
+		{    
+			[] PCO1.receive(MySig1)     
+			{ 
+				PCO1.send(MySig2);      
+				alt 
+				{      
+					[] PCO1.receive(MySig3)       
+					{ 
+						PCO2.receive(MySig7);       
+					}      
+					[] PCO2.receive(MySig7)       
+					{ 
+						PCO1.receive(MySig3);       
+					}      
+				}     
+			}    
+			[] PCO2.receive(MySig7)
+			{ 
+				PCO1.receive(MySig1);      
+				PCO1.send(MySig2);      
+				PCO1.receive(MySig3);     
+			}    
+		}   
+	}  
+}

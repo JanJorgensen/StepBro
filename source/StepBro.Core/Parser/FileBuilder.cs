@@ -1,0 +1,760 @@
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Atn;
+using Antlr4.Runtime.Tree;
+using StepBro.Core.Api;
+using StepBro.Core.Data;
+using StepBro.Core.General;
+using StepBro.Core.Logging;
+using StepBro.Core.ScriptData;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using TSP = StepBro.Core.Parser.TSharp;
+
+namespace StepBro.Core.Parser
+{
+    public class FileBuilder
+    {
+        private readonly ErrorCollector m_errors;
+        private TSP m_parser = null;
+        private readonly StepBroListener m_listener = null;
+        private readonly ScriptFile m_file = null;
+
+        internal FileBuilder(AntlrInputStream code, IAddonManager addons = null, ScriptFile file = null)
+        {
+            m_file = file;
+            m_errors = new ErrorCollector(file, false);
+            var lexer = new TSharpLexer(code);
+            lexer.RemoveErrorListeners();
+            lexer.AddErrorListener(m_errors);
+            ITokenStream tokens = new CommonTokenStream(lexer);
+            m_parser = new TSP(tokens);
+            m_parser.RemoveErrorListeners();
+            m_parser.AddErrorListener(m_errors);
+#if DEBUG
+            m_parser.Interpreter.PredictionMode = PredictionMode.LlExactAmbigDetection;
+#endif
+            m_parser.BuildParseTree = true;
+            m_listener = new StepBroListener(m_errors, addons, file);
+        }
+
+        internal static FileBuilder Create(string content, Type typeUsing = null, Type[] typeNamespaces = null)
+        {
+            var addons = AddonManager.Create();
+            addons.AddAssembly(AddonManager.TSharpCoreAssembly, true);
+            addons.AddAssembly(typeof(System.Math).Assembly, false);
+            addons.AddAssembly(typeof(System.Linq.Enumerable).Assembly, false);
+
+            var file = new ScriptFile();
+            file.AddNamespaceUsing(addons.Lookup(null, "System"));
+            file.AddNamespaceUsing(addons.Lookup(null, "System.Linq"));
+            if (typeUsing != null)
+            {
+                addons.AddAssembly(typeUsing.Assembly, false);
+                file.AddNamespaceUsing(addons.Lookup(null, typeUsing.FullName));
+            }
+            if (typeNamespaces != null)
+            {
+                foreach (var u in typeNamespaces)
+                {
+                    addons.AddAssembly(u.Assembly, false);
+                    file.AddNamespaceUsing(addons.Lookup(null, u.Namespace));
+                }
+            }
+
+            return new FileBuilder(new AntlrInputStream(content), addons, file);
+        }
+
+        public IErrorCollector Errors { get { return m_errors; } }
+        public TSP Parser { get { return m_parser; } }
+        internal StepBroListener Listener { get { return m_listener; } }
+        internal ScriptFile File { get { return m_file; } }
+
+        internal static IEnumerable<string> GetTokens(string content)
+        {
+            var lexer = new TSharpLexer(new AntlrInputStream(content));
+            var tokens = lexer.GetAllTokens();
+            foreach (var t in tokens) yield return TSharpLexer.ruleNames[t.Type - 1];
+        }
+
+        internal static SBExpressionData ParseLiteral(string content)
+        {
+            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenStream tokens = new CommonTokenStream(lexer);
+            var parser = new TSP(tokens);
+            var errors = new ErrorCollector(null);
+            parser.AddErrorListener(errors);
+            parser.BuildParseTree = true;
+            StepBroListener listener = new StepBroListener(errors);
+            listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseLiteral");
+            var context = parser.literal();
+
+            var walker = new ParseTreeWalker();
+            walker.Walk(listener, context);
+
+            return listener.GetExpressionResult();
+        }
+
+        internal static TypeReference ParseType(string content)
+        {
+            var builder = FileBuilder.Create(content);
+            var context = builder.Parser.type();
+
+            var walker = new ParseTreeWalker();
+            walker.Walk(builder.Listener, context);
+
+            return builder.Listener.LastParsedType;
+        }
+
+        internal static FileBuilder ParseExpression(string content)
+        {
+            return ParseExpression((Type)null, null, content);
+        }
+
+        internal static FileBuilder ParseExpression(Type typeUsing, Type[] typeNamespaces, string content)
+        {
+            var builder = FileBuilder.Create(content, typeUsing, typeNamespaces);
+            builder.Listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseExpression");
+            var context = builder.Parser.expression();
+
+            var walker = new ParseTreeWalker();
+            walker.Walk(builder.Listener, context);
+
+            return builder;
+        }
+
+        internal static FileBuilder ParseParExpression(Type typeUsing, Type[] typeNamespaces, string content)
+        {
+            var builder = FileBuilder.Create(content, typeUsing, typeNamespaces);
+            builder.Listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseParExpression");
+            var context = builder.Parser.parExpression();
+
+            var walker = new ParseTreeWalker();
+            walker.Walk(builder.Listener, context);
+
+            return builder;
+        }
+
+        internal static FileBuilder ParseExpression(ScriptFile fileContext, IAddonManager addons, string expression)
+        {
+            var builder = new FileBuilder(new AntlrInputStream(expression), addons, fileContext);
+            builder.Listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseExpression");
+            var context = builder.Parser.parExpression();
+
+            var walker = new ParseTreeWalker();
+            walker.Walk(builder.Listener, context);
+
+            return builder;
+        }
+
+        internal static Tuple<Stack<SBExpressionData>, IErrorCollector> ParseSimpleArguments(string expression)
+        {
+            var addons = AddonManager.Create();
+            addons.AddAssembly(AddonManager.TSharpCoreAssembly, true);
+            addons.AddAssembly(typeof(System.Math).Assembly, false);
+            addons.AddAssembly(typeof(System.Linq.Enumerable).Assembly, false);
+            //if (module != null) addons.AddAssembly(module, false);
+
+            var file = new ScriptFile();
+            file.AddNamespaceUsing(addons.Lookup(null, "System"));
+            file.AddNamespaceUsing(addons.Lookup(null, "System.Linq"));
+            //foreach (var u in usings)
+            //{
+            //    file.AddNamespaceUsing(addons.Lookup(null, u.FullName));
+            //}
+
+            var builder = new FileBuilder(new AntlrInputStream(expression), addons, file);
+            builder.Listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseExpression");
+            var context = builder.Parser.arguments();
+
+            var walker = new ParseTreeWalker();
+            walker.Walk(builder.Listener, context);
+
+            return new Tuple<Stack<SBExpressionData>, IErrorCollector>(builder.Listener.GetArguments(), builder.Errors);
+        }
+
+        internal static SBExpressionData ParsePrimary(string content, ScriptFile file = null)
+        {
+            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenStream tokens = new CommonTokenStream(lexer);
+            var parser = new TSP(tokens);
+            ErrorCollector errors = (file != null) ? file.Errors as ErrorCollector : new ErrorCollector(null, false);
+            parser.AddErrorListener(errors);
+            parser.BuildParseTree = true;
+            StepBroListener listener = new StepBroListener(errors, null, file ?? new ScriptFile());
+            listener.PrepareForExpressionParsing("TSharpFileBuilder.ParsePrimary");
+            var context = parser.primary();
+
+            ParseTreeWalker walker = new ParseTreeWalker();
+            walker.Walk(listener, context);
+
+            if (errors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
+
+            return listener.GetExpressionResult();
+        }
+
+        internal static Data.PropertyBlock ParsePropertyBlock(string content)
+        {
+            ErrorCollector errors = new ErrorCollector(null);
+            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenStream tokens = new CommonTokenStream(lexer);
+            var parser = new TSP(tokens);
+            parser.AddErrorListener(errors);
+            parser.BuildParseTree = true;
+            StepBroListener listener = new StepBroListener(errors);
+            var context = parser.elementPropertyblock();
+
+            ParseTreeWalker walker = new ParseTreeWalker();
+            walker.Walk(listener, context);
+
+            if (errors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
+
+            return listener.PopPropertyBlockData();
+        }
+
+        internal static IDatatable ParseDatatable(string content)
+        {
+            ErrorCollector errors = new ErrorCollector(null);
+            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenStream tokens = new CommonTokenStream(lexer);
+            var parser = new TSP(tokens);
+            parser.AddErrorListener(errors);
+            parser.BuildParseTree = true;
+            StepBroListener listener = new StepBroListener(errors);
+            var context = parser.datatableOnly();
+
+            ParseTreeWalker walker = new ParseTreeWalker();
+            walker.Walk(listener, context);
+
+            if (errors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
+
+            return listener.GetLastDatatable();
+        }
+
+        internal static List<Tuple<string, TypeReference, object>> ParseDatatableRow(string content)
+        {
+            ErrorCollector errors = new ErrorCollector(null);
+            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenStream tokens = new CommonTokenStream(lexer);
+            var parser = new TSP(tokens);
+            parser.AddErrorListener(errors);
+            parser.BuildParseTree = true;
+            StepBroListener listener = new StepBroListener(errors);
+            var context = parser.datatableRow();
+
+            ParseTreeWalker walker = new ParseTreeWalker();
+            walker.Walk(listener, context);
+
+            if (errors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
+
+            return listener.GetLastDatatableRow();
+        }
+
+        internal static void ParseKeywordProcedureCall(string content)
+        {
+            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenStream tokens = new CommonTokenStream(lexer);
+            var parser = new TSP(tokens);
+            var errors = new ErrorCollector(null);
+            parser.AddErrorListener(errors);
+            parser.BuildParseTree = true;
+            var listener = new StepBroListener(errors);
+            //listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseFunction");
+            var context = parser.keywordProcedureCall();
+
+            var walker = new ParseTreeWalker();
+            walker.Walk(listener, context);
+
+            if (errors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
+        }
+
+        internal static IValueContainer<T> ParseFileVariable<T>(Type typeUsing, Type[] typeNamespaces, string content)
+        {
+            var builder = FileBuilder.Create(content, typeUsing, typeNamespaces);
+            builder.Listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseExpression");
+            var context = builder.Parser.fileVariable();
+
+            var walker = new ParseTreeWalker();
+            walker.Walk(builder.Listener, context);
+
+            if (builder.Errors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
+
+            return builder.File.ListFileVariables().FirstOrDefault() as IValueContainer<T>;
+        }
+
+        internal static IFileProcedure ParseProcedure(params string[] content)
+        {
+            return ParseProcedure(null, new string[] { }, null, content).Listener.LastParsedProcedure;
+        }
+
+        internal static IFileProcedure ParseProcedure(Type usingType, params string[] content)
+        {
+            return ParseProcedure(null, new string[] { }, usingType, content).Listener.LastParsedProcedure;
+        }
+
+        internal static FileBuilder ParseProcedure(
+            IAddonManager addonManager,
+            string[] usings,
+            Type usingType,
+            params string[] content)
+        {
+            if (addonManager == null)
+            {
+                addonManager = AddonManager.Create();
+                addonManager.AddAssembly(typeof(Math).Assembly, false);
+                addonManager.AddAssembly(typeof(Enumerable).Assembly, false);
+            }
+            addonManager.AddAssembly(AddonManager.TSharpCoreAssembly, true);   // Add TSharp always.
+            if (usingType != null)
+            {
+                addonManager.AddAssembly(usingType.Assembly, false);
+            }
+
+            var contentBuilder = new StringBuilder();
+            foreach (var s in content) contentBuilder.AppendLine(s);
+            var file = new ScriptFile();
+            file.AddNamespaceUsing(addonManager.Lookup(null, "System"));
+            file.AddNamespaceUsing(addonManager.Lookup(null, "System.Linq"));
+            if (usings != null)
+            {
+                foreach (var u in usings)
+                {
+                    file.AddNamespaceUsing(addonManager.Lookup(null, u));
+                }
+            }
+
+
+            var builder = new FileBuilder(new AntlrInputStream(contentBuilder.ToString()), addonManager, file);
+            builder.Listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseExpression");
+
+            var context = builder.Parser.procedureDeclaration();
+
+            var walker = new ParseTreeWalker();
+            walker.Walk(builder.Listener, context);
+
+            if (file.Errors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
+
+            return builder;
+        }
+
+        internal static StepBroTypeScanListener.FileContent TypeScanFile(string content)
+        {
+            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenStream tokens = new CommonTokenStream(lexer);
+            var parser = new TSP(tokens);
+            var errors = new ErrorCollector(null);
+            parser.AddErrorListener(errors);
+            parser.BuildParseTree = true;
+            var listener = new StepBroTypeScanListener("Angus");     // Some random default namespace
+            var context = parser.compilationUnit();
+
+            var walker = new ParseTreeWalker();
+            walker.Walk(listener, context);
+
+            if (errors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
+
+            return listener.GetContent();
+        }
+
+        internal static ScriptFile ParseFile(IAddonManager addonManager, string content)
+        {
+            if (addonManager == null)
+            {
+                addonManager = AddonManager.Create();
+                addonManager.AddAssembly(typeof(Math).Assembly, false);
+                addonManager.AddAssembly(typeof(Enumerable).Assembly, false);
+            }
+            addonManager.AddAssembly(AddonManager.TSharpCoreAssembly, true);   // Add TSharp always.
+            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenStream tokens = new CommonTokenStream(lexer);
+            var parser = new TSP(tokens);
+            var file = new ScriptFile();
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(file.Errors as ErrorCollector);
+            parser.BuildParseTree = true;
+            var listener = new StepBroListener(file.Errors as ErrorCollector, addonManager, file);
+            var context = parser.compilationUnit();
+
+            var walker = new ParseTreeWalker();
+            walker.Walk(listener, context);
+
+            if (file.Errors.ErrorCount > 0) throw new Exception("PARSING ERRORS: " + file.Errors[0].ToString());
+
+            //file?.InitializeFileVariables();
+            return file;
+        }
+
+        internal static ScriptFile[] ParseFiles(ILogger logger, params Tuple<string, string>[] files)
+        {
+            return ParseFiles(logger, (Assembly)null, files);
+        }
+
+        internal static ScriptFile[] ParseFiles(ILogger logger, Assembly testAssembly, params Tuple<string, string>[] files)
+        {
+            var fileObjects = new List<ScriptFile>();
+            bool first = true;
+            foreach (var file in files)
+            {
+                var fileObject = new ScriptFile(file.Item1, new AntlrInputStream(file.Item2));
+                if (!first) fileObject.WasLoadedByNamespace = true; // All but the first file should have the WasLoadedByNamespace prop set.
+                fileObjects.Add(fileObject);
+                first = false;
+            }
+            return ParseFiles(logger, testAssembly, fileObjects.ToArray());
+        }
+
+        internal static ScriptFile[] ParseFiles(ServiceManager services, ILogger logger, params Tuple<string, string>[] files)
+        {
+            var fileObjects = new List<ScriptFile>();
+            bool first = true;
+            foreach (var file in files)
+            {
+                var fileObject = new ScriptFile(file.Item1, new AntlrInputStream(file.Item2));
+                //fileObject.AddNamespaceUsing(services.Get<IAddonManager>().Lookup(null, typeof(Execution.ScriptUtils).FullName));
+                if (!first) fileObject.WasLoadedByNamespace = true; // All but the first file should have the WasLoadedByNamespace prop set.
+                fileObjects.Add(fileObject);
+                first = false;
+                services.Get<ILoadedFilesManager>().RegisterLoadedFile(fileObject);
+            }
+            ParseFiles(services, logger, fileObjects[0]);
+            return fileObjects.ToArray();
+        }
+
+        internal static ScriptFile[] ParseFiles(ILogger logger, Assembly testAssembly, params ScriptFile[] files)
+        {
+            ServiceManager.IServiceManagerAdministration services = ServiceManager.Create();
+
+            IService service;
+            var addonManager = new AddonManager(null, out service);
+            services.Manager.Register(service);
+            var objectManager = new DynamicObjectManager(out service);
+            services.Manager.Register(service);
+            var loadedFiles = new LoadedFilesManager(out service);
+            services.Manager.Register(service);
+            var mainLogger = new MainLogger(out service);
+            services.Manager.Register(service);
+
+            TaskContextDummy taskContext = new TaskContextDummy();
+            services.StartServices(taskContext);
+
+            addonManager.AddAssembly(typeof(Math).Assembly, false);
+            addonManager.AddAssembly(typeof(Enumerable).Assembly, false);
+            addonManager.AddAssembly(AddonManager.TSharpCoreAssembly, true);
+
+            if (testAssembly != null) addonManager.AddAssembly(testAssembly, false);
+
+            foreach (var f in files)
+            {
+                loadedFiles.RegisterLoadedFile(f);
+            }
+
+            ParseFiles(services.Manager, logger, files[0]);
+            return loadedFiles.ListFiles<ScriptFile>().ToArray();
+        }
+
+        internal static int ParseFiles(ServiceManager services, ILogger logger, ScriptFile topfile = null)
+        {
+            var addons = services.Get<IAddonManager>();
+            var filesManager = services.Get<ILoadedFilesManager>();
+
+            var filesToParse = new List<ScriptFile>();
+            if (topfile != null)
+            {
+                filesToParse.Add(topfile);
+            }
+            else
+            {
+                filesToParse = filesManager.ListFiles<ScriptFile>().Reverse().ToList();
+            }
+            var fileListeners = new Dictionary<ScriptFile, StepBroListener>();
+            var fileContexts = new Dictionary<ScriptFile, TSP.CompilationUnitContext>();
+            var namespaceFiles = new Dictionary<string, IdentifierInfo>();
+
+            //==============================================================//
+            #region STEP 1: PRE-SCAN ALL FILES TO OPEN ALL DEPENDENCY FILES //
+            //==============================================================//
+            var fileParsingStack = new Queue<ScriptFile>(filesToParse);
+            while (fileParsingStack.Count > 0)
+            {
+                var file = fileParsingStack.Dequeue();
+                file.MarkForTypeScanning();
+                ITokenSource lexer = new TSharpLexer(file.GetParserFileStream());
+                ITokenStream tokens = new CommonTokenStream(lexer);
+                var parser = new TSP(tokens);
+                parser.RemoveErrorListeners();
+                (file.Errors as ErrorCollector).Clear();
+                parser.AddErrorListener(file.Errors as ErrorCollector);
+                parser.BuildParseTree = true;
+                var context = parser.compilationUnit();
+                fileContexts.Add(file, context);
+
+                if (String.IsNullOrEmpty(file.Namespace))
+                {
+                    file.SetNamespace(System.IO.Path.GetFileNameWithoutExtension(file.FileName));
+                }
+
+                var visitor = new TSharpTypeVisitor();
+                visitor.Visit(context);
+
+                var scanListener = new StepBroTypeScanListener(file.Namespace);
+                var walker = new ParseTreeWalker();
+                walker.Walk(scanListener, context);
+
+                if (file.Errors.ErrorCount > 0) continue;   // Stop parsing this file
+
+                var parserListener = new StepBroListener(file.Errors as ErrorCollector, addons, file);
+                fileListeners.Add(file, parserListener);
+                var fileScanData = scanListener.GetContent();
+                file.PreScanFileContent = fileScanData;
+
+                System.Diagnostics.Debug.Assert(!String.IsNullOrEmpty(fileScanData.TopElement.Name));
+                file.SetNamespace(fileScanData.TopElement.Name);    // Update the namespace from the scanning.
+
+                foreach (var @using in fileScanData.ListUsings())
+                {
+                    string type = @using.Item1;
+                    string name = @using.Item2;
+                    if (type == "i" || type == "I")
+                    {
+                        if (!file.AddNamespaceUsing(name))
+                        {
+                            throw new Exception($"Namespace using already added ({name}).");
+                        }
+                    }
+                    else if (type == "p" || type == "P")
+                    {
+                        if (!file.AddFileUsing(name))
+                        {
+                            throw new Exception($"File using already added ({name}).");
+                        }
+                    }
+                    else throw new Exception($"Unhandled using type: {type}");
+                }
+
+                file.ResolveFileUsings(
+                    fu =>
+                    {
+                        // Check the already parsed or loaded files first.
+                        foreach (var f in filesToParse)
+                        {
+                            if (!Object.ReferenceEquals(file, f) && String.Equals(fu, f.FileName, StringComparison.InvariantCulture))
+                            {
+                                return f;
+                            }
+                        }
+                        foreach (var f in filesManager.ListFiles<ScriptFile>())
+                        {
+                            if (!Object.ReferenceEquals(file, f) && String.Equals(fu, f.FileName, StringComparison.InvariantCulture))
+                            {
+                                fileParsingStack.Enqueue(f);
+                                filesToParse.Insert(0, f);      // Put in front
+                                return f;
+                            }
+                        }
+                        // File was not found among the already loaded files. Try loading the file.
+                        return null;
+                    }
+                );
+                file.ResolveNamespaceUsings(
+                    id =>
+                    {
+                        var foundIdentifier = addons.Lookup(null, id);
+                        if (foundIdentifier != null)
+                        {
+                            return foundIdentifier;
+                        }
+                        var scriptFilesInNamespace = new List<ScriptFile>();
+                        foreach (var f in filesToParse)
+                        {
+                            if (f.Namespace.Equals(id, StringComparison.InvariantCulture))
+                            {
+                                if (foundIdentifier == null)
+                                {
+                                    foundIdentifier = new IdentifierInfo(id, id, IdentifierType.FileNamespace, null, scriptFilesInNamespace);
+                                }
+                                scriptFilesInNamespace.Add(f);  // More files can have same namespace.
+                            }
+                        }
+                        if (foundIdentifier != null)
+                        {
+                            return foundIdentifier;
+                        }
+                        foreach (var f in filesManager.ListFiles<ScriptFile>())
+                        {
+                            if (f.Namespace.Equals(id, StringComparison.InvariantCulture))
+                            {
+                                if (foundIdentifier == null)
+                                {
+                                    foundIdentifier = new IdentifierInfo(id, id, IdentifierType.FileNamespace, null, scriptFilesInNamespace);
+                                }
+                                scriptFilesInNamespace.Add(f);  // More files can have same namespace.
+                                fileParsingStack.Enqueue(f);
+                                filesToParse.Insert(0, f);      // Put in front
+                            }
+                        }
+
+                        return foundIdentifier;     // Is null if not found
+                    }
+                );
+
+            }
+            #endregion
+
+            //===================================================//
+            #region STEP 2: COLLECT ALL THE PROCEDURE SIGNATURES //
+            //===================================================//
+            // TODO: Sort files after dependencies (usings)
+            foreach (var file in filesToParse)
+            {
+                var fileScanData = file.PreScanFileContent;
+                if (fileScanData != null)
+                {
+                    foreach (var element in fileScanData.TopElement.Childs)
+                    {
+                        switch (element.Type)
+                        {
+                            case FileElementType.Using:
+                                break;
+                            case FileElementType.Namespace:
+                                file.SetNamespace(element.Name);
+                                throw new Exception();
+                            //break;
+                            case FileElementType.EnumDeclaration:
+                                break;
+                            case FileElementType.ProcedureDeclaration:
+                                {
+                                    var procedure = new FileProcedure(file, element.Line, null, file.Namespace, element.Name)
+                                    {
+                                        IsFunction = element.IsFunction,
+                                        HasBody = element.HasBody
+                                    };
+                                    file.AddProcedure(procedure);
+                                    procedure.CheckForPrototypeChange(element.Parameters, element.ReturnTypeData);
+                                }
+                                break;
+                            case FileElementType.FileVariable:
+                                break;
+                            case FileElementType.TestList:
+                                {
+                                    var testlist = new FileTestList(file, element.Line, null, file.Namespace, element.Name);
+                                    file.AddTestList(testlist);
+                                }
+                                break;
+                            case FileElementType.Datatable:
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    file.LastTypeScan = DateTime.Now;
+                }
+            }
+            #endregion
+
+            //=================================================//
+            #region STEP 3: PARSE ALL THE PROCEDURE SIGNATURES //
+            //=================================================//
+            var signaturesToParseNow = new List<Tuple<FileElement, StepBroListener>>();
+            // Collect file elements to parse from _all_ files
+            foreach (var file in filesToParse)
+            {
+                StepBroListener listener;
+                if (fileListeners.TryGetValue(file, out listener))
+                {
+                    signaturesToParseNow.AddRange(
+                        file.ListElements().Cast<FileElement>().Select(e => new Tuple<FileElement, StepBroListener>(e, listener)));
+                }
+            }
+            var numberToParse = signaturesToParseNow.Count;
+            var numberParsedLast = int.MaxValue;
+            var signaturesToParseAgain = new List<Tuple<FileElement, StepBroListener>>();
+            // Continue parsing signatures until no more elements can be resolved
+            while (numberToParse > 0 && numberToParse < numberParsedLast)
+            {
+                foreach (var d in signaturesToParseNow)
+                {
+                    if (d.Item1.ParseSignature(d.Item2, false) > 0)
+                    {
+                        signaturesToParseAgain.Add(d);
+                    }
+                }
+                numberParsedLast = signaturesToParseNow.Count;
+                signaturesToParseNow = signaturesToParseAgain;
+                numberToParse = signaturesToParseNow.Count;
+                signaturesToParseAgain = new List<Tuple<FileElement, StepBroListener>>();
+            }
+
+            if (numberToParse > 0)
+            {
+                foreach (var d in signaturesToParseNow)
+                {
+                    d.Item1.ParseSignature(d.Item2, true);  // Parse again and report the errors
+                }
+                throw new Exception("Not all signatures could be parsed.");     // TBD
+            }
+            #endregion
+
+            //=================================//
+            #region STEP 4: PARSE ALL THE FILES #
+            //=================================//
+            int totalErrors = 0;
+            foreach (var file in filesToParse)
+            {
+                StepBroListener listener;
+                if (fileListeners.TryGetValue(file, out listener))
+                {
+                    var context = fileContexts[file];
+
+                    try
+                    {
+                        var walker = new ParseTreeWalker();
+                        walker.Walk(listener, context);
+                    }
+                    finally { }
+                }
+                totalErrors += file.Errors.ErrorCount;
+                if (file.Errors.ErrorCount == 0)
+                {
+                    file.InitializeFileVariables(logger);
+                    file.LastParsing = DateTime.Now;
+                }
+                file.DisposeFileStream();
+            }
+            #endregion
+
+            return totalErrors;
+        }
+
+        //public static void ParseKeywordTest()
+        //{
+        //    string input = "a4.Send.Mogens( 12 );";
+        //    AntlrInputStream stream = new AntlrInputStream(input);
+        //    ITokenSource lexer = new KeywordTestLexer(stream);
+        //    ITokenStream tokens = new CommonTokenStream(lexer);
+        //    KeywordTestParser parser = new KeywordTestParser(tokens);
+        //    parser.BuildParseTree = true;
+        //    KeywordTestListener listener = new KeywordTestListener();
+        //    var context = parser.procedureUnit();
+
+        //    ParseTreeWalker walker = new ParseTreeWalker();
+        //    walker.Walk(listener, context);
+        //}
+
+        public class Account
+        {
+            public string Email { get; set; }
+            public bool Active { get; set; }
+            public DateTime CreatedDate { get; set; }
+            public IList<string> Roles { get; set; }
+        }
+
+        public static void Test()
+        {
+            var resolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
+
+            var contract = resolver.ResolveContract(typeof(Account));
+        }
+    }
+}

@@ -1,0 +1,4 @@
+void MyProc() 
+{ 
+	a4.b9.Send 15 telegrammer til \"Alfred\" ( 12 );
+}

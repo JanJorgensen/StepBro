@@ -1,0 +1,23 @@
+﻿EXAMPLES
+
+Send Telegram2 after 2s ();
+Send Telegram2 when receiving Telegram1 (timeout = 2s);
+Send update request if Telegram1 was received ();
+Send message when 5 messages received () { message : {type : Reset, level : 4} }
+
+
+DECODE SPECIFICATION
+
+There must be some framework for specifying and parsing the keyword phrase.
+This is also necessary when editor should help with intellisense-like features.
+
+
+
+Send
+	<identifier>
+		after <time>
+		when receiving <identifier>
+	update request
+		if <identifier> was received 
+	message
+		when <number> messages received
