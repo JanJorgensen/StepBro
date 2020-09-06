@@ -7,13 +7,13 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace StepBro.Workbench
 {
-    public partial class TSharpScriptDocView : TextEditorDockContent
+    public partial class StepBroScriptDocView : TextEditorDockContent
     {
-        public TSharpScriptDocView() : this(new object())
+        public StepBroScriptDocView() : this(new object())
         {
         }
 
-        public TSharpScriptDocView(object scriptOwner) : base(scriptOwner)
+        public StepBroScriptDocView(object scriptOwner) : base(scriptOwner)
         {
             this.InitializeComponent();
             this.AutoScaleMode = AutoScaleMode.Dpi;
@@ -44,7 +44,7 @@ namespace StepBro.Workbench
             menuItemCheckTest.Checked = !menuItemCheckTest.Checked;
         }
 
-        private void TSharpScriptDocView_FormClosed(object sender, FormClosedEventArgs e)
+        private void StepBroScriptDocView_FormClosed(object sender, FormClosedEventArgs e)
         {
         }
 

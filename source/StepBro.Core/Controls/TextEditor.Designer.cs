@@ -70,12 +70,12 @@
             this.fastColoredTextBox.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.fastColoredTextBox_TextChanged);
             this.fastColoredTextBox.TextChangedDelayed += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.fastColoredTextBox_TextChangedDelayed);
             // 
-            // TSharpScriptFileEditor
+            // TextEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.fastColoredTextBox);
-            this.Name = "TSharpScriptFileEditor";
+            this.Name = "TextFileEditor";
             ((System.ComponentModel.ISupportInitialize)(this.fastColoredTextBox)).EndInit();
             this.ResumeLayout(false);
 

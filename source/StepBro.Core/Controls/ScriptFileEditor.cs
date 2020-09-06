@@ -171,7 +171,7 @@ namespace StepBro.Core.Controls
 
         protected override IEditorSupport CreateSyntaxHighlighter()
         {
-            return new TSharpEditorSupport(this);
+            return new StepBroEditorSupport(this);
         }
     }
 }

@@ -76,7 +76,7 @@ namespace StepBro.Core.Api
             }
         }
 
-        public static Assembly TSharpCoreAssembly
+        public static Assembly StepBroCoreAssembly
         {
             get { return typeof(AddonManager).Assembly; }
         }

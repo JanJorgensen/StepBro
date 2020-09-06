@@ -9,7 +9,7 @@ using StepBro.Core.Logging;
 
 namespace StepBroCoreTest.Utils
 {
-    public class LogInspector : TSharp.Utils.SequenceInspector<string>
+    public class LogInspector : StepBro.Utils.SequenceInspector<string>
     {
         public LogInspector(LoggerRoot logger, bool dump = false) :
             base(ListEntries(logger.GetOldestEntry()).Select(LogEntryToString))

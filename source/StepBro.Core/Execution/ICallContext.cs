@@ -10,7 +10,7 @@ using StepBro.Core.Tasks;
 namespace StepBro.Core.Execution
 {
     /// <summary>
-    /// Context interface to allow code module methods to access functionality from the script execution and the TSharp system.
+    /// Context interface to allow code module methods to access functionality from the script execution and the StepBro system.
     /// </summary>
     public interface ICallContext : IDisposable
     {
@@ -64,7 +64,7 @@ namespace StepBro.Core.Execution
         /// <summary>
         /// Indicates user wish to break debugging inside the called code module method.
         /// </summary>
-        /// <remarks>To use this flag, the user must attach a dot net debugger to the TSharp host application.</remarks>
+        /// <remarks>To use this flag, the user must attach a dot net debugger to the StepBro host application.</remarks>
         bool DebugBreakIsSet { get; }
 
         TaskManager TaskManager { get; }

@@ -57,7 +57,7 @@ namespace StepBroCoreTest.Execution
                 var log = new LogInspector(ServiceManager.Global.Get<IMainLogger>().Logger);
                 log.DebugDump();
 
-                log.ExpectNext("0 - Pre - TSharp - Main logger created");
+                log.ExpectNext("0 - Pre - StepBro - Main logger created");
                 log.ExpectNext("1 - Normal - MainLogger - Service started");
                 log.ExpectNext("1 - Pre - Script Execution - Main");
                 log.ExpectNext("1 - Pre - myfile.Main - <arguments>");

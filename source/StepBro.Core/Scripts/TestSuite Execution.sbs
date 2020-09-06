@@ -1,6 +1,6 @@
 using TestFramework;
 
-namespace TestTSharp;
+namespace TestStepBro;
 
 
 procedure TestFloats1() :: TestCaseBase

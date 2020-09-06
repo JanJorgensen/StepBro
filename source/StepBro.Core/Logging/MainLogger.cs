@@ -19,7 +19,7 @@ namespace StepBro.Core.Logging
 
         public MainLogger(out IService serviceAccess) : base("MainLogger", out serviceAccess)
         {
-            m_root = new LoggerRoot("", false, "TSharp", "Main logger created");
+            m_root = new LoggerRoot("", false, "StepBro", "Main logger created");
         }
 
         protected override void Start(ServiceManager manager, ITaskContext context)

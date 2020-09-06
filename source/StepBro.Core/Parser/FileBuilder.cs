@@ -43,7 +43,7 @@ namespace StepBro.Core.Parser
         internal static FileBuilder Create(string content, Type typeUsing = null, Type[] typeNamespaces = null)
         {
             var addons = AddonManager.Create();
-            addons.AddAssembly(AddonManager.TSharpCoreAssembly, true);
+            addons.AddAssembly(AddonManager.StepBroCoreAssembly, true);
             addons.AddAssembly(typeof(System.Math).Assembly, false);
             addons.AddAssembly(typeof(System.Linq.Enumerable).Assembly, false);
 
@@ -88,7 +88,7 @@ namespace StepBro.Core.Parser
             parser.AddErrorListener(errors);
             parser.BuildParseTree = true;
             StepBroListener listener = new StepBroListener(errors);
-            listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseLiteral");
+            listener.PrepareForExpressionParsing("StepBroFileBuilder.ParseLiteral");
             var context = parser.literal();
 
             var walker = new ParseTreeWalker();
@@ -116,7 +116,7 @@ namespace StepBro.Core.Parser
         internal static FileBuilder ParseExpression(Type typeUsing, Type[] typeNamespaces, string content)
         {
             var builder = FileBuilder.Create(content, typeUsing, typeNamespaces);
-            builder.Listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseExpression");
+            builder.Listener.PrepareForExpressionParsing("StepBroFileBuilder.ParseExpression");
             var context = builder.Parser.expression();
 
             var walker = new ParseTreeWalker();
@@ -128,7 +128,7 @@ namespace StepBro.Core.Parser
         internal static FileBuilder ParseParExpression(Type typeUsing, Type[] typeNamespaces, string content)
         {
             var builder = FileBuilder.Create(content, typeUsing, typeNamespaces);
-            builder.Listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseParExpression");
+            builder.Listener.PrepareForExpressionParsing("StepBroFileBuilder.ParseParExpression");
             var context = builder.Parser.parExpression();
 
             var walker = new ParseTreeWalker();
@@ -140,7 +140,7 @@ namespace StepBro.Core.Parser
         internal static FileBuilder ParseExpression(ScriptFile fileContext, IAddonManager addons, string expression)
         {
             var builder = new FileBuilder(new AntlrInputStream(expression), addons, fileContext);
-            builder.Listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseExpression");
+            builder.Listener.PrepareForExpressionParsing("StepBroFileBuilder.ParseExpression");
             var context = builder.Parser.parExpression();
 
             var walker = new ParseTreeWalker();
@@ -152,7 +152,7 @@ namespace StepBro.Core.Parser
         internal static Tuple<Stack<SBExpressionData>, IErrorCollector> ParseSimpleArguments(string expression)
         {
             var addons = AddonManager.Create();
-            addons.AddAssembly(AddonManager.TSharpCoreAssembly, true);
+            addons.AddAssembly(AddonManager.StepBroCoreAssembly, true);
             addons.AddAssembly(typeof(System.Math).Assembly, false);
             addons.AddAssembly(typeof(System.Linq.Enumerable).Assembly, false);
             //if (module != null) addons.AddAssembly(module, false);
@@ -166,7 +166,7 @@ namespace StepBro.Core.Parser
             //}
 
             var builder = new FileBuilder(new AntlrInputStream(expression), addons, file);
-            builder.Listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseExpression");
+            builder.Listener.PrepareForExpressionParsing("StepBroFileBuilder.ParseExpression");
             var context = builder.Parser.arguments();
 
             var walker = new ParseTreeWalker();
@@ -184,7 +184,7 @@ namespace StepBro.Core.Parser
             parser.AddErrorListener(errors);
             parser.BuildParseTree = true;
             StepBroListener listener = new StepBroListener(errors, null, file ?? new ScriptFile());
-            listener.PrepareForExpressionParsing("TSharpFileBuilder.ParsePrimary");
+            listener.PrepareForExpressionParsing("StepBroFileBuilder.ParsePrimary");
             var context = parser.primary();
 
             ParseTreeWalker walker = new ParseTreeWalker();
@@ -261,7 +261,7 @@ namespace StepBro.Core.Parser
             parser.AddErrorListener(errors);
             parser.BuildParseTree = true;
             var listener = new StepBroListener(errors);
-            //listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseFunction");
+            //listener.PrepareForExpressionParsing("StepBroFileBuilder.ParseFunction");
             var context = parser.keywordProcedureCall();
 
             var walker = new ParseTreeWalker();
@@ -273,7 +273,7 @@ namespace StepBro.Core.Parser
         internal static IValueContainer<T> ParseFileVariable<T>(Type typeUsing, Type[] typeNamespaces, string content)
         {
             var builder = FileBuilder.Create(content, typeUsing, typeNamespaces);
-            builder.Listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseExpression");
+            builder.Listener.PrepareForExpressionParsing("StepBroFileBuilder.ParseExpression");
             var context = builder.Parser.fileVariable();
 
             var walker = new ParseTreeWalker();
@@ -306,7 +306,7 @@ namespace StepBro.Core.Parser
                 addonManager.AddAssembly(typeof(Math).Assembly, false);
                 addonManager.AddAssembly(typeof(Enumerable).Assembly, false);
             }
-            addonManager.AddAssembly(AddonManager.TSharpCoreAssembly, true);   // Add TSharp always.
+            addonManager.AddAssembly(AddonManager.StepBroCoreAssembly, true);   // Add StepBro.Core always.
             if (usingType != null)
             {
                 addonManager.AddAssembly(usingType.Assembly, false);
@@ -327,7 +327,7 @@ namespace StepBro.Core.Parser
 
 
             var builder = new FileBuilder(new AntlrInputStream(contentBuilder.ToString()), addonManager, file);
-            builder.Listener.PrepareForExpressionParsing("TSharpFileBuilder.ParseExpression");
+            builder.Listener.PrepareForExpressionParsing("StepBroFileBuilder.ParseExpression");
 
             var context = builder.Parser.procedureDeclaration();
 
@@ -366,7 +366,7 @@ namespace StepBro.Core.Parser
                 addonManager.AddAssembly(typeof(Math).Assembly, false);
                 addonManager.AddAssembly(typeof(Enumerable).Assembly, false);
             }
-            addonManager.AddAssembly(AddonManager.TSharpCoreAssembly, true);   // Add TSharp always.
+            addonManager.AddAssembly(AddonManager.StepBroCoreAssembly, true);   // Add StepBro.Core always.
             ITokenSource lexer = new Grammar.StepBroLexer(new AntlrInputStream(content));
             ITokenStream tokens = new CommonTokenStream(lexer);
             var parser = new SBP(tokens);
@@ -441,7 +441,7 @@ namespace StepBro.Core.Parser
 
             addonManager.AddAssembly(typeof(Math).Assembly, false);
             addonManager.AddAssembly(typeof(Enumerable).Assembly, false);
-            addonManager.AddAssembly(AddonManager.TSharpCoreAssembly, true);
+            addonManager.AddAssembly(AddonManager.StepBroCoreAssembly, true);
 
             if (testAssembly != null) addonManager.AddAssembly(testAssembly, false);
 

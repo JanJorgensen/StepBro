@@ -11,7 +11,7 @@ namespace StepBro.Cmd
     internal class CommandLineOptions : StepBro.Core.General.CoreCommandlineOptions
     {
         //[Option('c', "console", Default = false,
-        //    HelpText = "Makes the TSharp application present itself as a console application rather than a graphical UI application.")]
+        //    HelpText = "Makes the StepBro console application present itself as a console application rather than a graphical UI application.")]
         //public bool Console { get; set; }
 
         [Option('w', "wait", Default = false,

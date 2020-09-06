@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.General
 {
-    public enum LoadedFileType { Unknown, TSharpScript, ClearText }
+    public enum LoadedFileType { Unknown, StepBroScript, ClearText }
     public interface ILoadedFile : IDisposable
     {
         string FileName { get; }

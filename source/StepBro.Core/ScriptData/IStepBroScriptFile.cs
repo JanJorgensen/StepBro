@@ -8,7 +8,7 @@ using StepBro.Core.Parser;
 
 namespace StepBro.Core.ScriptData
 {
-    //public interface ITSharpScriptFile : IScriptFile
+    //public interface IStepBroScriptFile : IScriptFile
     //{
 
     //}

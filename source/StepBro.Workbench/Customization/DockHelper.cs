@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
-namespace TSharp.Workbench.Customization
+namespace StepBro.Workbench.Customization
 {
 	internal static class DockHelper
 	{

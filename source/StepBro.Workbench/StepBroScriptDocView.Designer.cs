@@ -2,7 +2,7 @@ using StepBro.Core.General;
 
 namespace StepBro.Workbench
 {
-    partial class TSharpScriptDocView
+    partial class StepBroScriptDocView
     {
         /// <summary>
         /// Required designer variable.
@@ -30,7 +30,7 @@ namespace StepBro.Workbench
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TSharpScriptDocView));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(StepBroScriptDocView));
             this.mainMenu = new System.Windows.Forms.MenuStrip();
             this.menuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItem2 = new System.Windows.Forms.ToolStripMenuItem();
@@ -138,17 +138,17 @@ namespace StepBro.Workbench
             this.scriptFileEditor.TabIndex = 2;
             this.scriptFileEditor.IsChangedChanged += new System.EventHandler(this.scriptFileEditor_IsChangedChanged);
             // 
-            // TSharpScriptDocView
+            // StepBroScriptDocView
             // 
             this.ClientSize = new System.Drawing.Size(620, 449);
             this.Controls.Add(this.scriptFileEditor);
             this.Controls.Add(this.mainMenu);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.mainMenu;
-            this.Name = "TSharpScriptDocView";
+            this.Name = "StepBroScriptDocView";
             this.Padding = new System.Windows.Forms.Padding(0, 4, 0, 0);
             this.TabPageContextMenuStrip = this.contextMenuTabPage;
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.TSharpScriptDocView_FormClosed);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.StepBroScriptDocView_FormClosed);
             this.mainMenu.ResumeLayout(false);
             this.mainMenu.PerformLayout();
             this.contextMenuTabPage.ResumeLayout(false);

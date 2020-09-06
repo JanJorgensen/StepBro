@@ -33,7 +33,7 @@ namespace StepBro.Core.ScriptData
         //private readonly Dictionary<string, List<IIdentifierInfo>> m_fileScopeIdentifiers = null;
         //private readonly Dictionary<string, List<IIdentifierInfo>> m_fileAndProcedureScopeIdentifiers = null;
 
-        internal ScriptFile() : base(null, LoadedFileType.TSharpScript)
+        internal ScriptFile() : base(null, LoadedFileType.StepBroScript)
         {
             m_wasLoadedByNamespace = false;
             m_errors = new ErrorCollector(this, false);
@@ -42,7 +42,7 @@ namespace StepBro.Core.ScriptData
         }
 
         internal ScriptFile(string filepath) :
-                base(filepath, LoadedFileType.TSharpScript)
+                base(filepath, LoadedFileType.StepBroScript)
         {
             m_wasLoadedByNamespace = false;
             m_errors = new ErrorCollector(this, false);
@@ -53,7 +53,7 @@ namespace StepBro.Core.ScriptData
         internal ScriptFile(
             string filepath,
             AntlrInputStream filestream) :
-        base(filepath, LoadedFileType.TSharpScript)
+        base(filepath, LoadedFileType.StepBroScript)
         {
             m_wasLoadedByNamespace = false;
             m_errors = new ErrorCollector(this, false);

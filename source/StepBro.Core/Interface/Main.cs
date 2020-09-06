@@ -62,7 +62,7 @@ namespace StepBro.Core
 
                     m.AddAssembly(typeof(Enumerable).Assembly, false);
                     m.AddAssembly(typeof(Math).Assembly, false);
-                    m.AddAssembly(AddonManager.TSharpCoreAssembly, true);
+                    m.AddAssembly(AddonManager.StepBroCoreAssembly, true);
 
                     var modulesFolder = Path.Combine(Path.GetDirectoryName(typeof(AddonManager).Assembly.Location), "modules");
                     foreach (var f in Directory.GetFiles(modulesFolder, "*.dll"))

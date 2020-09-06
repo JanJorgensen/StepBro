@@ -182,9 +182,9 @@ namespace StepBro.Workbench
 
                     return doc;
                 }
-                else if (parsedStrings[0] == typeof(TSharpScriptDocView).ToString())
+                else if (parsedStrings[0] == typeof(StepBroScriptDocView).ToString())
                 {
-                    TSharpScriptDocView doc = new TSharpScriptDocView(m_resourceUserObject);
+                    StepBroScriptDocView doc = new StepBroScriptDocView(m_resourceUserObject);
                     if (parsedStrings[1] != string.Empty)
                     {
                         if (!doc.OpenFile(parsedStrings[1]))
@@ -329,7 +329,7 @@ namespace StepBro.Workbench
 
                 if (extension == "." + Main.StepBroFileExtension)
                 {
-                    var docView = new TSharpScriptDocView(m_resourceUserObject)
+                    var docView = new StepBroScriptDocView(m_resourceUserObject)
                     {
                         Text = fileName
                     };
@@ -699,9 +699,9 @@ namespace StepBro.Workbench
             // Temporary solution !!!!
             // Get the file element closest to the current selection (or the cursor), and execute that.
             var active = dockPanel.ActiveDocument.DockHandler.Content;
-            if (active != null && active is TSharpScriptDocView)
+            if (active != null && active is StepBroScriptDocView)
             {
-                var view = active as TSharpScriptDocView;
+                var view = active as StepBroScriptDocView;
                 var file = view.ScriptFile;
                 IFileElement element = null;
                 var selectionLine = view.SelectionStartLine + 1;    // Make line number 1-based

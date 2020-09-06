@@ -223,7 +223,7 @@
     <Compile Include="Language\EditorTextStyles.cs" />
     <Compile Include="Language\IEditorSupport.cs" />
     <Compile Include="Language\IEditorTextControl.cs" />
-    <Compile Include="Language\TSharpEditorSupport.cs" />
+    <Compile Include="Language\StepBroEditorSupport.cs" />
     <Compile Include="Logging\ILogSink.cs" />
     <Compile Include="Logging\LogSinkManager.cs" />
     <Compile Include="Logging\MainLogger.cs" />
@@ -242,7 +242,7 @@
     <Compile Include="ScriptData\IDatatable.cs" />
     <Compile Include="ScriptData\IPartner.cs" />
     <Compile Include="ScriptData\ITestList.cs" />
-    <Compile Include="ScriptData\ITSharpScriptFile.cs" />
+    <Compile Include="ScriptData\IStepBroScriptFile.cs" />
     <Compile Include="Tasks\AsyncResult.cs" />
     <Compile Include="Tasks\IAsyncResult.cs" />
     <Compile Include="Tasks\TaskDelegate.cs" />

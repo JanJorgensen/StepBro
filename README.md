@@ -1,18 +1,18 @@
-# TSharp
+# StepBro
 
-T# (TSharp) is a .net based automation framework especially for:
+StepBro is a .net based automation framework especially for:
  * automated system testing (both desktop and embedded system testing),
  * application scripting and
  * workbench instrument automation
 
 The inspiration sources are C#, CS-Script, TTCN-3, python, Robot framework and SeqZap.
 
-T# is both a language definition and a runtime system. 
+StepBro is both a language definition and a runtime system. 
 
-The user gets both the __tsharp.exe__ console application and the __TSharp Workbench__ integreted development/test environment.
+The user gets both the __stepbro.exe__ console application and the __StepBro Workbench__ integreted development/test environment.
 
-## T# Script Language Definition
-The T# language is not a general purpose language, but a specialized language for automation.
+## StepBro Script Language Definition
+The StepBro language is not a general purpose language, but a specialized language for automation.
 Some of the characteristics are:
  * Procedure centralized 
    - Procedures can inherit from another
@@ -22,7 +22,7 @@ Some of the characteristics are:
  * Numeric constant values can be specified with SI metric prefixes (as 12K, 500m)
  * Timespan values can easily be specified as e.g. 1500ms, 0:10.500, 50s or 199:23:59:59
 
-### Elements of a T# file
+### Elements of a StepBro script file
 
  * Usings (dependencies to other script files and to .net assemblies)
  * Procedures
@@ -51,7 +51,7 @@ The content of procedures are very much like the content of methods in C#, but w
  * Expect statements
  * Log, report and step statements
 
-## T# Runtime System
+## StepBro Runtime System
 
-T# compiles the scripts into binary code using LINQ expressions, and not into .net assemblies. Procedure definitions are build into delegates using LINQ expressions, and all other file elements are build into .net objects managed by the runtime system.
-That means T# does not have to deal with application domains, and can re-build scripts and unload older versions of the executable code when script files are changed in the host application or TSharp Workbench.
+StepBro compiles the scripts into binary code using LINQ expressions, and not into .net assemblies. Procedure definitions are build into delegates using LINQ expressions, and all other file elements are build into .net objects managed by the runtime system.
+That means StepBro does not have to deal with application domains, and can re-build scripts and unload older versions of the executable code when script files are changed in the host application or StepBro Workbench.

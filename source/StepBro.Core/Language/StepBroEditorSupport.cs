@@ -9,12 +9,12 @@ using StepBro.Core.Parser.Grammar;
 
 namespace StepBro.Core.Language
 {
-    public class TSharpEditorSupport : IEditorSupport
+    public class StepBroEditorSupport : IEditorSupport
     {
         private IEditorTextControl m_editor;
         private List<EditorTextStyles> m_tokenStyles = new List<EditorTextStyles>();
 
-        public TSharpEditorSupport(IEditorTextControl editor)
+        public StepBroEditorSupport(IEditorTextControl editor)
         {
             m_editor = editor;
 
@@ -128,26 +128,26 @@ namespace StepBro.Core.Language
         }
     }
 
-    internal class TSharpFileSection
+    internal class StepBroFileSection
     {
-        public TSharpFileSection()
+        public StepBroFileSection()
         {
 
         }
 
-        public void AddSubSection(TSharpFileSection section)
+        public void AddSubSection(StepBroFileSection section)
         {
         }
     }
 
-    internal class TSharpEditorSupportVisitor : Parser.Grammar.StepBroBaseVisitor<TSharpFileSection>
+    internal class StepBroEditorSupportVisitor : Parser.Grammar.StepBroBaseVisitor<StepBroFileSection>
     {
-        public override TSharpFileSection VisitExpression([NotNull] SBP.ExpressionContext context)
+        public override StepBroFileSection VisitExpression([NotNull] SBP.ExpressionContext context)
         {
             return base.VisitExpression(context);
         }
 
-        public override TSharpFileSection VisitCompilationUnit([NotNull] SBP.CompilationUnitContext context)
+        public override StepBroFileSection VisitCompilationUnit([NotNull] SBP.CompilationUnitContext context)
         {
             return base.VisitCompilationUnit(context);
         }
