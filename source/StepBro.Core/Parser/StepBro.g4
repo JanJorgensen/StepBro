@@ -1,6 +1,6 @@
-﻿parser grammar TSharp;
+﻿parser grammar StepBro;
 
-options { tokenVocab=TSharpLexer; }
+options { tokenVocab=StepBroLexer; }
 
 @parser::header {#pragma warning disable 3021}
 

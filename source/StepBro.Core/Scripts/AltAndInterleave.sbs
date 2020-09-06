@@ -1,0 +1,26 @@
+﻿using Stream;		// tool
+using MyProtocol;	// tool
+using #System.Text;	// .net namespace
+
+myProtocol entityA { port = "Port1" }
+myProtocol entityB { port = "Port2" }
+
+namespace AltAndInterleave;
+
+public void TryInterleave()
+{
+	interleave
+	{
+		on entityA.Receive()
+		{
+			entityB.Send();
+			entityA.Receive();
+		}
+		on entityB.Receive()
+		{
+			entityA.Send("");
+			entityB.Send("");
+			entityA.Receive();
+		}
+	}
+}

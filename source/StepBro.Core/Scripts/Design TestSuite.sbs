@@ -1,0 +1,8 @@
+ 
+testlist TestAllKindOfNumbers(timespan maxtime) : TestSuiteBase,
+	AddressSetup: Danish,
+	Timeout: 10s
+{
+	* TestEvenNumbers( looptime: maxtime )
+	* TestUnevenNumbers
+}

@@ -1,0 +1,7 @@
+﻿
+
+procedure int Main()
+{
+    log ("Ello, Mr. Polly Parrot!");
+    return 726;
+}

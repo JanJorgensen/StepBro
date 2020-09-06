@@ -1,0 +1,27 @@
+﻿// Demo project using the MyProjectBase and through that also the TestFramework.
+
+using MyProjectBase;
+
+testlist AllTests : TestSuite
+{
+    * FirstTestCase
+    * SecondTestCase
+    * ThirdTestCase
+}
+
+procedure void FirstTestCase() : TestCase,
+    override partner Setup:     TestCaseSpecialSetup
+{
+    log ("Inside FirstTestCase");
+}
+
+procedure void SecondTestCase() : TestCase,
+    override partner Cleanup:   TestCaseSpecialCleanup
+{
+    log ("Inside SecondTestCase");
+}
+
+procedure void ThirdTestCase() : TestCase
+{
+    log ("Inside ThirdTestCase");
+}

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using StepBro.Core;
 using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using StepBroCoreTest.Utils;
+using System;
+using System.Linq;
+using System.Text;
 
 namespace StepBroCoreTest.Execution
 {
@@ -30,7 +29,7 @@ namespace StepBroCoreTest.Execution
             f.AppendLine("   log (\"After\");");
             f.AppendLine("}");
 
-            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile.tss", f.ToString()))[0];
+            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()))[0];
 
             Assert.AreEqual(3, file.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
             var procedure = file.ListElements().First(p => p.Name == "ExecuteIt") as IFileProcedure;
@@ -97,7 +96,7 @@ namespace StepBroCoreTest.Execution
             f.AppendLine("   }");
             f.AppendLine("}");
 
-            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile.tss", f.ToString()))[0];
+            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()))[0];
 
             Assert.AreEqual(1, file.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
             var list = file["AllTests"] as ITestList;
@@ -352,10 +351,10 @@ namespace StepBroCoreTest.Execution
             f.AppendLine("}");
 
             var files = FileBuilder.ParseFiles((ILogger)null,
-                new Tuple<string, string>("myfile.tss", f.ToString()),
-                new Tuple<string, string>("TestFramework.tss", CreateTestFrameworkFile()));
-            var myfile = files.First(file => file.FileName == "myfile.tss");
-            var framework = files.First(file => file.FileName == "TestFramework.tss");
+                new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()),
+                new Tuple<string, string>("TestFramework." + Main.StepBroFileExtension, this.CreateTestFrameworkFile()));
+            var myfile = files.First(file => file.FileName == "myfile." + Main.StepBroFileExtension);
+            var framework = files.First(file => file.FileName == "TestFramework." + Main.StepBroFileExtension);
 
             Assert.AreEqual(9, myfile.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
             Assert.AreEqual(1, myfile.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());

@@ -10,11 +10,11 @@ using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
 {
-    internal partial class StepBroListener : TSharpBaseListener
+    internal partial class StepBroListener : StepBro.Core.Parser.Grammar.StepBroBaseListener
     {
         private enum ElementType { File, FileElement, ProcedureStatement }
 
@@ -45,7 +45,7 @@ namespace StepBro.Core.Parser
 
         public string Namespace { get { return m_file.Namespace; } }
 
-        public override void ExitFileProperties([NotNull] TSP.FilePropertiesContext context)
+        public override void ExitFileProperties([NotNull] SBP.FilePropertiesContext context)
         {
             var props = this.PopPropertyBlockData();
             if (m_file != null)
@@ -55,12 +55,12 @@ namespace StepBro.Core.Parser
             base.ExitFileProperties(context);
         }
 
-        public override void EnterUsingDeclarationWithIdentifier([NotNull] TSP.UsingDeclarationWithIdentifierContext context)
+        public override void EnterUsingDeclarationWithIdentifier([NotNull] SBP.UsingDeclarationWithIdentifierContext context)
         {
             m_expressionData.PushStackLevel("Using identifier");
         }
 
-        public override void ExitUsingDeclarationWithIdentifier([NotNull] TSP.UsingDeclarationWithIdentifierContext context)
+        public override void ExitUsingDeclarationWithIdentifier([NotNull] SBP.UsingDeclarationWithIdentifierContext context)
         {
             var stack = m_expressionData.PopStackLevel();
             if (!m_file.TypeScanIncluded)
@@ -75,11 +75,11 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void EnterUsingDeclarationWithPath([NotNull] TSP.UsingDeclarationWithPathContext context)
+        public override void EnterUsingDeclarationWithPath([NotNull] SBP.UsingDeclarationWithPathContext context)
         {
         }
 
-        public override void ExitUsingDeclarationWithPath([NotNull] TSP.UsingDeclarationWithPathContext context)
+        public override void ExitUsingDeclarationWithPath([NotNull] SBP.UsingDeclarationWithPathContext context)
         {
             if (!m_file.TypeScanIncluded)
             {
@@ -90,25 +90,25 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void EnterNamespace([NotNull] TSP.NamespaceContext context)
+        public override void EnterNamespace([NotNull] SBP.NamespaceContext context)
         {
             this.PrepareForExpressionParsing("namespace");
         }
 
-        public override void ExitNamespace([NotNull] TSP.NamespaceContext context)
+        public override void ExitNamespace([NotNull] SBP.NamespaceContext context)
         {
             var nsExpression = this.GetExpressionResultUnresolved();
             m_currentNamespace = (string)nsExpression.Value;
         }
 
-        public override void EnterFileElement([NotNull] TSP.FileElementContext context)
+        public override void EnterFileElement([NotNull] SBP.FileElementContext context)
         {
             m_lastElementPropertyBlock = null;
             m_fileElementModifier = AccessModifier.Private;    // Default is 'private'.
             m_currentFileElement = null;
         }
 
-        public override void EnterElementModifier([NotNull] TSP.ElementModifierContext context)
+        public override void EnterElementModifier([NotNull] SBP.ElementModifierContext context)
         {
             var modifier = context.GetText();
             if (modifier == "public") m_fileElementModifier = AccessModifier.Public;
@@ -116,17 +116,17 @@ namespace StepBro.Core.Parser
             else if (modifier == "protected") m_fileElementModifier = AccessModifier.Protected;
         }
 
-        public override void EnterFileVariable([NotNull] TSP.FileVariableContext context)
+        public override void EnterFileVariable([NotNull] SBP.FileVariableContext context)
         {
             m_variableModifier = VariableModifier.Static;
         }
 
-        public override void EnterFileVariableSimple([NotNull] TSP.FileVariableSimpleContext context)
+        public override void EnterFileVariableSimple([NotNull] SBP.FileVariableSimpleContext context)
         {
             this.CreateVariablesList();
         }
 
-        public override void ExitFileVariableSimple([NotNull] TSP.FileVariableSimpleContext context)
+        public override void ExitFileVariableSimple([NotNull] SBP.FileVariableSimpleContext context)
         {
             System.Diagnostics.Debug.Assert(m_variables.Count == 1);
             TypeReference type = m_variableType;
@@ -147,7 +147,7 @@ namespace StepBro.Core.Parser
             m_file.SetFileVariableModifier(id, m_fileElementModifier);
         }
 
-        public override void ExitFileVariableWithPropertyBlock([NotNull] TSP.FileVariableWithPropertyBlockContext context)
+        public override void ExitFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)
         {
             TypeReference type = m_variableType;
             if (type == null)
@@ -396,12 +396,12 @@ namespace StepBro.Core.Parser
 
         #region TestList
 
-        public override void EnterTestlist([NotNull] TSP.TestlistContext context)
+        public override void EnterTestlist([NotNull] SBP.TestlistContext context)
         {
             m_currentTestList = new FileTestList(m_file, context.Start.Line, null, m_currentNamespace, "");
         }
 
-        public override void ExitTestListName([NotNull] TSP.TestListNameContext context)
+        public override void ExitTestListName([NotNull] SBP.TestListNameContext context)
         {
             var name = context.GetText();
             m_currentTestList.SetName(m_currentNamespace, name);
@@ -417,18 +417,18 @@ namespace StepBro.Core.Parser
             m_currentFileElement = m_currentTestList;
         }
 
-        public override void ExitTestlist([NotNull] TSP.TestlistContext context)
+        public override void ExitTestlist([NotNull] SBP.TestlistContext context)
         {
             m_currentTestList = null;   // Clear, to better detect bugs.
         }
 
-        public override void EnterTestListEntry([NotNull] TSP.TestListEntryContext context)
+        public override void EnterTestListEntry([NotNull] SBP.TestListEntryContext context)
         {
             m_expressionData.PushStackLevel("TestListEntry");
             m_testListEntryArguments = null;
         }
 
-        public override void ExitTestListEntry([NotNull] TSP.TestListEntryContext context)
+        public override void ExitTestListEntry([NotNull] SBP.TestListEntryContext context)
         {
             var stack = m_expressionData.PopStackLevel();
             var entryTarget = stack.Pop();
@@ -460,7 +460,7 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void ExitTestListEntryArguments([NotNull] TSP.TestListEntryArgumentsContext context)
+        public override void ExitTestListEntryArguments([NotNull] SBP.TestListEntryArgumentsContext context)
         {
             m_testListEntryArguments = m_arguments.Pop();
         }

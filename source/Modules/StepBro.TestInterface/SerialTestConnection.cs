@@ -444,7 +444,7 @@ namespace StepBro.TestInterface
             string helpPrefix = "Help: ";
             string parametersPrefix = "Parameters: ";
             string returnTypePrefix = "Return type: ";
-            string listsPrefix = "Lists: ";
+            string lisSBPrefix = "Lists: ";
 
             var returnType = typeof(void);
             string help = null;
@@ -492,9 +492,9 @@ namespace StepBro.TestInterface
                             }
                         }
                     }
-                    else if (line.StartsWith(listsPrefix, StringComparison.InvariantCulture))
+                    else if (line.StartsWith(lisSBPrefix, StringComparison.InvariantCulture))
                     {
-                        lists = line.Substring(listsPrefix.Length);
+                        lists = line.Substring(lisSBPrefix.Length);
                     }
                     int i = line.IndexOf(returnTypePrefix, StringComparison.InvariantCulture);
                     if (i >= 0)

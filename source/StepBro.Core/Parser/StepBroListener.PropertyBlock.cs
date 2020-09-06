@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using StepBro.Core.Data;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
 {
@@ -27,11 +27,11 @@ namespace StepBro.Core.Parser
 
         #region Block
 
-        public override void EnterElementPropertyblock([NotNull] TSP.ElementPropertyblockContext context)
+        public override void EnterElementPropertyblock([NotNull] SBP.ElementPropertyblockContext context)
         {
             this.EnterElementProps();
         }
-        public override void EnterElementPropertyList([NotNull] TSP.ElementPropertyListContext context)
+        public override void EnterElementPropertyList([NotNull] SBP.ElementPropertyListContext context)
         {
             this.EnterElementProps();
         }
@@ -43,7 +43,7 @@ namespace StepBro.Core.Parser
             m_lastElementPropertyBlock = null;
         }
 
-        public override void ExitElementPropertyblock([NotNull] TSP.ElementPropertyblockContext context)
+        public override void ExitElementPropertyblock([NotNull] SBP.ElementPropertyblockContext context)
         {
             if (m_propertyBlockOperands.Count != 1) throw new InvalidOperationException("Unexpected stack depth.");
             if (m_propertyBlockOperands.Peek().Count != 1) throw new InvalidOperationException("Unexpected element count on stack base.");
@@ -57,7 +57,7 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void ExitElementPropertyList([NotNull] TSP.ElementPropertyListContext context)
+        public override void ExitElementPropertyList([NotNull] SBP.ElementPropertyListContext context)
         {
             if (m_propertyBlockOperands.Count != 1) throw new InvalidOperationException("Unexpected stack depth.");
             m_lastElementPropertyBlock = new PropertyBlock(m_propertyBlockOperands.Pop());
@@ -68,14 +68,14 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void EnterPropertyblock([NotNull] TSP.PropertyblockContext context)
+        public override void EnterPropertyblock([NotNull] SBP.PropertyblockContext context)
         {
             if (m_propertyBlockOperands.Count < 1) throw new InvalidOperationException("Operands stack not initiated.");
             m_propertyBlockOperands.Peek().Add(new PropertyBlock());    // Add this block to the current stack level list.
             m_propertyBlockOperands.Push(new List<PropertyBlockEntry>());       // Add new stack level for the children.
         }
 
-        public override void ExitPropertyblock([NotNull] TSP.PropertyblockContext context)
+        public override void ExitPropertyblock([NotNull] SBP.PropertyblockContext context)
         {
             var childs = m_propertyBlockOperands.Pop();
             var homeList = m_propertyBlockOperands.Peek();
@@ -83,22 +83,22 @@ namespace StepBro.Core.Parser
             block.AddRange(childs);
         }
 
-        //public override void EnterPropertyblockStatement([NotNull] TSP.PropertyblockStatementContext context)
+        //public override void EnterPropertyblockStatement([NotNull] SBP.PropertyblockStatementContext context)
         //{
         //}
 
-        //public override void ExitPropertyblockStatement([NotNull] TSP.PropertyblockStatementContext context)
+        //public override void ExitPropertyblockStatement([NotNull] SBP.PropertyblockStatementContext context)
         //{
         //}
 
-        public override void EnterPropertyblockStatementNamed([NotNull] TSP.PropertyblockStatementNamedContext context)
+        public override void EnterPropertyblockStatementNamed([NotNull] SBP.PropertyblockStatementNamedContext context)
         {
             m_expressionData.PushStackLevel("Block Statement Named");   // For the entry name.
             m_propertyEntryName = null;
             m_propertyEntryType = null;
         }
 
-        public override void ExitPropertyblockStatementNamed([NotNull] TSP.PropertyblockStatementNamedContext context)
+        public override void ExitPropertyblockStatementNamed([NotNull] SBP.PropertyblockStatementNamedContext context)
         {
             var homeList = m_propertyBlockOperands.Peek();
             var entry = homeList[homeList.Count - 1];    // This block is last in the current stack level.
@@ -112,17 +112,17 @@ namespace StepBro.Core.Parser
             var stack = m_expressionData.PopStackLevel();
         }
 
-        public override void EnterPropertyblockStatementNamedValue([NotNull] TSP.PropertyblockStatementNamedValueContext context)
+        public override void EnterPropertyblockStatementNamedValue([NotNull] SBP.PropertyblockStatementNamedValueContext context)
         {
             m_entryNameAndTypeStack.Push(new Tuple<string, string>(m_propertyEntryName, m_propertyEntryType));
         }
 
-        public override void ExitPropertyblockStatementNameSpecifier([NotNull] TSP.PropertyblockStatementNameSpecifierContext context)
+        public override void ExitPropertyblockStatementNameSpecifier([NotNull] SBP.PropertyblockStatementNameSpecifierContext context)
         {
             m_propertyEntryName = this.GetNamedPropertyBlockValueNameOrType(context);
         }
 
-        public override void ExitPropertyblockStatementTypeSpecifier([NotNull] TSP.PropertyblockStatementTypeSpecifierContext context)
+        public override void ExitPropertyblockStatementTypeSpecifier([NotNull] SBP.PropertyblockStatementTypeSpecifierContext context)
         {
             var type = this.GetNamedPropertyBlockValueNameOrType(context);
             if (m_propertyEntryType != null)    // In case more type specifiers are used
@@ -137,13 +137,13 @@ namespace StepBro.Core.Parser
 
         private string GetNamedPropertyBlockValueNameOrType(Antlr4.Runtime.ParserRuleContext context)
         {
-            if (context.Start.Type == TSP.IDENTIFIER)
+            if (context.Start.Type == SBP.IDENTIFIER)
             {
                 var stack = m_expressionData.Peek();
                 var identifier = stack.Pop();
                 return (string)identifier.Value;
             }
-            else if (context.Start.Type == TSP.STRING)
+            else if (context.Start.Type == SBP.STRING)
             {
                 return ParseStringLiteral(context.GetText(), context);
             }
@@ -157,12 +157,12 @@ namespace StepBro.Core.Parser
 
         #region Value
 
-        public override void EnterPropertyblockStatementValueNormal([NotNull] TSP.PropertyblockStatementValueNormalContext context)
+        public override void EnterPropertyblockStatementValueNormal([NotNull] SBP.PropertyblockStatementValueNormalContext context)
         {
             m_expressionData.PushStackLevel("Block statement value");   // For the value.
         }
 
-        public override void ExitPropertyblockStatementValueNormal([NotNull] TSP.PropertyblockStatementValueNormalContext context)
+        public override void ExitPropertyblockStatementValueNormal([NotNull] SBP.PropertyblockStatementValueNormalContext context)
         {
             this.PopValuePushEntry();
         }
@@ -191,14 +191,14 @@ namespace StepBro.Core.Parser
 
         #region Array
 
-        public override void EnterPropertyblockArray([NotNull] TSP.PropertyblockArrayContext context)
+        public override void EnterPropertyblockArray([NotNull] SBP.PropertyblockArrayContext context)
         {
             if (m_propertyBlockOperands.Count < 1) throw new InvalidOperationException("Operands stack not initiated.");
             m_propertyBlockOperands.Peek().Add(new PropertyBlockArray());    // Add this array to the current stack level list.
             m_propertyBlockOperands.Push(new List<PropertyBlockEntry>());       // Add new stack level for the children.
         }
 
-        public override void ExitPropertyblockArray([NotNull] TSP.PropertyblockArrayContext context)
+        public override void ExitPropertyblockArray([NotNull] SBP.PropertyblockArrayContext context)
         {
             var childs = m_propertyBlockOperands.Pop();
             var homeList = m_propertyBlockOperands.Peek();
@@ -206,46 +206,46 @@ namespace StepBro.Core.Parser
             array.AddRange(childs);
         }
 
-        public override void EnterPropertyblockArrayEntry([NotNull] TSP.PropertyblockArrayEntryContext context)
+        public override void EnterPropertyblockArrayEntry([NotNull] SBP.PropertyblockArrayEntryContext context)
         {
         }
-        public override void ExitPropertyblockArrayEntry([NotNull] TSP.PropertyblockArrayEntryContext context)
-        {
-        }
-
-        public override void EnterPropertyblockArrayEntryPropertyBlock([NotNull] TSP.PropertyblockArrayEntryPropertyBlockContext context)
+        public override void ExitPropertyblockArrayEntry([NotNull] SBP.PropertyblockArrayEntryContext context)
         {
         }
 
-        public override void ExitPropertyblockArrayEntryPropertyBlock([NotNull] TSP.PropertyblockArrayEntryPropertyBlockContext context)
+        public override void EnterPropertyblockArrayEntryPropertyBlock([NotNull] SBP.PropertyblockArrayEntryPropertyBlockContext context)
         {
         }
 
-        public override void EnterPropertyblockArrayEntryArray([NotNull] TSP.PropertyblockArrayEntryArrayContext context)
+        public override void ExitPropertyblockArrayEntryPropertyBlock([NotNull] SBP.PropertyblockArrayEntryPropertyBlockContext context)
         {
         }
 
-        public override void ExitPropertyblockArrayEntryArray([NotNull] TSP.PropertyblockArrayEntryArrayContext context)
+        public override void EnterPropertyblockArrayEntryArray([NotNull] SBP.PropertyblockArrayEntryArrayContext context)
         {
         }
 
-        public override void EnterPropertyblockArrayEntryPrimary([NotNull] TSP.PropertyblockArrayEntryPrimaryContext context)
+        public override void ExitPropertyblockArrayEntryArray([NotNull] SBP.PropertyblockArrayEntryArrayContext context)
+        {
+        }
+
+        public override void EnterPropertyblockArrayEntryPrimary([NotNull] SBP.PropertyblockArrayEntryPrimaryContext context)
         {
             m_expressionData.PushStackLevel("Array Entry Value");   // For the value.
         }
 
-        public override void ExitPropertyblockArrayEntryPrimary([NotNull] TSP.PropertyblockArrayEntryPrimaryContext context)
+        public override void ExitPropertyblockArrayEntryPrimary([NotNull] SBP.PropertyblockArrayEntryPrimaryContext context)
         {
             this.PopValuePushEntry();
         }
 
         #endregion
 
-        public override void EnterPropertyblockStatementValueIdentifierOnly([NotNull] TSP.PropertyblockStatementValueIdentifierOnlyContext context)
+        public override void EnterPropertyblockStatementValueIdentifierOnly([NotNull] SBP.PropertyblockStatementValueIdentifierOnlyContext context)
         {
             m_expressionData.PushStackLevel("Block statement value");   // For the value.
         }
-        public override void ExitPropertyblockStatementValueIdentifierOnly([NotNull] TSP.PropertyblockStatementValueIdentifierOnlyContext context)
+        public override void ExitPropertyblockStatementValueIdentifierOnly([NotNull] SBP.PropertyblockStatementValueIdentifierOnlyContext context)
         {
             string name = context.GetText();
             m_propertyBlockOperands.Peek().Add(new PropertyBlockFlag(name));
@@ -253,12 +253,12 @@ namespace StepBro.Core.Parser
 
         #region Event
 
-        public override void EnterPropertyblockEventVerdict([NotNull] TSP.PropertyblockEventVerdictContext context)
+        public override void EnterPropertyblockEventVerdict([NotNull] SBP.PropertyblockEventVerdictContext context)
         {
             m_expressionData.PushStackLevel("Block Event Verdict");
         }
 
-        public override void ExitPropertyblockEventVerdict([NotNull] TSP.PropertyblockEventVerdictContext context)
+        public override void ExitPropertyblockEventVerdict([NotNull] SBP.PropertyblockEventVerdictContext context)
         {
             var stack = m_expressionData.PopStackLevel();
             var verdict = (Verdict)(stack.Pop().Value);
@@ -266,12 +266,12 @@ namespace StepBro.Core.Parser
             m_propertyBlockOperands.Peek().Add(new PropertyBlockEvent(name, verdict));
         }
 
-        public override void EnterPropertyblockEventAssignment([NotNull] TSP.PropertyblockEventAssignmentContext context)
+        public override void EnterPropertyblockEventAssignment([NotNull] SBP.PropertyblockEventAssignmentContext context)
         {
             m_expressionData.PushStackLevel("Block Event Assignment");
         }
 
-        public override void ExitPropertyblockEventAssignment([NotNull] TSP.PropertyblockEventAssignmentContext context)
+        public override void ExitPropertyblockEventAssignment([NotNull] SBP.PropertyblockEventAssignmentContext context)
         {
         }
 
@@ -279,22 +279,22 @@ namespace StepBro.Core.Parser
 
         #region Attributes
 
-        public override void EnterAttributes([NotNull] TSP.AttributesContext context)
+        public override void EnterAttributes([NotNull] SBP.AttributesContext context)
         {
             m_lastAttributes = new List<PropertyBlockEntry>();
         }
 
-        public override void ExitAttributes([NotNull] TSP.AttributesContext context)
+        public override void ExitAttributes([NotNull] SBP.AttributesContext context)
         {
         }
 
-        public override void EnterAttribute_section([NotNull] TSP.Attribute_sectionContext context)
+        public override void EnterAttribute_section([NotNull] SBP.Attribute_sectionContext context)
         {
             m_propertyBlockOperands.Clear();
             m_propertyBlockOperands.Push(new List<PropertyBlockEntry>());
         }
 
-        public override void ExitAttribute_section([NotNull] TSP.Attribute_sectionContext context)
+        public override void ExitAttribute_section([NotNull] SBP.Attribute_sectionContext context)
         {
             if (m_propertyBlockOperands.Count != 1) throw new InvalidOperationException("Unexpected stack depth.");
             m_lastAttributes.AddRange(m_propertyBlockOperands.Pop());

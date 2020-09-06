@@ -26,7 +26,7 @@ namespace StepBro.Core.Data
             throw new Exception("Element not found.");
         }
 
-        public static IEnumerable<ITreeDataElement> ListSpecificElements(this ITreeDataElement element, params string[] names)
+        public static IEnumerable<ITreeDataElement> LisSBPecificElements(this ITreeDataElement element, params string[] names)
         {
             foreach (var sub in element.SubElements)
             {

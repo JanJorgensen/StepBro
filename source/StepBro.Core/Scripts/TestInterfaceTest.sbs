@@ -1,0 +1,101 @@
+﻿using StepBro.Streams;
+using Stepbro.TestInterface;
+
+SerialPort port
+{
+    PortName = "COM3",
+    BaudRate = 115200,
+    StopBits = One
+}
+
+SerialTestConnection sti
+{
+    Stream = port
+}
+
+GeneralTestInterface target
+{
+    Connection = sti
+}
+
+procedure void Open()
+{
+    sti.Connect();
+}
+
+procedure void Close()
+{
+    sti.Disconnect();
+}
+
+procedure void InvokeCommand()
+{
+    sti.Connect();
+    if (sti.Stream.IsOpen)
+    {
+        int i = 0;
+        //sti.Invoke("henry");
+        while (i < 10)
+        {
+            port.Write("henry\n");
+            port.ReadLine(10s);
+        }
+    }
+}
+
+procedure void SendCommands()
+{
+    sti.Connect();
+    if (sti.Stream.IsOpen)
+    {
+        sti.SetNextResponse(":271");
+        int h = await target.Hans();
+        log ("Hans: " + h);
+
+        sti.SetNextResponse(":\"That's life\"");
+        string f = await target.Fogter(true, 12s);
+        log ("Fogter: " + f);
+
+        sti.SetNextResponse(":OK");
+        await target.Miksi(53, "Anders", "Bent", "Christian");
+
+        sti.SetNextResponse(":true");
+        bool b = await target.Liza();
+        log ("Liza: " + b);
+
+        sti.SetNextResponse("*10\n*14\n*19\n:OK");
+        int[] ba = await target.Bananas();
+        log ("Bananas: " + ba);
+
+        sti.SetNextResponse("*\"anna k\"\n*\" 2 2 2 \"\n:OK");
+        string[] sa = await target.Apples();
+        log ("Apples: " + sa);
+    }
+}
+
+procedure void SendCommandWithArgumentErrors()
+{
+    if (sti.Stream.IsOpen)
+    {
+        sti.SetNextResponse(":271");
+        object response = await target.GetReadyToRock(15);
+        log ("Response: " + response);
+    }
+}
+
+procedure void SendMultilineResponseCommand()
+{
+    if (sti.Stream.IsOpen)
+    {
+        sti.SetNextResponse(",\"Anders\"\n,\"Bent\"\n,\"Christian\"\n:ERROR - Lost connection");
+        object response = await target.GetNameList();
+        log ("Response: " + response);
+    }
+}
+
+procedure void main()
+{
+    Open();
+    //SendSimpleCommand();
+    Close();
+}

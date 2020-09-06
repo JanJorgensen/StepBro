@@ -18,21 +18,21 @@ namespace StepBroCoreTest
         public void CommandLineScriptFile()
         {
             var options = CommandLineParser.Parse<CoreCommandlineOptions>(null,
-                new string[] { @"c:\temp\myscript.tss" });
+                new string[] { @"c:\temp\myscript.sbs" });
             Assert.IsFalse(options.HasParsingErrors);
             Assert.IsNull(options.ParsingErrors);
-            Assert.AreEqual(@"c:\temp\myscript.tss", options.InputFile);
+            Assert.AreEqual(@"c:\temp\myscript.sbs", options.InputFile);
         }
 
         //[TestMethod]
         //public void CommandLineScriptAndProject()
         //{
         //    var options = CommandLineParser.Parse<CoreCommandlineOptions>(null,
-        //        new string[] { "-r", @"c:\temp\myscript.tss", "-p", @"c:\temp\library\standard project.tss" });
+        //        new string[] { "-r", @"c:\temp\myscript.tss", "-p", @"c:\temp\library\standard project.sbs" });
         //    Assert.IsFalse(options.HasParsingErrors);
         //    Assert.IsNull(options.ParsingErrors);
-        //    Assert.AreEqual(@"c:\temp\myscript.tss", options.InputFile);
-        //    Assert.AreEqual(@"c:\temp\library\standard project.tss", options.ProjectFile);
+        //    Assert.AreEqual(@"c:\temp\myscript.sbs", options.InputFile);
+        //    Assert.AreEqual(@"c:\temp\library\standard project.sbs", options.ProjectFile);
         //}
 
         [TestMethod]

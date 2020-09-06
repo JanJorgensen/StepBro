@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Parser
 {
-    internal class TSharpTypeVisitor : TSharpBaseVisitor<object>
+    internal class StepBroTypeVisitor : StepBro.Core.Parser.Grammar.StepBroBaseVisitor<object>
     {
     }
 }

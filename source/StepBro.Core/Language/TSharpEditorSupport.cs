@@ -3,6 +3,9 @@ using Antlr4.Runtime.Misc;
 using System;
 using System.Collections.Generic;
 using StepBro.Core.Parser;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
+using Lexer = StepBro.Core.Parser.Grammar.StepBroLexer;
+using StepBro.Core.Parser.Grammar;
 
 namespace StepBro.Core.Language
 {
@@ -15,45 +18,45 @@ namespace StepBro.Core.Language
         {
             m_editor = editor;
 
-            this.AddTokenStyle(TSharpLexer.INTEGER_LITERAL, EditorTextStyles.Numeric);
-            this.AddTokenStyle(TSharpLexer.IntegerWithSIPrefixLiteral, EditorTextStyles.Numeric);
-            this.AddTokenStyle(TSharpLexer.FloatingPointLiteral, EditorTextStyles.Numeric);
-            this.AddTokenStyle(TSharpLexer.HexLiteral, EditorTextStyles.Numeric);
+            this.AddTokenStyle(Lexer.INTEGER_LITERAL, EditorTextStyles.Numeric);
+            this.AddTokenStyle(Lexer.IntegerWithSIPrefixLiteral, EditorTextStyles.Numeric);
+            this.AddTokenStyle(Lexer.FloatingPointLiteral, EditorTextStyles.Numeric);
+            this.AddTokenStyle(Lexer.HexLiteral, EditorTextStyles.Numeric);
 
-            this.AddTokenStyle(TSharpLexer.REGULAR_STRING, EditorTextStyles.String);
-            this.AddTokenStyle(TSharpLexer.VERBATIUM_STRING, EditorTextStyles.String);
+            this.AddTokenStyle(Lexer.REGULAR_STRING, EditorTextStyles.String);
+            this.AddTokenStyle(Lexer.VERBATIUM_STRING, EditorTextStyles.String);
 
-            this.AddTokenStyle(TSharpLexer.TimespanLiteral, EditorTextStyles.Timespan);
+            this.AddTokenStyle(Lexer.TimespanLiteral, EditorTextStyles.Timespan);
 
-            this.AddTokenStyle(TSharpLexer.SINGLE_LINE_COMMENT, EditorTextStyles.Comment);
-            this.AddTokenStyle(TSharpLexer.DELIMITED_COMMENT, EditorTextStyles.Comment);
-            this.AddTokenStyle(TSharpLexer.DOC_COMMENT_INDENTED, EditorTextStyles.DocComment);
-            this.AddTokenStyle(TSharpLexer.DOC_COMMENT, EditorTextStyles.DocComment);
-            //this.AddTokenStyle(TSharpLexer.DOC_COMMENT_START, EditorTextStyles.DocComment);
-            //this.AddTokenStyle(TSharpLexer.DOC_COMMENT_NEWLINE_INDENTED, EditorTextStyles.DocComment);
-            //this.AddTokenStyle(TSharpLexer.DOC_COMMENT_NEWLINE, EditorTextStyles.DocComment);
-            //this.AddTokenStyle(TSharpLexer.DOC_COMMENT_TEXT, EditorTextStyles.DocComment);
+            this.AddTokenStyle(Lexer.SINGLE_LINE_COMMENT, EditorTextStyles.Comment);
+            this.AddTokenStyle(Lexer.DELIMITED_COMMENT, EditorTextStyles.Comment);
+            this.AddTokenStyle(Lexer.DOC_COMMENT_INDENTED, EditorTextStyles.DocComment);
+            this.AddTokenStyle(Lexer.DOC_COMMENT, EditorTextStyles.DocComment);
+            //this.AddTokenStyle(Lexer.DOC_COMMENT_START, EditorTextStyles.DocComment);
+            //this.AddTokenStyle(Lexer.DOC_COMMENT_NEWLINE_INDENTED, EditorTextStyles.DocComment);
+            //this.AddTokenStyle(Lexer.DOC_COMMENT_NEWLINE, EditorTextStyles.DocComment);
+            //this.AddTokenStyle(Lexer.DOC_COMMENT_TEXT, EditorTextStyles.DocComment);
 
-            this.AddTokenStyle(TSharpLexer.DATATABLE_ROW_START, EditorTextStyles.DataTableRow);
-            this.AddTokenStyle(TSharpLexer.DATATABLE_CELL_CONTENT, EditorTextStyles.DataTableCell);
-            this.AddTokenStyle(TSharpLexer.DATATABLE_END_LINE, EditorTextStyles.DataTableRow);
-            this.AddTokenStyle(TSharpLexer.DATATABLE_END_LINE_COMMENT, EditorTextStyles.DataTableRow);
-            this.AddTokenStyle(TSharpLexer.DATATABLE_CELL_DELIMITER, EditorTextStyles.DataTableRow);
+            this.AddTokenStyle(Lexer.DATATABLE_ROW_START, EditorTextStyles.DataTableRow);
+            this.AddTokenStyle(Lexer.DATATABLE_CELL_CONTENT, EditorTextStyles.DataTableCell);
+            this.AddTokenStyle(Lexer.DATATABLE_END_LINE, EditorTextStyles.DataTableRow);
+            this.AddTokenStyle(Lexer.DATATABLE_END_LINE_COMMENT, EditorTextStyles.DataTableRow);
+            this.AddTokenStyle(Lexer.DATATABLE_CELL_DELIMITER, EditorTextStyles.DataTableRow);
 
             this.AddTokenStyle(EditorTextStyles.Keyword,
-                TSharpLexer.ALT, TSharpLexer.ASSERT, TSharpLexer.AWAIT, TSharpLexer.BASE, TSharpLexer.BOOL, TSharpLexer.BREAK,
-                TSharpLexer.CONST, TSharpLexer.CONTINUE, TSharpLexer.DATATABLE, TSharpLexer.DATETIME, TSharpLexer.DECIMAL,
-                TSharpLexer.DO, TSharpLexer.DOUBLE, TSharpLexer.DYNAMIC, TSharpLexer.ELSE, TSharpLexer.EMPTY, TSharpLexer.ENUM,
-                TSharpLexer.ERROR, TSharpLexer.EXECUTION, TSharpLexer.EXPECT, TSharpLexer.FAIL, TSharpLexer.FALSE,
-                TSharpLexer.FOR, TSharpLexer.FOREACH, TSharpLexer.FUNCTION, TSharpLexer.IF, TSharpLexer.IGNORE,
-                TSharpLexer.IN, TSharpLexer.INCONCLUSIVE, TSharpLexer.INTEGER, TSharpLexer.INT_, TSharpLexer.IS,
-                TSharpLexer.LOG, TSharpLexer.NAMESPACE, TSharpLexer.NOT, TSharpLexer.NULL, TSharpLexer.OBJECT, TSharpLexer.ON,
-                TSharpLexer.OR, TSharpLexer.OUT, TSharpLexer.PASS, TSharpLexer.PRIVATE, TSharpLexer.PROCEDURE,
-                TSharpLexer.PROTECTED, TSharpLexer.PUBLIC, TSharpLexer.REF, TSharpLexer.REPORT, TSharpLexer.RETURN,
-                TSharpLexer.SINGLESELECTION, TSharpLexer.START, TSharpLexer.STATIC, TSharpLexer.STEP, TSharpLexer.STRING,
-                TSharpLexer.TESTLIST, TSharpLexer.THIS, TSharpLexer.THROW, TSharpLexer.TIMEOUT, TSharpLexer.TIMESPAN,
-                TSharpLexer.TRUE, TSharpLexer.UNSET, TSharpLexer.USING, TSharpLexer.VAR, TSharpLexer.VERDICT, TSharpLexer.VOID,
-                TSharpLexer.WARNING, TSharpLexer.WHILE);
+                Lexer.ALT, Lexer.ASSERT, Lexer.AWAIT, Lexer.BASE, Lexer.BOOL, Lexer.BREAK,
+                Lexer.CONST, Lexer.CONTINUE, Lexer.DATATABLE, Lexer.DATETIME, Lexer.DECIMAL,
+                Lexer.DO, Lexer.DOUBLE, Lexer.DYNAMIC, Lexer.ELSE, Lexer.EMPTY, Lexer.ENUM,
+                Lexer.ERROR, Lexer.EXECUTION, Lexer.EXPECT, Lexer.FAIL, Lexer.FALSE,
+                Lexer.FOR, Lexer.FOREACH, Lexer.FUNCTION, Lexer.IF, Lexer.IGNORE,
+                Lexer.IN, Lexer.INCONCLUSIVE, Lexer.INTEGER, Lexer.INT_, Lexer.IS,
+                Lexer.LOG, Lexer.NAMESPACE, Lexer.NOT, Lexer.NULL, Lexer.OBJECT, Lexer.ON,
+                Lexer.OR, Lexer.OUT, Lexer.PASS, Lexer.PRIVATE, Lexer.PROCEDURE,
+                Lexer.PROTECTED, Lexer.PUBLIC, Lexer.REF, Lexer.REPORT, Lexer.RETURN,
+                Lexer.SINGLESELECTION, Lexer.START, Lexer.STATIC, Lexer.STEP, Lexer.STRING,
+                Lexer.TESTLIST, Lexer.THIS, Lexer.THROW, Lexer.TIMEOUT, Lexer.TIMESPAN,
+                Lexer.TRUE, Lexer.UNSET, Lexer.USING, Lexer.VAR, Lexer.VERDICT, Lexer.VOID,
+                Lexer.WARNING, Lexer.WHILE);
         }
 
         private void AddTokenStyle(int token, EditorTextStyles style)
@@ -100,7 +103,7 @@ namespace StepBro.Core.Language
 
             if (startLine != endLine || startColumn != endColumn)
             {
-                ITokenSource lexer = new TSharpLexer(this.GetParserStream(startLine, startColumn, endLine, endColumn));
+                ITokenSource lexer = new Lexer(this.GetParserStream(startLine, startColumn, endLine, endColumn));
                 var tokens = new CommonTokenStream(lexer);
                 tokens.Fill();
 
@@ -137,14 +140,14 @@ namespace StepBro.Core.Language
         }
     }
 
-    internal class TSharpEditorSupportVisitor : TSharpBaseVisitor<TSharpFileSection>
+    internal class TSharpEditorSupportVisitor : Parser.Grammar.StepBroBaseVisitor<TSharpFileSection>
     {
-        public override TSharpFileSection VisitExpression([NotNull] Parser.TSharp.ExpressionContext context)
+        public override TSharpFileSection VisitExpression([NotNull] SBP.ExpressionContext context)
         {
             return base.VisitExpression(context);
         }
 
-        public override TSharpFileSection VisitCompilationUnit([NotNull] Parser.TSharp.CompilationUnitContext context)
+        public override TSharpFileSection VisitCompilationUnit([NotNull] SBP.CompilationUnitContext context)
         {
             return base.VisitCompilationUnit(context);
         }

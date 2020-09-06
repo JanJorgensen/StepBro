@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser.AssignmentOperators
 {
@@ -17,9 +17,9 @@ namespace StepBro.Core.Parser.AssignmentOperators
 
         public static AssignmentOperatorBase GetOperator(int op)
         {
-            if (op == TSP.ASSIGNMENT) return g_AssignOp;
-            else if (op == TSP.OP_ADD_ASSIGNMENT) return g_AddAssignOp;
-            else if (op == TSP.OP_SUB_ASSIGNMENT) return g_SubAssignOp;
+            if (op == SBP.ASSIGNMENT) return g_AssignOp;
+            else if (op == SBP.OP_ADD_ASSIGNMENT) return g_AddAssignOp;
+            else if (op == SBP.OP_SUB_ASSIGNMENT) return g_SubAssignOp;
             else
             {
                 throw new NotImplementedException();

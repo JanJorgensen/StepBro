@@ -3,7 +3,7 @@ using StepBro.Core.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
 {
@@ -20,7 +20,7 @@ namespace StepBro.Core.Parser
             m_variables = new List<NamedData<SBExpressionData>>();
         }
 
-        public override void EnterVariableModifier([NotNull] TSP.VariableModifierContext context)
+        public override void EnterVariableModifier([NotNull] SBP.VariableModifierContext context)
         {
             var modifier = context.GetText();
             if (modifier == "static") m_variableModifier = VariableModifier.Static;
@@ -28,29 +28,29 @@ namespace StepBro.Core.Parser
             else if (modifier == "session") m_variableModifier = VariableModifier.Session;
         }
 
-        public override void EnterSimpleVarDeclarators([NotNull] TSP.SimpleVarDeclaratorsContext context)
+        public override void EnterSimpleVarDeclarators([NotNull] SBP.SimpleVarDeclaratorsContext context)
         {
             this.CreateVariablesList();
         }
 
-        public override void EnterVariableType([NotNull] TSP.VariableTypeContext context)
+        public override void EnterVariableType([NotNull] SBP.VariableTypeContext context)
         {
             m_variableType = null;
             m_expressionData.PushStackLevel("VariableType");
         }
 
-        public override void ExitVariableType([NotNull] TSP.VariableTypeContext context)
+        public override void ExitVariableType([NotNull] SBP.VariableTypeContext context)
         {
             m_expressionData.PopStackLevel();
             m_variableType = m_typeStack.Pop();
         }
 
-        public override void EnterVariableDeclaratorId([NotNull] TSP.VariableDeclaratorIdContext context)
+        public override void EnterVariableDeclaratorId([NotNull] SBP.VariableDeclaratorIdContext context)
         {
             m_variableName = context.GetText();
         }
 
-        public override void ExitVariableDeclaratorWithoutAssignment([NotNull] TSP.VariableDeclaratorWithoutAssignmentContext context)
+        public override void ExitVariableDeclaratorWithoutAssignment([NotNull] SBP.VariableDeclaratorWithoutAssignmentContext context)
         {
             if (m_variableType != null)
             {
@@ -69,7 +69,7 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void ExitVariableDeclarator([NotNull] TSP.VariableDeclaratorContext context)
+        public override void ExitVariableDeclarator([NotNull] SBP.VariableDeclaratorContext context)
         {
             if (m_variableType != null)
             {
@@ -140,17 +140,17 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void ExitVariableInitializerArray([NotNull] TSP.VariableInitializerArrayContext context)
+        public override void ExitVariableInitializerArray([NotNull] SBP.VariableInitializerArrayContext context)
         {
             base.ExitVariableInitializerArray(context);
         }
 
-        public override void EnterVariableInitializerExpression([NotNull] TSP.VariableInitializerExpressionContext context)
+        public override void EnterVariableInitializerExpression([NotNull] SBP.VariableInitializerExpressionContext context)
         {
             m_expressionData.PushStackLevel("VariableInitializerExpression @" + context.Start.Line.ToString() + ", " + context.Start.Column.ToString());
         }
 
-        public override void ExitVariableInitializerExpression([NotNull] TSP.VariableInitializerExpressionContext context)
+        public override void ExitVariableInitializerExpression([NotNull] SBP.VariableInitializerExpressionContext context)
         {
             var stack = m_expressionData.PopStackLevel();
             m_variableInitializer = this.ResolveForGetOperation(stack.Pop());

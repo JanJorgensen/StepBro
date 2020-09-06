@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser.UnaryOperators
 {
@@ -19,11 +19,11 @@ namespace StepBro.Core.Parser.UnaryOperators
 
         public static UnaryOperatorBase GetOperator(int op)
         {
-            if (op == TSP.OP_INC) return g_IncOp;
-            else if (op == TSP.OP_DEC) return g_DecOp;
-            else if (op == TSP.NOT || op == TSP.BANG) return g_NotOp;
-            else if (op == TSP.MINUS) return g_NegateOp;
-            else if (op == TSP.TILDE) return g_ComplementOp;
+            if (op == SBP.OP_INC) return g_IncOp;
+            else if (op == SBP.OP_DEC) return g_DecOp;
+            else if (op == SBP.NOT || op == SBP.BANG) return g_NotOp;
+            else if (op == SBP.MINUS) return g_NegateOp;
+            else if (op == SBP.TILDE) return g_ComplementOp;
             else
             {
                 throw new NotImplementedException();

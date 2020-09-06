@@ -1,0 +1,26 @@
+using Devices.CAN;
+
+namespace TestCAN;
+
+var can = CANChannel("IXXAT:0.0")		// Driver, Device and Port.
+{
+	on Reset: ResetCan
+}
+
+var can1 = CANChannel("ROBI-CAN1")		// Name from station configuration.
+{
+}
+
+procedure void SendAndReceive()
+{
+	can.Send(0x2030, 10, 20, 30, 40, 50, 60, 70, 80);
+	var received = can.Receive(10s);
+	if (received != null)
+	{
+		log received;
+	}
+	else
+	{
+		log "No CAN messages received.";
+	}
+}

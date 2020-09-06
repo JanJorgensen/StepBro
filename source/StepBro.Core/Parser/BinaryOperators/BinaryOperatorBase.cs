@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser.BinaryOperators
 {
@@ -30,22 +30,22 @@ namespace StepBro.Core.Parser.BinaryOperators
 
         public static BinaryOperatorBase GetOperator(int op)
         {
-            if (op == TSP.STAR) return g_MultiplyOp;
-            if (op == TSP.DIV) return g_DivideOp;
-            if (op == TSP.PLUS) return g_PlusOp;
-            if (op == TSP.MINUS) return g_MinusOp;
-            if (op == TSP.PERCENT) return g_ModulusOp;
-            if (op == TSP.OP_EQ) return g_EqualOp;
-            if (op == TSP.OP_NE) return g_NotEqualOp;
-            if (op == TSP.OP_EQ_APPROX) return g_EqualApproxOp;
-            if (op == TSP.GT) return g_GreaterThanOp;
-            if (op == TSP.LT) return g_LessThanOp;
-            if (op == TSP.OP_GE) return g_GreaterThanOrEqualOp;
-            if (op == TSP.OP_LE) return g_LessThanOrEqualOp;
-            if (op == TSP.OP_GT_APPROX) return g_GreaterThanOrApproxOp;
-            if (op == TSP.OP_LT_APPROX) return g_LessThanOrApproxOp;
-            if (op == TSP.OP_AND) return g_LogicalAndOp;
-            if (op == TSP.OP_OR) return g_LogicalOrOp;
+            if (op == SBP.STAR) return g_MultiplyOp;
+            if (op == SBP.DIV) return g_DivideOp;
+            if (op == SBP.PLUS) return g_PlusOp;
+            if (op == SBP.MINUS) return g_MinusOp;
+            if (op == SBP.PERCENT) return g_ModulusOp;
+            if (op == SBP.OP_EQ) return g_EqualOp;
+            if (op == SBP.OP_NE) return g_NotEqualOp;
+            if (op == SBP.OP_EQ_APPROX) return g_EqualApproxOp;
+            if (op == SBP.GT) return g_GreaterThanOp;
+            if (op == SBP.LT) return g_LessThanOp;
+            if (op == SBP.OP_GE) return g_GreaterThanOrEqualOp;
+            if (op == SBP.OP_LE) return g_LessThanOrEqualOp;
+            if (op == SBP.OP_GT_APPROX) return g_GreaterThanOrApproxOp;
+            if (op == SBP.OP_LT_APPROX) return g_LessThanOrApproxOp;
+            if (op == SBP.OP_AND) return g_LogicalAndOp;
+            if (op == SBP.OP_OR) return g_LogicalOrOp;
             else
             {
                 throw new NotImplementedException();

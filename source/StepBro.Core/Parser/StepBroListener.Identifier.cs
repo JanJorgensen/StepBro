@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
 {
@@ -28,17 +28,17 @@ namespace StepBro.Core.Parser
         private static string s_ScriptUtilsFullNamePrefix = typeof(Execution.ScriptUtils).FullName + ".";
         private static SBExpressionData s_ScriptUtilsTypeData = new SBExpressionData(HomeType.Immediate, SBExpressionType.TypeReference, new TypeReference(typeof(Execution.ScriptUtils)));
 
-        public override void ExitQualifiedName([NotNull] TSP.QualifiedNameContext context)
+        public override void ExitQualifiedName([NotNull] SBP.QualifiedNameContext context)
         {
             m_expressionData.Push(SBExpressionData.CreateIdentifier(context.GetText(), token: context.Start as CommonToken));
         }
 
-        public override void ExitPrimaryOrQualified([NotNull] TSP.PrimaryOrQualifiedContext context)
+        public override void ExitPrimaryOrQualified([NotNull] SBP.PrimaryOrQualifiedContext context)
         {
             this.PushIfIdentifier(context);
         }
 
-        public override void ExitIdentifierOrQualified([NotNull] TSP.IdentifierOrQualifiedContext context)
+        public override void ExitIdentifierOrQualified([NotNull] SBP.IdentifierOrQualifiedContext context)
         {
             this.PushIfIdentifier(context);
         }
@@ -49,19 +49,19 @@ namespace StepBro.Core.Parser
             if (context.ChildCount == 1)
             {
                 var child = context.GetChild(0) as TerminalNodeImpl;
-                if (child != null && child.Payload.Type == TSP.IDENTIFIER)
+                if (child != null && child.Payload.Type == SBP.IDENTIFIER)
                 {
                     m_expressionData.Push(SBExpressionData.CreateIdentifier(context.GetText(), token: child.Payload as CommonToken));
                 }
             }
         }
 
-        public override void ExitKeyword([NotNull] TSP.KeywordContext context)
+        public override void ExitKeyword([NotNull] SBP.KeywordContext context)
         {
             m_expressionData.Push(SBExpressionData.CreateIdentifier(context.GetText(), token: context.Start as CommonToken));
         }
 
-        public override void ExitExpDotIdentifier([NotNull] TSP.ExpDotIdentifierContext context)
+        public override void ExitExpDotIdentifier([NotNull] SBP.ExpDotIdentifierContext context)
         {
             var left = m_expressionData.Pop();
             left = this.ResolveIfIdentifier(left, true);

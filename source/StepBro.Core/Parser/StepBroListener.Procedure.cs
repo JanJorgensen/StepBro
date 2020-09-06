@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
 {
@@ -82,72 +82,72 @@ namespace StepBro.Core.Parser
             m_currentProcedure = (m_procedureStack.Count > 0) ? m_procedureStack.Peek() : null;
         }
 
-        public override void EnterProcedureDeclaration([NotNull] TSP.ProcedureDeclarationContext context)
+        public override void EnterProcedureDeclaration([NotNull] SBP.ProcedureDeclarationContext context)
         {
             //this.EnterProcedureParsing();
         }
 
-        public override void ExitProcedureDeclaration([NotNull] TSP.ProcedureDeclarationContext context)
+        public override void ExitProcedureDeclaration([NotNull] SBP.ProcedureDeclarationContext context)
         {
             this.ExitProcedureParsing();
         }
 
-        public override void EnterFileElementProcedure([NotNull] TSP.FileElementProcedureContext context)
+        public override void EnterFileElementProcedure([NotNull] SBP.FileElementProcedureContext context)
         {
             m_procedureIsFunction = false;  // In case no type scanning hsa beed performed.
         }
 
-        public override void EnterFileElementFunction([NotNull] TSP.FileElementFunctionContext context)
+        public override void EnterFileElementFunction([NotNull] SBP.FileElementFunctionContext context)
         {
             if (m_file.TypeScanIncluded && m_currentProcedure.IsFunction == true) throw new Exception("Procedure from type scanning is set to be a \"function\" type.");
             m_procedureIsFunction = true;  // In case no type scanning hsa beed performed.
         }
 
-        public override void ExitFileElementProcedure([NotNull] TSP.FileElementProcedureContext context)
+        public override void ExitFileElementProcedure([NotNull] SBP.FileElementProcedureContext context)
         {
             this.ExitProcedureParsing();
         }
 
-        public override void ExitFileElementFunction([NotNull] TSP.FileElementFunctionContext context)
+        public override void ExitFileElementFunction([NotNull] SBP.FileElementFunctionContext context)
         {
             this.ExitProcedureParsing();
         }
 
-        public override void EnterProcedureReturnType([NotNull] TSP.ProcedureReturnTypeContext context)
+        public override void EnterProcedureReturnType([NotNull] SBP.ProcedureReturnTypeContext context)
         {
             m_expressionData.PushStackLevel("ReturnType");
         }
 
-        public override void ExitProcedureReturnType([NotNull] TSP.ProcedureReturnTypeContext context)
+        public override void ExitProcedureReturnType([NotNull] SBP.ProcedureReturnTypeContext context)
         {
             m_procedureReturnType = m_typeStack.Pop();  // Must be past the return type. Save here to make it available to the parsing of the body.
             m_expressionData.PopStackLevel();
         }
 
-        public override void ExitProcedureName([NotNull] TSP.ProcedureNameContext context)
+        public override void ExitProcedureName([NotNull] SBP.ProcedureNameContext context)
         {
             m_elementStart = context.Start;
             this.EnterProcedureParsing(context.GetText());
         }
 
-        public override void EnterFormalParameters([NotNull] TSP.FormalParametersContext context)
+        public override void EnterFormalParameters([NotNull] SBP.FormalParametersContext context)
         {
             m_parameters = new List<ParameterData>();     // If used from the formalParameters rule (could be empty).
         }
-        public override void EnterFormalParameterDecls([NotNull] TSP.FormalParameterDeclsContext context)
+        public override void EnterFormalParameterDecls([NotNull] SBP.FormalParameterDeclsContext context)
         {
             m_parameters = new List<ParameterData>();     // If not used from the formalParameters rule.
         }
-        public override void EnterFormalParameterDecl([NotNull] TSP.FormalParameterDeclContext context)
+        public override void EnterFormalParameterDecl([NotNull] SBP.FormalParameterDeclContext context)
         {
             m_expressionData.PushStackLevel("Parameter");
             //m_parameters = new List<Tuple<Type, string>>();     // If not used from the formalParameters rule.
         }
-        public override void ExitFormalParameterModifiers([NotNull] TSP.FormalParameterModifiersContext context)
+        public override void ExitFormalParameterModifiers([NotNull] SBP.FormalParameterModifiersContext context)
         {
             m_modifiers = context.GetText();
         }
-        public override void ExitFormalParameterDecl([NotNull] TSP.FormalParameterDeclContext context)
+        public override void ExitFormalParameterDecl([NotNull] SBP.FormalParameterDeclContext context)
         {
             string name = context.GetChild(context.ChildCount - 1).GetText();
             TypeReference type = m_typeStack.Pop();
@@ -158,7 +158,7 @@ namespace StepBro.Core.Parser
             m_expressionData.PopStackLevel();
         }
 
-        public override void ExitProcedureParameters([NotNull] TSP.ProcedureParametersContext context)
+        public override void ExitProcedureParameters([NotNull] SBP.ProcedureParametersContext context)
         {
             if (!m_file.TypeScanIncluded)
             {
@@ -169,29 +169,29 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void EnterProcedureBodyOrNothing([NotNull] TSP.ProcedureBodyOrNothingContext context)
+        public override void EnterProcedureBodyOrNothing([NotNull] SBP.ProcedureBodyOrNothingContext context)
         {
             if (!m_file.TypeScanIncluded)
             {
-                m_currentProcedure.HasBody = context.Start.Type != TSP.SEMICOLON;
+                m_currentProcedure.HasBody = context.Start.Type != SBP.SEMICOLON;
                 m_currentProcedure.CreateDelegateType();
             }
         }
 
-        public override void EnterProcedureBody([NotNull] TSP.ProcedureBodyContext context)
+        public override void EnterProcedureBody([NotNull] SBP.ProcedureBodyContext context)
         {
             m_scopeStack.Clear();
             m_procedureBaseScope = null;
             m_inFunctionScope = true;
         }
 
-        public override void ExitProcedureBody([NotNull] TSP.ProcedureBodyContext context)
+        public override void ExitProcedureBody([NotNull] SBP.ProcedureBodyContext context)
         {
             m_inFunctionScope = false;
             m_currentProcedure.SetProcedureBody(m_procedureBaseScope.GetBlockCode());
         }
 
-        public override void EnterBlock([NotNull] TSP.BlockContext context)
+        public override void EnterBlock([NotNull] SBP.BlockContext context)
         {
             if (m_scopeStack.Count > 0)
             {
@@ -205,7 +205,7 @@ namespace StepBro.Core.Parser
             m_expressionData.PushStackLevel("Block");   // "Livrem og seler"
         }
 
-        public override void ExitBlock([NotNull] TSP.BlockContext context)
+        public override void ExitBlock([NotNull] SBP.BlockContext context)
         {
             m_expressionData.PopStackLevel();   // Just remove the level; it 
 
@@ -229,7 +229,7 @@ namespace StepBro.Core.Parser
             //    m_scopeStack.Peek().AddStatementCode(sub.GetBlockCode());
         }
 
-        public override void EnterSubStatement([NotNull] TSP.SubStatementContext context)
+        public override void EnterSubStatement([NotNull] SBP.SubStatementContext context)
         {
             if (m_enteredLoopStatement)
             {
@@ -239,7 +239,7 @@ namespace StepBro.Core.Parser
             m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "sub", ProcedureParsingScope.ScopeType.SubStatement));
         }
 
-        public override void ExitSubStatement([NotNull] TSP.SubStatementContext context)
+        public override void ExitSubStatement([NotNull] SBP.SubStatementContext context)
         {
             var sub = m_scopeStack.Pop();
             if (sub.StatementCount == 1)   // Just a single statement (not block)
@@ -263,7 +263,7 @@ namespace StepBro.Core.Parser
                     Expression.Constant(column));
         }
 
-        private void AddEnterStatement(TSP.StatementContext context, string entryTimeVariable = null)
+        private void AddEnterStatement(SBP.StatementContext context, string entryTimeVariable = null)
         {
             if (m_scopeStack.Peek().Type <= ProcedureParsingScope.ScopeType.Block)
             {
@@ -271,17 +271,17 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void EnterBlockStatement([NotNull] TSP.BlockStatementContext context)
+        public override void EnterBlockStatement([NotNull] SBP.BlockStatementContext context)
         {
             m_scopeStack.Peek().SetAttributes();
             m_enteredLoopStatement = false;
         }
 
-        public override void ExitBlockStatement([NotNull] TSP.BlockStatementContext context)
+        public override void ExitBlockStatement([NotNull] SBP.BlockStatementContext context)
         {
         }
 
-        public override void ExitBlockStatementAttributes([NotNull] TSP.BlockStatementAttributesContext context)
+        public override void ExitBlockStatementAttributes([NotNull] SBP.BlockStatementAttributesContext context)
         {
             m_scopeStack.Peek().SetAttributes(m_lastAttributes);
             m_lastAttributes = null;
@@ -291,14 +291,14 @@ namespace StepBro.Core.Parser
 
         #region Normal Procedure Call
 
-        public override void EnterCallStatement([NotNull] TSP.CallStatementContext context)
+        public override void EnterCallStatement([NotNull] SBP.CallStatementContext context)
         {
             this.AddEnterStatement(context);
             m_callAssignmentTarget = null;
             m_callAssignmentAwait = false;
         }
 
-        public override void ExitCallStatement([NotNull] TSP.CallStatementContext context)
+        public override void ExitCallStatement([NotNull] SBP.CallStatementContext context)
         {
             var left = m_expressionData.Pop();
             var argumentStack = m_arguments.Pop();
@@ -308,16 +308,16 @@ namespace StepBro.Core.Parser
             this.HandleParensExpression(context, true, left, argumentStack, null, propertyBlock);
         }
 
-        public override void ExitCallAssignment([NotNull] TSP.CallAssignmentContext context)
+        public override void ExitCallAssignment([NotNull] SBP.CallAssignmentContext context)
         {
             if (context.ChildCount == 1)
             {
-                if (context.Start.Type == TSP.AWAIT)
+                if (context.Start.Type == SBP.AWAIT)
                 {
                     m_callAssignmentAwait = true;
                     return;
                 }
-                else if (context.Start.Type == TSP.START)
+                else if (context.Start.Type == SBP.START)
                 {
                     throw new NotImplementedException();
                 }
@@ -329,7 +329,7 @@ namespace StepBro.Core.Parser
             else if (context.ChildCount == 3)
             {
                 var child = context.GetChild(2) as Antlr4.Runtime.Tree.TerminalNodeImpl;
-                if (child != null && child.Payload.Type == TSP.AWAIT)
+                if (child != null && child.Payload.Type == SBP.AWAIT)
                 {
                     m_callAssignmentAwait = true;
                 }
@@ -344,22 +344,22 @@ namespace StepBro.Core.Parser
 
         #endregion
 
-        public override void EnterAssertStatement([NotNull] TSP.AssertStatementContext context)
+        public override void EnterAssertStatement([NotNull] SBP.AssertStatementContext context)
         {
             this.AddEnterStatement(context);
         }
 
-        public override void ExitAssertStatement([NotNull] TSP.AssertStatementContext context)
+        public override void ExitAssertStatement([NotNull] SBP.AssertStatementContext context)
         {
         }
 
-        public override void EnterIfStatement([NotNull] TSP.IfStatementContext context)
+        public override void EnterIfStatement([NotNull] SBP.IfStatementContext context)
         {
             this.AddEnterStatement(context);
             m_expressionData.PushStackLevel("IfStatement");
         }
 
-        public override void ExitIfStatement([NotNull] TSP.IfStatementContext context)
+        public override void ExitIfStatement([NotNull] SBP.IfStatementContext context)
         {
             var stack = m_expressionData.PopStackLevel();
             var condition = stack.Pop();
@@ -412,7 +412,7 @@ namespace StepBro.Core.Parser
 
         #region Looping
 
-        public override void EnterForStatement([NotNull] TSP.ForStatementContext context)
+        public override void EnterForStatement([NotNull] SBP.ForStatementContext context)
         {
             this.AddEnterStatement(context);
             //m_lastPropertyBlock = null;
@@ -420,11 +420,11 @@ namespace StepBro.Core.Parser
             m_enteredLoopStatement = true;
         }
 
-        public override void ExitForStatement([NotNull] TSP.ForStatementContext context)
+        public override void ExitForStatement([NotNull] SBP.ForStatementContext context)
         {
         }
 
-        public override void EnterWhileStatement([NotNull] TSP.WhileStatementContext context)
+        public override void EnterWhileStatement([NotNull] SBP.WhileStatementContext context)
         {
             this.AddEnterStatement(context);
             //m_lastPropertyBlock = null;
@@ -432,7 +432,7 @@ namespace StepBro.Core.Parser
             m_enteredLoopStatement = true;
         }
 
-        public override void ExitWhileStatement([NotNull] TSP.WhileStatementContext context)
+        public override void ExitWhileStatement([NotNull] SBP.WhileStatementContext context)
         {
             var stack = m_expressionData.PopStackLevel();
             var condition = stack.Pop();
@@ -564,7 +564,7 @@ namespace StepBro.Core.Parser
             m_scopeStack.Peek().AddStatementCode(statementExpressions.ToArray());
         }
 
-        public override void EnterDoWhileStatement([NotNull] TSP.DoWhileStatementContext context)
+        public override void EnterDoWhileStatement([NotNull] SBP.DoWhileStatementContext context)
         {
             this.AddEnterStatement(context);
             //m_lastPropertyBlock = null;
@@ -572,11 +572,11 @@ namespace StepBro.Core.Parser
             m_enteredLoopStatement = true;
         }
 
-        public override void ExitDoWhileStatement([NotNull] TSP.DoWhileStatementContext context)
+        public override void ExitDoWhileStatement([NotNull] SBP.DoWhileStatementContext context)
         {
         }
 
-        public override void ExitBreakStatement([NotNull] TSP.BreakStatementContext context)
+        public override void ExitBreakStatement([NotNull] SBP.BreakStatementContext context)
         {
             this.AddEnterStatement(context);
             var scopeForLoop = this.TryGetLoopScope();
@@ -590,7 +590,7 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void ExitContinueStatement([NotNull] TSP.ContinueStatementContext context)
+        public override void ExitContinueStatement([NotNull] SBP.ContinueStatementContext context)
         {
             this.AddEnterStatement(context);
             var scopeForLoop = this.TryGetLoopScope();
@@ -613,7 +613,7 @@ namespace StepBro.Core.Parser
 
         #region Using Statement
 
-        public override void EnterUsingStatement([NotNull] TSP.UsingStatementContext context)
+        public override void EnterUsingStatement([NotNull] SBP.UsingStatementContext context)
         {
             // Create a sub-scope in case the using statement contains a variable declaraton. That variable
             // should only be visible within this statement scope.
@@ -622,7 +622,7 @@ namespace StepBro.Core.Parser
             this.AddEnterStatement(context);
         }
 
-        public override void ExitUsingStatement([NotNull] TSP.UsingStatementContext context)
+        public override void ExitUsingStatement([NotNull] SBP.UsingStatementContext context)
         {
             var subStatements = m_scopeStack.Peek().GetSubExpressions();
 
@@ -654,13 +654,13 @@ namespace StepBro.Core.Parser
             m_scopeStack.Peek().AddStatementCode(statementBlock.GetBlockCode());
         }
 
-        public override void EnterUsingExpression([NotNull] TSP.UsingExpressionContext context)
+        public override void EnterUsingExpression([NotNull] SBP.UsingExpressionContext context)
         {
             var child = context.GetChild(0) as Antlr4.Runtime.RuleContext;
-            if (child.RuleIndex == TSP.RULE_simpleVariableDeclaration)
+            if (child.RuleIndex == SBP.RULE_simpleVariableDeclaration)
             {
             }
-            else if (child.RuleIndex == TSP.RULE_expression)
+            else if (child.RuleIndex == SBP.RULE_expression)
             {
                 m_expressionData.PushStackLevel("UsingStatement");
             }
@@ -670,14 +670,14 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void ExitUsingExpression([NotNull] TSP.UsingExpressionContext context)
+        public override void ExitUsingExpression([NotNull] SBP.UsingExpressionContext context)
         {
             //var usingVariable = m_scopeStack.Peek().AddVariable("usingVariable_" + context.start.Line.ToString(), typeof(IDisposable), null, EntryModifiers.Private);
 
             Expression usingExpression = null;
 
             var child = context.GetChild(0) as Antlr4.Runtime.RuleContext;
-            if (child.RuleIndex == TSP.RULE_simpleVariableDeclaration)
+            if (child.RuleIndex == SBP.RULE_simpleVariableDeclaration)
             {
                 if (m_variableInitializer.IsConstant && m_variableInitializer.Value == null)
                 {
@@ -713,7 +713,7 @@ namespace StepBro.Core.Parser
                 m_variableName = null;
                 m_variableInitializer = null;
             }
-            else if (child.RuleIndex == TSP.RULE_expression)
+            else if (child.RuleIndex == SBP.RULE_expression)
             {
                 var stack = m_expressionData.PopStackLevel();
                 var exp = stack.Pop();
@@ -743,13 +743,13 @@ namespace StepBro.Core.Parser
 
         #region Return
 
-        public override void EnterReturnStatement([NotNull] TSP.ReturnStatementContext context)
+        public override void EnterReturnStatement([NotNull] SBP.ReturnStatementContext context)
         {
             this.AddEnterStatement(context);
             m_expressionData.PushStackLevel("Return Statement");
         }
 
-        public override void ExitReturnStatement([NotNull] TSP.ReturnStatementContext context)
+        public override void ExitReturnStatement([NotNull] SBP.ReturnStatementContext context)
         {
             if (context.ChildCount == 2)
             {
@@ -793,12 +793,12 @@ namespace StepBro.Core.Parser
 
         #region Throw
 
-        public override void EnterThrowStatement([NotNull] TSP.ThrowStatementContext context)
+        public override void EnterThrowStatement([NotNull] SBP.ThrowStatementContext context)
         {
             base.EnterThrowStatement(context);
         }
 
-        public override void ExitThrowStatement([NotNull] TSP.ThrowStatementContext context)
+        public override void ExitThrowStatement([NotNull] SBP.ThrowStatementContext context)
         {
             base.ExitThrowStatement(context);
         }
@@ -810,13 +810,13 @@ namespace StepBro.Core.Parser
         private int m_stepIndex;
         private string m_stepTitle;
 
-        public override void EnterStepStatement([NotNull] TSP.StepStatementContext context)
+        public override void EnterStepStatement([NotNull] SBP.StepStatementContext context)
         {
             m_stepIndex = -1;
             m_stepTitle = "";
         }
 
-        public override void ExitStepStatement([NotNull] TSP.StepStatementContext context)
+        public override void ExitStepStatement([NotNull] SBP.StepStatementContext context)
         {
             if (m_stepIndex > 0)
             {
@@ -836,12 +836,12 @@ namespace StepBro.Core.Parser
                     Expression.Constant(m_stepTitle)));
         }
 
-        public override void ExitStepIndex([NotNull] TSP.StepIndexContext context)
+        public override void ExitStepIndex([NotNull] SBP.StepIndexContext context)
         {
             m_stepIndex = Int32.Parse(context.GetText());
         }
 
-        public override void ExitStepTitle([NotNull] TSP.StepTitleContext context)
+        public override void ExitStepTitle([NotNull] SBP.StepTitleContext context)
         {
             m_stepTitle = ParseStringLiteral(context.GetText(), context);
         }
@@ -852,14 +852,14 @@ namespace StepBro.Core.Parser
 
         private string m_logStatementModifier;
 
-        public override void EnterLogStatement([NotNull] TSP.LogStatementContext context)
+        public override void EnterLogStatement([NotNull] SBP.LogStatementContext context)
         {
             this.AddEnterStatement(context);
             m_expressionData.PushStackLevel("LogStatement");
             m_logStatementModifier = null;
         }
 
-        public override void ExitLogStatement([NotNull] TSP.LogStatementContext context)
+        public override void ExitLogStatement([NotNull] SBP.LogStatementContext context)
         {
             var stack = m_expressionData.PopStackLevel();
             if (stack.Count == 0)
@@ -931,7 +931,7 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void ExitLogModifier([NotNull] TSP.LogModifierContext context)
+        public override void ExitLogModifier([NotNull] SBP.LogModifierContext context)
         {
             m_logStatementModifier = context.GetText();
         }
@@ -940,13 +940,13 @@ namespace StepBro.Core.Parser
 
         #region Expect
 
-        public override void EnterExpectStatement([NotNull] TSP.ExpectStatementContext context)
+        public override void EnterExpectStatement([NotNull] SBP.ExpectStatementContext context)
         {
             this.AddEnterStatement(context);
             m_expressionData.PushStackLevel("ExpectStatement");
         }
 
-        public override void ExitExpectStatement([NotNull] TSP.ExpectStatementContext context)
+        public override void ExitExpectStatement([NotNull] SBP.ExpectStatementContext context)
         {
             var stack = m_expressionData.PopStackLevel();
             var expression = stack.Pop();
@@ -977,20 +977,20 @@ namespace StepBro.Core.Parser
 
         #endregion
 
-        public override void ExitEmptyStatement([NotNull] TSP.EmptyStatementContext context)
+        public override void ExitEmptyStatement([NotNull] SBP.EmptyStatementContext context)
         {
             m_scopeStack.Peek().AddStatementCode(Expression.Default(typeof(void)));
         }
 
         #region Local Variable
 
-        public override void EnterLocalVariableDeclarationStatement([NotNull] TSP.LocalVariableDeclarationStatementContext context)
+        public override void EnterLocalVariableDeclarationStatement([NotNull] SBP.LocalVariableDeclarationStatementContext context)
         {
             this.AddEnterStatement(context);    // TODO: Not if no initializer, and only for static if setting.
             m_variableModifier = VariableModifier.None;
         }
 
-        public override void ExitLocalVariableDeclarationStatement([NotNull] TSP.LocalVariableDeclarationStatementContext context)
+        public override void ExitLocalVariableDeclarationStatement([NotNull] SBP.LocalVariableDeclarationStatementContext context)
         {
             TypeReference type = m_variableType;
             VariableModifier modifier = m_variableModifier;
@@ -1045,12 +1045,12 @@ namespace StepBro.Core.Parser
 
         #endregion
 
-        public override void EnterExpressionStatement([NotNull] TSP.ExpressionStatementContext context)
+        public override void EnterExpressionStatement([NotNull] SBP.ExpressionStatementContext context)
         {
             m_expressionData.PushStackLevel("ExpressionStatement @" + context.Start.Line.ToString() + ", " + context.Start.Column.ToString());
         }
 
-        public override void ExitExpressionStatement([NotNull] TSP.ExpressionStatementContext context)
+        public override void ExitExpressionStatement([NotNull] SBP.ExpressionStatementContext context)
         {
             var stack = m_expressionData.PopStackLevel();
             var expressionStatement = stack.Pop().ExpressionCode;
@@ -1062,11 +1062,11 @@ namespace StepBro.Core.Parser
 
         #endregion
 
-        public override void EnterStatementarguments([NotNull] TSP.StatementargumentsContext context)
+        public override void EnterStatementarguments([NotNull] SBP.StatementargumentsContext context)
         {
         }
 
-        public override void ExitStatementarguments([NotNull] TSP.StatementargumentsContext context)
+        public override void ExitStatementarguments([NotNull] SBP.StatementargumentsContext context)
         {
         }
 

@@ -1,0 +1,238 @@
+using stream;		// tool
+using Kamstrup;		// tool
+using #System.Text;	// .net namespace
+
+config int XMAX = 20;	// Adornment shows if private value is set.
+config bool UserPresent = true;	// Adornment checkbox for easy mouse access.
+config file ConfigurationFile = @"[this]\myConfiguration.xml";	// Adornment shows browse-button. Tooltip or gray text shows the full path.
+config link MyWebSite = "http://www.schmutstein.org";
+
+// Single-selection group. Adornment radio button shown for easy mouse access. Parser warning if none selected or more than one.
+config option [GroupName] OptionA = false;
+config option [GroupName] OptionB = false;
+config option [GroupName] OptionC = true;
+
+config singleselection SomeGroup
+{
+	OptionA = false;
+	OptionB = false;
+	OptionC = true;
+}
+
+config option OptionK = false;
+config option OptionL = false;
+config option OptionM = false;
+
+config MeterTest
+{
+	option X1 = false;
+	int Y2 = 15;
+	singleselection Menu
+	{
+		OptionA = false;
+		OptionB = false;
+		OptionC = true;
+	}
+};
+
+
+tool kmp : Kamstrup.KMP
+{
+	setup()
+	{
+		this.Setup(COM1, 9600) : { FSS = true,  };
+		this.Timeout = 15s;
+	}
+}
+
+public Kamstrup.KMP kmp(COM1, 9600) : { FSS = true, Timeout = 15s };
+
+public Graphics.Bitmap image5 { file = @"" };
+resource image7 : Graphics.Bitmap : { file: @"myicon.ico", size: {64,64} };
+resource image9 : Graphics.Bitmap : { resource: FoMaTyLi, size: {64,64} };
+resource sound3 : Graphics.Waveform : { file: @"", SampleRate: 44100 };
+
+
+
+datatable MyTable : MyTableModel
+{ 
+	HasHeader, 
+	HasColumnNames,
+	HasRowNames,
+	Columns: [
+		{Name= "A", Title = "Abc", Type = "integer", Justify = "left", DefaultValue = 175},
+		{Name= "B", Title = "De",  Type = "integer", Justify = "left", DefaultValue = 175} ],
+	Row: {				cells = [  12, 34, Mogens, "Henrik andersen" ] },
+	Row: { disabled,	cells = [   0, 94, Jan,    Frode ] },
+	Row: { disabled,	cells = [ 659,  7, Mette,  "Leslie" ] },
+	Row: { disabled,	cells = [  19,  4, Dennis, "" ] },
+	Row: { disabled,	cells = [    , 20, Erik,   "" ] }
+}
+ @| A   | B  | C      | D                 |
+__| Abc | De | Fgh    | Ijk               |
+  |  12 | 34 | Mogens | "Henrik andersen" |
+//|   0 | 94 |    Jan | Frode             |
+  | 659 |  7 |  Mette | "Leslie"          |
+  |  19 |  4 | Dennis | ""                |
+  |   - | 20 |   Erik | ""                |
+
+
+template MyTemplate(bool benny) : MyMessage
+{
+	a: 16,
+	b: matches MyValueTemplate,
+	c: omit,
+	d: *,
+	e: ?,
+	f: is not in [..10, 12, 14..16, 19..],
+	g: StartsWith("Jan"),		// Ide: Alle instans-metoder som returer boolean eller match-resultat kan bruges.
+	h: "Mogens".ToUpper(),
+	j: benny | (d < 16.4) // hmm not good. Hvad hvis andre felters værdi skal tages med i betragtning.... Skal lige tænkes lidt over.
+}
+
+
+procedure My Procedure ( integer a, string b, KMP kmp )
+{
+	var MyArray = {1,2,3,4};
+	var i = 16;
+	int j = i * 13;
+	decimal d = 100m;
+	int k = 100M;
+	int[] array2 = new int[]( System.IO.File.ListFiles(@"c:\Windows").Select(f => f.FileName == "Jens"));
+	
+	// Mogensen
+	
+	while ( x > 19 ) : { Task: "", Break: "Stop!!!", LoopVar: j, State: (i) => (i+14).ToString() }
+	{
+		log debug ( d.ToString() );
+	}
+
+	foreach ( int x in myArray )
+	{
+		i += x;
+	}
+	
+	using (new TimeGate( mimimumTime = 15s,  ))
+	{
+	}
+
+	if (i > 8) i = 0;
+	else if (i > 2)
+	{
+		i *= k;
+	}
+
+	test ()
+	{
+		expect "Global number of tigers": (4000 <= k <= 12000~) fatal;
+	}
+	
+	var list = kmp.Get Global Meter Objects List() :
+        error[ConnectionTimeout](Ignore, timeoutSeen = true); 
+    // Idea here is that the error object method has a void parameter; a parameter not used. That parameter can be used for any expression argument.
+    // or maybe the type could be an action-delegate.
+    // Using c#-like anonymous methods includes the delegate keyword and more syntax: delegate(int i) {}.
+
+	// Better maybe:
+	var list = kmp.Get Global Meter Objects List() [ignore ConnectionTimeout, on NackError nackReceived = true, ignore CRCError];
+	var list = kmp.Get Global Meter Objects List() {ignore ConnectionTimeout, on NackError nackReceived = true, ignore CRCError};
+	// 'a b' is equal to a(b) or maybe a = b (hmm, maybe not).
+
+
+	var list = kmp.Get Global Meter Objects List(10, {x=5, y=10, Option6}) [ignore ConnectionTimeout];
+	var list = kmp.Get Global Meter Objects List( max = 10 ) { x=5, y=10, Option6, ignore ConnectionTimeout };
+	
+	// The 'ignore' just means the action should not react on the error/fail and it will not be propagated to the procedure result.
+	
+	on ConnectionTimeout getFailed = true;		// If last action with error-emit had a ConnectionTimeout error.
+
+	var list = kmp.Get Global Meter Objects List( max = 10 ) : { x=5, y=10, Option6, errors { ignore ConnectionTimeout } };
+	// The 'errors' is a "field" on the context-reference, and can therefore be set.
+
+	var list = kmp.Get Global Meter Objects List( max = 10 ) : { x=5, y=10, Option6, errors { ignore ConnectionTimeout, on CRCError { cecErr = true; } } };
+
+	errors 
+	{  
+		ignore ConnectionTimeout, 
+		on CRCError { cecErr = true },
+		when ResponseUnknown error,
+	}
+
+	errors 
+	{  
+		ConnectionTimeout ignore, 
+		CRCError { cecErr = true },
+		ResponseUnknown error,
+	}
+
+	// IDEA: If the method has an ICallContext parameter, a context-scope will be created in the runtime code.
+}
+
+
+private procedure My Procedure ( integer a, string b, KMP kmp ) :
+	"Description": "This is the descriptive description for the fine procedure.",
+	"partners": { "Start": MyFineProcedure, "Run 10 Times": Proc10 },
+	"model": MyModel, ""
+{
+}
+
+private procedure My Procedure ( integer a, string b, KMP kmp ) :
+	Description: "This is the descriptive description for the fine procedure.",
+	Partners: 
+	{ 
+		Start: MyFineProcedure, 
+		"Run 10 Times": Proc10 
+	},
+	Model: MyModel, "Profile State": 
+{
+}
+
+/// <summary>
+/// This is the descriptive description for the fine procedure.
+/// </summary>
+private procedure My Procedure ( integer a, string b, KMP kmp ) : Model4
+[
+	Partner("Start", MyFineProcedure), 
+	Partner("Run 10 Times", Proc10),
+	ProfileState = Mogens, Flag1, Flag2, Flag3,
+	Custom("TargetFile", @"[this]\mydata.csv")
+]
+{
+}
+
+public abstract void My Procedure ( integer a, string b, KMP kmp ) :
+    Model4, // short for model = Model4. The model property is the default property when value is a model/procedure reference.
+	ProfileState = Mogens, Flags |= Flag1 | Flag2 | Flag3,
+	override property["TargetFile"] = @"[this]\mydata.csv"),
+	override method["Start"] = MyFineProcedure, 
+	method("Run 10 Times", Proc10, Starter),
+	method["Mogens"] = MyProxy
+{
+}
+
+private partner void MyProxy (int a)
+{
+	this(a, "Mafioso", KMP);	// Calls "My Procedure" 
+}
+
+public void Do Something()
+{
+	My Procedure.Mogens( 32 );	// Calls "My Procedure" through the Mogens partner (MyProxy).
+}
+
+// PROCEDURE
+// --------------------------------------------
+// Access (private, public, abstract, partner)
+// Name
+// Description, Purpose, Development State
+// Parameters
+// Return type
+// Model
+// Profile
+// Target Procedure Model (ved proxy)
+// Verdict?
+// Logging options
+// Partners
+// Preconditions
+// Custom Properties
+// Plugins (?)

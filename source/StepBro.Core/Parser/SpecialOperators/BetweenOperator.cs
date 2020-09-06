@@ -8,7 +8,7 @@ using System.Reflection;
 
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser.SpecialOperators
 {
@@ -141,9 +141,9 @@ namespace StepBro.Core.Parser.SpecialOperators
 
         static NumericLimitType OpToLimitType(int op)
         {
-            if (op == TSP.OP_LE) return NumericLimitType.Include;
-            else if (op == TSP.OP_LT_APPROX) return NumericLimitType.Approx;
-            else if (op == TSP.LT) return NumericLimitType.Exclude;
+            if (op == SBP.OP_LE) return NumericLimitType.Include;
+            else if (op == SBP.OP_LT_APPROX) return NumericLimitType.Approx;
+            else if (op == SBP.LT) return NumericLimitType.Exclude;
             else
             {
                 throw new NotImplementedException();

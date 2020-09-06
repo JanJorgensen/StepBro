@@ -8,6 +8,7 @@ using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using StepBroCoreTest.Utils;
+using StepBro.Core;
 
 namespace StepBroCoreTest.Execution
 {
@@ -42,7 +43,7 @@ namespace StepBroCoreTest.Execution
             var file = FileBuilder.ParseFiles(
                 (ILogger)null,
                 this.GetType().Assembly,
-                new Tuple<string, string>("myfile.tss", f.ToString()))[0];
+                new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()))[0];
 
             Assert.AreEqual(1, file.ListElements().Count());
             Assert.AreEqual(1, file.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());

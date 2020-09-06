@@ -1,0 +1,42 @@
+using TestFramework;
+
+namespace TestTSharp;
+
+
+procedure TestFloats1() :: TestCaseBase
+{
+	var a = 3.4;
+
+	expect "FloatWithinRange1": (1.0 <~ a <~ 4.0) ;
+}
+
+procedure TestFloats2() :: TestCaseBase
+{
+	var b = 3.4;
+
+	expect "FloatWithinRange2": (1.0 <~ b <~ 3.0) ;
+}
+
+procedure TestTimespan1() :: TestCaseBase
+{
+	var c = 135ms;
+
+	expect "Timespan1": (100ms <~ c <~ 150ms) ;
+}
+
+procedure TestInteger1(int value = 0) :: TestCaseBase
+{
+	expect "Integer1": (-5 <~ value <~ 5) ;
+}
+
+
+testlist TheTestSuite()
+{
+	* TestFloats1
+	* TestFloats2
+	* TestTimespan1
+	* TestInteger1(value = -7)
+	* TestInteger1(value = 3)
+	* TestInteger1(value = 5)
+	* TestInteger1(value = 8)
+}

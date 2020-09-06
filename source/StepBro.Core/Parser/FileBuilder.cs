@@ -11,14 +11,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
 {
     public class FileBuilder
     {
         private readonly ErrorCollector m_errors;
-        private TSP m_parser = null;
+        private SBP m_parser = null;
         private readonly StepBroListener m_listener = null;
         private readonly ScriptFile m_file = null;
 
@@ -26,11 +26,11 @@ namespace StepBro.Core.Parser
         {
             m_file = file;
             m_errors = new ErrorCollector(file, false);
-            var lexer = new TSharpLexer(code);
+            var lexer = new Grammar.StepBroLexer(code);
             lexer.RemoveErrorListeners();
             lexer.AddErrorListener(m_errors);
             ITokenStream tokens = new CommonTokenStream(lexer);
-            m_parser = new TSP(tokens);
+            m_parser = new SBP(tokens);
             m_parser.RemoveErrorListeners();
             m_parser.AddErrorListener(m_errors);
 #if DEBUG
@@ -68,22 +68,22 @@ namespace StepBro.Core.Parser
         }
 
         public IErrorCollector Errors { get { return m_errors; } }
-        public TSP Parser { get { return m_parser; } }
+        public SBP Parser { get { return m_parser; } }
         internal StepBroListener Listener { get { return m_listener; } }
         internal ScriptFile File { get { return m_file; } }
 
         internal static IEnumerable<string> GetTokens(string content)
         {
-            var lexer = new TSharpLexer(new AntlrInputStream(content));
+            var lexer = new Grammar.StepBroLexer(new AntlrInputStream(content));
             var tokens = lexer.GetAllTokens();
-            foreach (var t in tokens) yield return TSharpLexer.ruleNames[t.Type - 1];
+            foreach (var t in tokens) yield return Grammar.StepBroLexer.ruleNames[t.Type - 1];
         }
 
         internal static SBExpressionData ParseLiteral(string content)
         {
-            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenSource lexer = new Grammar.StepBroLexer(new AntlrInputStream(content));
             ITokenStream tokens = new CommonTokenStream(lexer);
-            var parser = new TSP(tokens);
+            var parser = new SBP(tokens);
             var errors = new ErrorCollector(null);
             parser.AddErrorListener(errors);
             parser.BuildParseTree = true;
@@ -177,9 +177,9 @@ namespace StepBro.Core.Parser
 
         internal static SBExpressionData ParsePrimary(string content, ScriptFile file = null)
         {
-            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenSource lexer = new Grammar.StepBroLexer(new AntlrInputStream(content));
             ITokenStream tokens = new CommonTokenStream(lexer);
-            var parser = new TSP(tokens);
+            var parser = new SBP(tokens);
             ErrorCollector errors = (file != null) ? file.Errors as ErrorCollector : new ErrorCollector(null, false);
             parser.AddErrorListener(errors);
             parser.BuildParseTree = true;
@@ -198,9 +198,9 @@ namespace StepBro.Core.Parser
         internal static Data.PropertyBlock ParsePropertyBlock(string content)
         {
             ErrorCollector errors = new ErrorCollector(null);
-            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenSource lexer = new Grammar.StepBroLexer(new AntlrInputStream(content));
             ITokenStream tokens = new CommonTokenStream(lexer);
-            var parser = new TSP(tokens);
+            var parser = new SBP(tokens);
             parser.AddErrorListener(errors);
             parser.BuildParseTree = true;
             StepBroListener listener = new StepBroListener(errors);
@@ -217,9 +217,9 @@ namespace StepBro.Core.Parser
         internal static IDatatable ParseDatatable(string content)
         {
             ErrorCollector errors = new ErrorCollector(null);
-            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenSource lexer = new Grammar.StepBroLexer(new AntlrInputStream(content));
             ITokenStream tokens = new CommonTokenStream(lexer);
-            var parser = new TSP(tokens);
+            var parser = new SBP(tokens);
             parser.AddErrorListener(errors);
             parser.BuildParseTree = true;
             StepBroListener listener = new StepBroListener(errors);
@@ -236,9 +236,9 @@ namespace StepBro.Core.Parser
         internal static List<Tuple<string, TypeReference, object>> ParseDatatableRow(string content)
         {
             ErrorCollector errors = new ErrorCollector(null);
-            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenSource lexer = new Grammar.StepBroLexer(new AntlrInputStream(content));
             ITokenStream tokens = new CommonTokenStream(lexer);
-            var parser = new TSP(tokens);
+            var parser = new SBP(tokens);
             parser.AddErrorListener(errors);
             parser.BuildParseTree = true;
             StepBroListener listener = new StepBroListener(errors);
@@ -254,9 +254,9 @@ namespace StepBro.Core.Parser
 
         internal static void ParseKeywordProcedureCall(string content)
         {
-            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenSource lexer = new Grammar.StepBroLexer(new AntlrInputStream(content));
             ITokenStream tokens = new CommonTokenStream(lexer);
-            var parser = new TSP(tokens);
+            var parser = new SBP(tokens);
             var errors = new ErrorCollector(null);
             parser.AddErrorListener(errors);
             parser.BuildParseTree = true;
@@ -341,9 +341,9 @@ namespace StepBro.Core.Parser
 
         internal static StepBroTypeScanListener.FileContent TypeScanFile(string content)
         {
-            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenSource lexer = new Grammar.StepBroLexer(new AntlrInputStream(content));
             ITokenStream tokens = new CommonTokenStream(lexer);
-            var parser = new TSP(tokens);
+            var parser = new SBP(tokens);
             var errors = new ErrorCollector(null);
             parser.AddErrorListener(errors);
             parser.BuildParseTree = true;
@@ -367,9 +367,9 @@ namespace StepBro.Core.Parser
                 addonManager.AddAssembly(typeof(Enumerable).Assembly, false);
             }
             addonManager.AddAssembly(AddonManager.TSharpCoreAssembly, true);   // Add TSharp always.
-            ITokenSource lexer = new TSharpLexer(new AntlrInputStream(content));
+            ITokenSource lexer = new Grammar.StepBroLexer(new AntlrInputStream(content));
             ITokenStream tokens = new CommonTokenStream(lexer);
-            var parser = new TSP(tokens);
+            var parser = new SBP(tokens);
             var file = new ScriptFile();
             parser.RemoveErrorListeners();
             parser.AddErrorListener(file.Errors as ErrorCollector);
@@ -469,7 +469,7 @@ namespace StepBro.Core.Parser
                 filesToParse = filesManager.ListFiles<ScriptFile>().Reverse().ToList();
             }
             var fileListeners = new Dictionary<ScriptFile, StepBroListener>();
-            var fileContexts = new Dictionary<ScriptFile, TSP.CompilationUnitContext>();
+            var fileContexts = new Dictionary<ScriptFile, SBP.CompilationUnitContext>();
             var namespaceFiles = new Dictionary<string, IdentifierInfo>();
 
             //==============================================================//
@@ -480,9 +480,9 @@ namespace StepBro.Core.Parser
             {
                 var file = fileParsingStack.Dequeue();
                 file.MarkForTypeScanning();
-                ITokenSource lexer = new TSharpLexer(file.GetParserFileStream());
+                ITokenSource lexer = new Grammar.StepBroLexer(file.GetParserFileStream());
                 ITokenStream tokens = new CommonTokenStream(lexer);
-                var parser = new TSP(tokens);
+                var parser = new SBP(tokens);
                 parser.RemoveErrorListeners();
                 (file.Errors as ErrorCollector).Clear();
                 parser.AddErrorListener(file.Errors as ErrorCollector);
@@ -495,7 +495,7 @@ namespace StepBro.Core.Parser
                     file.SetNamespace(System.IO.Path.GetFileNameWithoutExtension(file.FileName));
                 }
 
-                var visitor = new TSharpTypeVisitor();
+                var visitor = new StepBroTypeVisitor();
                 visitor.Visit(context);
 
                 var scanListener = new StepBroTypeScanListener(file.Namespace);

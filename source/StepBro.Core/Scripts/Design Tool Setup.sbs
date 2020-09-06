@@ -1,0 +1,57 @@
+ 
+MeterConfiguration meterConfig : Setup( Project.FirmwareNo, Project.FirmwareRev ) 
+{
+	ConfigurationFileName = @"[this]\MeterConfiguration.xml"
+}
+
+SerialPort modulPort
+{
+	Port: PORT_MODUL_1
+	BaudRate: 9600,
+	Parity: Parity.None,
+	DataBits: 8,
+	StopBits: StopBits.Two,
+	ReadTimeout: 2s,
+	WriteTimeout: 2s,
+	Handshake: Handshake.None,
+	Open: false		
+}
+ 
+KMP kmp
+{
+	Init: {
+		Connection: modulPort,
+		Config: meterConfig,
+		MeterAddress = 63,
+		Password = 6294,
+		Retries = 1,
+		ExtendedMode = false,
+		ExtendedRevision = 1,
+		ExtendedDestination = 0,
+		ExtendedSource = 512 },
+	partner Init: InitKMP,
+
+}
+ 
+AutomationConnection arduino
+{
+	Port: arduinoPort,
+	BrowseEntireTreeOnSetup: false,
+	IgnoreExtraMessages: true,
+	SendNoopMessages: false,
+	NoopMessageInterval: 1s,
+	CountMessages: false,
+	Setup: SetupAutomationConnection,
+}
+
+FileStream errorEventLogFile
+{
+	Filename = "[this]\log.txt",
+	Mode = StreamMode.Write
+}
+
+FileStream MakeBatFile
+{
+	Filename = @"[this]\AutoUploadTestFiles\FetchFtpFiles.bat",
+	Mode = StreamMode.Write
+}

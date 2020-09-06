@@ -83,7 +83,7 @@ namespace StepBroCoreTest.Parser
             f.AppendLine("   return myTool.Fcn(\"Janse\", true);");
             f.AppendLine("}");
             var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
-                new Tuple<string, string>("myfile.tss", f.ToString()));
+                new Tuple<string, string>("myfile.sbs", f.ToString()));
 
             Assert.AreEqual("ObjectUsing", files[0].Namespace);
 
@@ -101,7 +101,7 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        public void TestSpecialFileVariableWithPropblockConfig()
+        public void TesSBPecialFileVariableWithPropblockConfig()
         {
             var f = new StringBuilder();
             f.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");
@@ -117,7 +117,7 @@ namespace StepBroCoreTest.Parser
             f.AppendLine("   return myTool.Fcn(\"Janse\", false);");
             f.AppendLine("}");
             var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
-                new Tuple<string, string>("myfile.tss", f.ToString()));
+                new Tuple<string, string>("myfile.sbs", f.ToString()));
             Assert.AreEqual("ObjectUsing", files[0].Namespace);
             var procedure = files[0].ListElements().First(p => p.Name == "UseObject") as IFileProcedure;
             Assert.AreEqual("UseObject", procedure.Name);

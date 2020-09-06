@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using StepBro.Core.Data;
 //using StepBro.Core.ScriptData;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
 {
-    internal class StepBroTypeScanListener : TSharpBaseListener
+    internal class StepBroTypeScanListener : StepBro.Core.Parser.Grammar.StepBroBaseListener
     {
         public class FileElement
         {
@@ -120,7 +120,7 @@ namespace StepBro.Core.Parser
             return type;
         }
 
-        public override void ExitUsingDeclarationWithIdentifier([NotNull] TSP.UsingDeclarationWithIdentifierContext context)
+        public override void ExitUsingDeclarationWithIdentifier([NotNull] SBP.UsingDeclarationWithIdentifierContext context)
         {
             if (context.ChildCount == 3)
             {
@@ -132,7 +132,7 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void ExitUsingDeclarationWithPath([NotNull] TSP.UsingDeclarationWithPathContext context)
+        public override void ExitUsingDeclarationWithPath([NotNull] SBP.UsingDeclarationWithPathContext context)
         {
             if (context.ChildCount == 3)
             {
@@ -144,7 +144,7 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void ExitNamespace([NotNull] TSP.NamespaceContext context)
+        public override void ExitNamespace([NotNull] SBP.NamespaceContext context)
         {
             this.SetNamespace(context.GetText());
             m_namespaceSet = true;  // Indicate namespace was seen in the file.
@@ -162,44 +162,44 @@ namespace StepBro.Core.Parser
             m_elementStack.Push(element);
         }
 
-        public override void EnterFileElement([NotNull] TSP.FileElementContext context)
+        public override void EnterFileElement([NotNull] SBP.FileElementContext context)
         {
             m_modifiers = null;
         }
 
-        public override void ExitFileElement([NotNull] TSP.FileElementContext context)
+        public override void ExitFileElement([NotNull] SBP.FileElementContext context)
         {
         }
 
-        public override void EnterElementModifier([NotNull] TSP.ElementModifierContext context)
+        public override void EnterElementModifier([NotNull] SBP.ElementModifierContext context)
         {
             if (m_modifiers == null) m_modifiers = new List<string>();
             m_modifiers.Add(context.GetText());
         }
 
-        public override void EnterFileElementProcedure([NotNull] TSP.FileElementProcedureContext context)
+        public override void EnterFileElementProcedure([NotNull] SBP.FileElementProcedureContext context)
         {
             m_isFunction = false;
             m_elementStartLine = context.Start.Line;
         }
-        public override void EnterFileElementFunction([NotNull] TSP.FileElementFunctionContext context)
+        public override void EnterFileElementFunction([NotNull] SBP.FileElementFunctionContext context)
         {
             m_isFunction = true;
             m_elementStartLine = context.Start.Line;
         }
 
-        public override void EnterProcedureParameters([NotNull] TSP.ProcedureParametersContext context)
+        public override void EnterProcedureParameters([NotNull] SBP.ProcedureParametersContext context)
         {
             m_procedureParameters = new List<ParameterData>();    // New list; it will be handed to the file element object.
         }
 
-        public override void ExitFormalParameterModifiers([NotNull] TSP.FormalParameterModifiersContext context)
+        public override void ExitFormalParameterModifiers([NotNull] SBP.FormalParameterModifiersContext context)
         {
             var m = context.GetText();
             m_parameterModifiers = m.Split(' ');
         }
 
-        public override void ExitFormalParameterDecl([NotNull] TSP.FormalParameterDeclContext context)
+        public override void ExitFormalParameterDecl([NotNull] SBP.FormalParameterDeclContext context)
         {
             var type = this.PopType("ExitFormalParameterDecl");
             var name = context.GetChild(context.children.Count - 1).GetText();
@@ -207,26 +207,26 @@ namespace StepBro.Core.Parser
             m_parameterModifiers = null;
         }
 
-        public override void ExitProcedureParameters([NotNull] TSP.ProcedureParametersContext context)
+        public override void ExitProcedureParameters([NotNull] SBP.ProcedureParametersContext context)
         {
             base.ExitProcedureParameters(context);
         }
-        public override void ExitProcedureReturnType([NotNull] TSP.ProcedureReturnTypeContext context)
+        public override void ExitProcedureReturnType([NotNull] SBP.ProcedureReturnTypeContext context)
         {
             m_returnType = this.PopType("ExitProcedureReturnType");
         }
 
-        public override void ExitProcedureName([NotNull] TSP.ProcedureNameContext context)
+        public override void ExitProcedureName([NotNull] SBP.ProcedureNameContext context)
         {
             m_name = context.GetText();
         }
 
-        public override void ExitVariableType([NotNull] TSP.VariableTypeContext context)
+        public override void ExitVariableType([NotNull] SBP.VariableTypeContext context)
         {
             m_type = context.GetText();
         }
 
-        public override void EnterProcedureBodyOrNothing([NotNull] TSP.ProcedureBodyOrNothingContext context)
+        public override void EnterProcedureBodyOrNothing([NotNull] SBP.ProcedureBodyOrNothingContext context)
         {
             var name = m_name;
             var parameters = m_procedureParameters;
@@ -236,21 +236,21 @@ namespace StepBro.Core.Parser
             element.Parameters = parameters;
             element.ReturnTypeData = m_returnType;
             element.IsFunction = m_isFunction;
-            element.HasBody = context.Start.Type != TSP.SEMICOLON;
+            element.HasBody = context.Start.Type != SBP.SEMICOLON;
             this.TopElement.Childs.Add(element);
         }
 
-        public override void ExitTestListName([NotNull] TSP.TestListNameContext context)
+        public override void ExitTestListName([NotNull] SBP.TestListNameContext context)
         {
             m_name = context.GetText();
         }
 
-        public override void EnterTestlist([NotNull] TSP.TestlistContext context)
+        public override void EnterTestlist([NotNull] SBP.TestlistContext context)
         {
             m_elementStartLine = context.Start.Line;
         }
 
-        public override void ExitTestlist([NotNull] TSP.TestlistContext context)
+        public override void ExitTestlist([NotNull] SBP.TestlistContext context)
         {
             var name = m_name;
             //var parameters = m_procedureParameters;
@@ -258,16 +258,16 @@ namespace StepBro.Core.Parser
             var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.TestList, name);
             element.Modifiers = m_modifiers;
             //element.Parameters = parameters;
-            //element.HasBody = context.Start.Type != TSP.SEMICOLON;
+            //element.HasBody = context.Start.Type != SBP.SEMICOLON;
             this.TopElement.Childs.Add(element);
         }
 
-        public override void EnterFileVariable([NotNull] TSP.FileVariableContext context)
+        public override void EnterFileVariable([NotNull] SBP.FileVariableContext context)
         {
             m_elementStartLine = context.Start.Line;
         }
 
-        public override void ExitFileVariableSimple([NotNull] TSP.FileVariableSimpleContext context)
+        public override void ExitFileVariableSimple([NotNull] SBP.FileVariableSimpleContext context)
         {
             var type = this.PopType("ExitFileVariableSimple");
             var name = m_varName;
@@ -278,7 +278,7 @@ namespace StepBro.Core.Parser
             this.TopElement.Childs.Add(element);
         }
 
-        public override void ExitFileVariableWithPropertyBlock([NotNull] TSP.FileVariableWithPropertyBlockContext context)
+        public override void ExitFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)
         {
             var type = this.PopType("ExitFileVariableWithPropertyBlock");
             var name = m_varName;
@@ -289,38 +289,38 @@ namespace StepBro.Core.Parser
             this.TopElement.Childs.Add(element);
         }
 
-        public override void EnterVariableDeclaratorId([NotNull] TSP.VariableDeclaratorIdContext context)
+        public override void EnterVariableDeclaratorId([NotNull] SBP.VariableDeclaratorIdContext context)
         {
             m_varName = context.GetText();
         }
 
-        public override void EnterVariableModifier([NotNull] TSP.VariableModifierContext context)
+        public override void EnterVariableModifier([NotNull] SBP.VariableModifierContext context)
         {
             if (m_modifiers == null) m_modifiers = new List<string>();
             m_modifiers.Add(context.GetText());
         }
 
-        public override void ExitTypeVoid([NotNull] TSP.TypeVoidContext context)
+        public override void ExitTypeVoid([NotNull] SBP.TypeVoidContext context)
         {
             this.PushType("ExitTypeVoid", "void", context.Start);
         }
 
-        public override void ExitTypePrimitive([NotNull] TSP.TypePrimitiveContext context)
+        public override void ExitTypePrimitive([NotNull] SBP.TypePrimitiveContext context)
         {
             this.PushType("ExitTypePrimitive", context.GetText(), context.Start);
         }
 
-        public override void ExitTypeProcedure([NotNull] TSP.TypeProcedureContext context)
+        public override void ExitTypeProcedure([NotNull] SBP.TypeProcedureContext context)
         {
             this.PushType("ExitTypeProcedure", "procedure", context.Start);
         }
 
-        public override void ExitTypeFunction([NotNull] TSP.TypeFunctionContext context)
+        public override void ExitTypeFunction([NotNull] SBP.TypeFunctionContext context)
         {
             this.PushType("ExitTypeProcedure", "function", context.Start);
         }
 
-        public override void ExitTypeClassOrInterface([NotNull] TSP.TypeClassOrInterfaceContext context)
+        public override void ExitTypeClassOrInterface([NotNull] SBP.TypeClassOrInterfaceContext context)
         {
             this.PushType("ExitTypeClassOrInterface", context.GetText(), context.Start);
         }

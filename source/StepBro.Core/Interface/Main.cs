@@ -18,6 +18,7 @@ namespace StepBro.Core
 {
     public static class Main
     {
+        public static readonly string StepBroFileExtension = "sbs";
         private static bool m_initialized = false;
         private static ServiceManager.IServiceManagerAdministration m_serviceManagerAdmin = null;
         private static MainLogger m_mainLogger = null;

@@ -3,7 +3,8 @@ using System;
 using System.Collections.Generic;
 using StepBro.Core.Data;
 using StepBro.Core.ScriptData;
-using SBP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
+using Lexer = StepBro.Core.Parser.Grammar.StepBroLexer;
 
 namespace StepBro.Core.Parser
 {
@@ -75,7 +76,7 @@ namespace StepBro.Core.Parser
             if (!String.IsNullOrEmpty(text))
             {
                 // TODO: It MUST be possible to make this simpler... (e.g. re-use tokens)
-                Antlr4.Runtime.ITokenSource lexer = new TSharpLexer(new Antlr4.Runtime.AntlrInputStream(text));
+                Antlr4.Runtime.ITokenSource lexer = new Lexer(new Antlr4.Runtime.AntlrInputStream(text));
                 Antlr4.Runtime.ITokenStream tokens = new Antlr4.Runtime.CommonTokenStream(lexer);
                 var parser = new SBP(tokens);
                 parser.RemoveErrorListeners();

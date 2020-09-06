@@ -5,7 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using StepBro.Core.Data;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
 {
@@ -18,7 +18,7 @@ namespace StepBro.Core.Parser
         private List<Tuple<string, Type>> m_lambdaDelegateGenericArguments = null;
         private Type m_lambdaDelegateReturnType;
 
-        public override void EnterLambdaExpression([NotNull] TSP.LambdaExpressionContext context)
+        public override void EnterLambdaExpression([NotNull] SBP.LambdaExpressionContext context)
         {
             m_lambdaDelegateTargetType = null;
             m_lambdaDelegateGenericArguments = null;
@@ -29,28 +29,28 @@ namespace StepBro.Core.Parser
 
             switch (m_lambdaParentRule)
             {
-                case TSP.RULE_argument:
+                case SBP.RULE_argument:
                     m_lambdaLeftExpression = m_leftOfMethodCallExpression;
                     break;
-                case TSP.RULE_variableInitializer:
+                case SBP.RULE_variableInitializer:
                     break;
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        public override void ExitLambdaSimpleParameter([NotNull] TSP.LambdaSimpleParameterContext context)
+        public override void ExitLambdaSimpleParameter([NotNull] SBP.LambdaSimpleParameterContext context)
         {
-            if (m_lambdaParentRule != TSP.RULE_argument)
+            if (m_lambdaParentRule != SBP.RULE_argument)
             {
                 throw new NotSupportedException();
             }
             this.SetupUntypedLambdaParameters(context.GetText());
         }
 
-        public override void ExitLambdaMoreParameters([NotNull] TSP.LambdaMoreParametersContext context)
+        public override void ExitLambdaMoreParameters([NotNull] SBP.LambdaMoreParametersContext context)
         {
-            if (m_lambdaParentRule != TSP.RULE_argument)
+            if (m_lambdaParentRule != SBP.RULE_argument)
             {
                 throw new NotSupportedException();
             }
@@ -58,19 +58,19 @@ namespace StepBro.Core.Parser
             //this.SetupLambdaParameters();
         }
 
-        public override void ExitLambdaTypedParameters([NotNull] TSP.LambdaTypedParametersContext context)
+        public override void ExitLambdaTypedParameters([NotNull] SBP.LambdaTypedParametersContext context)
         {
             m_lambdaTypedParameters = m_parameters.Select(pt => new Tuple<Type, string>(pt.Type.Type, pt.Name)).ToList();
             this.SetupTypedLambdaParameters();
         }
 
-        public override void ExitLambdaNoParameters([NotNull] TSP.LambdaNoParametersContext context)
+        public override void ExitLambdaNoParameters([NotNull] SBP.LambdaNoParametersContext context)
         {
-            if (m_lambdaParentRule == TSP.RULE_argument)
+            if (m_lambdaParentRule == SBP.RULE_argument)
             {
                 this.SetupUntypedLambdaParameters();
             }
-            else if (m_lambdaParentRule == TSP.RULE_variableInitializer)
+            else if (m_lambdaParentRule == SBP.RULE_variableInitializer)
             {
                 m_lambdaTypedParameters = new List<Tuple<Type, string>>();
                 this.SetupTypedLambdaParameters();
@@ -246,7 +246,7 @@ namespace StepBro.Core.Parser
 
         //private bool IsMethodMatching
 
-        public override void ExitLambdaExpression([NotNull] TSP.LambdaExpressionContext context)
+        public override void ExitLambdaExpression([NotNull] SBP.LambdaExpressionContext context)
         {
             var lambdaExpressionCode = m_expressionData.Pop();
 
@@ -255,7 +255,7 @@ namespace StepBro.Core.Parser
             var delegateType = m_lambdaDelegateTargetType;
 
 
-            if (m_lambdaParentRule == TSP.RULE_argument)
+            if (m_lambdaParentRule == SBP.RULE_argument)
             {
                 // Udfordringen: finde typen, som typisk er parameter til metoden som kaldes.
                 // Dette er faktisk nødvendigt for at kende data-typen af parametrene til denne lambda-expression.
@@ -285,7 +285,7 @@ namespace StepBro.Core.Parser
                 }
 
             }
-            else if (m_lambdaParentRule == TSP.RULE_variableInitializer)
+            else if (m_lambdaParentRule == SBP.RULE_variableInitializer)
             {
                 if (delegateType == null)
                 {

@@ -222,7 +222,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestFileScanUsings()
         {
-            var result = FileBuilder.TypeScanFile("using Andrea; using Betty.Chrissy; using \"Denise.tss\"; public using Erica; namespace Uncle; void ProcA(){}");
+            var result = FileBuilder.TypeScanFile("using Andrea; using Betty.Chrissy; using \"Denise.sbs\"; public using Erica; namespace Uncle; void ProcA(){}");
             Assert.AreEqual(FET.Namespace, result.TopElement.Type);
             Assert.AreEqual("Uncle", result.TopElement.Name);
 
@@ -232,7 +232,7 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual("i", result.ListUsings().ElementAt(1).Item1);
             Assert.AreEqual("Betty.Chrissy", result.ListUsings().ElementAt(1).Item2);
             Assert.AreEqual("p", result.ListUsings().ElementAt(2).Item1);
-            Assert.AreEqual("Denise.tss", result.ListUsings().ElementAt(2).Item2);
+            Assert.AreEqual("Denise.sbs", result.ListUsings().ElementAt(2).Item2);
             Assert.AreEqual("I", result.ListUsings().ElementAt(3).Item1);
             Assert.AreEqual("Erica", result.ListUsings().ElementAt(3).Item2);
 

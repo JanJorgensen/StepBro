@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
 {
@@ -24,56 +24,56 @@ namespace StepBro.Core.Parser
         private string m_argumentName = null;  // TODO: add this to the stack somehow.
         private SBExpressionData m_leftOfMethodCallExpression = null;   // TODO: add this to the stack somehow.
 
-        public override void EnterArgument([NotNull] TSP.ArgumentContext context)
+        public override void EnterArgument([NotNull] SBP.ArgumentContext context)
         {
             m_argumentIndex = m_expressionData.Peek().Count;
             m_argumentName = null;
         }
 
-        public override void ExitArgument([NotNull] TSP.ArgumentContext context)
+        public override void ExitArgument([NotNull] SBP.ArgumentContext context)
         {
             m_expressionData.Peek().Peek().ArgumentIndex = m_argumentIndex;
             m_expressionData.Peek().Peek().ParameterName = m_argumentName;
         }
 
-        //public override void EnterArgumentWithoutName([NotNull] TSP.ArgumentWithoutNameContext context)
+        //public override void EnterArgumentWithoutName([NotNull] SBP.ArgumentWithoutNameContext context)
         //{
         //    m_argumentIndex = m_expressionData.Peek().Count;
         //}
 
-        //public override void ExitArgumentWithoutName([NotNull] TSP.ArgumentWithoutNameContext context)
+        //public override void ExitArgumentWithoutName([NotNull] SBP.ArgumentWithoutNameContext context)
         //{
         //    m_expressionData.Peek().Peek().ArgumentIndex = m_argumentIndex;
         //}
 
-        public override void ExitReferenceArgument([NotNull] TSP.ReferenceArgumentContext context)
+        public override void ExitReferenceArgument([NotNull] SBP.ReferenceArgumentContext context)
         {
             string name = context.children[1].GetText();
             string refType = context.children[0].GetText();
             m_expressionData.Push(SBExpressionData.CreateIdentifier(name, refType));
         }
 
-        public override void ExitArgumentName([NotNull] TSP.ArgumentNameContext context)
+        public override void ExitArgumentName([NotNull] SBP.ArgumentNameContext context)
         {
             m_argumentName = context.children[0].GetText();
         }
 
-        //public override void ExitArgumentWithName([NotNull] TSP.ArgumentWithNameContext context)
+        //public override void ExitArgumentWithName([NotNull] SBP.ArgumentWithNameContext context)
         //{
         //    m_expressionData.Peek().Peek().ParameterName = context.children[0].GetText();
         //}
 
-        public override void EnterArguments([NotNull] TSP.ArgumentsContext context)
+        public override void EnterArguments([NotNull] SBP.ArgumentsContext context)
         {
             m_expressionData.PushStackLevel("EnterArguments @" + context.Start.Line.ToString() + ", " + context.Start.Column.ToString());
         }
 
-        public override void ExitArguments([NotNull] TSP.ArgumentsContext context)
+        public override void ExitArguments([NotNull] SBP.ArgumentsContext context)
         {
             m_arguments.Push(m_expressionData.PopStackLevel());
         }
 
-        public override void EnterMethodArguments([NotNull] TSP.MethodArgumentsContext context)
+        public override void EnterMethodArguments([NotNull] SBP.MethodArgumentsContext context)
         {
             var left = m_expressionData.Pop();
             left = this.ResolveIfIdentifier(left, true);
@@ -84,14 +84,14 @@ namespace StepBro.Core.Parser
 
         #endregion
 
-        public override void EnterExpParens([NotNull] TSP.ExpParensContext context)
+        public override void EnterExpParens([NotNull] SBP.ExpParensContext context)
         {
             //var left = m_expressionData.Pop();
             //left = this.ResolveIfIdentifier(left);
             //m_expressionData.Push(left);
         }
 
-        public override void ExitExpParens([NotNull] TSP.ExpParensContext context)
+        public override void ExitExpParens([NotNull] SBP.ExpParensContext context)
         {
             var argumentStack = m_arguments.Pop();
             var left = m_expressionData.Pop();
@@ -960,12 +960,12 @@ namespace StepBro.Core.Parser
 
         #region Keyword Procedure Call
 
-        public override void EnterKeywordProcedureCall([NotNull] TSP.KeywordProcedureCallContext context)
+        public override void EnterKeywordProcedureCall([NotNull] SBP.KeywordProcedureCallContext context)
         {
             m_lastElementPropertyBlock = null;
         }
 
-        public override void ExitKeywordProcedureCall([NotNull] TSP.KeywordProcedureCallContext context)
+        public override void ExitKeywordProcedureCall([NotNull] SBP.KeywordProcedureCallContext context)
         {
             //var identifier = m_identifier;
             //var keywordArguments = m_keywordArguments;
@@ -978,12 +978,12 @@ namespace StepBro.Core.Parser
             //this.HandleParensExpression(context, true, left, argumentStack, null, propertyBlock);
         }
 
-        public override void EnterProcedureAndArgumentCombinedPhrase([NotNull] TSP.ProcedureAndArgumentCombinedPhraseContext context)
+        public override void EnterProcedureAndArgumentCombinedPhrase([NotNull] SBP.ProcedureAndArgumentCombinedPhraseContext context)
         {
             m_expressionData.PushStackLevel("ProcedureAndArgumentCombinedPhrase");
         }
 
-        public override void ExitProcedureAndArgumentCombinedPhrase([NotNull] TSP.ProcedureAndArgumentCombinedPhraseContext context)
+        public override void ExitProcedureAndArgumentCombinedPhrase([NotNull] SBP.ProcedureAndArgumentCombinedPhraseContext context)
         {
             //m_keywordArguments = m_expressionData.PopStackLevel();
             //int n = context.ChildCount - 1;     // Minus the procedureAndArgumentCombinedPhraseTail 
@@ -995,7 +995,7 @@ namespace StepBro.Core.Parser
             throw new NotImplementedException();
         }
 
-        public override void ExitProcedureAndArgumentCombinedPhraseTail([NotNull] TSP.ProcedureAndArgumentCombinedPhraseTailContext context)
+        public override void ExitProcedureAndArgumentCombinedPhraseTail([NotNull] SBP.ProcedureAndArgumentCombinedPhraseTailContext context)
         {
             base.ExitProcedureAndArgumentCombinedPhraseTail(context);
         }

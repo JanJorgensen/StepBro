@@ -3,18 +3,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
 {
     internal partial class StepBroListener
     {
-        public override void EnterExpBracket([NotNull] TSP.ExpBracketContext context)
+        public override void EnterExpBracket([NotNull] SBP.ExpBracketContext context)
         {
             m_expressionData.PushStackLevel("ExpressionBracket");
         }
 
-        public override void ExitExpBracket([NotNull] TSP.ExpBracketContext context)
+        public override void ExitExpBracket([NotNull] SBP.ExpBracketContext context)
         {
             var expressions = m_expressionData.PopStackLevel();
             var indexingExpressions = new List<SBExpressionData>();
@@ -64,12 +64,12 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void EnterExpArray([NotNull] TSP.ExpArrayContext context)
+        public override void EnterExpArray([NotNull] SBP.ExpArrayContext context)
         {
             m_expressionData.PushStackLevel("ExpressionArray");
         }
 
-        public override void ExitExpArray([NotNull] TSP.ExpArrayContext context)
+        public override void ExitExpArray([NotNull] SBP.ExpArrayContext context)
         {
             var valueParserExpressions = m_expressionData.PopStackLevel();
             bool first = true, same = true;

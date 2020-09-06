@@ -19,11 +19,11 @@ namespace StepBroCoreTest.Parser
         public void TestFileParsingSimpleFileUsings()
         {
             var files = FileBuilder.ParseFiles((ILogger)null,
-                new Tuple<string, string>("andrea.tss", "using \"betty.tss\"; namespace Anders; procedure int Absalon(){ int i = 0; i = Bethlehem(); return i; }"),
-                new Tuple<string, string>("betty.tss", "namespace Anders; procedure int Bethlehem(){ return 7161; }"));
+                new Tuple<string, string>("andrea.sbs", "using \"betty.sbs\"; namespace Anders; procedure int Absalon(){ int i = 0; i = Bethlehem(); return i; }"),
+                new Tuple<string, string>("betty.sbs", "namespace Anders; procedure int Bethlehem(){ return 7161; }"));
             Assert.AreEqual(2, files.Length);
-            Assert.AreEqual("andrea.tss", files.ElementAt(0).FileName);
-            Assert.AreEqual("betty.tss", files.ElementAt(1).FileName);
+            Assert.AreEqual("andrea.sbs", files.ElementAt(0).FileName);
+            Assert.AreEqual("betty.sbs", files.ElementAt(1).FileName);
             var procedure = files[0].ListElements().First(p => p.Name == "Absalon") as IFileProcedure;
             Assert.AreEqual("Absalon", procedure.Name);
             procedure = files[1].ListElements().First(p => p.Name == "Bethlehem") as IFileProcedure;

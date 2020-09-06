@@ -1,0 +1,31 @@
+﻿// Base test project definitions.
+
+public using TestFramework;
+
+public procedure TestCase() :
+    TestCaseBase,
+    FreeParameters,
+    override partner Setup:     TestCaseSetup,
+    override partner Cleanup:   TestCaseCleanup;
+
+public procedure void TestCaseSetup( this TestCase testcase )
+{
+    log ("Doing default setup for " + testcase.Name);
+}
+
+public procedure void TestCaseCleanup( this TestCase testcase )
+{
+    log ("Doing default cleanup for " + testcase.Name);
+}
+
+public procedure void TestCaseSpecialSetup( this TestCase testcase )
+{
+    log ("Doing special setup for " + testcase.Name);
+}
+
+public procedure void TestCaseSpecialCleanup( this TestCase testcase )
+{
+    log ("Doing special cleanup for " + testcase.Name);
+}
+
+public testlist TestSuite : TestSuiteBase;

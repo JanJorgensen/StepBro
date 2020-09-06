@@ -391,7 +391,7 @@
     <Compile Include="ScriptData\IScriptProperty.cs" />
     <Compile Include="Host\IHost.cs" />
     <Compile Include="ScriptData\IScriptFile.cs" />
-    <None Include="LatestSyntax.tss" />
+    <None Include="LatestSyntax.sbs" />
     <None Include="packages.config" />
     <None Include="Parser\CSharp4.g4">
       <Generator>MSBuild:Compile</Generator>
@@ -405,9 +405,9 @@
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>TSharpCore.Parser</CustomToolNamespace>
     </None>
-    <Antlr4 Include="Parser\TSharp.g4">
+    <Antlr4 Include="Parser\StepBro.g4">
       <Generator>MSBuild:Compile</Generator>
-      <CustomToolNamespace>StepBro.Core.Parser</CustomToolNamespace>
+      <CustomToolNamespace>StepBro.Core.Parser.Grammar</CustomToolNamespace>
       <Listener>True</Listener>
       <Visitor>True</Visitor>
       <TargetLanguage>CSharp</TargetLanguage>
@@ -422,9 +422,9 @@
     <Compile Include="File\Exceptions.cs" />
     <Compile Include="File\FileReference.cs" />
     <Compile Include="File\XmlTextExtensions.cs" />
-    <Antlr4 Include="Parser\TSharpLexer.g4">
+    <Antlr4 Include="Parser\StepBroLexer.g4">
       <Generator>MSBuild:Compile</Generator>
-      <CustomToolNamespace>StepBro.Core.Parser</CustomToolNamespace>
+      <CustomToolNamespace>StepBro.Core.Parser.Grammar</CustomToolNamespace>
       <TargetLanguage>CSharp</TargetLanguage>
       <Listener>False</Listener>
       <Visitor>False</Visitor>
@@ -434,29 +434,29 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Scripts\AltAndInterleave.tss" />
-    <None Include="Scripts\ConsoleTest.tss">
+    <None Include="Scripts\AltAndInterleave.sbs" />
+    <None Include="Scripts\ConsoleTest.sbs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Scripts\MyProjectBase.tss">
+    <None Include="Scripts\MyProjectBase.sbs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Scripts\TestInterfaceTest.tss" />
-    <None Include="Scripts\TestProject.tss">
+    <None Include="Scripts\TestInterfaceTest.sbs" />
+    <None Include="Scripts\TestProject.sbs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Scripts\TestFramework.tss">
+    <None Include="Scripts\TestFramework.sbs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Scripts\CAN Test.tss">
+    <None Include="Scripts\CAN Test.sbs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Scripts\TestSuite Execution.tss">
+    <None Include="Scripts\TestSuite Execution.sbs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Scripts\Design TestSuite.tss" />
-    <None Include="Scripts\Design Tool Setup.tss" />
-    <None Include="TSharp Example.tss" />
+    <None Include="Scripts\Design TestSuite.sbs" />
+    <None Include="Scripts\Design Tool Setup.sbs" />
+    <None Include="TSharp Example.sbs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Keyword work.txt" />

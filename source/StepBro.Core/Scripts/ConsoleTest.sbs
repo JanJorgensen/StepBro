@@ -1,0 +1,7 @@
+﻿namespace ConsoleTest;
+
+
+procedure int Add215(int i)
+{
+	return i + 215;
+}

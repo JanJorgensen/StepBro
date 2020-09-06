@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
 {
@@ -23,27 +23,27 @@ namespace StepBro.Core.Parser
         /// </summary>
         internal sealed class DynamicSpecifiedType { private DynamicSpecifiedType() { } }
 
-        public override void ExitTypeVoid([NotNull] TSP.TypeVoidContext context)
+        public override void ExitTypeVoid([NotNull] SBP.TypeVoidContext context)
         {
             m_typeStack.Push((TypeReference)typeof(void));
         }
 
-        public override void ExitTypeProcedure([NotNull] TSP.TypeProcedureContext context)
+        public override void ExitTypeProcedure([NotNull] SBP.TypeProcedureContext context)
         {
             m_typeStack.Push(TypeReference.TypeProcedure);
         }
 
-        public override void ExitTypeFunction([NotNull] TSP.TypeFunctionContext context)
+        public override void ExitTypeFunction([NotNull] SBP.TypeFunctionContext context)
         {
             m_typeStack.Push(TypeReference.TypeFunction);
         }
 
-        public override void ExitTypeTestList([NotNull] TSP.TypeTestListContext context)
+        public override void ExitTypeTestList([NotNull] SBP.TypeTestListContext context)
         {
             m_typeStack.Push(TypeReference.TypeTestList);
         }
 
-        public override void ExitTypePrimitive([NotNull] TSP.TypePrimitiveContext context)
+        public override void ExitTypePrimitive([NotNull] SBP.TypePrimitiveContext context)
         {
             Type type = null;
             var arrRank = (context.ChildCount > 1) ? context.children[1].GetText().Where(c => c == '[').Count() : 0;
@@ -51,16 +51,16 @@ namespace StepBro.Core.Parser
             {
                 switch (context.Start.Type)
                 {
-                    case TSP.BOOL: type = typeof(bool); break;
-                    case TSP.INT_: type = typeof(long); break;
-                    case TSP.INTEGER: type = typeof(long); break;
-                    case TSP.DECIMAL: type = typeof(double); break;
-                    case TSP.DOUBLE: type = typeof(double); break;
-                    case TSP.VERDICT: type = typeof(Verdict); break;
-                    case TSP.DATETIME: type = typeof(DateTime); break;
-                    case TSP.TIMESPAN: type = typeof(TimeSpan); break;
-                    case TSP.STRING: type = typeof(string); break;
-                    case TSP.OBJECT: type = typeof(object); break;
+                    case SBP.BOOL: type = typeof(bool); break;
+                    case SBP.INT_: type = typeof(long); break;
+                    case SBP.INTEGER: type = typeof(long); break;
+                    case SBP.DECIMAL: type = typeof(double); break;
+                    case SBP.DOUBLE: type = typeof(double); break;
+                    case SBP.VERDICT: type = typeof(Verdict); break;
+                    case SBP.DATETIME: type = typeof(DateTime); break;
+                    case SBP.TIMESPAN: type = typeof(TimeSpan); break;
+                    case SBP.STRING: type = typeof(string); break;
+                    case SBP.OBJECT: type = typeof(object); break;
                     default:
                         throw new NotImplementedException();
                 }
@@ -69,16 +69,16 @@ namespace StepBro.Core.Parser
             {
                 switch (context.Start.Type)
                 {
-                    case TSP.BOOL: type = typeof(List<bool>); break;
-                    case TSP.INT_: type = typeof(List<long>); break;
-                    case TSP.INTEGER: type = typeof(List<long>); break;
-                    case TSP.DECIMAL: type = typeof(List<double>); break;
-                    case TSP.DOUBLE: type = typeof(List<double>); break;
-                    case TSP.VERDICT: type = typeof(List<Verdict>); break;
-                    case TSP.DATETIME: type = typeof(List<DateTime>); break;
-                    case TSP.TIMESPAN: type = typeof(List<TimeSpan>); break;
-                    case TSP.STRING: type = typeof(List<string>); break;
-                    case TSP.OBJECT: type = typeof(List<object>); break;
+                    case SBP.BOOL: type = typeof(List<bool>); break;
+                    case SBP.INT_: type = typeof(List<long>); break;
+                    case SBP.INTEGER: type = typeof(List<long>); break;
+                    case SBP.DECIMAL: type = typeof(List<double>); break;
+                    case SBP.DOUBLE: type = typeof(List<double>); break;
+                    case SBP.VERDICT: type = typeof(List<Verdict>); break;
+                    case SBP.DATETIME: type = typeof(List<DateTime>); break;
+                    case SBP.TIMESPAN: type = typeof(List<TimeSpan>); break;
+                    case SBP.STRING: type = typeof(List<string>); break;
+                    case SBP.OBJECT: type = typeof(List<object>); break;
                     default:
                         throw new NotImplementedException();
                 }
@@ -87,16 +87,16 @@ namespace StepBro.Core.Parser
             {
                 switch (context.Start.Type)
                 {
-                    case TSP.BOOL: type = typeof(List<List<bool>>); break;
-                    case TSP.INT_: type = typeof(List<List<long>>); break;
-                    case TSP.INTEGER: type = typeof(List<List<long>>); break;
-                    case TSP.DECIMAL: type = typeof(List<List<double>>); break;
-                    case TSP.DOUBLE: type = typeof(List<List<double>>); break;
-                    case TSP.VERDICT: type = typeof(List<List<Verdict>>); break;
-                    case TSP.DATETIME: type = typeof(List<List<DateTime>>); break;
-                    case TSP.TIMESPAN: type = typeof(List<List<TimeSpan>>); break;
-                    case TSP.STRING: type = typeof(List<List<string>>); break;
-                    case TSP.OBJECT: type = typeof(List<List<object>>); break;
+                    case SBP.BOOL: type = typeof(List<List<bool>>); break;
+                    case SBP.INT_: type = typeof(List<List<long>>); break;
+                    case SBP.INTEGER: type = typeof(List<List<long>>); break;
+                    case SBP.DECIMAL: type = typeof(List<List<double>>); break;
+                    case SBP.DOUBLE: type = typeof(List<List<double>>); break;
+                    case SBP.VERDICT: type = typeof(List<List<Verdict>>); break;
+                    case SBP.DATETIME: type = typeof(List<List<DateTime>>); break;
+                    case SBP.TIMESPAN: type = typeof(List<List<TimeSpan>>); break;
+                    case SBP.STRING: type = typeof(List<List<string>>); break;
+                    case SBP.OBJECT: type = typeof(List<List<object>>); break;
                     default:
                         throw new NotImplementedException();
                 }
@@ -104,19 +104,19 @@ namespace StepBro.Core.Parser
             m_typeStack.Push((TypeReference)type);
         }
 
-        public override void ExitTypeClassOrInterface([NotNull] TSP.TypeClassOrInterfaceContext context)
+        public override void ExitTypeClassOrInterface([NotNull] SBP.TypeClassOrInterfaceContext context)
         {
             var exp = m_expressionData.Pop();
             var type = this.ParseTypeString(exp.Value as string, false, true, context.Start);
             m_typeStack.Push(type);     // Push, even if null.
         }
 
-        public override void ExitVariableVarType([NotNull] TSP.VariableVarTypeContext context)
+        public override void ExitVariableVarType([NotNull] SBP.VariableVarTypeContext context)
         {
             m_typeStack.Push((TypeReference)typeof(VarSpecifiedType));
         }
 
-        public override void ExitVariableDynamicType([NotNull] TSP.VariableDynamicTypeContext context)
+        public override void ExitVariableDynamicType([NotNull] SBP.VariableDynamicTypeContext context)
         {
             m_typeStack.Push((TypeReference)typeof(DynamicSpecifiedType));
         }
@@ -154,7 +154,7 @@ namespace StepBro.Core.Parser
             return this.ResolveQualifiedType(identifier, reportErrors, token)?.DataType;
         }
 
-        public override void ExitTypeReference([NotNull] TSP.TypeReferenceContext context)
+        public override void ExitTypeReference([NotNull] SBP.TypeReferenceContext context)
         {
             var typename = context.GetChild(2).GetText();
             var type = ParseTypeString(typename, false, true, (context.GetChild(2).Payload as Antlr4.Runtime.CommonToken));

@@ -1,4 +1,4 @@
-﻿lexer grammar TSharpLexer;
+﻿lexer grammar StepBroLexer;
 
 @lexer::header {
     using System.Collections.Generic;

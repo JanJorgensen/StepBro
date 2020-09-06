@@ -41,7 +41,7 @@ namespace StepBro.Workbench
 
             StepBro.Core.Main.Initialize();
 
-            //this.SetSplashScreen();
+            //this.SeSBPlashScreen();
             m_commandLineOptions = StepBro.Core.General.CommandLineParser.Parse<CommandLineOptions>(null, Environment.GetCommandLineArgs());
 
             this.CreateStandardControls();
@@ -311,7 +311,7 @@ namespace StepBro.Workbench
             OpenFileDialog openFile = new OpenFileDialog();
 
             openFile.InitialDirectory = Application.ExecutablePath;
-            openFile.Filter = "T# files (*.tss)|*.tss|txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            openFile.Filter = "T# files (*." + Main.StepBroFileExtension + ")|*." + Main.StepBroFileExtension + "|txt files (*.txt)|*.txt|All files (*.*)|*.*";
             openFile.FilterIndex = 1;
             openFile.RestoreDirectory = true;
 
@@ -327,7 +327,7 @@ namespace StepBro.Workbench
                     return;
                 }
 
-                if (extension == ".tss")
+                if (extension == "." + Main.StepBroFileExtension)
                 {
                     var docView = new TSharpScriptDocView(m_resourceUserObject)
                     {
@@ -508,7 +508,7 @@ namespace StepBro.Workbench
             dockPanel.ResumeLayout(true, true);
         }
 
-        private void SetSplashScreen()
+        private void SeSBPlashScreen()
         {
 
             _showSplash = true;
@@ -840,7 +840,7 @@ namespace StepBro.Workbench
                 {
                     if (objContainer.Object != null && panelInfo.IsCompatibleWithObject(objContainer.Object))
                     {
-                        if (panelManager.GetPanelCreationOption(panelInfo, objContainer)== Core.Data.PanelCreationOption.Possible)
+                        if (panelManager.GetPanelCreationOption(panelInfo, objContainer) == Core.Data.PanelCreationOption.Possible)
                         {
                             var panel = panelManager.CreatePanel(panelInfo, objContainer);
                             if (panel != null)

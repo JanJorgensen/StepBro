@@ -1,0 +1,14 @@
+using TestModule;
+
+namespace TestTheTestModule;
+
+procedure int DoTest()
+{
+	//var obj = TestClassWithInterface.CreateInstanceInterface();
+	//if (!obj.SetupDone)
+	//{
+		//obj.SetupA();
+	//}
+	log ("We are here !!");
+	return 15;
+}

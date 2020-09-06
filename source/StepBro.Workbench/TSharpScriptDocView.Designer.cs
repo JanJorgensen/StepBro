@@ -115,19 +115,19 @@ namespace StepBro.Workbench
             // 
             this.menuItem3.Name = "menuItem3";
             this.menuItem3.Size = new System.Drawing.Size(142, 22);
-            this.menuItem3.Text = "Option TSS &1";
+            this.menuItem3.Text = "Option SBS &1";
             // 
             // menuItem4
             // 
             this.menuItem4.Name = "menuItem4";
             this.menuItem4.Size = new System.Drawing.Size(142, 22);
-            this.menuItem4.Text = "Option TSS &2";
+            this.menuItem4.Text = "Option SBS &2";
             // 
             // menuItem5
             // 
             this.menuItem5.Name = "menuItem5";
             this.menuItem5.Size = new System.Drawing.Size(142, 22);
-            this.menuItem5.Text = "Option TSS &3";
+            this.menuItem5.Text = "Option SBS &3";
             // 
             // scriptFileEditor
             // 

@@ -1,0 +1,142 @@
+﻿using stream;                   // tool
+using SuspecTronic;             // tool
+using System.Text;              // .net namespace
+using "schmutFramework.sbs";    // script file
+using @"...\BigProject.sbs";    // script file - project found in parent folder, or parant folders parent folder or in ...
+using @"**\BigProject.sbs";     // script file - project found in any sub folder
+
+namespace LatestSyntax;
+
+/// summary: This is the descriptive description
+///          for this fine configuration.
+/// purpose: Some deep purpose.
+config		// Grouped config properties.
+{
+	int	XMAX = 20;	// Adornment shows if private value is set.
+	bool UserPresent = true;	// Adornment checkbox for easy mouse access.
+	file ConfigurationFile = @"[this]\myConfiguration.xml";	// Adornment shows browse-button. Tooltip or gray text shows the full path.
+	link MyWebSite = "http://www.schmutstein.org";
+
+    bool X1 = false;
+    int Y2 = 15;
+    singleselection Menu, default OptionB
+    {
+        OptionA,
+        OptionB,
+        OptionC
+    }
+}
+
+public TargetLink target
+{
+	port: Port1, baudrate: 9600, FSS: true, timeout: 15s,
+	function setup: portSetup,
+	function reset: portReset
+}
+
+public Graphics.Bitmap image5 { file = @"" }
+public Graphics.Bitmap image7 { file = @"myicon.ico", size = {64,64} }
+public Graphics.Bitmap image9 { resource FoMaTyLi, size = {64,64} }
+public Graphics.Bitmap sound3 { file = @"", SampleRate = 44100 }
+
+
+datatable MyTable :
+    MyTableModel,
+    Column "Ax": {Type: int, DefaultValue: 175},
+    Column "Bi": {Type: int, DefaultValue: 175},
+    Column "Co": {Type: text, Justify: Right},
+    Column "Dy": {Type: text, Justify: Left}
+|__|  Ax | Bi |  Co    |        Dy         |
+| @| Abc | De | Fgh    | Ijk               |
+|  |  12 | 34 | Mogens | "Henrik andersen" |
+|//|   0 | 94 |    Jan | Frode             |
+|  | 659 |  7 |  Mette | "Leslie"          |
+|  |  19 |  4 | Dennis | ""                |
+|  |   - | 20 |   Erik | ""                |
+
+
+procedure void MyProcedure ( integer a, string b, KMP kmp )
+{
+    var MyArray = {1,2,3,4};
+    var i = 16;
+    int j = i * 13;
+    decimal d = 100m;
+    int k = 100M;
+    int[] array2 = new int[]( System.IO.File.ListFiles(@"c:\Windows").Select(f => f.FileName == "Jens"));
+    
+    // Mogensen
+    while ( x > 19 ) : Task = "", Break = "Stop!!!", LoopVar = j, DebugLogging
+    {
+        log debug ( d.ToString() );
+    }
+
+    foreach ( int x in myArray )
+    {
+        i += x;
+    }
+
+    var time = 0s;
+    
+    using (TimeGate( mimimumTime: 15s, elapsed: ref time ))
+    {
+    }
+
+    if (i > 8) i = 0;
+    else if (i > 2)
+    {
+        i *= k;
+    }
+    
+    var list = kmp.Get Global Meter Objects List( max = 10 ) : 
+    { 
+        x = 5, 
+        y = 10, 
+        Option6, 
+        errors 
+        { 
+            ConnectionTimeout ignore, 
+            CRCError { cecErr = true }, 
+            ResponseUnknown error 
+        } 
+    }
+}
+
+/// summary: This is the descriptive description
+///          for the fine procedure.
+/// purpose: Some deep purpose.
+procedure void MyProcedure( integer a, string b, KMP kmp ) :
+	MyModel,	// short for model = Model4. The model property is the default property when value is a model/procedure reference.
+    partner "Start": MyProxy,
+	partner "Run 10 Times": Proc10,
+    ProfileState = Mogens, Flag1, Flag2, Flag3,
+    custom "TargetFile": @"[this]\mydata.csv"
+{
+	return;
+}
+
+private partner void MyProxy(int a)
+{
+    this(a, "Mafioso", KMP);	// Calls MyProcedure with some fixed arguments. 
+}
+
+public void DoSomething()
+{
+    MyProcedure.Start( 32 );	// Calls "MyProcedure" through the "Start" partner (MyProxy).
+}
+
+// PROCEDURE
+// --------------------------------------------
+// Access (private, public, abstract, partner)
+// Name
+// Description, Purpose, Development State
+// Parameters
+// Return type
+// Model
+// Profile
+// Target Procedure Model (ved proxy)
+// Verdict?
+// Logging options
+// Partners
+// Preconditions
+// Custom Properties
+// Plugins (?)

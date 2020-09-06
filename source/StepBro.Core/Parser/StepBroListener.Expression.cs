@@ -5,7 +5,7 @@ using StepBro.Core.ScriptData;
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using TSP = StepBro.Core.Parser.TSharp;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
 {
@@ -77,12 +77,12 @@ namespace StepBro.Core.Parser
         //    return value;
         //}
 
-        public override void EnterParExpression([NotNull] TSP.ParExpressionContext context)
+        public override void EnterParExpression([NotNull] SBP.ParExpressionContext context)
         {
             m_expressionData.PushStackLevel("EnterParExpression");
         }
 
-        public override void ExitParExpression([NotNull] TSP.ParExpressionContext context)
+        public override void ExitParExpression([NotNull] SBP.ParExpressionContext context)
         {
             var expressionScope = m_expressionData.PopStackLevel();
             System.Diagnostics.Debug.Assert(expressionScope.Count == 1);    // Until anything else has been seen...
@@ -90,13 +90,13 @@ namespace StepBro.Core.Parser
             m_expressionData.Push(data);
         }
 
-        public override void ExitPrimary([NotNull] TSP.PrimaryContext context)
+        public override void ExitPrimary([NotNull] SBP.PrimaryContext context)
         {
-            if (context.Start.Type == TSharp.IDENTIFIER)
+            if (context.Start.Type == Grammar.StepBro.IDENTIFIER)
             {
                 m_expressionData.Push(SBExpressionData.CreateIdentifier(context.GetText(), token: context.start));
             }
-            else if (context.Start.Type == TSharp.THIS)
+            else if (context.Start.Type == Grammar.StepBro.THIS)
             {
                 var thisProperty = Expression.Property(
                     m_currentProcedure.ContextReferenceInternal,
@@ -110,27 +110,27 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void EnterExpPrimary([NotNull] TSP.ExpPrimaryContext context)
+        public override void EnterExpPrimary([NotNull] SBP.ExpPrimaryContext context)
         {
         }
 
-        public override void ExitExpPrimary([NotNull] TSP.ExpPrimaryContext context)
+        public override void ExitExpPrimary([NotNull] SBP.ExpPrimaryContext context)
         {
         }
 
-        public override void EnterExpCast([NotNull] TSP.ExpCastContext context)
+        public override void EnterExpCast([NotNull] SBP.ExpCastContext context)
         {
             //base.EnterExpCast(context);
         }
 
-        public override void ExitExpCast([NotNull] TSP.ExpCastContext context)
+        public override void ExitExpCast([NotNull] SBP.ExpCastContext context)
         {
             var type = m_typeStack.Pop();
             var value = this.ResolveForGetOperation(m_expressionData.Pop());
             m_expressionData.Push(new SBExpressionData(Expression.Convert(value.ExpressionCode, type.Type)));
         }
 
-        public override void ExitExpAwait([NotNull] TSP.ExpAwaitContext context)
+        public override void ExitExpAwait([NotNull] SBP.ExpAwaitContext context)
         {
             try
             {
@@ -159,7 +159,7 @@ namespace StepBro.Core.Parser
             //}
         }
 
-        public override void ExitExpIsType([NotNull] TSP.ExpIsTypeContext context)
+        public override void ExitExpIsType([NotNull] SBP.ExpIsTypeContext context)
         {
             var exp = this.ResolveForGetOperation(m_expressionData.Pop());
             var type = m_typeStack.Pop();
@@ -294,7 +294,7 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void ExitExpBinary([NotNull] TSP.ExpBinaryContext context)
+        public override void ExitExpBinary([NotNull] SBP.ExpBinaryContext context)
         {
             var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
             var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
@@ -312,12 +312,12 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void ExitExpUnaryRight([NotNull] TSP.ExpUnaryRightContext context)
+        public override void ExitExpUnaryRight([NotNull] SBP.ExpUnaryRightContext context)
         {
             this.ExitExpUnary(context.op.Type, false);
         }
 
-        public override void ExitExpUnaryLeft([NotNull] TSP.ExpUnaryLeftContext context)
+        public override void ExitExpUnaryLeft([NotNull] SBP.ExpUnaryLeftContext context)
         {
             this.ExitExpUnary(context.op.Type, true);
         }
@@ -331,7 +331,7 @@ namespace StepBro.Core.Parser
             m_expressionData.Push(result);
         }
 
-        public override void ExitExpAssignment([NotNull] TSP.ExpAssignmentContext context)
+        public override void ExitExpAssignment([NotNull] SBP.ExpAssignmentContext context)
         {
             var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
             var first = this.ResolveIfIdentifier(m_expressionData.Peek().Pop(), true);
@@ -342,7 +342,7 @@ namespace StepBro.Core.Parser
             m_expressionData.Push(result);
         }
 
-        public override void ExitExpBetween([NotNull] TSP.ExpBetweenContext context)
+        public override void ExitExpBetween([NotNull] SBP.ExpBetweenContext context)
         {
             var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
             var middle = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
@@ -354,7 +354,7 @@ namespace StepBro.Core.Parser
             m_expressionData.Push(result);
         }
 
-        public override void ExitExpEqualsWithTolerance([NotNull] TSP.ExpEqualsWithToleranceContext context)
+        public override void ExitExpEqualsWithTolerance([NotNull] SBP.ExpEqualsWithToleranceContext context)
         {
             var tolerance = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
             var expected = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
@@ -365,7 +365,7 @@ namespace StepBro.Core.Parser
             m_expressionData.Push(result);
         }
 
-        public override void ExitExpCoalescing([NotNull] TSP.ExpCoalescingContext context)
+        public override void ExitExpCoalescing([NotNull] SBP.ExpCoalescingContext context)
         {
             var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
             var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
@@ -375,7 +375,7 @@ namespace StepBro.Core.Parser
 
         #region Literals
 
-        public override void ExitLiteralInteger([NotNull] TSP.LiteralIntegerContext context)
+        public override void ExitLiteralInteger([NotNull] SBP.LiteralIntegerContext context)
         {
             var str = context.GetText();
             char last = str[str.Length - 1];
@@ -425,7 +425,7 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void ExitLiteralHex([NotNull] TSP.LiteralHexContext context)
+        public override void ExitLiteralHex([NotNull] SBP.LiteralHexContext context)
         {
             var str = context.GetText();
             long value = 0L;
@@ -440,7 +440,7 @@ namespace StepBro.Core.Parser
             m_expressionData.Push(new SBExpressionData(value, context.Start));
         }
 
-        public override void ExitLiteralFloat([NotNull] TSP.LiteralFloatContext context)
+        public override void ExitLiteralFloat([NotNull] SBP.LiteralFloatContext context)
         {
             var str = context.GetText();
             var strVal = str;
@@ -469,12 +469,12 @@ namespace StepBro.Core.Parser
             m_expressionData.Push(new SBExpressionData(v * factor, context.Start));
         }
 
-        public override void ExitLiteralBool([NotNull] TSP.LiteralBoolContext context)
+        public override void ExitLiteralBool([NotNull] SBP.LiteralBoolContext context)
         {
             m_expressionData.Push(new SBExpressionData(context.GetText() == "true", context.Start));
         }
 
-        public override void ExitLiteralString([NotNull] TSP.LiteralStringContext context)
+        public override void ExitLiteralString([NotNull] SBP.LiteralStringContext context)
         {
             m_expressionData.Push(SBExpressionData.Constant(TypeReference.TypeString, ParseStringLiteral(context.GetText(), context), context.Start));
         }
@@ -503,40 +503,40 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void ExitLiteralIdentifier([NotNull] TSP.LiteralIdentifierContext context)
+        public override void ExitLiteralIdentifier([NotNull] SBP.LiteralIdentifierContext context)
         {
             var str = context.GetText();
             str = str.Substring(1, str.Length - 2);
             m_expressionData.Push(new SBExpressionData(new Identifier(str), context.Start));
         }
 
-        public override void ExitVerdictLiteral([NotNull] TSP.VerdictLiteralContext context)
+        public override void ExitVerdictLiteral([NotNull] SBP.VerdictLiteralContext context)
         {
             var str = context.GetText();
             Data.Verdict verdict = (Data.Verdict)Enum.Parse(typeof(Data.Verdict), str, true);
             m_expressionData.Push(new SBExpressionData(verdict));
         }
 
-        public override void ExitLiteralTimespan([NotNull] TSP.LiteralTimespanContext context)
+        public override void ExitLiteralTimespan([NotNull] SBP.LiteralTimespanContext context)
         {
             var str = context.GetText();
             var ts = TimeUtils.ParseTimeSpan(str);
             m_expressionData.Push(new SBExpressionData(ts, context.Start));
         }
 
-        public override void ExitLiteralDateTime([NotNull] TSP.LiteralDateTimeContext context)
+        public override void ExitLiteralDateTime([NotNull] SBP.LiteralDateTimeContext context)
         {
             var str = context.GetText();
             var ts = TimeUtils.ParseDateTime(str, 1);   // 1, because @ should be skipped.
             m_expressionData.Push(new SBExpressionData(ts, context.Start));
         }
 
-        public override void ExitLiteralNull([NotNull] TSP.LiteralNullContext context)
+        public override void ExitLiteralNull([NotNull] SBP.LiteralNullContext context)
         {
             m_expressionData.Push(SBExpressionData.Constant((TypeReference)typeof(object), null, context.Start));
         }
 
-        public override void ExitLiteralRange([NotNull] TSP.LiteralRangeContext context)
+        public override void ExitLiteralRange([NotNull] SBP.LiteralRangeContext context)
         {
             var str = context.GetText();
             string error = null;
@@ -552,7 +552,7 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void ExitLiteralBinaryBlock([NotNull] TSP.LiteralBinaryBlockContext context)
+        public override void ExitLiteralBinaryBlock([NotNull] SBP.LiteralBinaryBlockContext context)
         {
             var str = context.GetText();
             var l = str.Length - 1;
