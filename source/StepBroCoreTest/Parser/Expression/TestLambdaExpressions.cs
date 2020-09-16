@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StepBro.Core.Data;
 using StepBro.Core.Parser;
 using static StepBroCoreTest.Parser.ExpressionParser;
+using StepBroCoreTest.Data;
 
 namespace StepBroCoreTest.Parser
 {

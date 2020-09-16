@@ -50,7 +50,11 @@ namespace StepBro.Workbench
             this.menuItemToolBar = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemExecutionToolBar = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemStatusBar = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItemCreateAllClassPanels = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparatorAfterClassPanels = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItemCreateAllObjectPanels = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSeparatorAfterObjectPanels = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemLayoutByCode = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemLayoutByXml = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator5 = new System.Windows.Forms.ToolStripSeparator();
@@ -101,10 +105,8 @@ namespace StepBro.Workbench
             this.toolStripButtonStepOut = new System.Windows.Forms.ToolStripButton();
             this.toolStripComboBoxExecutionTarget = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripComboBoxExecutionTargetPartner = new System.Windows.Forms.ToolStripComboBox();
-            this.menuItemSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemSeparatorAfterObjectPanels = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripMenuItemCreateAllObjectPanels = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItemCreateAllClassPanels = new System.Windows.Forms.ToolStripMenuItem();
+            this.timerPostInitAction = new System.Windows.Forms.Timer(this.components);
+            this.toolStripMenuItemDebugMode = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.toolBar.SuspendLayout();
             this.toolStripExecution.SuspendLayout();
@@ -122,7 +124,7 @@ namespace StepBro.Workbench
             this.mainMenu.Location = new System.Drawing.Point(0, 0);
             this.mainMenu.MdiWindowListItem = this.menuItemWindow;
             this.mainMenu.Name = "mainMenu";
-            this.mainMenu.Size = new System.Drawing.Size(1196, 24);
+            this.mainMenu.Size = new System.Drawing.Size(1151, 24);
             this.mainMenu.TabIndex = 7;
             // 
             // menuItemFile
@@ -226,7 +228,7 @@ namespace StepBro.Workbench
             // menuItemSolutionExplorer
             // 
             this.menuItemSolutionExplorer.Name = "menuItemSolutionExplorer";
-            this.menuItemSolutionExplorer.Size = new System.Drawing.Size(185, 22);
+            this.menuItemSolutionExplorer.Size = new System.Drawing.Size(193, 22);
             this.menuItemSolutionExplorer.Text = "File E&xplorer";
             this.menuItemSolutionExplorer.Click += new System.EventHandler(this.menuItemSolutionExplorer_Click);
             // 
@@ -234,49 +236,49 @@ namespace StepBro.Workbench
             // 
             this.menuItemPropertyWindow.Name = "menuItemPropertyWindow";
             this.menuItemPropertyWindow.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.menuItemPropertyWindow.Size = new System.Drawing.Size(185, 22);
-            this.menuItemPropertyWindow.Text = "&Property Window";
+            this.menuItemPropertyWindow.Size = new System.Drawing.Size(193, 22);
+            this.menuItemPropertyWindow.Text = "&Properties Window";
             this.menuItemPropertyWindow.Click += new System.EventHandler(this.menuItemPropertyWindow_Click);
             // 
             // menuItemToolbox
             // 
             this.menuItemToolbox.Name = "menuItemToolbox";
-            this.menuItemToolbox.Size = new System.Drawing.Size(185, 22);
+            this.menuItemToolbox.Size = new System.Drawing.Size(193, 22);
             this.menuItemToolbox.Text = "&Toolbox";
             this.menuItemToolbox.Click += new System.EventHandler(this.menuItemToolbox_Click);
             // 
             // menuItemErrorList
             // 
             this.menuItemErrorList.Name = "menuItemErrorList";
-            this.menuItemErrorList.Size = new System.Drawing.Size(185, 22);
+            this.menuItemErrorList.Size = new System.Drawing.Size(193, 22);
             this.menuItemErrorList.Text = "&Error List";
             this.menuItemErrorList.Click += new System.EventHandler(this.menuItemErrorList_Click);
             // 
             // menuItemOutputWindow
             // 
             this.menuItemOutputWindow.Name = "menuItemOutputWindow";
-            this.menuItemOutputWindow.Size = new System.Drawing.Size(185, 22);
-            this.menuItemOutputWindow.Text = "&Output Window";
+            this.menuItemOutputWindow.Size = new System.Drawing.Size(193, 22);
+            this.menuItemOutputWindow.Text = "&Output";
             this.menuItemOutputWindow.Click += new System.EventHandler(this.menuItemOutputWindow_Click);
             // 
             // menuItemTaskList
             // 
             this.menuItemTaskList.Name = "menuItemTaskList";
-            this.menuItemTaskList.Size = new System.Drawing.Size(185, 22);
+            this.menuItemTaskList.Size = new System.Drawing.Size(193, 22);
             this.menuItemTaskList.Text = "Task &List";
             this.menuItemTaskList.Click += new System.EventHandler(this.menuItemTaskList_Click);
             // 
             // menuItemSeparator1
             // 
             this.menuItemSeparator1.Name = "menuItemSeparator1";
-            this.menuItemSeparator1.Size = new System.Drawing.Size(182, 6);
+            this.menuItemSeparator1.Size = new System.Drawing.Size(190, 6);
             // 
             // menuItemToolBar
             // 
             this.menuItemToolBar.Checked = true;
             this.menuItemToolBar.CheckState = System.Windows.Forms.CheckState.Checked;
             this.menuItemToolBar.Name = "menuItemToolBar";
-            this.menuItemToolBar.Size = new System.Drawing.Size(185, 22);
+            this.menuItemToolBar.Size = new System.Drawing.Size(193, 22);
             this.menuItemToolBar.Text = "Tool Bar";
             this.menuItemToolBar.Click += new System.EventHandler(this.menuItemToolBar_Click);
             // 
@@ -285,7 +287,7 @@ namespace StepBro.Workbench
             this.menuItemExecutionToolBar.Checked = true;
             this.menuItemExecutionToolBar.CheckState = System.Windows.Forms.CheckState.Checked;
             this.menuItemExecutionToolBar.Name = "menuItemExecutionToolBar";
-            this.menuItemExecutionToolBar.Size = new System.Drawing.Size(185, 22);
+            this.menuItemExecutionToolBar.Size = new System.Drawing.Size(193, 22);
             this.menuItemExecutionToolBar.Text = "Execution Tool Bar";
             this.menuItemExecutionToolBar.Click += new System.EventHandler(this.executionToolBarToolStripMenuItem_Click);
             // 
@@ -294,19 +296,43 @@ namespace StepBro.Workbench
             this.menuItemStatusBar.Checked = true;
             this.menuItemStatusBar.CheckState = System.Windows.Forms.CheckState.Checked;
             this.menuItemStatusBar.Name = "menuItemStatusBar";
-            this.menuItemStatusBar.Size = new System.Drawing.Size(185, 22);
+            this.menuItemStatusBar.Size = new System.Drawing.Size(193, 22);
             this.menuItemStatusBar.Text = "Status Bar";
             this.menuItemStatusBar.Click += new System.EventHandler(this.menuItemStatusBar_Click);
+            // 
+            // menuItemSeparator2
+            // 
+            this.menuItemSeparator2.Name = "menuItemSeparator2";
+            this.menuItemSeparator2.Size = new System.Drawing.Size(190, 6);
+            // 
+            // toolStripMenuItemCreateAllClassPanels
+            // 
+            this.toolStripMenuItemCreateAllClassPanels.Name = "toolStripMenuItemCreateAllClassPanels";
+            this.toolStripMenuItemCreateAllClassPanels.Size = new System.Drawing.Size(193, 22);
+            this.toolStripMenuItemCreateAllClassPanels.Text = "Create Class Panels";
+            this.toolStripMenuItemCreateAllClassPanels.Click += new System.EventHandler(this.toolStripMenuItemCreateAllClassPanels_Click);
             // 
             // menuItemSeparatorAfterClassPanels
             // 
             this.menuItemSeparatorAfterClassPanels.Name = "menuItemSeparatorAfterClassPanels";
-            this.menuItemSeparatorAfterClassPanels.Size = new System.Drawing.Size(182, 6);
+            this.menuItemSeparatorAfterClassPanels.Size = new System.Drawing.Size(190, 6);
+            // 
+            // toolStripMenuItemCreateAllObjectPanels
+            // 
+            this.toolStripMenuItemCreateAllObjectPanels.Name = "toolStripMenuItemCreateAllObjectPanels";
+            this.toolStripMenuItemCreateAllObjectPanels.Size = new System.Drawing.Size(193, 22);
+            this.toolStripMenuItemCreateAllObjectPanels.Text = "Create Object Panels";
+            this.toolStripMenuItemCreateAllObjectPanels.Click += new System.EventHandler(this.toolStripMenuItemCreateAllObjectPanels_Click);
+            // 
+            // menuItemSeparatorAfterObjectPanels
+            // 
+            this.menuItemSeparatorAfterObjectPanels.Name = "menuItemSeparatorAfterObjectPanels";
+            this.menuItemSeparatorAfterObjectPanels.Size = new System.Drawing.Size(190, 6);
             // 
             // menuItemLayoutByCode
             // 
             this.menuItemLayoutByCode.Name = "menuItemLayoutByCode";
-            this.menuItemLayoutByCode.Size = new System.Drawing.Size(185, 22);
+            this.menuItemLayoutByCode.Size = new System.Drawing.Size(193, 22);
             this.menuItemLayoutByCode.Text = "Layout By Code";
             this.menuItemLayoutByCode.Visible = false;
             this.menuItemLayoutByCode.Click += new System.EventHandler(this.menuItemLayoutByCode_Click);
@@ -314,7 +340,7 @@ namespace StepBro.Workbench
             // menuItemLayoutByXml
             // 
             this.menuItemLayoutByXml.Name = "menuItemLayoutByXml";
-            this.menuItemLayoutByXml.Size = new System.Drawing.Size(185, 22);
+            this.menuItemLayoutByXml.Size = new System.Drawing.Size(193, 22);
             this.menuItemLayoutByXml.Text = "Layout By XML";
             this.menuItemLayoutByXml.Visible = false;
             this.menuItemLayoutByXml.Click += new System.EventHandler(this.menuItemLayoutByXml_Click);
@@ -322,7 +348,7 @@ namespace StepBro.Workbench
             // menuItemSeparator5
             // 
             this.menuItemSeparator5.Name = "menuItemSeparator5";
-            this.menuItemSeparator5.Size = new System.Drawing.Size(182, 6);
+            this.menuItemSeparator5.Size = new System.Drawing.Size(190, 6);
             // 
             // subMenuToolStripMenuItem
             // 
@@ -330,26 +356,26 @@ namespace StepBro.Workbench
             this.itemAToolStripMenuItem,
             this.itemBToolStripMenuItem});
             this.subMenuToolStripMenuItem.Name = "subMenuToolStripMenuItem";
-            this.subMenuToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.subMenuToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.subMenuToolStripMenuItem.Text = "Sub menu";
             // 
             // itemAToolStripMenuItem
             // 
             this.itemAToolStripMenuItem.Name = "itemAToolStripMenuItem";
-            this.itemAToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.itemAToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.itemAToolStripMenuItem.Text = "Item A";
             // 
             // itemBToolStripMenuItem
             // 
             this.itemBToolStripMenuItem.Name = "itemBToolStripMenuItem";
-            this.itemBToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.itemBToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.itemBToolStripMenuItem.Text = "Item B";
             // 
             // disabledItemToolStripMenuItem
             // 
             this.disabledItemToolStripMenuItem.Enabled = false;
             this.disabledItemToolStripMenuItem.Name = "disabledItemToolStripMenuItem";
-            this.disabledItemToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.disabledItemToolStripMenuItem.Size = new System.Drawing.Size(193, 22);
             this.disabledItemToolStripMenuItem.Text = "Disabled Item";
             // 
             // debugToolStripMenuItem
@@ -361,7 +387,8 @@ namespace StepBro.Workbench
             this.stepIntoToolStripMenuItem,
             this.stepOverToolStripMenuItem,
             this.stepOutToolStripMenuItem,
-            this.parseAllFilesToolStripMenuItem});
+            this.parseAllFilesToolStripMenuItem,
+            this.toolStripMenuItemDebugMode});
             this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
             this.debugToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
             this.debugToolStripMenuItem.Text = "&Debug";
@@ -462,7 +489,7 @@ namespace StepBro.Workbench
             // menuItemNewWindow
             // 
             this.menuItemNewWindow.Name = "menuItemNewWindow";
-            this.menuItemNewWindow.Size = new System.Drawing.Size(180, 22);
+            this.menuItemNewWindow.Size = new System.Drawing.Size(145, 22);
             this.menuItemNewWindow.Text = "&New Window";
             this.menuItemNewWindow.Click += new System.EventHandler(this.menuItemNewWindow_Click);
             // 
@@ -494,9 +521,9 @@ namespace StepBro.Workbench
             // statusBar
             // 
             this.statusBar.BackColor = System.Drawing.Color.Black;
-            this.statusBar.Location = new System.Drawing.Point(0, 518);
+            this.statusBar.Location = new System.Drawing.Point(0, 557);
             this.statusBar.Name = "statusBar";
-            this.statusBar.Size = new System.Drawing.Size(1196, 22);
+            this.statusBar.Size = new System.Drawing.Size(1151, 22);
             this.statusBar.TabIndex = 4;
             // 
             // imageList
@@ -530,7 +557,7 @@ namespace StepBro.Workbench
             this.toolBarButtonLayoutByXml});
             this.toolBar.Location = new System.Drawing.Point(0, 24);
             this.toolBar.Name = "toolBar";
-            this.toolBar.Size = new System.Drawing.Size(1196, 25);
+            this.toolBar.Size = new System.Drawing.Size(1151, 25);
             this.toolBar.TabIndex = 6;
             this.toolBar.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.toolBar_ButtonClick);
             // 
@@ -620,7 +647,7 @@ namespace StepBro.Workbench
             this.dockPanel.Name = "dockPanel";
             this.dockPanel.RightToLeftLayout = true;
             this.dockPanel.ShowAutoHideContentOnHover = false;
-            this.dockPanel.Size = new System.Drawing.Size(1196, 469);
+            this.dockPanel.Size = new System.Drawing.Size(1151, 508);
             this.dockPanel.TabIndex = 0;
             this.dockPanel.ActiveDocumentChanged += new System.EventHandler(this.dockPanel_ActiveDocumentChanged);
             // 
@@ -641,7 +668,7 @@ namespace StepBro.Workbench
             this.toolStripComboBoxExecutionTargetPartner});
             this.toolStripExecution.Location = new System.Drawing.Point(0, 49);
             this.toolStripExecution.Name = "toolStripExecution";
-            this.toolStripExecution.Size = new System.Drawing.Size(1196, 25);
+            this.toolStripExecution.Size = new System.Drawing.Size(1151, 25);
             this.toolStripExecution.TabIndex = 9;
             this.toolStripExecution.Text = "toolStripDebug";
             // 
@@ -721,33 +748,23 @@ namespace StepBro.Workbench
     "";
             this.toolStripComboBoxExecutionTargetPartner.Visible = false;
             // 
-            // menuItemSeparator2
+            // timerPostInitAction
             // 
-            this.menuItemSeparator2.Name = "menuItemSeparator2";
-            this.menuItemSeparator2.Size = new System.Drawing.Size(182, 6);
+            this.timerPostInitAction.Enabled = true;
+            this.timerPostInitAction.Interval = 1000;
+            this.timerPostInitAction.Tick += new System.EventHandler(this.timerPostInitAction_Tick);
             // 
-            // menuItemSeparatorAfterObjectPanels
+            // toolStripMenuItemDebugMode
             // 
-            this.menuItemSeparatorAfterObjectPanels.Name = "menuItemSeparatorAfterObjectPanels";
-            this.menuItemSeparatorAfterObjectPanels.Size = new System.Drawing.Size(182, 6);
-            // 
-            // toolStripMenuItemCreateAllObjectPanels
-            // 
-            this.toolStripMenuItemCreateAllObjectPanels.Name = "toolStripMenuItemCreateAllObjectPanels";
-            this.toolStripMenuItemCreateAllObjectPanels.Size = new System.Drawing.Size(185, 22);
-            this.toolStripMenuItemCreateAllObjectPanels.Text = "Create Object Panels";
-            this.toolStripMenuItemCreateAllObjectPanels.Click += new System.EventHandler(this.toolStripMenuItemCreateAllObjectPanels_Click);
-            // 
-            // toolStripMenuItemCreateAllClassPanels
-            // 
-            this.toolStripMenuItemCreateAllClassPanels.Name = "toolStripMenuItemCreateAllClassPanels";
-            this.toolStripMenuItemCreateAllClassPanels.Size = new System.Drawing.Size(185, 22);
-            this.toolStripMenuItemCreateAllClassPanels.Text = "Create Class Panels";
-            this.toolStripMenuItemCreateAllClassPanels.Click += new System.EventHandler(this.toolStripMenuItemCreateAllClassPanels_Click);
+            this.toolStripMenuItemDebugMode.CheckOnClick = true;
+            this.toolStripMenuItemDebugMode.Name = "toolStripMenuItemDebugMode";
+            this.toolStripMenuItemDebugMode.Size = new System.Drawing.Size(316, 22);
+            this.toolStripMenuItemDebugMode.Text = "Debug Mode";
+            this.toolStripMenuItemDebugMode.ToolTipText = "Enable or disable script";
             // 
             // MainForm
             // 
-            this.ClientSize = new System.Drawing.Size(1196, 540);
+            this.ClientSize = new System.Drawing.Size(1151, 579);
             this.Controls.Add(this.toolStripExecution);
             this.Controls.Add(this.dockPanel);
             this.Controls.Add(this.toolBar);
@@ -850,5 +867,7 @@ namespace StepBro.Workbench
         private System.Windows.Forms.ToolStripSeparator menuItemSeparatorAfterObjectPanels;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemCreateAllClassPanels;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemCreateAllObjectPanels;
+        private System.Windows.Forms.Timer timerPostInitAction;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemDebugMode;
     }
 }

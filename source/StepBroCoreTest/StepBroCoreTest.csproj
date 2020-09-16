@@ -84,6 +84,7 @@
     <Compile Include="Execution\AsyncExecution.cs" />
     <Compile Include="Execution\TestLayeredModuleUsage.cs" />
     <Compile Include="Execution\FormalTestSetupExecution.cs" />
+    <Compile Include="Execution\TestLogStatement.cs" />
     <Compile Include="Execution\TestProcedure_Expect.cs" />
     <Compile Include="Execution\TestExecutionSupportMethods.cs" />
     <Compile Include="Execution\TestProcedureCallDynamic.cs" />
@@ -96,9 +97,9 @@
     <Compile Include="Mocks\TaskContextMock.cs" />
     <Compile Include="Parser\Datatable\TestDatatableInFile.cs" />
     <Compile Include="Parser\Datatable\TestDatatable.cs" />
-    <Compile Include="Parser\DummyClass.cs" />
-    <Compile Include="Parser\DummyDynamicAsyncObject.cs" />
-    <Compile Include="Parser\DummyDynamicObject.cs" />
+    <Compile Include="Data\DummyClass.cs" />
+    <Compile Include="Data\DummyDynamicAsyncObject.cs" />
+    <Compile Include="Data\DummyDynamicObject.cs" />
     <Compile Include="Parser\Expression\ExpressionParser.cs" />
     <Compile Include="Parser\Expression\TestCoalescing.cs" />
     <Compile Include="Parser\Expression\TestComparisonExpression.cs" />
@@ -147,6 +148,7 @@
     <Compile Include="TestSoftEnum.cs" />
     <Compile Include="Parser\TestPropertyBlock.cs" />
     <Compile Include="TestSandbox.cs" />
+    <Compile Include="TestHostApplicationActionQueue.cs" />
     <Compile Include="Utils\LogInspector.cs" />
     <Compile Include="Utils\MiniLogger.cs" />
     <Compile Include="Utils\MiniLoggerWalker.cs" />

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Tasks
 {
-    public delegate TResult TaskDelegateWithControl<TResult>(ITaskControl control, ITaskContext context);
+    public delegate void TaskDelegate(ITaskContext context);
 
     //public delegate void TaskDelegateWithJustContext(ITaskContext context); // Hmm
 }

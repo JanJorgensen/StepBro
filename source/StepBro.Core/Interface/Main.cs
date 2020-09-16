@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace StepBro.Core
 {
@@ -26,18 +25,19 @@ namespace StepBro.Core
         private static IAddonManager m_addonManager = null;
         private static ILogSinkManager m_logSinkManager = null;
         private static TaskManager m_taskManager = null;
+        private static HostApplicationActionQueue m_hostActions = null;
         //private static List<ScriptFile> m_loadedFiles = new List<ScriptFile>();
         private static ScriptExecutionManager m_scriptExecutionManager = null;
         private static DynamicObjectManager m_dynamicObjectManager = null;
         private static ObjectPanelManager m_objectPanelManager = null;
         //private static readonly object m_mainObject = new object();
         private static readonly bool m_isInDebugMode = true;
-        private static Queue<Task> m_runningTasks = new Queue<Task>();
-        private static readonly object m_runningTasksSync = new object();
-        private static IAsyncResult m_parsingInQueue = null;
+        //private static Queue<Task> m_runningTasks = new Queue<Task>();
+        //private static readonly object m_runningTasksSync = new object();
+        private static ITask m_parsingInQueue = null;
         private static int m_lastParsingErrorCount = 0;
 
-        public static object ExecutionHelper { get; private set; }
+        //public static object ExecutionHelper { get; private set; }
 
         static Main()
         {
@@ -88,6 +88,9 @@ namespace StepBro.Core
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_taskManager = new TaskManager(out service);
+            m_serviceManagerAdmin.Manager.Register(service);
+
+            m_hostActions = new HostApplicationActionQueue(out service);
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_scriptExecutionManager = new ScriptExecutionManager(out service);
@@ -189,66 +192,71 @@ namespace StepBro.Core
             m_loadedFilesManager.UnloadAllFilesWithoutDependants();
         }
 
-        private static IAsyncResult EnqueueTask(Action action)
-        {
-            var combinedActions = new DoubleAction(action, OnRunningTaskEnd);
-            var task = new Task(combinedActions.ActionDoSecondAlways);
-            lock (m_runningTasksSync)
-            {
-                if (m_runningTasks.Count == 0)
-                {
-                    task.Start();
-                }
-                m_runningTasks.Enqueue(task);
-            }
-            return task;
-        }
+        public static IHostApplicationActionQueue Actions { get { return m_hostActions; } }
 
-        private static void OnRunningTaskEnd()
-        {
-            lock (m_runningTasksSync)
-            {
-                m_runningTasks.Dequeue();   // Remove task that just ended.
-                if (m_runningTasks.Count > 0)
-                {
-                    var next = m_runningTasks.Peek();
-                    next.Start();
-                }
-            }
-        }
+        //private static IAsyncResult EnqueueTask(Action action)
+        //{
+        //    var combinedActions = new DoubleAction(action, OnRunningTaskEnd);
+        //    var task = new Task(combinedActions.ActionDoSecondAlways);
+        //    lock (m_runningTasksSync)
+        //    {
+        //        if (m_runningTasks.Count == 0)
+        //        {
+        //            task.Start();
+        //        }
+        //        m_runningTasks.Enqueue(task);
+        //    }
+        //    return task;
+        //}
+
+        //private static void OnRunningTaskEnd()
+        //{
+        //    lock (m_runningTasksSync)
+        //    {
+        //        m_runningTasks.Dequeue();   // Remove task that just ended.
+        //        if (m_runningTasks.Count > 0)
+        //        {
+        //            var next = m_runningTasks.Peek();
+        //            next.Start();
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Starts a task parsing all loaded script files.
         /// </summary>
         /// <param name="force">Set to true to force a parsing of all files.</param>
         /// <returns>True if parsing succeeded (no errors or parsing skipped).</returns>
-        public static IAsyncResult StartFileParsing(bool force)
+        public static ITask StartFileParsing(bool force)
         {
             if (m_parsingInQueue != null) return m_parsingInQueue;
             if (force || CheckIfFileParsingNeeded())
             {
-                var parsingTask = EnqueueTask(() =>
+                m_parsingInQueue = m_hostActions.AddTask("Script File Parsing", true, null, (context) =>
                     {
-                        ILoggerScope logger = null;
                         try
                         {
-                            logger = m_mainLogger.Logger.RootLogger.LogEntering("StepBro.Main", "Starting file parsing");
+                            context.UpdateStatus($"Resetting files ({(force ? "forced" : "not forced")})");
                             foreach (var f in m_loadedFilesManager.ListFiles<ScriptFile>())
                             {
                                 f.ResetBeforeParsing(force == true);
                             }
 
-                            m_lastParsingErrorCount = FileBuilder.ParseFiles(m_serviceManagerAdmin.Manager, logger);
+                            context.UpdateStatus("Parsing files");
+                            m_lastParsingErrorCount = FileBuilder.ParseFiles(m_serviceManagerAdmin.Manager, context.Logger);
+                        }
+                        catch (Exception ex)
+                        {
+                            context.Logger.LogError("File Parsing", ex.ToString());
                         }
                         finally
                         {
-                            logger.LogExit("StepBro.Main", $"Ended file parsing. {m_lastParsingErrorCount} errors.");
+                            context.UpdateStatus("Finished parsing");
                             m_parsingInQueue = null;
                             ParsingCompleted?.Invoke(null, EventArgs.Empty);
                         }
                     });
-                m_parsingInQueue = parsingTask;
-                return parsingTask;
+                return m_parsingInQueue;
             }
             else
             {
@@ -469,9 +477,17 @@ namespace StepBro.Core
 
     internal class TaskContextDummy : ITaskContext
     {
+        public TaskContextDummy(ILoggerScope logger = null) { this.Logger = logger; }
+
         public bool PauseRequested
         {
             get { return false; }
+        }
+
+        public ILoggerScope Logger
+        {
+            get;
+            private set;
         }
 
         public bool EnterPauseIfRequested(string state)

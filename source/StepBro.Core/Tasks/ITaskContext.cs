@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StepBro.Core.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,5 +21,9 @@ namespace StepBro.Core.Tasks
         /// <param name="state">A description of the current task state.</param>
         /// <returns>Whether a pause was effectuated.</returns>
         bool EnterPauseIfRequested(string state);
+        /// <summary>
+        /// The logger to use in the task.
+        /// </summary>
+        ILoggerScope Logger { get; }
     }
 }

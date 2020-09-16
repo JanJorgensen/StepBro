@@ -878,37 +878,65 @@ namespace StepBro.Core.Parser
                 var resultVar = Expression.Variable(code.Type, "logValue");
                 var assignVar = Expression.Assign(resultVar, code);
 
+                var loggingEnabled = Expression.Property(
+                    Expression.Convert(m_currentProcedure.ContextReferenceInternal, typeof(ICallContext)),
+                    typeof(ICallContext).GetProperty("LoggingEnabled"));
+
                 var logValue = code;
                 if (code.Type != typeof(string))
                 {
-                    if (!code.Type.IsPrimitive)
+                    if (code.Type.IsPrimitive || code.Type.IsEnum)
                     {
-                        logValue = Expression.Condition(
-                            Expression.Equal(resultVar, Expression.Constant(null)),
-                            Expression.Constant("<null>"),
-                            Expression.Call(typeof(string).GetMethod("Concat", new Type[] { typeof(string), typeof(string), typeof(string) }),
-                                    Expression.Property(
-                                        Expression.Call(resultVar, typeof(object).GetMethod("GetType", new Type[] { })),
-                                        "FullName"),
-                                    Expression.Constant(" - "),
-                                    Expression.Call(resultVar, typeof(object).GetMethod("ToString", new Type[] { }))));
+                        logValue = Expression.Call(resultVar, typeof(object).GetMethod("ToString", new Type[] { }));
                     }
                     else
                     {
-                        logValue = Expression.Condition(
-                            Expression.Equal(resultVar, Expression.Constant(null)),
-                            Expression.Constant("<null>"),
-                            Expression.Call(resultVar, typeof(object).GetMethod("ToString", new Type[] { })));
+                        if (typeof(IEnumerable<string>).IsAssignableFrom(code.Type))
+                        {
+                            #region Special handling of IEnumerable<string>
+
+                            var helper = typeof(ExecutionHelperMethods).GetMethod(
+                                nameof(ExecutionHelperMethods.LogList));
+
+                            var helperCall = Expression.Call(helper,
+                                m_currentProcedure?.ContextReferenceInternal,
+                                logValue);
+
+                            var logListStatementBlock = Expression.IfThen(
+                                loggingEnabled,
+                                Expression.Block(
+                                    new ParameterExpression[] { resultVar },
+                                    Expression.TryCatch(
+                                        Expression.Block(
+                                            assignVar,
+                                            helperCall),
+                                        Expression.Catch(
+                                            typeof(Exception),
+                                            Expression.Empty()))));
+
+                            m_scopeStack.Peek().AddStatementCode(logListStatementBlock);
+
+                            return;
+                            #endregion
+                        }
+                        else
+                        {
+                            logValue = Expression.Condition(
+                                Expression.Equal(resultVar, Expression.Constant(null)),
+                                Expression.Constant("<null>"),
+                                Expression.Call(typeof(string).GetMethod("Concat", new Type[] { typeof(string), typeof(string), typeof(string) }),
+                                        Expression.Property(
+                                            Expression.Call(resultVar, typeof(object).GetMethod("GetType", new Type[] { })),
+                                            "FullName"),
+                                        Expression.Constant(" - "),
+                                        Expression.Call(resultVar, typeof(object).GetMethod("ToString", new Type[] { }))));
+                        }
                     }
                 }
                 logValue = Expression.Call(
                     typeof(string).GetMethod("Concat", new Type[] { typeof(string), typeof(string) }),
                     Expression.Constant("log: "),
                     logValue);
-
-                var loggingEnabled = Expression.Property(
-                    Expression.Convert(m_currentProcedure.ContextReferenceInternal, typeof(ICallContext)),
-                    typeof(ICallContext).GetProperty("LoggingEnabled"));
 
                 var loggingCall = Expression.Call(
                     m_currentProcedure.ContextReferenceInternal,

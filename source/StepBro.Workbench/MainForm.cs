@@ -8,7 +8,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using StepBroMain = StepBro.Core.Main;
@@ -39,7 +38,7 @@ namespace StepBro.Workbench
 
             this.AutoScaleMode = AutoScaleMode.Dpi;
 
-            StepBro.Core.Main.Initialize();
+            StepBroMain.Initialize();
 
             //this.SeSBPlashScreen();
             m_commandLineOptions = StepBro.Core.General.CommandLineParser.Parse<CommandLineOptions>(null, Environment.GetCommandLineArgs());
@@ -626,19 +625,13 @@ namespace StepBro.Workbench
             {
                 if (toolStripComboBoxExecutionTarget.SelectedIndex >= 0)
                 {
-                    var parsing = StepBroMain.StartFileParsing(false);
-                    if (parsing != null)
-                    {
-                        Task.Run(() =>
+                    StepBroMain.StartFileParsing(false);
+                    StepBroMain.Actions.AddTask("Execute Selected Procedure", true,
+                        () => { return (StepBroMain.LastParsingErrorCount == 0); },
+                        (context) =>
                         {
-                            parsing.AsyncWaitHandle.WaitOne(TimeSpan.FromMinutes(5));
-                            this.BeginInvoke(new Action(this.OnReadyForExecuteSelectedProcedure));
+                            this.ExecuteSelectedProcedure();
                         });
-                    }
-                    else
-                    {
-                        this.OnReadyForExecuteSelectedProcedure();
-                    }
                 }
             }
             else
@@ -650,35 +643,35 @@ namespace StepBro.Workbench
             }
         }
 
-        private void OnReadyForExecuteSelectedProcedure()
-        {
-            if (StepBroMain.LastParsingErrorCount == 0)
-            {
-                this.ExecuteSelectedProcedure();
-            }
-            else
-            {
-                MessageBox.Show(
-                    this,
-                    "Could not start execution because of one or more parsing errors.",
-                    "Error starting execution", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
+        //private void OnReadyForExecuteSelectedProcedure()
+        //{
+        //    if (StepBroMain.LastParsingErrorCount == 0)
+        //    {
+        //        this.ExecuteSelectedProcedure();
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show(
+        //            this,
+        //            "Could not start execution because of one or more parsing errors.",
+        //            "Error starting execution", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //}
 
-        private void OnReadyForExecuteProcedureUnderCursor()
-        {
-            if (StepBroMain.LastParsingErrorCount == 0)
-            {
-                this.ExecuteProcedureUnderCursor();
-            }
-            else
-            {
-                MessageBox.Show(
-                    this,
-                    "Could not start execution because of one or more parsing errors.",
-                    "Error starting execution", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
+        //private void OnReadyForExecuteProcedureUnderCursor()
+        //{
+        //    if (StepBroMain.LastParsingErrorCount == 0)
+        //    {
+        //        this.ExecuteProcedureUnderCursor();
+        //    }
+        //    else
+        //    {
+        //        MessageBox.Show(
+        //            this,
+        //            "Could not start execution because of one or more parsing errors.",
+        //            "Error starting execution", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //    }
+        //}
 
         private void ExecuteSelectedProcedure()
         {
@@ -763,19 +756,13 @@ namespace StepBro.Workbench
         {
             if (m_mainScriptExecution == null)
             {
-                var parsing = StepBroMain.StartFileParsing(false);
-                if (parsing != null)
-                {
-                    Task.Run(() =>
+                StepBroMain.StartFileParsing(false);
+                StepBroMain.Actions.AddTask("Execute Selected Procedure", true,
+                    () => { return (StepBroMain.LastParsingErrorCount == 0); },
+                    (context) =>
                     {
-                        parsing.AsyncWaitHandle.WaitOne(TimeSpan.FromMinutes(5));
-                        this.BeginInvoke(new Action(this.OnReadyForExecuteProcedureUnderCursor));
+                        this.ExecuteProcedureUnderCursor();
                     });
-                }
-                else
-                {
-                    this.ExecuteProcedureUnderCursor();
-                }
             }
             else
             {
@@ -853,6 +840,12 @@ namespace StepBro.Workbench
                     }
                 }
             }
+        }
+
+        private void timerPostInitAction_Tick(object sender, EventArgs e)
+        {
+            timerPostInitAction.Stop();
+            StepBroMain.StartFileParsing(false);
         }
     }
 }

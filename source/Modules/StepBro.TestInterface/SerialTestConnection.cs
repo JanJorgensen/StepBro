@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using static StepBro.Core.Data.LogLineData;
 
 namespace StepBro.TestInterface
 {
@@ -215,6 +216,8 @@ namespace StepBro.TestInterface
         private readonly object m_sync = new object();
         private Stream m_stream = null;
         private IReadBuffer<char> m_inputBuffer = null;
+        private LogLineData m_firstLogLine = null;
+        private LogLineData m_lastLogLine = null;
         private readonly Queue<string> m_events = new Queue<string>();
         private readonly Queue<string> m_responseLines = new Queue<string>();
         private Task m_receiverTask = null;
@@ -563,6 +566,18 @@ namespace StepBro.TestInterface
 
         #endregion
 
+        private void AddToLog(LogType type, uint id, string text)
+        {
+            m_lastLogLine = new LogLineData(m_lastLogLine, type, id, text);
+            if (m_firstLogLine == null)
+            {
+                m_firstLogLine = m_lastLogLine;
+            }
+            this.LogLineAdded?.Invoke(this, new LogLineEventArgs(m_lastLogLine));
+        }
+
+        public event LogLineAddEventHandler LogLineAdded;
+
         private void ReceiverTask()
         {
             int knownCount = 0;
@@ -591,8 +606,10 @@ namespace StepBro.TestInterface
                             i = 0;
                             knownCount = m_inputBuffer.Count;
 
+                            var s = new string(line, 1, line.Length - 1);
                             if (line[0] == this.EventLineChar)
                             {
+                                this.AddToLog(LogType.ReceivedAsync, 0, s);
                                 m_events.Enqueue(new string(line, 1, line.Length - 1));
                                 while (m_events.Count > 1000)
                                 {
@@ -603,11 +620,12 @@ namespace StepBro.TestInterface
                             {
                                 if (line[0] == this.ResponseMultiLineChar)
                                 {
-                                    var s = new string(line, 1, line.Length - 1);
+                                    this.AddToLog(LogType.ReceivedPartial, 0, s);
                                     m_responseLines.Enqueue(s);
                                 }
                                 else if (line[0] == this.ResponseEndLineChar)
                                 {
+                                    this.AddToLog(LogType.ReceivedEnd, 0, s);
                                     if (m_currentExecutingCommand != null)
                                     {
                                         try

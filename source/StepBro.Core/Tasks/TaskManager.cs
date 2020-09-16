@@ -14,11 +14,15 @@ namespace StepBro.Core.Tasks
         {
             protected readonly ICallContext m_callContext;
             protected Task m_task = null;
+            protected ILoggerScope m_logger = null;
 
             public TaskContext(ICallContext context, Task task = null)
             {
                 m_callContext = context;
             }
+
+            public void SetLogger(ILoggerScope logger) { m_logger = logger; }
+
 
             #region Interfaces
 
@@ -31,6 +35,11 @@ namespace StepBro.Core.Tasks
             BreakOption ITaskControl.BreakOptions => throw new NotImplementedException();
 
             bool ITaskContext.PauseRequested => throw new NotImplementedException();
+
+            public ILoggerScope Logger
+            {
+                get { return m_logger; }
+            }
 
             event EventHandler ITaskControl.CurrentStateChanged
             {
@@ -84,7 +93,7 @@ namespace StepBro.Core.Tasks
             {
                 throw new NotImplementedException();
             }
-            
+
             #endregion
         }
 
@@ -94,15 +103,15 @@ namespace StepBro.Core.Tasks
             {
             }
 
-            public Task<TResult> Call(TaskDelegateWithControl<TResult> function)
-            {
-                var task = Task.Run(() =>
-                {
-                    return function((ITaskControl)this, (ITaskContext)this);
-                });
-                m_task = task;
-                return task;
-            }
+            //public Task<TResult> Call(TaskDelegateWithControl<TResult> function)
+            //{
+            //    var task = Task.Run(() =>
+            //    {
+            //        return function((ITaskControl)this, (ITaskContext)this);
+            //    });
+            //    m_task = task;
+            //    return task;
+            //}
         }
 
         public TaskManager(out IService serviceAccess) : base("TaskManager", out serviceAccess, typeof(IMainLogger))
@@ -116,11 +125,11 @@ namespace StepBro.Core.Tasks
             m_tasks.Add(taskContext);
         }
 
-        public Task<TResult> StartTask<TResult>(ICallContext context, TaskDelegateWithControl<TResult> function)
-        {
-            var taskContext = new TaskContext<TResult>(context);
-            m_tasks.Add(taskContext);
-            return taskContext.Call(function);
-        }
+        //public Task<TResult> StartTask<TResult>(ICallContext context, TaskDelegateWithControl<TResult> function)
+        //{
+        //    var taskContext = new TaskContext<TResult>(context);
+        //    m_tasks.Add(taskContext);
+        //    return taskContext.Call(function);
+        //}
     }
 }

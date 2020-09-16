@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StepBro.Core.Data;
 using StepBro.Core.Parser;
+using StepBroCoreTest.Data;
 
 namespace StepBroCoreTest.Parser
 {

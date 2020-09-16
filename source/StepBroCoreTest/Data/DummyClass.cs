@@ -2,9 +2,10 @@
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
-namespace StepBroCoreTest.Parser
+namespace StepBroCoreTest.Data
 {
     public enum DummyEnum { First = 11, Second = 22, Third = 33 }
 
@@ -200,6 +201,14 @@ namespace StepBroCoreTest.Parser
         public static string MethodNullableStringValue()
         {
             return "Jenson";
+        }
+
+        public static IEnumerable<string> MethodListSomeNames()
+        {
+            yield return "Anders";
+            yield return "Berditto";
+            yield return "Chrushtor";
+            yield return "Dowfick";
         }
     }
 }

@@ -214,6 +214,8 @@
     <Compile Include="Execution\ScriptUtils.cs" />
     <Compile Include="General\DynamicPropertyNotFoundException.cs" />
     <Compile Include="General\DynamicMethodNotFoundException.cs" />
+    <Compile Include="General\HostApplicationActionQueue.cs" />
+    <Compile Include="General\IHostApplicationActionQueue.cs" />
     <Compile Include="General\ILoadedFile.cs" />
     <Compile Include="General\ILoadedFilesManager.cs" />
     <Compile Include="General\LoadedFileBase.cs" />
@@ -245,6 +247,8 @@
     <Compile Include="ScriptData\IStepBroScriptFile.cs" />
     <Compile Include="Tasks\AsyncResult.cs" />
     <Compile Include="Tasks\IAsyncResult.cs" />
+    <Compile Include="Tasks\ITask.cs" />
+    <Compile Include="Tasks\TaskBase.cs" />
     <Compile Include="Tasks\TaskDelegate.cs" />
     <Compile Include="Tasks\TaskManager.cs" />
     <Compile Include="Tasks\TaskToAsyncResult.cs" />

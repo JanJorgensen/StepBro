@@ -23,14 +23,31 @@ namespace StepBro.TestInterface.Controls
             this.InitializeComponent();
         }
 
+        private void CommandTerminal_Load(object sender, EventArgs e)
+        {
+            textBoxCommand.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            textBoxCommand.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            AutoCompleteStringCollection commands = new AutoCompleteStringCollection();
+            commands.Add("anton");
+            commands.Add("bent");
+            commands.Add("chris");
+            commands.Add("dennis");
+            textBoxCommand.AutoCompleteCustomSource = commands;
+        }
+
         public override bool IsBindable { get { return true; } }
 
         protected override bool TryBind(object @object)
         {
             if (!(@object is SerialTestConnection)) return false;
             m_connection = @object as SerialTestConnection;
-            //m_connection.Invoke()
+            m_connection.LogLineAdded += this.Connection_LogLineAdded;
             return true;
+        }
+
+        private void Connection_LogLineAdded(object sender, LogLineEventArgs args)
+        {
+            throw new NotImplementedException();
         }
 
         protected override void DisconnectBinding()

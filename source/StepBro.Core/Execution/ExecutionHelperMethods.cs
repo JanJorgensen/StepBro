@@ -368,6 +368,14 @@ namespace StepBro.Core.Execution
             return element;
         }
 
+        public static void LogList(IScriptCallContext context, IEnumerable<string> list)
+        {
+            foreach (string s in list)
+            {
+                context.Log(s);
+            }
+        }
+
         public static object DynamicProcedureCall(
             this IProcedureReference procedure,
             IScriptCallContext context,

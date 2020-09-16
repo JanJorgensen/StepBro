@@ -6,7 +6,7 @@
     public enum TaskExecutionState
     {
         /// <summary>
-        /// The process has been created but not started yet.
+        /// The initial state where the process/task has been created but not started yet.
         /// </summary>
         Created,
         /// <summary>

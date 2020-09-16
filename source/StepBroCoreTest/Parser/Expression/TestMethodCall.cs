@@ -2,7 +2,8 @@
 using StepBro.Core.Parser;
 using System;
 using System.Linq.Expressions;
-using static StepBroCoreTest.Parser.DummyClass;
+using StepBroCoreTest.Data;
+using static StepBroCoreTest.Data.DummyClass;
 using static StepBroCoreTest.Parser.ExpressionParser;
 
 namespace StepBroCoreTest.Parser

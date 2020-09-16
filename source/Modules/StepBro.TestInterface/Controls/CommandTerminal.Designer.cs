@@ -312,6 +312,7 @@
             this.Controls.Add(this.panelBottom);
             this.Name = "CommandTerminal";
             this.Size = new System.Drawing.Size(728, 442);
+            this.Load += new System.EventHandler(this.CommandTerminal_Load);
             this.panelBottom.ResumeLayout(false);
             this.panelBottom.PerformLayout();
             this.toolStripQuickCommands.ResumeLayout(false);

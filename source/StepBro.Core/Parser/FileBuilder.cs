@@ -324,6 +324,10 @@ namespace StepBro.Core.Parser
                     file.AddNamespaceUsing(addonManager.Lookup(null, u));
                 }
             }
+            if (usingType != null)
+            {
+                file.AddNamespaceUsing(addonManager.Lookup(null, usingType.Namespace));
+            }
 
 
             var builder = new FileBuilder(new AntlrInputStream(contentBuilder.ToString()), addonManager, file);
