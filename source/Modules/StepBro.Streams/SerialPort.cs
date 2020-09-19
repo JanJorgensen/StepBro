@@ -1,6 +1,7 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.Logging;
 using System;
 
 namespace StepBro.Streams
@@ -132,7 +133,7 @@ namespace StepBro.Streams
 
         private void Port_ErrorReceived(object sender, System.IO.Ports.SerialErrorReceivedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            Core.Main.GetService<IMainLogger>().Logger.RootLogger.LogError(this.GetType().Name, e.EventType.ToString());
         }
 
         protected override void DoDispose()

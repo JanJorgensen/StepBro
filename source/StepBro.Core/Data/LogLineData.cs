@@ -24,7 +24,7 @@ namespace StepBro.Core.Data
 
         public LogLineData(LogLineData previous, LogType type, uint id, string text)
         {
-            previous.Next = this;
+            if (previous != null) previous.Next = this;
             this.Previous = previous;
             this.Type = type;
             this.ID = id;

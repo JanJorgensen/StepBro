@@ -12,7 +12,7 @@ using static StepBro.Core.Data.LogLineData;
 
 namespace StepBro.TestInterface
 {
-    public class SerialTestConnection : AvailabilityBase, IConnection, IRemoteProcedures
+    public class SerialTestConnection : AvailabilityBase, IConnection, IRemoteProcedures, ILogLineSource
     {
         private class CommandData : IAsyncResult<object>, IObjectFaultDescriptor
         {
@@ -41,16 +41,16 @@ namespace StepBro.TestInterface
                 m_syncCompletion = false;
             }
 
-            public CommandData(string command, object result) : base()
-            {
-                m_start = DateTime.Now;
-                m_command = command;
-                m_state = CommandState.EndResponseReceived;
-                m_timeoutTimeSpan = TimeSpan.MinValue; ;
-                m_completeEvent = null;
-                m_syncCompletion = true;
-                m_result = result;
-            }
+            //public CommandData(string command, object result) : base()
+            //{
+            //    m_start = DateTime.Now;
+            //    m_command = command;
+            //    m_state = CommandState.EndResponseReceived;
+            //    m_timeoutTimeSpan = TimeSpan.MinValue; ;
+            //    m_completeEvent = null;
+            //    m_syncCompletion = true;
+            //    m_result = result;
+            //}
 
             public string Command { get { return m_command; } }
             public CommandState State { get { return m_state; } }
@@ -279,6 +279,7 @@ namespace StepBro.TestInterface
         public char EventLineChar { get; set; } = '!';
         public char ResponseEndLineChar { get; set; } = ':';
         public char ResponseMultiLineChar { get; set; } = '*';
+        public string ResponseErrorPrefix { get; set; } = ":ERROR";
         public TimeSpan CommandResponseTimeout { get; set; } = TimeSpan.FromMilliseconds(5000);
         public long InstanceID { get { return m_instanceID; } }
 
@@ -328,6 +329,12 @@ namespace StepBro.TestInterface
         public bool SetProfile(string profile, string accesskey = "")
         {
             throw new System.NotImplementedException();
+        }
+
+        public void SendCommand(string command)
+        {
+            var commandData = new CommandData(command, this.CommandResponseTimeout, null);
+            var cmd = this.EnqueueCommand(commandData);
         }
 
         public IAsyncResult<bool> UpdateInterfaceData([Implicit] ICallContext context = null)
@@ -573,10 +580,8 @@ namespace StepBro.TestInterface
             {
                 m_firstLogLine = m_lastLogLine;
             }
-            this.LogLineAdded?.Invoke(this, new LogLineEventArgs(m_lastLogLine));
+            this.LinesAdded?.Invoke(this, new LogLineEventArgs(m_lastLogLine));
         }
-
-        public event LogLineAddEventHandler LogLineAdded;
 
         private void ReceiverTask()
         {
@@ -609,7 +614,7 @@ namespace StepBro.TestInterface
                             var s = new string(line, 1, line.Length - 1);
                             if (line[0] == this.EventLineChar)
                             {
-                                this.AddToLog(LogType.ReceivedAsync, 0, s);
+                                this.AddToLog(LogType.ReceivedAsync, 0, new string(line));
                                 m_events.Enqueue(new string(line, 1, line.Length - 1));
                                 while (m_events.Count > 1000)
                                 {
@@ -620,12 +625,13 @@ namespace StepBro.TestInterface
                             {
                                 if (line[0] == this.ResponseMultiLineChar)
                                 {
-                                    this.AddToLog(LogType.ReceivedPartial, 0, s);
+                                    this.AddToLog(LogType.ReceivedPartial, 0, new string(line));
                                     m_responseLines.Enqueue(s);
                                 }
                                 else if (line[0] == this.ResponseEndLineChar)
                                 {
-                                    this.AddToLog(LogType.ReceivedEnd, 0, s);
+                                    var l = new string(line);
+                                    this.AddToLog((l.StartsWith(this.ResponseErrorPrefix)) ? LogType.ReceivedError : LogType.ReceivedEnd, 0, l);
                                     if (m_currentExecutingCommand != null)
                                     {
                                         try
@@ -643,7 +649,7 @@ namespace StepBro.TestInterface
                                         {
                                             m_currentExecutingCommand = m_commandQueue.Dequeue();
                                             var commandstring = m_currentExecutingCommand.GetAndMarkActive();
-                                            m_stream.Write(null, commandstring + "\n");
+                                            this.TransmitCommand(commandstring);
                                             //System.Diagnostics.Debug.WriteLine("Command: " + commandstring);
                                         }
                                         else
@@ -676,7 +682,7 @@ namespace StepBro.TestInterface
                     m_currentExecutingCommand = command;
                     var commandstring = command.GetAndMarkActive();
                     if (m_nextResponse != null) commandstring = m_nextResponse;
-                    m_stream.Write(null, commandstring + "\n");
+                    this.TransmitCommand(commandstring);
                     //System.Diagnostics.Debug.WriteLine("Command: " + commandstring);
                 }
                 else
@@ -685,6 +691,12 @@ namespace StepBro.TestInterface
                 }
             }
             return command;
+        }
+
+        private void TransmitCommand(string command)
+        {
+            this.AddToLog(LogType.Sent, 0, command);
+            m_stream.Write(null, command + "\n");
         }
 
         private static string ArgumentToCommandString(object arg)
@@ -775,5 +787,13 @@ namespace StepBro.TestInterface
         }
 
         private RemoteProcedureInfo LastProc { get { return m_remoteProcedures[m_remoteProcedures.Count - 1]; } }
+
+        #region LogLineSource
+
+        public LogLineData FirstEntry { get { throw new NotImplementedException(); } }
+
+        public event LogLineAddEventHandler LinesAdded;
+
+        #endregion
     }
 }

@@ -14,6 +14,7 @@ namespace StepBroCoreTest.Parser
             this.AssertConstantExpression(16L, "16");
             this.AssertConstantExpression(0x44L, "0x44");
             this.AssertConstantExpression(0x7BL, "7Bh");
+            this.AssertConstantExpression(new Identifier("blabber"), "'blabber'");
         }
 
         [TestMethod]

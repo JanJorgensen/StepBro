@@ -8,13 +8,15 @@ namespace StepBro.Core.Controls
 {
     public partial class SimpleLogView : UserControl
     {
-        private TextStyle StyleInfo = new TextStyle(Brushes.Black, null, FontStyle.Regular);
-        private TextStyle StyleReceived = new TextStyle(Brushes.BurlyWood, null, FontStyle.Regular);
+        private TextStyle StyleInfo = new TextStyle(Brushes.DarkGoldenrod, null, FontStyle.Regular);
+        private TextStyle StyleSent = new TextStyle(Brushes.Black, null, FontStyle.Regular);
+        private TextStyle StyleReceived = new TextStyle(Brushes.Green, null, FontStyle.Regular);
+        private TextStyle StyleReceivedPartial = new TextStyle(Brushes.CornflowerBlue, null, FontStyle.Regular);
         private TextStyle StyleReceivedError = new TextStyle(Brushes.Red, null, FontStyle.Regular);
-        private TextStyle StyleReceivedAsync = new TextStyle(Brushes.SeaGreen, null, FontStyle.Regular);
+        private TextStyle StyleReceivedAsync = new TextStyle(Brushes.Gray, null, FontStyle.Regular);
         private LogLineData m_firstSeen = null;
         private LogLineData m_lastHandled = null;
-        private LogLineData m_oldestEntry = null;
+        //private LogLineData m_oldestEntry = null;
         private ILogLineSource m_source = null;
         private Predicate<LogLineData> m_filter = (LogLineData l) => { return true; };
 
@@ -127,26 +129,27 @@ namespace StepBro.Core.Controls
                     style = StyleInfo;
                     break;
                 case LogLineData.LogType.Sent:
-                    style = StyleInfo;
+                    style = StyleSent;
                     break;
                 case LogLineData.LogType.ReceivedEnd:
                     style = StyleReceived;
                     break;
                 case LogLineData.LogType.ReceivedPartial:
-                    style = StyleReceived;
+                    style = StyleReceivedPartial;
                     break;
                 case LogLineData.LogType.ReceivedError:
                     style = StyleReceivedError;
                     break;
                 case LogLineData.LogType.ReceivedAsync:
-                    style = StyleReceived;
+                    style = StyleReceivedAsync;
                     break;
                 case LogLineData.LogType.ReceivedTrace:
+                    style = StyleReceivedAsync;
                     break;
                 default:
                     break;
             }
-            fctb.AppendText(entry.LineText, style);
+            fctb.AppendText(String.Concat(entry.LineText, Environment.NewLine), style);
         }
 
     }
