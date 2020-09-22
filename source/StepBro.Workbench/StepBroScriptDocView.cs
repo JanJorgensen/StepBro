@@ -50,7 +50,7 @@ namespace StepBro.Workbench
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.SaveToFile();
+            this.SaveFile(Core.File.SaveOption.SaveToExisting);
         }
 
         private void scriptFileEditor_IsChangedChanged(object sender, EventArgs e)

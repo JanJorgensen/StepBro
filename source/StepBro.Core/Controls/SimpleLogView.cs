@@ -1,5 +1,6 @@
 ﻿using FastColoredTextBoxNS;
 using StepBro.Core.Data;
+using StepBro.Core.Utils;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -8,6 +9,7 @@ namespace StepBro.Core.Controls
 {
     public partial class SimpleLogView : UserControl
     {
+        private TextStyle StyleTimestamp = new TextStyle(Brushes.Firebrick, null, FontStyle.Regular);
         private TextStyle StyleInfo = new TextStyle(Brushes.DarkGoldenrod, null, FontStyle.Regular);
         private TextStyle StyleSent = new TextStyle(Brushes.Black, null, FontStyle.Regular);
         private TextStyle StyleReceived = new TextStyle(Brushes.Green, null, FontStyle.Regular);
@@ -19,20 +21,32 @@ namespace StepBro.Core.Controls
         //private LogLineData m_oldestEntry = null;
         private ILogLineSource m_source = null;
         private Predicate<LogLineData> m_filter = (LogLineData l) => { return true; };
+        private DateTime m_zeroTime;
 
         public SimpleLogView()
         {
             this.InitializeComponent();
+            fctb.AddStyle(StyleTimestamp);
+            fctb.AddStyle(StyleInfo);
+            fctb.AddStyle(StyleSent);
+            fctb.AddStyle(StyleReceived);
+            fctb.AddStyle(StyleReceivedPartial);
+            fctb.AddStyle(StyleReceivedError);
+            fctb.AddStyle(StyleReceivedAsync);
+            m_zeroTime = DateTime.Now;
         }
 
         public void SetSource(ILogLineSource source)
         {
             if (m_source != null)
             {
-                throw new NotImplementedException();
+                m_source.LinesAdded -= this.source_LinesAdded;
             }
             m_source = source;
-            m_source.LinesAdded += this.source_LinesAdded;
+            if (m_source != null)
+            {
+                m_source.LinesAdded += this.source_LinesAdded;
+            }
         }
 
         private void source_LinesAdded(object sender, LogLineEventArgs args)
@@ -149,8 +163,8 @@ namespace StepBro.Core.Controls
                 default:
                     break;
             }
-            fctb.AppendText(String.Concat(entry.LineText, Environment.NewLine), style);
+            fctb.AppendText(entry.Timestamp.ToMinutesTimestamp(m_zeroTime), StyleTimestamp);
+            fctb.AppendText(String.Concat(" ", entry.LineText, Environment.NewLine), style);
         }
-
     }
 }

@@ -9,10 +9,14 @@ namespace StepBro.Core.Data
         void SetUniqueID(int id);
         void SetValue(object value, ILogger logger);
         bool DataCreated { get; }
+        bool InitNeeded { get; set; }
         void SetAccessModifier(AccessModifier access);
         VariableContainerAction DataResetter { get; set; }
         VariableContainerAction DataCreator { get; set; }
         VariableContainerAction DataInitializer { get; set; }
+        int FileLine { get; set; }
+        int FileColumn { get; set; }
+        int CodeHash { get; set; }
         object Tag { get; set; }
     }
 
@@ -50,10 +54,11 @@ namespace StepBro.Core.Data
             public void SetValue(object value, ILogger logger = null)
             {
                 m_container.SetValue(value, logger, true);
-                m_dataIsSet = true;
+                m_dataIsSet = (value!= null);
             }
 
             public bool DataCreated { get { return m_dataIsSet; } }
+            public bool InitNeeded { get; set; } = true;
 
             public void SetAccessModifier(AccessModifier access)
             {
@@ -64,9 +69,12 @@ namespace StepBro.Core.Data
             public VariableContainerAction DataCreator { get; set; } = null;
             public VariableContainerAction DataInitializer { get; set; } = null;
 
+            public int FileLine { get; set; }
+            public int FileColumn { get; set; }
+            public int CodeHash { get; set; }
             public object Tag { get; set; } = null;
 
-            public bool IsStillValid => throw new NotImplementedException();
+            public bool IsStillValid { get { return disposedValue == false; } }
 
             #region IDisposable Support
             private bool disposedValue = false; // To detect redundant calls

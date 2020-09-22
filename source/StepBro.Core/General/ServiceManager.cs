@@ -148,9 +148,12 @@ namespace StepBro.Core
                     throw new NotSupportedException($"Service manager cannot return services; current state: {this.State}.");
                 }
                 var service = m_services.FirstOrDefault(s => s.ServiceType == typeof(T));
-                if (service.State != ServiceState.Started)
+                if (service != null)
                 {
-                    throw new Exception("");
+                    if (service.State != ServiceState.Started)
+                    {
+                        throw new Exception("");
+                    }
                 }
                 return service?.ServiceObject as T;
             }

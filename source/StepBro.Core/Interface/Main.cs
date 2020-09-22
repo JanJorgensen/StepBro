@@ -17,6 +17,7 @@ namespace StepBro.Core
 {
     public static class Main
     {
+        private static int m_initIndex = 0;
         public static readonly string StepBroFileExtension = "sbs";
         private static bool m_initialized = false;
         private static ServiceManager.IServiceManagerAdministration m_serviceManagerAdmin = null;
@@ -120,6 +121,7 @@ namespace StepBro.Core
             }
 
             m_initialized = true;
+            m_initIndex++;
         }
 
         public static void Deinitialize()
@@ -239,7 +241,7 @@ namespace StepBro.Core
                             context.UpdateStatus($"Resetting files ({(force ? "forced" : "not forced")})");
                             foreach (var f in m_loadedFilesManager.ListFiles<ScriptFile>())
                             {
-                                f.ResetBeforeParsing(force == true);
+                                f.ResetBeforeParsing(preserveUpdateableElements: force == false);
                             }
 
                             context.UpdateStatus("Parsing files");
@@ -286,7 +288,7 @@ namespace StepBro.Core
                     logger = m_mainLogger.Logger.RootLogger.LogEntering("StepBro.Main", "Starting file parsing");
                     foreach (var f in m_loadedFilesManager.ListFiles<ScriptFile>())
                     {
-                        f.ResetBeforeParsing(force == true);
+                        f.ResetBeforeParsing(preserveUpdateableElements: force == false);
                     }
 
                     m_lastParsingErrorCount = FileBuilder.ParseFiles(m_serviceManagerAdmin.Manager, logger);
@@ -348,6 +350,11 @@ namespace StepBro.Core
             var execution = m_scriptExecutionManager.CreateFileElementExecution(procedure, null, arguments);
             execution.StartExecution();
             return execution;
+        }
+
+        public static ICallContext CreateUICallContext()
+        {
+            return new UICallContext(m_serviceManagerAdmin.Manager);
         }
 
         public static object ParseExpression(IScriptFile fileContext, string expression)

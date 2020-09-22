@@ -48,7 +48,7 @@ namespace StepBro.Core.Data
         /// <returns>Container value.</returns>
         T GetTypedValue(ILogger logger = null);
         /// <summary>
-        /// Modifies the value of the container with the specifed mofifier function.
+        /// Modifies the value of the container with the specifed modifier function.
         /// </summary>
         /// <param name="modifier">Delegate to a modifier function.</param>
         /// <param name="logger">Interface for logging the container value modification.</param>

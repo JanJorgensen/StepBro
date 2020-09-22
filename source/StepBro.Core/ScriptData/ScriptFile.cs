@@ -22,6 +22,7 @@ namespace StepBro.Core.ScriptData
         private List<IIdentifierInfo> m_fileUsings = new List<IIdentifierInfo>();
         private PropertyBlock m_fileProperties = null;
         private List<FileVariableContainer> m_fileScopeVariables = new List<FileVariableContainer>();
+        private List<FileVariableContainer> m_fileScopeVariablesBefore = new List<FileVariableContainer>();
         private List<FileElement> m_elements = new List<FileElement>();
         private bool m_typeScanIncluded = false;
         private DateTime m_lastFileChange = DateTime.MinValue;
@@ -65,7 +66,7 @@ namespace StepBro.Core.ScriptData
         {
             foreach (var fileVariable in m_fileScopeVariables)
             {
-                fileVariable.VariableAccess.Dispose();
+                fileVariable.Access.Dispose();
             }
             m_fileScopeVariables = null;
         }
@@ -113,6 +114,11 @@ namespace StepBro.Core.ScriptData
             //if (m_parserFileStream == null) return true;
             var lastWrite = System.IO.File.GetLastWriteTime(path);
             return (lastWrite != m_lastFileChange);
+        }
+
+        internal void SetParserFileStream(string content)
+        {
+            m_parserFileStream = new AntlrInputStream(content);
         }
 
         internal AntlrInputStream GetParserFileStream()
@@ -196,34 +202,33 @@ namespace StepBro.Core.ScriptData
         {
             m_namespaceUsings = new List<IIdentifierInfo>();
             m_fileProperties = null;
-            if (preserveUpdateableElements)
-            {
-                throw new NotImplementedException();
-            }
-            else
+
+            if (!preserveUpdateableElements)
             {
                 foreach (var fsv in ((IEnumerable<FileVariableContainer>)m_fileScopeVariables).Reverse())
                 {
-                    object value = fsv.VariableAccess.Container.GetValue(null);
+                    object value = fsv.Access.Container.GetValue(null);
                     if (value != null && value is IDisposable)
                     {
                         ((IDisposable)value).Dispose();
                     }
+                    // TODO: Set container.CreateNeeded
                 }
-                foreach (var fu in m_fileUsings.Where(u => u.Type == IdentifierType.FileNamespace))
+                m_fileScopeVariables.Clear();
+            }
+            foreach (var fu in m_fileUsings.Where(u => u.Type == IdentifierType.FileNamespace))
+            {
+                if (fu.Reference != null)
                 {
-                    if (fu.Reference != null)
+                    foreach (var f in (IEnumerable<ScriptFile>)fu.Reference)
                     {
-                        foreach (var f in (IEnumerable<ScriptFile>)fu.Reference)
-                        {
-                            f.UnregisterDependant(this);
-                        }
+                        f.UnregisterDependant(this);
                     }
                 }
-                m_fileUsings = new List<IIdentifierInfo>();
-                m_fileScopeVariables = new List<FileVariableContainer>();
-                m_elements = new List<FileElement>();
             }
+            m_fileUsings = new List<IIdentifierInfo>();
+            m_elements = new List<FileElement>();
+
             m_typeScanIncluded = false;
         }
 
@@ -271,9 +276,9 @@ namespace StepBro.Core.ScriptData
         {
             foreach (var v in m_fileScopeVariables)
             {
-                if (v.VariableAccess.Container.UniqueID == id)
+                if (v.Access.Container.UniqueID == id)
                 {
-                    return v.VariableAccess;
+                    return v.Access;
                 }
             }
             return null;    // Not found
@@ -286,31 +291,36 @@ namespace StepBro.Core.ScriptData
             bool @readonly,
             int line,
             int column,
+            int codeHash,
             VariableContainerAction resetter = null,
             VariableContainerAction creator = null,
             VariableContainerAction initializer = null)
         {
-            foreach (var v in m_fileScopeVariables)
+            var existing = m_fileScopeVariablesBefore.FirstOrDefault(
+                v => (String.Equals(v.Access.Container.Name, name, StringComparison.InvariantCulture) &&
+                        v.Access.Container.DataType.Type == datatype.Type));
+            if (existing != null)
             {
-                if (v.VariableAccess.Container.Name == name && v.VariableAccess.Container.DataType.Type == datatype.Type && ((int)v.VariableAccess.Tag) == line * 1000 + column)
+                existing.Access.InitNeeded = (existing.Access.CodeHash != codeHash);
+                m_fileScopeVariables.Add(existing);
+                m_fileScopeVariablesBefore.RemoveAt(m_fileScopeVariablesBefore.IndexOf(existing));
+                if (resetter != null)
                 {
-                    if (resetter != null)
-                    {
-                        v.VariableAccess.DataResetter = resetter;
-                    }
-                    if (creator != null)
-                    {
-                        v.VariableAccess.DataCreator = creator;
-                    }
-                    if (initializer != null)
-                    {
-                        v.VariableAccess.DataInitializer = initializer;
-                    }
-                    return v.ID;
+                    existing.Access.DataResetter = resetter;
                 }
+                if (creator != null)
+                {
+                    existing.Access.DataCreator = creator;
+                }
+                if (initializer != null)
+                {
+                    existing.Access.DataInitializer = initializer;
+                }
+                existing.Access.CodeHash = codeHash;
+                return existing.ID;
             }
 
-            var vc = FileVariableContainer.Create(@namespace, name, datatype, @readonly, line, column, resetter, creator, initializer);
+            var vc = FileVariableContainer.Create(@namespace, name, datatype, @readonly, line, column, codeHash, resetter, creator, initializer);
             m_fileScopeVariables.Add(vc);
             this.ObjectContainerListChanged?.Invoke(this, EventArgs.Empty);
             return vc.ID;
@@ -358,9 +368,9 @@ namespace StepBro.Core.ScriptData
             {
                 if (v.ID == id)
                 {
-                    if (v.VariableAccess.Container is IValueContainer<T>)
+                    if (v.Access.Container is IValueContainer<T>)
                     {
-                        return v.VariableAccess.Container as IValueContainer<T>;
+                        return v.Access.Container as IValueContainer<T>;
                     }
                     else
                     {
@@ -371,11 +381,17 @@ namespace StepBro.Core.ScriptData
             throw new ArgumentException("The specified variable id was not found.");
         }
 
+        public void SaveCurrentFileVariables()
+        {
+            m_fileScopeVariablesBefore = m_fileScopeVariables;
+            m_fileScopeVariables = new List<FileVariableContainer>();
+        }
+
         public IEnumerable<IValueContainer> ListFileVariables()
         {
             foreach (var v in m_fileScopeVariables)
             {
-                yield return v.VariableAccess.Container;
+                yield return v.Access.Container;
             }
         }
 
@@ -383,13 +399,29 @@ namespace StepBro.Core.ScriptData
         {
             foreach (var v in m_fileScopeVariables)
             {
-                if (!v.VariableAccess.DataCreated)
+                bool doInit = !v.Access.DataCreated || v.Access.InitNeeded;
+                if (!v.Access.DataCreated)
                 {
-                    v.VariableAccess.DataCreator?.Invoke(v.VariableAccess, logger);
+                    logger?.Log("Variable " + v.Access.Container.Name, "Create data");
+                    v.Access.DataCreator?.Invoke(v.Access, logger);
                 }
-                v.VariableAccess.DataResetter?.Invoke(v.VariableAccess, logger);
-                v.VariableAccess.DataInitializer?.Invoke(v.VariableAccess, logger);
+                if (doInit)
+                {
+                    logger?.Log("Variable " + v.Access.Container.Name, "Reset and initialize");
+                    v.Access.DataResetter?.Invoke(v.Access, logger);
+                    v.Access.DataInitializer?.Invoke(v.Access, logger);
+                }
             }
+        }
+
+        public void DisposeUnusedFileVariables(ILogger logger)
+        {
+            foreach (var v in m_fileScopeVariablesBefore)
+            {
+                logger?.Log("Variable " + v.Access.Container.Name, "Dispose");
+                v.Access.Dispose();
+            }
+            m_fileScopeVariablesBefore = null;
         }
 
         internal void AddProcedure(FileProcedure function)
@@ -517,7 +549,7 @@ namespace StepBro.Core.ScriptData
             {
                 foreach (var fv in m_fileScopeVariables)
                 {
-                    yield return fv.VariableAccess.Container;
+                    yield return fv.Access.Container;
                 }
             }
         }

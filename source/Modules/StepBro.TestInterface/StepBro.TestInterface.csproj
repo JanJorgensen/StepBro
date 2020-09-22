@@ -7,7 +7,7 @@
     <ProjectGuid>{30EF33A6-DCA6-471F-BA08-76684B7D69A2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Stepbro.TestInterface</RootNamespace>
+    <RootNamespace>StepBro.TestInterface</RootNamespace>
     <AssemblyName>Stepbro.TestInterface</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -53,6 +53,12 @@
     <Compile Include="Controls\CommandTerminal.Designer.cs">
       <DependentUpon>CommandTerminal.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\LoggedValuesView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\LoggedValuesView.Designer.cs">
+      <DependentUpon>LoggedValuesView.cs</DependentUpon>
+    </Compile>
     <Compile Include="GeneralTestInterface.cs" />
     <Compile Include="IConnection.cs" />
     <Compile Include="IParameter.cs" />
@@ -86,6 +92,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Controls\CommandTerminal.resx">
       <DependentUpon>CommandTerminal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\LoggedValuesView.resx">
+      <DependentUpon>LoggedValuesView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

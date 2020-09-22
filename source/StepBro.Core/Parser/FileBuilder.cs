@@ -6,6 +6,7 @@ using StepBro.Core.Data;
 using StepBro.Core.General;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
+using StepBro.Core.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,6 +40,8 @@ namespace StepBro.Core.Parser
             m_parser.BuildParseTree = true;
             m_listener = new StepBroListener(m_errors, addons, file);
         }
+
+        public static ServiceManager.IServiceManagerAdministration LastServiceManager { get; internal set; }
 
         internal static FileBuilder Create(string content, Type typeUsing = null, Type[] typeNamespaces = null)
         {
@@ -426,9 +429,10 @@ namespace StepBro.Core.Parser
             return fileObjects.ToArray();
         }
 
-        internal static ScriptFile[] ParseFiles(ILogger logger, Assembly testAssembly, params ScriptFile[] files)
+        internal static ServiceManager.IServiceManagerAdministration CreateFileParsingSetup(Assembly testAssembly, params ScriptFile[] files)
         {
             ServiceManager.IServiceManagerAdministration services = ServiceManager.Create();
+            LastServiceManager = services;
 
             IService service;
             var addonManager = new AddonManager(null, out service);
@@ -438,6 +442,8 @@ namespace StepBro.Core.Parser
             var loadedFiles = new LoadedFilesManager(out service);
             services.Manager.Register(service);
             var mainLogger = new MainLogger(out service);
+            services.Manager.Register(service);
+            var taskManager = new TaskManager(out service);
             services.Manager.Register(service);
 
             TaskContextDummy taskContext = new TaskContextDummy();
@@ -454,8 +460,14 @@ namespace StepBro.Core.Parser
                 loadedFiles.RegisterLoadedFile(f);
             }
 
+            return services;
+        }
+
+        internal static ScriptFile[] ParseFiles(ILogger logger, Assembly testAssembly, params ScriptFile[] files)
+        {
+            var services = CreateFileParsingSetup(testAssembly, files);
             ParseFiles(services.Manager, logger, files[0]);
-            return loadedFiles.ListFiles<ScriptFile>().ToArray();
+            return services.Manager.Get<ILoadedFilesManager>().ListFiles<ScriptFile>().ToArray();
         }
 
         internal static int ParseFiles(ServiceManager services, ILogger logger, ScriptFile topfile = null)
@@ -706,6 +718,7 @@ namespace StepBro.Core.Parser
             int totalErrors = 0;
             foreach (var file in filesToParse)
             {
+                file.SaveCurrentFileVariables();
                 StepBroListener listener;
                 if (fileListeners.TryGetValue(file, out listener))
                 {
@@ -718,11 +731,16 @@ namespace StepBro.Core.Parser
                     }
                     finally { }
                 }
+                else
+                {
+                    throw new NotImplementedException();
+                }
                 totalErrors += file.Errors.ErrorCount;
                 if (file.Errors.ErrorCount == 0)
                 {
                     file.InitializeFileVariables(logger);
                     file.LastParsing = DateTime.Now;
+                    file.DisposeUnusedFileVariables(logger);
                 }
                 file.DisposeFileStream();
             }

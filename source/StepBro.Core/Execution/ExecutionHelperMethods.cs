@@ -1,6 +1,7 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.General;
+using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using System;
@@ -642,6 +643,16 @@ namespace StepBro.Core.Execution
             if (obj == null) return !isNot;
             var ot = obj.GetType();
             return ot.IsAssignableFrom(type) == !isNot;
+        }
+
+        public static bool ResetFileVariable(IValueContainerOwnerAccess access, ILogger logger)
+        {
+            object o = access.Container.GetValue();
+            if (o != null && o is IResettable)
+            {
+                return (o as IResettable).Reset(null);
+            }
+            return false;
         }
     }
 }

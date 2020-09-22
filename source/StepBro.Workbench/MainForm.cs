@@ -25,6 +25,7 @@ namespace StepBro.Workbench
         private OutputWindow m_outputWindow;
         private ErrorsWindow m_errorListWindow;
         private DummyTaskList m_taskList;
+        private EditorPlayground m_editorPlayground;
         private bool _showSplash;
         private SplashScreen _splashScreen;
         private object m_resourceUserObject = new object();
@@ -157,6 +158,8 @@ namespace StepBro.Workbench
                 return m_errorListWindow;
             else if (persistString == typeof(DummyTaskList).ToString())
                 return m_taskList;
+            else if (persistString == typeof(EditorPlayground).ToString())
+                return m_editorPlayground;
             else
             {
                 // DummyDoc overrides GetPersistString to add extra information into persistString.
@@ -218,6 +221,7 @@ namespace StepBro.Workbench
             m_outputWindow.DockPanel = null;
             m_errorListWindow.DockPanel = null;
             m_taskList.DockPanel = null;
+            m_editorPlayground.DockPanel = null;
 
             // Close all other document windows
             this.CloseAllDocuments();
@@ -283,6 +287,11 @@ namespace StepBro.Workbench
         private void menuItemTaskList_Click(object sender, System.EventArgs e)
         {
             m_taskList.Show(dockPanel);
+        }
+
+        private void menuItemEditorPlayground_Click(object sender, EventArgs e)
+        {
+            m_editorPlayground.Show(dockPanel);
         }
 
         private void menuItemAbout_Click(object sender, System.EventArgs e)
@@ -389,6 +398,21 @@ namespace StepBro.Workbench
                 menuItemClose.Enabled = (dockPanel.ActiveDocument != null);
                 menuItemCloseAll.Enabled =
                     menuItemCloseAllButThisOne.Enabled = (dockPanel.DocumentsCount > 0);
+            }
+        }
+
+        private void menuItemSaveAll_Click(object sender, EventArgs e)
+        {
+            foreach (var doc in dockPanel.Documents)
+            {
+                if (doc.DockHandler.Content is DocumentViewDockContent)
+                {
+                    var view = doc.DockHandler.Content as DocumentViewDockContent;
+                    if (view.FileChanged())
+                    {
+                        view.SaveFile(Core.File.SaveOption.SaveToExisting, null);
+                    }
+                }
             }
         }
 
@@ -551,6 +575,8 @@ namespace StepBro.Workbench
             m_errorListWindow = new ErrorsWindow();
             m_outputWindow = new OutputWindow();
             m_taskList = new DummyTaskList();
+            m_editorPlayground = new EditorPlayground();
+
         }
 
         private void menuItemLayoutByXml_Click(object sender, System.EventArgs e)

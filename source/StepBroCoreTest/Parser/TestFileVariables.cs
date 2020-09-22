@@ -168,18 +168,27 @@ namespace StepBroCoreTest.Parser
 
     }
 
-    public class DummyInstrumentClass : IDisposable
+    public class DummyInstrumentClass : IDisposable, IResettable
     {
+        private static long m_nextInstanceID = 10;
+
         private List<string> m_names = new List<string>();
+        private long m_id;
+        private long m_resetCounts = 0;
 
         public DummyInstrumentClass()
         {
+            m_id = m_nextInstanceID++;
         }
 
-        public DummyInstrumentClass(string[] names)
+        public DummyInstrumentClass(string[] names) : this()
         {
             m_names = names.ToList();
         }
+
+        public long ID { get { return m_id; } }
+        public long ResetCounts { get { return m_resetCounts; } }
+        public bool Disposed { get; private set; } = false;
 
         public bool BoolA { get; set; } = false;
         public long IntA { get; set; } = 0L;
@@ -188,12 +197,19 @@ namespace StepBroCoreTest.Parser
         public void Dispose()
         {
             m_names.Clear();
+            this.Disposed = true;
         }
 
         public long Fcn(string s, bool b)
         {
             if (b) return s.Length + (this.BoolA ? 72 : 81);
             else return this.IntA + m_names.Count * 1000L;
+        }
+
+        public bool Reset(ILogger logger)
+        {
+            m_resetCounts++;
+            return true;
         }
     }
 }

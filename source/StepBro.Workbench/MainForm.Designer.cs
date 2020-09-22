@@ -33,6 +33,7 @@ namespace StepBro.Workbench
             this.menuItemFile = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemNew = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOpen = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSaveAll = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemClose = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemCloseAll = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemCloseAllButThisOne = new System.Windows.Forms.ToolStripMenuItem();
@@ -70,6 +71,7 @@ namespace StepBro.Workbench
             this.stepOverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stepOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.parseAllFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemDebugMode = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemTools = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemLockLayout = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowDocumentIcon = new System.Windows.Forms.ToolStripMenuItem();
@@ -106,7 +108,7 @@ namespace StepBro.Workbench
             this.toolStripComboBoxExecutionTarget = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripComboBoxExecutionTargetPartner = new System.Windows.Forms.ToolStripComboBox();
             this.timerPostInitAction = new System.Windows.Forms.Timer(this.components);
-            this.toolStripMenuItemDebugMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemEditorPlayground = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.toolBar.SuspendLayout();
             this.toolStripExecution.SuspendLayout();
@@ -132,6 +134,7 @@ namespace StepBro.Workbench
             this.menuItemFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemNew,
             this.menuItemOpen,
+            this.menuItemSaveAll,
             this.menuItemClose,
             this.menuItemCloseAll,
             this.menuItemCloseAllButThisOne,
@@ -146,6 +149,7 @@ namespace StepBro.Workbench
             // menuItemNew
             // 
             this.menuItemNew.Name = "menuItemNew";
+            this.menuItemNew.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
             this.menuItemNew.Size = new System.Drawing.Size(216, 22);
             this.menuItemNew.Text = "&New";
             this.menuItemNew.Click += new System.EventHandler(this.menuItemNew_Click);
@@ -153,9 +157,19 @@ namespace StepBro.Workbench
             // menuItemOpen
             // 
             this.menuItemOpen.Name = "menuItemOpen";
+            this.menuItemOpen.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
             this.menuItemOpen.Size = new System.Drawing.Size(216, 22);
             this.menuItemOpen.Text = "&Open...";
             this.menuItemOpen.Click += new System.EventHandler(this.menuItemOpen_Click);
+            // 
+            // menuItemSaveAll
+            // 
+            this.menuItemSaveAll.Name = "menuItemSaveAll";
+            this.menuItemSaveAll.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.S)));
+            this.menuItemSaveAll.Size = new System.Drawing.Size(216, 22);
+            this.menuItemSaveAll.Text = "Save &All";
+            this.menuItemSaveAll.Click += new System.EventHandler(this.menuItemSaveAll_Click);
             // 
             // menuItemClose
             // 
@@ -186,6 +200,7 @@ namespace StepBro.Workbench
             // menuItemExit
             // 
             this.menuItemExit.Name = "menuItemExit";
+            this.menuItemExit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
             this.menuItemExit.Size = new System.Drawing.Size(216, 22);
             this.menuItemExit.Text = "&Exit";
             this.menuItemExit.Click += new System.EventHandler(this.menuItemExit_Click);
@@ -206,6 +221,7 @@ namespace StepBro.Workbench
             this.menuItemErrorList,
             this.menuItemOutputWindow,
             this.menuItemTaskList,
+            this.menuItemEditorPlayground,
             this.menuItemSeparator1,
             this.menuItemToolBar,
             this.menuItemExecutionToolBar,
@@ -452,6 +468,14 @@ namespace StepBro.Workbench
             this.parseAllFilesToolStripMenuItem.Text = "Parse All Files";
             this.parseAllFilesToolStripMenuItem.Click += new System.EventHandler(this.parseAllFilesToolStripMenuItem_Click);
             // 
+            // toolStripMenuItemDebugMode
+            // 
+            this.toolStripMenuItemDebugMode.CheckOnClick = true;
+            this.toolStripMenuItemDebugMode.Name = "toolStripMenuItemDebugMode";
+            this.toolStripMenuItemDebugMode.Size = new System.Drawing.Size(316, 22);
+            this.toolStripMenuItemDebugMode.Text = "Debug Mode";
+            this.toolStripMenuItemDebugMode.ToolTipText = "Enable or disable script";
+            // 
             // menuItemTools
             // 
             this.menuItemTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -506,14 +530,14 @@ namespace StepBro.Workbench
             // menuItemAbout
             // 
             this.menuItemAbout.Name = "menuItemAbout";
-            this.menuItemAbout.Size = new System.Drawing.Size(185, 22);
-            this.menuItemAbout.Text = "&About DockSample...";
+            this.menuItemAbout.Size = new System.Drawing.Size(224, 22);
+            this.menuItemAbout.Text = "&About StepBro Workbench...";
             this.menuItemAbout.Click += new System.EventHandler(this.menuItemAbout_Click);
             // 
             // toolStripMenuItemListCurrentObjects
             // 
             this.toolStripMenuItemListCurrentObjects.Name = "toolStripMenuItemListCurrentObjects";
-            this.toolStripMenuItemListCurrentObjects.Size = new System.Drawing.Size(185, 22);
+            this.toolStripMenuItemListCurrentObjects.Size = new System.Drawing.Size(224, 22);
             this.toolStripMenuItemListCurrentObjects.Text = "List Current Objects";
             this.toolStripMenuItemListCurrentObjects.ToolTipText = "Dumps a list of the current objets and loaded files to the log (output window).";
             this.toolStripMenuItemListCurrentObjects.Click += new System.EventHandler(this.toolStripMenuItemListCurrentObjects_Click);
@@ -754,13 +778,12 @@ namespace StepBro.Workbench
             this.timerPostInitAction.Interval = 1000;
             this.timerPostInitAction.Tick += new System.EventHandler(this.timerPostInitAction_Tick);
             // 
-            // toolStripMenuItemDebugMode
+            // menuItemEditorPlayground
             // 
-            this.toolStripMenuItemDebugMode.CheckOnClick = true;
-            this.toolStripMenuItemDebugMode.Name = "toolStripMenuItemDebugMode";
-            this.toolStripMenuItemDebugMode.Size = new System.Drawing.Size(316, 22);
-            this.toolStripMenuItemDebugMode.Text = "Debug Mode";
-            this.toolStripMenuItemDebugMode.ToolTipText = "Enable or disable script";
+            this.menuItemEditorPlayground.Name = "menuItemEditorPlayground";
+            this.menuItemEditorPlayground.Size = new System.Drawing.Size(193, 22);
+            this.menuItemEditorPlayground.Text = "Editor Playground";
+            this.menuItemEditorPlayground.Click += new System.EventHandler(this.menuItemEditorPlayground_Click);
             // 
             // MainForm
             // 
@@ -869,5 +892,7 @@ namespace StepBro.Workbench
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemCreateAllObjectPanels;
         private System.Windows.Forms.Timer timerPostInitAction;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemDebugMode;
+        private System.Windows.Forms.ToolStripMenuItem menuItemSaveAll;
+        private System.Windows.Forms.ToolStripMenuItem menuItemEditorPlayground;
     }
 }

@@ -2,9 +2,6 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace StepBro.TestInterface.Controls
 {
@@ -37,9 +34,30 @@ namespace StepBro.TestInterface.Controls
                 {
                     if (!String.IsNullOrEmpty(textBoxCommand.Text))
                     {
-                        m_connection.SendCommand(textBoxCommand.Text);
-                        this.AddCommandToList(textBoxCommand.Text);
-                        textBoxCommand.SelectAll();
+                        if (m_connection != null)
+                        {
+                            bool doCommand = true;
+                            if (!m_connection.IsConnected())
+                            {
+                                if (m_connection.Stream != null)
+                                {
+                                    if (MessageBox.Show(this, "Do you wish to open the port/connaction?", "Serial Test Interface is not connacted", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                                    {
+                                        doCommand = m_connection.Connect(Core.Main.CreateUICallContext());
+                                    }
+                                    else
+                                    {
+                                        doCommand = false;
+                                    }
+                                }
+                            }
+                            if (doCommand)
+                            {
+                                m_connection.SendCommand(textBoxCommand.Text);
+                                this.AddCommandToList(textBoxCommand.Text);
+                                textBoxCommand.SelectAll();
+                            }
+                        }
                     }
                     return true;
                 }
@@ -49,7 +67,7 @@ namespace StepBro.TestInterface.Controls
                 }
                 else if (textBoxCommandButtonText.Focused)
                 {
-                    AddCommandButton(textBoxCommandButtonText.Text, textBoxCommand.Text);
+                    this.AddCommandButton(textBoxCommandButtonText.Text, textBoxCommand.Text);
                     panelCommandButtonInput.Visible = false;
                     return true;
                 }
@@ -69,6 +87,7 @@ namespace StepBro.TestInterface.Controls
 
         protected override void DisconnectBinding()
         {
+            simpleLogViewFull.SetSource(null);
             m_connection = null;
         }
 
@@ -93,7 +112,7 @@ namespace StepBro.TestInterface.Controls
             textBoxCommand.Text = command;
             textBoxCommand.SelectAll();
             textBoxCommand.Focus();
-            AddCommandToList(command);
+            this.AddCommandToList(command);
         }
 
         private void AddCommandToList(string command)

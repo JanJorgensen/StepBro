@@ -2,14 +2,14 @@
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
@@ -139,10 +139,11 @@ namespace StepBro.Core.Parser
             {
                 throw new NotImplementedException("Variables assignment of incompatible type.");
             }
+            var codeText = context.GetText();
             // TODO: private or public variable(s) ?
             var id = m_file.CreateOrGetFileVariable(
                 m_currentNamespace, variable.Name, type, false,
-                context.Start.Line, context.Start.Column,
+                context.Start.Line, context.Start.Column, codeText.GetHashCode(),
                 CreateVariableContainerValueAssignAction(variable.Value.ExpressionCode));
             m_file.SetFileVariableModifier(id, m_fileElementModifier);
         }
@@ -167,6 +168,7 @@ namespace StepBro.Core.Parser
             }
             else
             {
+                #region Creator Action
                 var ctor = type.Type.GetConstructor(new Type[] { });
                 if (ctor != null)
                 {
@@ -180,6 +182,33 @@ namespace StepBro.Core.Parser
                             m => String.Equals(m.Name, "Create", StringComparison.InvariantCulture) && m.IsStatic).ToArray();
                     throw new NotImplementedException();
                 }
+                #endregion
+                #region Reset Action
+                var resettable = type.Type.GetInterface(nameof(IResettable));
+                if (resettable != null)
+                {
+                    LabelTarget returnLabel = Expression.Label(typeof(bool));
+
+                    var parameterContainer = Expression.Parameter(typeof(IValueContainerOwnerAccess), "container");
+                    var parameterLogger = Expression.Parameter(typeof(ILogger), "logger");
+
+                    var callSetValue = Expression.Call(
+                        typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ResetFileVariable), new Type[] { typeof(IValueContainerOwnerAccess), typeof(ILogger) }),
+                        parameterContainer,
+                        parameterLogger);
+
+                    var lambdaExpr = Expression.Lambda(
+                        typeof(VariableContainerAction),
+                        Expression.Block(
+                            callSetValue,
+                            Expression.Label(returnLabel, Expression.Constant(true))),
+                        parameterContainer,
+                        parameterLogger);
+
+                    var @delegate = lambdaExpr.Compile();
+                    resetAction = (VariableContainerAction)@delegate;
+                }
+                #endregion
             }
 
             if (props != null && props.Count > 0)
@@ -187,13 +216,14 @@ namespace StepBro.Core.Parser
                 initAction = this.CreateVariableContainerObjectInitAction(type.Type, props, m_errors, context.Start);
             }
 
+            var codeText = context.GetText();
             // TODO: private or public variable(s) ?
             var id = m_file.CreateOrGetFileVariable(
-            m_currentNamespace, m_variableName, type, true,
-            context.Start.Line, context.Start.Column,
-            resetter: resetAction,
-            creator: createAction,
-            initializer: initAction);
+                m_currentNamespace, m_variableName, type, true,
+                context.Start.Line, context.Start.Column, codeText.GetHashCode(),
+                resetter: resetAction,
+                creator: createAction,
+                initializer: initAction);
             m_file.SetFileVariableModifier(id, m_fileElementModifier);
 
             m_variableName = null;
@@ -302,9 +332,9 @@ namespace StepBro.Core.Parser
                                     if (value is Identifier)
                                     {
                                         value = ((Identifier)value).Name;
-                                        var resolved = ResolveIdentifierForGetOperation(
-                                            (string)value, 
-                                            false, 
+                                        var resolved = this.ResolveIdentifierForGetOperation(
+                                            (string)value,
+                                            false,
                                             new TypeReference(objectProperty.PropertyType));
                                         if (resolved != null)
                                         {

@@ -287,6 +287,11 @@ namespace StepBro.TestInterface
 
         #region IConnection
 
+        public bool IsConnected()
+        {
+            return m_stream != null && m_stream.IsOpen;
+        }
+
         public bool Connect([Implicit] ICallContext context)
         {
             if (m_stream.IsOpen || m_stream.Open(context))

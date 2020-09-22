@@ -51,7 +51,7 @@ namespace StepBroCoreTest
             return taskContext.CallProcedure(procedure, args);
         }
 
-        public static ScriptTaskContext ExeContext(bool debugging = true)
+        public static ScriptTaskContext ExeContext(bool debugging = true, ServiceManager services = null)
         {
             ScriptTaskContext taskContext = new ScriptTaskContext();
             RuntimeErrors = new RuntimeErrorCollector();
@@ -62,9 +62,19 @@ namespace StepBroCoreTest
                 logger.IsDebugging = true;
             }
             var taskStatusUpdater = new Mocks.ExecutionScopeStatusUpdaterMock();
-            IService service;
-            LoadedFilesManager loadedFiles = new LoadedFilesManager(out service);
-            TaskManager taskManager = new TaskManager(out service);
+            ILoadedFilesManager loadedFiles = null;
+            TaskManager taskManager = null;
+            if (services != null)
+            {
+                loadedFiles = services.Get<ILoadedFilesManager>();
+                taskManager = services.Get<TaskManager>();
+            }
+            else
+            {
+                IService service;
+                loadedFiles = new LoadedFilesManager(out service);
+                taskManager = new TaskManager(out service);
+            }
             taskContext.Setup(logger.m_rootLogger, ContextLogOption.Normal, taskStatusUpdater, loadedFiles, taskManager);
             return taskContext;
         }

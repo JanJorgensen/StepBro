@@ -72,7 +72,7 @@ namespace StepBro.Workbench
                         | WeifenLuo.WinFormsUI.Docking.DockAreas.DockBottom)));
             this.Name = "ToolWindow";
             this.TabPageContextMenuStrip = this.contextMenuStrip1;
-            this.TabText = "ToolWindow";
+            this.TabText = "<Remember to set TabText>";
             this.Text = "ToolWindow";
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);

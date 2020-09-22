@@ -1,6 +1,7 @@
-﻿using System;
-using StepBro.Core.Controls;
+﻿using StepBro.Core.Controls;
+using StepBro.Core.File;
 using StepBro.Core.General;
+using System;
 
 namespace StepBro.Workbench
 {
@@ -14,22 +15,53 @@ namespace StepBro.Workbench
 
         protected virtual TextEditor Editor { get { throw new NotImplementedException(); } }
 
-        protected override void DoOpenFile(ILoadedFile file)
+        protected override void DoOpenFileView(ILoadedFile file)
         {
             this.Editor.OpenFile(file.FilePath);
         }
 
-        public void SaveToFile()
+        protected override bool DoDiscardChanges()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override bool IsFileChanged()
+        {
+            return this.Editor.IsChanged;
+        }
+
+        protected override bool DoSaveFile(SaveOption option, string filepath)
         {
             System.Diagnostics.Debug.WriteLine("SaveToFile");
             try
             {
-                this.Editor.SaveToFile(this.File.FilePath);
-                //this.Text = this.Text.Replace("*", "");
+                switch (option)
+                {
+                    case SaveOption.SaveToExisting:
+                        this.Editor.SaveToFile(this.File.FilePath);
+                        return true;
+
+                    case SaveOption.SaveAsCopy:
+                        try
+                        {
+                            this.Editor.SaveToFile(filepath);
+                            return this.DiscardChanges();
+                        }
+                        catch (Exception)
+                        {
+                            return false;
+                        }
+
+                    case SaveOption.Rename:
+                        throw new NotImplementedException();
+
+                    default:
+                        throw new NotImplementedException();
+                }
             }
             catch (Exception)
             {
-
+                return false;
             }
         }
 

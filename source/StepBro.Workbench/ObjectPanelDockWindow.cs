@@ -61,7 +61,7 @@ namespace StepBro.Workbench
             m_panel.TabIndex = 0;
             m_panel.Visible = false;
             labelErrorMessage.Visible = false;
-            this.Text = m_panel.Name;
+            this.TabText = m_panel.Name;
             this.Controls.Add(m_panel);
         }
 

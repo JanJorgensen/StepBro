@@ -150,6 +150,15 @@
     <Compile Include="Attributes\ClassPanelAttribute.cs" />
     <Compile Include="Attributes\ObjectPanelAttribute.cs" />
     <Compile Include="Controls\ComboboxItem.cs" />
+    <Compile Include="Controls\DataView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\DataView.Designer.cs">
+      <DependentUpon>DataView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DataViewControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Controls\FCTBRangeStream.cs" />
     <Compile Include="Controls\ObjectPanel.cs">
       <SubType>UserControl</SubType>
@@ -181,6 +190,9 @@
     <Compile Include="Controls\TextEditor.Designer.cs">
       <DependentUpon>TextEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\TextView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Data\ArrayFifo.cs" />
     <Compile Include="Data\AvailabilityBase.cs" />
     <Compile Include="Data\DoubleAction.cs" />
@@ -192,6 +204,7 @@
     <Compile Include="Data\IObjectHost.cs" />
     <Compile Include="Data\IObjectPanelManager.cs" />
     <Compile Include="Data\IReadBuffer.cs" />
+    <Compile Include="Data\IResettable.cs" />
     <Compile Include="Data\ListElementPicker.cs" />
     <Compile Include="Data\LogLineData.cs" />
     <Compile Include="Data\NumericLimitType.cs" />
@@ -200,6 +213,7 @@
     <Compile Include="Data\ProcedureOutput.cs" />
     <Compile Include="Data\PropertyBlockFlag.cs" />
     <Compile Include="Data\TypeReference.cs" />
+    <Compile Include="Data\UICallContext.cs" />
     <Compile Include="Execution\ArgumentList.cs" />
     <Compile Include="Execution\ExecutionFailure.cs" />
     <Compile Include="Execution\ExecutionResult.cs" />
@@ -212,6 +226,7 @@
     <Compile Include="Execution\ScriptExecutionManager.cs" />
     <Compile Include="Execution\ScriptExecutionTask.cs" />
     <Compile Include="Execution\ScriptUtils.cs" />
+    <Compile Include="File\SaveOption.cs" />
     <Compile Include="General\DynamicPropertyNotFoundException.cs" />
     <Compile Include="General\DynamicMethodNotFoundException.cs" />
     <Compile Include="General\HostApplicationActionQueue.cs" />
@@ -254,6 +269,7 @@
     <Compile Include="Tasks\TaskToAsyncResult.cs" />
     <Compile Include="Utils\IValueWithDescription.cs" />
     <Compile Include="Utils\SequenceInspector.cs" />
+    <Compile Include="Utils\StringFormatter.cs" />
     <Compile Include="Utils\ValueWithDescription.cs" />
     <None Include="CodeGeneration\CodeBuilder.cs" />
     <Compile Include="Attributes\AliasAttribute.cs" />
@@ -467,6 +483,9 @@
     <Content Include="TSharpDataFormat.txt" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Controls\DataView.resx">
+      <DependentUpon>DataView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\ParsingErrorListView.resx">
       <DependentUpon>ParsingErrorListView.cs</DependentUpon>
     </EmbeddedResource>

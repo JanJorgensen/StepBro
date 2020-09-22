@@ -137,6 +137,7 @@ namespace StepBro.Core.General
 
             public void UpdateStatus(string text = null, long progress = -1)
             {
+                this.Logger.Log(this.Title, text);
             }
 
             #endregion
