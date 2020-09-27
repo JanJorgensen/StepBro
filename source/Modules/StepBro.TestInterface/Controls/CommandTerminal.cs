@@ -53,7 +53,7 @@ namespace StepBro.TestInterface.Controls
                             }
                             if (doCommand)
                             {
-                                m_connection.SendCommand(textBoxCommand.Text);
+                                m_connection.SendCommand(null, textBoxCommand.Text);
                                 this.AddCommandToList(textBoxCommand.Text);
                                 textBoxCommand.SelectAll();
                             }
@@ -108,7 +108,7 @@ namespace StepBro.TestInterface.Controls
         {
             var commandButton = sender as ToolStripButton;
             var command = commandButton.Tag as string;
-            m_connection.SendCommand(command);
+            m_connection.SendCommand(null, command);
             textBoxCommand.Text = command;
             textBoxCommand.SelectAll();
             textBoxCommand.Focus();

@@ -25,3 +25,9 @@ procedure void ThirdTestCase() : TestCase
 {
     log ("Inside ThirdTestCase");
 }
+
+
+procedure void ExecuteTest()
+{
+    AllTests.FormalTest();
+}

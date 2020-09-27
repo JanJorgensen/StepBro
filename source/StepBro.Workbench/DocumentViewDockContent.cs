@@ -61,7 +61,7 @@ namespace StepBro.Workbench
                 this.ToolTipText = file.FilePath;
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -78,7 +78,7 @@ namespace StepBro.Workbench
                     var file = this.DoOpenFile(filepath);
                     return this.OpenFileView(file);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return false;
                 }

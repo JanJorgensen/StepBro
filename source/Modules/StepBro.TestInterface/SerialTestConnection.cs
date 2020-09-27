@@ -228,6 +228,7 @@ namespace StepBro.TestInterface
         private string m_nextResponse = null;
         private readonly long m_instanceID;
         private static Random rnd = new Random(DateTime.Now.GetHashCode());
+        private Dictionary<string, string> m_loopbackAnswers = null;
 
         private List<RemoteProcedureInfo> m_remoteProcedures = new List<RemoteProcedureInfo>();
 
@@ -336,10 +337,19 @@ namespace StepBro.TestInterface
             throw new System.NotImplementedException();
         }
 
-        public void SendCommand(string command)
+        public IAsyncResult<object> SendCommand([Implicit] ICallContext context, string command, params object[] arguments)
         {
-            var commandData = new CommandData(command, this.CommandResponseTimeout, null);
-            var cmd = this.EnqueueCommand(commandData);
+            var request = new List<string>();
+            request.Add(command);
+            if (arguments != null && arguments.Length > 0)
+            {
+                foreach (var a in arguments)
+                {
+                    request.Add(ArgumentToCommandString(a));
+                }
+            }
+            var commandData = new CommandData(String.Join(" ", request), this.CommandResponseTimeout, null);
+            return this.EnqueueCommand(commandData);
         }
 
         public IAsyncResult<bool> UpdateInterfaceData([Implicit] ICallContext context = null)
@@ -612,6 +622,11 @@ namespace StepBro.TestInterface
                         char ch = m_inputBuffer[i];
                         if (ch == '\n' || ch == '\r')
                         {
+                            if (i == 0)
+                            {
+                                m_inputBuffer.Eat(1);
+                                continue;
+                            }
                             var line = m_inputBuffer.Get(0, i, i + 1);
                             i = 0;
                             knownCount = m_inputBuffer.Count;
@@ -650,16 +665,10 @@ namespace StepBro.TestInterface
                                     m_responseLines.Clear();
                                     lock (m_sync)
                                     {
+                                        m_currentExecutingCommand = null;
                                         if (m_commandQueue.Count > 0)
                                         {
-                                            m_currentExecutingCommand = m_commandQueue.Dequeue();
-                                            var commandstring = m_currentExecutingCommand.GetAndMarkActive();
-                                            this.TransmitCommand(commandstring);
-                                            //System.Diagnostics.Debug.WriteLine("Command: " + commandstring);
-                                        }
-                                        else
-                                        {
-                                            m_currentExecutingCommand = null;
+                                            this.DoSendCommand(m_commandQueue.Dequeue());
                                         }
                                     }
                                 }
@@ -684,11 +693,7 @@ namespace StepBro.TestInterface
             {
                 if (m_currentExecutingCommand == null)
                 {
-                    m_currentExecutingCommand = command;
-                    var commandstring = command.GetAndMarkActive();
-                    if (m_nextResponse != null) commandstring = m_nextResponse;
-                    this.TransmitCommand(commandstring);
-                    //System.Diagnostics.Debug.WriteLine("Command: " + commandstring);
+                    this.DoSendCommand(command);
                 }
                 else
                 {
@@ -698,76 +703,33 @@ namespace StepBro.TestInterface
             return command;
         }
 
-        private void TransmitCommand(string command)
+        private void DoSendCommand(CommandData command)
         {
-            this.AddToLog(LogType.Sent, 0, command);
-            m_stream.Write(null, command + "\n");
+            m_currentExecutingCommand = command;
+            var commandstring = command.GetAndMarkActive();
+            if (m_loopbackAnswers != null)
+            {
+                if (m_loopbackAnswers.TryGetValue(commandstring, out commandstring)) ;
+            }
+            if (m_nextResponse != null) commandstring = m_nextResponse;
+            this.AddToLog(LogType.Sent, 0, command.Command);
+            m_stream.Write(null, commandstring + "\n");
         }
 
         private static string ArgumentToCommandString(object arg)
         {
-            return StringUtils.ObjectToString(arg);
+            return StringUtils.ObjectToString(arg, identifierBare: true);
         }
-
-        //public object SendCommand([Implicit] ICallContext context, string command)
-        //{
-        //    m_stream.Write(context, command + "\n");
-        //    if (m_newResponseDataEvent.WaitOne(5000))
-        //    {
-        //        var responses = m_responseLines.ToArray();
-        //        m_responseLines.Clear();
-        //        if (context != null)
-        //        {
-        //            foreach (var r in responses)
-        //            {
-        //                context.Logger.Log("SendCommand", "Response: " + r);
-        //            }
-        //        }
-        //        if (responses.Length == 0)
-        //        {
-        //            return null;
-        //        }
-        //        else if (responses.Length == 1)
-        //        {
-        //            if (responses[0] == ":OK") return null;
-        //            else if (responses[0].StartsWith(":ERROR"))
-        //            {
-        //                if (context != null)
-        //                {
-        //                    context.ReportError(new RemoteError(), responses[0].Substring(1));
-        //                }
-        //                return null;
-        //            }
-        //            else
-        //            {
-        //                var value = StepBro.Core.Main.ParseExpression(null, responses[0].Substring(1));
-        //                return value;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            var array = new List<object>();
-        //            for (int i = 0; i < responses.Length; i++)
-        //            {
-        //                object value = StepBro.Core.Main.ParseExpression(null, responses[i]);
-        //                array.Add(value);
-        //            }
-        //            return array;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        if (context != null)
-        //        {
-        //            context.ReportError(new TimeoutError(), "No response received.");
-        //        }
-        //        return null;
-        //    }
-        //}
 
         public void SetNextResponse(string response)
         {
             m_nextResponse = response;
+        }
+
+        public void SetLoopbackRespone(string command, string response)
+        {
+            if (m_loopbackAnswers == null) m_loopbackAnswers = new Dictionary<string, string>();
+            m_loopbackAnswers[command] = response;
         }
 
         public void SetupDebugCommands()

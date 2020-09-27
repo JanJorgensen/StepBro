@@ -10,8 +10,8 @@ namespace StepBro.Core.Controls
     {
         private string m_text;
         private object m_value;
-        private string m_toolTipTitle;
-        private string m_toolTipText;
+        //private string m_toolTipTitle;
+        //private string m_toolTipText;
         
         public ComboboxItem(string text, object value)
         {

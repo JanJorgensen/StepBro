@@ -118,6 +118,11 @@ namespace StepBro.Core.Parser
             this.SymanticError(line, charPositionInLine, false, $"Unresolved identifier: \"{name}\".");
         }
 
+        public void IncompatibleDataType(int line, int charPositionInLine, string type, string expectedType)
+        {
+            this.SymanticError(line, charPositionInLine, false, $"Not a compatible type: '{type}'. Expected type: {expectedType}.");
+        }
+
         public void InternalError(int line, int charPositionInLine, string description)
         {
             m_errors.Add(new ErrorData(line, charPositionInLine, "INTERNAL ERROR. " + description, false));

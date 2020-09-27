@@ -92,7 +92,6 @@ REF : 'ref' ;
 REPORT : 'report' ;
 RETURN : 'return' ;
 SESSION : 'session' ;
-SINGLESELECTION : 'singleselection';
 START : 'start' ;
 STATIC : 'static' ;
 STEP : 'step' ;

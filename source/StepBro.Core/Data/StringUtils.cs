@@ -68,12 +68,12 @@ namespace StepBro.Core.Data
                 .Replace("\'", "\\\'");
         }
 
-        public static string ObjectToString(object value)
+        public static string ObjectToString(object value, bool identifierBare = false)
         {
             if (value == null) return "<null>";
             var t = value.GetType();
             if (t == typeof(string)) return "\"" + ((string)value).EscapeString() + "\"";
-            if (t.IsPrimitive || t == typeof(object)) return value.ToString();
+            if (t == typeof(Identifier)) return identifierBare ? ((Identifier)value).Name : ("'" + ((Identifier)value).Name + "'");
             if (typeof(System.Collections.IEnumerable).IsAssignableFrom(t)) return ListToString((System.Collections.IEnumerable)value);
             return value.ToString();
         }

@@ -48,7 +48,7 @@ namespace StepBro.Core.Api
                         m_panelCreators.Add(creator);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     throw new NotImplementedException();
                 }

@@ -855,11 +855,11 @@ namespace StepBro.Workbench
                     {
                         if (panelManager.GetPanelCreationOption(panelInfo, objContainer) == Core.Data.PanelCreationOption.Possible)
                         {
-                            var panel = panelManager.CreatePanel(panelInfo, objContainer);
+                            var panel = panelManager.CreateObjectPanel(panelInfo, objContainer);
                             if (panel != null)
                             {
                                 var window = new ObjectPanelDockWindow(StepBroMain.ServiceManager);
-                                window.SetPanel(panel);
+                                window.SetPanel(panelInfo, panel);
                                 window.Show(dockPanel);
                             }
                         }

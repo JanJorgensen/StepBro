@@ -13,7 +13,7 @@ namespace StepBro.Core.Data
         public bool IsObjectPanel { get; private set; }
         public bool AllowMultipleInstances { get; private set; }
 
-        internal abstract ObjectPanel CreatePanel(IObjectContainer container = null);
+        internal abstract ObjectPanel CreatePanel();
 
         internal ObjectPanelInfo(string name, string description, bool isObjectPanel, bool allowMultpile)
         {
@@ -40,32 +40,36 @@ namespace StepBro.Core.Data
 
     public class ObjectPanelInfo<TPanel, TObject> : ObjectPanelInfo where TPanel : ObjectPanel
     {
-        public ObjectPanelInfo(string name, string description, bool isObjectPanel, bool allowMultpile) :
-            base(name, description, isObjectPanel, allowMultpile)
+        public ObjectPanelInfo(string name, string description, bool allowMultpile) :
+            base(name, description, true, allowMultpile)
         {
         }
 
-        public override string TypeIdentification
-        {
-            get
-            {
-                return typeof(TPanel).FullName;
-            }
-        }
+        public override string TypeIdentification { get { return typeof(TPanel).FullName; } }
 
         public override bool IsCompatibleWithType(Type type)
         {
             return type.IsAssignableFrom(typeof(TObject));
         }
 
-        internal override ObjectPanel CreatePanel(IObjectContainer container = null)
+        internal override ObjectPanel CreatePanel()
         {
-            if (!this.IsObjectPanel && container != null) throw new NotSupportedException();
             var panel = System.Activator.CreateInstance<TPanel>();
-            if (container != null)
-            {
-                panel.Bind(container);
-            }
+            return (ObjectPanel)panel;
+        }
+    }
+
+    public class ObjectPanelInfo<TPanel> : ObjectPanelInfo where TPanel : ObjectPanel
+    {
+        public ObjectPanelInfo(string name, string description, bool allowMultpile) :
+            base(name, description, false, allowMultpile)
+        {
+        }
+        public override string TypeIdentification { get { return typeof(TPanel).FullName; } }
+
+        internal override ObjectPanel CreatePanel()
+        {
+            var panel = System.Activator.CreateInstance<TPanel>();
             return (ObjectPanel)panel;
         }
     }

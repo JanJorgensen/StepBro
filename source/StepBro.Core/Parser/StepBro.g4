@@ -99,18 +99,8 @@ enumValue : IDENTIFIER (ASSIGNMENT (INTEGER_LITERAL | HexLiteral)) ? ;
 configDeclaration : CONFIG configDeclarationBody ;
 
 configDeclarationBody
-    :	SINGLESELECTION IDENTIFIER configSingleSelectionGroupBody
-    |	type variableDeclarator SEMICOLON
+    :	type variableDeclarator SEMICOLON
     |	type IDENTIFIER elementPropertyblock
-    ;
-
-configSingleSelectionGroupBody
-    :	OPEN_BRACE configSingleSelectionGroupEntry configSingleSelectionGroupEntry* CLOSE_BRACE
-    ;
-
-configSingleSelectionGroupEntry
-    :	IDENTIFIER SEMICOLON 
-    |	IDENTIFIER ASSIGNMENT booleanLiteral SEMICOLON
     ;
 
 // TESTLIST

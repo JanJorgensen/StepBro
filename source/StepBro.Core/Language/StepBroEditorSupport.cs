@@ -53,7 +53,7 @@ namespace StepBro.Core.Language
                 Lexer.LOG, Lexer.NAMESPACE, Lexer.NOT, Lexer.NULL, Lexer.OBJECT, Lexer.ON,
                 Lexer.OR, Lexer.OUT, Lexer.PASS, Lexer.PRIVATE, Lexer.PROCEDURE,
                 Lexer.PROTECTED, Lexer.PUBLIC, Lexer.REF, Lexer.REPORT, Lexer.RETURN,
-                Lexer.SINGLESELECTION, Lexer.START, Lexer.STATIC, Lexer.STEP, Lexer.STRING,
+                Lexer.START, Lexer.STATIC, Lexer.STEP, Lexer.STRING,
                 Lexer.TESTLIST, Lexer.THIS, Lexer.THROW, Lexer.TIMEOUT, Lexer.TIMESPAN,
                 Lexer.TRUE, Lexer.UNSET, Lexer.USING, Lexer.VAR, Lexer.VERDICT, Lexer.VOID,
                 Lexer.WARNING, Lexer.WHILE);

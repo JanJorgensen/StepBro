@@ -283,7 +283,7 @@ namespace StepBro.Core.Parser
                         if (objectProperty != null)
                         {
                             bool dataError = false;
-
+                            System.Diagnostics.Debug.WriteLine($"Property type: {objectProperty.PropertyType.Name}");
                             Expression valueExpression = null;
                             object value = valueEntry.Value;
                             if (value != null)
@@ -327,7 +327,7 @@ namespace StepBro.Core.Parser
                                         value = ((Identifier)value).Name;
                                     }
                                 }
-                                else if (!objectProperty.PropertyType.IsPrimitive)
+                                else if (!objectProperty.PropertyType.IsPrimitive && objectProperty.PropertyType != typeof(TimeSpan) && objectProperty.PropertyType != typeof(DateTime))
                                 {
                                     if (value is Identifier)
                                     {
@@ -357,19 +357,27 @@ namespace StepBro.Core.Parser
                                     else
                                     {
                                         dataError = true;
-                                        errors.SymanticError(startToken.Line, startToken.Column, false, $"Unsupported value for property \"{entry.Name}\": '{(string)value}'.");
+                                        errors.SymanticError(startToken.Line, startToken.Column, false, $"Unsupported value type for property \"{entry.Name}\": '{(string)value.GetType().Name}'.");
                                     }
                                 }
                             }
                             if (!dataError)
                             {
-                                if (valueExpression == null)
+                                var vt = (valueExpression != null) ? valueExpression.Type : value?.GetType();
+                                if (vt != null && !objectProperty.PropertyType.IsAssignableFrom(vt))
                                 {
-                                    valueExpression = Expression.Constant(value, objectProperty.PropertyType);
+                                    errors.IncompatibleDataType(startToken.Line, startToken.Column, vt.Name, objectProperty.PropertyType.Name);
                                 }
-                                dataSetters.Add(Expression.Assign(
-                                    Expression.Property(objectReference, objectProperty.UnderlyingName),
-                                    valueExpression));
+                                else
+                                {
+                                    if (valueExpression == null)
+                                    {
+                                        valueExpression = Expression.Constant(value, objectProperty.PropertyType);
+                                    }
+                                    dataSetters.Add(Expression.Assign(
+                                        Expression.Property(objectReference, objectProperty.UnderlyingName),
+                                        valueExpression));
+                                }
                             }
                         }
                         else

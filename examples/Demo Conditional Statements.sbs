@@ -1,17 +1,14 @@
-﻿// Place the cursor on the line below and press Ctrl+Shift+F5 to execute the procedure.
-procedure void ProcedureWithoutParameters()
-{
-    log("That's it.");  // See the execution log (the Output view). The line in the log from this statement starts with the line number.
-}
-
-procedure void ProcedureWithIfStatements()
+﻿procedure void Procedure1()
 {
     // A simple 'if' statement.
     if (56 < 82)
     {
         log("Yes, that's right.");
     }
-    
+}
+
+procedure void Procedure2()
+{
     // An 'if' statement followed by some 'else if' statements
     if (4 > 30)
     {
@@ -31,6 +28,6 @@ procedure void ProcedureWithIfStatements()
     }
     else
     {
-        log("Were none of the above true ???");
+        log("Only here if none of the above were true.");
     }
 }

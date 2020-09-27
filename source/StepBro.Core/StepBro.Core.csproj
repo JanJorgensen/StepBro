@@ -141,6 +141,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Antlr4 Include="Parser\StepBroLexer.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>StepBro.Core.Parser.Grammar</CustomToolNamespace>
+    </Antlr4>
     <Compile Include="Api\DynamicAsyncStepBroObject.cs" />
     <Compile Include="Api\IDynamicAsyncStepBroObject.cs" />
     <Compile Include="Api\IDynamicStepBroObject.cs" />
@@ -442,13 +446,6 @@
     <Compile Include="File\Exceptions.cs" />
     <Compile Include="File\FileReference.cs" />
     <Compile Include="File\XmlTextExtensions.cs" />
-    <Antlr4 Include="Parser\StepBroLexer.g4">
-      <Generator>MSBuild:Compile</Generator>
-      <CustomToolNamespace>StepBro.Core.Parser.Grammar</CustomToolNamespace>
-      <TargetLanguage>CSharp</TargetLanguage>
-      <Listener>False</Listener>
-      <Visitor>False</Visitor>
-    </Antlr4>
     <None Include="Procedure\ExecutionResult.cs" />
     <Compile Include="Execution\ICallContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

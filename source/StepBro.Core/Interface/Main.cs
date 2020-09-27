@@ -32,7 +32,7 @@ namespace StepBro.Core
         private static DynamicObjectManager m_dynamicObjectManager = null;
         private static ObjectPanelManager m_objectPanelManager = null;
         //private static readonly object m_mainObject = new object();
-        private static readonly bool m_isInDebugMode = true;
+        //private static readonly bool m_isInDebugMode = true;
         //private static Queue<Task> m_runningTasks = new Queue<Task>();
         //private static readonly object m_runningTasksSync = new object();
         private static ITask m_parsingInQueue = null;

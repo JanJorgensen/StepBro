@@ -23,7 +23,9 @@ namespace StepBro.Core.Data
 
         PanelCreationOption GetPanelCreationOption(ObjectPanelInfo type, object @object = null);
 
-        Controls.ObjectPanel CreatePanel(ObjectPanelInfo type, IObjectContainer container = null);
+        Controls.ObjectPanel CreateStaticPanel(ObjectPanelInfo type);
+        Controls.ObjectPanel CreateObjectPanel(ObjectPanelInfo type, IObjectContainer container);
+        Controls.ObjectPanel CreateObjectPanel(ObjectPanelInfo type, string objectReference);
 
         /// <summary>
         /// 

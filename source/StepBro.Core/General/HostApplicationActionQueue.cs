@@ -282,6 +282,7 @@ namespace StepBro.Core.General
         {
             try
             {
+                this.TaskStarted?.Invoke(this, EventArgs.Empty);
                 var taskData = data as TaskData;
                 taskData.SetTaskLogger(m_logger.Logger.RootLogger.LogEntering("Starting Application Task", taskData.Title));
                 taskData.RunTask();
@@ -290,6 +291,7 @@ namespace StepBro.Core.General
             {
                 lock (m_sync)
                 {
+                    this.TaskEnded?.Invoke(this, EventArgs.Empty);
                     m_currentTask = null;
                     m_currentTaskData = null;
                     m_finishedTasks++;

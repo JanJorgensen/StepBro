@@ -1,5 +1,8 @@
-﻿//       Basic test framework for test projects.
-//########################################################
+﻿// Basic test framework for test projects.
+//
+// Test projects should have a common framework file, that uses this
+// file as its basic test framework setup.
+//#####################################################################
 
 
 public procedure TestCaseBase() :

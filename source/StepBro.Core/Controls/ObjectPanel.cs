@@ -10,22 +10,7 @@ namespace StepBro.Core.Controls
         private IObjectContainer m_objectContainer = null;
         private BindingState m_state = BindingState.NotBindable;
         private string m_targetObject = null;
-
-        public virtual bool IsBindable { get { return false; } }
-
-        public object BoundObject { get { return m_objectContainer?.Object; } }
-
-        protected virtual bool TryBind(object @object)
-        {
-            if (this.IsBindable) throw new NotImplementedException();
-            return false;
-        }
-
-        protected virtual void DisconnectBinding()
-        {
-        }
-
-        #region Internal functionality
+        private IDynamicObjectManager m_objectManager = null;
 
         public ObjectPanel()
         {
@@ -33,7 +18,37 @@ namespace StepBro.Core.Controls
             m_state = this.IsBindable ? BindingState.NotBound : BindingState.NotBindable;
         }
 
-        public void SetObjectReference(string fullname)
+        public virtual bool IsBindable { get { return false; } }
+
+        public IObjectContainer BoundObject { get { return m_objectContainer; } }
+
+        protected virtual bool TryBind(object @object)
+        {
+            if (this.IsBindable) throw new NotImplementedException($"Panel should override this method ({nameof(this.TryBind)}).");
+            else throw new NotSupportedException("This panel is not bindable (it is a static panel).");
+        }
+
+        /// <summary>
+        /// This function is called when the current bound object is not used anymore. Inheritors should override this method to disconnect the current object.
+        /// </summary>
+        /// <remarks>The panel can still be bound to the same variable/container, but not the current object.</remarks>
+        protected virtual void DisconnectBinding()
+        {
+        }
+
+        public BindingState State { get { return m_state; } }
+
+        public event EventHandler BindingStateChanged;
+
+        public IObjectContainer BoundObjectContainer { get { return m_objectContainer; } }
+
+        public string TargetObjectReference { get { return m_targetObject; } }
+
+        #region Internal functionality
+
+        internal ObjectPanelInfo PanelType { get; set; } = null;
+
+        internal void SetObjectReference(string fullname)
         {
             if (String.IsNullOrWhiteSpace(fullname)) throw new ArgumentNullException("Reference name is missing.");
             switch (m_state)
@@ -50,8 +65,11 @@ namespace StepBro.Core.Controls
             }
             this.SetState(BindingState.BoundWithoutObject);
             m_targetObject = fullname;
-            StepBro.Core.Main.ServiceManager.Get<IDynamicObjectManager>().ObjectListChanged += this.ObjectManager_ObjectListChanged;
-
+            if (m_objectManager == null)
+            {
+                m_objectManager = StepBro.Core.Main.ServiceManager.Get<IDynamicObjectManager>();
+            }
+            m_objectManager.ObjectListChanged += this.ObjectManager_ObjectListChanged;
         }
 
         private void ObjectManager_ObjectListChanged(object sender, EventArgs e)
@@ -80,21 +98,13 @@ namespace StepBro.Core.Controls
             }
         }
 
-        public BindingState State { get { return m_state; } }
-
-        public event EventHandler BindingStateChanged;
-
-        public IObjectContainer BoundObjectContainer { get { return m_objectContainer; } }
-
-        public string TargetObjectReference { get { return m_targetObject; } }
-
-        public void Bind(IObjectContainer container)
+        internal void Bind(IObjectContainer container)
         {
             if (!this.IsBindable) throw new NotSupportedException();
             m_objectContainer = container;
             if (m_objectContainer.Object != null)
             {
-                this.TryBind();
+                this.TryBindToObject();
             }
             else
             {
@@ -105,7 +115,7 @@ namespace StepBro.Core.Controls
             m_objectContainer.ObjectReplaced += this.ObjectContainer_ObjectReplaced;
         }
 
-        private void TryBind()
+        private void TryBindToObject()
         {
             if (m_objectContainer.Object != null)
             {
@@ -120,7 +130,20 @@ namespace StepBro.Core.Controls
             }
             else
             {
-                throw new NotImplementedException();
+                this.SetState(BindingState.BoundWithoutObject);
+            }
+        }
+
+        internal void ReleaseBinding()
+        {
+            if (m_objectContainer != null)
+            {
+                this.DisconnectBinding();
+                m_objectContainer.Disposing -= this.ObjectContainer_Disposing;
+                m_objectContainer.ObjectReplaced -= this.ObjectContainer_ObjectReplaced;
+                m_targetObject = null;
+                m_objectContainer = null;
+                this.SetState(BindingState.Disconnected);
             }
         }
 
@@ -143,10 +166,11 @@ namespace StepBro.Core.Controls
         {
             this.BeginInvoke(new System.Action(() =>
             {
-                if (m_state == BindingState.BoundWithoutObject)
-                {
-                    this.TryBind();
-                }
+                // Disconnect current object
+                this.DisconnectBinding();
+                this.SetState(BindingState.BoundWithoutObject);
+
+                this.TryBindToObject();
             }));
         }
 

@@ -1,7 +1,7 @@
 ﻿using StepBro.Core;
 using StepBro.Core.Controls;
 using StepBro.Core.Data;
-using System.Linq;
+using System;
 
 namespace StepBro.Workbench
 {
@@ -23,6 +23,15 @@ namespace StepBro.Workbench
             m_services = services;
         }
 
+        protected override void OnDockStateChanged(EventArgs e)
+        {
+            if (this.DockState == WeifenLuo.WinFormsUI.Docking.DockState.Unknown)
+            {
+                m_panel.Dispose();
+            }
+            base.OnDockStateChanged(e);
+        }
+
         public static readonly string PersistTitle = nameof(ObjectPanelDockWindow);
 
         protected override string GetPersistString()
@@ -41,12 +50,14 @@ namespace StepBro.Workbench
             }
         }
 
-        public void SetPanel(ObjectPanel panel)
+        public void SetPanel(ObjectPanelInfo type, ObjectPanel panel)
         {
             System.Diagnostics.Debug.Assert(m_panel == null);
             System.Diagnostics.Debug.Assert(m_loadSpecification == null);
 
+            m_panelType = type;
             m_panel = panel;
+            m_objectName = (panel.BoundObject != null) ? panel.BoundObject.FullName : null;
             this.SetupPanel();
             this.UpdateWindowFromPanelState();
         }
@@ -61,7 +72,14 @@ namespace StepBro.Workbench
             m_panel.TabIndex = 0;
             m_panel.Visible = false;
             labelErrorMessage.Visible = false;
-            this.TabText = m_panel.Name;
+            if (!String.IsNullOrEmpty(m_objectName))
+            {
+                this.TabText = m_panelType.Name + " - " + m_objectName;
+            }
+            else
+            {
+                this.TabText = m_panelType.Name;
+            }
             this.Controls.Add(m_panel);
         }
 
@@ -87,17 +105,24 @@ namespace StepBro.Workbench
             m_objectName = (m_loadSpecification.Length > 1) ? m_loadSpecification[1] : null;
 
             var panelManager = m_services.Get<IObjectPanelManager>();
-            var panelInfo = panelManager.FindPanel(m_loadSpecification[0]);
-            if (panelInfo != null)
+            m_panelType = panelManager.FindPanel(m_loadSpecification[0]);
+            if (m_panelType != null)
             {
-                m_panel = panelManager.CreatePanel(panelInfo, null);
+                if (m_loadSpecification.Length >= 2)
+                {
+                    m_panel = panelManager.CreateObjectPanel(m_panelType, m_loadSpecification[1]);
+                }
+                else
+                {
+                    m_panel = panelManager.CreateStaticPanel(m_panelType);
+                }
                 if (m_panel != null)
                 {
                     this.SetupPanel();
-                    if (m_panel.IsBindable && m_loadSpecification.Length >= 2)
-                    {
-                        m_panel.SetObjectReference(m_loadSpecification[1]);
-                    }
+                    //if (m_panel.IsBindable && m_loadSpecification.Length >= 2)
+                    //{
+                    //    m_panel.SetObjectReference();
+                    //}
                     this.UpdateWindowFromPanelState();
                 }
                 else
