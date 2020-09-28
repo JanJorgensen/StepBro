@@ -1,8 +1,9 @@
-using System;
-using System.Windows.Forms;
 using StepBro.Core.Controls;
 using StepBro.Core.General;
 using StepBro.Core.ScriptData;
+using System;
+using System.Linq;
+using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace StepBro.Workbench
@@ -30,7 +31,16 @@ namespace StepBro.Workbench
 
         protected override ILoadedFile DoOpenFile(string filepath)
         {
-            return StepBro.Core.Main.CreateScriptFileObject(filepath);
+            var loadedFile = StepBro.Core.Main.GetLoadedFilesManager().ListFiles<IScriptFile>().FirstOrDefault(lf => String.Equals(lf.FilePath, filepath, StringComparison.InvariantCulture));
+            if (loadedFile == null)
+            {
+                loadedFile = StepBro.Core.Main.CreateScriptFileObject(filepath);
+                if (loadedFile != null)
+                {
+                    StepBro.Core.Main.GetLoadedFilesManager().RegisterLoadedFile(loadedFile);
+                }
+            }
+            return loadedFile;
         }
 
 

@@ -1,6 +1,6 @@
 ﻿// Demo project using the MyProjectBase and through that also the TestFramework.
 
-using MyProjectBase;
+using "MyProjectBase.sbs";
 
 testlist AllTests : TestSuite
 {

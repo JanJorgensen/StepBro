@@ -57,7 +57,6 @@ namespace StepBro.Workbench
             {
                 this.DoOpenFileView(file);
                 m_file.RegisterDependant(this.FileOwner);
-                StepBro.Core.Main.GetLoadedFilesManager().RegisterLoadedFile(m_file);
                 this.ToolTipText = file.FilePath;
                 return true;
             }

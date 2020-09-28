@@ -1,7 +1,7 @@
-using System;
-using System.Windows.Forms;
 using StepBro.Core.General;
 using StepBro.Core.ScriptData;
+using System;
+using System.Windows.Forms;
 
 namespace StepBro.Workbench
 {
@@ -11,7 +11,7 @@ namespace StepBro.Workbench
 
         public FileExplorer()
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
             if (StepBro.Core.Main.IsInitialized)
             {
@@ -25,14 +25,29 @@ namespace StepBro.Workbench
 
         private void FileManager_FileLoaded(object sender, LoadedFileEventArgs args)
         {
-            refreshTimer.Stop();
-            refreshTimer.Start();
+            this.RestartTimer();
         }
 
         private void FileManager_FileClosed(object sender, LoadedFileEventArgs args)
         {
-            refreshTimer.Stop();
-            refreshTimer.Start();
+            this.RestartTimer();
+        }
+
+        private void RestartTimer()
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new Action(() =>
+                {
+                    refreshTimer.Stop();
+                    refreshTimer.Start();
+                }));
+            }
+            else
+            {
+                refreshTimer.Stop();
+                refreshTimer.Start();
+            }
         }
 
         private void refreshTimer_Tick(object sender, EventArgs e)
@@ -43,53 +58,65 @@ namespace StepBro.Workbench
 
         private void UpdateTree()
         {
+            System.Diagnostics.Debug.WriteLine("UpdateTree");
             treeView.BeginUpdate();
-            treeView.Nodes.Clear();
-            var loadedFilesNode = new TreeNode
+            try
             {
-                ImageIndex = 1,
-                SelectedImageIndex = 1,
-                Text = "Loaded Files"
-            };
-            treeView.Nodes.Add(loadedFilesNode);
-            foreach (var file in m_fileManager.ListFiles<ILoadedFile>())
-            {
-                TreeNode fileNode;
-                if (file is IScriptFile)
+                treeView.Nodes.Clear();
+                var loadedFilesNode = new TreeNode
                 {
-                    fileNode = new TreeNode
-                    {
-                        ImageIndex = 4,
-                        SelectedImageIndex = 4,
-                        Text = file.FileName,
-                        ToolTipText = file.FilePath
-                    };
-                    loadedFilesNode.Nodes.Add(fileNode);
-                }
-                else
+                    ImageIndex = 1,
+                    SelectedImageIndex = 1,
+                    Text = "Loaded Files"
+                };
+                treeView.Nodes.Add(loadedFilesNode);
+                foreach (var file in m_fileManager.ListFiles<ILoadedFile>())
                 {
-                    fileNode = new TreeNode
+                    TreeNode fileNode;
+                    if (file is IScriptFile)
                     {
-                        ImageIndex = 5,
-                        SelectedImageIndex = 5,
-                        Text = file.FileName,
-                        ToolTipText = file.FilePath
-                    };
-                    loadedFilesNode.Nodes.Add(fileNode);
+                        fileNode = new TreeNode
+                        {
+                            ImageIndex = 4,
+                            SelectedImageIndex = 4,
+                            Text = file.FileName,
+                            ToolTipText = file.FilePath
+                        };
+                        loadedFilesNode.Nodes.Add(fileNode);
+                    }
+                    else
+                    {
+                        fileNode = new TreeNode
+                        {
+                            ImageIndex = 5,
+                            SelectedImageIndex = 5,
+                            Text = file.FileName,
+                            ToolTipText = file.FilePath
+                        };
+                        loadedFilesNode.Nodes.Add(fileNode);
+                    }
+                    fileNode.Tag = file;
                 }
-                fileNode.Tag = file;
+                loadedFilesNode.Expand();
             }
-            loadedFilesNode.Expand();
-            treeView.EndUpdate();
+            finally
+            {
+                treeView.EndUpdate();
+            }
         }
         protected override void OnRightToLeftLayoutChanged(EventArgs e)
         {
-            treeView.RightToLeftLayout = RightToLeftLayout;
+            treeView.RightToLeftLayout = this.RightToLeftLayout;
         }
 
         private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             MainForm.Instance.ShowFileEditor(e.Node.Tag as ILoadedFile, -1, -1, -1);
+        }
+
+        private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+
         }
     }
 }

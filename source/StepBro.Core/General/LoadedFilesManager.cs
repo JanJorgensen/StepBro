@@ -138,6 +138,12 @@ namespace StepBro.Core.General
                         this.NotifyFileClosed(file);
                         file.PropertyChanged -= this.File_PropetyChanged;
                         file.Dispose();
+                        foreach (var lf in m_loadedFiles)
+                        {
+                            // If file is dependant on the disposed file, unregister the disposed file.
+                            // In case the file has no dependants, the file will also be closed and disposed.
+                            lf.UnregisterDependant(file, false);
+                        }
                         checkFiles = true;  // Run one more time, to check if more should be removed when this one is disposed.
                     }
                     else

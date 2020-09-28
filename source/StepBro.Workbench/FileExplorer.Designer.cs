@@ -45,6 +45,7 @@ namespace StepBro.Workbench
             this.treeView.SelectedImageIndex = 0;
             this.treeView.Size = new System.Drawing.Size(311, 371);
             this.treeView.TabIndex = 0;
+            this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
             this.treeView.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseDoubleClick);
             // 
             // imageList
@@ -65,7 +66,7 @@ namespace StepBro.Workbench
             // refreshTimer
             // 
             this.refreshTimer.Enabled = true;
-            this.refreshTimer.Interval = 200;
+            this.refreshTimer.Interval = 1000;
             this.refreshTimer.Tick += new System.EventHandler(this.refreshTimer_Tick);
             // 
             // FileExplorer

@@ -9,6 +9,7 @@ using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -569,7 +570,44 @@ namespace StepBro.Core.Parser
                                 return f;
                             }
                         }
+
                         // File was not found among the already loaded files. Try loading the file.
+
+                        string foundMatchingFile = null;
+
+                        if (fu.Contains("\\") || fu.Contains("["))
+                        {
+                            throw new NotImplementedException();
+                        }
+                        else
+                        {
+                            // Start at the location of this file.
+                            string folder = Path.GetDirectoryName(file.GetFullPath());
+                            while (folder != Path.GetPathRoot(folder))
+                            {
+                                string path = Path.Combine(folder, fu);
+                                if (System.IO.File.Exists(path))
+                                {
+                                    object dummyUser = new object();    // The parser will set the current scriptfile as a dependant.
+                                    if (Main.LoadScriptFile(user: dummyUser, filepath: path) is ScriptFile loadedFile)
+                                    {
+                                        loadedFile.UnregisterDependant(dummyUser);
+                                        fileParsingStack.Enqueue(loadedFile);
+                                        filesToParse.Insert(0, loadedFile);      // Put in front
+                                        return loadedFile;
+                                    }
+                                }
+
+                                // Not found yet; try the parent folder.
+                                folder = Path.GetDirectoryName(folder);
+                            }
+                        }
+                        if (foundMatchingFile != null)
+                        {
+                            // Load and add file to fileParsingStack
+
+                        }
+
                         return null;
                     }
                 );

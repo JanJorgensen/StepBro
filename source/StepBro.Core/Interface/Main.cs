@@ -170,7 +170,7 @@ namespace StepBro.Core
             if (user == null) throw new ArgumentNullException("user");
             if (String.IsNullOrWhiteSpace(filepath)) throw new ArgumentNullException("filepath");
             var extension = System.IO.Path.GetExtension(filepath);
-            if (extension.Equals(".tss", StringComparison.InvariantCulture))
+            if (extension.Equals(".sbs", StringComparison.InvariantCulture))
             {
                 var file = new ScriptFile(filepath);
                 file.RegisterDependant(user);

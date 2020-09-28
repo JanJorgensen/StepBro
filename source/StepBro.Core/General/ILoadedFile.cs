@@ -17,7 +17,7 @@ namespace StepBro.Core.General
         event PropertyChangedEventHandler PropertyChanged;
 
         void RegisterDependant(object usingObject);
-        void UnregisterDependant(object usingObject);
+        void UnregisterDependant(object usingObject, bool throwIfNotFound = true);
         int RegisteredDependantsCount { get; }
         IEnumerable<string> ListDependantDescriptors();
     }

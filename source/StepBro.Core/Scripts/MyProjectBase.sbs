@@ -1,6 +1,6 @@
 ﻿// Base test project definitions.
 
-public using TestFramework;
+public using "TestFramework.sbs";
 
 public procedure TestCase() :
     TestCaseBase,

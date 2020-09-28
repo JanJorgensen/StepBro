@@ -34,27 +34,7 @@ namespace StepBro.Core.ScriptData
         //private readonly Dictionary<string, List<IIdentifierInfo>> m_fileScopeIdentifiers = null;
         //private readonly Dictionary<string, List<IIdentifierInfo>> m_fileAndProcedureScopeIdentifiers = null;
 
-        internal ScriptFile() : base(null, LoadedFileType.StepBroScript)
-        {
-            m_wasLoadedByNamespace = false;
-            m_errors = new ErrorCollector(this, false);
-            m_lastFileChange = DateTime.Now;   // TODO: take this from file timestamp.
-            m_parserFileStream = null;
-        }
-
-        internal ScriptFile(string filepath) :
-                base(filepath, LoadedFileType.StepBroScript)
-        {
-            m_wasLoadedByNamespace = false;
-            m_errors = new ErrorCollector(this, false);
-            m_lastFileChange = DateTime.Now;   // TODO: take this from file timestamp.
-            m_parserFileStream = null;
-        }
-
-        internal ScriptFile(
-            string filepath,
-            AntlrInputStream filestream) :
-        base(filepath, LoadedFileType.StepBroScript)
+        internal ScriptFile(string filepath = null, AntlrInputStream filestream = null) : base(filepath, LoadedFileType.StepBroScript)
         {
             m_wasLoadedByNamespace = false;
             m_errors = new ErrorCollector(this, false);
@@ -482,7 +462,7 @@ namespace StepBro.Core.ScriptData
             }
         }
 
-        internal void ResolveFileUsings(Converter<string, ScriptFile> resolver)
+        internal void ResolveFileUsings(Converter<string, IScriptFile> resolver)
         {
             var c = m_fileUsings.Count;
             for (int i = 0; i < c; i++)

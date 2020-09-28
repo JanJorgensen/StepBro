@@ -68,11 +68,11 @@ namespace StepBro.Core.General
 
         public void RegisterDependant(object usingObject)
         {
-            if (m_dependants.Contains(usingObject)) throw new ArgumentException("The specified object is already registered as a dependant.");
+            if (m_dependants.Select(wr => { if (wr.TryGetTarget(out object o)) return o; else return null; }).Contains(usingObject)) throw new ArgumentException("The specified object is already registered as a dependant.");
             m_dependants.Add(new WeakReference<object>(usingObject));
         }
 
-        public void UnregisterDependant(object usingObject)
+        public void UnregisterDependant(object usingObject, bool throwIfNotFound = true)
         {
             int i = 0;
             bool found = false;
@@ -99,7 +99,7 @@ namespace StepBro.Core.General
             {
                 m_dependants.RemoveAt(j);
             }
-            if (usingObject != null && !found)
+            if (throwIfNotFound && usingObject != null && !found)
             {
                 throw new ArgumentException("The specified object is not registered as a dependant.");
             }

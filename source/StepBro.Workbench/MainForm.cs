@@ -71,9 +71,13 @@ namespace StepBro.Workbench
                         {
                             view.ShowLine(line, selectionStart, selectionEnd);
                         }
+                        return; // Found editor, so we're done.
                     }
                 }
             }
+
+            // An editor was not found, so open the file in an editor then.
+            this.OpenFile(file.FilePath);
         }
 
         #endregion
@@ -326,48 +330,53 @@ namespace StepBro.Workbench
             if (openFile.ShowDialog() == DialogResult.OK)
             {
                 var fullName = openFile.FileName;
-                var fileName = Path.GetFileName(fullName);
-                var extension = Path.GetExtension(fullName);
+                this.OpenFile(fullName);
+            }
+        }
 
-                if (this.FindDocument(fileName) != null)
-                {
-                    MessageBox.Show("The document: " + fileName + " is already opened!");
-                    return;
-                }
+        internal void OpenFile(string filepath)
+        {
+            var fileName = Path.GetFileName(filepath);
+            var extension = Path.GetExtension(filepath);
 
-                if (extension == "." + Main.StepBroFileExtension)
+            if (this.FindDocument(fileName) != null)
+            {
+                MessageBox.Show("The document: " + fileName + " is already opened!");
+                return;
+            }
+
+            if (extension == "." + Main.StepBroFileExtension)
+            {
+                var docView = new StepBroScriptDocView(m_resourceUserObject)
                 {
-                    var docView = new StepBroScriptDocView(m_resourceUserObject)
-                    {
-                        Text = fileName
-                    };
-                    this.ShowDocView(docView);
-                    try
-                    {
-                        docView.OpenFile(fullName);
-                    }
-                    catch (Exception exception)
-                    {
-                        docView.Close();
-                        MessageBox.Show(exception.Message);
-                    }
+                    Text = fileName
+                };
+                this.ShowDocView(docView);
+                try
+                {
+                    docView.OpenFile(filepath);
                 }
-                else
+                catch (Exception exception)
                 {
-                    var docView = new TextDocView
-                    {
-                        Text = fileName
-                    };
-                    this.ShowDocView(docView);
-                    try
-                    {
-                        docView.OpenFile(fullName);
-                    }
-                    catch (Exception exception)
-                    {
-                        docView.Close();
-                        MessageBox.Show(exception.Message);
-                    }
+                    docView.Close();
+                    MessageBox.Show(exception.Message);
+                }
+            }
+            else
+            {
+                var docView = new TextDocView
+                {
+                    Text = fileName
+                };
+                this.ShowDocView(docView);
+                try
+                {
+                    docView.OpenFile(filepath);
+                }
+                catch (Exception exception)
+                {
+                    docView.Close();
+                    MessageBox.Show(exception.Message);
                 }
             }
         }

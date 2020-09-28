@@ -49,5 +49,15 @@ namespace StepBroCoreTest
             Assert.AreEqual(@"C:\f2\file.txt", FileReferenceUtils.GetFullPath(m_collection.ListShortcuts(), @"[Anna]\..\f2\file.txt"));
             Assert.AreEqual(@"C:\temp\f2\file.txt", FileReferenceUtils.GetFullPath(m_collection.ListShortcuts(), @"[Christina]\..\f2\file.txt"));
         }
+
+        //[TestMethod]
+        //public void TestFolderFun()
+        //{
+        //    string path = @"c:\temp\anders\henry";
+        //    string root = System.IO.Path.GetPathRoot(path);
+        //    string parent = System.IO.Directory.GetParent(path).FullName;
+        //    parent = System.IO.Path.GetDirectoryName(path);
+        //    Assert.AreEqual("", parent);
+        //}
     }
 }
