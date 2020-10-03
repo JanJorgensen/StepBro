@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace StepBro.CAN
 {
-    public interface ICANMessageDecoder
+    public interface IMessageDecoder
     {
         string Name { get; }
         string Description { get; }
-        string DecodeMessage(ICANMessage message, List<string> keywordsOut = null);
+        string DecodeMessage(IMessage message, List<string> keywordsOut = null);
     }
 }

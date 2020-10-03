@@ -107,15 +107,23 @@ namespace StepBro.Core.Controls
         {
             try
             {
-                fastColoredTextBox.SaveToFile(filepath, Encoding.UTF8);
+                try
+                {
+                    fastColoredTextBox.SaveToFile(filepath, Encoding.UTF8);
+                }
+                catch (Exception ex)
+                {
+                    throw new System.IO.IOException("Error saving file: \"" + filepath + "\"", ex);
+                }
                 if (m_isChanged)
                 {
                     m_isChanged = false;
                     this.IsChangedChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
-            catch (Exception)
+            catch
             {
+                throw;
             }
         }
 

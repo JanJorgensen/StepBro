@@ -349,7 +349,14 @@ namespace StepBro.Core.Parser
             }
             if (reportUnresolved)
             {
-                m_errors.UnresolvedType(token.Line, token.Column, identifier);
+                if (token != null)
+                {
+                    m_errors.UnresolvedType(token.Line, token.Column, identifier);
+                }
+                else
+                {
+                    m_errors.UnresolvedType(-1, -1, identifier);
+                }
             }
             return null;
         }

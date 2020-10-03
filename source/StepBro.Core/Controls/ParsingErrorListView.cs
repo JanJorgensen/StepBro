@@ -43,8 +43,11 @@ namespace StepBro.Core.Controls
 
         private void Errors_EventListChanged(object sender, EventArgs e)
         {
-            this.BeginInvoke(new Action(refreshTimer.Stop));
-            this.BeginInvoke(new Action(refreshTimer.Start));
+            if (this.IsHandleCreated)
+            {
+                this.BeginInvoke(new Action(refreshTimer.Stop));
+                this.BeginInvoke(new Action(refreshTimer.Start));
+            }
         }
 
         private void refreshTimer_Tick(object sender, EventArgs e)

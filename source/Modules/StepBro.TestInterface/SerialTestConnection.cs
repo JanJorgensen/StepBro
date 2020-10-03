@@ -707,10 +707,7 @@ namespace StepBro.TestInterface
         {
             m_currentExecutingCommand = command;
             var commandstring = command.GetAndMarkActive();
-            if (m_loopbackAnswers != null)
-            {
-                if (m_loopbackAnswers.TryGetValue(commandstring, out commandstring)) ;
-            }
+            m_loopbackAnswers?.TryGetValue(commandstring, out commandstring);
             if (m_nextResponse != null) commandstring = m_nextResponse;
             this.AddToLog(LogType.Sent, 0, command.Command);
             m_stream.Write(null, commandstring + "\n");

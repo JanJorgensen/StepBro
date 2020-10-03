@@ -746,7 +746,8 @@ namespace StepBro.Core.Parser
                 {
                     d.Item1.ParseSignature(d.Item2, true);  // Parse again and report the errors
                 }
-                throw new Exception("Not all signatures could be parsed.");     // TBD
+                //throw new Exception("Not all signatures could be parsed.");     // TBD
+                return signaturesToParseNow.Count;
             }
             #endregion
 

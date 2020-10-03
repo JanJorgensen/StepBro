@@ -7,7 +7,7 @@
     <ProjectGuid>{A85AC535-0EFE-41F4-A1C8-DD6F925CEA07}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Stepbro.PCAN</RootNamespace>
+    <RootNamespace>Stepbro.CAN</RootNamespace>
     <AssemblyName>Stepbro.PeakCANPlugin</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

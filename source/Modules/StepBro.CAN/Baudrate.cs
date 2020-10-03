@@ -8,7 +8,7 @@ using StepBro.Core.Api;
 namespace StepBro.CAN
 {
     [Public]
-    public enum CANBaudrate
+    public enum Baudrate
     {
         Unsupported,
         BR5K,

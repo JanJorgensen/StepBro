@@ -9,12 +9,12 @@ using StepBro.Core.Execution;
 namespace StepBro.CAN
 {
     [Public]
-    public interface ICANAdapter
+    public interface IAdapter
     {
-        ICANDriver Driver { get; }
+        IDriver Driver { get; }
         string Identification { get; }
         string DeviceType { get; }
         int Channels { get; }
-        ICANChannel GetChannel([Implicit] ICallContext context, int index);
+        IChannel GetChannel([Implicit] ICallContext context, int index);
     }
 }

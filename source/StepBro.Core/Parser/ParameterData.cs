@@ -1,6 +1,6 @@
 ﻿using Antlr4.Runtime;
-using System;
 using StepBro.Core.Data;
+using System;
 
 namespace StepBro.Core.Parser
 {
@@ -10,7 +10,7 @@ namespace StepBro.Core.Parser
         private readonly string m_name;
         private readonly string m_typeName;
         private TypeReference m_type;
-        private IToken m_typeToken;
+        private readonly IToken m_typeToken;
         public ParameterData(string[] modifiers, string name, string typeName, TypeReference type = null, IToken typeToken = null)
         {
             m_modifiers = modifiers ?? new string[] { };
@@ -30,5 +30,6 @@ namespace StepBro.Core.Parser
         public string Name { get { return m_name; } }
         public string TypeName { get { return m_typeName; } }
         public TypeReference Type { get { return m_type; } }
+        public IToken TypeToken { get { return m_typeToken; } }
     }
 }

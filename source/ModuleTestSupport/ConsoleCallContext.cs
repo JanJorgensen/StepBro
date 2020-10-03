@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using StepBro.Core.Data;
+﻿using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.File;
 using StepBro.Core.Host;
 using StepBro.Core.Logging;
 using StepBro.Core.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace ModuleTestSupport
 {
@@ -120,7 +120,7 @@ namespace ModuleTestSupport
 
         void ILogger.LogError(string location, string text)
         {
-            throw new NotImplementedException();
+            ((ILogger)this).Log("Error " + location, text);
         }
 
         void ILogger.LogSystem(string location, string text)

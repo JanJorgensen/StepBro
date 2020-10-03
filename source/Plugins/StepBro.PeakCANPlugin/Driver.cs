@@ -1,32 +1,26 @@
-﻿using StepBro.CAN;
-using Peak.Can.Basic;
-using System;
-using System.Collections.Generic;
+﻿using Peak.Can.Basic;
 using StepBro.Core.Api;
 using StepBro.Core.Execution;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 
-namespace StepBro.PCAN
+namespace StepBro.CAN
 {
     using TPCANHandle = System.UInt16;
 
     [Public]
-    public class PCANInterface : ICANDriver
+    public class PCAN : IDriver
     {
-        private static PCANInterface g_instance = null;
         private static List<PCANAdapter> g_adapters;
 
-        private PCANInterface() { }
+        private PCAN() { }
 
-        [Public]
-        public static PCANInterface Instance { get { return GetInstance(); } }
-
-        public static PCANInterface GetInstance()
+        static PCAN()
         {
-            if (g_instance == null)
-            {
-                g_instance = new PCANInterface();
-                g_adapters = new List<PCANAdapter>();
-                var ids = new string[] {
+            Driver = new PCAN();
+            g_adapters = new List<PCANAdapter>();
+            var ids = new string[] {
                 "NONEBUS",
                 "ISABUS1", "ISABUS2", "ISABUS3", "ISABUS4", "ISABUS5", "ISABUS6", "ISABUS7", "ISABUS8",
                 "DNGBUS1",
@@ -34,16 +28,17 @@ namespace StepBro.PCAN
                 "USBBUS1", "USBBUS2", "USBBUS3", "USBBUS4", "USBBUS5", "USBBUS6", "USBBUS7", "USBBUS8", "USBBUS9", "USBBUS10", "USBBUS11", "USBBUS12", "USBBUS13", "USBBUS14", "USBBUS15", "USBBUS16",
                 "PCCBUS1", "PCCBUS2",
                 "LANBUS1", "LANBUS2", "LANBUS3", "LANBUS4", "LANBUS5", "LANBUS6", "LANBUS7", "LANBUS8", "LANBUS9", "LANBUS10", "LANBUS11", "LANBUS12", "LANBUS13", "LANBUS14", "LANBUS15", "LANBUS16" };
-                foreach (var s in ids)
-                {
-                    g_adapters.Add(new PCANAdapter(g_instance, s, AdapterIdentificationToHandle(s)));
-                }
+            foreach (var s in ids)
+            {
+                g_adapters.Add(new PCANAdapter(Driver, s, AdapterIdentificationToHandle(s)));
             }
-            return g_instance;
         }
 
         [Public]
-        public ICANAdapter GetAdapter([Implicit] ICallContext context, string identification = "")
+        public static PCAN Driver { get; private set; }
+
+        [Public]
+        public IAdapter GetAdapter([Implicit] ICallContext context, string identification = "")
         {
             if (context != null) context.Logger.Log("GetAdapter", identification);
             if (String.IsNullOrEmpty(identification)) return this.GetAdapter(context, "USBBUS1");
@@ -58,13 +53,14 @@ namespace StepBro.PCAN
         }
 
         [Public]
-        public IEnumerable<ICANAdapter> ListAdapters()
+        public IEnumerable<IAdapter> ListAdapters()
         {
             foreach (var a in g_adapters)
             {
                 yield return a;
             }
         }
+
         internal static TPCANHandle AdapterIdentificationToHandle(string identification)
         {
             switch (identification)
@@ -136,14 +132,14 @@ namespace StepBro.PCAN
         }
     }
 
-    internal class PCANAdapter : ICANAdapter
+    internal class PCANAdapter : IAdapter
     {
-        private readonly PCANInterface m_parent;
+        private readonly PCAN m_parent;
         private readonly string m_identification;
         private readonly TPCANHandle m_handle;
         private readonly PCANChannel m_onlyChannel;
 
-        internal PCANAdapter(PCANInterface parent, string identification, TPCANHandle handle)
+        internal PCANAdapter(PCAN parent, string identification, TPCANHandle handle)
         {
             m_parent = parent;
             m_identification = identification;
@@ -169,7 +165,7 @@ namespace StepBro.PCAN
             }
         }
 
-        public ICANDriver Driver
+        public IDriver Driver
         {
             get
             {
@@ -185,7 +181,7 @@ namespace StepBro.PCAN
             }
         }
 
-        public ICANChannel GetChannel([Implicit] ICallContext context, int index)
+        public IChannel GetChannel([Implicit] ICallContext context, int index)
         {
             if (context != null)
             {
@@ -197,22 +193,26 @@ namespace StepBro.PCAN
         }
     }
 
-    internal class PCANChannel : ICANChannel
+    internal class PCANChannel : IChannel
     {
         private readonly PCANAdapter m_parent;
         private readonly TPCANHandle m_handle;   // Only one channel per adapter, thus also saving handle here.
-        private CANChannelMode m_mode;
-        private CANBaudrate m_baudrate;
+        private ChannelMode m_mode;
+        private Baudrate m_baudrate;
         private bool m_open = false;
         private string m_errorStatus = "";
         private string m_lastOperationStatus = "";
-        private TimeSpan m_transmitTimeout = TimeSpan.FromSeconds(10);
+        private Thread m_receiver = null;
+        private List<ReceiveQueue> m_receivers = null;
+        private readonly ReceiveQueue m_noQueueReceived = new ReceiveQueue();
 
         internal PCANChannel(PCANAdapter adapter)
         {
             m_parent = adapter;
-            m_mode = CANChannelMode.Extended;
+            m_mode = ChannelMode.Extended;
             m_handle = adapter.Handle;
+            m_receivers = new List<ReceiveQueue>();
+            m_receivers.Add(m_noQueueReceived);
         }
 
         private TPCANStatus UpdateStatusFromOperation(TPCANStatus status)
@@ -230,7 +230,7 @@ namespace StepBro.PCAN
             return status;
         }
 
-        public ICANAdapter Adapter
+        public IAdapter Adapter
         {
             get
             {
@@ -238,15 +238,52 @@ namespace StepBro.PCAN
             }
         }
 
-        public void Setup([Implicit] ICallContext context, CANBaudrate baudrate, CANChannelMode mode, TimeSpan transmitTimeout)
+        public void Setup([Implicit] ICallContext context, Baudrate baudrate, ChannelMode mode)
         {
             if (context != null && context.LoggingEnabled)
             {
-                context.Logger.Log("Setup (", $"{baudrate}, {mode}, {transmitTimeout} )");
+                context.Logger.Log("Setup", $"( {baudrate}, {mode} )");
             }
             m_baudrate = baudrate;
             m_mode = mode;
-            m_transmitTimeout = transmitTimeout;
+            if (m_receiver == null)
+            {
+                m_receiver = new Thread(new ThreadStart(this.ReceiveThreadHandler));
+                m_receiver.Start();
+                //Core.Main.ServiceManager.Get<>
+            }
+        }
+
+        private void ReceiveThreadHandler()
+        {
+            TPCANMsg msg;
+            TPCANTimestamp timestamp;
+            TPCANStatus result;
+            while (m_open)
+            {
+                var status = PCANBasic.GetStatus(m_handle);
+                if ((status & TPCANStatus.PCAN_ERROR_QRCVEMPTY) == 0) // If NOT empty
+                {
+                    result = PCANBasic.Read(m_handle, out msg, out timestamp);
+                    if (this.UpdateStatusFromOperation(result) == TPCANStatus.PCAN_ERROR_OK)
+                    {
+                        this.PutReceivedInQueue(new PCANMessage(msg, timestamp));
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(5);
+                }
+            }
+            m_receiver = null;
+        }
+
+        private void PutReceivedInQueue(PCANMessage message)
+        {
+            foreach (var rq in m_receivers)
+            {
+                if (rq.TryAddToQueue(message)) return;
+            }
         }
 
         public bool IsOpen
@@ -299,8 +336,9 @@ namespace StepBro.PCAN
         {
             if (m_open)
             {
-                TPCANStatus result = PCANBasic.Uninitialize(m_handle);
                 m_open = false;
+                while (m_receiver != null) System.Threading.Thread.Sleep(100);
+                TPCANStatus result = PCANBasic.Uninitialize(m_handle);
                 if (this.UpdateStatusFromOperation(result) == TPCANStatus.PCAN_ERROR_OK)
                 {
                     return true;
@@ -309,21 +347,21 @@ namespace StepBro.PCAN
             return false;
         }
 
-        public ICANMessage CreateMessage(CANMessageType type, uint id, byte[] data)
+        public IMessage CreateMessage(MessageType type, uint id, byte[] data)
         {
             TPCANMessageType t = TPCANMessageType.PCAN_MESSAGE_STANDARD;
             switch (type)
             {
-                case CANMessageType.Standard:
+                case MessageType.Standard:
                     t = TPCANMessageType.PCAN_MESSAGE_STANDARD;
                     break;
-                case CANMessageType.Extended:
+                case MessageType.Extended:
                     t = TPCANMessageType.PCAN_MESSAGE_EXTENDED;
                     break;
-                case CANMessageType.Status:
+                case MessageType.Status:
                     t = TPCANMessageType.PCAN_MESSAGE_STATUS;
                     break;
-                case CANMessageType.Special:
+                case MessageType.Special:
                     throw new NotSupportedException("It is not possible to create a CAN message with the \"Special\" type.");
             }
             TPCANMsg msg = new TPCANMsg();
@@ -342,19 +380,9 @@ namespace StepBro.PCAN
             }
         }
 
-        public ICANMessage GetReceived()
+        public IMessage GetReceived([Implicit] ICallContext context)
         {
-            TPCANMsg msg;
-            TPCANTimestamp timestamp;
-            TPCANStatus result = PCANBasic.Read(m_handle, out msg, out timestamp);
-            if (this.UpdateStatusFromOperation(result) == TPCANStatus.PCAN_ERROR_OK)
-            {
-                return new PCANMessage(msg, timestamp);
-            }
-            else
-            {
-                return null;
-            }
+            return m_noQueueReceived.GetNext(context);
         }
 
         public void ResetErrors()
@@ -362,7 +390,7 @@ namespace StepBro.PCAN
             this.Flush();
         }
 
-        public bool Send(ICANMessage message)
+        public bool Send(IMessage message)
         {
             if (this.IsOpen)
             {
@@ -389,78 +417,84 @@ namespace StepBro.PCAN
             return false;
         }
 
-        public ICANMessage Send(uint id, byte[] data)
+        public IMessage Send(uint id, byte[] data)
         {
-            ICANMessage msg = this.CreateMessage(id, data);
+            IMessage msg = this.CreateMessage(id, data);
             if (this.Send(msg)) return msg;
             else return null;
         }
 
-        public ICANMessage Send(CANMessageType type, uint id, byte[] data)
+        public IMessage Send(MessageType type, uint id, byte[] data)
         {
-            ICANMessage msg = this.CreateMessage(type, id, data);
+            IMessage msg = this.CreateMessage(type, id, data);
             if (this.Send(msg)) return msg;
             else return null;
         }
 
-        public ICANMessage CreateMessage(uint id, byte[] data)
+        public IMessage CreateMessage(uint id, byte[] data)
         {
-            CANMessageType type;
-            if (m_mode == CANChannelMode.Standard) type = CANMessageType.Standard;
-            else type = CANMessageType.Extended;
+            MessageType type;
+            if (m_mode == ChannelMode.Standard) type = MessageType.Standard;
+            else type = MessageType.Extended;
             return this.CreateMessage(type, id, data);
         }
 
 
-        internal static TPCANBaudrate ToPCANBaudrate(CANBaudrate baudrate)
+        internal static TPCANBaudrate ToPCANBaudrate(Baudrate baudrate)
         {
             switch (baudrate)
             {
-                case CANBaudrate.BR5K: return TPCANBaudrate.PCAN_BAUD_5K;
-                case CANBaudrate.BR10K: return TPCANBaudrate.PCAN_BAUD_10K;
-                case CANBaudrate.BR20K: return TPCANBaudrate.PCAN_BAUD_20K;
-                case CANBaudrate.BR33K: return TPCANBaudrate.PCAN_BAUD_33K;
-                case CANBaudrate.BR47K: return TPCANBaudrate.PCAN_BAUD_47K;
-                case CANBaudrate.BR50K: return TPCANBaudrate.PCAN_BAUD_50K;
-                case CANBaudrate.BR83K: return TPCANBaudrate.PCAN_BAUD_83K;
-                case CANBaudrate.BR95K: return TPCANBaudrate.PCAN_BAUD_95K;
-                case CANBaudrate.BR100K: return TPCANBaudrate.PCAN_BAUD_100K;
-                case CANBaudrate.BR125K: return TPCANBaudrate.PCAN_BAUD_125K;
-                case CANBaudrate.BR250K: return TPCANBaudrate.PCAN_BAUD_250K;
-                case CANBaudrate.BR500K: return TPCANBaudrate.PCAN_BAUD_500K;
-                case CANBaudrate.BR800K: return TPCANBaudrate.PCAN_BAUD_800K;
-                case CANBaudrate.BR1000K: return TPCANBaudrate.PCAN_BAUD_1M;
+                case Baudrate.BR5K: return TPCANBaudrate.PCAN_BAUD_5K;
+                case Baudrate.BR10K: return TPCANBaudrate.PCAN_BAUD_10K;
+                case Baudrate.BR20K: return TPCANBaudrate.PCAN_BAUD_20K;
+                case Baudrate.BR33K: return TPCANBaudrate.PCAN_BAUD_33K;
+                case Baudrate.BR47K: return TPCANBaudrate.PCAN_BAUD_47K;
+                case Baudrate.BR50K: return TPCANBaudrate.PCAN_BAUD_50K;
+                case Baudrate.BR83K: return TPCANBaudrate.PCAN_BAUD_83K;
+                case Baudrate.BR95K: return TPCANBaudrate.PCAN_BAUD_95K;
+                case Baudrate.BR100K: return TPCANBaudrate.PCAN_BAUD_100K;
+                case Baudrate.BR125K: return TPCANBaudrate.PCAN_BAUD_125K;
+                case Baudrate.BR250K: return TPCANBaudrate.PCAN_BAUD_250K;
+                case Baudrate.BR500K: return TPCANBaudrate.PCAN_BAUD_500K;
+                case Baudrate.BR800K: return TPCANBaudrate.PCAN_BAUD_800K;
+                case Baudrate.BR1000K: return TPCANBaudrate.PCAN_BAUD_1M;
                 default:
                     return TPCANBaudrate.PCAN_BAUD_100K;
             }
         }
 
-        internal static CANBaudrate ToInterfaceBaudrate(TPCANBaudrate baudrate)
+        internal static Baudrate ToInterfaceBaudrate(TPCANBaudrate baudrate)
         {
             switch (baudrate)
             {
-                case TPCANBaudrate.PCAN_BAUD_1M: return CANBaudrate.BR1000K;
-                case TPCANBaudrate.PCAN_BAUD_800K: return CANBaudrate.BR800K;
-                case TPCANBaudrate.PCAN_BAUD_500K: return CANBaudrate.BR500K;
-                case TPCANBaudrate.PCAN_BAUD_250K: return CANBaudrate.BR250K;
-                case TPCANBaudrate.PCAN_BAUD_125K: return CANBaudrate.BR125K;
-                case TPCANBaudrate.PCAN_BAUD_100K: return CANBaudrate.BR100K;
-                case TPCANBaudrate.PCAN_BAUD_95K: return CANBaudrate.BR95K;
-                case TPCANBaudrate.PCAN_BAUD_83K: return CANBaudrate.BR83K;
-                case TPCANBaudrate.PCAN_BAUD_50K: return CANBaudrate.BR50K;
-                case TPCANBaudrate.PCAN_BAUD_47K: return CANBaudrate.BR47K;
-                case TPCANBaudrate.PCAN_BAUD_33K: return CANBaudrate.BR33K;
-                case TPCANBaudrate.PCAN_BAUD_20K: return CANBaudrate.BR20K;
-                case TPCANBaudrate.PCAN_BAUD_10K: return CANBaudrate.BR10K;
-                case TPCANBaudrate.PCAN_BAUD_5K: return CANBaudrate.BR5K;
+                case TPCANBaudrate.PCAN_BAUD_1M: return Baudrate.BR1000K;
+                case TPCANBaudrate.PCAN_BAUD_800K: return Baudrate.BR800K;
+                case TPCANBaudrate.PCAN_BAUD_500K: return Baudrate.BR500K;
+                case TPCANBaudrate.PCAN_BAUD_250K: return Baudrate.BR250K;
+                case TPCANBaudrate.PCAN_BAUD_125K: return Baudrate.BR125K;
+                case TPCANBaudrate.PCAN_BAUD_100K: return Baudrate.BR100K;
+                case TPCANBaudrate.PCAN_BAUD_95K: return Baudrate.BR95K;
+                case TPCANBaudrate.PCAN_BAUD_83K: return Baudrate.BR83K;
+                case TPCANBaudrate.PCAN_BAUD_50K: return Baudrate.BR50K;
+                case TPCANBaudrate.PCAN_BAUD_47K: return Baudrate.BR47K;
+                case TPCANBaudrate.PCAN_BAUD_33K: return Baudrate.BR33K;
+                case TPCANBaudrate.PCAN_BAUD_20K: return Baudrate.BR20K;
+                case TPCANBaudrate.PCAN_BAUD_10K: return Baudrate.BR10K;
+                case TPCANBaudrate.PCAN_BAUD_5K: return Baudrate.BR5K;
                 default:
-                    return CANBaudrate.Unsupported;
+                    return Baudrate.Unsupported;
             }
         }
 
+        public ReceiveQueue CreateQueue([Implicit] ICallContext context, Predicate<IMessage> filter)
+        {
+            var q = new ReceiveQueue(filter);
+            m_receivers.Insert(m_receivers.Count - 1, q);
+            return q;
+        }
     }
 
-    internal class PCANMessage : ICANMessage
+    internal class PCANMessage : IMessage
     {
         private static long TICKSPERMICRO = TimeSpan.TicksPerMillisecond / 1000L;
         private static long TICKSPERMILLI = TimeSpan.TicksPerMillisecond;
@@ -555,25 +589,25 @@ namespace StepBro.PCAN
             }
         }
 
-        public CANMessageType Type
+        public MessageType Type
         {
             get
             {
                 switch (m_msg.MSGTYPE)
                 {
                     case TPCANMessageType.PCAN_MESSAGE_STANDARD:
-                        return CANMessageType.Standard;
+                        return MessageType.Standard;
                     case TPCANMessageType.PCAN_MESSAGE_EXTENDED:
-                        return CANMessageType.Extended;
+                        return MessageType.Extended;
                     case TPCANMessageType.PCAN_MESSAGE_STATUS:
-                        return CANMessageType.Status;
+                        return MessageType.Status;
 
                     case TPCANMessageType.PCAN_MESSAGE_RTR:
                     case TPCANMessageType.PCAN_MESSAGE_FD:
                     case TPCANMessageType.PCAN_MESSAGE_BRS:
                     case TPCANMessageType.PCAN_MESSAGE_ESI:
                     default:
-                        return CANMessageType.Special;
+                        return MessageType.Special;
                 }
             }
         }

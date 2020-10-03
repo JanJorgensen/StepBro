@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.CAN
 {
-    public class CANChannel : ICANChannel
+    public class Channel : ICANChannel
     {
         private ICANChannel m_driverChannel = null;
         ICANChannel DriverChannel { get { return m_driverChannel; } }

@@ -8,7 +8,7 @@ using StepBro.Core.Api;
 namespace StepBro.CAN
 {
     [Public]
-    public enum CANMessageType
+    public enum MessageType
     {
         Standard,
         Extended,
@@ -18,9 +18,9 @@ namespace StepBro.CAN
     }
 
     [Public]
-    public interface ICANMessage
+    public interface IMessage
     {
-        CANMessageType Type { get; }
+        MessageType Type { get; }
         uint ID { get; set; }
         byte[] Data { get; set; }
         DateTime Timestamp { get; }

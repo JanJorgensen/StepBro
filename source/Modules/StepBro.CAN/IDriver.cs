@@ -9,9 +9,9 @@ using StepBro.Core.Execution;
 namespace StepBro.CAN
 {
     [Public]
-    public interface ICANDriver
+    public interface IDriver
     {
-        IEnumerable<ICANAdapter> ListAdapters();
-        ICANAdapter GetAdapter([Implicit] ICallContext context, string identification = "");
+        IEnumerable<IAdapter> ListAdapters();
+        IAdapter GetAdapter([Implicit] ICallContext context, string identification = "");
     }
 }

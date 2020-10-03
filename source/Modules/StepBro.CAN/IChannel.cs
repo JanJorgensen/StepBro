@@ -9,7 +9,7 @@ using StepBro.Core.Execution;
 namespace StepBro.CAN
 {
     [Public]
-    public enum CANChannelMode
+    public enum ChannelMode
     {
         Standard,
         Extended,
@@ -18,10 +18,10 @@ namespace StepBro.CAN
     }
 
     [Public]
-    public interface ICANChannel
+    public interface IChannel
     {
-        ICANAdapter Adapter { get; }
-        void Setup([Implicit] ICallContext context, CANBaudrate baudrate, CANChannelMode mode, TimeSpan transmitTimeout);
+        IAdapter Adapter { get; }
+        void Setup([Implicit] ICallContext context, Baudrate baudrate, ChannelMode mode);
         //CANUSB.CANUSB_ACCEPTANCE_CODE_ALL,
         //CANUSB.CANUSB_ACCEPTANCE_MASK_ALL,
         //CANUSB.CANUSB_FLAG_TIMESTAMP);
@@ -33,11 +33,12 @@ namespace StepBro.CAN
         void ResetErrors();
         string ErrorStatus { get; }
         string LastOperationStatus { get; }
-        bool Send(ICANMessage message);
-        ICANMessage Send(uint id, byte[] data);
-        ICANMessage Send(CANMessageType type, uint id, byte[] data);
-        ICANMessage GetReceived();
-        ICANMessage CreateMessage(uint id, byte[] data);
-        ICANMessage CreateMessage(CANMessageType type, uint id, byte[] data);
+        bool Send(IMessage message);
+        IMessage Send(uint id, byte[] data);
+        IMessage Send(MessageType type, uint id, byte[] data);
+        IMessage GetReceived([Implicit] ICallContext context);
+        IMessage CreateMessage(uint id, byte[] data);
+        IMessage CreateMessage(MessageType type, uint id, byte[] data);
+        ReceiveQueue CreateQueue([Implicit] ICallContext context, Predicate<IMessage> filter);
     }
 }

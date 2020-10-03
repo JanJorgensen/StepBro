@@ -41,15 +41,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CANBaudrate.cs" />
+    <Compile Include="Baudrate.cs" />
+    <Compile Include="ReceiveQueue.cs" />
     <None Include="app.config" />
-    <None Include="CANChannel.cs" />
-    <Compile Include="CANSupport.cs" />
-    <Compile Include="ICANAdapter.cs" />
-    <Compile Include="ICANChannel.cs" />
-    <Compile Include="ICANDriver.cs" />
-    <Compile Include="ICANMessage.cs" />
-    <Compile Include="ICANMessageDecoder.cs" />
+    <None Include="Channel.cs" />
+    <Compile Include="Support.cs" />
+    <Compile Include="IAdapter.cs" />
+    <Compile Include="IChannel.cs" />
+    <Compile Include="IDriver.cs" />
+    <Compile Include="IMessage.cs" />
+    <Compile Include="IMessageDecoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

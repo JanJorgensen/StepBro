@@ -359,7 +359,7 @@ namespace StepBro.Core.Execution
 
         bool IProcedureThis.HasFailsOrErrors { get { return m_expectFailCount > 0 | m_errorCount > 0; } }
 
-        ErrorID IProcedureThis.LastError { get { return null; } }
+        ErrorID IProcedureThis.LastError { get { throw new NotImplementedException(); } }
 
         public TaskManager TaskManager { get { return m_taskManager; } }
     }

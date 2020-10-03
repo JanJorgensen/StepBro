@@ -95,7 +95,7 @@ namespace StepBroCoreTest
             throw new NotImplementedException();
         }
 
-        public void UnregisterDependant(object usingObject)
+        public void UnregisterDependant(object usingObject, bool throwIfNotFound)
         {
             throw new NotImplementedException();
         }

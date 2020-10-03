@@ -93,15 +93,8 @@ enumBody : OPEN_BRACE enumValues? CLOSE_BRACE ;
 enumValues : enumValue (COMMA enumValue)* COMMA? ;
 enumValue : IDENTIFIER (ASSIGNMENT (INTEGER_LITERAL | HexLiteral)) ? ;
 
-
-// CONFIGURATION VALUE
-
-configDeclaration : CONFIG configDeclarationBody ;
-
-configDeclarationBody
-    :	type variableDeclarator SEMICOLON
-    |	type IDENTIFIER elementPropertyblock
-    ;
+// CONFIGURATION DATA
+configDeclaration : CONFIG IDENTIFIER elementPropertyblock ;
 
 // TESTLIST
 

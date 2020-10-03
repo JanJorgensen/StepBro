@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using StepBro.Core.CodeGeneration;
+﻿using StepBro.Core.CodeGeneration;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using StepBro.Core.Parser;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace StepBro.Core.ScriptData
 {
@@ -272,7 +272,7 @@ namespace StepBro.Core.ScriptData
 
             if (m_returnType == null)
             {
-                m_returnType = listener.ParseTypeString(m_returnTypeData.Item1, reportErrors: reportErrors);
+                m_returnType = listener.ParseTypeString(m_returnTypeData.Item1, reportErrors: reportErrors, token: m_returnTypeData.Item2);
                 if (m_returnType == null) unresolvedTypes++;
             }
 
@@ -280,7 +280,7 @@ namespace StepBro.Core.ScriptData
             {
                 if (p.Type == null)
                 {
-                    var type = listener.ParseTypeString(p.TypeName, reportErrors: reportErrors);
+                    var type = listener.ParseTypeString(p.TypeName, reportErrors: reportErrors, token: p.TypeToken);
                     if (type == null)
                     {
                         unresolvedTypes++;

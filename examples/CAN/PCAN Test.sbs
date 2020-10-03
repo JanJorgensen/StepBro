@@ -1,26 +1,12 @@
-using TSharp.PCAN;
-using Devices.CAN;
+﻿using StepBro.CAN;
 
-namespace CANSnifferDemo;
-
-procedure ICANChannel OpenCAN()
+procedure void OpenCAN()
 {
-	var adapter = PCANInterface.Instance.GetAdapter("USBBUS1");
-	var channel = adapter.GetChannel(0);
-	channel.Setup(CANBaudrate.BR500K, CANChannelMode.Extended, 1s);
-	if (!channel.IsOpen)
-	{
-		channel.Open();
-	}
-	return channel;
-}
-
-procedure void CANTest()
-{
-	log ("Entered CANTest");
-
-	ICANChannel channel = null;
-	channel = OpenCAN();
-
-	log ("End of CANTest ");
+    var channel = PCAN.Driver.GetAdapter("USBBUS1").GetChannel(0);
+    channel.Setup(Baudrate.BR500K, ChannelMode.Extended);
+    if (!channel.IsOpen)
+    {
+        channel.Open();
+    }
+	var statusQueue = channel.CreateReceiveQueue(m => m.ID == 0x1092);
 }

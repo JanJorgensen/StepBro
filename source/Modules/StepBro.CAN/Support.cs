@@ -20,7 +20,7 @@ namespace StepBro.CAN
             set { g_little = !value; }
         }
 
-        public static void SetData(this ICANMessage message, ulong data, int length)
+        public static void SetData(this IMessage message, ulong data, int length)
         {
             if (length < 0 | length > 8) throw new ArgumentOutOfRangeException("length");
             if (g_little)
@@ -47,7 +47,7 @@ namespace StepBro.CAN
             }
         }
 
-        public static ulong GetDataAsInteger(this ICANMessage message)
+        public static ulong GetDataAsInteger(this IMessage message)
         {
             if (g_little)
             {

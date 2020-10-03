@@ -14,8 +14,7 @@ namespace StepBro.Workbench
 
         private void AboutDialog_Load(object sender, EventArgs e)
         {
-            labelAppVersion.Text = typeof(MainForm).Assembly.GetName().Version.ToString();
-            labelLibVersion.Text = typeof(DockPanel).Assembly.GetName().Version.ToString();
+            labelAppVersion.Text = typeof(Core.Main).Assembly.GetName().Version.ToString();
         }
     }
 }

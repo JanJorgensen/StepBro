@@ -117,7 +117,7 @@ namespace StepBro.Core
                     m_serviceManagerAdmin.StopServices(taskContext);
                 }
                 catch { /* Ignore exceptions during stop */ }
-                throw new Exception("Failed to start all services.", ex);
+                throw new Exception("Failed to start all services. " + ex.GetType().Name + ", " + ex.ToString());
             }
 
             m_initialized = true;
@@ -475,9 +475,10 @@ namespace StepBro.Core
 
         public static void DumpCurrentObjectsToLog()
         {
+            var logger = m_mainLogger.Logger.RootLogger;
             foreach (var oc in m_dynamicObjectManager.ListKnownObjects())
             {
-                m_mainLogger.Logger.RootLogger.Log("Dynamic object", oc.FullName);
+                logger.Log("Dynamic object", oc.FullName);
             }
         }
     }

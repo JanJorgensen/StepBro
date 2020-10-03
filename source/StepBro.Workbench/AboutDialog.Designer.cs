@@ -30,8 +30,6 @@ namespace StepBro.Workbench
             this.buttonOK = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.labelLibVersion = new System.Windows.Forms.Label();
             this.labelAppVersion = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -50,7 +48,7 @@ namespace StepBro.Workbench
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(109, 16);
             this.label1.TabIndex = 1;
-            this.label1.Text = "DockSample Version:";
+            this.label1.Text = "StepBro Version:";
             // 
             // label2
             // 
@@ -58,23 +56,7 @@ namespace StepBro.Workbench
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(272, 32);
             this.label2.TabIndex = 2;
-            this.label2.Text = "Copyright 2007, Weifen Luo";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(24, 81);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(128, 13);
-            this.label3.TabIndex = 3;
-            this.label3.Text = "DockPanel Suite Version:";
-            // 
-            // labelLibVersion
-            // 
-            this.labelLibVersion.Location = new System.Drawing.Point(148, 81);
-            this.labelLibVersion.Name = "labelLibVersion";
-            this.labelLibVersion.Size = new System.Drawing.Size(97, 13);
-            this.labelLibVersion.TabIndex = 4;
+            this.label2.Text = "Copyright 2020, Jan Jorgensen";
             // 
             // labelAppVersion
             // 
@@ -89,8 +71,6 @@ namespace StepBro.Workbench
             this.CancelButton = this.buttonOK;
             this.ClientSize = new System.Drawing.Size(322, 215);
             this.Controls.Add(this.labelAppVersion);
-            this.Controls.Add(this.labelLibVersion);
-            this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonOK);
@@ -103,7 +83,6 @@ namespace StepBro.Workbench
             this.Text = "About";
             this.Load += new System.EventHandler(this.AboutDialog_Load);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
         #endregion
@@ -111,8 +90,6 @@ namespace StepBro.Workbench
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button buttonOK;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label labelLibVersion;
         private System.Windows.Forms.Label labelAppVersion;
     }
 }

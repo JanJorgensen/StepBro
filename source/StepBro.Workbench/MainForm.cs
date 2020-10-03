@@ -82,6 +82,274 @@ namespace StepBro.Workbench
 
         #endregion
 
+        #region Menu Event Handlers
+
+        #region File Menu Handlers
+
+        private void menuItemExit_Click(object sender, System.EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void menuItemNew_Click(object sender, System.EventArgs e)
+        {
+            TextDocView dummyDoc = this.CreateNewDocument();
+            if (dockPanel.DocumentStyle == DocumentStyle.SystemMdi)
+            {
+                dummyDoc.MdiParent = this;
+                dummyDoc.Show();
+            }
+            else
+            {
+                dummyDoc.Show(dockPanel);
+            }
+        }
+
+        private void menuItemOpen_Click(object sender, System.EventArgs e)
+        {
+            OpenFileDialog openFile = new OpenFileDialog();
+
+            openFile.InitialDirectory = Application.ExecutablePath;
+            openFile.Filter = "StepBro script files (*." + Main.StepBroFileExtension + ")|*." + Main.StepBroFileExtension + "|txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            openFile.FilterIndex = 1;
+            openFile.RestoreDirectory = true;
+
+            if (openFile.ShowDialog() == DialogResult.OK)
+            {
+                var fullName = openFile.FileName;
+                this.OpenFile(fullName);
+            }
+        }
+
+        private void menuItemSaveAll_Click(object sender, EventArgs e)
+        {
+            foreach (var doc in dockPanel.Documents)
+            {
+                if (doc.DockHandler.Content is DocumentViewDockContent)
+                {
+                    var view = doc.DockHandler.Content as DocumentViewDockContent;
+                    if (view.FileChanged())
+                    {
+                        view.SaveFile(Core.File.SaveOption.SaveToExisting, null);
+                    }
+                }
+            }
+        }
+
+        private void menuItemClose_Click(object sender, System.EventArgs e)
+        {
+            if (dockPanel.DocumentStyle == DocumentStyle.SystemMdi)
+                this.ActiveMdiChild.Close();
+            else if (dockPanel.ActiveDocument != null)
+                dockPanel.ActiveDocument.DockHandler.Close();
+        }
+
+        private void menuItemCloseAll_Click(object sender, System.EventArgs e)
+        {
+            this.CloseAllDocuments();
+        }
+
+        private void menuItemFile_Popup(object sender, System.EventArgs e)
+        {
+            if (dockPanel.DocumentStyle == DocumentStyle.SystemMdi)
+            {
+                menuItemClose.Enabled =
+                    menuItemCloseAll.Enabled =
+                    menuItemCloseAllButThisOne.Enabled = (this.ActiveMdiChild != null);
+            }
+            else
+            {
+                menuItemClose.Enabled = (dockPanel.ActiveDocument != null);
+                menuItemCloseAll.Enabled =
+                    menuItemCloseAllButThisOne.Enabled = (dockPanel.DocumentsCount > 0);
+            }
+        }
+
+        #endregion
+
+        #region Edit Menu Handlers
+
+        #endregion
+
+        #region View Menu Handlers
+
+        private void menuItemSolutionExplorer_Click(object sender, System.EventArgs e)
+        {
+            m_solutionExplorer.Show(dockPanel);
+        }
+
+        private void menuItemPropertyWindow_Click(object sender, System.EventArgs e)
+        {
+            m_propertyWindow.Show(dockPanel);
+        }
+
+        private void menuItemToolbox_Click(object sender, System.EventArgs e)
+        {
+            m_toolbox.Show(dockPanel);
+        }
+
+        private void menuItemErrorList_Click(object sender, EventArgs e)
+        {
+            m_errorListWindow.Show(dockPanel);
+        }
+
+        private void menuItemOutputWindow_Click(object sender, System.EventArgs e)
+        {
+            m_outputWindow.Show(dockPanel);
+        }
+
+        private void menuItemTaskList_Click(object sender, System.EventArgs e)
+        {
+            m_taskList.Show(dockPanel);
+        }
+
+        private void menuItemViewEditorPlayground_Click(object sender, EventArgs e)
+        {
+            m_editorPlayground.Show(dockPanel);
+        }
+
+        private void menuItemViewToolBar_Click(object sender, System.EventArgs e)
+        {
+            toolBar.Visible = menuItemViewToolBar.Checked = !menuItemViewToolBar.Checked;
+        }
+
+        private void menuItemViewExecutionToolBar_Click(object sender, EventArgs e)
+        {
+            toolStripExecution.Visible = menuItemViewExecutionToolBar.Checked = !menuItemViewExecutionToolBar.Checked;
+        }
+
+        private void menuItemViewStatusBar_Click(object sender, System.EventArgs e)
+        {
+            statusBar.Visible = menuItemViewStatusBar.Checked = !menuItemViewStatusBar.Checked;
+        }
+
+        private void menuItemLayoutByCode_Click(object sender, System.EventArgs e)
+        {
+            dockPanel.SuspendLayout(true);
+
+            this.CloseAllContents();
+
+            this.CreateStandardControls();
+
+            m_solutionExplorer.Show(dockPanel, DockState.DockRight);
+            m_propertyWindow.Show(m_solutionExplorer.Pane, m_solutionExplorer);
+            m_toolbox.Show(dockPanel, new Rectangle(98, 133, 200, 383));
+            m_outputWindow.Show(m_solutionExplorer.Pane, DockAlignment.Bottom, 0.35);
+            m_taskList.Show(m_toolbox.Pane, DockAlignment.Left, 0.4);
+
+            TextDocView doc1 = this.CreateNewDocument("Document1");
+            TextDocView doc2 = this.CreateNewDocument("Document2");
+            TextDocView doc3 = this.CreateNewDocument("Document3");
+            TextDocView doc4 = this.CreateNewDocument("Document4");
+            doc1.Show(dockPanel, DockState.Document);
+            doc2.Show(doc1.Pane, null);
+            doc3.Show(doc1.Pane, DockAlignment.Bottom, 0.5);
+            doc4.Show(doc3.Pane, DockAlignment.Right, 0.5);
+
+            dockPanel.ResumeLayout(true, true);
+        }
+
+        #endregion
+
+        #region Debug Menu Handlers
+
+        private void menuItemDebugStart_Click(object sender, EventArgs e)
+        {
+            this.StartButtonPressed();
+        }
+
+        private void menuItemDebugStartElementSelectedInEditor_Click(object sender, EventArgs e)
+        {
+            if (m_mainScriptExecution == null)
+            {
+                StepBroMain.StartFileParsing(false);
+                StepBroMain.Actions.AddTask("Execute Selected Procedure", true,
+                    () => { return (StepBroMain.LastParsingErrorCount == 0); },
+                    (context) =>
+                    {
+                        this.ExecuteProcedureUnderCursor();
+                    });
+            }
+            else
+            {
+                if (m_mainScriptExecution.Task.CurrentState == StepBro.Core.Tasks.TaskExecutionState.Paused)
+                {
+                    m_mainScriptExecution.Task.RequestContinue();
+                }
+            }
+        }
+
+        #endregion
+
+        #region Tools Menu Handlers
+
+        private void menuItemTools_Popup(object sender, System.EventArgs e)
+        {
+            menuItemLockLayout.Checked = !dockPanel.AllowEndUserDocking;
+        }
+
+        private void menuItemLockLayout_Click(object sender, System.EventArgs e)
+        {
+            dockPanel.AllowEndUserDocking = !dockPanel.AllowEndUserDocking;
+        }
+
+        #endregion
+
+        #region Window Menu Handler
+
+        private void menuItemNewWindow_Click(object sender, System.EventArgs e)
+        {
+            MainForm newWindow = new MainForm();
+            newWindow.Text = newWindow.Text + " - New";
+            newWindow.Show();
+        }
+
+        #endregion
+
+        #region Help Menu Handlers
+
+        private void menuItemAbout_Click(object sender, System.EventArgs e)
+        {
+            AboutDialog aboutDialog = new AboutDialog();
+            aboutDialog.ShowDialog(this);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Toolbar Event Handlers
+
+        private void toolBar_ButtonClick(object sender, System.Windows.Forms.ToolStripItemClickedEventArgs e)
+        {
+            if (e.ClickedItem == toolBarButtonNew)
+                this.menuItemNew_Click(null, null);
+            else if (e.ClickedItem == toolBarButtonOpen)
+                this.menuItemOpen_Click(null, null);
+            else if (e.ClickedItem == toolBarButtonSolutionExplorer)
+                this.menuItemSolutionExplorer_Click(null, null);
+            else if (e.ClickedItem == toolBarButtonPropertyWindow)
+                this.menuItemPropertyWindow_Click(null, null);
+            else if (e.ClickedItem == toolBarButtonToolbox)
+                this.menuItemToolbox_Click(null, null);
+            else if (e.ClickedItem == toolBarButtonOutputWindow)
+                this.menuItemOutputWindow_Click(null, null);
+            else if (e.ClickedItem == toolBarButtonTaskList)
+                this.menuItemTaskList_Click(null, null);
+            else if (e.ClickedItem == toolBarButtonLayoutByCode)
+                this.menuItemLayoutByCode_Click(null, null);
+            else if (e.ClickedItem == toolBarButtonLayoutByXml)
+                this.menuItemLayoutByXml_Click(null, null);
+        }
+
+        private void toolStripButtonRun_Click(object sender, EventArgs e)
+        {
+            this.StartButtonPressed();
+        }
+
+
+        #endregion
+
         #region Methods
 
         private IDockContent FindDocument(string text)
@@ -253,86 +521,101 @@ namespace StepBro.Workbench
 
         #region Event Handlers
 
+        private void MainForm_Load(object sender, System.EventArgs e)
+        {
+            dockPanel.Theme = vS2015BlueTheme;
+            this.EnableVSRenderer(VisualStudioToolStripExtender.VsVersion.Vs2015, vS2015BlueTheme);
+
+            string configFile = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), DockConfigFile);
+
+            if (File.Exists(configFile))
+                dockPanel.LoadFromXml(configFile, m_deserializeDockContent);
+        }
+
+        private void MainForm_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            string configFile = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), DockConfigFile);
+            if (m_bSaveLayout)
+            {
+                dockPanel.SaveAsXml(configFile);
+            }
+            //else if (File.Exists(configFile))
+            //    File.Delete(configFile);
+        }
+
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
         }
 
-        private void menuItemExit_Click(object sender, System.EventArgs e)
+        private void MainForm_SizeChanged(object sender, EventArgs e)
         {
-            this.Close();
+            this.ResizeSplash();
         }
 
-        private void menuItemSolutionExplorer_Click(object sender, System.EventArgs e)
+        private void dockPanel_ActiveDocumentChanged(object sender, EventArgs e)
         {
-            m_solutionExplorer.Show(dockPanel);
         }
 
-        private void menuItemPropertyWindow_Click(object sender, System.EventArgs e)
-        {
-            m_propertyWindow.Show(dockPanel);
-        }
 
-        private void menuItemToolbox_Click(object sender, System.EventArgs e)
-        {
-            m_toolbox.Show(dockPanel);
-        }
 
-        private void menuItemErrorList_Click(object sender, EventArgs e)
-        {
-            m_errorListWindow.Show(dockPanel);
-        }
 
-        private void menuItemOutputWindow_Click(object sender, System.EventArgs e)
-        {
-            m_outputWindow.Show(dockPanel);
-        }
 
-        private void menuItemTaskList_Click(object sender, System.EventArgs e)
+        private void menuItemCloseAllButThisOne_Click(object sender, System.EventArgs e)
         {
-            m_taskList.Show(dockPanel);
-        }
-
-        private void menuItemEditorPlayground_Click(object sender, EventArgs e)
-        {
-            m_editorPlayground.Show(dockPanel);
-        }
-
-        private void menuItemAbout_Click(object sender, System.EventArgs e)
-        {
-            AboutDialog aboutDialog = new AboutDialog();
-            aboutDialog.ShowDialog(this);
-        }
-
-        private void menuItemNew_Click(object sender, System.EventArgs e)
-        {
-            TextDocView dummyDoc = this.CreateNewDocument();
             if (dockPanel.DocumentStyle == DocumentStyle.SystemMdi)
             {
-                dummyDoc.MdiParent = this;
-                dummyDoc.Show();
+                Form activeMdi = this.ActiveMdiChild;
+                foreach (Form form in this.MdiChildren)
+                {
+                    if (form != activeMdi)
+                        form.Close();
+                }
             }
             else
             {
-                dummyDoc.Show(dockPanel);
+                foreach (IDockContent document in dockPanel.DocumentsToArray())
+                {
+                    if (!document.DockHandler.IsActivated)
+                        document.DockHandler.Close();
+                }
             }
         }
 
-        private void menuItemOpen_Click(object sender, System.EventArgs e)
+        private void menuItemShowDocumentIcon_Click(object sender, System.EventArgs e)
         {
-            OpenFileDialog openFile = new OpenFileDialog();
-
-            openFile.InitialDirectory = Application.ExecutablePath;
-            openFile.Filter = "StepBro script files (*." + Main.StepBroFileExtension + ")|*." + Main.StepBroFileExtension + "|txt files (*.txt)|*.txt|All files (*.*)|*.*";
-            openFile.FilterIndex = 1;
-            openFile.RestoreDirectory = true;
-
-            if (openFile.ShowDialog() == DialogResult.OK)
-            {
-                var fullName = openFile.FileName;
-                this.OpenFile(fullName);
-            }
+            dockPanel.ShowDocumentIcon = menuItemShowDocumentIcon.Checked = !menuItemShowDocumentIcon.Checked;
         }
+
+        private void exitWithoutSavingLayout_Click(object sender, EventArgs e)
+        {
+            m_bSaveLayout = false;
+            this.Close();
+            m_bSaveLayout = true;
+        }
+
+        #endregion
+
+        #region Inherited from Docking Framework
+
+        private void menuItemLayoutByXml_Click(object sender, System.EventArgs e)
+        {
+            dockPanel.SuspendLayout(true);
+
+            // In order to load layout from XML, we need to close all the DockContents
+            this.CloseAllContents();
+
+            this.CreateStandardControls();
+
+            Assembly assembly = Assembly.GetAssembly(typeof(MainForm));
+            Stream xmlStream = assembly.GetManifestResourceStream("DockSample.Resources.DockPanel.xml");
+            dockPanel.LoadFromXml(xmlStream, m_deserializeDockContent);
+            xmlStream.Close();
+
+            dockPanel.ResumeLayout(true, true);
+        }
+
+        #endregion
 
         internal void OpenFile(string filepath)
         {
@@ -394,152 +677,6 @@ namespace StepBro.Workbench
             }
         }
 
-        private void menuItemFile_Popup(object sender, System.EventArgs e)
-        {
-            if (dockPanel.DocumentStyle == DocumentStyle.SystemMdi)
-            {
-                menuItemClose.Enabled =
-                    menuItemCloseAll.Enabled =
-                    menuItemCloseAllButThisOne.Enabled = (this.ActiveMdiChild != null);
-            }
-            else
-            {
-                menuItemClose.Enabled = (dockPanel.ActiveDocument != null);
-                menuItemCloseAll.Enabled =
-                    menuItemCloseAllButThisOne.Enabled = (dockPanel.DocumentsCount > 0);
-            }
-        }
-
-        private void menuItemSaveAll_Click(object sender, EventArgs e)
-        {
-            foreach (var doc in dockPanel.Documents)
-            {
-                if (doc.DockHandler.Content is DocumentViewDockContent)
-                {
-                    var view = doc.DockHandler.Content as DocumentViewDockContent;
-                    if (view.FileChanged())
-                    {
-                        view.SaveFile(Core.File.SaveOption.SaveToExisting, null);
-                    }
-                }
-            }
-        }
-
-        private void menuItemClose_Click(object sender, System.EventArgs e)
-        {
-            if (dockPanel.DocumentStyle == DocumentStyle.SystemMdi)
-                this.ActiveMdiChild.Close();
-            else if (dockPanel.ActiveDocument != null)
-                dockPanel.ActiveDocument.DockHandler.Close();
-        }
-
-        private void menuItemCloseAll_Click(object sender, System.EventArgs e)
-        {
-            this.CloseAllDocuments();
-        }
-
-        private void MainForm_Load(object sender, System.EventArgs e)
-        {
-            dockPanel.Theme = vS2015BlueTheme;
-            this.EnableVSRenderer(VisualStudioToolStripExtender.VsVersion.Vs2015, vS2015BlueTheme);
-
-            string configFile = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), DockConfigFile);
-
-            if (File.Exists(configFile))
-                dockPanel.LoadFromXml(configFile, m_deserializeDockContent);
-        }
-
-        private void MainForm_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            string configFile = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), DockConfigFile);
-            if (m_bSaveLayout)
-            {
-                dockPanel.SaveAsXml(configFile);
-            }
-            //else if (File.Exists(configFile))
-            //    File.Delete(configFile);
-        }
-
-        private void menuItemToolBar_Click(object sender, System.EventArgs e)
-        {
-            toolBar.Visible = menuItemToolBar.Checked = !menuItemToolBar.Checked;
-        }
-
-        private void executionToolBarToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            toolStripExecution.Visible = menuItemExecutionToolBar.Checked = !menuItemExecutionToolBar.Checked;
-        }
-
-        private void menuItemStatusBar_Click(object sender, System.EventArgs e)
-        {
-            statusBar.Visible = menuItemStatusBar.Checked = !menuItemStatusBar.Checked;
-        }
-
-        private void toolBar_ButtonClick(object sender, System.Windows.Forms.ToolStripItemClickedEventArgs e)
-        {
-            if (e.ClickedItem == toolBarButtonNew)
-                this.menuItemNew_Click(null, null);
-            else if (e.ClickedItem == toolBarButtonOpen)
-                this.menuItemOpen_Click(null, null);
-            else if (e.ClickedItem == toolBarButtonSolutionExplorer)
-                this.menuItemSolutionExplorer_Click(null, null);
-            else if (e.ClickedItem == toolBarButtonPropertyWindow)
-                this.menuItemPropertyWindow_Click(null, null);
-            else if (e.ClickedItem == toolBarButtonToolbox)
-                this.menuItemToolbox_Click(null, null);
-            else if (e.ClickedItem == toolBarButtonOutputWindow)
-                this.menuItemOutputWindow_Click(null, null);
-            else if (e.ClickedItem == toolBarButtonTaskList)
-                this.menuItemTaskList_Click(null, null);
-            else if (e.ClickedItem == toolBarButtonLayoutByCode)
-                this.menuItemLayoutByCode_Click(null, null);
-            else if (e.ClickedItem == toolBarButtonLayoutByXml)
-                this.menuItemLayoutByXml_Click(null, null);
-        }
-
-        private void menuItemNewWindow_Click(object sender, System.EventArgs e)
-        {
-            MainForm newWindow = new MainForm();
-            newWindow.Text = newWindow.Text + " - New";
-            newWindow.Show();
-        }
-
-        private void menuItemTools_Popup(object sender, System.EventArgs e)
-        {
-            menuItemLockLayout.Checked = !dockPanel.AllowEndUserDocking;
-        }
-
-        private void menuItemLockLayout_Click(object sender, System.EventArgs e)
-        {
-            dockPanel.AllowEndUserDocking = !dockPanel.AllowEndUserDocking;
-        }
-
-        private void menuItemLayoutByCode_Click(object sender, System.EventArgs e)
-        {
-            dockPanel.SuspendLayout(true);
-
-            this.CloseAllContents();
-
-            this.CreateStandardControls();
-
-            m_solutionExplorer.Show(dockPanel, DockState.DockRight);
-            m_propertyWindow.Show(m_solutionExplorer.Pane, m_solutionExplorer);
-            m_toolbox.Show(dockPanel, new Rectangle(98, 133, 200, 383));
-            m_outputWindow.Show(m_solutionExplorer.Pane, DockAlignment.Bottom, 0.35);
-            m_taskList.Show(m_toolbox.Pane, DockAlignment.Left, 0.4);
-
-            TextDocView doc1 = this.CreateNewDocument("Document1");
-            TextDocView doc2 = this.CreateNewDocument("Document2");
-            TextDocView doc3 = this.CreateNewDocument("Document3");
-            TextDocView doc4 = this.CreateNewDocument("Document4");
-            doc1.Show(dockPanel, DockState.Document);
-            doc2.Show(doc1.Pane, null);
-            doc3.Show(doc1.Pane, DockAlignment.Bottom, 0.5);
-            doc4.Show(doc3.Pane, DockAlignment.Right, 0.5);
-
-            dockPanel.ResumeLayout(true, true);
-        }
-
         private void SeSBPlashScreen()
         {
 
@@ -588,71 +725,6 @@ namespace StepBro.Workbench
 
         }
 
-        private void menuItemLayoutByXml_Click(object sender, System.EventArgs e)
-        {
-            dockPanel.SuspendLayout(true);
-
-            // In order to load layout from XML, we need to close all the DockContents
-            this.CloseAllContents();
-
-            this.CreateStandardControls();
-
-            Assembly assembly = Assembly.GetAssembly(typeof(MainForm));
-            Stream xmlStream = assembly.GetManifestResourceStream("DockSample.Resources.DockPanel.xml");
-            dockPanel.LoadFromXml(xmlStream, m_deserializeDockContent);
-            xmlStream.Close();
-
-            dockPanel.ResumeLayout(true, true);
-        }
-
-        private void menuItemCloseAllButThisOne_Click(object sender, System.EventArgs e)
-        {
-            if (dockPanel.DocumentStyle == DocumentStyle.SystemMdi)
-            {
-                Form activeMdi = this.ActiveMdiChild;
-                foreach (Form form in this.MdiChildren)
-                {
-                    if (form != activeMdi)
-                        form.Close();
-                }
-            }
-            else
-            {
-                foreach (IDockContent document in dockPanel.DocumentsToArray())
-                {
-                    if (!document.DockHandler.IsActivated)
-                        document.DockHandler.Close();
-                }
-            }
-        }
-
-        private void menuItemShowDocumentIcon_Click(object sender, System.EventArgs e)
-        {
-            dockPanel.ShowDocumentIcon = menuItemShowDocumentIcon.Checked = !menuItemShowDocumentIcon.Checked;
-        }
-
-        private void exitWithoutSavingLayout_Click(object sender, EventArgs e)
-        {
-            m_bSaveLayout = false;
-            this.Close();
-            m_bSaveLayout = true;
-        }
-
-        #endregion
-
-        private void MainForm_SizeChanged(object sender, EventArgs e)
-        {
-            this.ResizeSplash();
-        }
-
-        private void dockPanel_ActiveDocumentChanged(object sender, EventArgs e)
-        {
-        }
-
-        private void startToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.StartButtonPressed();
-        }
 
         private void StartButtonPressed()
         {
@@ -717,7 +789,7 @@ namespace StepBro.Workbench
                 if (element != null)
                 {
                     m_mainScriptExecution = StepBro.Core.Main.StartProcedureExecution(element as IFileProcedure);
-                    m_mainScriptExecution.Task.CurrentStateChanged += this.CurrentScriptExeccution_CurrentStateChanged;
+                    m_mainScriptExecution.Task.CurrentStateChanged += this.CurrentScriptExecution_CurrentStateChanged;
                 }
             }
         }
@@ -743,12 +815,12 @@ namespace StepBro.Workbench
                 if (element != null && element is IFileProcedure)
                 {
                     m_mainScriptExecution = StepBro.Core.Main.StartProcedureExecution(element as IFileProcedure);
-                    m_mainScriptExecution.Task.CurrentStateChanged += this.CurrentScriptExeccution_CurrentStateChanged;
+                    m_mainScriptExecution.Task.CurrentStateChanged += this.CurrentScriptExecution_CurrentStateChanged;
                 }
             }
         }
 
-        private void CurrentScriptExeccution_CurrentStateChanged(object sender, EventArgs e)
+        private void CurrentScriptExecution_CurrentStateChanged(object sender, EventArgs e)
         {
             switch (m_mainScriptExecution.Task.CurrentState)
             {
@@ -782,32 +854,6 @@ namespace StepBro.Workbench
             }
         }
 
-        private void toolStripButtonRun_Click(object sender, EventArgs e)
-        {
-            this.StartButtonPressed();
-        }
-
-        private void startElementSelectedInEditorToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (m_mainScriptExecution == null)
-            {
-                StepBroMain.StartFileParsing(false);
-                StepBroMain.Actions.AddTask("Execute Selected Procedure", true,
-                    () => { return (StepBroMain.LastParsingErrorCount == 0); },
-                    (context) =>
-                    {
-                        this.ExecuteProcedureUnderCursor();
-                    });
-            }
-            else
-            {
-                if (m_mainScriptExecution.Task.CurrentState == StepBro.Core.Tasks.TaskExecutionState.Paused)
-                {
-                    m_mainScriptExecution.Task.RequestContinue();
-                }
-            }
-        }
-
         private void OnScriptExecutionRunning()
         {
             toolStripButtonRun.Enabled = false;
@@ -828,7 +874,7 @@ namespace StepBro.Workbench
         }
         private void OnScriptExecutionEnded()
         {
-            m_mainScriptExecution.Task.CurrentStateChanged -= this.CurrentScriptExeccution_CurrentStateChanged;
+            m_mainScriptExecution.Task.CurrentStateChanged -= this.CurrentScriptExecution_CurrentStateChanged;
             m_mainScriptExecution = null;
             toolStripButtonRun.Enabled = true;
             toolStripButtonStop.Enabled = false;
@@ -881,6 +927,11 @@ namespace StepBro.Workbench
         {
             timerPostInitAction.Stop();
             StepBroMain.StartFileParsing(false);
+        }
+
+        private void menuItemListDynamicObjects_Click(object sender, EventArgs e)
+        {
+            StepBroMain.DumpCurrentObjectsToLog();
         }
     }
 }

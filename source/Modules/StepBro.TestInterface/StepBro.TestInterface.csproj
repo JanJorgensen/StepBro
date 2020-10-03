@@ -34,6 +34,7 @@
     <Reference Include="FastColoredTextBox, Version=2.16.24.0, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\FastColoredTextBox.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -84,6 +85,7 @@
     <ProjectReference Include="..\StepBro.Streams\StepBro.Streams.csproj">
       <Project>{61ffd78c-8e68-4f63-bc1a-3ff59fb8f938}</Project>
       <Name>StepBro.Streams</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
