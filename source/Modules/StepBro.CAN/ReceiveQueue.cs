@@ -7,19 +7,22 @@ namespace StepBro.CAN
 {
     public class ReceiveQueue
     {
+        private readonly string m_name;
         private BlockingCollection<IMessage> m_queue = new BlockingCollection<IMessage>();
         private TimeSpan m_defaultTimeout = TimeSpan.MaxValue;
-        private readonly object m_sync = new object();
         private readonly Predicate<IMessage> m_filter = null;
 
-        public ReceiveQueue()
+        public ReceiveQueue(string name)
         {
+            m_name = name;
         }
 
-        public ReceiveQueue(Predicate<IMessage> filter)
+        public ReceiveQueue(string name, Predicate<IMessage> filter) : this(name)
         {
             m_filter = filter;
         }
+
+        public string Name { get { return m_name; } }
 
         public bool TryAddToQueue(IMessage message)
         {

@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using StepBro.Core.Data;
-using StepBro.Core.Parser;
-using static StepBroCoreTest.Parser.ExpressionParser;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StepBroCoreTest.Data;
+using static StepBroCoreTest.Parser.ExpressionParser;
 
 namespace StepBroCoreTest.Parser
 {
@@ -19,7 +12,16 @@ namespace StepBroCoreTest.Parser
         {
             Assert.AreEqual(124L, ParseAndRun<long>(
                 "value",
-                "var value = " + typeof(DummyClass).FullName + ".GenerateNumber( a => (a % 2) == 0 );",
+                "var value = " + typeof(DummyClass).FullName + ".GenerateNumber1( a => (a % 2) == 0 );",
+                false));
+        }
+
+        [TestMethod]
+        public void TestSimpleStaticMethodWithFilterAndAnotherParameter()
+        {
+            Assert.AreEqual(1124L, ParseAndRun<long>(
+                "value",
+                "var value = " + typeof(DummyClass).FullName + ".GenerateNumber2( 1000, a => (a % 2) == 0 );",
                 false));
         }
 
@@ -84,6 +86,18 @@ namespace StepBroCoreTest.Parser
                 "var lambda = () => 5; " +
                 "var value = lambda();",
                 false));
+        }
+
+        [TestMethod]
+        public void TestStaticMethodWithObjectTypeInFilter()
+        {
+            var value = ParseAndRun<DummyDataClass>(
+                "value",
+                "var value = " + typeof(DummyClass).FullName + ".GetAnObject( obj => (obj.IntProp == -38) );",
+                false);
+            Assert.IsNotNull(value);
+            Assert.IsInstanceOfType(value, typeof(DummyDataClass));
+            Assert.AreEqual(42u, value.UIntProp);
         }
     }
 }

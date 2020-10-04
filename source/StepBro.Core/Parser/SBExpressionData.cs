@@ -298,7 +298,7 @@ namespace StepBro.Core.Parser
         public bool IsProcedureReference { get { return ReferencedType == SBExpressionType.ProcedureReference; } }
         public bool IsMethodReference { get { return ReferencedType == SBExpressionType.MethodReference; } }
         public bool IsTestList { get { return ReferencedType == SBExpressionType.TestList; } }
-        
+
         public bool IsAwaitExpression { get { return ReferencedType == SBExpressionType.AwaitExpression; } }
 
         public SBExpressionData NarrowGetValueType(TypeReference type = null)
@@ -325,6 +325,10 @@ namespace StepBro.Core.Parser
                 case SBExpressionType.PropertyReference:
                 case SBExpressionType.Indexing:
                     ExpressionCode = NarrowGetValueTypeByConverting(ExpressionCode, t.Type);
+                    if (ExpressionCode != null)
+                    {
+                        DataType = new TypeReference(ExpressionCode.Type);
+                    }
                     break;
                 case SBExpressionType.GlobalVariableReference:
                     throw new NotImplementedException();

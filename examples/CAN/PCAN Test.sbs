@@ -8,5 +8,5 @@ procedure void OpenCAN()
     {
         channel.Open();
     }
-	var statusQueue = channel.CreateReceiveQueue(m => m.ID == 0x1092);
+    var statusQueue = channel.CreateReceiveQueue("status", m => m.ID == 0x1092);
 }

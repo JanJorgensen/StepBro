@@ -1,10 +1,11 @@
 ﻿using Antlr4.Runtime.Misc;
+using StepBro.Core.Api;
+using StepBro.Core.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using StepBro.Core.Data;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
@@ -135,9 +136,16 @@ namespace StepBro.Core.Parser
                 {
                     bool matching = false;
                     bool isExtension = method.IsExtension();
-                    var parameterIndex = m_argumentIndex + (isExtension ? 1 : 0);
+                    var parametersToSkip = (isExtension ? 1 : 0);
                     var parameters = method.GetParameters();
                     var parTypes = new List<Type>();
+
+                    if (parameters.Length > parametersToSkip && ImplicitAttribute.IsImplicit(parameters[parametersToSkip]))
+                    {
+                        parametersToSkip++;   // Skip this argument because it is implicit.
+                    }
+
+                    var parameterIndex = m_argumentIndex + parametersToSkip;
                     var resolverMethodData = new PrivateMethodInfoForLambdaResolver(method, parameterIndex);
 
                     if (parameterIndex < parameters.Length)

@@ -3,6 +3,7 @@ using StepBro.Core.Api;
 using StepBro.Core.Execution;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace StepBro.CAN
@@ -204,7 +205,7 @@ namespace StepBro.CAN
         private string m_lastOperationStatus = "";
         private Thread m_receiver = null;
         private List<ReceiveQueue> m_receivers = null;
-        private readonly ReceiveQueue m_noQueueReceived = new ReceiveQueue();
+        private readonly ReceiveQueue m_noQueueReceived = new ReceiveQueue("default");
 
         internal PCANChannel(PCANAdapter adapter)
         {
@@ -486,11 +487,26 @@ namespace StepBro.CAN
             }
         }
 
-        public ReceiveQueue CreateQueue([Implicit] ICallContext context, Predicate<IMessage> filter)
+        public ReceiveQueue CreateReceiveQueue([Implicit] ICallContext context, string name, Predicate<IMessage> filter)
         {
-            var q = new ReceiveQueue(filter);
-            m_receivers.Insert(m_receivers.Count - 1, q);
-            return q;
+            if (m_receivers.FirstOrDefault(r => !String.IsNullOrEmpty(r.Name) && String.Equals(r.Name, name, StringComparison.InvariantCulture)) != null)
+            {
+                if (context != null)
+                {
+                    context.ReportError(description: "There are already a receive queue named \"" + name + "\".");
+                }
+                return null;
+            }
+            else
+            {
+                if (context != null && context.LoggingEnabled)
+                {
+                    context.Logger.Log("PCANChannel.CreateReceiveQueue", "Registered receive queue named \"" + name + "\".");
+                }
+                var q = new ReceiveQueue(name, filter);
+                m_receivers.Insert(m_receivers.Count - 1, q);
+                return q;
+            }
         }
     }
 

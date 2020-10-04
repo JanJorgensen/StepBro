@@ -80,6 +80,7 @@ namespace StepBroCoreTest.Parser
             else if (typeof(T) == typeof(TimeSpan)) typeName = "timespan";
             else if (typeof(T) == typeof(DateTime)) typeName = "datetime";
             else if (typeof(T) == typeof(Verdict)) typeName = "verdict";
+            else if (typeof(T) == typeof(DummyDataClass)) typeName = "DummyDataClass";
             else throw new NotImplementedException();
             StringBuilder source = new StringBuilder();
             source.AppendLine(typeName + " ExpressionProcedure(){");

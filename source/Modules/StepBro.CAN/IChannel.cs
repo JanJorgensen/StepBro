@@ -39,6 +39,6 @@ namespace StepBro.CAN
         IMessage GetReceived([Implicit] ICallContext context);
         IMessage CreateMessage(uint id, byte[] data);
         IMessage CreateMessage(MessageType type, uint id, byte[] data);
-        ReceiveQueue CreateQueue([Implicit] ICallContext context, Predicate<IMessage> filter);
+        ReceiveQueue CreateReceiveQueue([Implicit] ICallContext context, string name, Predicate<IMessage> filter);
     }
 }

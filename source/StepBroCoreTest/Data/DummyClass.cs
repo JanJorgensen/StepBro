@@ -9,6 +9,14 @@ namespace StepBroCoreTest.Data
 {
     public enum DummyEnum { First = 11, Second = 22, Third = 33 }
 
+    public class DummyDataClass
+    {
+        public bool BoolProp { get; set; }
+        public int IntProp { get; set; }
+        public uint UIntProp { get; set; }
+        public string stringProp { get; set; }
+    }
+
     public interface IDummyClass
     {
         long MethodWithCallContextA([Implicit] ICallContext context);
@@ -177,13 +185,37 @@ namespace StepBroCoreTest.Data
             }
         }
 
-        public static long GenerateNumber(System.Predicate<long> filter)
+        public static long GenerateNumber1(Predicate<long> filter)
         {
             for (long i = 123; i < 1000; i++)
             {
                 if (filter(i)) return i;
             }
             return -1L;
+        }
+
+        public static long GenerateNumber2(long add, Predicate<long> filter)
+        {
+            for (long i = 123; i < 1000; i++)
+            {
+                if (filter(i)) return i + add;
+            }
+            return -1L;
+        }
+
+        private static readonly DummyDataClass[] m_dummyDatas = new DummyDataClass[] {
+                new DummyDataClass() { BoolProp = true, IntProp = 62, UIntProp = 12u, stringProp = "Anders"},
+                new DummyDataClass() { BoolProp = false, IntProp = 9, UIntProp = 125u, stringProp = "Bent"},
+                new DummyDataClass() { BoolProp = false, IntProp = -38, UIntProp = 42u, stringProp = "Christian"},
+                new DummyDataClass() { BoolProp = true, IntProp = 92, UIntProp = 85u, stringProp = "Dennis" } };
+
+        public static DummyDataClass GetAnObject(Predicate<DummyDataClass> filter)
+        {
+            foreach (var o in m_dummyDatas)
+            {
+                if (filter == null || filter(o)) return o;
+            }
+            return null;
         }
 
         public static long? MethodNullableIntNull()
