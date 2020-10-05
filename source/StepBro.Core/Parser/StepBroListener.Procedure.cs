@@ -732,7 +732,7 @@ namespace StepBro.Core.Parser
                 throw new NotImplementedException(String.Format("What? Unknown using expression type (rule = {0}).", child.RuleIndex));
             }
 
-            if (!usingExpression.Type.IsClass || !typeof(IDisposable).IsAssignableFrom(usingExpression.Type))
+            if ((!usingExpression.Type.IsClass && !usingExpression.Type.IsInterface) || !typeof(IDisposable).IsAssignableFrom(usingExpression.Type))
             {
                 throw new NotImplementedException("Something wrong with the using expression; it is not an IDisposable type.");
             }

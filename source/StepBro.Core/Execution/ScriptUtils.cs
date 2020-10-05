@@ -1,9 +1,6 @@
-﻿using System;
+﻿using StepBro.Core.Api;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StepBro.Core.Api;
 
 namespace StepBro.Core.Execution
 {
@@ -41,6 +38,12 @@ namespace StepBro.Core.Execution
         public static TimeSpan TimeTillNow(DateTime before)
         {
             return DateTime.Now - before;
+        }
+
+        [Public]
+        public static byte[] ToByteArray(this List<long> input)
+        {
+            return input.ConvertAll(v => (byte)(ulong)v).ToArray();
         }
     }
 }

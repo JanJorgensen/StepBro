@@ -1,5 +1,6 @@
 ﻿using Peak.Can.Basic;
 using StepBro.Core.Api;
+using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using System;
 using System.Collections.Generic;
@@ -203,16 +204,19 @@ namespace StepBro.CAN
         private bool m_open = false;
         private string m_errorStatus = "";
         private string m_lastOperationStatus = "";
-        private Thread m_receiver = null;
-        private List<ReceiveQueue> m_receivers = null;
+        private Thread m_receiverThread = null;
+        private Thread m_autoTransmitterThread = null;
+        private List<IReceiveEntity> m_receivers = null;
+        private readonly object m_receiveLock = new object();
         private readonly ReceiveQueue m_noQueueReceived = new ReceiveQueue("default");
+        private TimedDataQueue<MessageTransmitter> m_timerActions = new TimedDataQueue<MessageTransmitter>();
 
         internal PCANChannel(PCANAdapter adapter)
         {
             m_parent = adapter;
             m_mode = ChannelMode.Extended;
             m_handle = adapter.Handle;
-            m_receivers = new List<ReceiveQueue>();
+            m_receivers = new List<IReceiveEntity>();
             m_receivers.Add(m_noQueueReceived);
         }
 
@@ -247,10 +251,10 @@ namespace StepBro.CAN
             }
             m_baudrate = baudrate;
             m_mode = mode;
-            if (m_receiver == null)
+            if (m_open && m_receiverThread == null)
             {
-                m_receiver = new Thread(new ThreadStart(this.ReceiveThreadHandler));
-                m_receiver.Start();
+                m_receiverThread = new Thread(new ThreadStart(this.ReceiveThreadHandler));
+                m_receiverThread.Start();
                 //Core.Main.ServiceManager.Get<>
             }
         }
@@ -260,30 +264,40 @@ namespace StepBro.CAN
             TPCANMsg msg;
             TPCANTimestamp timestamp;
             TPCANStatus result;
-            while (m_open)
+            try
             {
-                var status = PCANBasic.GetStatus(m_handle);
-                if ((status & TPCANStatus.PCAN_ERROR_QRCVEMPTY) == 0) // If NOT empty
+                while (m_open)
                 {
-                    result = PCANBasic.Read(m_handle, out msg, out timestamp);
-                    if (this.UpdateStatusFromOperation(result) == TPCANStatus.PCAN_ERROR_OK)
+                    var status = PCANBasic.GetStatus(m_handle);
+                    if ((status & TPCANStatus.PCAN_ERROR_QRCVEMPTY) == 0) // If NOT empty
                     {
-                        this.PutReceivedInQueue(new PCANMessage(msg, timestamp));
+                        result = PCANBasic.Read(m_handle, out msg, out timestamp);
+                        if (this.UpdateStatusFromOperation(result) == TPCANStatus.PCAN_ERROR_OK)
+                        {
+                            System.Diagnostics.Debug.WriteLine("CAN In: " + msg.ID.ToString());
+                            this.PutReceivedInQueue(new PCANMessage(msg, timestamp));
+                        }
+                    }
+                    else
+                    {
+                        Thread.Sleep(5);
                     }
                 }
-                else
-                {
-                    Thread.Sleep(5);
-                }
             }
-            m_receiver = null;
+            finally
+            {
+                m_receiverThread = null;
+            }
         }
 
         private void PutReceivedInQueue(PCANMessage message)
         {
-            foreach (var rq in m_receivers)
+            lock (m_receiveLock)
             {
-                if (rq.TryAddToQueue(message)) return;
+                foreach (var rq in m_receivers)
+                {
+                    if (rq.TryAddHandover(message)) return;
+                }
             }
         }
 
@@ -323,6 +337,14 @@ namespace StepBro.CAN
                         context.Logger.Log("Open", "Opened successfully");
                     }
                     m_open = true;
+
+                    if (m_receiverThread == null)
+                    {
+                        m_receiverThread = new Thread(new ThreadStart(this.ReceiveThreadHandler));
+                        m_receiverThread.Start();
+                        //Core.Main.ServiceManager.Get<>
+                    }
+
                     return true;
                 }
                 else
@@ -337,8 +359,13 @@ namespace StepBro.CAN
         {
             if (m_open)
             {
+                this.Flush();
                 m_open = false;
-                while (m_receiver != null) System.Threading.Thread.Sleep(100);
+                while (m_receiverThread != null)
+                {
+                    System.Threading.Thread.Sleep(100);
+                }
+                m_timerActions.DeactivateAll();
                 TPCANStatus result = PCANBasic.Uninitialize(m_handle);
                 if (this.UpdateStatusFromOperation(result) == TPCANStatus.PCAN_ERROR_OK)
                 {
@@ -377,7 +404,14 @@ namespace StepBro.CAN
         {
             if (m_open)
             {
-                PCANBasic.Reset(m_handle);
+                lock (m_receiveLock)
+                {
+                    PCANBasic.Reset(m_handle);
+                    foreach (var r in m_receivers)
+                    {
+                        r.Flush(true);
+                    }
+                }
             }
         }
 
@@ -493,7 +527,7 @@ namespace StepBro.CAN
             {
                 if (context != null)
                 {
-                    context.ReportError(description: "There are already a receive queue named \"" + name + "\".");
+                    context.ReportError(description: "There are already a receiver named \"" + name + "\".");
                 }
                 return null;
             }
@@ -506,6 +540,64 @@ namespace StepBro.CAN
                 var q = new ReceiveQueue(name, filter);
                 m_receivers.Insert(m_receivers.Count - 1, q);
                 return q;
+            }
+        }
+
+        public ReceivedStatus CreateStatusReceiver([Implicit] ICallContext context, string name, Predicate<IMessage> filter)
+        {
+            if (m_receivers.FirstOrDefault(r => !String.IsNullOrEmpty(r.Name) && String.Equals(r.Name, name, StringComparison.InvariantCulture)) != null)
+            {
+                if (context != null)
+                {
+                    context.ReportError(description: "There are already a receiver named \"" + name + "\".");
+                }
+                return null;
+            }
+            else
+            {
+                if (context != null && context.LoggingEnabled)
+                {
+                    context.Logger.Log("PCANChannel.CreateStatusReceiver", "Registered status receiver named \"" + name + "\".");
+                }
+                var s = new ReceivedStatus(name, filter);
+                m_receivers.Insert(m_receivers.Count - 1, s);
+                return s;
+            }
+        }
+
+        public MessageTransmitter SetupPeriodicTransmit(string name, MessageType type, uint ID, byte[] data, TimeSpan time, bool startNow)
+        {
+            var transmitter = new MessageTransmitter(name, type, ID, data, time, true);
+            m_timerActions.Add(transmitter);
+
+            if (m_autoTransmitterThread == null)
+            {
+                m_autoTransmitterThread = new Thread(new ThreadStart(this.AutoTransmitterThreadHandler));
+                m_autoTransmitterThread.Start();
+                //Core.Main.ServiceManager.Get<>
+            }
+
+            return transmitter;
+        }
+        private void AutoTransmitterThreadHandler()
+        {
+            var time = TimeSpan.FromMilliseconds(5000);
+            while (!m_timerActions.IsEmpty && m_open)
+            {
+                var next = m_timerActions.AwaitNext(time);
+                if (next != null)
+                {
+                    this.Send(next.Type, next.ID, next.Data);
+                }
+            }
+            m_autoTransmitterThread = null;
+        }
+
+        public void Dispose()
+        {
+            if (m_open)
+            {
+
             }
         }
     }

@@ -18,7 +18,7 @@ namespace StepBro.CAN
     }
 
     [Public]
-    public interface IChannel
+    public interface IChannel : IDisposable
     {
         IAdapter Adapter { get; }
         void Setup([Implicit] ICallContext context, Baudrate baudrate, ChannelMode mode);
@@ -40,5 +40,7 @@ namespace StepBro.CAN
         IMessage CreateMessage(uint id, byte[] data);
         IMessage CreateMessage(MessageType type, uint id, byte[] data);
         ReceiveQueue CreateReceiveQueue([Implicit] ICallContext context, string name, Predicate<IMessage> filter);
+        ReceivedStatus CreateStatusReceiver([Implicit] ICallContext context, string name, Predicate<IMessage> filter);
+        MessageTransmitter SetupPeriodicTransmit(string name, MessageType type, uint ID, byte[] data, TimeSpan time, bool startNow);
     }
 }

@@ -42,6 +42,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Baudrate.cs" />
+    <Compile Include="IReceiveEntity.cs" />
+    <Compile Include="MessageTransmitter.cs" />
+    <Compile Include="ReceivedStatus.cs" />
     <Compile Include="ReceiveQueue.cs" />
     <None Include="app.config" />
     <None Include="Channel.cs" />

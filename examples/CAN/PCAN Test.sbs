@@ -2,11 +2,18 @@
 
 procedure void OpenCAN()
 {
-    var channel = PCAN.Driver.GetAdapter("USBBUS1").GetChannel(0);
-    channel.Setup(Baudrate.BR500K, ChannelMode.Extended);
-    if (!channel.IsOpen)
-    {
-        channel.Open();
-    }
-    var statusQueue = channel.CreateReceiveQueue("status", m => m.ID == 0x1092);
+	using ( var channel = PCAN.Driver.GetAdapter("USBBUS1").GetChannel(0) )
+	{
+		channel.Setup(Baudrate.BR250K, ChannelMode.Extended);
+		channel.Open();
+		var status = channel.CreateStatusReceiver("status", m => m.ID == 0x620);
+		var heartbeat = channel.SetupPeriodicTransmit("heartbeat", MessageType.Standard, 0x720, [5].ToByteArray(), 2.5s, true);
+		
+		while ( status.TotalCount < 20000 )
+		{
+			delay(1s);
+			log ("Count: " + status.TotalCount);
+		}
+		channel.Close();
+	}
 }

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace StepBro.CAN
 {
@@ -70,6 +67,29 @@ namespace StepBro.CAN
                     factor >>= 8;
                 }
                 return val;
+            }
+        }
+
+        public static string GetDataAsString(this IMessage message)
+        {
+
+            if (message.Data.Length == 0)
+            {
+                return "";
+            }
+            else
+            {
+                var s = new StringBuilder();
+                string HexAlphabet = "0123456789ABCDEF";
+                bool first = true;
+                foreach (byte B in message.Data)
+                {
+                    if (first) first = false;
+                    else s.Append(" ");
+                    s.Append(HexAlphabet[(int)(B >> 4)]);
+                    s.Append(HexAlphabet[(int)(B & 0xF)]);
+                }
+                return s.ToString();
             }
         }
     }

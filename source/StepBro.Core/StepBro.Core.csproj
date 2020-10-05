@@ -209,6 +209,7 @@
     <Compile Include="Data\IObjectPanelManager.cs" />
     <Compile Include="Data\IReadBuffer.cs" />
     <Compile Include="Data\IResettable.cs" />
+    <Compile Include="Data\ITimedAction.cs" />
     <Compile Include="Data\ListElementPicker.cs" />
     <Compile Include="Data\LogLineData.cs" />
     <Compile Include="Data\NumericLimitType.cs" />
@@ -216,6 +217,7 @@
     <Compile Include="Data\ObjectPanelManager.cs" />
     <Compile Include="Data\ProcedureOutput.cs" />
     <Compile Include="Data\PropertyBlockFlag.cs" />
+    <Compile Include="Data\TimedDataQueue.cs" />
     <Compile Include="Data\TypeReference.cs" />
     <Compile Include="Data\UICallContext.cs" />
     <Compile Include="Execution\ArgumentList.cs" />
