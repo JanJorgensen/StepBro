@@ -2,10 +2,8 @@
 using Antlr4.Runtime.Misc;
 using System;
 using System.Collections.Generic;
-using StepBro.Core.Parser;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 using Lexer = StepBro.Core.Parser.Grammar.StepBroLexer;
-using StepBro.Core.Parser.Grammar;
 
 namespace StepBro.Core.Language
 {
@@ -106,7 +104,6 @@ namespace StepBro.Core.Language
                 ITokenSource lexer = new Lexer(this.GetParserStream(startLine, startColumn, endLine, endColumn));
                 var tokens = new CommonTokenStream(lexer);
                 tokens.Fill();
-
                 foreach (var token in tokens.GetTokens())
                 {
                     EditorTextStyles style = EditorTextStyles.Normal;

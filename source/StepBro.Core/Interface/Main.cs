@@ -401,6 +401,7 @@ namespace StepBro.Core
             }
 
             public event EventHandler Disposed;
+            public event EventHandler ExpectedTimeExceeded;
 
             public void AddActionButton(string title, ButtonActivationType type, Action<bool> activationAction)
             {

@@ -34,15 +34,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ActiproSoftware.SyntaxEditor.Wpf, Version=17.2.665.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
+    <Reference Include="ActiproSoftware.Text.Wpf, Version=17.2.665.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
     <Reference Include="Antlr4.Runtime, Version=4.6.0.0, Culture=neutral, PublicKeyToken=09abb75b9ed49849, processorArchitecture=MSIL">
       <HintPath>packages\Antlr4.Runtime.4.6.6\lib\net45\Antlr4.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CommandLine, Version=2.8.0.0, Culture=neutral, PublicKeyToken=5a870481e358d379, processorArchitecture=MSIL">
       <HintPath>packages\CommandLineParser.2.8.0\lib\net45\CommandLine.dll</HintPath>
-    </Reference>
-    <Reference Include="FastColoredTextBox, Version=2.16.24.0, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL">
-      <HintPath>packages\FCTB.2.16.24\lib\FastColoredTextBox.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Win32.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Win32.Primitives.4.3.0\lib\net46\Microsoft.Win32.Primitives.dll</HintPath>
@@ -160,8 +159,14 @@
     <Compile Include="Controls\DataView.Designer.cs">
       <DependentUpon>DataView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\DataViewControl.cs">
+    <Compile Include="Controls\DataViewTextBased.cs">
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\DataViewGridBased.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\DataViewGridBased.Designer.cs">
+      <DependentUpon>DataViewGridBased.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\FCTBRangeStream.cs" />
     <Compile Include="Controls\ObjectPanel.cs">
@@ -199,6 +204,7 @@
     </Compile>
     <Compile Include="Data\ArrayFifo.cs" />
     <Compile Include="Data\AvailabilityBase.cs" />
+    <Compile Include="Data\Report\DataReport.cs" />
     <Compile Include="Data\DoubleAction.cs" />
     <Compile Include="Data\DynamicObjectManager.cs" />
     <Compile Include="Data\IDynamicObjectManager.cs" />
@@ -217,6 +223,11 @@
     <Compile Include="Data\ObjectPanelManager.cs" />
     <Compile Include="Data\ProcedureOutput.cs" />
     <Compile Include="Data\PropertyBlockFlag.cs" />
+    <Compile Include="Data\Report\ExpectResultData.cs" />
+    <Compile Include="Data\Report\ReportData.cs" />
+    <Compile Include="Data\Report\ReportDataType.cs" />
+    <Compile Include="Data\Report\ReportWriter.cs" />
+    <Compile Include="Data\Report\TableData.cs" />
     <Compile Include="Data\TimedDataQueue.cs" />
     <Compile Include="Data\TypeReference.cs" />
     <Compile Include="Data\UICallContext.cs" />
@@ -250,18 +261,23 @@
     <Compile Include="Logging\ILogSink.cs" />
     <Compile Include="Logging\LogSinkManager.cs" />
     <Compile Include="Logging\MainLogger.cs" />
+    <Compile Include="Parser\EditorSupport.cs" />
     <Compile Include="Parser\ErrorCollector.cs" />
     <Compile Include="Parser\ParameterData.cs" />
     <Compile Include="Parser\SpecialOperators\CoalescingOperator.cs" />
     <Compile Include="Parser\SpecialOperators\EqualsWithToleranceOperator.cs" />
     <Compile Include="Parser\SpecialOperators\BetweenOperator.cs" />
+    <Compile Include="Parser\SyntaxEditorAntlrToken.cs" />
+    <Compile Include="Parser\SyntaxEditorStepBroLexer.cs" />
     <Compile Include="Parser\StepBroListener.DataTable.cs" />
+    <Compile Include="Parser\SyntaxEditorStepBroSyntaxLanguage.cs" />
+    <Compile Include="Parser\SyntaxEditorStepBroTokenIdProvider.cs" />
     <Compile Include="Parser\TokenOrSection.cs" />
     <Compile Include="Parser\StepBroTypeVisitor.cs" />
     <Compile Include="ScriptData\FileDatatable.cs" />
     <Compile Include="ScriptData\FileElementPartner.cs" />
     <Compile Include="ScriptData\FileTestList.cs" />
-    <Compile Include="ScriptData\FileVariableContainer.cs" />
+    <Compile Include="ScriptData\FileVariable.cs" />
     <Compile Include="ScriptData\IDatatable.cs" />
     <Compile Include="ScriptData\IPartner.cs" />
     <Compile Include="ScriptData\ITestList.cs" />
@@ -485,6 +501,9 @@
     <EmbeddedResource Include="Controls\DataView.resx">
       <DependentUpon>DataView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\DataViewGridBased.resx">
+      <DependentUpon>DataViewGridBased.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\ParsingErrorListView.resx">
       <DependentUpon>ParsingErrorListView.cs</DependentUpon>
     </EmbeddedResource>
@@ -495,7 +514,12 @@
       <DependentUpon>TextEditor.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\ThirdParty\FastColoredTextBox\FastColoredTextBox.csproj">
+      <Project>{6dd14a85-ccfc-4774-bd26-0f5772512319}</Project>
+      <Name>FastColoredTextBox</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

@@ -46,6 +46,11 @@ namespace StepBro.Core.Execution
         /// </summary>
         event EventHandler Disposed;
 
+        /// <summary>
+        /// Notifies that the initial expected time now is exceeded.
+        /// </summary>
+        event EventHandler ExpectedTimeExceeded;
+
         Brush ProgressColor { get; set; }
 
         //void SetProgress(long progress);

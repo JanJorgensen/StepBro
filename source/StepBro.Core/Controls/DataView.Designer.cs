@@ -33,7 +33,7 @@
             this.toolStrip = new System.Windows.Forms.ToolStrip();
             this.buttonAutoUpdate = new System.Windows.Forms.ToolStripButton();
             this.updateTimer = new System.Windows.Forms.Timer(this.components);
-            this.dataViewControl = new StepBro.Core.Controls.DataViewControl();
+            this.dataViewControl = new StepBro.Core.Controls.DataViewTextBased();
             this.toolStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataViewControl)).BeginInit();
             this.SuspendLayout();
@@ -119,6 +119,6 @@
         private System.Windows.Forms.ToolStrip toolStrip;
         private System.Windows.Forms.ToolStripButton buttonAutoUpdate;
         private System.Windows.Forms.Timer updateTimer;
-        private DataViewControl dataViewControl;
+        private DataViewTextBased dataViewControl;
     }
 }

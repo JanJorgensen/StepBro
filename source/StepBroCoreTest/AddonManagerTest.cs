@@ -10,7 +10,7 @@ namespace StepBroCoreTest
     [TestClass]
     public class AddonManagerTest
     {
-        // C:\work\T#\bin\modules\TestModule.dll
+        // C:\work\StepBro\bin\modules\TestModule.dll
 
         private static string GetBasePath()
         {
@@ -99,7 +99,7 @@ namespace StepBroCoreTest
         {
             var usings = new string[] { "StepBro.Core.Execution" };
             IAddonManager addons = AddonManager.Create();
-            addons.AddAssembly(typeof(StepBro.Core.Data.Verdict).Assembly, false);
+            addons.AddAssembly(AddonManager.StepBroCoreAssembly, false);
 
             var methods = addons.ListExtensionMethods(
                     typeof(IProcedureReference)).Where(mi => mi.Name == "DynamicInvoke").ToList();

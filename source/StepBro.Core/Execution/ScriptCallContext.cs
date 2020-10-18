@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Data;
+using StepBro.Core.Data.Report;
 using StepBro.Core.File;
 using StepBro.Core.General;
 using StepBro.Core.Host;
@@ -7,6 +8,7 @@ using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StepBro.Core.Execution
 {
@@ -27,12 +29,13 @@ namespace StepBro.Core.Execution
         //ITaskStatusUpdate m_currentStatusUpdater = null;
         private int m_currentStatementLine = 0;
         private int m_currentStatementColumn = 0;
-        private int m_currentTestStepIndex = 0;
-        private string m_currentTestStepTitle = "";
+        private int m_currentTestStepIndex = -1;
+        private string m_currentTestStepTitle = null;
         private bool m_loggingEnabled;
         private int m_expectFailCount = 0;
         private readonly int m_errorCount = 0;
         private RuntimeErrorListener m_errorListener = null;
+        private List<DataReport> m_currentReports = null;
 
         internal ScriptCallContext(
             ScriptTaskContext task,
@@ -70,6 +73,8 @@ namespace StepBro.Core.Execution
             m_procedure = procedure;
             m_isDynamicCall = isDynamicCall;
             this.SetupFromProcedure();
+
+            m_currentReports = parent.m_currentReports; // Simply inherit the list.
 
             //m_createdlogger = logger.LogEntering(procedure.ElementName, procedure.Purpose);
             //if (separateStateLevel)
@@ -229,7 +234,7 @@ namespace StepBro.Core.Execution
         {
             get
             {
-                throw new NotImplementedException();
+                return m_currentTestStepIndex;
             }
         }
 
@@ -237,7 +242,7 @@ namespace StepBro.Core.Execution
         {
             get
             {
-                throw new NotImplementedException();
+                return m_currentTestStepTitle;
             }
         }
 
@@ -246,23 +251,76 @@ namespace StepBro.Core.Execution
             throw new NotImplementedException();
         }
 
-        public IScriptCallContext EnterNewScriptContext(IFileProcedure procedure, ContextLogOption callerLoggingOption, bool isDynamicCall)
+        public virtual IScriptCallContext EnterNewScriptContext(IFileProcedure procedure, ContextLogOption callerLoggingOption, bool isDynamicCall)
         {
             return new ScriptCallContext(this, procedure, callerLoggingOption, isDynamicCall);
         }
 
         public IScriptCallContext EnterNewScriptContext(IProcedureReference procedure, ContextLogOption callerLoggingOption, bool isDynamicCall)
         {
-            //if (isDynamicCall)
-            //{
-            //    this.LogDetail("Dynamic Procedure Call");
-            //}
-            return new ScriptCallContext(this, procedure.ProcedureData, callerLoggingOption, isDynamicCall);
+            return this.EnterNewScriptContext(procedure.ProcedureData, callerLoggingOption, isDynamicCall);
         }
 
         public IEnumerable<IFolderShortcut> GetFolders()
         {
             throw new NotImplementedException();
+        }
+
+        private string GetLocationDescription()
+        {
+            if (m_currentTestStepIndex > 0)
+            {
+                return m_procedure.FullName + " step " + ((m_currentTestStepTitle != null) ? ("'" + m_currentTestStepTitle + "'") : m_currentTestStepIndex.ToString());
+            }
+            else
+            {
+                return m_procedure.FullName + " - " + m_currentStatementLine.ToString();
+            }
+        }
+
+        public DataReport AddReport(DataReport report)
+        {
+            if (m_currentReports == null) m_currentReports = new List<DataReport>();
+            m_currentReports.Add(report);
+            return report;
+        }
+
+        public bool RemoveReport(string id)
+        {
+            if (m_currentReports != null)
+            {
+                var report = m_currentReports.FirstOrDefault(r => String.Equals(id, r.ID, StringComparison.InvariantCulture));
+                if (report != null)
+                {
+                    m_currentReports.Remove(report);
+                    return true;
+                }
+                else { return false; }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public IEnumerable<DataReport> ListReports()
+        {
+            if (m_currentReports == null) yield break;
+            else
+            {
+                foreach (var report in m_currentReports)
+                {
+                    yield return report;
+                }
+            }
+        }
+
+        private void AddToReports(ReportData data)
+        {
+            foreach (var report in m_currentReports)
+            {
+                report.AddData(data);
+            }
         }
 
         public bool ReportError(ErrorID error = null, string description = "", Exception exception = null)
@@ -272,23 +330,21 @@ namespace StepBro.Core.Execution
             return false;
         }
 
-        public void ReportExpectResult(string title, string expression, bool success)
+        public void ReportExpectResult(string title, string expected, string actual, Verdict verdict)
         {
-            string result = success ? "PASS" : "FAIL";
-            if (!success) m_expectFailCount++;
+            if (verdict >= Verdict.Fail) m_expectFailCount++;
+            if (m_currentReports != null)
+            {
+                this.AddToReports(new ExpectResultData(this.GetLocationDescription(), title, expected, actual, verdict));
+            }
             if (String.IsNullOrEmpty(title))
             {
-                m_loggerInside.Log(m_currentStatementLine.ToString(), $"EXPECT: {result}; {expression}");
+                m_loggerInside.Log(m_currentStatementLine.ToString(), $"EXPECT: {actual} => {verdict}; Expected: {expected}");
             }
             else
             {
-                m_loggerInside.Log(m_currentStatementLine.ToString(), $"EXPECT \"{title}\": {result}; {expression}");
+                m_loggerInside.Log(m_currentStatementLine.ToString(), $"EXPECT \"{title}\": {actual} => {verdict}; Expected: {expected}");
             }
-        }
-
-        public void ReportExpectResult(string title, string expected, string actual, bool success)
-        {
-            throw new NotImplementedException();
         }
 
         public void EnterTestStep(int line, int column, int index, string title)

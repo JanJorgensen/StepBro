@@ -189,14 +189,9 @@ namespace StepBro.Core.Execution
             return true;
         }
 
-        public void ReportExpectResult(string title, string expression, bool success)
+        public void ReportExpectResult(string title, string expected, string actual, Verdict verdict)
         {
-            m_context.ReportExpectResult(title, expression, success);
-        }
-
-        public void ReportExpectResult(string title, string expected, string actual, bool success)
-        {
-            m_context.ReportExpectResult(title, expected, actual, success);
+            m_context.ReportExpectResult(title, expected, actual, verdict);
         }
     }
 }

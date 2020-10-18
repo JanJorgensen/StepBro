@@ -1,10 +1,10 @@
 ﻿using Antlr4.Runtime.Misc;
-using System;
-using System.Collections.Generic;
 using StepBro.Core.Data;
 using StepBro.Core.ScriptData;
-using SBP = StepBro.Core.Parser.Grammar.StepBro;
+using System;
+using System.Collections.Generic;
 using Lexer = StepBro.Core.Parser.Grammar.StepBroLexer;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
 {
@@ -46,7 +46,7 @@ namespace StepBro.Core.Parser
 
         public override void ExitDatatableName([NotNull] SBP.DatatableNameContext context)
         {
-            m_currentDatatable = new FileDatatable(m_file, m_elementStart.Line, null, m_currentNamespace, context.GetText());
+            m_currentDatatable = new FileDatatable(m_file, m_fileElementModifier, m_elementStart.Line, null, m_currentNamespace, context.GetText());
         }
 
         public override void EnterDatatableRow([NotNull] SBP.DatatableRowContext context)

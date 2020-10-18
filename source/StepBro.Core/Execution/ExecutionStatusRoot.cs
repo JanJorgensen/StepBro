@@ -72,6 +72,7 @@ namespace StepBro.Core.Execution
 
 #pragma warning disable 67
         public event EventHandler Disposed;
+        public event EventHandler ExpectedTimeExceeded;
 
         public void AddActionButton(string title, ButtonActivationType type, Action<bool> activationAction)
         {

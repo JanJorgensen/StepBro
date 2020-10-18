@@ -35,7 +35,8 @@ namespace StepBro.Core.Parser
         // Errors:
         OperationError,
         UnknownIdentifier,
-        UnsupportedOperation
+        UnsupportedOperation,
+        ExpressionError
     };
 
     public class SBExpressionData
@@ -145,6 +146,17 @@ namespace StepBro.Core.Parser
             ParameterName = null;
         }
 
+        public SBExpressionData(SBExpressionType type)
+        {
+            Home = HomeType.Immediate;
+            ReferencedType = type;
+            DataType = null;
+            ExpressionCode = null;
+            Value = null;
+            Argument = null;
+            ParameterName = null;
+        }
+
         public SBExpressionData(Expression instance, List<MethodInfo> methods)
         {
             //System.Diagnostics.Debug.Assert(type == null || !type.IsGenericTypeDefinition);
@@ -184,16 +196,9 @@ namespace StepBro.Core.Parser
 
         public bool IsError()
         {
-            switch (ReferencedType)
-            {
-                case SBExpressionType.UnknownIdentifier:
-                case SBExpressionType.UnsupportedOperation:
-                case SBExpressionType.OperationError:
-                    return true;
-                default:
-                    return false;
-            }
+            return (this.ReferencedType >= SBExpressionType.OperationError);
         }
+
         public bool IsResolved
         {
             get

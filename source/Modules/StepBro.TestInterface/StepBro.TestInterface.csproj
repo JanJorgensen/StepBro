@@ -60,6 +60,12 @@
     <Compile Include="Controls\LoggedValuesView.Designer.cs">
       <DependentUpon>LoggedValuesView.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\NewLoggedValuesView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\NewLoggedValuesView.Designer.cs">
+      <DependentUpon>NewLoggedValuesView.cs</DependentUpon>
+    </Compile>
     <Compile Include="GeneralTestInterface.cs" />
     <Compile Include="IConnection.cs" />
     <Compile Include="IParameter.cs" />

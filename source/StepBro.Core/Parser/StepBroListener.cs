@@ -114,6 +114,7 @@ namespace StepBro.Core.Parser
             if (modifier == "public") m_fileElementModifier = AccessModifier.Public;
             else if (modifier == "private") m_fileElementModifier = AccessModifier.Private;
             else if (modifier == "protected") m_fileElementModifier = AccessModifier.Protected;
+            else throw new NotImplementedException();
         }
 
         public override void EnterFileVariable([NotNull] SBP.FileVariableContext context)
@@ -139,11 +140,10 @@ namespace StepBro.Core.Parser
             {
                 throw new NotImplementedException("Variables assignment of incompatible type.");
             }
-            var codeText = context.GetText();
-            // TODO: private or public variable(s) ?
+            var codeHash = context.GetText().GetHashCode();
             var id = m_file.CreateOrGetFileVariable(
-                m_currentNamespace, variable.Name, type, false,
-                context.Start.Line, context.Start.Column, codeText.GetHashCode(),
+                m_currentNamespace, m_fileElementModifier, variable.Name, type, false,
+                context.Start.Line, context.Start.Column, codeHash,
                 CreateVariableContainerValueAssignAction(variable.Value.ExpressionCode));
             m_file.SetFileVariableModifier(id, m_fileElementModifier);
         }
@@ -216,11 +216,10 @@ namespace StepBro.Core.Parser
                 initAction = this.CreateVariableContainerObjectInitAction(type.Type, props, m_errors, context.Start);
             }
 
-            var codeText = context.GetText();
-            // TODO: private or public variable(s) ?
+            var codeHash = context.GetText().GetHashCode();
             var id = m_file.CreateOrGetFileVariable(
-                m_currentNamespace, m_variableName, type, true,
-                context.Start.Line, context.Start.Column, codeText.GetHashCode(),
+                m_currentNamespace, m_fileElementModifier, m_variableName, type, true,
+                context.Start.Line, context.Start.Column, codeHash,
                 resetter: resetAction,
                 creator: createAction,
                 initializer: initAction);
@@ -436,7 +435,7 @@ namespace StepBro.Core.Parser
 
         public override void EnterTestlist([NotNull] SBP.TestlistContext context)
         {
-            m_currentTestList = new FileTestList(m_file, context.Start.Line, null, m_currentNamespace, "");
+            m_currentTestList = new FileTestList(m_file, m_fileElementModifier, context.Start.Line, null, m_currentNamespace, "");
         }
 
         public override void ExitTestListName([NotNull] SBP.TestListNameContext context)

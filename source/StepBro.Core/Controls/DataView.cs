@@ -22,6 +22,6 @@ namespace StepBro.Core.Controls
             dataViewControl.UpdateView();
         }
 
-        public DataViewControl ViewControl { get { return dataViewControl; } }
+        public DataViewTextBased ViewControl { get { return dataViewControl; } }
     }
 }

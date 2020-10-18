@@ -75,7 +75,7 @@ namespace StepBro.Core.Data
             if (t == typeof(string)) return "\"" + ((string)value).EscapeString() + "\"";
             if (t == typeof(Identifier)) return identifierBare ? ((Identifier)value).Name : ("'" + ((Identifier)value).Name + "'");
             if (typeof(System.Collections.IEnumerable).IsAssignableFrom(t)) return ListToString((System.Collections.IEnumerable)value);
-            return value.ToString();
+            return Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
         }
 
 

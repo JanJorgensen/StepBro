@@ -155,6 +155,7 @@ namespace StepBro.Core.Execution
             public ExecutionScopeStatusUpdaterMock m_child = null;
             public string m_text = null;
             private bool m_pauseRequested = false;
+            private DateTime m_entryTime;
             public TimeSpan m_expectedTime = default(TimeSpan);
             public long m_progressMax = -1;
             public long m_progress = -1;
@@ -175,6 +176,7 @@ namespace StepBro.Core.Execution
             }
 
             public event EventHandler Disposed;
+            public event EventHandler ExpectedTimeExceeded;
 
             public void AddActionButton(string title, ButtonActivationType type, Action<bool> activationAction)
             {
@@ -198,6 +200,7 @@ namespace StepBro.Core.Execution
                 m_child = new ExecutionScopeStatusUpdaterMock();
                 m_child.m_level = m_level + 1;
                 m_child.m_text = text;
+                m_entryTime = DateTime.Now;
                 m_child.m_expectedTime = expectedTime;
                 m_child.m_progressMax = progressMax;
                 m_child.m_progressFormatter = progressFormatter;

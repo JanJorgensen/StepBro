@@ -37,6 +37,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("0.1.0.0")]
 
 
+[assembly: InternalsVisibleTo("stepbro")]
 [assembly: InternalsVisibleTo("StepBroCoreTest")]
 [assembly: InternalsVisibleTo("TestStepBroScriptFileEditor")]
 [assembly: NeutralResourcesLanguage("en")]

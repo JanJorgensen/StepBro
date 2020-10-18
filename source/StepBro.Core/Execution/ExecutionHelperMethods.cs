@@ -654,5 +654,18 @@ namespace StepBro.Core.Execution
             }
             return false;
         }
+
+        /// <summary>
+        /// Helper method to create a string representation of a value and then just return the value itself.
+        /// </summary>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="value">Input value</param>
+        /// <param name="valueText">The textual representation of the input value.</param>
+        /// <returns>Input value directly.</returns>
+        public static T GetExpectValueText<T>(T value, out string valueText)
+        {
+            valueText = StringUtils.ObjectToString(value, false);
+            return value;
+        }
     }
 }

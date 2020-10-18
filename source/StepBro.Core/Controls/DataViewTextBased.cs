@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace StepBro.Core.Controls
 {
-    public class DataViewControl : TextView
+    public class DataViewTextBased : TextView
     {
         public class SingleLineDataPresenter
         {
@@ -102,7 +102,7 @@ namespace StepBro.Core.Controls
         private Queue<Tuple<string, string>> m_updateQueue = new Queue<Tuple<string, string>>();
         private int m_widestName = 25;
 
-        public DataViewControl() : base()
+        public DataViewTextBased() : base()
         {
             //var rnd = new Random();
             //for (int i = 0; i < 2000; i++)
@@ -152,7 +152,7 @@ namespace StepBro.Core.Controls
                 }
                 else
                 {
-                    var newLine = new DataViewControl.SingleLineDataPresenter(entry.Item1, 0, 40);
+                    var newLine = new DataViewTextBased.SingleLineDataPresenter(entry.Item1, 0, 40);
                     newLine.UpdateValue(entry.Item2);
                     this.InsertLine(-1, newLine);
                 }

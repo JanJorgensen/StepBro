@@ -60,12 +60,7 @@ namespace StepBro.Core.Data
             throw new NotImplementedException();
         }
 
-        public void ReportExpectResult(string title, string expression, bool success)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ReportExpectResult(string title, string expected, string actual, bool success)
+        public void ReportExpectResult(string title, string expected, string actual, Verdict verdict)
         {
             throw new NotImplementedException();
         }

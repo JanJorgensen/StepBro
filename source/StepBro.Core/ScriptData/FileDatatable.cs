@@ -1,6 +1,6 @@
-﻿using System;
+﻿using StepBro.Core.Data;
+using System;
 using System.Collections.Generic;
-using StepBro.Core.Data;
 
 namespace StepBro.Core.ScriptData
 {
@@ -98,11 +98,12 @@ namespace StepBro.Core.ScriptData
 
         public FileDatatable(
             IScriptFile file,
+            AccessModifier access,
             int line,
             IDatatable parentElement,
             string @namespace,
             string name) :
-                base(file, line, parentElement, @namespace, name, FileElementType.Datatable)
+                base(file, line, parentElement, @namespace, name, access, FileElementType.Datatable)
         {
         }
 

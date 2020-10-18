@@ -1,10 +1,7 @@
-﻿using System;
+﻿using StepBro.Core.Controls;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
-using StepBro.Core.Controls;
 
 namespace StepBro.Core.Execution
 {
@@ -19,14 +16,14 @@ namespace StepBro.Core.Execution
         }
 
         private int m_level = 0;
-        private string m_text = "";
-        private DateTime m_startTime;
+        private readonly string m_text = "";
+        private readonly DateTime m_startTime;
 
-        private LevelProgressType m_progressType = LevelProgressType.NoProgress;
+        private readonly LevelProgressType m_progressType = LevelProgressType.NoProgress;
         private string m_progressText = null;
-        private long m_progress = -1L;
-        private Func<long, string> m_progressFormatter = null;
-        Brush m_progressColor = Brushes.Blue;
+        private readonly long m_progress = -1L;
+        private readonly Func<long, string> m_progressFormatter = null;
+        private Brush m_progressColor = Brushes.Blue;
 
         public List<Tuple<string, ButtonActivationType, Action<bool>>> m_buttons = null;
 
@@ -43,6 +40,20 @@ namespace StepBro.Core.Execution
             m_startTime = DateTime.Now;
         }
 
+        private EventHandler m_expectedTimeExceeded;
+        public event EventHandler ExpectedTimeExceeded
+        {
+            add
+            {
+                m_expectedTimeExceeded += value;
+            }
+
+            remove
+            {
+                m_expectedTimeExceeded -= value;
+            }
+        }
+
         public ExecutionScopeStatusUpdater GetUpmostChild()
         {
             if (m_child != null) return m_child.GetUpmostChild();
@@ -53,7 +64,7 @@ namespace StepBro.Core.Execution
         {
             if (m_child != null)
             {
-                m_child.Disposed -= M_child_Disposed;
+                m_child.Disposed -= this.M_child_Disposed;
                 m_child = null;
             }
         }
@@ -123,7 +134,7 @@ namespace StepBro.Core.Execution
             }
             m_child = new ExecutionScopeStatusUpdater(text, expectedTime, progressMax, progressFormatter);
             m_child.m_level = m_level + 1;
-            m_child.Disposed += M_child_Disposed;
+            m_child.Disposed += this.M_child_Disposed;
             return m_child;
         }
 

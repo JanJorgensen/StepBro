@@ -30,13 +30,14 @@ namespace StepBro.Core.ScriptData
 
         public FileProcedure(
             IScriptFile file,
+            AccessModifier access,
             int line,
             IFileElement parentElement,
             string @namespace,
             string name,
             ContextLogOption logOption = ContextLogOption.Normal,
             bool separateStateLevel = true) :
-                base(file, line, parentElement, @namespace, name, FileElementType.ProcedureDeclaration)
+                base(file, line, parentElement, @namespace, name, access, FileElementType.ProcedureDeclaration)
         {
             m_callContextParameter = Expression.Parameter(typeof(ICallContext), "callcontext");
             //var delegatetype = (m_runtimeProcedure != null) ? m_runtimeProcedure.GetType() : typeof(UnresolvedProcedureType);
@@ -50,7 +51,7 @@ namespace StepBro.Core.ScriptData
         {
             if (file == null) throw new ArgumentNullException("file");
             if (runtime == null) throw new ArgumentNullException("runtime");
-            var fp = new FileProcedure(file, -1, null, @namespace, name, logOption, true);
+            var fp = new FileProcedure(file, AccessModifier.Public, -1, null, @namespace, name, logOption, true);
             fp.SetRuntimeProcedure(runtime as Delegate);
             var referenceType = typeof(Reference<>).MakeGenericType(typeof(T));
             fp.m_reference = (IProcedureReference)Activator.CreateInstance(referenceType, fp);

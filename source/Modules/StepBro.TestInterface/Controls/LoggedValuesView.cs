@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace StepBro.TestInterface.Controls
 {
-    [ObjectPanelAttribute(allowMultipleInstances: false)]
+    [ObjectPanel(allowMultipleInstances: false)]
     public partial class LoggedValuesView : StepBro.Core.Controls.ObjectPanel
     {
         //private class ValueLinePresenter : DataViewControl.SingleLineDataPresenter
@@ -16,7 +16,7 @@ namespace StepBro.TestInterface.Controls
         //    }
         //}
 
-        private DataViewControl m_viewControl = null;
+        private DataViewTextBased m_viewControl = null;
         private SerialTestConnection m_connection = null;
         //private LogLineData m_firstSeen = null;
         //private LogLineData m_lastHandled = null;

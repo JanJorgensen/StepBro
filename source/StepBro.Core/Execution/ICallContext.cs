@@ -23,8 +23,7 @@ namespace StepBro.Core.Execution
         string CurrentTestStepTitle { get; }
 
         bool ReportError(ErrorID error = null, string description = "", Exception exception = null);
-        void ReportExpectResult(string title, string expression, bool success);
-        void ReportExpectResult(string title, string expected, string actual, bool success);
+        void ReportExpectResult(string title, string expected, string actual, Verdict verdict);
 
         /// <summary>
         /// Creates a new named call context.

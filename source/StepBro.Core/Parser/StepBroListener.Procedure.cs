@@ -25,6 +25,7 @@ namespace StepBro.Core.Parser
         private Stack<ProcedureParsingScope> m_scopeStack = new Stack<ProcedureParsingScope>();
         private bool m_enteredLoopStatement = false;
         private string m_modifiers = null;
+        private bool m_awaitsExpectExpression = false;
 
         public IFileProcedure LastParsedProcedure { get { return m_lastProcedure; } }
 
@@ -57,7 +58,7 @@ namespace StepBro.Core.Parser
             }
             else
             {
-                m_currentProcedure = new FileProcedure(m_file, m_elementStart.Line, null, m_currentNamespace, name);
+                m_currentProcedure = new FileProcedure(m_file, m_fileElementModifier, m_elementStart.Line, null, m_currentNamespace, name);
             }
             m_currentProcedure.ReturnType = m_procedureReturnType;
             m_currentProcedure.IsFunction = m_procedureIsFunction;
@@ -972,6 +973,7 @@ namespace StepBro.Core.Parser
         {
             this.AddEnterStatement(context);
             m_expressionData.PushStackLevel("ExpectStatement");
+            m_awaitsExpectExpression = true;
         }
 
         public override void ExitExpectStatement([NotNull] SBP.ExpectStatementContext context)
@@ -987,15 +989,28 @@ namespace StepBro.Core.Parser
                 title = title.Substring(1, title.Length - 2);   // Strip quotes
             }
 
+            //if (expression.ExpressionCode.NodeType == ExpressionType.Equal ||
+            //    expression.ExpressionCode.NodeType == ExpressionType.NotEqual)
+            //{
+            //    throw new NotImplementedException();
+            //}
+
+            var expectVerdict = Expression.Condition(
+                expression.ExpressionCode,
+                Expression.Constant(Verdict.Pass),
+                Expression.Condition(Expression.Constant(false), Expression.Constant(Verdict.Error), Expression.Constant(Verdict.Fail)));
+
             var expectCall = Expression.Call(
                 m_currentProcedure.ContextReferenceInternal,
-                typeof(ICallContext).GetMethod(nameof(ICallContext.ReportExpectResult), new Type[] { typeof(string), typeof(string), typeof(bool) }),
+                typeof(ICallContext).GetMethod(nameof(ICallContext.ReportExpectResult), new Type[] { typeof(string), typeof(string), typeof(string), typeof(Verdict) }),
                 Expression.Constant(title),
                 Expression.Constant(expressionText),
-                expression.ExpressionCode);
+                Expression.Condition(expression.ExpressionCode, Expression.Constant("true"), Expression.Constant("true")),
+                expectVerdict);
 
             var statementBlock = Expression.TryCatch(
-                        expectCall,
+                Expression.Block(
+                        expectCall),
                         Expression.Catch(
                             typeof(Exception),
                             Expression.Empty()));       // TODO: Log the exception
@@ -1080,12 +1095,19 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpressionStatement([NotNull] SBP.ExpressionStatementContext context)
         {
-            var stack = m_expressionData.PopStackLevel();
-            var expressionStatement = stack.Pop().ExpressionCode;
-            m_scopeStack.Peek().AddStatementCode(
-                Expression.Block(
-                    this.CreateEnterStatement(context.Start.Line, context.Start.Column),
-                    expressionStatement));
+            var statement = m_expressionData.PopStackLevel().Pop();
+            if (statement.IsError())
+            {
+                // TODO: Has error been reported???
+            }
+            else
+            {
+                var expressionStatement = statement.ExpressionCode;
+                m_scopeStack.Peek().AddStatementCode(
+                    Expression.Block(
+                        this.CreateEnterStatement(context.Start.Line, context.Start.Column),
+                        expressionStatement));
+            }
         }
 
         #endregion

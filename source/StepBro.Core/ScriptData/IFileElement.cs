@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StepBro.Core.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ namespace StepBro.Core.ScriptData
         FileElementType ElementType { get; }
         string Purpose { get; }
         int UniqueID { get; }
+        AccessModifier AccessLevel { get; }
         IEnumerable<IPartner> ListPartners();
     }
 }

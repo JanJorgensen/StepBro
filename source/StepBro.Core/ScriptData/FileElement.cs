@@ -1,14 +1,15 @@
-﻿using System;
+﻿using StepBro.Core.Data;
+using StepBro.Core.Parser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using StepBro.Core.Data;
-using StepBro.Core.Parser;
 
 namespace StepBro.Core.ScriptData
 {
     public abstract class FileElement : IFileElement
     {
         private IScriptFile m_parentFile;
+        private readonly AccessModifier m_accessModifier;
         private readonly int m_line;
         private string m_baseElementName = null;
         private IFileElement m_baseElement;
@@ -22,13 +23,14 @@ namespace StepBro.Core.ScriptData
         protected PropertyBlock m_propertyBlock = null;
         private readonly List<IPartner> m_partners = new List<IPartner>();
 
-        public FileElement(IScriptFile file, int line, IFileElement parentElement, string @namespace, string name, FileElementType type)
+        public FileElement(IScriptFile file, int line, IFileElement parentElement, string @namespace, string name, AccessModifier access, FileElementType type)
         {
             m_parentFile = file;
             m_line = line;
             m_baseElement = null;
             m_parentElement = parentElement;
             m_elementName = name;
+            m_accessModifier = access;
             m_elementType = type;
             if (String.IsNullOrEmpty(@namespace))
             {
@@ -52,13 +54,7 @@ namespace StepBro.Core.ScriptData
             return $"{m_uid} {m_elementType} {m_elementName}";
         }
 
-        public string Name
-        {
-            get
-            {
-                return m_elementName;
-            }
-        }
+        public string Name { get { return m_elementName; } }
 
         internal void SetName(string @namespace, string name)
         {
@@ -75,13 +71,9 @@ namespace StepBro.Core.ScriptData
             internal set { m_elementType = value; }
         }
 
-        public string FullName
-        {
-            get
-            {
-                return m_elementFullName;
-            }
-        }
+        public string FullName { get { return m_elementFullName; } }
+
+        public AccessModifier AccessLevel { get { return m_accessModifier; } }
 
         public IFileElement BaseElement
         {

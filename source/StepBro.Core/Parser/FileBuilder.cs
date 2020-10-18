@@ -54,6 +54,7 @@ namespace StepBro.Core.Parser
             var file = new ScriptFile();
             file.AddNamespaceUsing(addons.Lookup(null, "System"));
             file.AddNamespaceUsing(addons.Lookup(null, "System.Linq"));
+            file.AddNamespaceUsing(addons.Lookup(null, typeof(StepBro.Core.DataReport).Namespace));
             if (typeUsing != null)
             {
                 addons.AddAssembly(typeUsing.Assembly, false);
@@ -290,7 +291,9 @@ namespace StepBro.Core.Parser
 
         internal static IFileProcedure ParseProcedure(params string[] content)
         {
-            return ParseProcedure(null, new string[] { }, null, content).Listener.LastParsedProcedure;
+            var builder = ParseProcedure(null, new string[] { }, null, content);
+            System.Diagnostics.Debug.Assert(builder.Errors.ErrorCount == 0);
+            return builder.Listener.LastParsedProcedure;
         }
 
         internal static IFileProcedure ParseProcedure(Type usingType, params string[] content)
@@ -321,6 +324,7 @@ namespace StepBro.Core.Parser
             var file = new ScriptFile();
             file.AddNamespaceUsing(addonManager.Lookup(null, "System"));
             file.AddNamespaceUsing(addonManager.Lookup(null, "System.Linq"));
+            file.AddNamespaceUsing(addonManager.Lookup(null, typeof(StepBro.Core.DataReport).Namespace));
             if (usings != null)
             {
                 foreach (var u in usings)
@@ -426,7 +430,8 @@ namespace StepBro.Core.Parser
                 first = false;
                 services.Get<ILoadedFilesManager>().RegisterLoadedFile(fileObject);
             }
-            ParseFiles(services, logger, fileObjects[0]);
+            var errorsCount = ParseFiles(services, logger, fileObjects[0]);
+            if (errorsCount > 0) throw new Exception("Parsing errors");
             return fileObjects.ToArray();
         }
 
@@ -667,6 +672,7 @@ namespace StepBro.Core.Parser
                 {
                     foreach (var element in fileScanData.TopElement.Childs)
                     {
+                        var accessModifier = (element.Modifiers != null && element.Modifiers.Count > 0) ? (AccessModifier)Enum.Parse(typeof(AccessModifier), element.Modifiers[0], true) : AccessModifier.Private;
                         switch (element.Type)
                         {
                             case FileElementType.Using:
@@ -679,7 +685,7 @@ namespace StepBro.Core.Parser
                                 break;
                             case FileElementType.ProcedureDeclaration:
                                 {
-                                    var procedure = new FileProcedure(file, element.Line, null, file.Namespace, element.Name)
+                                    var procedure = new FileProcedure(file, accessModifier, element.Line, null, file.Namespace, element.Name)
                                     {
                                         IsFunction = element.IsFunction,
                                         HasBody = element.HasBody
@@ -692,7 +698,7 @@ namespace StepBro.Core.Parser
                                 break;
                             case FileElementType.TestList:
                                 {
-                                    var testlist = new FileTestList(file, element.Line, null, file.Namespace, element.Name);
+                                    var testlist = new FileTestList(file, accessModifier, element.Line, null, file.Namespace, element.Name);
                                     file.AddTestList(testlist);
                                 }
                                 break;

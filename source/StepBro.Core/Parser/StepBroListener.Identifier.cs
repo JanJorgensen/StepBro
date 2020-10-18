@@ -148,11 +148,6 @@ namespace StepBro.Core.Parser
             return null;
         }
 
-        public IIdentifierInfo TryGetExternalGlobalVariable(string name)
-        {
-            return null;
-        }
-
         public IEnumerable<IFileElement> ListLocalFileElements()
         {
             if (m_file != null)
@@ -168,10 +163,14 @@ namespace StepBro.Core.Parser
         {
             foreach (var file in m_file.ListReferencedScriptFiles())
             {
+                var minAccessLevel = AccessModifier.Public;
+                if (String.Equals(file.Namespace, m_file.Namespace, StringComparison.InvariantCulture))
+                {
+                    minAccessLevel = AccessModifier.Protected;  // When same namespace, the protected elements are also accessible.
+                }
                 foreach (var e in file.ListElements())
                 {
-                    //if (e.FullName.StartsWith(m_currentNamespace))        Removed this, 'cos: when it's in referenced file, it's okay.
-                    yield return e;
+                    if (e.AccessLevel >= minAccessLevel) yield return e;
                 }
             }
         }
@@ -260,10 +259,6 @@ namespace StepBro.Core.Parser
             }
             if (m_file != null)
             {
-                foundIdentifier = this.TryGetFileVariable(identifier);
-                if (foundIdentifier != null) goto returnFound;
-                foundIdentifier = this.TryGetExternalGlobalVariable(identifier);
-                if (foundIdentifier != null) goto returnFound;
                 foundIdentifier = this.TryGetFileElementInScope(m_file?.Usings, identifier);
                 if (foundIdentifier != null) goto returnFound;
             }
@@ -281,7 +276,7 @@ namespace StepBro.Core.Parser
 
             if (reportUnresolved)
             {
-                m_errors.SymanticError((token != null) ? token.Line : -1, (token != null) ? token.Column : -1, false, "Identifier not found; '" + identifier + "'.");
+                m_errors.UnresolvedIdentifier(token, identifier);
             }
             return new SBExpressionData(SBExpressionType.UnknownIdentifier, "", identifier, token);
         }
@@ -376,24 +371,9 @@ namespace StepBro.Core.Parser
             {
                 result = new SBExpressionData(HomeType.Immediate, SBExpressionType.LocalVariableReference, (TypeReference)identifier.DataType, (Expression)identifier.Reference);
             }
-            else if (identifier.Type == IdentifierType.VariableContainer)
-            {
-                var containerType = typeof(IValueContainer<>).MakeGenericType(identifier.DataType.Type);
-                var getGlobalVariableTyped = s_GetGlobalVariable.MakeGenericMethod(identifier.DataType.Type);
-                var context = (m_inFunctionScope) ? m_currentProcedure.ContextReferenceInternal : Expression.Constant(null, typeof(Execution.IScriptCallContext));
-                result = new SBExpressionData(
-                    HomeType.Immediate,
-                    SBExpressionType.GlobalVariableReference,
-                    (TypeReference)containerType,
-                    Expression.Call(
-                        getGlobalVariableTyped,
-                        context,
-                        Expression.Constant((identifier as IValueContainer).UniqueID)),
-                    identifier);
-            }
             else if (identifier.Type == IdentifierType.FileElement)
             {
-                var element = identifier.DataType.DynamicType as IFileElement;
+                var element = identifier as IFileElement;
                 switch (element.ElementType)
                 {
                     case FileElementType.ProcedureDeclaration:
@@ -418,6 +398,25 @@ namespace StepBro.Core.Parser
                                 procedure.DataType,
                                 getProc,
                                 identifier.Reference);
+                        }
+                        break;
+
+                    case FileElementType.FileVariable:
+                        {
+                            var fileVariable = element as FileVariable;
+                            var container = fileVariable.VariableOwnerAccess.Container;
+                            var containerType = typeof(IValueContainer<>).MakeGenericType(container.DataType.Type);
+                            var getGlobalVariableTyped = s_GetGlobalVariable.MakeGenericMethod(container.DataType.Type);
+                            var context = (m_inFunctionScope) ? m_currentProcedure.ContextReferenceInternal : Expression.Constant(null, typeof(Execution.IScriptCallContext));
+                            result = new SBExpressionData(
+                                HomeType.Immediate,
+                                SBExpressionType.GlobalVariableReference,
+                                (TypeReference)containerType,
+                                Expression.Call(
+                                    getGlobalVariableTyped,
+                                    context,
+                                    Expression.Constant((container as IValueContainer).UniqueID)),
+                                identifier);
                         }
                         break;
 

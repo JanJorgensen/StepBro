@@ -118,6 +118,11 @@ namespace StepBro.Core.Parser
             this.SymanticError(line, charPositionInLine, false, $"Unresolved identifier: \"{name}\".");
         }
 
+        public void UnresolvedIdentifier(Antlr4.Runtime.IToken token, string name)
+        {
+            this.SymanticError((token != null) ? token.Line : -1, (token != null) ? token.Column : -1, false, $"Unresolved identifier: \"{name}\".");
+        }
+
         public void IncompatibleDataType(int line, int charPositionInLine, string type, string expectedType)
         {
             this.SymanticError(line, charPositionInLine, false, $"Not a compatible type: '{type}'. Expected type: {expectedType}.");

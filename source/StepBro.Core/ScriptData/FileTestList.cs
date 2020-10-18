@@ -59,8 +59,8 @@ namespace StepBro.Core.ScriptData
         private ArgumentList m_arguments = null;
         private List<ITestListEntry> m_entries = new List<ITestListEntry>();
 
-        public FileTestList(IScriptFile file, int line, IFileElement parentElement, string @namespace, string name) :
-            base(file, line, parentElement, @namespace, name, FileElementType.TestList)
+        public FileTestList(IScriptFile file, AccessModifier access, int line, IFileElement parentElement, string @namespace, string name) :
+            base(file, line, parentElement, @namespace, name, access, FileElementType.TestList)
         {
         }
 

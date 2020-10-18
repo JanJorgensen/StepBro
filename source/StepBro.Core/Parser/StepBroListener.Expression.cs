@@ -248,7 +248,7 @@ namespace StepBro.Core.Parser
             }
         }
 
-        private SBExpressionData ResolveForGetOperation(SBExpressionData input, TypeReference targetType = null)
+        private SBExpressionData ResolveForGetOperation(SBExpressionData input, TypeReference targetType = null, bool reportIfUnresolved = false)
         {
             var output = input;
             if (input.IsUnresolvedIdentifier)
@@ -260,6 +260,10 @@ namespace StepBro.Core.Parser
                     output.Token = input.Token;
                     output.ParameterName = input.ParameterName;
                     output.Argument = input.Argument;
+                    if (reportIfUnresolved && resolved.IsUnknownIdentifier)
+                    {
+                        m_errors.UnresolvedIdentifier(output.Token, (string)output.Value);
+                    }
                 }
             }
             return output;
@@ -268,7 +272,10 @@ namespace StepBro.Core.Parser
         private SBExpressionData ResolveIdentifierForGetOperation(string input, bool inFunctionScope, TypeReference targetType = null)
         {
             SBExpressionData result = this.ResolveQualifiedIdentifier(input, inFunctionScope);
-            if (result.IsError()) return result;
+            if (result.IsError())
+            {
+                return result;
+            }
             if (result != null)
             {
                 Expression expression = result.ExpressionCode;
@@ -290,7 +297,7 @@ namespace StepBro.Core.Parser
             }
             else
             {
-                return null;
+                throw new NotImplementedException("Must be handled somewhere else!!");
             }
         }
 
@@ -333,13 +340,37 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpAssignment([NotNull] SBP.ExpAssignmentContext context)
         {
-            var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
+            var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true);
             var first = this.ResolveIfIdentifier(m_expressionData.Peek().Pop(), true);
-            var op = AssignmentOperators.AssignmentOperatorBase.GetOperator(context.op.Type);
-            // TODO: Check if operator is returned
-            last = this.CastProcedureAssignmentArgumentIfNeeded(first.DataType, last);
-            var result = op.Resolve(this, first, last);
-            m_expressionData.Push(result);
+            if (last.IsError())
+            {
+                m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError));
+            }
+            else
+            {
+                if (first.IsError())
+                {
+                    m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError));
+                }
+                else
+                {
+                    last.NarrowGetValueType();
+                    var op = AssignmentOperators.AssignmentOperatorBase.GetOperator(context.op.Type);
+                    if (op != null)
+                    {
+                        // TODO: Check if operator is returned
+                        last = this.CastProcedureAssignmentArgumentIfNeeded(first.DataType, last);
+
+                        if (first.IsError()) m_expressionData.Push(first);
+                        else if (last.IsError()) m_expressionData.Push(last);
+                        else
+                        {
+                            var result = op.Resolve(this, first, last);
+                            m_expressionData.Push(result);
+                        }
+                    }
+                }
+            }
         }
 
         public override void ExitExpBetween([NotNull] SBP.ExpBetweenContext context)
@@ -575,7 +606,8 @@ namespace StepBro.Core.Parser
         public SBExpressionData CastProcedureAssignmentArgumentIfNeeded(TypeReference type, SBExpressionData expression)
         {
             var t = type.Type;
-            if (expression.DataType.Type != t &&
+            if (!expression.IsError() &&
+                expression.DataType.Type != t &&
                 expression.DataType.Type == typeof(IProcedureReference) &&
                 t.IsConstructedGenericType &&
                 t.GenericTypeArguments.Length == 1 &&

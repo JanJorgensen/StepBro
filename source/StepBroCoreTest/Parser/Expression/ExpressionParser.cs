@@ -1,14 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using StepBro.Core;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Parser;
-using StepBro.Core.ScriptData;
+using StepBroCoreTest.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
-using StepBroCoreTest.Data;
 
 namespace StepBroCoreTest.Parser
 {
@@ -53,7 +52,7 @@ namespace StepBroCoreTest.Parser
             Assert.IsTrue(result.IsExpression);
             Assert.AreEqual(typeof(T), result.DataType.Type);
 
-            
+
             var compiled = System.Linq.Expressions.Expression.Lambda<Func<T>>(result.ExpressionCode).Compile();
             var before = DateTime.Now;
             try
@@ -81,6 +80,7 @@ namespace StepBroCoreTest.Parser
             else if (typeof(T) == typeof(DateTime)) typeName = "datetime";
             else if (typeof(T) == typeof(Verdict)) typeName = "verdict";
             else if (typeof(T) == typeof(DummyDataClass)) typeName = "DummyDataClass";
+            else if (typeof(T) == typeof(DataReport)) typeName = "DataReport";
             else throw new NotImplementedException();
             StringBuilder source = new StringBuilder();
             source.AppendLine(typeName + " ExpressionProcedure(){");
@@ -94,7 +94,7 @@ namespace StepBroCoreTest.Parser
             addons.AddAssembly(typeof(ExpressionParser).Assembly, false);
             return FileBuilder.ParseProcedure(
                 addons,
-                new string[] { typeof(DummyClass).FullName, typeof(DummyClass).Namespace },
+                new string[] { typeof(DataReport).Namespace, typeof(DummyClass).FullName, typeof(DummyClass).Namespace },
                 null,
                 source.ToString());
         }

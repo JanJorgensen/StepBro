@@ -9,7 +9,7 @@ namespace StepBro.Core.Api
 {
     internal class AddonManager : ServiceBase<IAddonManager, AddonManager>, IAddonManager
     {
-        private Action<IAddonManager> m_basicModulesLoader;
+        private readonly Action<IAddonManager> m_basicModulesLoader;
         private List<Assembly> m_assemblies = new List<Assembly>();
         private List<NamespaceList> m_rootNamespaces = new List<NamespaceList>();
         private Dictionary<string, NamespaceList> m_namespaceLookup = new Dictionary<string, NamespaceList>();
@@ -19,7 +19,7 @@ namespace StepBro.Core.Api
         private List<Type> m_panelCreatorTypes = new List<Type>();
         private List<ObjectPanelCreator> m_panelCreators = new List<ObjectPanelCreator>();
 
-        public AddonManager(Action<IAddonManager> basicModulesLoader, out IService serviceAccess) : 
+        public AddonManager(Action<IAddonManager> basicModulesLoader, out IService serviceAccess) :
             base("AddonManager", out serviceAccess, typeof(Logging.IMainLogger))
         {
             m_basicModulesLoader = basicModulesLoader;
@@ -176,6 +176,7 @@ namespace StepBro.Core.Api
 
         public IEnumerable<MethodInfo> ListExtensionMethods(Type thistype, Func<MethodInfo, bool> filter = null)
         {
+            // TODO: Optimize this; takes most of the parsing time!!!
             var f = (filter != null) ? filter : (a => true);
             List<MethodInfo> returned = new List<MethodInfo>();
             foreach (var tt in thistype.SelfAndInterfaces())

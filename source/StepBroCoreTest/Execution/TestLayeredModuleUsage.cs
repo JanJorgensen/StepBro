@@ -45,7 +45,7 @@ namespace StepBroCoreTest.Execution
                 this.GetType().Assembly,
                 new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()))[0];
 
-            Assert.AreEqual(1, file.ListElements().Count());
+            Assert.AreEqual(4, file.ListElements().Count());
             Assert.AreEqual(1, file.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
             var procedure = file.ListElements().First(p => p.Name == "UseIt") as IFileProcedure;
 
@@ -56,15 +56,13 @@ namespace StepBroCoreTest.Execution
             var log = new LogInspector(taskContext.Logger);
             log.DebugDump();
 
-            //log.ExpectNext("0 - Pre - TestRun - Starting");
-            //log.ExpectNext("1 - Pre - MyFile.ExecuteIt - <arguments>");
-            //log.ExpectNext("2 - Normal - 8 - log: Before");
-            //log.ExpectNext("2 - Pre - MyFile.Helper - <arguments>");
-            //log.ExpectNext("3 - Normal - 5 - log: Doing partner for MyProcedure");
-            //log.ExpectNext("3 - Post");
-            //log.ExpectNext("2 - Normal - 10 - log: After");
-            //log.ExpectNext("2 - Post");
-            //log.ExpectEnd();
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - ObjectUsing.UseIt - <arguments>");
+            log.ExpectNext("2 - Normal - HighLayerCodeModule.Fcn - i: 4");
+            log.ExpectNext("2 - Normal - MidLayerCodeModule.Fcn - i: 8");
+            log.ExpectNext("2 - Normal - LowLayerCodeModule.Fcn - i: 19");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
         }
     }
     public class LowLayerCodeModule : IDisposable

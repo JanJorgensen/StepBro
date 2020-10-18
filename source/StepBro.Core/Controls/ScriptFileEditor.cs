@@ -16,9 +16,10 @@ namespace StepBro.Core.Controls
             "ignore", "in", "inconclusive", "int", "integer", "is", "log", "namespace", "not", "null", "object", "on", "or", "out", "pass",
             "private", "procedure", "protected", "public", "ref", "report", "return", "singleselection", "start", "static", "step", "string",
             "testlist", "this", "throw", "timeout", "timespan", "true", "unset", "using", "var", "verdict", "void", "warning", "while" };
-        private readonly string[] methods = { "Equals()", "GetHashCode()", "GetType()", "ToString()" };
         private readonly string[] snippets = { "namespace ^;", "if (^)\n{\n;\n}", "if (^)\n{\n;\n}\nelse\n{\n;\n}", "while (^)\n{\n;\n}" };
         private readonly string[] declarationSnippets = { "public procedure void ^()\n{\n}" };
+        //private DynamicCollection m_autoCompleteItems = null;
+
 
         public ScriptFileEditor()
         {
@@ -31,30 +32,46 @@ namespace StepBro.Core.Controls
             popupMenu.SearchPattern = @"[\w\.:=!<>]";
             popupMenu.AllowTabKey = true;
             //
-            BuildAutocompleteMenu();
+            this.BuildAutocompleteMenu();
         }
 
         private void BuildAutocompleteMenu()
         {
-            List<AutocompleteItem> items = new List<AutocompleteItem>();
+            List<AutocompleteItem> staticItems = new List<AutocompleteItem>();
 
             foreach (var item in snippets)
-                items.Add(new SnippetAutocompleteItem(item) { ImageIndex = 1 });
+                staticItems.Add(new SnippetAutocompleteItem(item) { ImageIndex = 1 });
             foreach (var item in declarationSnippets)
-                items.Add(new DeclarationSnippet(item) { ImageIndex = 0 });
-            foreach (var item in methods)
-                items.Add(new MethodAutocompleteItem(item) { ImageIndex = 2 });
+                staticItems.Add(new DeclarationSnippet(item) { ImageIndex = 0 });
             foreach (var item in keywords)
-                items.Add(new AutocompleteItem(item));
+                staticItems.Add(new AutocompleteItem(item));
 
+            //var declSnippets = new DeclarationSnippetCreator(popupMenu, this.FCTB);
+            //popupMenu.Items.SetCreator(declSnippets);
+
+
+            //m_autoCompleteItems = new DynamicCollection(popupMenu, this.FCTB, staticItems);
             //set as autocomplete source
-            popupMenu.Items.SetAutocompleteItems(items);
+            popupMenu.Items.SetAutocompleteItems(staticItems);
         }
+
+        //private class DeclarationSnippetCreator : AutocompleteCreator
+        //{
+        //    //private 
+        //    public DeclarationSnippetCreator(AutocompleteMenu menu, FastColoredTextBox fctb) : base(menu, fctb)
+        //    {
+
+        //    }
+        //    public override IEnumerable<AutocompleteItem> CreateItems(int line, int column)
+        //    {
+        //        throw new NotImplementedException();
+        //    }
+        //}
 
         /// <summary>
         /// This item appears when any part of snippet text is typed
         /// </summary>
-        class DeclarationSnippet : SnippetAutocompleteItem
+        private class DeclarationSnippet : SnippetAutocompleteItem
         {
             public DeclarationSnippet(string snippet)
                 : base(snippet)
@@ -66,7 +83,7 @@ namespace StepBro.Core.Controls
                 var pattern = Regex.Escape(fragmentText);
                 if (Regex.IsMatch(Text, "\\b" + pattern, RegexOptions.IgnoreCase))
                     return CompareResult.Visible;
-                return CompareResult.Hidden;
+                return CompareResult.Visible;
             }
         }
 
@@ -75,17 +92,26 @@ namespace StepBro.Core.Controls
         /// </summary>
         internal class DynamicCollection : IEnumerable<AutocompleteItem>
         {
-            private AutocompleteMenu menu;
-            private FastColoredTextBox tb;
+            private class Item : AutocompleteItem
+            {
 
-            public DynamicCollection(AutocompleteMenu menu, FastColoredTextBox tb)
+            }
+
+            private AutocompleteMenu menu;
+            private readonly FastColoredTextBox tb;
+            private readonly List<AutocompleteItem> staticItems;
+
+            public DynamicCollection(AutocompleteMenu menu, FastColoredTextBox tb, List<AutocompleteItem> staticItems)
             {
                 this.menu = menu;
                 this.tb = tb;
+                this.staticItems = staticItems;
             }
 
             public IEnumerator<AutocompleteItem> GetEnumerator()
             {
+                foreach (var si in staticItems) yield return si;
+
                 //get current fragment of the text
                 var text = menu.Fragment.Text;
                 System.Diagnostics.Trace.WriteLine($"AutoComplete from \"{text}\"");
@@ -96,30 +122,36 @@ namespace StepBro.Core.Controls
                 var className = parts[parts.Length - 2];
 
                 //find type for given className
-                var type = FindTypeByName(className);
+                var type = this.FindTypeByName(className);
 
                 if (type == null)
                     yield break;
 
                 //return static methods of the class
-                foreach (var methodName in type.GetMethods().AsEnumerable().Select(mi => mi.Name).Distinct())
+                foreach (var methodName in type.GetMethods(BindingFlags.Public | BindingFlags.Static).AsEnumerable().Select(mi => mi.Name).Distinct())
+                {
                     yield return new MethodAutocompleteItem(methodName)
                     {
                         ToolTipTitle = methodName,
                         ToolTipText = "Description of method " + methodName + " goes here.",
                         Tag = methodName + "___"
                     };
+                    System.Diagnostics.Debug.WriteLine(type.FullName + "." + methodName);
+                }
 
                 //return static properties of the class
                 foreach (var pi in type.GetProperties())
+                {
                     yield return new MethodAutocompleteItem(pi.Name)
                     {
                         ToolTipTitle = pi.Name,
                         ToolTipText = "Description of property " + pi.Name + " goes here.",
                     };
+                    System.Diagnostics.Debug.WriteLine(type.FullName + "." + pi.Name);
+                }
             }
 
-            Type FindTypeByName(string name)
+            private Type FindTypeByName(string name)
             {
                 Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
                 foreach (var a in assemblies)
@@ -138,7 +170,7 @@ namespace StepBro.Core.Controls
 
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
             {
-                return GetEnumerator();
+                return this.GetEnumerator();
             }
         }
 

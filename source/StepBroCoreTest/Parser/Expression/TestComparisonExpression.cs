@@ -139,7 +139,7 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        public void TestEquelsWithToleranceInteger()
+        public void TestEqualsWithToleranceInteger()
         {
             //var ch ='±';
             //int v = Convert.ToInt32(ch);
@@ -163,7 +163,7 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        public void TestEquelsWithToleranceDecimal()
+        public void TestEqualsWithToleranceDecimal()
         {
             var comparison = "a == 10.0 ± 5.0";
             Assert.AreEqual(false, ParseAndRun<bool>(comparison, "decimal a = 4.0;"));
@@ -191,7 +191,7 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        public void TestEquelsWithToleranceTimespan()
+        public void TestEqualsWithToleranceTimespan()
         {
             var comparison = "a == 10s ± 5s";
 
@@ -222,7 +222,7 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        public void TestEquelsWithToleranceDateTime()
+        public void TestEqualsWithToleranceDateTime()
         {
             var comparison = "a == @2000-01-01 12:45:00 ± 30s";
             Assert.AreEqual(false, ParseAndRun<bool>(comparison, "datetime a = @2000-01-01 12:44:00;"));
