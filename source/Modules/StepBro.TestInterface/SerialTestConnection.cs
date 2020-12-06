@@ -1,10 +1,12 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.Logging;
 using StepBro.Core.Tasks;
 using StepBro.Streams;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +14,8 @@ using static StepBro.Core.Data.LogLineData;
 
 namespace StepBro.TestInterface
 {
-    public class SerialTestConnection : AvailabilityBase, IConnection, IRemoteProcedures, ILogLineSource
+    public class SerialTestConnection :
+        AvailabilityBase, IConnection, IRemoteProcedures, ILogLineSource, ISettableFromPropertyBlock, INotifyPropertyChanged
     {
         private class CommandData : IAsyncResult<object>, IObjectFaultDescriptor
         {
@@ -99,6 +102,16 @@ namespace StepBro.TestInterface
                     throw new InvalidOperationException("Command already activated.");
                 }
             }
+
+            public void SetTimeoutResult()
+            {
+                if (m_state == CommandState.Running)
+                {
+                    m_state = CommandState.EndTimeout;
+                    m_completeEvent.Set();
+                }
+            }
+
             public void SetResult(string last, params string[] listResponse)
             {
                 //if (listResponse != null && listResponse.Length > 0)
@@ -229,6 +242,7 @@ namespace StepBro.TestInterface
         private readonly long m_instanceID;
         private static Random rnd = new Random(DateTime.Now.GetHashCode());
         private Dictionary<string, string> m_loopbackAnswers = null;
+        private List<Tuple<string, string>> m_uiCommands = null;
 
         private List<RemoteProcedureInfo> m_remoteProcedures = new List<RemoteProcedureInfo>();
 
@@ -243,6 +257,13 @@ namespace StepBro.TestInterface
         {
             this.Disconnect(null);
             this.Stream = null;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged(string name)
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
         #region Properties
@@ -610,7 +631,12 @@ namespace StepBro.TestInterface
                     if (m_currentExecutingCommand != null)
                     {
                         var to = (m_currentExecutingCommand.TimeoutTime - DateTime.Now).Ticks / TimeSpan.TicksPerMillisecond;
-                        if (to <= 0) nextWaitTime = 0;
+                        if (to <= 0)
+                        {
+                            m_currentExecutingCommand.SetTimeoutResult();
+                            this.AddToLog(LogType.ReceivedError, 0, "<timeout>");
+                            this.OnEndCommand();
+                        }
                         else if (to < 3000) nextWaitTime = (int)to;
                     }
                 }
@@ -662,15 +688,7 @@ namespace StepBro.TestInterface
                                         {
                                         }
                                     }
-                                    m_responseLines.Clear();
-                                    lock (m_sync)
-                                    {
-                                        m_currentExecutingCommand = null;
-                                        if (m_commandQueue.Count > 0)
-                                        {
-                                            this.DoSendCommand(m_commandQueue.Dequeue());
-                                        }
-                                    }
+                                    this.OnEndCommand();
                                 }
                             }
                         }
@@ -684,6 +702,20 @@ namespace StepBro.TestInterface
                 //        var timeTillTimeout = (DateTime.Now - m_currentExecutingCommand.TimeoutTime).Ticks;
                 //    }
                 //}
+            }
+        }
+
+        private void OnEndCommand()
+        {
+            m_inputBuffer.Eat(-1);
+            m_responseLines.Clear();
+            lock (m_sync)
+            {
+                m_currentExecutingCommand = null;
+                if (m_commandQueue.Count > 0)
+                {
+                    this.DoSendCommand(m_commandQueue.Dequeue());
+                }
             }
         }
 
@@ -748,6 +780,69 @@ namespace StepBro.TestInterface
             //m_remoteProcedures.Add(new RemoteProcedureInfo("Liza", 23, "Minelli", typeof(bool)));
             //m_remoteProcedures.Add(new RemoteProcedureInfo("Bananas", 24, "List of lot sizes.", typeof(List<long>)));
             //m_remoteProcedures.Add(new RemoteProcedureInfo("Apples", 25, "List of names.", typeof(List<string>)));
+        }
+
+        public void Setup(ILogger logger, PropertyBlock properties)
+        {
+            if (m_uiCommands == null)
+            {
+                var commands = properties.FirstOrDefault(e => String.Equals(e.Name, "commands", StringComparison.InvariantCulture));
+                if (commands != null && commands.BlockEntryType == PropertyBlockEntryType.Array)
+                {
+                    var uiCommands = new List<Tuple<string, string>>();
+                    foreach (var e in (commands as PropertyBlockArray))
+                    {
+                        if (e.BlockEntryType == PropertyBlockEntryType.Value)
+                        {
+                            var pbv = e as PropertyBlockValue;
+                            var value = pbv.Value as string;
+                            if (value != null)
+                            {
+                                uiCommands.Add(new Tuple<string, string>(value, value));
+                            }
+                            else
+                            {
+                                logger?.LogError(this.GetType().Name + ".Setup", "commands entry is not a string");
+                            }
+                        }
+                        else if (e.BlockEntryType == PropertyBlockEntryType.Block)
+                        {
+                            var pb = e as PropertyBlock;
+                            if (pb.Count == 1 && pb[0].BlockEntryType == PropertyBlockEntryType.Value)
+                            {
+                                var pbv = pb[0] as PropertyBlockValue;
+                                if (pbv != null && !String.IsNullOrEmpty(pbv.Name) && !String.IsNullOrEmpty(pbv.Value as string))
+                                {
+                                    uiCommands.Add(new Tuple<string, string>(pbv.Name, pbv.Value as string));
+                                }
+                                else
+                                {
+                                    logger?.LogError(this.GetType().Name + ".Setup", "commands entry is not property with name and string value.");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            logger?.LogError(this.GetType().Name + ".Setup", "Command entry type is not supported.");
+                            return;
+                        }
+                    }
+                    m_uiCommands = uiCommands;
+                    this.NotifyPropertyChanged(nameof(this.UICommands));
+                }
+                else
+                {
+                    logger?.LogError(this.GetType().Name + ".Setup", "'commands' type is not an array.");
+                }
+            }
+        }
+
+        public List<Tuple<string, string>> UICommands
+        {
+            get
+            {
+                return m_uiCommands?.ToList();   // Create a copy to return.
+            }
         }
 
         private RemoteProcedureInfo LastProc { get { return m_remoteProcedures[m_remoteProcedures.Count - 1]; } }

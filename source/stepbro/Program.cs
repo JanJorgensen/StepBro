@@ -90,66 +90,83 @@ namespace StepBro.Cmd
                 if (!String.IsNullOrEmpty(m_commandLineOptions.InputFile))
                 {
                     if (m_commandLineOptions.Verbose) Console.WriteLine("Filename: {0}", m_commandLineOptions.InputFile);
-                    var file = StepBroMain.LoadScriptFile(consoleResourceUserObject, m_commandLineOptions.InputFile);
-
-                    var parsingSuccess = StepBroMain.ParseFiles(true);
-                    if (parsingSuccess)
+                    IScriptFile file = null;
+                    try
                     {
-                        if (!String.IsNullOrEmpty(m_commandLineOptions.TargetElement))
+                        file = StepBroMain.LoadScriptFile(consoleResourceUserObject, m_commandLineOptions.InputFile);
+                        if (file == null)
                         {
-                            IFileElement element = StepBroMain.TryFindFileElement(m_commandLineOptions.TargetElement);
-                            if (element != null && element is IFileProcedure)
+                            retval = -1;
+                            Console.WriteLine("Error: Loading script file failed ( " + m_commandLineOptions.InputFile + " )");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        retval = -1;
+                        Console.WriteLine("Error: Loading script file failed: " + ex.GetType().Name + ", " + ex.Message);
+                    }
+
+                    if (file != null)
+                    {
+                        var parsingSuccess = StepBroMain.ParseFiles(true);
+                        if (parsingSuccess)
+                        {
+                            if (!String.IsNullOrEmpty(m_commandLineOptions.TargetElement))
                             {
-                                var procedure = element as IFileProcedure;
-                                object[] arguments = m_commandLineOptions?.Arguments.Select(
-                                    (a) => StepBroMain.ParseExpression(procedure?.ParentFile, a)).ToArray();
-                                try
+                                IFileElement element = StepBroMain.TryFindFileElement(m_commandLineOptions.TargetElement);
+                                if (element != null && element is IFileProcedure)
                                 {
-                                    object result = StepBroMain.ExecuteProcedure(procedure, arguments);
-                                    if (result != null)
+                                    var procedure = element as IFileProcedure;
+                                    object[] arguments = m_commandLineOptions?.Arguments.Select(
+                                        (a) => StepBroMain.ParseExpression(procedure?.ParentFile, a)).ToArray();
+                                    try
                                     {
-                                        Console.WriteLine("Procedure execution ended. Result: " + result.ToString());
+                                        object result = StepBroMain.ExecuteProcedure(procedure, arguments);
+                                        if (result != null)
+                                        {
+                                            Console.WriteLine("Procedure execution ended. Result: " + result.ToString());
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Procedure execution ended.");
+                                        }
                                     }
-                                    else
+                                    catch (TargetParameterCountException)
                                     {
-                                        Console.WriteLine("Procedure execution ended.");
+                                        retval = -1;
+                                        Console.WriteLine("Error: The number of arguments does not match the target procedure.");
                                     }
                                 }
-                                catch (TargetParameterCountException)
+                                else if (element != null && element is ITestList)
                                 {
-                                    retval = -1;
-                                    Console.WriteLine("Error: The number of arguments does not match the target procedure.");
-                                }
-                            }
-                            else if (element != null && element is ITestList)
-                            {
-                                throw new NotImplementedException("Handling of test list tarteg not implemented.");
-                            }
-                            else
-                            {
-                                retval = -1;
-                                if (element == null)
-                                {
-                                    Console.WriteLine($"Error: File element named '{m_commandLineOptions.TargetElement} was not found.");
+                                    throw new NotImplementedException("Handling of test list tarteg not implemented.");
                                 }
                                 else
                                 {
-                                    Console.WriteLine($"Error: File element type for '{m_commandLineOptions.TargetElement} cannot be used as an execution target.");
+                                    retval = -1;
+                                    if (element == null)
+                                    {
+                                        Console.WriteLine($"Error: File element named '{m_commandLineOptions.TargetElement} was not found.");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"Error: File element type for '{m_commandLineOptions.TargetElement} cannot be used as an execution target.");
+                                    }
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Parsing errors!");
-                        foreach (var err in file.Errors.GetList())
+                        else
                         {
-                            if (!err.JustWarning)
+                            Console.WriteLine("Parsing errors!");
+                            foreach (var err in file.Errors.GetList())
                             {
-                                Console.WriteLine($"    Line {err.Line}: {err.Message}");
+                                if (!err.JustWarning)
+                                {
+                                    Console.WriteLine($"    Line {err.Line}: {err.Message}");
+                                }
                             }
+                            retval = -1;
                         }
-                        retval = -1;
                     }
                 }
                 else

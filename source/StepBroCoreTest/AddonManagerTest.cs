@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using StepBro.Core.Api;
+using StepBro.Core.Execution;
+using StepBro.Core.ScriptData;
 using System.Collections.Generic;
 using System.Linq;
-using StepBro.Core.Api;
-using StepBro.Core.Data;
-using StepBro.Core.Execution;
 
 namespace StepBroCoreTest
 {
@@ -37,7 +37,7 @@ namespace StepBroCoreTest
             typeReference = addons.TryGetType(null, "TestModule.SubNamespace.Deep.VeryDeep.MuchDeeper.TestClassInDeepNamespace.SubClass");
             Assert.IsNotNull(typeReference);
 
-            var usings = new IIdentifierInfo[] { addons.Lookup(null, "TestModule") };
+            var usings = new UsingData[] { new UsingData(-1, addons.Lookup(null, "TestModule")) };
             typeReference = addons.TryGetType(usings, "TestClassWithOnlyProperties");
             Assert.IsNotNull(typeReference);
             Assert.AreEqual("TestClassWithOnlyProperties", typeReference.Name);
@@ -48,7 +48,7 @@ namespace StepBroCoreTest
             Assert.AreEqual("SubClass", typeReference.Name);
             typeReference = null;
 
-            usings = new IIdentifierInfo[] { addons.Lookup(null, "TestModule"), addons.Lookup(null, "TestModule.SubNamespace.Deep") };
+            usings = new UsingData[] { new UsingData(-1, addons.Lookup(null, "TestModule")), new UsingData(-1, addons.Lookup(null, "TestModule.SubNamespace.Deep")) };
             typeReference = addons.TryGetType(usings, "VeryDeep.MuchDeeper.TestClassInDeepNamespace.SubClass");
             Assert.IsNotNull(typeReference);
             Assert.AreEqual("SubClass", typeReference.Name);

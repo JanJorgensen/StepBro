@@ -57,7 +57,7 @@ datatable MyTable :
 
 procedure void MyProcedure ( integer a, string b, KMP kmp )
 {
-    var MyArray = {1,2,3,4};
+    var myArray = {1,2,3,4};
     var i = 16;
     int j = i * 13;
     decimal d = 100m;

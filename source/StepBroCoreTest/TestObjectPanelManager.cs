@@ -1,9 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StepBro.Core;
 using StepBro.Core.Controls;
+using StepBro.Core.Controls.WinForms;
 using StepBro.Core.Data;
 using System.Collections.Generic;
 using System.Linq;
+using ObjectPanel = StepBro.Core.Controls.WinForms.ObjectPanel;
 
 namespace StepBroCoreTest
 {

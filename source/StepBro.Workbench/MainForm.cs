@@ -812,10 +812,21 @@ namespace StepBro.Workbench
                         element = fe;
                     }
                 }
-                if (element != null && element is IFileProcedure)
+                if (element != null)
                 {
-                    m_mainScriptExecution = StepBro.Core.Main.StartProcedureExecution(element as IFileProcedure);
-                    m_mainScriptExecution.Task.CurrentStateChanged += this.CurrentScriptExecution_CurrentStateChanged;
+                    if (element is IFileProcedure)
+                    {
+                        m_mainScriptExecution = StepBro.Core.Main.StartProcedureExecution(element as IFileProcedure);
+                        m_mainScriptExecution.Task.CurrentStateChanged += this.CurrentScriptExecution_CurrentStateChanged;
+                    }
+                    else
+                    {
+                        // TODO: Show comment in status bar
+                    }
+                }
+                else
+                {
+                    // TODO: Show comment in status bar
                 }
             }
         }

@@ -25,7 +25,7 @@ namespace StepBro.Core.Parser
         private Stack<ProcedureParsingScope> m_scopeStack = new Stack<ProcedureParsingScope>();
         private bool m_enteredLoopStatement = false;
         private string m_modifiers = null;
-        private bool m_awaitsExpectExpression = false;
+        //private bool m_awaitsExpectExpression = false;
 
         public IFileProcedure LastParsedProcedure { get { return m_lastProcedure; } }
 
@@ -641,14 +641,15 @@ namespace StepBro.Core.Parser
             var variableAssignment = m_scopeStack.Peek().UsingVariableAssignment;
             var usingVariableAssignment = Expression.Assign(usingVariable.VariableExpression, variableAssignment);
 
-            var disposeMethod = typeof(IDisposable).GetMethod(nameof(IDisposable.Dispose));
+            var disposeHelper = typeof(ExecutionHelperMethods).GetMethod(
+                nameof(ExecutionHelperMethods.DisposeObject));
 
             var usingCode = Expression.TryFinally(
                 Expression.Block(
                     usingVariableAssignment,
                     scopeCode
                 ),
-                Expression.Call(usingVariable.VariableExpression, disposeMethod));
+                Expression.Call(disposeHelper, m_currentProcedure.ContextReferenceInternal, usingVariable.VariableExpression));
             m_scopeStack.Peek().AddStatementCode(usingCode);
 
             var statementBlock = m_scopeStack.Pop();
@@ -973,7 +974,7 @@ namespace StepBro.Core.Parser
         {
             this.AddEnterStatement(context);
             m_expressionData.PushStackLevel("ExpectStatement");
-            m_awaitsExpectExpression = true;
+            //m_awaitsExpectExpression = true;
         }
 
         public override void ExitExpectStatement([NotNull] SBP.ExpectStatementContext context)

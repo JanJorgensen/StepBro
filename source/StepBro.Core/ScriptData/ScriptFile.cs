@@ -18,8 +18,8 @@ namespace StepBro.Core.ScriptData
         private string m_namespace = "";
         private bool m_wasLoadedByNamespace;
         private readonly ErrorCollector m_errors;
-        private List<IIdentifierInfo> m_namespaceUsings = new List<IIdentifierInfo>();
-        private List<IIdentifierInfo> m_fileUsings = new List<IIdentifierInfo>();
+        private List<UsingData> m_namespaceUsings = new List<UsingData>();
+        private List<UsingData> m_fileUsings = new List<UsingData>();
         private PropertyBlock m_fileProperties = null;
         private List<FileVariable> m_fileScopeVariables = new List<FileVariable>();
         private List<FileVariable> m_fileScopeVariablesBefore = new List<FileVariable>();
@@ -85,6 +85,7 @@ namespace StepBro.Core.ScriptData
         }
 
         public IErrorCollector Errors { get { return m_errors; } }
+        public ErrorCollector ErrorsInternal { get { return m_errors; } }
 
         public bool HasFileChanged()
         {
@@ -180,7 +181,7 @@ namespace StepBro.Core.ScriptData
         /// <param name="preserveUpdateableElements">Whether to save element objects and just update the changes.</param>
         public void ResetBeforeParsing(bool preserveUpdateableElements)
         {
-            m_namespaceUsings = new List<IIdentifierInfo>();
+            m_namespaceUsings = new List<UsingData>();
             m_fileProperties = null;
 
             if (!preserveUpdateableElements)
@@ -196,17 +197,17 @@ namespace StepBro.Core.ScriptData
                 }
                 m_fileScopeVariables.Clear();
             }
-            foreach (var fu in m_fileUsings.Where(u => u.Type == IdentifierType.FileNamespace))
+            foreach (var fu in m_fileUsings.Where(u => u.Identifier.Type == IdentifierType.FileNamespace))
             {
-                if (fu.Reference != null)
+                if (fu.Identifier.Reference != null)
                 {
-                    foreach (var f in (IEnumerable<ScriptFile>)fu.Reference)
+                    foreach (var f in (IEnumerable<ScriptFile>)fu.Identifier.Reference)
                     {
                         f.UnregisterDependant(this);
                     }
                 }
             }
-            m_fileUsings = new List<IIdentifierInfo>();
+            m_fileUsings = new List<UsingData>();
             m_elements = new List<FileElement>();
 
             m_typeScanIncluded = false;
@@ -222,33 +223,33 @@ namespace StepBro.Core.ScriptData
             m_fileProperties = props;
         }
 
-        internal bool AddNamespaceUsing(string namespaceOrType)
+        internal bool AddNamespaceUsing(int line, string namespaceOrType)
         {
-            if (m_namespaceUsings.Select(u => u.Name).FirstOrDefault(u => String.Equals(u, namespaceOrType, StringComparison.InvariantCultureIgnoreCase)) != null)
+            if (m_namespaceUsings.Select(u => u.Identifier.Name).FirstOrDefault(u => String.Equals(u, namespaceOrType, StringComparison.InvariantCultureIgnoreCase)) != null)
             {
                 return false;
             }
-            m_namespaceUsings.Add(new IdentifierInfo(namespaceOrType, namespaceOrType, IdentifierType.UnresolvedType, null, null));
+            m_namespaceUsings.Add(new UsingData(line, new IdentifierInfo(namespaceOrType, namespaceOrType, IdentifierType.UnresolvedType, null, null)));
             return true;
         }
 
-        internal bool AddNamespaceUsing(IIdentifierInfo identifier)
+        internal bool AddNamespaceUsing(int line, IIdentifierInfo identifier)
         {
-            if (m_namespaceUsings.Select(u => u.FullName).FirstOrDefault(u => String.Equals(u, identifier.FullName, StringComparison.InvariantCultureIgnoreCase)) != null)
+            if (m_namespaceUsings.Select(u => u.Identifier.FullName).FirstOrDefault(u => String.Equals(u, identifier.FullName, StringComparison.InvariantCultureIgnoreCase)) != null)
             {
                 return false;
             }
-            m_namespaceUsings.Add(identifier);
+            m_namespaceUsings.Add(new UsingData(line, identifier));
             return true;
         }
 
-        internal bool AddFileUsing(string file)
+        internal bool AddFileUsing(int line, string file)
         {
-            if (m_fileUsings.Select(u => u.Name).FirstOrDefault(u => String.Equals(u, file, StringComparison.InvariantCultureIgnoreCase)) != null)
+            if (m_fileUsings.Select(u => u.Identifier.Name).FirstOrDefault(u => String.Equals(u, file, StringComparison.InvariantCultureIgnoreCase)) != null)
             {
                 return false;
             }
-            m_fileUsings.Add(new IdentifierInfo(file, file, IdentifierType.FileByName, null, null));
+            m_fileUsings.Add(new UsingData(line, file, IdentifierType.FileByName));
             return true;
         }
 
@@ -275,7 +276,8 @@ namespace StepBro.Core.ScriptData
             int codeHash,
             VariableContainerAction resetter = null,
             VariableContainerAction creator = null,
-            VariableContainerAction initializer = null)
+            VariableContainerAction initializer = null,
+            PropertyBlock customSetupData = null)
         {
             var existing = m_fileScopeVariablesBefore.FirstOrDefault(
                 v => (String.Equals(v.VariableOwnerAccess.Container.Name, name, StringComparison.InvariantCulture) &&
@@ -298,13 +300,27 @@ namespace StepBro.Core.ScriptData
                     existing.VariableOwnerAccess.DataInitializer = initializer;
                 }
                 existing.VariableOwnerAccess.CodeHash = codeHash;
+                if (customSetupData != null)
+                {
+                    SetFileVariableCustomData(existing, customSetupData);
+                }
                 return existing.ID;
             }
 
             var vc = FileVariable.Create(this, access, @namespace, name, datatype, @readonly, line, column, codeHash, resetter, creator, initializer);
+            if (customSetupData != null)
+            {
+                SetFileVariableCustomData(vc, customSetupData);
+            }
             m_fileScopeVariables.Add(vc);
             this.ObjectContainerListChanged?.Invoke(this, EventArgs.Empty);
             return vc.ID;
+        }
+
+        private static void SetFileVariableCustomData(FileVariable variable, PropertyBlock customSetupData)
+        {
+            System.Diagnostics.Debug.Assert(variable.VariableOwnerAccess.Tag != null && variable.VariableOwnerAccess.Tag is Dictionary<Type, Object>);
+            (variable.VariableOwnerAccess.Tag as Dictionary<Type, Object>).Add(typeof(PropertyBlock), customSetupData);
         }
 
         internal void SetFileVariableModifier(int id, AccessModifier access)
@@ -362,7 +378,7 @@ namespace StepBro.Core.ScriptData
 
             foreach (var uf in m_fileUsings)
             {
-                var file = uf.Reference as ScriptFile;
+                var file = uf.Identifier.Reference as ScriptFile;
                 var found = file.GetVariableContainer<T>(id);
                 if (found != null) return found;
             }
@@ -448,7 +464,7 @@ namespace StepBro.Core.ScriptData
             }
         }
 
-        public IEnumerable<IIdentifierInfo> Usings
+        public IEnumerable<UsingData> Usings
         {
             get
             {
@@ -464,12 +480,16 @@ namespace StepBro.Core.ScriptData
             var c = m_namespaceUsings.Count;
             for (int i = 0; i < c; i++)
             {
-                if (m_namespaceUsings[i].Type == IdentifierType.UnresolvedType)
+                if (m_namespaceUsings[i].Identifier.Type == IdentifierType.UnresolvedType)
                 {
-                    var resolved = resolver(m_namespaceUsings[i].Name);
+                    var resolved = resolver(m_namespaceUsings[i].Identifier.Name);
                     if (resolved != null)
                     {
-                        m_namespaceUsings[i] = resolved;
+                        m_namespaceUsings[i] = new UsingData(m_namespaceUsings[i].Line, resolved);
+                    }
+                    else
+                    {
+                        m_errors.UnresolvedUsing(m_fileUsings[i].Line, -1, m_fileUsings[i].Identifier.Name);
                     }
                 }
             }
@@ -480,13 +500,24 @@ namespace StepBro.Core.ScriptData
             var c = m_fileUsings.Count;
             for (int i = 0; i < c; i++)
             {
-                if (m_fileUsings[i].Reference == null)
+                if (m_fileUsings[i].Identifier.Reference == null)
                 {
-                    var resolved = resolver(m_fileUsings[i].Name);
-                    if (resolved != null)
+                    try
                     {
-                        m_fileUsings[i] = new IdentifierInfo(m_fileUsings[i].Name, m_fileUsings[i].FullName, IdentifierType.FileByName, null, resolved);
-                        resolved.RegisterDependant(this);
+                        var resolved = resolver(m_fileUsings[i].Identifier.Name);
+                        if (resolved != null)
+                        {
+                            m_fileUsings[i] = new UsingData(m_fileUsings[i].Line, m_fileUsings[i].Identifier.Name, IdentifierType.FileByName, resolved);
+                            resolved.RegisterDependant(this);
+                        }
+                        else
+                        {
+                            m_errors.UnresolvedUsing(m_fileUsings[i].Line, -1, m_fileUsings[i].Identifier.Name);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        m_errors.InternalError(m_fileUsings[i].Line, -1, "Exception thrown when resolving using. Exception: " + ex.GetType().Name + ", " + ex.Message);
                     }
                 }
             }
@@ -494,14 +525,14 @@ namespace StepBro.Core.ScriptData
 
         internal IEnumerable<IIdentifierInfo> ListResolvedNamespaceUsings()
         {
-            return m_namespaceUsings.Where(e => e.Type != IdentifierType.UnresolvedType);
+            return m_namespaceUsings.Where(e => e.Identifier.Type != IdentifierType.UnresolvedType).Select(nu => nu.Identifier);
         }
 
         internal IEnumerable<ScriptFile> ListResolvedFileUsings()
         {
             foreach (var u in m_fileUsings)
             {
-                if (u.Reference != null && u.Type == IdentifierType.FileByName) yield return u.Reference as ScriptFile;
+                if (u.Identifier.Reference != null && u.Identifier.Type == IdentifierType.FileByName) yield return u.Identifier.Reference as ScriptFile;
             }
         }
 

@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StepBro.TestInterface</RootNamespace>
     <AssemblyName>Stepbro.TestInterface</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -31,40 +31,55 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ActiproSoftware.Editors.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
+    <Reference Include="ActiproSoftware.Ribbon.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
+    <Reference Include="ActiproSoftware.Shared.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
+    <Reference Include="ActiproSoftware.SyntaxEditor.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
     <Reference Include="FastColoredTextBox, Version=2.16.24.0, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\FastColoredTextBox.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="ReachFramework" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Printing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UIAutomationClient" />
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\CommandTerminal.cs">
+    <Compile Include="Controls\CommandTerminalView.xaml.cs">
+      <DependentUpon>CommandTerminalView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\CommandTerminalViewModel.cs" />
+    <Compile Include="Controls\CommandTerminal_WinForms.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\CommandTerminal.Designer.cs">
-      <DependentUpon>CommandTerminal.cs</DependentUpon>
+    <Compile Include="Controls\CommandTerminal_WinForms.Designer.cs">
+      <DependentUpon>CommandTerminal_WinForms.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\LoggedValuesView.cs">
+    <Compile Include="Controls\LoggedValuesView.xaml.cs">
+      <DependentUpon>LoggedValuesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\LoggedValuesView_WinForms.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\LoggedValuesView.Designer.cs">
-      <DependentUpon>LoggedValuesView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\NewLoggedValuesView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\NewLoggedValuesView.Designer.cs">
-      <DependentUpon>NewLoggedValuesView.cs</DependentUpon>
+    <Compile Include="Controls\LoggedValuesView_WinForms.Designer.cs">
+      <DependentUpon>LoggedValuesView_WinForms.cs</DependentUpon>
     </Compile>
     <Compile Include="GeneralTestInterface.cs" />
     <Compile Include="IConnection.cs" />
@@ -98,16 +113,26 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Controls\CommandTerminal.resx">
-      <DependentUpon>CommandTerminal.cs</DependentUpon>
+    <EmbeddedResource Include="Controls\CommandTerminal_WinForms.resx">
+      <DependentUpon>CommandTerminal_WinForms.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\LoggedValuesView.resx">
-      <DependentUpon>LoggedValuesView.cs</DependentUpon>
+    <EmbeddedResource Include="Controls\LoggedValuesView_WinForms.resx">
+      <DependentUpon>LoggedValuesView_WinForms.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Controls\CommandTerminalView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\LoggedValuesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

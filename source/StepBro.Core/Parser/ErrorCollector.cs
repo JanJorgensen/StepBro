@@ -123,6 +123,11 @@ namespace StepBro.Core.Parser
             this.SymanticError((token != null) ? token.Line : -1, (token != null) ? token.Column : -1, false, $"Unresolved identifier: \"{name}\".");
         }
 
+        public void UnresolvedUsing(int line, int charPositionInLine, string @using)
+        {
+            this.SymanticError(line, charPositionInLine, false, $"Unable to find/resolve using: \"{@using}\".");
+        }
+
         public void IncompatibleDataType(int line, int charPositionInLine, string type, string expectedType)
         {
             this.SymanticError(line, charPositionInLine, false, $"Not a compatible type: '{type}'. Expected type: {expectedType}.");

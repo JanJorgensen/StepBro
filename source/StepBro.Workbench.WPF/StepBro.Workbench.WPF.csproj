@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{0E611B5E-94F9-4BDB-8522-D018D014BB4A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>StepBro.Workbench.WPF</RootNamespace>
+    <RootNamespace>StepBro.Workbench</RootNamespace>
     <AssemblyName>StepBro.Workbench.WPF</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -14,6 +14,7 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -35,18 +36,19 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ActiproSoftware.DataGrid.Contrib.Wpf, Version=17.2.665.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
-    <Reference Include="ActiproSoftware.Docking.Wpf, Version=17.2.665.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
-    <Reference Include="ActiproSoftware.Editors.Interop.DataGrid.Wpf, Version=17.2.665.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
-    <Reference Include="ActiproSoftware.Editors.Interop.Grids.Wpf, Version=17.2.665.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
-    <Reference Include="ActiproSoftware.Editors.Wpf, Version=17.2.665.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
-    <Reference Include="ActiproSoftware.Grids.Wpf, Version=17.2.665.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
-    <Reference Include="ActiproSoftware.Shared.Wpf, Version=17.2.665.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
-    <Reference Include="ActiproSoftware.SyntaxEditor.Wpf, Version=17.2.665.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
-    <Reference Include="ActiproSoftware.Text.LLParser.Wpf, Version=17.2.665.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
-    <Reference Include="ActiproSoftware.Text.Wpf, Version=17.2.665.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
+    <Reference Include="ActiproSoftware.DataGrid.Contrib.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
+    <Reference Include="ActiproSoftware.Docking.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
+    <Reference Include="ActiproSoftware.Editors.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
+    <Reference Include="ActiproSoftware.Grids.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
+    <Reference Include="ActiproSoftware.Shared.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
+    <Reference Include="ActiproSoftware.SyntaxEditor.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
+    <Reference Include="ActiproSoftware.Text.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9" />
+    <Reference Include="ReachFramework" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Printing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -69,6 +71,60 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controls\LeftRightPanel.cs" />
+    <Compile Include="DockingItemViewModelBase.cs" />
+    <Compile Include="DocumentHelper.cs" />
+    <Compile Include="DocumentItemViewModel.cs" />
+    <Compile Include="Editor\CalculateAction.cs" />
+    <Compile Include="Editor\CustomEditCommands.cs" />
+    <Compile Include="Editor\InsertCalculatorResultAction.cs" />
+    <Compile Include="Editor\MacroPlaybackAction.cs" />
+    <Compile Include="Editor\NoMacroRecordAction.cs" />
+    <Compile Include="Editor\RepeatAction.cs" />
+    <Compile Include="Editor\RepeatActivationAction.cs" />
+    <Compile Include="MainView.xaml.cs">
+      <DependentUpon>MainView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainViewModel.cs" />
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TextDocumentItemView.xaml.cs">
+      <DependentUpon>TextDocumentItemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TextDocumentItemViewModel.cs" />
+    <Compile Include="ToolItemDockSide.cs" />
+    <Compile Include="ToolItemDockSideConverter.cs" />
+    <Compile Include="ToolItemState.cs" />
+    <Compile Include="ToolItemStateConverter.cs" />
+    <Compile Include="ToolItemTemplateSelector.cs" />
+    <Compile Include="ToolItemViewModel.cs" />
+    <Compile Include="ToolViews\CalculatorView.xaml.cs">
+      <DependentUpon>CalculatorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ToolViews\EditActionData.cs" />
+    <Compile Include="ToolViews\KeyBindingsView.xaml.cs">
+      <DependentUpon>KeyBindingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ToolViews\KeyBindingsViewModel.cs" />
+    <Compile Include="ToolViews\ObjectPanelToolViewModel.cs" />
+    <Compile Include="ToolViews\PropertiesView.xaml.cs">
+      <DependentUpon>PropertiesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ToolViews\PropertiesViewModel.cs" />
+    <Compile Include="ToolViews\ToolItem1View.xaml.cs">
+      <DependentUpon>ToolItem1View.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ToolViews\CalculatorViewModel.cs" />
+    <Compile Include="ToolViews\ToolItem1ViewModel.cs" />
+    <Compile Include="ToolViews\ToolItem2View.xaml.cs">
+      <DependentUpon>ToolItem2View.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ToolViews\ToolItem2ViewModel.cs" />
+    <Compile Include="ToolViews\ToolItem3View.xaml.cs">
+      <DependentUpon>ToolItem3View.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ToolViews\ToolItem3ViewModel.cs" />
     <Compile Include="TreeNodeModel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -76,9 +132,6 @@
     <Compile Include="DocumentData.cs" />
     <Compile Include="EditorDocumentWindow.xaml.cs">
       <DependentUpon>EditorDocumentWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -117,26 +170,79 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MainView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="TextDocumentItemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="ToolViews\CalculatorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ToolViews\KeyBindingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ToolViews\PropertiesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ToolViews\ToolItem1View.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ToolViews\ToolItem2View.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ToolViews\ToolItem3View.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Images\ActiproAppIcon.ico" />
-    <Resource Include="Resources\Images\ActiproIcon.ico" />
-    <Resource Include="Resources\Images\ActiproMetro24.png" />
     <Resource Include="Resources\Images\ClassView16.png" />
     <Resource Include="Resources\Images\Find16.png" />
     <Resource Include="Resources\Images\FindResults16.png" />
     <Resource Include="Resources\Images\Output16.png" />
-    <Resource Include="Resources\Images\ProjectCSharp16.png" />
     <Resource Include="Resources\Images\Properties16.png" />
     <Resource Include="Resources\Images\Reference16.png" />
     <Resource Include="Resources\Images\Solution16.png" />
     <Resource Include="Resources\Images\SolutionExplorer16.png" />
     <Resource Include="Resources\Images\TextDocument16.png" />
-    <Resource Include="Resources\Images\Wrench16.png" />
+    <Resource Include="Resources\Images\Property_16x.png" />
+    <Resource Include="Resources\Images\CSProjectNode_16x.png" />
+    <Resource Include="Resources\Images\Calculator_16x.png" />
+    <Resource Include="Resources\Images\NewFile_16x.png" />
+    <Resource Include="Resources\Images\OpenFile_16x.png" />
+    <Resource Include="Resources\Images\Save_16x.png" />
+    <Resource Include="Resources\Images\Redo_16x.png" />
+    <Resource Include="Resources\Images\Undo_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\StepIn_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\StepOut_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\StepOver_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Stop_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Run_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\BreakpointEnable_16x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

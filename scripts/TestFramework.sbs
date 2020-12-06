@@ -1,0 +1,74 @@
+﻿// Basic test framework for test projects.
+//
+// Test projects should have a common framework file, that uses this
+// file as its basic test framework setup.
+//#####################################################################
+
+
+public procedure TestCaseBase() :
+    FreeParameters,
+    partner Setup:                          TestCaseEmptySetup,
+    partner Cleanup:                        TestCaseEmptyCleanup,
+    partner starter TestFormal:             TestCaseFormalTest,
+    partner starter TestFormalUntilFail:    TestCaseFormalTestUntilFail;
+
+public procedure void TestCaseEmptySetup( this TestCaseBase testcase )
+{
+    log ("Empty setup for " + testcase.Name);
+}
+
+public procedure void TestCaseEmptyCleanup( this TestCaseBase testcase )
+{
+    log ("Empty setup for " + testcase.Name);
+}
+
+public procedure void TestCaseFormalTest( this TestCaseBase testcase )
+{
+    testcase.Setup();
+    testcase();
+    testcase.Cleanup();
+}
+
+public procedure void TestCaseFormalTestUntilFail( this TestCaseBase testcase )
+{
+}
+
+public testlist TestSuiteBase :
+    partner FormalTest : TestSuiteFormalTestExecution,
+    partner DirectTest : TestSuiteDirectTestExecution;
+
+
+/// 
+public procedure void TestSuiteDirectTestExecution(this TestSuiteBase suite)
+{
+    var iterator = suite.GetProcedureIterator();
+    while (iterator.GetNext())
+    {
+        log ("Starting Test: " + iterator.Procedure.Name);
+        TestCaseBase testcase = iterator.Procedure;
+        iterator.Procedure( iterator.Arguments );
+    }
+}
+
+/// 
+public procedure void TestSuiteFormalTestExecution(this TestSuiteBase suite)
+{
+    var iterator = suite.GetProcedureIterator();
+    var testReport = StartReport("TestReport", suite.Name);
+    using (testReport)
+    {
+		// TODO: Save setup data in report
+		// TODO: Save test suite data in report
+        while (iterator.GetNext())
+        {
+			// TODO: Start new group in report
+			// TODO: Save test case data in report
+            log ("Starting Test: " + iterator.Procedure.Name);
+            TestCaseBase testcase = iterator.Procedure;
+            testcase.Setup();
+            iterator.Procedure( iterator.Arguments );
+            testcase.Cleanup();
+			// TODO: Save test summary in report
+        }
+    }
+}

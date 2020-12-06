@@ -1,0 +1,32 @@
+﻿<UserControl
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:syntaxeditor="http://schemas.actiprosoftware.com/winfx/xaml/syntaxeditor"
+		xmlns:Controls="clr-namespace:StepBro.Workbench.Controls" x:Class="StepBro.Workbench.ToolViews.CalculatorView"
+		>
+    <DockPanel>
+        <syntaxeditor:SyntaxEditor DockPanel.Dock="Bottom" x:Name="expressionEditor" IsMultiLine="False" Text="70 - column" VerticalAlignment="Bottom" Margin="0,4,0,0"/>
+        <ListBox x:Name="history" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <Controls:LeftRightPanel Background="#FFF8FFE0">
+                <TextBlock TextWrapping="Wrap" MinWidth="80"><Run Text="n1 = line"/></TextBlock>
+                <TextBlock TextWrapping="Wrap" MinWidth="40" TextAlignment="Right"><Run Text="728"/></TextBlock>
+            </Controls:LeftRightPanel>
+            <Controls:LeftRightPanel>
+                <TextBlock TextWrapping="Wrap" MinWidth="80"><Run Text="cos(51)"/></TextBlock>
+                <TextBlock TextWrapping="Wrap" MinWidth="40" TextAlignment="Right"><Run Text="0,6293203910"/></TextBlock>
+            </Controls:LeftRightPanel>
+            <Controls:LeftRightPanel Background="#FFF8FFE0">
+                <TextBlock TextWrapping="Wrap" MinWidth="80">s4 += " // TODO: "</TextBlock>
+                <TextBlock TextWrapping="Wrap" MinWidth="40" TextAlignment="Right">"  int x =14; // TODO: "</TextBlock>
+            </Controls:LeftRightPanel>
+            <Controls:LeftRightPanel>
+                <TextBlock TextWrapping="Wrap" MinWidth="80"><Run Text="isAtEndOfLine"/></TextBlock>
+                <TextBlock TextWrapping="Wrap" MinWidth="40" TextAlignment="Right"><Run Text="true"/></TextBlock>
+            </Controls:LeftRightPanel>
+            <Controls:LeftRightPanel Background="#FFF8FFE0">
+                <TextBlock TextWrapping="Wrap" MinWidth="80"><Run Text="70 - column"/></TextBlock>
+                <TextBlock TextWrapping="Wrap" MinWidth="40" TextAlignment="Right"><Run Text="9"/></TextBlock>
+            </Controls:LeftRightPanel>
+        </ListBox>
+    </DockPanel>
+</UserControl>

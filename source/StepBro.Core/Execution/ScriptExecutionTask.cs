@@ -236,6 +236,7 @@ namespace StepBro.Core.Execution
             {
                 if (text != null) m_text = text;
                 if (progress >= 0) m_progress = progress;
+                if (progress == 99999) this.ExpectedTimeExceeded?.Invoke(this, EventArgs.Empty);    // TODO
                 //MiniLogger.Instance.Add(String.Format("TaskUpdate({0}).UpdateStatus: {1}, {2}", m_level, String.IsNullOrEmpty(text) ? "<no text>" : text, (progress >= 0) ? progress.ToString() : "<no progress>"));
             }
 

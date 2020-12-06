@@ -54,6 +54,8 @@
         '\"',
         '\'',
         '\''};
+            this.fctb.AutoIndentCharsPatterns = "^\\s*[\\w\\.]+(\\s\\w+)?\\s*(?<range>=)\\s*(?<range>[^;=]+);\r\n^\\s*(case|default)\\s*[^:]*" +
+    "(?<range>:)\\s*(?<range>[^;]+);";
             this.fctb.AutoScrollMinSize = new System.Drawing.Size(2, 14);
             this.fctb.BackBrush = null;
             this.fctb.CharHeight = 14;
@@ -67,7 +69,6 @@
             this.fctb.Paddings = new System.Windows.Forms.Padding(0);
             this.fctb.ReadOnly = true;
             this.fctb.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
-            this.fctb.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("fctb.ServiceColors")));
             this.fctb.ShowLineNumbers = false;
             this.fctb.Size = new System.Drawing.Size(150, 150);
             this.fctb.TabIndex = 3;
@@ -75,8 +76,7 @@
             // 
             // SimpleLogView
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.Controls.Add(this.fctb);
             this.Name = "SimpleLogView";
             ((System.ComponentModel.ISupportInitialize)(this.fctb)).EndInit();

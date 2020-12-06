@@ -70,7 +70,7 @@ namespace StepBro.Core.Parser
                 {
                     var identifier = (string)identifierExpression.Value;
                     // TODO: check the identifier
-                    m_file.AddNamespaceUsing(identifier);
+                    m_file.AddNamespaceUsing(context.Start.Line, identifier);
                 }
             }
         }
@@ -86,7 +86,7 @@ namespace StepBro.Core.Parser
                 var path = context.GetChild(1).GetText();
                 path = ParseStringLiteral(path, context);
                 // TODO: check the path
-                m_file.AddFileUsing(path);
+                m_file.AddFileUsing(context.Start.Line, path);
             }
         }
 
@@ -211,9 +211,15 @@ namespace StepBro.Core.Parser
                 #endregion
             }
 
+            PropertyBlock customProperties = null;
             if (props != null && props.Count > 0)
             {
                 initAction = this.CreateVariableContainerObjectInitAction(type.Type, props, m_errors, context.Start);
+                if (props.Count(e => e.Tag == null) > 0)
+                {
+                    customProperties = new PropertyBlock();
+                    customProperties.AddRange(props.Where(e => e.Tag == null));
+                }
             }
 
             var codeHash = context.GetText().GetHashCode();
@@ -222,7 +228,8 @@ namespace StepBro.Core.Parser
                 context.Start.Line, context.Start.Column, codeHash,
                 resetter: resetAction,
                 creator: createAction,
-                initializer: initAction);
+                initializer: initAction,
+                customSetupData: customProperties);
             m_file.SetFileVariableModifier(id, m_fileElementModifier);
 
             m_variableName = null;
@@ -281,6 +288,7 @@ namespace StepBro.Core.Parser
                         var objectProperty = contract.Properties.FirstOrDefault(p => String.Equals(entry.Name, p.PropertyName, StringComparison.InvariantCulture));
                         if (objectProperty != null)
                         {
+                            entry.Tag = "Property";
                             bool dataError = false;
                             System.Diagnostics.Debug.WriteLine($"Property type: {objectProperty.PropertyType.Name}");
                             Expression valueExpression = null;
@@ -391,7 +399,7 @@ namespace StepBro.Core.Parser
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    // Not handled yet; just let it fall through.
                 }
             }
             if (dataSetters.Count > 0)
@@ -413,6 +421,16 @@ namespace StepBro.Core.Parser
                         Expression.Convert(getObjectReference, objectType));
                     var expressions = new List<Expression>(dataSetters);
                     expressions.Insert(0, objectReferenceAssignment);
+
+                    if (objectType.GetInterface(nameof(ISettableFromPropertyBlock)) != null)
+                    {
+                        var setterHelper = typeof(ExecutionHelperMethods).GetMethod(
+                            nameof(ExecutionHelperMethods.SetupObjectWithPropertyBlock));
+
+                        var propertyBlockSetter = Expression.Call(setterHelper, parameterLogger, parameterContainer);
+                        expressions.Add(propertyBlockSetter);
+                    }
+
                     expressions.Add(Expression.Label(returnLabel, Expression.Constant(true)));
 
                     var lambdaExpr = Expression.Lambda(
@@ -421,7 +439,7 @@ namespace StepBro.Core.Parser
                         parameterContainer,
                         parameterLogger);
                     var @delegate = lambdaExpr.Compile();
-                    return (VariableContainerAction)@delegate;
+                    action = (VariableContainerAction)@delegate;
                 }
                 catch (Exception ex)
                 {
@@ -522,6 +540,7 @@ namespace StepBro.Core.Parser
 
         public override void VisitErrorNode([NotNull] IErrorNode node)
         {
+            //m_errors.InternalError(-1, -1, "VisitErrorNode");
             //base.VisitErrorNode(node);
         }
     }

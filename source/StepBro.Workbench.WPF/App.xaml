@@ -1,7 +1,7 @@
-﻿<Application x:Class="StepBro.Workbench.WPF.App"
+﻿<Application x:Class="StepBro.Workbench.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:StepBro.Workbench.WPF"
+             xmlns:local="clr-namespace:StepBro.Workbench"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

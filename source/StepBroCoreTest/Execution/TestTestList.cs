@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using StepBro.Core.Data;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
-using StepBro.Core.Execution;
-using StepBro.Core.Logging;
 using StepBroCoreTest.Utils;
+using System;
+using System.Linq;
+using System.Text;
 
 namespace StepBroCoreTest.Execution
 {
@@ -74,6 +70,51 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
 
+        }
+
+        [TestMethod]
+        public void TestlistUseWithOppositeOrder()
+        {
+            var f = new StringBuilder();
+            f.AppendLine("procedure void ExecuteAllTests()");
+            f.AppendLine("{");
+            f.AppendLine("   var iterator = AllTests.GetProcedureIterator();");
+            f.AppendLine("   while (iterator.GetNext())");
+            f.AppendLine("   {");
+            f.AppendLine("      iterator.Procedure( iterator.Arguments );");
+            f.AppendLine("   }");
+            f.AppendLine("}");
+            f.AppendLine("testlist AllTests");
+            f.AppendLine("{");
+            f.AppendLine("   * FirstTestCase");
+            f.AppendLine("}");
+            f.AppendLine("procedure void FirstTestCase() {}");
+
+            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile.tss", f.ToString()))[0];
+
+            Assert.AreEqual(1, file.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
+            var procedure = file.ListElements().First(p => p.Name == "ExecuteAllTests") as IFileProcedure;
+
+            Exception exeException = null;
+            var taskContext = ExecutionHelper.ExeContext();
+            try
+            {
+                taskContext.CallProcedure(procedure);
+            }
+            catch (Exception ex)
+            {
+                exeException = ex;
+            }
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+            if (exeException != null) throw exeException;
+
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - myfile.ExecuteAllTests - <arguments>");
+            log.ExpectNext("2 - Pre - <DYNAMIC CALL> myfile.FirstTestCase - <arguments>");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
         }
     }
 }

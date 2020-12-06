@@ -1,5 +1,6 @@
 ﻿using StepBro.Core;
 using StepBro.Core.Controls;
+using StepBro.Core.Controls.WinForms;
 using StepBro.Core.Data;
 using System;
 
@@ -7,7 +8,7 @@ namespace StepBro.Workbench
 {
     public partial class ObjectPanelDockWindow : ToolWindow
     {
-        private ObjectPanel m_panel = null;
+        private Core.Controls.WinForms.ObjectPanel m_panel = null;
         private string[] m_loadSpecification = null;
         private string m_objectName = null;
         private ObjectPanelInfo m_panelType = null;
@@ -50,7 +51,7 @@ namespace StepBro.Workbench
             }
         }
 
-        public void SetPanel(ObjectPanelInfo type, ObjectPanel panel)
+        public void SetPanel(ObjectPanelInfo type, Core.Controls.WinForms.ObjectPanel panel)
         {
             System.Diagnostics.Debug.Assert(m_panel == null);
             System.Diagnostics.Debug.Assert(m_loadSpecification == null);
@@ -140,23 +141,23 @@ namespace StepBro.Workbench
         {
             switch (m_panel.State)
             {
-                case ObjectPanel.BindingState.NotBindable:
-                case ObjectPanel.BindingState.Bound:
+                case ObjectPanelBindingState.NotBindable:
+                case ObjectPanelBindingState.Bound:
                     m_panel.Visible = true;
                     labelErrorMessage.Visible = false;
                     break;
 
-                case ObjectPanel.BindingState.NotBound:
+                case ObjectPanelBindingState.NotBound:
                     m_panel.Visible = false;
                     labelErrorMessage.Visible = true;
                     labelErrorMessage.Text = "Awaiting object named \"" + m_objectName + "\" to created.";
                     break;
-                case ObjectPanel.BindingState.BoundWithoutObject:
+                case ObjectPanelBindingState.BoundWithoutObject:
                     m_panel.Visible = false;
                     labelErrorMessage.Visible = true;
                     labelErrorMessage.Text = "Awaiting object to be re-created.";
                     break;
-                case ObjectPanel.BindingState.BindingFailed:
+                case ObjectPanelBindingState.BindingFailed:
                     m_panel.Visible = false;
                     labelErrorMessage.Visible = true;
                     labelErrorMessage.Text = "Binding to object named \"" + m_objectName + "\" failed.";

@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="StepBro.Workbench.TextDocumentItemView"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:self="clr-namespace:StepBro.Workbench.Editor"
+		xmlns:syntaxeditor="http://schemas.actiprosoftware.com/winfx/xaml/syntaxeditor" 
+        xmlns:themes="http://schemas.actiprosoftware.com/winfx/xaml/themes"
+		>
+
+    <UserControl.CommandBindings>
+        <CommandBinding Command="self:CustomEditCommands.RepeatActivationCommand"/>
+    </UserControl.CommandBindings>
+    
+    <!--<syntaxeditor:SyntaxEditor x:Name="editor" Text="{Binding Path=Text, Mode=OneTime}"/>-->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Border x:Name="symbolSelectorBorder" Background="{DynamicResource {x:Static themes:AssetResourceKeys.ToolBarHorizontalBackgroundNormalBrushKey}}" Visibility="Collapsed">
+            <syntaxeditor:NavigableSymbolSelector x:Name="symbolSelector" Margin="0,0,0,1" SyntaxEditor="{Binding ElementName=editor}" />
+        </Border>
+
+        <syntaxeditor:SyntaxEditor x:Name="editor" Grid.Row="1" BorderThickness="0" CanSplitHorizontally="False" HasSearchOverlayPaneKeyBindings="False"
+								   Text="{Binding Path=Text, Mode=OneTime}"
+                                   DocumentIsModifiedChanged="OnEditorDocumentIsModifiedChanged"
+								   DocumentParseDataChanged="OnEditorDocumentParseDataChanged"
+								   ViewSearch="OnEditorViewSearch"
+								   UserInterfaceUpdate="OnEditorUserInterfaceUpdate"
+                                   />
+
+    </Grid>
+
+</UserControl>

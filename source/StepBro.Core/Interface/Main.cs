@@ -3,6 +3,7 @@ using StepBro.Core.Controls;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.General;
+using StepBro.Core.Host;
 using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
@@ -31,6 +32,7 @@ namespace StepBro.Core
         private static ScriptExecutionManager m_scriptExecutionManager = null;
         private static DynamicObjectManager m_dynamicObjectManager = null;
         private static ObjectPanelManager m_objectPanelManager = null;
+        private static UICalculator m_uiCalculator = null;
         //private static readonly object m_mainObject = new object();
         //private static readonly bool m_isInDebugMode = true;
         //private static Queue<Task> m_runningTasks = new Queue<Task>();
@@ -103,6 +105,9 @@ namespace StepBro.Core
             m_objectPanelManager = new ObjectPanelManager(out service);
             m_serviceManagerAdmin.Manager.Register(service);
 
+            m_uiCalculator = new UICalculator(out service);
+            m_serviceManagerAdmin.Manager.Register(service);
+
             TaskContextDummy taskContext = new TaskContextDummy();
 
             try
@@ -169,6 +174,10 @@ namespace StepBro.Core
         {
             if (user == null) throw new ArgumentNullException("user");
             if (String.IsNullOrWhiteSpace(filepath)) throw new ArgumentNullException("filepath");
+            if (m_loadedFilesManager.ListFiles<IScriptFile>().FirstOrDefault(f => String.Equals(f.FilePath, filepath))!=null)
+            {
+                throw new FileAlreadyLoadedException(filepath);
+            }
             var extension = System.IO.Path.GetExtension(filepath);
             if (extension.Equals(".sbs", StringComparison.InvariantCulture))
             {
@@ -460,6 +469,7 @@ namespace StepBro.Core
             {
                 if (text != null) m_text = text;
                 if (progress >= 0) m_progress = progress;
+                if (progress == 99999) this.ExpectedTimeExceeded?.Invoke(this, EventArgs.Empty);    // TODO
                 //MiniLogger.Instance.Add(String.Format("TaskUpdate({0}).UpdateStatus: {1}, {2}", m_level, String.IsNullOrEmpty(text) ? "<no text>" : text, (progress >= 0) ? progress.ToString() : "<no progress>"));
             }
 

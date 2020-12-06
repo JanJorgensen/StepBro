@@ -23,14 +23,14 @@ namespace StepBro.Core.Data
 
         PanelCreationOption GetPanelCreationOption(ObjectPanelInfo type, object @object = null);
 
-        Controls.ObjectPanel CreateStaticPanel(ObjectPanelInfo type);
-        Controls.ObjectPanel CreateObjectPanel(ObjectPanelInfo type, IObjectContainer container);
-        Controls.ObjectPanel CreateObjectPanel(ObjectPanelInfo type, string objectReference);
+        Controls.WinForms.ObjectPanel CreateStaticPanel(ObjectPanelInfo type);
+        Controls.WinForms.ObjectPanel CreateObjectPanel(ObjectPanelInfo type, IObjectContainer container);
+        Controls.WinForms.ObjectPanel CreateObjectPanel(ObjectPanelInfo type, string objectReference);
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        IEnumerable<Controls.ObjectPanel> ListCreatedPanels();
+        IEnumerable<Controls.WinForms.ObjectPanel> ListCreatedPanels();
     }
 }

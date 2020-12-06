@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "StepBro"
-#define MyAppVersion "0.1.0"
+#define MyAppVersion "0.1.30"
 #define MyAppPublisher "SchmutStein"
 #define MyAppURL "http://www.schmutstein.com/"
 #define MyAppExeName "StepBro.Workbench.exe"
@@ -52,9 +52,9 @@ Name: "{app}\examples"
 [Files]
 Source: "bin\stepbro.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "bin\StepBro.Workbench.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "bin\StepBro.Workbench.WPF.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "bin\StepBro.Core.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "bin\Antlr4.Runtime.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "bin\Microsoft.Win32.Primitives.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "bin\CommandLine.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "bin\FastColoredTextBox.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "bin\Newtonsoft.Json.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -79,13 +79,18 @@ Source: "bin\System.Security.Cryptography.Encoding.dll"; DestDir: "{app}"; Flags
 Source: "bin\System.Security.Cryptography.Primitives.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "bin\System.Security.Cryptography.X509Certificates.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "bin\System.Threading.Tasks.Extensions.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "bin\System.ValueTuple.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "bin\System.Xml.ReaderWriter.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "bin\ActiproSoftware.DataGrid.Contrib.Wpf.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "bin\ActiproSoftware.Docking.Wpf.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "bin\ActiproSoftware.Editors.Wpf.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "bin\ActiproSoftware.Grids.Wpf.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "bin\ActiproSoftware.Shared.Wpf.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "bin\ActiproSoftware.SyntaxEditor.Wpf.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "bin\ActiproSoftware.Text.Wpf.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "bin\modules\PCANBasic.dll"; DestDir: "{app}\modules"; Flags: ignoreversion
 Source: "bin\modules\StepBro.CAN.dll"; DestDir: "{app}\modules"; Flags: ignoreversion
 Source: "bin\modules\StepBro.Process.dll"; DestDir: "{app}\modules"; Flags: ignoreversion
 Source: "bin\modules\StepBro.Streams.dll"; DestDir: "{app}\modules"; Flags: ignoreversion
 Source: "bin\modules\Stepbro.TestInterface.dll"; DestDir: "{app}\modules"; Flags: ignoreversion
-Source: "..\examples\Demo Conditional Statements.sbs"; DestDir: "{app}\examples"
-Source: "..\examples\Demo Procedure.sbs"; DestDir: "{app}\examples"
-Source: "..\examples\Demo Workbench.sbs"; DestDir: "{app}\examples"
+Source: "..\examples\scripts\Demo Conditional Statements.sbs"; DestDir: "{app}\examples\scripts"
+Source: "..\examples\scripts\Demo Procedure.sbs"; DestDir: "{app}\examples\scripts"
+Source: "..\examples\scripts\Demo Workbench.sbs"; DestDir: "{app}\examples\scripts"

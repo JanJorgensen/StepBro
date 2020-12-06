@@ -175,15 +175,15 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public IEnumerable<IFileElement> ListFileElementsInScope(IEnumerable<IIdentifierInfo> usings)
+        public IEnumerable<IFileElement> ListFileElementsInScope()
         {
             foreach (var e in this.ListLocalFileElements()) yield return e;
             foreach (var e in this.ListExternalFileElements()) yield return e;
         }
 
-        public IFileElement TryGetFileElementInScope(IEnumerable<IIdentifierInfo> usings, string name)
+        public IFileElement TryGetFileElementInScope(IEnumerable<UsingData> usings, string name)
         {
-            var elements = this.ListFileElementsInScope(usings).ToList();   // Creating list for debugging purposes.
+            var elements = this.ListFileElementsInScope().ToList();   // Creating list for debugging purposes.
             return elements.FirstOrDefault(e => e.Name.Equals(name, StringComparison.InvariantCulture));
         }
 

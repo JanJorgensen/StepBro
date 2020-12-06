@@ -9,7 +9,7 @@ using System.Windows.Data;
 using System.ComponentModel;
 using StepBro.Core.Parser;
 
-namespace StepBro.Workbench.WPF
+namespace StepBro.Workbench
 {
     /// <summary>
     /// Interaction logic for EditorDocumentWindow.xaml

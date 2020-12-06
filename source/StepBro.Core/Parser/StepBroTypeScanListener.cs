@@ -12,6 +12,19 @@ namespace StepBro.Core.Parser
 {
     internal class StepBroTypeScanListener : StepBro.Core.Parser.Grammar.StepBroBaseListener
     {
+        public class UsingData
+        {
+            public int Line = -1;
+            public string Type = null;
+            public string Name = null;
+            public UsingData(int line, string type, string name)
+            {
+                this.Line = line;
+                this.Type = type;
+                this.Name = name;
+            }
+        }
+
         public class FileElement
         {
             public FileElement Parent { get; private set; }
@@ -54,15 +67,15 @@ namespace StepBro.Core.Parser
 
         public class FileContent
         {
-            private readonly List<Tuple<string, string>> m_usings = new List<Tuple<string, string>>();
-            public FileContent(List<Tuple<string, string>> usings, FileElement topElement)
+            private readonly List<UsingData> m_usings = new List<UsingData>();
+            public FileContent(List<UsingData> usings, FileElement topElement)
             {
                 m_usings = usings;
                 this.TopElement = topElement;
             }
             public FileElement TopElement { get; private set; }
 
-            public IEnumerable<Tuple<string, string>> ListUsings()
+            public IEnumerable<UsingData> ListUsings()
             {
                 foreach (var u in m_usings)
                 {
@@ -76,7 +89,7 @@ namespace StepBro.Core.Parser
             this.SetNamespace(@namespace);
         }
 
-        private List<Tuple<string, string>> m_usings = new List<Tuple<string, string>>();
+        private List<UsingData> m_usings = new List<UsingData>();
         private FileElement m_firstElement = null;
         private bool m_namespaceSet = false;
         private int m_elementStartLine = -1;
@@ -105,7 +118,7 @@ namespace StepBro.Core.Parser
             return new FileContent(m_usings, this.TopElement);
         }
 
-        public IEnumerable<Tuple<string, string>> ListUsings() { return m_usings; }
+        //public IEnumerable<Tuple<string, string>> ListUsings() { return m_usings; }
 
         private void PushType(string location, string type, IToken token)
         {
@@ -124,11 +137,11 @@ namespace StepBro.Core.Parser
         {
             if (context.ChildCount == 3)
             {
-                m_usings.Add(new Tuple<string, string>("i", context.GetChild(1).GetText()));
+                m_usings.Add(new UsingData(context.Start.Line, "i", context.GetChild(1).GetText()));
             }
             else if (context.ChildCount == 4)
             {
-                m_usings.Add(new Tuple<string, string>("I", context.GetChild(2).GetText()));
+                m_usings.Add(new UsingData(context.Start.Line, "I", context.GetChild(2).GetText()));
             }
         }
 
@@ -136,11 +149,11 @@ namespace StepBro.Core.Parser
         {
             if (context.ChildCount == 3)
             {
-                m_usings.Add(new Tuple<string, string>("p", StepBroListener.ParseStringLiteral(context.GetChild(1).GetText(), context)));
+                m_usings.Add(new UsingData(context.Start.Line, "p", StepBroListener.ParseStringLiteral(context.GetChild(1).GetText(), context)));
             }
             else if (context.ChildCount == 4)
             {
-                m_usings.Add(new Tuple<string, string>("P", StepBroListener.ParseStringLiteral(context.GetChild(2).GetText(), context)));
+                m_usings.Add(new UsingData(context.Start.Line, "P", StepBroListener.ParseStringLiteral(context.GetChild(2).GetText(), context)));
             }
         }
 

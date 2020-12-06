@@ -66,10 +66,14 @@ namespace StepBro.Core.General
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        public void RegisterDependant(object usingObject)
+        public bool RegisterDependant(object usingObject)
         {
-            if (m_dependants.Select(wr => { if (wr.TryGetTarget(out object o)) return o; else return null; }).Contains(usingObject)) throw new ArgumentException("The specified object is already registered as a dependant.");
+            if (m_dependants.Select(wr => { if (wr.TryGetTarget(out object o)) return o; else return null; }).Contains(usingObject))
+            {
+                return true;
+            }
             m_dependants.Add(new WeakReference<object>(usingObject));
+            return false;
         }
 
         public void UnregisterDependant(object usingObject, bool throwIfNotFound = true)

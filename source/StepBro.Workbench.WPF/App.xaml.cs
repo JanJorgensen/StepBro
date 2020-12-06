@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace StepBro.Workbench.WPF
+namespace StepBro.Workbench
 {
     /// <summary>
     /// Interaction logic for App.xaml

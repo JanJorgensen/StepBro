@@ -1,6 +1,7 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.General;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace StepBroCoreTest.Data
 
     }
 
-    public class DummyClass : IDummyClass, IDisposable
+    public class DummyClass : IDummyClass, IScriptDisposable
     {
         private long m_propInt;
         private bool m_propBool = false;
@@ -88,6 +89,15 @@ namespace StepBroCoreTest.Data
             m_disposeCount++;
             m_disposed = true;
             this.PropInt += 1000;
+        }
+
+        public event EventHandler Disposing;
+
+        public void Dispose(ICallContext context)
+        {
+            this.Disposing?.Invoke(this, EventArgs.Empty);
+            this.Dispose();
+            this.PropInt += 80;
         }
 
         public Func<long> DelegateLong

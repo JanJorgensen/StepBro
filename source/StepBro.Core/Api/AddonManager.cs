@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Data;
+using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using System;
 using System.Collections.Generic;
@@ -114,26 +115,27 @@ namespace StepBro.Core.Api
             }
         }
 
-        public IIdentifierInfo Lookup(IEnumerable<IIdentifierInfo> usings, string name)
+        public IIdentifierInfo Lookup(IEnumerable<UsingData> usings, string name)
         {
             IIdentifierInfo data;
             if (m_lookup.TryGetValue(name, out data)) return data;
             else if (usings != null)
             {
-                foreach (IIdentifierInfo u in usings)
+                foreach (UsingData u in usings)
                 {
-                    switch (u.Type)
+                    var ui = u.Identifier;
+                    switch (ui.Type)
                     {
                         case IdentifierType.DotNetNamespace:
-                            if (m_lookup.TryGetValue(((NamespaceList)u.Reference).FullName + "." + name, out data)) return data;
+                            if (m_lookup.TryGetValue(((NamespaceList)ui.Reference).FullName + "." + name, out data)) return data;
                             break;
 
                         case IdentifierType.DotNetType:
-                            foreach (var nt in ((Type)u.DataType.Type).GetNestedTypes())
+                            foreach (var nt in ((Type)ui.DataType.Type).GetNestedTypes())
                             {
                                 if (nt.Name.Equals(name, StringComparison.InvariantCulture))
                                 {
-                                    return new IdentifierInfo(name, u.FullName + "." + name, IdentifierType.DotNetType, (TypeReference)nt);
+                                    return new IdentifierInfo(name, ui.FullName + "." + name, IdentifierType.DotNetType, (TypeReference)nt);
                                 }
                             }
                             break;
@@ -147,7 +149,7 @@ namespace StepBro.Core.Api
             return null;
         }
 
-        public IEnumerable<IIdentifierInfo> List(IEnumerable<IIdentifierInfo> usings)
+        public IEnumerable<IIdentifierInfo> List(IEnumerable<UsingData> usings)
         {
             yield break;
             //foreach (IIdentifierInfo u in usings)
@@ -226,7 +228,7 @@ namespace StepBro.Core.Api
         }
 
 
-        public Type TryGetType(IEnumerable<IIdentifierInfo> usings, string name)
+        public Type TryGetType(IEnumerable<UsingData> usings, string name)
         {
             var found = this.Lookup(usings, name);
             if (found != null && found.Type == IdentifierType.DotNetType)

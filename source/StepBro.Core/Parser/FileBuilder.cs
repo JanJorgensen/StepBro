@@ -52,20 +52,20 @@ namespace StepBro.Core.Parser
             addons.AddAssembly(typeof(System.Linq.Enumerable).Assembly, false);
 
             var file = new ScriptFile();
-            file.AddNamespaceUsing(addons.Lookup(null, "System"));
-            file.AddNamespaceUsing(addons.Lookup(null, "System.Linq"));
-            file.AddNamespaceUsing(addons.Lookup(null, typeof(StepBro.Core.DataReport).Namespace));
+            file.AddNamespaceUsing(-1, addons.Lookup(null, "System"));
+            file.AddNamespaceUsing(-1, addons.Lookup(null, "System.Linq"));
+            file.AddNamespaceUsing(-1, addons.Lookup(null, typeof(StepBro.Core.DataReport).Namespace));
             if (typeUsing != null)
             {
                 addons.AddAssembly(typeUsing.Assembly, false);
-                file.AddNamespaceUsing(addons.Lookup(null, typeUsing.FullName));
+                file.AddNamespaceUsing(-1, addons.Lookup(null, typeUsing.FullName));
             }
             if (typeNamespaces != null)
             {
                 foreach (var u in typeNamespaces)
                 {
                     addons.AddAssembly(u.Assembly, false);
-                    file.AddNamespaceUsing(addons.Lookup(null, u.Namespace));
+                    file.AddNamespaceUsing(-1, addons.Lookup(null, u.Namespace));
                 }
             }
 
@@ -163,8 +163,8 @@ namespace StepBro.Core.Parser
             //if (module != null) addons.AddAssembly(module, false);
 
             var file = new ScriptFile();
-            file.AddNamespaceUsing(addons.Lookup(null, "System"));
-            file.AddNamespaceUsing(addons.Lookup(null, "System.Linq"));
+            file.AddNamespaceUsing(-1, addons.Lookup(null, "System"));
+            file.AddNamespaceUsing(-1, addons.Lookup(null, "System.Linq"));
             //foreach (var u in usings)
             //{
             //    file.AddNamespaceUsing(addons.Lookup(null, u.FullName));
@@ -322,19 +322,19 @@ namespace StepBro.Core.Parser
             var contentBuilder = new StringBuilder();
             foreach (var s in content) contentBuilder.AppendLine(s);
             var file = new ScriptFile();
-            file.AddNamespaceUsing(addonManager.Lookup(null, "System"));
-            file.AddNamespaceUsing(addonManager.Lookup(null, "System.Linq"));
-            file.AddNamespaceUsing(addonManager.Lookup(null, typeof(StepBro.Core.DataReport).Namespace));
+            file.AddNamespaceUsing(-1, addonManager.Lookup(null, "System"));
+            file.AddNamespaceUsing(-1, addonManager.Lookup(null, "System.Linq"));
+            file.AddNamespaceUsing(-1, addonManager.Lookup(null, typeof(StepBro.Core.DataReport).Namespace));
             if (usings != null)
             {
                 foreach (var u in usings)
                 {
-                    file.AddNamespaceUsing(addonManager.Lookup(null, u));
+                    file.AddNamespaceUsing(-1, addonManager.Lookup(null, u));
                 }
             }
             if (usingType != null)
             {
-                file.AddNamespaceUsing(addonManager.Lookup(null, usingType.Namespace));
+                file.AddNamespaceUsing(-1, addonManager.Lookup(null, usingType.Namespace));
             }
 
 
@@ -536,18 +536,19 @@ namespace StepBro.Core.Parser
 
                 foreach (var @using in fileScanData.ListUsings())
                 {
-                    string type = @using.Item1;
-                    string name = @using.Item2;
+                    var line = @using.Line;
+                    var type = @using.Type;
+                    var name = @using.Name;
                     if (type == "i" || type == "I")
                     {
-                        if (!file.AddNamespaceUsing(name))
+                        if (!file.AddNamespaceUsing(line, name))
                         {
                             throw new Exception($"Namespace using already added ({name}).");
                         }
                     }
                     else if (type == "p" || type == "P")
                     {
-                        if (!file.AddFileUsing(name))
+                        if (!file.AddFileUsing(line, name))
                         {
                             throw new Exception($"File using already added ({name}).");
                         }
@@ -558,17 +559,20 @@ namespace StepBro.Core.Parser
                 file.ResolveFileUsings(
                     fu =>
                     {
+                        string basefolder = Path.GetDirectoryName(file.GetFullPath());
+                        var fuName = Path.GetFileName(fu);
+
                         // Check the already parsed or loaded files first.
                         foreach (var f in filesToParse)
                         {
-                            if (!Object.ReferenceEquals(file, f) && String.Equals(fu, f.FileName, StringComparison.InvariantCulture))
+                            if (!Object.ReferenceEquals(file, f) && String.Equals(fuName, f.FileName, StringComparison.InvariantCulture))
                             {
                                 return f;
                             }
                         }
                         foreach (var f in filesManager.ListFiles<ScriptFile>())
                         {
-                            if (!Object.ReferenceEquals(file, f) && String.Equals(fu, f.FileName, StringComparison.InvariantCulture))
+                            if (!Object.ReferenceEquals(file, f) && String.Equals(fuName, f.FileName, StringComparison.InvariantCulture))
                             {
                                 fileParsingStack.Enqueue(f);
                                 filesToParse.Insert(0, f);      // Put in front
@@ -580,40 +584,49 @@ namespace StepBro.Core.Parser
 
                         string foundMatchingFile = null;
 
-                        if (fu.Contains("\\") || fu.Contains("["))
+                        if (fu.Contains("["))     // It's a path using a folder shortcut.
                         {
                             throw new NotImplementedException();
+                        }
+                        else if (fu.Contains("\\"))     // It's a relative or absolute path
+                        {
+                            string path = Path.GetFullPath(Path.Combine(basefolder, fu));
+                            if (System.IO.File.Exists(path))
+                            {
+                                foundMatchingFile = path;
+                            }
                         }
                         else
                         {
                             // Start at the location of this file.
-                            string folder = Path.GetDirectoryName(file.GetFullPath());
-                            while (folder != Path.GetPathRoot(folder))
+                            while (basefolder != Path.GetPathRoot(basefolder))
                             {
-                                string path = Path.Combine(folder, fu);
+                                string path = Path.GetFullPath(Path.Combine(basefolder, fu));
                                 if (System.IO.File.Exists(path))
                                 {
-                                    object dummyUser = new object();    // The parser will set the current scriptfile as a dependant.
-                                    if (Main.LoadScriptFile(user: dummyUser, filepath: path) is ScriptFile loadedFile)
-                                    {
-                                        loadedFile.UnregisterDependant(dummyUser);
-                                        fileParsingStack.Enqueue(loadedFile);
-                                        filesToParse.Insert(0, loadedFile);      // Put in front
-                                        return loadedFile;
-                                    }
+                                    foundMatchingFile = path;
+                                    break;
                                 }
 
                                 // Not found yet; try the parent folder.
-                                folder = Path.GetDirectoryName(folder);
+                                basefolder = Path.GetDirectoryName(basefolder);
                             }
                         }
+
                         if (foundMatchingFile != null)
                         {
                             // Load and add file to fileParsingStack
-
+                            object dummyUser = new object();    // The parser will set the current scriptfile as a dependant.
+                            if (Main.LoadScriptFile(user: dummyUser, filepath: foundMatchingFile) is ScriptFile loadedFile)
+                            {
+                                loadedFile.UnregisterDependant(dummyUser);
+                                fileParsingStack.Enqueue(loadedFile);
+                                filesToParse.Insert(0, loadedFile);      // Put in front
+                                return loadedFile;
+                            }
                         }
 
-                        return null;
+                        return null;    // Not found!
                     }
                 );
                 file.ResolveNamespaceUsings(
@@ -648,7 +661,7 @@ namespace StepBro.Core.Parser
                                 {
                                     foundIdentifier = new IdentifierInfo(id, id, IdentifierType.FileNamespace, null, scriptFilesInNamespace);
                                 }
-                                scriptFilesInNamespace.Add(f);  // More files can have same namespace.
+                                scriptFilesInNamespace.Add(f);  // Different files can have the same namespace.
                                 fileParsingStack.Enqueue(f);
                                 filesToParse.Insert(0, f);      // Put in front
                             }
@@ -765,20 +778,23 @@ namespace StepBro.Core.Parser
             {
                 file.SaveCurrentFileVariables();
                 StepBroListener listener;
-                if (fileListeners.TryGetValue(file, out listener))
+                if (file.Errors.ErrorCount == 0)
                 {
-                    var context = fileContexts[file];
-
-                    try
+                    if (fileListeners.TryGetValue(file, out listener))
                     {
-                        var walker = new ParseTreeWalker();
-                        walker.Walk(listener, context);
+                        var context = fileContexts[file];
+
+                        try
+                        {
+                            var walker = new ParseTreeWalker();
+                            walker.Walk(listener, context);
+                        }
+                        finally { }
                     }
-                    finally { }
-                }
-                else
-                {
-                    throw new NotImplementedException();
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
                 }
                 totalErrors += file.Errors.ErrorCount;
                 if (file.Errors.ErrorCount == 0)

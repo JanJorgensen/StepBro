@@ -3,6 +3,8 @@ using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using System;
+using System.Management;
+using System.Collections.Generic;
 
 namespace StepBro.Streams
 {
@@ -157,7 +159,25 @@ namespace StepBro.Streams
 
         protected override bool DoOpen(StepBro.Core.Execution.ICallContext context)
         {
-            m_port.Open();
+            try
+            {
+                m_port.Open();
+            }
+            catch
+            {
+                if (context != null && context.LoggingEnabled)
+                {
+                    ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\cimv2",
+                        "SELECT * FROM Win32_PnPEntity WHERE ClassGuid=\"{4d36e978-e325-11ce-bfc1-08002be10318}\"");
+
+                    // Add all available (COM)-ports to the combobox
+                    foreach (ManagementObject queryObj in searcher.Get())
+                    {
+                        context.Logger.Log("SerialPort.Open", "Available port: " + (queryObj["Caption"] as string));
+                    }
+                }
+                throw;
+            }
             try
             {
                 m_port.DiscardInBuffer();

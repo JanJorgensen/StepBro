@@ -12,7 +12,7 @@ namespace StepBro.Core.Data
     {
         private class PanelState
         {
-            public List<ObjectPanel> CreatedPanels = new List<ObjectPanel>();
+            public List<Controls.WinForms.ObjectPanel> CreatedPanels = new List<Controls.WinForms.ObjectPanel>();
         }
 
         private List<ObjectPanelCreator> m_creators = null;
@@ -72,13 +72,13 @@ namespace StepBro.Core.Data
             }
         }
 
-        public Controls.ObjectPanel CreateStaticPanel(ObjectPanelInfo type)
+        public Controls.WinForms.ObjectPanel CreateStaticPanel(ObjectPanelInfo type)
         {
             System.Diagnostics.Debug.Assert(!type.IsObjectPanel);
             return this.CreateThePanel(type);
         }
 
-        public ObjectPanel CreateObjectPanel(ObjectPanelInfo type, IObjectContainer container)
+        public Controls.WinForms.ObjectPanel CreateObjectPanel(ObjectPanelInfo type, IObjectContainer container)
         {
             System.Diagnostics.Debug.Assert(container != null);
             System.Diagnostics.Debug.Assert(type.IsObjectPanel);
@@ -90,7 +90,7 @@ namespace StepBro.Core.Data
             return panel;
         }
 
-        public ObjectPanel CreateObjectPanel(ObjectPanelInfo type, string objectReference)
+        public Controls.WinForms.ObjectPanel CreateObjectPanel(ObjectPanelInfo type, string objectReference)
         {
             System.Diagnostics.Debug.Assert(type.IsObjectPanel);
             var panel = this.CreateThePanel(type);
@@ -101,7 +101,7 @@ namespace StepBro.Core.Data
             return panel;
         }
 
-        private ObjectPanel CreateThePanel(ObjectPanelInfo type)
+        private Controls.WinForms.ObjectPanel CreateThePanel(ObjectPanelInfo type)
         {
             PanelState state;
             if (!m_panelStates.TryGetValue(type, out state))
@@ -129,7 +129,7 @@ namespace StepBro.Core.Data
 
         private void Panel_Disposed(object sender, EventArgs e)
         {
-            var panel = sender as ObjectPanel;
+            var panel = sender as Controls.WinForms.ObjectPanel;
             panel.Disposed -= this.Panel_Disposed;
             var type = panel.PanelType;
             m_panelStates[type].CreatedPanels.Remove(panel);
@@ -140,7 +140,7 @@ namespace StepBro.Core.Data
             return PanelCreationOption.Possible;
         }
 
-        public IEnumerable<ObjectPanel> ListCreatedPanels()
+        public IEnumerable<Controls.WinForms.ObjectPanel> ListCreatedPanels()
         {
             foreach (var ps in m_panelStates.Keys)
             {

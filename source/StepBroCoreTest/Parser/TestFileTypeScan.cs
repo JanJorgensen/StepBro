@@ -227,14 +227,14 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual("Uncle", result.TopElement.Name);
 
             Assert.AreEqual(4, result.ListUsings().Count());
-            Assert.AreEqual("i", result.ListUsings().ElementAt(0).Item1);
-            Assert.AreEqual("Andrea", result.ListUsings().ElementAt(0).Item2);
-            Assert.AreEqual("i", result.ListUsings().ElementAt(1).Item1);
-            Assert.AreEqual("Betty.Chrissy", result.ListUsings().ElementAt(1).Item2);
-            Assert.AreEqual("p", result.ListUsings().ElementAt(2).Item1);
-            Assert.AreEqual("Denise.sbs", result.ListUsings().ElementAt(2).Item2);
-            Assert.AreEqual("I", result.ListUsings().ElementAt(3).Item1);
-            Assert.AreEqual("Erica", result.ListUsings().ElementAt(3).Item2);
+            Assert.AreEqual("i", result.ListUsings().ElementAt(0).Type);
+            Assert.AreEqual("Andrea", result.ListUsings().ElementAt(0).Name);
+            Assert.AreEqual("i", result.ListUsings().ElementAt(1).Type);
+            Assert.AreEqual("Betty.Chrissy", result.ListUsings().ElementAt(1).Name);
+            Assert.AreEqual("p", result.ListUsings().ElementAt(2).Type);
+            Assert.AreEqual("Denise.sbs", result.ListUsings().ElementAt(2).Name);
+            Assert.AreEqual("I", result.ListUsings().ElementAt(3).Type);
+            Assert.AreEqual("Erica", result.ListUsings().ElementAt(3).Name);
 
             Assert.AreEqual(1, result.TopElement.Childs.Count);
             Assert.AreEqual(FET.ProcedureDeclaration, result.TopElement.Childs[0].Type);

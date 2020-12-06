@@ -90,7 +90,7 @@ namespace StepBroCoreTest
             throw new NotImplementedException();
         }
 
-        public void RegisterDependant(object usingObject)
+        public bool RegisterDependant(object usingObject)
         {
             throw new NotImplementedException();
         }

@@ -1,0 +1,42 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:StepBro.TestInterface.Controls"
+             xmlns:editors="http://schemas.actiprosoftware.com/winfx/xaml/editors" 
+             xmlns:syntaxeditor="http://schemas.actiprosoftware.com/winfx/xaml/syntaxeditor" 
+             xmlns:ribbon="http://schemas.actiprosoftware.com/winfx/xaml/ribbon" 
+             xmlns:shared="http://schemas.actiprosoftware.com/winfx/xaml/shared" 
+             x:Class="StepBro.TestInterface.Controls.CommandTerminal"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <DockPanel LastChildFill="True">
+        <StackPanel DockPanel.Dock="Bottom">
+            <ToolBar x:Name="toolBar">
+                <Button Content="About"/>
+                <Button Content="List Commands"/>
+                <Button Content="Admin Login"/>
+            </ToolBar>
+            <DockPanel Margin="0,4" LastChildFill="True">
+                <Button DockPanel.Dock="Right" Content="Send Prevous" Margin="8,2,0,2" VerticalAlignment="Center" Width="80"/>
+                <ComboBox x:Name="comboBox"/>
+            </DockPanel>
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Content="Send" Margin="8,2,0,2" VerticalAlignment="Center" Width="80"/>
+                <syntaxeditor:SyntaxEditor IsMultiLine="False" VerticalAlignment="Center"/>
+            </DockPanel>
+            <StackPanel Orientation="Horizontal" Margin="4">
+                <CheckBox x:Name="repeat2" Content="Repeat" VerticalAlignment="Center" Margin="0,0,8,0" IsEnabled="False" />
+                <TextBlock VerticalAlignment="Center" IsEnabled="False" ><Run Text="Count:"/></TextBlock>
+                <editors:Int32EditBox VerticalAlignment="Center" Margin="2,0,8,0" PickerKind="Default" Minimum="0" LargeChange="100"/>
+                <CheckBox x:Name="awaitResponse2" Content="Await response" VerticalAlignment="Center" Margin="8,0" IsEnabled="False" />
+                <TextBlock VerticalAlignment="Center" ><Run Text="Delay:"/></TextBlock>
+                <editors:TimeSpanEditBox VerticalAlignment="Center" Margin="2,0,8,0" Minimum="0" Maximum="0:10:0" LargeChange="0:0:10" SmallChange="0:0:0.01"/>
+                <Button DockPanel.Dock="Right" Content="Show Toolbar"/>
+            </StackPanel>
+        </StackPanel>
+        <ListBox x:Name="listBox" VerticalAlignment="Stretch"/>
+    </DockPanel>
+</UserControl>

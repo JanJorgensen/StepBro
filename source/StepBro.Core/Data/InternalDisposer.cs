@@ -5,11 +5,6 @@ namespace StepBro.Core.Data
 {
     internal static class InternalDisposer
     {
-        public static InternalDisposer<T> Create<T>(T obj) where T : class, IInternalDispose
-        {
-            return new InternalDisposer<T>(obj);
-        }
-
         public static InternalDisposer<T> Disposer<T>(this T obj) where T : class, IInternalDispose
         {
             return new InternalDisposer<T>(obj);

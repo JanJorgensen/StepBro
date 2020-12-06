@@ -667,5 +667,35 @@ namespace StepBro.Core.Execution
             valueText = StringUtils.ObjectToString(value, false);
             return value;
         }
+
+        public static void DisposeObject(IScriptCallContext context, IDisposable obj)
+        {
+            if (obj == null) throw new NotImplementedException();
+            if (obj is IScriptDisposable)
+            {
+                (obj as IScriptDisposable).Dispose(context);
+            }
+            else
+            {
+                obj.Dispose();
+            }
+        }
+
+        public static void SetupObjectWithPropertyBlock(ILogger logger, IValueContainerOwnerAccess containerOwner)
+        {
+            if (containerOwner != null && (containerOwner.Tag as Dictionary<Type, Object>) != null)
+            {
+                var @object = containerOwner.Container.GetValue(logger) as ISettableFromPropertyBlock;
+                if (@object != null)
+                {
+                    var dict = containerOwner.Tag as Dictionary<Type, Object>;
+                    object props;
+                    if (dict != null && dict.TryGetValue(typeof(PropertyBlock), out props) && props is PropertyBlock)
+                    {
+                        @object.Setup(logger, props as PropertyBlock);
+                    }
+                }
+            }
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace StepBro.Core.Data
             ReceivedPartial,
             ReceivedError,
             ReceivedAsync,
-            ReceivedTrace
+            ReceivedTrace,
         }
 
         public LogLineData Previous { get; private set; }

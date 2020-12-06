@@ -3,13 +3,14 @@ using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace StepBro.Core.General
 {
     internal class LoadedFilesManager : ServiceBase<ILoadedFilesManager, LoadedFilesManager>, ILoadedFilesManager
     {
         private IDynamicObjectManager m_objectManager = null;
-        private List<ILoadedFile> m_loadedFiles = new List<ILoadedFile>();
+        private ObservableCollection<ILoadedFile> m_loadedFiles = new ObservableCollection<ILoadedFile>();
         private readonly List<NamedData<Tuple<List<IScriptFile>, IReadOnlyCollection<IScriptFile>>>> m_namespaceLists =
             new List<NamedData<Tuple<List<IScriptFile>, IReadOnlyCollection<IScriptFile>>>>();
 

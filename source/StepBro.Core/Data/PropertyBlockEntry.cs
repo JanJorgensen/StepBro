@@ -60,6 +60,8 @@ namespace StepBro.Core.Data
 
         public PropertyBlockEntryType BlockEntryType { get; private set; }
 
+        public object Tag { get; set; }
+
         public abstract void GetTestString(StringBuilder text);
 
         public string GetTestString()

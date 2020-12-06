@@ -119,12 +119,20 @@ namespace StepBro.Core.Data
         {
             lock (m_lock)
             {
-                if (length > (m_head - m_tail) || length <= 0) throw new ArgumentOutOfRangeException("length");
-                m_tail += length;
-                if (m_tail == m_head)
+                if (length > (m_head - m_tail)) throw new ArgumentOutOfRangeException("length");
+                else if (length < 0)
                 {
                     m_tail = 0;
                     m_head = 0;
+                }
+                else
+                {
+                    m_tail += length;
+                    if (m_tail == m_head)
+                    {
+                        m_tail = 0;
+                        m_head = 0;
+                    }
                 }
                 this.OnDataPulled();
             }

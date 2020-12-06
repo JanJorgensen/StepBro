@@ -1,4 +1,6 @@
 ﻿using StepBro.Core.Data;
+using System;
+using System.Collections.Generic;
 
 namespace StepBro.Core.ScriptData
 {
@@ -34,7 +36,7 @@ namespace StepBro.Core.ScriptData
             vcOwnerAccess.FileLine = line;
             vcOwnerAccess.FileColumn = column;
             vcOwnerAccess.CodeHash = codeHash;
-            vcOwnerAccess.Tag = line * 1000 + column;
+            vcOwnerAccess.Tag = new Dictionary<Type, Object>();
             if (resetter != null)
             {
                 vcOwnerAccess.DataResetter = resetter;

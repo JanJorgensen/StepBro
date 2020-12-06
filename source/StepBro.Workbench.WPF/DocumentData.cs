@@ -4,7 +4,7 @@ using System.IO;
 using ActiproSoftware.Text.Searching;
 using ActiproSoftware.Windows;
 
-namespace StepBro.Workbench.WPF
+namespace StepBro.Workbench
 {
 
 	/// <summary>

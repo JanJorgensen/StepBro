@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using ActiproSoftware.Windows.Controls.Grids;
 
-namespace StepBro.Workbench.WPF
+namespace StepBro.Workbench
 {
 	
 	/// <summary>

@@ -12,9 +12,13 @@ namespace StepBro.Core.Parser
     {
         public SyntaxEditorStepBroSyntaxLanguage() : base("StepBro")
         {
+            this.RegisterParser(new SyntaxEditorStepBroParser());
             this.RegisterLexer(new SyntaxEditorStepBroLexer());
+            this.RegisterService(new SyntaxEditorStepBroTokenTaggerProvider(new SyntaxEditorStepBroClassificationTypeProvider()));
+
+
             //this.RegisterService(new TokenTaggerProvider<MyCustomTokenTagger>());
-            this.RegisterLineCommenter(new LineBasedLineCommenter() { StartDelimiter = "//" });
+            //this.RegisterLineCommenter(new LineBasedLineCommenter() { StartDelimiter = "//" });
         }
     }
 }

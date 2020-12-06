@@ -13,13 +13,13 @@ namespace StepBro.Core.Api
 
         void AddAssembly(Assembly assembly, bool loadOnlyTypesWithPublicAttribute);
 
-        IIdentifierInfo Lookup(IEnumerable<IIdentifierInfo> usings, string name);
+        IIdentifierInfo Lookup(IEnumerable<UsingData> usings, string name);
 
-        IEnumerable<IIdentifierInfo> List(IEnumerable<IIdentifierInfo> usings);
+        IEnumerable<IIdentifierInfo> List(IEnumerable<UsingData> usings);
 
         IEnumerable<MethodInfo> ListExtensionMethods(Type type, Func<MethodInfo, bool> filter = null);
 
-        Type TryGetType(IEnumerable<IIdentifierInfo> usings, string name);
+        Type TryGetType(IEnumerable<UsingData> usings, string name);
 
         IEnumerable<ObjectPanelCreator> GetPanelCreators();
 

@@ -16,8 +16,8 @@ fileProperties : elementPropertyblock ;
 usingDeclarations : usingDeclaration* ;
 
 usingDeclaration 
-    :	PUBLIC? USING identifierOrQualified SEMICOLON		# UsingDeclarationWithIdentifier
-    |	PUBLIC? USING REGULAR_STRING SEMICOLON				# UsingDeclarationWithPath
+    :	PUBLIC? USING identifierOrQualified SEMICOLON		            # UsingDeclarationWithIdentifier
+    |	PUBLIC? USING (REGULAR_STRING | VERBATIUM_STRING) SEMICOLON		# UsingDeclarationWithPath
     ;
 
 namespace : identifierOrQualified ;
@@ -154,6 +154,11 @@ datatableRowCellContent
 //localVariableDeclarationStatement
 //    :    localVariableDeclaration SEMICOLON
 //    ;
+
+calculatorExpression 
+    : VAR variableDeclaratorId ASSIGNMENT variableInitializer   # CalcVarExpression
+    | expression                                                # CalcExpression
+    ;
 
 localVariableDeclaration	// Used in procedure-scope and in for-loop initializer.
     :   variableModifier? variableType variableDeclarators

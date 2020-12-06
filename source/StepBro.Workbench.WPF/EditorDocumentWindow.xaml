@@ -1,9 +1,9 @@
-﻿<docking:DocumentWindow x:Class="StepBro.Workbench.WPF.EditorDocumentWindow"
+﻿<docking:DocumentWindow x:Class="StepBro.Workbench.EditorDocumentWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:docking="http://schemas.actiprosoftware.com/winfx/xaml/docking"
-        xmlns:local="clr-namespace:StepBro.Workbench.WPF"
+        xmlns:local="clr-namespace:StepBro.Workbench"
         xmlns:syntaxeditor="http://schemas.actiprosoftware.com/winfx/xaml/syntaxeditor"
 		xmlns:themes="http://schemas.actiprosoftware.com/winfx/xaml/themes"
 		Description="Text document"
@@ -18,7 +18,7 @@
             <syntaxeditor:NavigableSymbolSelector x:Name="symbolSelector" Margin="0,0,0,1" SyntaxEditor="{Binding ElementName=editor}" />
         </Border>
 
-        <syntaxeditor:SyntaxEditor x:Name="editor" Grid.Row="1" BorderThickness="0" CanSplitHorizontally="False" 
+		<syntaxeditor:SyntaxEditor x:Name="editor" Grid.Row="1" BorderThickness="0" CanSplitHorizontally="False" HasSearchOverlayPaneKeyBindings="False"
 								   DocumentIsModifiedChanged="OnEditorDocumentIsModifiedChanged"
 								   DocumentParseDataChanged="OnEditorDocumentParseDataChanged"
 								   ViewSearch="OnEditorViewSearch"

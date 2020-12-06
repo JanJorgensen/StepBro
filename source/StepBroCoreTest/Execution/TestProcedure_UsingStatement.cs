@@ -28,7 +28,7 @@ namespace StepBroCoreTest.Parser
             object result = proc.Call();
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(long));
-            Assert.AreEqual(1016L, (long)result);
+            Assert.AreEqual(1096L, (long)result);
         }
 
         [TestMethod]
@@ -46,7 +46,7 @@ namespace StepBroCoreTest.Parser
             object result = proc.Call();
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(long));
-            Assert.AreEqual(1027L, (long)result);
+            Assert.AreEqual(1107L, (long)result);
         }
 
         [TestMethod]
@@ -64,7 +64,7 @@ namespace StepBroCoreTest.Parser
             object result = proc.Call();
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(long));
-            Assert.AreEqual(1019L, (long)result);
+            Assert.AreEqual(1099L, (long)result);
         }
     }
 }

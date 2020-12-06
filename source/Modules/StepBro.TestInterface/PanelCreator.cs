@@ -13,8 +13,8 @@ namespace Stepbro.TestInterface
     {
         protected override IEnumerable<ObjectPanelInfo> CreatePanelList()
         {
-            yield return new ObjectPanelInfo<CommandTerminal,SerialTestConnection>("Test Interface Terminal", "", false);
-            yield return new ObjectPanelInfo<LoggedValuesView, SerialTestConnection>("Logged Values View", "", false);
+            yield return new ObjectPanelInfo<CommandTerminal_WinForms,SerialTestConnection>("Test Interface Terminal", "", false);
+            yield return new ObjectPanelInfo<LoggedValuesView_WinForms, SerialTestConnection>("Logged Values View", "", false);
         }
     }
 }
