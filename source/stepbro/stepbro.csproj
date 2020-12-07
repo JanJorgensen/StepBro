@@ -64,6 +64,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\StepBroInfo.cs">
+      <Link>Properties\StepBroInfo.cs</Link>
+    </Compile>
     <Compile Include="CommandLineOptions.cs" />
     <Compile Include="HostAccess.cs" />
     <Compile Include="Program.cs" />

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "StepBro"
-#define MyAppVersion "0.1.30"
+#define MyAppVersion "0.1.31"
 #define MyAppPublisher "SchmutStein"
 #define MyAppURL "http://www.schmutstein.com/"
 #define MyAppExeName "StepBro.Workbench.exe"
@@ -25,7 +25,7 @@ LicenseFile=..\LICENSE
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
 OutputDir=Installer
-OutputBaseFilename=stepbro.setup
+OutputBaseFilename=stepbro.setup.{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
