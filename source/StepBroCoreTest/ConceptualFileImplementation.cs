@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using StepBro.Core.Data;
-using StepBro.Core.File;
+﻿using StepBro.Core.Data;
+using StepBro.Core.Execution;
 using StepBro.Core.General;
 using StepBro.Core.Logging;
-using StepBro.Core.ScriptData;
-using StepBro.Core.Execution;
-using System.ComponentModel;
 using StepBro.Core.Parser;
+using StepBro.Core.ScriptData;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace StepBroCoreTest
 {
@@ -61,16 +56,23 @@ namespace StepBroCoreTest
 
         public int UniqueID => throw new NotImplementedException();
 
+        public string OffDiskFileContent { get; set; }
+
         public int RegisteredDependantsCount => throw new NotImplementedException();
 
         public string Namespace => throw new NotImplementedException();
 
         public IErrorCollector Errors => throw new NotImplementedException();
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event EventHandler ObjectContainerListChanged;
+        public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
+        public event EventHandler ObjectContainerListChanged { add { } remove { } }
 
         public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsDependantOf(object @object)
         {
             throw new NotImplementedException();
         }
@@ -95,7 +97,7 @@ namespace StepBroCoreTest
             throw new NotImplementedException();
         }
 
-        public void UnregisterDependant(object usingObject, bool throwIfNotFound)
+        public bool UnregisterDependant(object usingObject, bool throwIfNotFound)
         {
             throw new NotImplementedException();
         }

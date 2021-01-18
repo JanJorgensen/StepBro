@@ -75,7 +75,10 @@
     <Compile Include="Api\ModuleLoadAttribute.cs" />
     <Compile Include="Attributes\ClassPanelAttribute.cs" />
     <Compile Include="Attributes\ObjectPanelAttribute.cs" />
-    <Compile Include="Controls\ComboboxItem.cs" />
+    <Compile Include="Controls\SimpleLogViewer.xaml.cs">
+      <DependentUpon>SimpleLogViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\WinForms\ComboboxItem.cs" />
     <Compile Include="Controls\ObjectPanel.xaml.cs">
       <DependentUpon>ObjectPanel.xaml</DependentUpon>
     </Compile>
@@ -86,47 +89,47 @@
     <Compile Include="Controls\WinForms\DataView.Designer.cs">
       <DependentUpon>DataView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\DataViewTextBased.cs">
+    <Compile Include="Controls\WinForms\DataViewTextBased.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\DataViewGridBased.cs">
+    <Compile Include="Controls\WinForms\DataViewGridBased.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\DataViewGridBased.Designer.cs">
+    <Compile Include="Controls\WinForms\DataViewGridBased.Designer.cs">
       <DependentUpon>DataViewGridBased.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\FCTBRangeStream.cs" />
+    <Compile Include="Controls\WinForms\FCTBRangeStream.cs" />
     <Compile Include="Controls\WinForms\ObjectPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\WinForms\ObjectPanel.Designer.cs">
       <DependentUpon>ObjectPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ParsingErrorListView.cs">
+    <Compile Include="Controls\WinForms\ParsingErrorListView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\ParsingErrorListView.Designer.cs">
+    <Compile Include="Controls\WinForms\ParsingErrorListView.Designer.cs">
       <DependentUpon>ParsingErrorListView.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\WinForms\ScriptFileEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\SimpleLogView.cs">
+    <Compile Include="Controls\WinForms\SimpleLogView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\SimpleLogView.Designer.cs">
+    <Compile Include="Controls\WinForms\SimpleLogView.Designer.cs">
       <DependentUpon>SimpleLogView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\SourceCodeEditor.cs">
+    <Compile Include="Controls\WinForms\SourceCodeEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\TextEditor.cs">
+    <Compile Include="Controls\WinForms\TextEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\TextEditor.Designer.cs">
+    <Compile Include="Controls\WinForms\TextEditor.Designer.cs">
       <DependentUpon>TextEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\TextView.cs">
+    <Compile Include="Controls\WinForms\TextView.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Data\ArrayFifo.cs" />
@@ -193,6 +196,7 @@
     <Compile Include="Language\IEditorSupport.cs" />
     <Compile Include="Language\IEditorTextControl.cs" />
     <Compile Include="Language\StepBroEditorSupport.cs" />
+    <Compile Include="Logging\DebugLogEntry.cs" />
     <Compile Include="Logging\ILogSink.cs" />
     <Compile Include="Logging\LogSinkManager.cs" />
     <Compile Include="Logging\MainLogger.cs" />
@@ -423,16 +427,16 @@
     <EmbeddedResource Include="Controls\WinForms\DataView.resx">
       <DependentUpon>DataView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\DataViewGridBased.resx">
+    <EmbeddedResource Include="Controls\WinForms\DataViewGridBased.resx">
       <DependentUpon>DataViewGridBased.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\ParsingErrorListView.resx">
+    <EmbeddedResource Include="Controls\WinForms\ParsingErrorListView.resx">
       <DependentUpon>ParsingErrorListView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\SimpleLogView.resx">
+    <EmbeddedResource Include="Controls\WinForms\SimpleLogView.resx">
       <DependentUpon>SimpleLogView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\TextEditor.resx">
+    <EmbeddedResource Include="Controls\WinForms\TextEditor.resx">
       <DependentUpon>TextEditor.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
@@ -444,6 +448,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Controls\ObjectPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\SimpleLogViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

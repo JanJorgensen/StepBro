@@ -246,15 +246,17 @@ namespace StepBro.Core
                         this.State = ServiceManagerState.Stopped;
                     }
                 }
-
-                if (reset)
-                {
-                    m_services = new List<IService>();
-                }
             }
             else
             {
                 context.UpdateStatus($"Failed to stop, because manager is in '{this.State}' state.", 0);
+            }
+
+            if (reset)
+            {
+                m_services = new List<IService>();
+                g_manager = null;
+                this.State = ServiceManagerState.Initial;
             }
         }
     }

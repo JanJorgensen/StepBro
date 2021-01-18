@@ -69,7 +69,9 @@
         </local:ToolItemTemplateSelector>
 
     </UserControl.Resources>
-
+    <UserControl.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Open" CanExecute="OpenCanExecute" Executed="OpenExecuted" />
+    </UserControl.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -142,9 +144,9 @@
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator />
-                    <MenuItem Header="Print" Command="ApplicationCommands.Print" Icon="" />
+                    <!--<MenuItem Header="Print" Command="ApplicationCommands.Print" Icon="" />
                     <MenuItem Header="Print Preview" Command="ApplicationCommands.PrintPreview" Icon="" />
-                    <Separator />
+                    <Separator />-->
                     <MenuItem Header="Exit" Command="ApplicationCommands.Close" Icon=""/>
                 </MenuItem>
                 <MenuItem Header="Edit">
@@ -168,9 +170,9 @@
                     <Separator />
                     <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.SelectAll" />
                     <MenuItem Header="Advanced">
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.FormatDocument" Icon="" />
+                        <!--<MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.FormatDocument" Icon="" />
                         <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.FormatSelection" Icon="" />
-                        <Separator />
+                        <Separator />-->
                         <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.Indent" Icon="" />
                         <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.Outdent" Icon="" />
                         <Separator />
@@ -196,11 +198,11 @@
                         <Separator />
                         <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.MoveSelectedLinesUp" />
                         <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.MoveSelectedLinesDown" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.TransposeLines" />
+                        <!--<MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.TransposeLines" />
                         <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.TransposeWords" />
                         <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.TransposeCharacters" />
-                        <Separator />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.IncrementalSearch" />
+                        <Separator />-->
+                        <!--<MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.IncrementalSearch" />-->
                     </MenuItem>
                     <MenuItem Header="Outlining">
                         <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.CollapseToDefinitions" />
@@ -222,21 +224,21 @@
                         <MenuItem Header="Ruler Margin Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsRulerMarginVisible, Mode=TwoWay}" />
                         <MenuItem Header="Selection Margin Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsSelectionMarginVisible, Mode=TwoWay}" />
                         <Separator />
-                        <MenuItem x:Name="wordWrapMenuItem" Header="Word Wrap"/>
+                        <!--<MenuItem x:Name="wordWrapMenuItem" Header="Word Wrap"/>
                         <MenuItem Header="Word Wrap Glyphs Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=AreWordWrapGlyphsVisible, Mode=TwoWay}" />
                         <MenuItem Header="Whitespace Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsWhitespaceVisible, Mode=TwoWay}" />
-                        <Separator />
-                        <MenuItem Header="Can Scroll Past Document End" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=CanScrollPastDocumentEnd, Mode=TwoWay}" />
+                        <Separator />-->
+                        <!--<MenuItem Header="Can Scroll Past Document End" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=CanScrollPastDocumentEnd, Mode=TwoWay}" />
                         <MenuItem Header="Virtual Space at Line End" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsVirtualSpaceAtLineEndEnabled, Mode=TwoWay}" />
-                        <Separator />
+                        <Separator />-->
                         <MenuItem Header="Indentation Guides Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=AreIndentationGuidesVisible, Mode=TwoWay}" />
                         <MenuItem Header="Line Modification Marks Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=AreLineModificationMarksVisible, Mode=TwoWay}" />
                         <MenuItem Header="Current Line Highlighting Enabled" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsCurrentLineHighlightingEnabled, Mode=TwoWay}" />
                         <MenuItem Header="Delimiter Highlighting Enabled" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsDelimiterHighlightingEnabled, Mode=TwoWay}" />
                         <MenuItem Header="Search Result Highlighting Enabled" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsSearchResultHighlightingEnabled, Mode=TwoWay}" />
                         <MenuItem Header="Auto-Correct Enabled" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsAutoCorrectEnabled, Mode=TwoWay}" />
-                        <Separator />
-                        <MenuItem x:Name="toggleTokenInfoMenuItem" Header="Toggle Token Info in Status Bar" IsCheckable="True"/>
+                        <!--<Separator />-->
+                        <!--<MenuItem x:Name="toggleTokenInfoMenuItem" Header="Toggle Token Info in Status Bar" IsCheckable="True"/>-->
                     </MenuItem>
                 </MenuItem>
                 <MenuItem Header="Script">
@@ -263,13 +265,14 @@
 							  CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.CancelMacroRecording" />
                     <Separator />
                     <MenuItem x:Name="repeatActionMenuItem" Header="Repeat Action" Icon="" 
-                              CommandTarget="{Binding ElementName=editor}" Command="{Binding CustomEditCommands.RepeatActivationCommand}" />
+                              Command="{Binding CustomEditCommands.RepeatActivationCommand}" />
+                    <!--CommandTarget="{Binding ElementName=editor}"-->
                 </MenuItem>
                 <MenuItem Header="Window">
-                    <MenuItem Header="Can Split Horizontally" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=CanSplitHorizontally, Mode=TwoWay}" />
+                    <!--<MenuItem Header="Can Split Horizontally" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=CanSplitHorizontally, Mode=TwoWay}" />
                     <MenuItem Header="Has Horizontal Split" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=HasHorizontalSplit, Mode=TwoWay}" />
                     <Separator />
-                    <MenuItem Header="Is Document Read-only" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=Document.IsReadOnly, Mode=TwoWay}" />
+                    <MenuItem Header="Is Document Read-only" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=Document.IsReadOnly, Mode=TwoWay}" />-->
                 </MenuItem>
             </Menu>
         </shared:PixelSnapper>

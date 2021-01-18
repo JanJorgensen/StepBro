@@ -921,7 +921,7 @@ namespace StepBro.Workbench
                     {
                         if (panelManager.GetPanelCreationOption(panelInfo, objContainer) == Core.Data.PanelCreationOption.Possible)
                         {
-                            var panel = panelManager.CreateObjectPanel(panelInfo, objContainer);
+                            var panel = panelManager.CreateObjectWinFormsPanel(panelInfo, objContainer);
                             if (panel != null)
                             {
                                 var window = new ObjectPanelDockWindow(StepBroMain.ServiceManager);

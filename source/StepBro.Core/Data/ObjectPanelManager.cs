@@ -12,7 +12,8 @@ namespace StepBro.Core.Data
     {
         private class PanelState
         {
-            public List<Controls.WinForms.ObjectPanel> CreatedPanels = new List<Controls.WinForms.ObjectPanel>();
+            public List<Controls.ObjectPanel> CreatedPanels = new List<Controls.ObjectPanel>();
+            public List<Controls.WinForms.ObjectPanel> CreatedWinFormsPanels = new List<Controls.WinForms.ObjectPanel>();
         }
 
         private List<ObjectPanelCreator> m_creators = null;
@@ -38,7 +39,7 @@ namespace StepBro.Core.Data
                 }
                 catch (Exception ex)
                 {
-                    context.Logger.LogError(this.GetType().Name, $"Error updating panel list for {creator.GetType().FullName}. {ex}");
+                    context.Logger.LogError(GetType().Name, $"Error updating panel list for {creator.GetType().FullName}. {ex}");
                     deadCreators.Add(creator);
                 }
             }
@@ -66,23 +67,38 @@ namespace StepBro.Core.Data
 
         public IEnumerable<ObjectPanelInfo> ListPanelTypes()
         {
-            foreach (var c in this.ListPanelCreators())
+            foreach (var c in ListPanelCreators())
             {
                 foreach (var p in c.ListPanels()) yield return p;
             }
         }
 
-        public Controls.WinForms.ObjectPanel CreateStaticPanel(ObjectPanelInfo type)
+        public ObjectPanel CreateStaticPanel(ObjectPanelInfo type)
         {
-            System.Diagnostics.Debug.Assert(!type.IsObjectPanel);
-            return this.CreateThePanel(type);
+            throw new NotImplementedException();
         }
 
-        public Controls.WinForms.ObjectPanel CreateObjectPanel(ObjectPanelInfo type, IObjectContainer container)
+        public ObjectPanel CreateObjectPanel(ObjectPanelInfo type, IObjectContainer container)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ObjectPanel CreateObjectPanel(ObjectPanelInfo type, string objectReference)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Controls.WinForms.ObjectPanel CreateStaticWinFormsPanel(ObjectPanelInfo type)
+        {
+            System.Diagnostics.Debug.Assert(!type.IsObjectPanel);
+            return CreateTheWinFormsPanel(type);
+        }
+
+        public Controls.WinForms.ObjectPanel CreateObjectWinFormsPanel(ObjectPanelInfo type, IObjectContainer container)
         {
             System.Diagnostics.Debug.Assert(container != null);
             System.Diagnostics.Debug.Assert(type.IsObjectPanel);
-            var panel = this.CreateThePanel(type);
+            var panel = CreateTheWinFormsPanel(type);
             if (panel != null)
             {
                 panel.Bind(container);
@@ -90,10 +106,10 @@ namespace StepBro.Core.Data
             return panel;
         }
 
-        public Controls.WinForms.ObjectPanel CreateObjectPanel(ObjectPanelInfo type, string objectReference)
+        public Controls.WinForms.ObjectPanel CreateObjectWinFormsPanel(ObjectPanelInfo type, string objectReference)
         {
             System.Diagnostics.Debug.Assert(type.IsObjectPanel);
-            var panel = this.CreateThePanel(type);
+            var panel = CreateTheWinFormsPanel(type);
             if (panel != null)
             {
                 panel.SetObjectReference(objectReference);
@@ -101,7 +117,7 @@ namespace StepBro.Core.Data
             return panel;
         }
 
-        private Controls.WinForms.ObjectPanel CreateThePanel(ObjectPanelInfo type)
+        private Controls.WinForms.ObjectPanel CreateTheWinFormsPanel(ObjectPanelInfo type)
         {
             PanelState state;
             if (!m_panelStates.TryGetValue(type, out state))
@@ -110,14 +126,14 @@ namespace StepBro.Core.Data
                 m_panelStates[type] = state;
             }
 
-            if (state.CreatedPanels.Count == 0 || type.AllowMultipleInstances)
+            if (state.CreatedWinFormsPanels.Count == 0 || type.AllowMultipleInstances)
             {
-                var panel = type.CreatePanel();
+                var panel = type.CreateWinFormsPanel();
                 if (panel != null)
                 {
-                    state.CreatedPanels.Add(panel);
+                    state.CreatedWinFormsPanels.Add(panel);
                     panel.PanelType = type;
-                    panel.Disposed += this.Panel_Disposed;
+                    panel.Disposed += Panel_Disposed;
                 }
                 return panel;
             }
@@ -130,9 +146,9 @@ namespace StepBro.Core.Data
         private void Panel_Disposed(object sender, EventArgs e)
         {
             var panel = sender as Controls.WinForms.ObjectPanel;
-            panel.Disposed -= this.Panel_Disposed;
+            panel.Disposed -= Panel_Disposed;
             var type = panel.PanelType;
-            m_panelStates[type].CreatedPanels.Remove(panel);
+            m_panelStates[type].CreatedWinFormsPanels.Remove(panel);
         }
 
         public PanelCreationOption GetPanelCreationOption(ObjectPanelInfo type, object @object = null)
@@ -140,7 +156,7 @@ namespace StepBro.Core.Data
             return PanelCreationOption.Possible;
         }
 
-        public IEnumerable<Controls.WinForms.ObjectPanel> ListCreatedPanels()
+        public IEnumerable<ObjectPanel> ListCreatedPanels()
         {
             foreach (var ps in m_panelStates.Keys)
             {
@@ -148,9 +164,17 @@ namespace StepBro.Core.Data
             }
         }
 
+        public IEnumerable<Controls.WinForms.ObjectPanel> ListCreatedPanelsWinForms()
+        {
+            foreach (var ps in m_panelStates.Keys)
+            {
+                foreach (var p in m_panelStates[ps].CreatedWinFormsPanels) yield return p;
+            }
+        }
+
         public ObjectPanelInfo FindPanel(string name)
         {
-            foreach (var p in this.ListPanelTypes())
+            foreach (var p in ListPanelTypes())
             {
                 if (string.Equals(p.TypeIdentification, name, System.StringComparison.InvariantCulture))
                 {

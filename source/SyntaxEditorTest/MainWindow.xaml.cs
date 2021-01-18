@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StepBro.Core.Parser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,12 +21,21 @@ namespace SyntaxEditorTest
     /// </summary>
     public partial class MainWindow : Window
     {
+        SyntaxEditorStepBroSyntaxLanguage language;
+
         public MainWindow()
         {
             InitializeComponent();
+            language = new SyntaxEditorStepBroSyntaxLanguage();
+            editor.Document.Language = language;
         }
 
         private void OnOpenDocumentMenuItemClick(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
 
         }

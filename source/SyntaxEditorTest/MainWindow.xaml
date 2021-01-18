@@ -9,14 +9,14 @@
         xmlns:editor="http://schemas.actiprosoftware.com/winfx/xaml/syntaxeditor" 
         x:Class="SyntaxEditorTest.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="650" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <editor:SyntaxEditor Grid.Row="1">
+        <editor:SyntaxEditor x:Name="editor" Grid.Row="1">
             <editor:EditorDocument x:Name="document" xml:space="preserve"><![CDATA[using StepBro.Streams;
 using StepBro.TestInterface;
 
@@ -26,8 +26,9 @@ SerialPort port
     BaudRate = 460800,
     StopBits = One
 }
-SerialTestConnection sti { Stream = port, CommandResponseTimeout = 2s }
+SerialTestConnection sti { Stream = port, ResponseTimeout = 2s }
 
+// All the connection related tests
 testlist ConnectionTests
 {
     * TestGetCommandList
@@ -35,12 +36,28 @@ testlist ConnectionTests
     * TestCommandWithStringParameter
     * TestCommandWithIdentifierParameter
 }
+                
+procedure int DoYourThing(string command)
+{
+    string s = null;
+    timespan t = 4s;
+    
+    log ("Was here!");
+    if (t < 20s)
+    {
+        s = "Time: " + t;
+    }
+}
 ]]></editor:EditorDocument>
         </editor:SyntaxEditor>
 
         <shared:PixelSnapper>
             <Menu>
                 <MenuItem Header="Open..." Click="OnOpenDocumentMenuItemClick"/>
+                <MenuItem Header="Macro">
+                    <MenuItem Header="Start Recording"/>
+                    <MenuItem Header="Pause Recording"/>
+                </MenuItem>
             </Menu>
         </shared:PixelSnapper>
 

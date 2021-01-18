@@ -7,8 +7,9 @@
              xmlns:editors="http://schemas.actiprosoftware.com/winfx/xaml/editors" 
              xmlns:syntaxeditor="http://schemas.actiprosoftware.com/winfx/xaml/syntaxeditor" 
              xmlns:ribbon="http://schemas.actiprosoftware.com/winfx/xaml/ribbon" 
-             xmlns:shared="http://schemas.actiprosoftware.com/winfx/xaml/shared" 
-             x:Class="StepBro.TestInterface.Controls.CommandTerminal"
+             xmlns:shared="http://schemas.actiprosoftware.com/winfx/xaml/shared"
+    xmlns:controls="clr-namespace:StepBro.Core.Controls;assembly=StepBro.Core"
+    x:Class="StepBro.TestInterface.Controls.CommandTerminal"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -16,8 +17,26 @@
         <StackPanel DockPanel.Dock="Bottom">
             <ToolBar x:Name="toolBar">
                 <Button Content="About"/>
-                <Button Content="List Commands"/>
-                <Button Content="Admin Login"/>
+                <Menu>
+                    <MenuItem Header="List">
+                        <MenuItem Header="Commands"/>
+                        <MenuItem Header="Get Last"/>
+                    </MenuItem>
+                </Menu>
+                <Menu>
+                    <MenuItem Header="ADC">
+                        <MenuItem Header="List"/>
+                        <MenuItem Header="Get Last"/>
+                    </MenuItem>
+                </Menu>
+                <Menu>
+                    <MenuItem Header="Login">
+                        <MenuItem Header="Dev Login"/>
+                        <MenuItem Header="Tech Login"/>
+                        <Separator/>
+                        <MenuItem Header="Logout"/>
+                    </MenuItem>
+                </Menu>
             </ToolBar>
             <DockPanel Margin="0,4" LastChildFill="True">
                 <Button DockPanel.Dock="Right" Content="Send Prevous" Margin="8,2,0,2" VerticalAlignment="Center" Width="80"/>
@@ -37,6 +56,6 @@
                 <Button DockPanel.Dock="Right" Content="Show Toolbar"/>
             </StackPanel>
         </StackPanel>
-        <ListBox x:Name="listBox" VerticalAlignment="Stretch"/>
+        <controls:SimpleLogViewer x:Name="log"/>
     </DockPanel>
 </UserControl>

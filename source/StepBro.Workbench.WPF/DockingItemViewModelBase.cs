@@ -17,6 +17,8 @@ namespace StepBro.Workbench
         private bool isSelected;
         private string serializationId;
         private string title;
+        private bool isModified = false;
+
         private string windowGroupName;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +40,7 @@ namespace StepBro.Workbench
                 if (description != value)
                 {
                     description = value;
-                    this.NotifyPropertyChanged("Description");
+                    NotifyPropertyChanged("Description");
                 }
             }
         }
@@ -58,7 +60,7 @@ namespace StepBro.Workbench
                 if (imageSource != value)
                 {
                     imageSource = value;
-                    this.NotifyPropertyChanged("ImageSource");
+                    NotifyPropertyChanged("ImageSource");
                 }
             }
         }
@@ -80,7 +82,7 @@ namespace StepBro.Workbench
                 if (isActive != value)
                 {
                     isActive = value;
-                    this.NotifyPropertyChanged("IsActive");
+                    NotifyPropertyChanged("IsActive");
                 }
             }
         }
@@ -102,7 +104,7 @@ namespace StepBro.Workbench
                 if (isFloating != value)
                 {
                     isFloating = value;
-                    this.NotifyPropertyChanged("IsFloating");
+                    NotifyPropertyChanged("IsFloating");
                 }
             }
         }
@@ -124,7 +126,7 @@ namespace StepBro.Workbench
                 if (isOpen != value)
                 {
                     isOpen = value;
-                    this.NotifyPropertyChanged("IsOpen");
+                    NotifyPropertyChanged("IsOpen");
                 }
             }
         }
@@ -146,7 +148,7 @@ namespace StepBro.Workbench
                 if (isSelected != value)
                 {
                     isSelected = value;
-                    this.NotifyPropertyChanged("IsSelected");
+                    NotifyPropertyChanged("IsSelected");
                 }
             }
         }
@@ -174,7 +176,7 @@ namespace StepBro.Workbench
                 if (serializationId != value)
                 {
                     serializationId = value;
-                    this.NotifyPropertyChanged("SerializationId");
+                    NotifyPropertyChanged("SerializationId");
                 }
             }
         }
@@ -187,14 +189,31 @@ namespace StepBro.Workbench
         {
             get
             {
-                return title;
+                return isModified ? (title + "*") : title;
             }
             set
             {
                 if (title != value)
                 {
                     title = value;
-                    this.NotifyPropertyChanged("Title");
+                    NotifyPropertyChanged("Title");
+                }
+            }
+        }
+
+        public bool IsModified
+        {
+            get
+            {
+                return isModified;
+            }
+            set
+            {
+                if (isModified != value)
+                {
+                    isModified = value;
+                    NotifyPropertyChanged(nameof(IsModified));
+                    NotifyPropertyChanged(nameof(Title));
                 }
             }
         }
@@ -214,7 +233,7 @@ namespace StepBro.Workbench
                 if (windowGroupName != value)
                 {
                     windowGroupName = value;
-                    this.NotifyPropertyChanged("WindowGroupName");
+                    NotifyPropertyChanged("WindowGroupName");
                 }
             }
         }

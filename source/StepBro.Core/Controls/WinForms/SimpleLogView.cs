@@ -22,10 +22,12 @@ namespace StepBro.Core.Controls
         private ILogLineSource m_source = null;
         private Predicate<LogLineData> m_filter = (LogLineData l) => { return true; };
         private DateTime m_zeroTime;
+        private bool m_followEnd = true;
+        private object m_sync = new object();
 
         public SimpleLogView()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             fctb.AddStyle(StyleTimestamp);
             fctb.AddStyle(StyleInfo);
             fctb.AddStyle(StyleSent);
@@ -40,12 +42,12 @@ namespace StepBro.Core.Controls
         {
             if (m_source != null)
             {
-                m_source.LinesAdded -= this.source_LinesAdded;
+                m_source.LinesAdded -= source_LinesAdded;
             }
             m_source = source;
             if (m_source != null)
             {
-                m_source.LinesAdded += this.source_LinesAdded;
+                m_source.LinesAdded += source_LinesAdded;
             }
         }
 
@@ -55,6 +57,21 @@ namespace StepBro.Core.Controls
             {
                 m_firstSeen = args.Line;
             }
+        }
+
+        public void ClearLog()
+        {
+            lock (m_sync)
+            {
+                m_firstSeen = null;
+                m_lastHandled = null;
+            }
+            fctb.Clear();
+        }
+
+        public void FollowEnd()
+        {
+            m_followEnd = true;
         }
 
         public void SetViewFilter(Predicate<LogLineData> filter)
@@ -77,19 +94,19 @@ namespace StepBro.Core.Controls
                     var userSelection = fctb.Selection.Clone();
                     //add text with predefined style
                     fctb.TextSource.CurrentTB = fctb;
-                    bool gotoEnd = (userSelection.IsEmpty && userSelection.Start.iLine == (fctb.LinesCount - 1));
+                    //bool gotoEnd = (userSelection.IsEmpty && userSelection.Start.iLine == (fctb.LinesCount - 1));
 
                     int i = 0;
                     while ((i < 1000 || DateTime.Now < stopTime) && entry != null)
                     {
-                        this.AddEntry(entry);
+                        AddEntry(entry);
                         m_lastHandled = entry;
                         i++;
                         entry = m_lastHandled.Next;
                     }
 
                     //restore user selection
-                    if (gotoEnd)
+                    if (m_followEnd)
                     {
                         fctb.GoEnd();//scroll to end of the text
                     }
@@ -115,7 +132,7 @@ namespace StepBro.Core.Controls
                     //add text with predefined style
                     fctb.TextSource.CurrentTB = fctb;
 
-                    this.AddEntry(m_firstSeen);
+                    AddEntry(m_firstSeen);
                     m_lastHandled = m_firstSeen;
 
                     //restore user selection
@@ -165,6 +182,20 @@ namespace StepBro.Core.Controls
             }
             fctb.AppendText(entry.Timestamp.ToMinutesTimestamp(m_zeroTime), StyleTimestamp);
             fctb.AppendText(String.Concat(" ", entry.LineText, Environment.NewLine), style);
+        }
+
+        private void fctb_Enter(object sender, EventArgs e)
+        {
+            m_followEnd = false;
+        }
+
+        private void fctb_SelectionChanged(object sender, EventArgs e)
+        {
+            if (!m_followEnd)
+            {
+                var userSelection = fctb.Selection.Clone();
+                m_followEnd = userSelection.IsEmpty && (userSelection.Start.iLine == fctb.LinesCount - 1);
+            }
         }
     }
 }

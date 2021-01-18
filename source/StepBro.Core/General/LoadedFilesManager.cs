@@ -4,6 +4,7 @@ using StepBro.Core.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace StepBro.Core.General
 {
@@ -21,6 +22,7 @@ namespace StepBro.Core.General
 
         public event LoadedFileEventHandler FileLoaded;
         public event LoadedFileEventHandler FileClosed;
+        public event PropertyChangedEventHandler FilePropertyChanged;
 
         private void NotifyFileLoaded(ILoadedFile file)
         {
@@ -64,6 +66,7 @@ namespace StepBro.Core.General
             {
                 this.ReInsertFileInNamespaceList((IScriptFile)sender);
             }
+            this.FilePropertyChanged?.Invoke(sender, e);
         }
 
         private void ReInsertFileInNamespaceList(IScriptFile file)
@@ -135,9 +138,9 @@ namespace StepBro.Core.General
                         {
                             m_objectManager.DeRegisterObjectHost(file as IObjectHost);
                         }
+                        file.PropertyChanged -= this.File_PropetyChanged;
                         m_loadedFiles.RemoveAt(i);
                         this.NotifyFileClosed(file);
-                        file.PropertyChanged -= this.File_PropetyChanged;
                         file.Dispose();
                         foreach (var lf in m_loadedFiles)
                         {

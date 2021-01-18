@@ -166,6 +166,7 @@ namespace StepBro.TestInterface.Controls
                 buttonSendCommand.Enabled = false;
                 timer.Enabled = true;
             }
+            simpleLogViewFull.FollowEnd();
             this.UpdateUI();
         }
 
@@ -239,6 +240,11 @@ namespace StepBro.TestInterface.Controls
                 m_activeCommand = null;
                 this.UpdateUI();
             }
+        }
+
+        private void clearLogToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            simpleLogViewFull.ClearLog();
         }
     }
 }

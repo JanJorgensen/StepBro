@@ -23,6 +23,7 @@ namespace StepBro.Core
         private static bool m_initialized = false;
         private static ServiceManager.IServiceManagerAdministration m_serviceManagerAdmin = null;
         private static MainLogger m_mainLogger = null;
+        private static ILogger m_rootLogger = null;
         private static ILoadedFilesManager m_loadedFilesManager = null;
         private static IAddonManager m_addonManager = null;
         private static ILogSinkManager m_logSinkManager = null;
@@ -53,6 +54,7 @@ namespace StepBro.Core
         {
             IService service;
             m_mainLogger = new MainLogger(out service);
+            m_rootLogger = m_mainLogger.Logger.RootLogger;
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_loadedFilesManager = new LoadedFilesManager(out service);
@@ -76,11 +78,11 @@ namespace StepBro.Core
                         }
                         catch (BadImageFormatException)
                         {
-                            m_mainLogger.Logger.RootLogger.LogError("Main.Initialize", $"Error loading assembly '{f}'.");
+                            m_rootLogger.LogError("Main.Initialize", $"Error loading assembly '{f}'.");
                         }
                         catch (Exception ex)
                         {
-                            m_mainLogger.Logger.RootLogger.LogError("Main.Initialize", $"Unexpected error loading assembly '{f}'. Exception: {ex}");
+                            m_rootLogger.LogError("Main.Initialize", $"Unexpected error loading assembly '{f}'. Exception: {ex}");
                         }
                     }
                 },
@@ -143,6 +145,7 @@ namespace StepBro.Core
 
             if (reset)
             {
+                m_serviceManagerAdmin = null;
                 m_mainLogger = null;
                 m_loadedFilesManager = null;
                 m_addonManager = null;
@@ -150,6 +153,9 @@ namespace StepBro.Core
                 m_scriptExecutionManager = null;
                 m_dynamicObjectManager = null;
                 m_objectPanelManager = null;
+                m_uiCalculator = null;
+
+                m_serviceManagerAdmin = ServiceManager.Create();
             }
         }
 
@@ -157,6 +163,8 @@ namespace StepBro.Core
         {
             return m_serviceManagerAdmin.Manager.Get<T>();
         }
+
+        public static ILogger RootLogger { get { return m_rootLogger; } }
 
         public static ServiceManager ServiceManager { get { return m_serviceManagerAdmin.Manager; } }
 
@@ -174,7 +182,7 @@ namespace StepBro.Core
         {
             if (user == null) throw new ArgumentNullException("user");
             if (String.IsNullOrWhiteSpace(filepath)) throw new ArgumentNullException("filepath");
-            if (m_loadedFilesManager.ListFiles<IScriptFile>().FirstOrDefault(f => String.Equals(f.FilePath, filepath))!=null)
+            if (m_loadedFilesManager.ListFiles<IScriptFile>().FirstOrDefault(f => String.Equals(f.FilePath, filepath)) != null)
             {
                 throw new FileAlreadyLoadedException(filepath);
             }
@@ -197,10 +205,11 @@ namespace StepBro.Core
             return new ScriptFile(filepath);
         }
 
-        public static void UnregisterScriptFileUsage(object user, IScriptFile file)
+        public static bool UnregisterFileUsage(object user, ILoadedFile file, bool throwIfNotFound = true)
         {
-            file.UnregisterDependant(user);
+            var wasUnregistered = file.UnregisterDependant(user, throwIfNotFound);
             m_loadedFilesManager.UnloadAllFilesWithoutDependants();
+            return wasUnregistered;
         }
 
         public static IHostApplicationActionQueue Actions { get { return m_hostActions; } }
@@ -294,7 +303,7 @@ namespace StepBro.Core
                 ILoggerScope logger = null;
                 try
                 {
-                    logger = m_mainLogger.Logger.RootLogger.LogEntering("StepBro.Main", "Starting file parsing");
+                    logger = m_rootLogger.LogEntering("StepBro.Main", "Starting file parsing");
                     foreach (var f in m_loadedFilesManager.ListFiles<ScriptFile>())
                     {
                         f.ResetBeforeParsing(preserveUpdateableElements: force == false);
@@ -437,7 +446,7 @@ namespace StepBro.Core
                 m_child.m_expectedTime = expectedTime;
                 m_child.m_progressMax = progressMax;
                 m_child.m_progressFormatter = progressFormatter;
-                m_child.Disposed += this.M_child_Disposed;
+                m_child.Disposed += M_child_Disposed;
                 return m_child;
             }
 
@@ -445,7 +454,7 @@ namespace StepBro.Core
             {
                 if (Object.ReferenceEquals(sender, m_child))
                 {
-                    m_child.Disposed -= this.M_child_Disposed;
+                    m_child.Disposed -= M_child_Disposed;
                     m_child = null;
                 }
             }
@@ -455,7 +464,7 @@ namespace StepBro.Core
                 m_disposeCount++;
                 if (m_disposeCount == 1)
                 {
-                    if (this.Disposed != null) this.Disposed(this, EventArgs.Empty);
+                    if (Disposed != null) Disposed(this, EventArgs.Empty);
                 }
             }
 
@@ -469,7 +478,7 @@ namespace StepBro.Core
             {
                 if (text != null) m_text = text;
                 if (progress >= 0) m_progress = progress;
-                if (progress == 99999) this.ExpectedTimeExceeded?.Invoke(this, EventArgs.Empty);    // TODO
+                if (progress == 99999) ExpectedTimeExceeded?.Invoke(this, EventArgs.Empty);    // TODO
                 //MiniLogger.Instance.Add(String.Format("TaskUpdate({0}).UpdateStatus: {1}, {2}", m_level, String.IsNullOrEmpty(text) ? "<no text>" : text, (progress >= 0) ? progress.ToString() : "<no progress>"));
             }
 
@@ -496,7 +505,7 @@ namespace StepBro.Core
 
     internal class TaskContextDummy : ITaskContext
     {
-        public TaskContextDummy(ILoggerScope logger = null) { this.Logger = logger; }
+        public TaskContextDummy(ILoggerScope logger = null) { Logger = logger; }
 
         public bool PauseRequested
         {

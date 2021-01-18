@@ -45,22 +45,19 @@
             this.buttonSendPrevious = new System.Windows.Forms.Button();
             this.checkBoxSendPrevious = new System.Windows.Forms.CheckBox();
             this.comboBoxPreviousCommands = new System.Windows.Forms.ComboBox();
-            this.splitContainerLogWindows = new System.Windows.Forms.SplitContainer();
             this.simpleLogViewFull = new StepBro.Core.Controls.SimpleLogView();
-            this.simpleLogViewCommands = new StepBro.Core.Controls.SimpleLogView();
             this.panelCommandButtonInput = new System.Windows.Forms.Panel();
             this.textBoxCommandButtonText = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.toolStripButtonAddCommand = new System.Windows.Forms.ToolStripButton();
             this.toolStripQuickCommands = new System.Windows.Forms.ToolStrip();
             this.timer = new System.Windows.Forms.Timer(this.components);
+            this.contextMenuLog = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.clearLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panelBottom.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainerLogWindows)).BeginInit();
-            this.splitContainerLogWindows.Panel1.SuspendLayout();
-            this.splitContainerLogWindows.Panel2.SuspendLayout();
-            this.splitContainerLogWindows.SuspendLayout();
             this.panelCommandButtonInput.SuspendLayout();
             this.toolStripQuickCommands.SuspendLayout();
+            this.contextMenuLog.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelBottom
@@ -80,7 +77,7 @@
             this.panelBottom.Controls.Add(this.checkBoxSendPrevious);
             this.panelBottom.Controls.Add(this.comboBoxPreviousCommands);
             this.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelBottom.Location = new System.Drawing.Point(0, 329);
+            this.panelBottom.Location = new System.Drawing.Point(0, 354);
             this.panelBottom.Name = "panelBottom";
             this.panelBottom.Size = new System.Drawing.Size(728, 88);
             this.panelBottom.TabIndex = 0;
@@ -246,38 +243,14 @@
             this.comboBoxPreviousCommands.TabIndex = 10;
             this.comboBoxPreviousCommands.SelectedIndexChanged += new System.EventHandler(this.comboBoxPreviousCommands_SelectedIndexChanged);
             // 
-            // splitContainerLogWindows
-            // 
-            this.splitContainerLogWindows.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainerLogWindows.Location = new System.Drawing.Point(0, 0);
-            this.splitContainerLogWindows.Name = "splitContainerLogWindows";
-            // 
-            // splitContainerLogWindows.Panel1
-            // 
-            this.splitContainerLogWindows.Panel1.Controls.Add(this.simpleLogViewFull);
-            // 
-            // splitContainerLogWindows.Panel2
-            // 
-            this.splitContainerLogWindows.Panel2.Controls.Add(this.simpleLogViewCommands);
-            this.splitContainerLogWindows.Size = new System.Drawing.Size(728, 329);
-            this.splitContainerLogWindows.SplitterDistance = 363;
-            this.splitContainerLogWindows.TabIndex = 2;
-            // 
             // simpleLogViewFull
             // 
+            this.simpleLogViewFull.ContextMenuStrip = this.contextMenuLog;
             this.simpleLogViewFull.Dock = System.Windows.Forms.DockStyle.Fill;
             this.simpleLogViewFull.Location = new System.Drawing.Point(0, 0);
             this.simpleLogViewFull.Name = "simpleLogViewFull";
-            this.simpleLogViewFull.Size = new System.Drawing.Size(363, 329);
+            this.simpleLogViewFull.Size = new System.Drawing.Size(728, 354);
             this.simpleLogViewFull.TabIndex = 0;
-            // 
-            // simpleLogViewCommands
-            // 
-            this.simpleLogViewCommands.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.simpleLogViewCommands.Location = new System.Drawing.Point(0, 0);
-            this.simpleLogViewCommands.Name = "simpleLogViewCommands";
-            this.simpleLogViewCommands.Size = new System.Drawing.Size(361, 329);
-            this.simpleLogViewCommands.TabIndex = 0;
             // 
             // panelCommandButtonInput
             // 
@@ -339,11 +312,25 @@
             this.timer.Interval = 250;
             this.timer.Tick += new System.EventHandler(this.timer_Tick);
             // 
+            // contextMenuLog
+            // 
+            this.contextMenuLog.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.clearLogToolStripMenuItem});
+            this.contextMenuLog.Name = "contextMenuLog";
+            this.contextMenuLog.Size = new System.Drawing.Size(102, 26);
+            // 
+            // clearLogToolStripMenuItem
+            // 
+            this.clearLogToolStripMenuItem.Name = "clearLogToolStripMenuItem";
+            this.clearLogToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
+            this.clearLogToolStripMenuItem.Text = "Clear";
+            this.clearLogToolStripMenuItem.Click += new System.EventHandler(this.clearLogToolStripMenuItem_Click);
+            // 
             // CommandTerminal_WinForms
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.Controls.Add(this.simpleLogViewFull);
             this.Controls.Add(this.panelCommandButtonInput);
-            this.Controls.Add(this.splitContainerLogWindows);
             this.Controls.Add(this.panelBottom);
             this.Controls.Add(this.toolStripQuickCommands);
             this.Name = "CommandTerminal_WinForms";
@@ -351,14 +338,11 @@
             this.Load += new System.EventHandler(this.CommandTerminal_Load);
             this.panelBottom.ResumeLayout(false);
             this.panelBottom.PerformLayout();
-            this.splitContainerLogWindows.Panel1.ResumeLayout(false);
-            this.splitContainerLogWindows.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainerLogWindows)).EndInit();
-            this.splitContainerLogWindows.ResumeLayout(false);
             this.panelCommandButtonInput.ResumeLayout(false);
             this.panelCommandButtonInput.PerformLayout();
             this.toolStripQuickCommands.ResumeLayout(false);
             this.toolStripQuickCommands.PerformLayout();
+            this.contextMenuLog.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -381,14 +365,14 @@
         private System.Windows.Forms.CheckBox checkBoxSend;
         private System.Windows.Forms.CheckBox checkBoxSendPrevious;
         private System.Windows.Forms.CheckBox checkBoxShowCommandButtons;
-        private System.Windows.Forms.SplitContainer splitContainerLogWindows;
         private Core.Controls.SimpleLogView simpleLogViewFull;
-        private Core.Controls.SimpleLogView simpleLogViewCommands;
         private System.Windows.Forms.Panel panelCommandButtonInput;
         private System.Windows.Forms.TextBox textBoxCommandButtonText;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolStripButton toolStripButtonAddCommand;
         private System.Windows.Forms.ToolStrip toolStripQuickCommands;
         private System.Windows.Forms.Timer timer;
+        private System.Windows.Forms.ContextMenuStrip contextMenuLog;
+        private System.Windows.Forms.ToolStripMenuItem clearLogToolStripMenuItem;
     }
 }

@@ -8,7 +8,6 @@ namespace StepBro.Workbench
     /// </summary>
     public class TextDocumentItemViewModel : DocumentItemViewModel
     {
-
         private string text;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,11 +42,9 @@ namespace StepBro.Workbench
                 if (text != value)
                 {
                     text = value;
-                    this.NotifyPropertyChanged("Text");
+                    this.NotifyPropertyChanged(nameof(Text));
                 }
             }
         }
-
     }
-
 }

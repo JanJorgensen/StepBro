@@ -1,10 +1,29 @@
-﻿using System;
+﻿using StepBro.Core.Logging;
+using System;
 using System.Threading;
 
 namespace StepBro.Core.Data
 {
     public class ArrayFifo<T> : IReadBuffer<T>
     {
+        private class MyDebugLogEntry : Logging.DebugLogEntry
+        {
+            public enum Action { Add, Get, Index, AwaitImmediate, AwaitEvent, AwaitTimeout, Eat }
+            private readonly Action m_action;
+            private readonly int m_head, m_tail, m_count;
+            public MyDebugLogEntry(Action action, int head, int tail, int count) : base()
+            {
+                m_action = action;
+                m_head = head;
+                m_tail = tail;
+                m_count = count;
+            }
+            public override string ToString()
+            {
+                return $"{m_action}: {m_head}, {m_tail}, {m_count}";
+            }
+        }
+
         private readonly object m_lock = new object();
         private AutoResetEvent m_newDataEvent;
         private bool m_waitingForData = false;
@@ -15,7 +34,7 @@ namespace StepBro.Core.Data
         public ArrayFifo(int size = 16 * 1024)
         {
             m_newDataEvent = new AutoResetEvent(false);
-            this.Setup(size);
+            Setup(size);
         }
 
         public void Setup(int size)
@@ -35,8 +54,9 @@ namespace StepBro.Core.Data
         {
             lock (m_lock)
             {
-                this.MakeSpace(length);
+                MakeSpace(length);
                 Array.Copy(m_buffer, start, m_buffer, m_head, length);
+                DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.Add, m_head, m_tail, length));
                 m_head += length;
                 if (m_waitingForData)
                 {
@@ -50,8 +70,10 @@ namespace StepBro.Core.Data
         {
             lock (m_lock)
             {
-                this.MakeSpace(length);
-                m_head += getter(m_buffer, m_head, length);
+                MakeSpace(length);
+                var count = getter(m_buffer, m_head, length);
+                DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.Add, m_head, m_tail, count));
+                m_head += count;
                 if (m_waitingForData)
                 {
                     m_newDataEvent.Set();
@@ -64,23 +86,46 @@ namespace StepBro.Core.Data
         {
             lock (m_lock)
             {
-                if (this.Count > knownCount)
+                if (Count > knownCount)
                 {
+                    DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.AwaitImmediate, m_head, m_tail, -1));
                     return true;
                 }
                 m_waitingForData = true;
             }
-            return m_newDataEvent.WaitOne(timeout);
+            if (m_newDataEvent.WaitOne(timeout))
+            {
+                DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.AwaitEvent, m_head, m_tail, -1));
+                return true;
+            }
+            else
+            {
+                DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.AwaitTimeout, m_head, m_tail, -1));
+                return false;
+            }
         }
 
         public bool AwaitNewData(int knownCount, TimeSpan timeout)
         {
             lock (m_lock)
             {
-                if (this.Count > knownCount) return true;
+                if (Count > knownCount)
+                {
+                    DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.AwaitImmediate, m_head, m_tail, -1));
+                    return true;
+                }
                 m_waitingForData = true;
             }
-            return m_newDataEvent.WaitOne(timeout);
+            if (m_newDataEvent.WaitOne(timeout))
+            {
+                DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.AwaitEvent, m_head, m_tail, -1));
+                return true;
+            }
+            else
+            {
+                DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.AwaitTimeout, m_head, m_tail, -1));
+                return false;
+            }
         }
 
         private void MakeSpace(int size)
@@ -105,8 +150,18 @@ namespace StepBro.Core.Data
             {
                 lock (m_lock)
                 {
-                    if (m_tail + index >= m_head) throw new ArgumentOutOfRangeException("index");
-                    return m_buffer[m_tail + index];
+                    try
+                    {
+                        DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.Index, m_head, m_tail, index));
+                        if (m_tail + index >= m_head) throw new ArgumentOutOfRangeException("index");
+                        return m_buffer[m_tail + index];
+                    }
+                    catch (Exception ex)
+                    {
+                        DebugLogEntry.Register(new DebugLogEntryString(ex.GetType().Name + ", " + ex.Message));
+                        DebugLogUtils.DumpToFile();
+                        throw;
+                    }
                 }
             }
         }
@@ -134,20 +189,9 @@ namespace StepBro.Core.Data
                         m_head = 0;
                     }
                 }
-                this.OnDataPulled();
+                DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.Eat, m_head, m_tail, length));
+                OnDataPulled();
             }
-        }
-
-        public T[] Get(int index, int length, int total)
-        {
-            T[] block = new T[length];
-            this.Get(index, length, total, block, 0);
-            return block;
-        }
-
-        public T[] Get(int length)
-        {
-            return this.Get(length, 0, length);
         }
 
         public void Get(int index, int length, int total, T[] targetbuffer, int targetindex)
@@ -164,8 +208,21 @@ namespace StepBro.Core.Data
                     m_tail = 0;
                     m_head = 0;
                 }
-                this.OnDataPulled();
+                DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.Get, m_head, m_tail, length));
+                OnDataPulled();
             }
+        }
+
+        public T[] Get(int index, int length, int total)
+        {
+            T[] block = new T[length];
+            Get(index, length, total, block, 0);
+            return block;
+        }
+
+        public T[] Get(int length)
+        {
+            return Get(length, 0, length);
         }
     }
 }

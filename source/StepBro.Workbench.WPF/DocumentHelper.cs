@@ -52,7 +52,7 @@ namespace StepBro.Workbench.WPF
 
 			// Create the document
 			var documentWindow = new DocumentWindow(dockSite, name, title, 
-				new BitmapImage(new Uri("/Images/Icons/TextDocument16.png", UriKind.Relative)), textBox);
+				new BitmapImage(new Uri("/Resources/Images/TextDocument16.png", UriKind.Relative)), textBox);
 			documentWindow.Description = "Text document";
 			documentWindow.FileName = filename;
 

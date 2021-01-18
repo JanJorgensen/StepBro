@@ -1,4 +1,6 @@
-﻿namespace StepBro.Workbench
+﻿using StepBro.Core.General;
+
+namespace StepBro.Workbench
 {
 
     /// <summary>
@@ -6,9 +8,9 @@
     /// </summary>
     public class DocumentItemViewModel : DockingItemViewModelBase
     {
-
-        private string fileName;
-        private bool isReadOnly;
+        private string m_fileName = null;
+        private bool m_isReadOnly = true;
+        private ILoadedFile m_loadedFile = null;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         // PUBLIC PROCEDURES
@@ -22,14 +24,14 @@
         {
             get
             {
-                return fileName;
+                return m_fileName;
             }
             set
             {
-                if (fileName != value)
+                if (m_fileName != value)
                 {
-                    fileName = value;
-                    this.NotifyPropertyChanged("FileName");
+                    m_fileName = value;
+                    NotifyPropertyChanged("FileName");
                 }
             }
         }
@@ -42,14 +44,33 @@
         {
             get
             {
-                return isReadOnly;
+                return m_isReadOnly;
             }
             set
             {
-                if (isReadOnly != value)
+                if (m_isReadOnly != value)
                 {
-                    isReadOnly = value;
-                    this.NotifyPropertyChanged("IsReadOnly");
+                    m_isReadOnly = value;
+                    NotifyPropertyChanged("IsReadOnly");
+                }
+            }
+        }
+
+        public ILoadedFile LoadedFile
+        {
+            get { return m_loadedFile; }
+            set
+            {
+                if (!object.ReferenceEquals(value, m_loadedFile))
+                {
+                    m_loadedFile = value;
+                    if (m_loadedFile != null)
+                    {
+                        this.FileName = m_loadedFile.FilePath;
+                        this.SerializationId = m_loadedFile.FilePath;
+                        this.Title = System.IO.Path.GetFileName(m_loadedFile.FilePath);
+                    }
+                    NotifyPropertyChanged("LoadedFile");
                 }
             }
         }

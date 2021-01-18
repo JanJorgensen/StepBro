@@ -21,7 +21,6 @@
         </Border>
 
         <syntaxeditor:SyntaxEditor x:Name="editor" Grid.Row="1" BorderThickness="0" CanSplitHorizontally="False" HasSearchOverlayPaneKeyBindings="False"
-								   Text="{Binding Path=Text, Mode=OneTime}"
                                    DocumentIsModifiedChanged="OnEditorDocumentIsModifiedChanged"
 								   DocumentParseDataChanged="OnEditorDocumentParseDataChanged"
 								   ViewSearch="OnEditorViewSearch"

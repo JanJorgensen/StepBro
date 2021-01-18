@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using Microsoft.Win32;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace StepBro.Workbench
 {
@@ -24,9 +14,28 @@ namespace StepBro.Workbench
             InitializeComponent();
         }
 
-        private void Calculator_Click(object sender, RoutedEventArgs e)
-        {
+        #region Open File Command
 
+        private void OpenCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+            System.Diagnostics.Trace.WriteLine("OpenCanExecute");
         }
+
+        private void OpenExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.Filter = "StepBro files (*.sbs)|*.sbs|Text files (*.txt)|*.txt|All files (*.*)|*.*";
+            if (dialog.ShowDialog() == true)
+            {
+                var viewModel = (MainViewModel)DataContext;
+                if (viewModel.OpenFileCommand.CanExecute(null))
+                {
+                    viewModel.OpenFileCommand.Execute(dialog.FileName);
+                }
+            }
+        }
+
+        #endregion
     }
 }

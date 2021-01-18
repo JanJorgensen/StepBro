@@ -37,3 +37,5 @@ using System.Windows;
 
 
 //[assembly: AssemblyFileVersion("0.1.30.0")]
+
+[assembly: InternalsVisibleTo("StepBroWorkbenchTest")]

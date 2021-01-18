@@ -13,7 +13,7 @@ namespace StepBro.Workbench.Editor
     {
         private readonly IEditAction m_action;
 
-        public event EventHandler CanExecuteChanged;
+        public event EventHandler CanExecuteChanged { add { } remove { } }
         public NoMacroRecordAction(IEditAction action)
         {
             m_action = action;

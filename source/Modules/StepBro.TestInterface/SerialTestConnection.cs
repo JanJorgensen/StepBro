@@ -611,10 +611,17 @@ namespace StepBro.TestInterface
 
         private void AddToLog(LogType type, uint id, string text)
         {
-            m_lastLogLine = new LogLineData(m_lastLogLine, type, id, text);
-            if (m_firstLogLine == null)
+            try
             {
-                m_firstLogLine = m_lastLogLine;
+                m_lastLogLine = new LogLineData(m_lastLogLine, type, id, text);
+                if (m_firstLogLine == null)
+                {
+                    m_firstLogLine = m_lastLogLine;
+                }
+            }
+            catch (Exception ex)
+            {
+                StepBro.Core.Main.RootLogger.LogError("SerialTestConnection.AddToLog", $"Unexpected error. Exception: {ex}");
             }
             this.LinesAdded?.Invoke(this, new LogLineEventArgs(m_lastLogLine));
         }
@@ -660,7 +667,10 @@ namespace StepBro.TestInterface
                             var s = new string(line, 1, line.Length - 1);
                             if (line[0] == this.EventLineChar)
                             {
-                                this.AddToLog(LogType.ReceivedAsync, 0, new string(line));
+                                lock (m_sync)
+                                {
+                                    this.AddToLog(LogType.ReceivedAsync, 0, new string(line));
+                                }
                                 m_events.Enqueue(new string(line, 1, line.Length - 1));
                                 while (m_events.Count > 1000)
                                 {
@@ -671,13 +681,19 @@ namespace StepBro.TestInterface
                             {
                                 if (line[0] == this.ResponseMultiLineChar)
                                 {
-                                    this.AddToLog(LogType.ReceivedPartial, 0, new string(line));
+                                    lock (m_sync)
+                                    {
+                                        this.AddToLog(LogType.ReceivedPartial, 0, new string(line));
+                                    }
                                     m_responseLines.Enqueue(s);
                                 }
                                 else if (line[0] == this.ResponseEndLineChar)
                                 {
                                     var l = new string(line);
-                                    this.AddToLog((l.StartsWith(this.ResponseErrorPrefix)) ? LogType.ReceivedError : LogType.ReceivedEnd, 0, l);
+                                    lock (m_sync)
+                                    {
+                                        this.AddToLog((l.StartsWith(this.ResponseErrorPrefix)) ? LogType.ReceivedError : LogType.ReceivedEnd, 0, l);
+                                    }
                                     if (m_currentExecutingCommand != null)
                                     {
                                         try
@@ -707,7 +723,6 @@ namespace StepBro.TestInterface
 
         private void OnEndCommand()
         {
-            m_inputBuffer.Eat(-1);
             m_responseLines.Clear();
             lock (m_sync)
             {

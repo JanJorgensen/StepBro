@@ -111,11 +111,11 @@ namespace StepBro.Workbench
             {
                 if (m_loadSpecification.Length >= 2)
                 {
-                    m_panel = panelManager.CreateObjectPanel(m_panelType, m_loadSpecification[1]);
+                    m_panel = panelManager.CreateObjectWinFormsPanel(m_panelType, m_loadSpecification[1]);
                 }
                 else
                 {
-                    m_panel = panelManager.CreateStaticPanel(m_panelType);
+                    m_panel = panelManager.CreateStaticWinFormsPanel(m_panelType);
                 }
                 if (m_panel != null)
                 {

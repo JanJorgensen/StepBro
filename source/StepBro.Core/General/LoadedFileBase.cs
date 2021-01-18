@@ -10,6 +10,7 @@ namespace StepBro.Core.General
         private readonly string m_filepath;
         private readonly string m_filename;
         private readonly LoadedFileType m_fileType;
+        private string m_offDiskFileContent = null;
         private List<WeakReference<object>> m_dependants = new List<WeakReference<object>>();
         private static int g_nextID = 1000;
 
@@ -61,9 +62,22 @@ namespace StepBro.Core.General
 
         public int UniqueID { get; } = g_nextID++;
 
+        public string OffDiskFileContent
+        {
+            get
+            {
+                return m_offDiskFileContent;
+            }
+            set
+            {
+                m_offDiskFileContent = value;
+            }
+        }
+
+
         protected void NotifyPropertyChanged(string name)
         {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
         public bool RegisterDependant(object usingObject)
@@ -73,28 +87,30 @@ namespace StepBro.Core.General
                 return true;
             }
             m_dependants.Add(new WeakReference<object>(usingObject));
+            NotifyPropertyChanged(nameof(RegisteredDependantsCount));
             return false;
         }
 
-        public void UnregisterDependant(object usingObject, bool throwIfNotFound = true)
+        public bool UnregisterDependant(object usingObject, bool throwIfNotFound = true)
         {
             int i = 0;
             bool found = false;
             List<int> elementsToRemove = new List<int>();
+            // Check all dependants. Remove specified object and all disposed objects.
             foreach (var dep in m_dependants)
             {
                 if (dep.TryGetTarget(out object obj))
                 {
+                    // If using object specified and the current object is that specified object.
                     if (usingObject != null && Object.ReferenceEquals(usingObject, obj))
                     {
                         found = true;
                         elementsToRemove.Insert(0, i);  // Insert first, to get reverse order for indices to remove.
-                        break;
                     }
                 }
                 else
                 {
-                    // Object deleted; remove from list
+                    // Object disposed; remove it from the list
                     elementsToRemove.Insert(0, i);  // Insert first, to get reverse order for indices to remove.
                 }
                 i++;
@@ -103,20 +119,41 @@ namespace StepBro.Core.General
             {
                 m_dependants.RemoveAt(j);
             }
+            if (elementsToRemove.Count > 0)
+            {
+                NotifyPropertyChanged(nameof(RegisteredDependantsCount));
+            }
             if (throwIfNotFound && usingObject != null && !found)
             {
                 throw new ArgumentException("The specified object is not registered as a dependant.");
             }
+            return found;
+        }
+
+        public bool IsDependantOf(object @object)
+        {
+            if (@object == null) throw new ArgumentNullException();
+            foreach (var dep in m_dependants)
+            {
+                if (dep.TryGetTarget(out object obj))
+                {
+                    if (Object.ReferenceEquals(@object, obj))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public void Dispose()
         {
-            this.UnregisterDependant(null);
+            UnregisterDependant(null);
             //if (this.RegisteredDependantsCount > 0)
             //{
             //    throw new Exception("Disposing file object when still having dependants.");
             //}
-            this.DoDispose();
+            DoDispose();
         }
 
         protected virtual void DoDispose()
@@ -125,7 +162,7 @@ namespace StepBro.Core.General
 
         public IEnumerable<string> ListDependantDescriptors()
         {
-            this.UnregisterDependant(null);
+            UnregisterDependant(null);
             foreach (var dep in m_dependants)
             {
                 if (dep.TryGetTarget(out object obj))

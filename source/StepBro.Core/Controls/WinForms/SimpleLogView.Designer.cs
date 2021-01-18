@@ -63,16 +63,20 @@
             this.fctb.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.fctb.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.fctb.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.fctb.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.fctb.IsReplaceMode = false;
             this.fctb.Location = new System.Drawing.Point(0, 0);
             this.fctb.Name = "fctb";
             this.fctb.Paddings = new System.Windows.Forms.Padding(0);
             this.fctb.ReadOnly = true;
             this.fctb.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
+            this.fctb.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("fctb.ServiceColors")));
             this.fctb.ShowLineNumbers = false;
             this.fctb.Size = new System.Drawing.Size(150, 150);
             this.fctb.TabIndex = 3;
             this.fctb.Zoom = 100;
+            this.fctb.SelectionChanged += new System.EventHandler(this.fctb_SelectionChanged);
+            this.fctb.Enter += new System.EventHandler(this.fctb_Enter);
             // 
             // SimpleLogView
             // 

@@ -65,7 +65,6 @@
     <Compile Include="Controls\CommandTerminalView.xaml.cs">
       <DependentUpon>CommandTerminalView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\CommandTerminalViewModel.cs" />
     <Compile Include="Controls\CommandTerminal_WinForms.cs">
       <SubType>UserControl</SubType>
     </Compile>

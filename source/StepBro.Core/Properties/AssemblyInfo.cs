@@ -20,4 +20,5 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("stepbro")]
 [assembly: InternalsVisibleTo("StepBroCoreTest")]
 [assembly: InternalsVisibleTo("TestStepBroScriptFileEditor")]
+[assembly: InternalsVisibleTo("StepBroWorkbenchTest")]
 

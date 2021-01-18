@@ -38,7 +38,7 @@ namespace StepBroCoreTest.Mocks
         }
 
         public event EventHandler Disposed;
-        public event EventHandler ExpectedTimeExceeded;
+        public event EventHandler ExpectedTimeExceeded { add { } remove { } }
 
         public void AddActionButton(string title, ButtonActivationType type, Action<bool> activationAction)
         {

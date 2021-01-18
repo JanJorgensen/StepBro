@@ -320,7 +320,7 @@ namespace StepBro.Core.ScriptData
         private static void SetFileVariableCustomData(FileVariable variable, PropertyBlock customSetupData)
         {
             System.Diagnostics.Debug.Assert(variable.VariableOwnerAccess.Tag != null && variable.VariableOwnerAccess.Tag is Dictionary<Type, Object>);
-            (variable.VariableOwnerAccess.Tag as Dictionary<Type, Object>).Add(typeof(PropertyBlock), customSetupData);
+            (variable.VariableOwnerAccess.Tag as Dictionary<Type, Object>)[typeof(PropertyBlock)] = customSetupData;
         }
 
         internal void SetFileVariableModifier(int id, AccessModifier access)

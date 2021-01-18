@@ -74,6 +74,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CommandLineOptions.cs" />
     <Compile Include="Controls\LeftRightPanel.cs" />
     <Compile Include="DockingItemViewModelBase.cs" />
     <Compile Include="DocumentHelper.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="Editor\NoMacroRecordAction.cs" />
     <Compile Include="Editor\RepeatAction.cs" />
     <Compile Include="Editor\RepeatActivationAction.cs" />
+    <Compile Include="LoadedFileViewModel.cs" />
     <Compile Include="MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
@@ -101,7 +103,7 @@
     <Compile Include="ToolItemState.cs" />
     <Compile Include="ToolItemStateConverter.cs" />
     <Compile Include="ToolItemTemplateSelector.cs" />
-    <Compile Include="ToolItemViewModel.cs" />
+    <Compile Include="ToolViews\ToolItemViewModel.cs" />
     <Compile Include="ToolViews\CalculatorView.xaml.cs">
       <DependentUpon>CalculatorView.xaml</DependentUpon>
     </Compile>

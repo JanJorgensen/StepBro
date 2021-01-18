@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,5 +31,6 @@ namespace StepBro.Core.General
         IReadOnlyCollection<IScriptFile> TryGetNamespaceList(string @namespace);
         event LoadedFileEventHandler FileLoaded;
         event LoadedFileEventHandler FileClosed;
+        event PropertyChangedEventHandler FilePropertyChanged;
     }
 }

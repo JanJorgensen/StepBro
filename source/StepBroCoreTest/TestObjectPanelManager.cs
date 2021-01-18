@@ -20,7 +20,7 @@ namespace StepBroCoreTest
             service.Start(null, null);
 
             Assert.AreEqual(5, manager.ListPanelTypes().Count());
-            Assert.AreEqual(0, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(0, manager.ListCreatedPanelsWinForms().Count());
 
             return manager;
         }
@@ -32,28 +32,28 @@ namespace StepBroCoreTest
 
             const string NAME = "Panel1 Title";
 
-            var panelA = manager.CreateStaticPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME));
+            var panelA = manager.CreateStaticWinFormsPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME));
             Assert.IsNotNull(panelA);
             Assert.IsTrue(panelA.GetType() == typeof(Panel1));
-            Assert.AreEqual(1, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(1, manager.ListCreatedPanelsWinForms().Count());
             // Not expecting to be able to create one more
-            var panelB = manager.CreateStaticPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME));
+            var panelB = manager.CreateStaticWinFormsPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME));
             Assert.IsNull(panelB);
-            Assert.AreEqual(1, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(1, manager.ListCreatedPanelsWinForms().Count());
 
             // Dispose, to be able to create new.
             panelA.Dispose();
-            Assert.AreEqual(0, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(0, manager.ListCreatedPanelsWinForms().Count());
 
-            panelB = manager.CreateStaticPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME));
+            panelB = manager.CreateStaticWinFormsPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME));
             Assert.IsNotNull(panelB);
-            Assert.AreEqual(1, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(1, manager.ListCreatedPanelsWinForms().Count());
 
             // Now dispose the panels
             panelA.Dispose();
-            Assert.AreEqual(1, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(1, manager.ListCreatedPanelsWinForms().Count());
             panelB.Dispose();
-            Assert.AreEqual(0, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(0, manager.ListCreatedPanelsWinForms().Count());
         }
 
         [TestMethod]
@@ -63,30 +63,30 @@ namespace StepBroCoreTest
 
             const string NAME = "Panel5 Title";
 
-            var panelA = manager.CreateStaticPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME));
+            var panelA = manager.CreateStaticWinFormsPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME));
             Assert.IsNotNull(panelA);
             Assert.IsTrue(panelA.GetType() == typeof(Panel5));
-            Assert.AreEqual(1, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(1, manager.ListCreatedPanelsWinForms().Count());
 
             // Expect to be able to create more instances
-            var panelB = manager.CreateStaticPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME));
+            var panelB = manager.CreateStaticWinFormsPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME));
             Assert.IsNotNull(panelB);
             Assert.IsTrue(panelB.GetType() == typeof(Panel5));
-            Assert.AreEqual(2, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(2, manager.ListCreatedPanelsWinForms().Count());
 
             // ... and still more
-            var panelC = manager.CreateStaticPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME));
+            var panelC = manager.CreateStaticWinFormsPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME));
             Assert.IsNotNull(panelC);
             Assert.IsTrue(panelC.GetType() == typeof(Panel5));
-            Assert.AreEqual(3, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(3, manager.ListCreatedPanelsWinForms().Count());
 
             // Now dispose the panels
             panelB.Dispose();
-            Assert.AreEqual(2, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(2, manager.ListCreatedPanelsWinForms().Count());
             panelA.Dispose();
-            Assert.AreEqual(1, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(1, manager.ListCreatedPanelsWinForms().Count());
             panelC.Dispose();
-            Assert.AreEqual(0, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(0, manager.ListCreatedPanelsWinForms().Count());
         }
 
         [TestMethod]
@@ -97,31 +97,31 @@ namespace StepBroCoreTest
             const string NAME = "Panel2 Title";
 
             var vc1 = new VariableContainer<bool>("", "", true, false);
-            var panelA = manager.CreateObjectPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME), vc1);
+            var panelA = manager.CreateObjectWinFormsPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME), vc1);
             Assert.IsNotNull(panelA);
             Assert.IsTrue(panelA.GetType() == typeof(Panel2));
-            Assert.AreEqual(1, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(1, manager.ListCreatedPanelsWinForms().Count());
 
             // Not expecting to be able to create one more
             var vc2 = new VariableContainer<bool>("", "", true, false);
-            var panelB = manager.CreateObjectPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME), vc2);
+            var panelB = manager.CreateObjectWinFormsPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME), vc2);
             Assert.IsNull(panelB);
-            Assert.AreEqual(1, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(1, manager.ListCreatedPanelsWinForms().Count());
 
             // Dispose, to be able to create new.
             panelA.Dispose();
-            Assert.AreEqual(0, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(0, manager.ListCreatedPanelsWinForms().Count());
 
-            panelB = manager.CreateObjectPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME), vc2);
+            panelB = manager.CreateObjectWinFormsPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME), vc2);
             Assert.IsNotNull(panelB);
             Assert.IsTrue(panelB.GetType() == typeof(Panel2));
-            Assert.AreEqual(1, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(1, manager.ListCreatedPanelsWinForms().Count());
 
             // Now dispose the panels
             panelA.Dispose();
-            Assert.AreEqual(1, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(1, manager.ListCreatedPanelsWinForms().Count());
             panelB.Dispose();
-            Assert.AreEqual(0, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(0, manager.ListCreatedPanelsWinForms().Count());
         }
 
         [TestMethod]
@@ -132,32 +132,32 @@ namespace StepBroCoreTest
             const string NAME = "Panel3 Title";
 
             var vc1 = new VariableContainer<long>("", "", 10L, false);
-            var panelA = manager.CreateObjectPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME), vc1);
+            var panelA = manager.CreateObjectWinFormsPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME), vc1);
             Assert.IsNotNull(panelA);
             Assert.IsTrue(panelA.GetType() == typeof(Panel3));
-            Assert.AreEqual(1, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(1, manager.ListCreatedPanelsWinForms().Count());
 
             // Expect to be able to create more instances
             var vc2 = new VariableContainer<long>("", "", 20L, false);
-            var panelB = manager.CreateObjectPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME), vc2);
+            var panelB = manager.CreateObjectWinFormsPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME), vc2);
             Assert.IsNotNull(panelB);
             Assert.IsTrue(panelB.GetType() == typeof(Panel3));
-            Assert.AreEqual(2, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(2, manager.ListCreatedPanelsWinForms().Count());
 
             // ... and still more
             var vc3 = new VariableContainer<long>("", "", 30L, false);
-            var panelC = manager.CreateObjectPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME), vc3);
+            var panelC = manager.CreateObjectWinFormsPanel(manager.ListPanelTypes().FirstOrDefault(p => p.Name == NAME), vc3);
             Assert.IsNotNull(panelC);
             Assert.IsTrue(panelC.GetType() == typeof(Panel3));
-            Assert.AreEqual(3, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(3, manager.ListCreatedPanelsWinForms().Count());
 
             // Now dispose the panels
             panelB.Dispose();
-            Assert.AreEqual(2, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(2, manager.ListCreatedPanelsWinForms().Count());
             panelA.Dispose();
-            Assert.AreEqual(1, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(1, manager.ListCreatedPanelsWinForms().Count());
             panelC.Dispose();
-            Assert.AreEqual(0, manager.ListCreatedPanels().Count());
+            Assert.AreEqual(0, manager.ListCreatedPanelsWinForms().Count());
         }
 
         #region Test Data
@@ -168,9 +168,9 @@ namespace StepBroCoreTest
 
             protected override IEnumerable<ObjectPanelInfo> CreatePanelList()
             {
-                yield return new ObjectPanelInfo<Panel1>("Panel1 Title", "", false);
-                yield return new ObjectPanelInfo<Panel2, bool>("Panel2 Title", "", false);
-                yield return new ObjectPanelInfo<Panel3, long>("Panel3 Title", "", true);
+                yield return new ObjectPanelInfoWinForms<Panel1>("Panel1 Title", "", false);
+                yield return new ObjectPanelInfoWinForms<Panel2, bool>("Panel2 Title", "", false);
+                yield return new ObjectPanelInfoWinForms<Panel3, long>("Panel3 Title", "", true);
             }
         }
         private class Creator2 : ObjectPanelCreator
@@ -179,8 +179,8 @@ namespace StepBroCoreTest
 
             protected override IEnumerable<ObjectPanelInfo> CreatePanelList()
             {
-                yield return new ObjectPanelInfo<Panel4, string>("Panel4 Title", "", false);
-                yield return new ObjectPanelInfo<Panel5>("Panel5 Title", "", true);
+                yield return new ObjectPanelInfoWinForms<Panel4, string>("Panel4 Title", "", false);
+                yield return new ObjectPanelInfoWinForms<Panel5>("Panel5 Title", "", true);
             }
         }
 
