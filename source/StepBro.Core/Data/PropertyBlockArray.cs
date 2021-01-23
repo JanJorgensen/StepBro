@@ -11,7 +11,7 @@ namespace StepBro.Core.Data
     {
         List<PropertyBlockEntry> m_entries = new List<PropertyBlockEntry>();
 
-        public PropertyBlockArray(string name = null) : base(PropertyBlockEntryType.Array, name)
+        public PropertyBlockArray(int line, string name = null) : base(line, PropertyBlockEntryType.Array, name)
         {
         }
 

@@ -11,11 +11,11 @@ namespace StepBro.Core.Data
     {
         List<PropertyBlockEntry> m_children = new List<PropertyBlockEntry>();
 
-        public PropertyBlock(string name = null) : base(PropertyBlockEntryType.Block, name)
+        public PropertyBlock(int line, string name = null) : base(line, PropertyBlockEntryType.Block, name)
         {
         }
 
-        public PropertyBlock(string name, IEnumerable<PropertyBlockEntry> children) : base(PropertyBlockEntryType.Block, name)
+        public PropertyBlock(int line, string name, IEnumerable<PropertyBlockEntry> children) : base(line, PropertyBlockEntryType.Block, name)
         {
             if (children != null)
             {
@@ -23,7 +23,7 @@ namespace StepBro.Core.Data
             }
         }
 
-        public PropertyBlock(IEnumerable<PropertyBlockEntry> children) : base(PropertyBlockEntryType.Block)
+        public PropertyBlock(int line, IEnumerable<PropertyBlockEntry> children) : base(line, PropertyBlockEntryType.Block)
         {
             m_children.AddRange(children);
         }

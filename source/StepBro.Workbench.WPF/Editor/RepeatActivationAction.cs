@@ -37,32 +37,33 @@ namespace StepBro.Workbench.Editor
         {
             if (m_view == null)
             {
-                view.SyntaxEditor.ViewActionExecuting += this.SyntaxEditor_ViewActionExecuting;
+                //view.SyntaxEditor.ViewActionExecuting += this.SyntaxEditor_ViewActionExecuting;   // TODO: Include again
                 m_view = view;
             }
             else
             {
-                m_view.SyntaxEditor.ViewActionExecuting -= this.SyntaxEditor_ViewActionExecuting;
+                //m_view.SyntaxEditor.ViewActionExecuting -= this.SyntaxEditor_ViewActionExecuting;
                 m_view = null;
             }
         }
 
-        private void SyntaxEditor_ViewActionExecuting(object sender, EditActionEventArgs e)
-        {
-            if (e.Action.CanRecordInMacro)
-            {
-                e.Cancel = true;
-                var repeatAction = new RepeatAction(e.Action);
-                m_view.SyntaxEditor.Dispatcher.BeginInvoke(DispatcherPriority.Send, (DispatcherOperationCallback)delegate (object arg)
-                {
-                    m_view.SyntaxEditor.Focus();
-                    m_view.ExecuteEditAction(new RepeatAction(e.Action));
-                    return null;
-                }, null);
-            }
-            m_view.SyntaxEditor.ViewActionExecuting -= this.SyntaxEditor_ViewActionExecuting;   // Stop waiting for action to repeat.
-            m_view = null;
-        }
+        // TODO: Include again
+        //private void SyntaxEditor_ViewActionExecuting(object sender, EditActionEventArgs e)
+        //{
+        //    if (e.Action.CanRecordInMacro)
+        //    {
+        //        e.Cancel = true;
+        //        var repeatAction = new RepeatAction(e.Action);
+        //        m_view.SyntaxEditor.Dispatcher.BeginInvoke(DispatcherPriority.Send, (DispatcherOperationCallback)delegate (object arg)
+        //        {
+        //            m_view.SyntaxEditor.Focus();
+        //            m_view.ExecuteEditAction(new RepeatAction(e.Action));
+        //            return null;
+        //        }, null);
+        //    }
+        //    m_view.SyntaxEditor.ViewActionExecuting -= this.SyntaxEditor_ViewActionExecuting;   // Stop waiting for action to repeat.
+        //    m_view = null;
+        //}
 
         public override bool CanRecordInMacro { get { return false; } }
     }

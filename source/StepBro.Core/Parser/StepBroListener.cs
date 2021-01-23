@@ -217,7 +217,7 @@ namespace StepBro.Core.Parser
                 initAction = this.CreateVariableContainerObjectInitAction(type.Type, props, m_errors, context.Start);
                 if (props.Count(e => e.Tag == null) > 0)
                 {
-                    customProperties = new PropertyBlock();
+                    customProperties = new PropertyBlock(context.Start.Line);
                     customProperties.AddRange(props.Where(e => e.Tag == null));
                 }
             }

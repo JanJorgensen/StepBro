@@ -1,28 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace StepBro.Core.Data
 {
     public abstract class PropertyBlockEntry
     {
+        private readonly int m_line;
         private string m_specifiedDataType;
         private string m_name;
         private bool m_isArrayEntry = false;
 
-        protected PropertyBlockEntry(PropertyBlockEntryType type, string name = null)
+        protected PropertyBlockEntry(int line, PropertyBlockEntryType type, string name = null)
         {
-            this.Name = name;
-            this.BlockEntryType = type;
+            m_line = line;
+            Name = name;
+            BlockEntryType = type;
         }
+
+        public int Line { get { return m_line; } }
 
         public string Name
         {
             get
             {
-                if (this.IsArrayEntry) throw new NotSupportedException("Entry is an array element, and therefore has no name.");
+                if (IsArrayEntry) throw new NotSupportedException("Entry is an array element, and therefore has no name.");
                 return m_name;
             }
             set
@@ -37,7 +38,7 @@ namespace StepBro.Core.Data
         {
             get
             {
-                if (this.IsArrayEntry) throw new NotSupportedException("Entry is an array element, and therefore has no specified type.");
+                if (IsArrayEntry) throw new NotSupportedException("Entry is an array element, and therefore has no specified type.");
                 return m_specifiedDataType;
             }
             set
@@ -67,13 +68,13 @@ namespace StepBro.Core.Data
         public string GetTestString()
         {
             var sb = new StringBuilder();
-            this.GetTestString(sb);
+            GetTestString(sb);
             return sb.ToString();
         }
 
         public bool Is(string name, PropertyBlockEntryType type)
         {
-            return m_name == name && this.BlockEntryType == type;
+            return m_name == name && BlockEntryType == type;
         }
     }
 }

@@ -53,6 +53,15 @@ namespace StepBro.Core
             m_groups.Add(m_currentGroup);
         }
 
+        public void DumpToLog([Implicit] ICallContext context)
+        {
+            if (context.LoggingEnabled)
+            {
+                var logger = context.Logger;
+                logger.Log("ReportData.DumpToLog", "<some data to go>");
+            }
+        }
+
         public void Dispose()
         {
             if (!m_isClosed)

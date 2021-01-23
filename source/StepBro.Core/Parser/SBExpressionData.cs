@@ -27,7 +27,7 @@ namespace StepBro.Core.Parser
         ProcedurePartner,
         ProcedurePropertyReference,
         ProcedureCustomPropertyReference,
-        TestList,
+        TestListReference,
         DatatableReference,
         AwaitExpression,
         DynamicObjectMember,
@@ -255,6 +255,7 @@ namespace StepBro.Core.Parser
                     case SBExpressionType.TypeReference:
                     case SBExpressionType.MethodReference:
                     case SBExpressionType.ProcedureReference:
+                    case SBExpressionType.TestListReference:
                     case SBExpressionType.DatatableReference:
                         return false;
 
@@ -302,7 +303,7 @@ namespace StepBro.Core.Parser
         public bool IsPropertyReference { get { return ReferencedType == SBExpressionType.PropertyReference; } }
         public bool IsProcedureReference { get { return ReferencedType == SBExpressionType.ProcedureReference; } }
         public bool IsMethodReference { get { return ReferencedType == SBExpressionType.MethodReference; } }
-        public bool IsTestList { get { return ReferencedType == SBExpressionType.TestList; } }
+        public bool IsTestList { get { return ReferencedType == SBExpressionType.TestListReference; } }
 
         public bool IsAwaitExpression { get { return ReferencedType == SBExpressionType.AwaitExpression; } }
 

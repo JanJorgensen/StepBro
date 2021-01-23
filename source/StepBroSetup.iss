@@ -47,6 +47,7 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 [Dirs]
 Name: "{app}\modules"
 Name: "{app}\examples"
+Name: "{app}\scripts"
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 [Files]
@@ -94,3 +95,4 @@ Source: "bin\modules\Stepbro.TestInterface.dll"; DestDir: "{app}\modules"; Flags
 Source: "..\examples\scripts\Demo Conditional Statements.sbs"; DestDir: "{app}\examples\scripts"
 Source: "..\examples\scripts\Demo Procedure.sbs"; DestDir: "{app}\examples\scripts"
 Source: "..\examples\scripts\Demo Workbench.sbs"; DestDir: "{app}\examples\scripts"
+Source: "..\scripts\*.*"; DestDir: "{app}\scripts"

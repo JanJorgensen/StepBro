@@ -8,6 +8,17 @@ namespace StepBro.Core.Data
 {
     public static class TimeUtils
     {
+        public static TimeSpan TimeTill(this DateTime now, DateTime time)
+        {
+            if (now >= time) return TimeSpan.Zero;
+            else return time - now;
+        }
+
+        public static TimeSpan TimeTill(DateTime time)
+        {
+            return DateTime.Now.TimeTill(time);
+        }
+
         public static TimeSpan Multiply(this TimeSpan ts, long multiplier)
         {
             return TimeSpan.FromTicks(ts.Ticks * multiplier);

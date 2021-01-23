@@ -1,9 +1,10 @@
-﻿using StepBro.Core.Logging;
-using StepBro.Core.Tasks;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using StepBro.Core.Logging;
+using StepBro.Core.Tasks;
+using StepBro.Core.Data;
 
 namespace StepBro.Core.General
 {
@@ -215,7 +216,7 @@ namespace StepBro.Core.General
                             if (DateTime.Now > (entry + timeout)) return false;
                             Thread.Sleep(10);
                         }
-                        return m_task.Wait(timeout - (DateTime.Now - entry));
+                        return m_task.Wait(DateTime.Now.TimeTill( entry + timeout) );
                     }
                 }
                 else

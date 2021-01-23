@@ -10,7 +10,7 @@ namespace StepBro.Core.Data
     {
         private Verdict? m_verdict;
 
-        public PropertyBlockEvent(string name, Verdict verdict) : base(PropertyBlockEntryType.Event, name)
+        public PropertyBlockEvent(int line, string name, Verdict verdict) : base(line, PropertyBlockEntryType.Event, name)
         {
             m_verdict = verdict;
         }

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.Workbench.WPF5", "StepBro.Workbench.WPF\StepBro.Workbench.WPF5.csproj", "{03E75F69-A412-43A1-8648-C03B8A89C576}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.Core5", "StepBro.Core5\StepBro.Core5.csproj", "{F56B9BC1-0F9A-4BEB-A1EF-434F5E58C806}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{03E75F69-A412-43A1-8648-C03B8A89C576}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03E75F69-A412-43A1-8648-C03B8A89C576}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03E75F69-A412-43A1-8648-C03B8A89C576}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03E75F69-A412-43A1-8648-C03B8A89C576}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F56B9BC1-0F9A-4BEB-A1EF-434F5E58C806}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F56B9BC1-0F9A-4BEB-A1EF-434F5E58C806}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F56B9BC1-0F9A-4BEB-A1EF-434F5E58C806}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F56B9BC1-0F9A-4BEB-A1EF-434F5E58C806}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2684A99E-8352-4250-AFE9-C724A535A6A8}
+	EndGlobalSection
+EndGlobal

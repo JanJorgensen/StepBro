@@ -235,7 +235,7 @@ namespace StepBro.Streams
                         System.Threading.Thread.Sleep(20);
                         if (timeout != TimeSpan.Zero)
                         {
-                            timeleft = timeout - (DateTime.Now - entry);
+                            timeleft = DateTime.Now.TimeTill(entry + timeout);
                         }
                     }
                     if (m_port.BytesToRead > 0)
@@ -281,7 +281,7 @@ namespace StepBro.Streams
                             }
                             if (timeout != TimeSpan.Zero)
                             {
-                                timeleft = timeout - (DateTime.Now - entry);
+                                timeleft = DateTime.Now.TimeTill(entry - timeout);
                             }
                         }
                         else

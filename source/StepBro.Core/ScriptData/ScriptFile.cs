@@ -361,6 +361,7 @@ namespace StepBro.Core.ScriptData
 
         public IValueContainer<T> GetVariableContainer<T>(int id)
         {
+            var t = typeof(T);
             foreach (var v in m_fileScopeVariables)
             {
                 if (v.ID == id)
@@ -371,7 +372,7 @@ namespace StepBro.Core.ScriptData
                     }
                     else
                     {
-                        throw new ArgumentException("The data type for the variable is not the same as the specified type.");
+                        throw new ArgumentException($"The data type for the variable is not the same as the specified type ({t.Name}).");
                     }
                 }
             }

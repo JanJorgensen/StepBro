@@ -36,10 +36,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ActiproSoftware.Docking.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
-    <Reference Include="ActiproSoftware.Shared.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
-    <Reference Include="ActiproSoftware.SyntaxEditor.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
-    <Reference Include="ActiproSoftware.Text.Wpf, Version=20.1.2.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL" />
+    <Reference Include="ActiproSoftware.Docking.Wpf, Version=20.1.1.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL">
+      <HintPath>..\StepBro.Core\packages\ActiproSoftware.Controls.WPF.Docking.20.1.1\lib\net40\ActiproSoftware.Docking.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="ActiproSoftware.Shared.Wpf, Version=20.1.1.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL">
+      <HintPath>..\StepBro.Core\packages\ActiproSoftware.Controls.WPF.Shared.20.1.1\lib\net40\ActiproSoftware.Shared.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="ActiproSoftware.SyntaxEditor.Wpf, Version=20.1.1.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL">
+      <HintPath>..\StepBro.Core\packages\ActiproSoftware.Controls.WPF.SyntaxEditor.20.1.1\lib\net40\ActiproSoftware.SyntaxEditor.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="ActiproSoftware.Text.LLParser.Wpf, Version=20.1.1.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL">
+      <HintPath>..\StepBro.Core\packages\ActiproSoftware.Controls.WPF.SyntaxEditor.20.1.1\lib\net40\ActiproSoftware.Text.LLParser.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="ActiproSoftware.Text.Wpf, Version=20.1.1.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL">
+      <HintPath>..\StepBro.Core\packages\ActiproSoftware.Controls.WPF.SyntaxEditor.20.1.1\lib\net40\ActiproSoftware.Text.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="Antlr4.Runtime, Version=4.6.0.0, Culture=neutral, PublicKeyToken=09abb75b9ed49849, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\Antlr4.Runtime.dll</HintPath>
@@ -47,6 +58,7 @@
     </Reference>
     <Reference Include="ReachFramework" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Printing" />
     <Reference Include="System.Xml" />
@@ -113,6 +125,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

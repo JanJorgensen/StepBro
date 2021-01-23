@@ -4,7 +4,7 @@ namespace StepBro.Core.Data
 {
     public class PropertyBlockFlag : PropertyBlockEntry
     {
-        public PropertyBlockFlag(string name) : base(PropertyBlockEntryType.Flag, name)
+        public PropertyBlockFlag(int line, string name) : base(line, PropertyBlockEntryType.Flag, name)
         {
         }
 

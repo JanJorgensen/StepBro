@@ -16,7 +16,7 @@ namespace StepBro.Core.Controls
         private static readonly Style BoldStyle = new TextStyle(null, null, FontStyle.Bold | FontStyle.Underline);
         private static readonly Style BrownStyle = new TextStyle(Brushes.Brown, null, FontStyle.Italic);
         private static readonly Style GrayStyle = new TextStyle(Brushes.Gray, null, FontStyle.Regular);
-        private static readonly Style GreenStyle = new TextStyle(Brushes.Green, null, FontStyle.Italic);
+        private static readonly Style GreenStyle = new TextStyle(Brushes.Green, null, FontStyle.Regular);
         private static readonly Style OliveStyle = new TextStyle(Brushes.Olive, null, FontStyle.Regular);
         private static readonly Style MagentaStyle = new TextStyle(Brushes.DarkMagenta, null, FontStyle.Regular);
         //public static readonly Style MaroonStyle = new TextStyle(Brushes.Maroon, null, FontStyle.Regular);

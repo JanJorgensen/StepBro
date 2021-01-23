@@ -180,7 +180,9 @@ namespace StepBro.Core.Execution
 
             public void AddActionButton(string title, ButtonActivationType type, Action<bool> activationAction)
             {
-                throw new AccessViolationException();
+                System.Diagnostics.Debug.WriteLine("AddActionButton " + title);
+                // TODO: Implement ....
+                //throw new AccessViolationException();
                 //MiniLogger.Instance.Add("TaskUpdate(" + m_level + ").AddActionButton: " + title);
                 //m_buttons.Add(new Tuple<string, ButtonActivationType, Action<bool>>(title, type, activationAction));
             }

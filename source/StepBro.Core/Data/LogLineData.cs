@@ -43,4 +43,10 @@ namespace StepBro.Core.Data
     }
 
     public delegate void LogLineAddEventHandler(object sender, LogLineEventArgs args);
+
+    public interface ILogLineParent
+    {
+        LogLineData FirstEntry { get; }
+        event LogLineAddEventHandler LinesAdded;
+    }
 }

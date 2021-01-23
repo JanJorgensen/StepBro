@@ -437,7 +437,7 @@ namespace StepBro.Core.Parser
 
                             result = new SBExpressionData(
                                 HomeType.Immediate,
-                                SBExpressionType.TestList,
+                                SBExpressionType.TestListReference,
                                 new TypeReference(typeof(ITestList), list),
                                 getList,
                                 list);
@@ -498,9 +498,10 @@ namespace StepBro.Core.Parser
                 //break;
                 case SBExpressionType.Constant:
                 case SBExpressionType.Expression:
+                case SBExpressionType.Indexing:
                 case SBExpressionType.LocalVariableReference:
                 case SBExpressionType.PropertyReference:
-                case SBExpressionType.TestList:
+                case SBExpressionType.TestListReference:
                     result = this.ResolveDotIdentifierInstanceReference(left, right, true);
                     break;
                 case SBExpressionType.TypeReference:
@@ -672,17 +673,10 @@ namespace StepBro.Core.Parser
                 methods.AddRange(m_addonManager.ListExtensionMethods(left.DataType.Type, mi => mi.Name == rightString));
                 var properties = type.GetProperties().Where(pi => pi.Name == rightString).ToList();
 
-                if (methods.Count > 0 && properties.Count > 0)
-                {
-                    throw new NotImplementedException("No handling when both methods and props are matching.");
-                }
-
-                if (methods.Count > 0)
-                {
-                    return new SBExpressionData(
-                        left.ExpressionCode,                // The instance expression
-                        methods);                           // Reference to the found methods
-                }
+                //if (methods.Count > 0 && properties.Count > 1)
+                //{
+                //    throw new NotImplementedException("No handling when both methods and props are matching.");
+                //}
 
                 if (properties.Count == 1)
                 {
@@ -696,6 +690,13 @@ namespace StepBro.Core.Parser
                 else if (properties.Count > 1)
                 {
                     throw new NotImplementedException("More than one property with same name !!!?");
+                }
+
+                if (methods.Count > 0)
+                {
+                    return new SBExpressionData(
+                        left.ExpressionCode,                // The instance expression
+                        methods);                           // Reference to the found methods
                 }
             }
 

@@ -74,6 +74,7 @@
     <Compile Include="Execution\TestLayeredModuleUsage.cs" />
     <Compile Include="Execution\FormalTestSetupExecution.cs" />
     <Compile Include="Execution\TestLogStatement.cs" />
+    <Compile Include="Execution\TestPartners.cs" />
     <Compile Include="Execution\TestProcedure_Expect.cs" />
     <Compile Include="Execution\TestExecutionSupportMethods.cs" />
     <Compile Include="Execution\TestProcedureCallDynamic.cs" />

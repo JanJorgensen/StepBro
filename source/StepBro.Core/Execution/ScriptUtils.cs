@@ -1,8 +1,9 @@
-﻿using StepBro.Core;
-using StepBro.Core.Api;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using StepBro.Core;
+using StepBro.Core.Api;
+using StepBro.Core.Data;
 
 namespace StepBro.Core.Execution
 {
@@ -21,17 +22,23 @@ namespace StepBro.Core.Execution
         private static TimeSpan g_80mills;
 
         [Public]
+#pragma warning disable IDE1006 // Naming Styles
         public static void delay([Implicit] ICallContext context, TimeSpan time)
+#pragma warning restore IDE1006 // Naming Styles
         {
             if (time >= g_fiveSeconds)
             {
-                context.Logger.Log("delay", "TODO: update state info when delay > 5s");
+                if (context != null && context.LoggingEnabled)
+                {
+                    context.Logger.Log("delay", $"{(long)time.TotalMilliseconds}ms");
+                }
                 var reporter = context.StatusUpdater.CreateProgressReporter("", time);
                 using (reporter)
                 {
                     bool skipClicked = false;
                     reporter.AddActionButton("Skip Delay", Controls.ButtonActivationType.ToggleWhenClicked, b => { skipClicked |= b; });
                     var entry = DateTime.Now;
+                    var timeout = entry + time;
                     var timeLeft = time;
                     while (timeLeft > TimeSpan.Zero && !skipClicked)
                     {
@@ -43,10 +50,9 @@ namespace StepBro.Core.Execution
                         {
                             System.Threading.Thread.Sleep(timeLeft);    // Last time to sleep; take whats left.
                         }
-                        timeLeft = DateTime.Now - entry;
+                        timeLeft = DateTime.Now.TimeTill(timeout);
                     }
                 }
-                throw new NotImplementedException();
             }
             else
             {
@@ -64,6 +70,12 @@ namespace StepBro.Core.Execution
         public static TimeSpan TimeTillNow(DateTime before)
         {
             return DateTime.Now - before;
+        }
+
+        [Public]
+        public static TimeSpan TimeTill(DateTime time)
+        {
+            return DateTime.Now.TimeTill(time);
         }
 
         [Public]

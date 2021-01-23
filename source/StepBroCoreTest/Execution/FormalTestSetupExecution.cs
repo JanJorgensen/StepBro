@@ -201,6 +201,52 @@ namespace StepBroCoreTest.Execution
         }
 
         [TestMethod]
+        public void TestPartnerOnTestList_WithReturn()
+        {
+            var f = new StringBuilder();
+            f.AppendLine("namespace MyFile;");
+            f.AppendLine("testlist MyTestSuite :");
+            f.AppendLine("    partner MyHelper : Helper;");
+            f.AppendLine("procedure string Helper(this MyTestSuite suite)");
+            f.AppendLine("{ return \"Was here!\"; }");
+            f.AppendLine("procedure void ExecuteIt()");
+            f.AppendLine("{");
+            f.AppendLine("   log (\"Before\");");
+            f.AppendLine("   string res = \"\";");
+            f.AppendLine("   res = MyTestSuite.MyHelper();");
+            f.AppendLine("   log (\"res: \" + res);");
+            f.AppendLine("}");
+
+            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile.tss", f.ToString()))[0];
+
+            Assert.AreEqual(1, file.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
+            var procedure = file.ListElements().First(p => p.Name == "ExecuteIt") as IFileProcedure;
+
+            Exception exeException = null;
+            var taskContext = ExecutionHelper.ExeContext();
+            try
+            {
+                taskContext.CallProcedure(procedure);
+            }
+            catch (Exception ex)
+            {
+                exeException = ex;
+            }
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+            if (exeException != null) throw exeException;
+
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - MyFile.ExecuteIt - <arguments>");
+            log.ExpectNext("2 - Normal - 8 - log: Before");
+            log.ExpectNext("2 - Pre - MyFile.Helper - <arguments>");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Normal - 11 - log: res: Was here!");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
+
+        [TestMethod]
         public void TestSetupWithBaseTypes()
         {
             var f = new StringBuilder();
@@ -312,8 +358,8 @@ namespace StepBroCoreTest.Execution
             var f = new StringBuilder();
 
             f.AppendLine("using TestFramework;");
-            f.AppendLine("procedure TestCase() :");
-            f.AppendLine("TestCaseBase, FreeParameters,");
+            f.AppendLine("procedure TestCase() : TestCaseBase,");
+            f.AppendLine("   FreeParameters,");
             f.AppendLine("   partner override Setup: TestCaseSetup,");
             f.AppendLine("   partner override Cleanup:	TestCaseCleanup;");
 
@@ -358,7 +404,7 @@ namespace StepBroCoreTest.Execution
 
             Assert.AreEqual(9, myfile.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
             Assert.AreEqual(1, myfile.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
-            Assert.AreEqual(6, framework.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
+            Assert.AreEqual(7, framework.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
             Assert.AreEqual(1, framework.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
 
             var list = myfile["AllTests"] as ITestList;
@@ -377,7 +423,7 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - myfile.ExecuteAllTests - <arguments>");
             log.ExpectNext("2 - Pre - TestFramework.TestSuiteFormalTestExecution - <arguments>");
-            log.ExpectNext("3 - Normal - 25 - log: Starting Test: FirstTestCase");
+            log.ExpectNext("3 - Normal - 31 - log: Starting Test: FirstTestCase");
             log.ExpectNext("3 - Pre - myfile.TestCaseSpecialSetup - <arguments>");
             log.ExpectNext("4 - Normal - 11 - log: Doing special setup for FirstTestCase");
             log.ExpectNext("4 - Post");
@@ -387,7 +433,7 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("3 - Pre - myfile.TestCaseCleanup - <arguments>");
             log.ExpectNext("4 - Normal - 9 - log: Doing default cleanup for FirstTestCase");
             log.ExpectNext("4 - Post");
-            log.ExpectNext("3 - Normal - 25 - log: Starting Test: SecondTestCase");
+            log.ExpectNext("3 - Normal - 31 - log: Starting Test: SecondTestCase");
             log.ExpectNext("3 - Pre - myfile.TestCaseSetup - <arguments>");
             log.ExpectNext("4 - Normal - 7 - log: Doing default setup for SecondTestCase");
             log.ExpectNext("4 - Post");
@@ -397,7 +443,115 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("3 - Pre - myfile.TestCaseSpecialCleanup - <arguments>");
             log.ExpectNext("4 - Normal - 13 - log: Doing special cleanup for SecondTestCase");
             log.ExpectNext("4 - Post");
-            log.ExpectNext("3 - Normal - 25 - log: Starting Test: ThirdTestCase");
+            log.ExpectNext("3 - Normal - 31 - log: Starting Test: ThirdTestCase");
+            log.ExpectNext("3 - Pre - myfile.TestCaseSetup - <arguments>");
+            log.ExpectNext("4 - Normal - 7 - log: Doing default setup for ThirdTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - <DYNAMIC CALL> myfile.ThirdTestCase - <arguments>");
+            log.ExpectNext("4 - Normal - 27 - log: Inside ThirdTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - myfile.TestCaseCleanup - <arguments>");
+            log.ExpectNext("4 - Normal - 9 - log: Doing default cleanup for ThirdTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
+
+        [TestMethod]
+        public void TestSetupWithCompanyFrameworkFile()
+        {
+            var f = new StringBuilder();
+
+            f.AppendLine("using CompanyTestFramework;");
+            f.AppendLine("procedure TestCase() :");
+            f.AppendLine("TestCaseBase, FreeParameters,");
+            f.AppendLine("   partner override Setup: TestCaseSetup,");
+            f.AppendLine("   partner override Cleanup:	TestCaseCleanup;");
+
+            f.AppendLine("procedure void TestCaseSetup(this TestCase testcase)");
+            f.AppendLine("{ log (\"Doing default setup for \" + testcase.Name); }");
+            f.AppendLine("procedure void TestCaseCleanup(this TestCase testcase)");
+            f.AppendLine("{ log (\"Doing default cleanup for \" + testcase.Name); }");
+
+            f.AppendLine("procedure void TestCaseSpecialSetup(this TestCase testcase)");
+            f.AppendLine("{ log (\"Doing special setup for \" + testcase.Name); }");
+            f.AppendLine("procedure void TestCaseSpecialCleanup(this TestCase testcase)");
+            f.AppendLine("{ log (\"Doing special cleanup for \" + testcase.Name); }");
+
+            f.AppendLine("testlist AllTests : TestSuiteBase");
+            f.AppendLine("{");
+            f.AppendLine("    * FirstTestCase");
+            f.AppendLine("    * SecondTestCase");
+            f.AppendLine("    * ThirdTestCase");
+            f.AppendLine("}");
+
+            f.AppendLine("procedure void FirstTestCase() : TestCase,");
+            f.AppendLine(" partner override Setup: TestCaseSpecialSetup");
+            f.AppendLine("{ log(\"Inside FirstTestCase\"); }");
+
+            f.AppendLine("procedure void SecondTestCase() : TestCase,");
+            f.AppendLine("partner override Cleanup:	TestCaseSpecialCleanup");
+            f.AppendLine("{ log(\"Inside SecondTestCase\"); }");
+
+            f.AppendLine("procedure void ThirdTestCase() : TestCase");
+            f.AppendLine("{ log(\"Inside ThirdTestCase\"); }");
+
+            f.AppendLine("procedure void ExecuteAllTests()");
+            f.AppendLine("{");
+            f.AppendLine("   AllTests.FormalTest();");
+            f.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null,
+                new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()),
+                new Tuple<string, string>("CompanyTestFramework." + Main.StepBroFileExtension, this.CreateCompanyTestFrameworkFile()),
+                new Tuple<string, string>("TestFramework." + Main.StepBroFileExtension, this.CreateTestFrameworkFile()));
+            var myfile = files.First(file => file.FileName == "myfile." + Main.StepBroFileExtension);
+            var company = files.First(file => file.FileName == "CompanyTestFramework." + Main.StepBroFileExtension);
+            var framework = files.First(file => file.FileName == "TestFramework." + Main.StepBroFileExtension);
+
+            Assert.AreEqual(9, myfile.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
+            Assert.AreEqual(1, myfile.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
+            Assert.AreEqual(7, framework.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
+            Assert.AreEqual(1, framework.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
+
+            var list = myfile["AllTests"] as ITestList;
+            Assert.AreEqual("AllTests", list.Name);
+            Assert.AreEqual(3, list.EntryCount);
+            Assert.AreEqual("FirstTestCase", list[0].ReferenceName);
+            Assert.AreEqual("SecondTestCase", list[1].ReferenceName);
+            Assert.AreEqual("ThirdTestCase", list[2].ReferenceName);
+
+            var procedure = myfile.ListElements().First(p => p.Name == "ExecuteAllTests") as IFileProcedure;
+
+            var taskContext = ExecutionHelper.ExeContext();
+            taskContext.CallProcedure(procedure);
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - myfile.ExecuteAllTests - <arguments>");
+            log.ExpectNext("2 - Pre - TestFramework.TestSuiteFormalTestExecution - <arguments>");
+            log.ExpectNext("3 - Normal - 31 - log: Starting Test: FirstTestCase");
+            log.ExpectNext("3 - Pre - myfile.TestCaseSpecialSetup - <arguments>");
+            log.ExpectNext("4 - Normal - 11 - log: Doing special setup for FirstTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - <DYNAMIC CALL> myfile.FirstTestCase - <arguments>");
+            log.ExpectNext("4 - Normal - 22 - log: Inside FirstTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - myfile.TestCaseCleanup - <arguments>");
+            log.ExpectNext("4 - Normal - 9 - log: Doing default cleanup for FirstTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Normal - 31 - log: Starting Test: SecondTestCase");
+            log.ExpectNext("3 - Pre - myfile.TestCaseSetup - <arguments>");
+            log.ExpectNext("4 - Normal - 7 - log: Doing default setup for SecondTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - <DYNAMIC CALL> myfile.SecondTestCase - <arguments>");
+            log.ExpectNext("4 - Normal - 25 - log: Inside SecondTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - myfile.TestCaseSpecialCleanup - <arguments>");
+            log.ExpectNext("4 - Normal - 13 - log: Doing special cleanup for SecondTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Normal - 31 - log: Starting Test: ThirdTestCase");
             log.ExpectNext("3 - Pre - myfile.TestCaseSetup - <arguments>");
             log.ExpectNext("4 - Normal - 7 - log: Doing default setup for ThirdTestCase");
             log.ExpectNext("4 - Post");
@@ -437,7 +591,14 @@ namespace StepBroCoreTest.Execution
             f.AppendLine("}");
 
             f.AppendLine("testlist TestSuiteBase :");
-            f.AppendLine("    partner FormalTest : TestSuiteFormalTestExecution;");
+            f.AppendLine("    partner FormalTest : TestSuiteFormalTestExecution,");
+            f.AppendLine("    partner PreTest    : TestSuitePreTest;");
+
+            f.AppendLine("procedure bool TestSuitePreTest()");
+            f.AppendLine("{");
+            f.AppendLine("    log(\"TestSuitePreTest\");");
+            f.AppendLine("    return true;");
+            f.AppendLine("}");
 
             f.AppendLine("procedure void TestSuiteFormalTestExecution(this TestSuiteBase suite)");
             f.AppendLine("{");
@@ -454,5 +615,40 @@ namespace StepBroCoreTest.Execution
 
             return f.ToString();
         }
+
+        public string CreateCompanyTestFrameworkFile()
+        {
+            var f = new StringBuilder();
+            f.AppendLine("var f = new StringBuilder();");
+            f.AppendLine("public using \"TestFramework.sbs\";");
+            f.AppendLine("public procedure TestCase() :");
+            f.AppendLine("TestCaseBase,");
+            f.AppendLine("FreeParameters,");
+            f.AppendLine("override partner Setup:     TestCaseSetup,");
+            f.AppendLine("override partner Cleanup:   TestCaseCleanup;");
+
+            f.AppendLine("public procedure void TestCaseSetup(this TestCase testcase)");
+            f.AppendLine("{ log(\"Doing default setup for \" + testcase.Name); }") ;
+            f.AppendLine("public procedure void TestCaseCleanup(this TestCase testcase)");
+            f.AppendLine("{ log(\"Doing default cleanup for \" + testcase.Name); }") ;
+
+            f.AppendLine("public procedure void TestCaseSpecialSetup(this TestCase testcase)");
+            f.AppendLine("{ log(\"Doing special setup for \" + testcase.Name); }");
+
+            f.AppendLine("public procedure void TestCaseSpecialCleanup(this TestCase testcase)");
+            f.AppendLine("{ log(\"Doing special cleanup for \" + testcase.Name); }");
+
+            f.AppendLine("public testlist TestSuite : TestSuiteBase,");
+            f.AppendLine("    override partner PreTest : OurPreTest;");
+
+            f.AppendLine("procedure bool OurPreTest()");
+            f.AppendLine("{");
+            f.AppendLine("    log(\"OurPreTest\");");
+            f.AppendLine("    return true;");
+            f.AppendLine("}");
+
+            return f.ToString();
+        }
+
     }
 }

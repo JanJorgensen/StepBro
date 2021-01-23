@@ -223,7 +223,7 @@ namespace StepBro.Core.ScriptData
                         m_baseElementName = entry.Name;
                         if (!this.ParseBaseElement())
                         {
-                            throw new Exception("Parse error: base element not found.");
+                            throw new ParsingErrorException(entry.Line, m_baseElementName, "Base element unknown.");
                         }
                     }
                     continue;
@@ -234,13 +234,13 @@ namespace StepBro.Core.ScriptData
                     var typename = entry.SpecifiedTypeName;
                     object value = valueProp.Value;
 
-                    if (this.ParsePartnerProperty(listener, typename, entry.Name, value)) continue;
+                    if (this.ParsePartnerProperty(listener, entry.Line, typename, entry.Name, value)) continue;
                 }
 
             }
         }
 
-        private bool ParsePartnerProperty(StepBroListener listener, string type, string name, object value)
+        private bool ParsePartnerProperty(StepBroListener listener, int line, string type, string name, object value)
         {
             System.Diagnostics.Debug.Assert(!String.IsNullOrWhiteSpace(name));
             if (type != null &&
@@ -259,7 +259,7 @@ namespace StepBro.Core.ScriptData
                 }
                 else
                 {
-                    throw new NotImplementedException("Error reporting");
+                    throw new ParsingErrorException(line, name, "Value is not a string or an identifier.");
                 }
 
                 var element = listener.TryGetFileElementInScope(reference);
@@ -271,12 +271,12 @@ namespace StepBro.Core.ScriptData
                     }
                     else
                     {
-                        throw new NotImplementedException("Error reporting");
+                        throw new ParsingErrorException(line, name, $"Element '{reference}' is not a procedure.");
                     }
                 }
                 else
                 {
-                    throw new NotImplementedException("Error reporting");
+                    throw new ParsingErrorException(line, name, $"Element '{reference}' was not found.");
                 }
 
                 return true;

@@ -11,12 +11,12 @@ namespace StepBro.Core.Data
         private object m_value;
         private PropertyBlockValueSolver m_solver;
 
-        public PropertyBlockValue(string name, object value) : base(PropertyBlockEntryType.Value, name)
+        public PropertyBlockValue(int line, string name, object value) : base(line, PropertyBlockEntryType.Value, name)
         {
             m_value = value;
             m_solver = null;
         }
-        public PropertyBlockValue(string name, PropertyBlockValueSolver solver) : base(PropertyBlockEntryType.Value, name)
+        public PropertyBlockValue(int line, string name, PropertyBlockValueSolver solver) : base(line, PropertyBlockEntryType.Value, name)
         {
             m_value = null;
             m_solver = solver;

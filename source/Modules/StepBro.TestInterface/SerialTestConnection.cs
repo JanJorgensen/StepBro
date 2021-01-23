@@ -15,7 +15,7 @@ using static StepBro.Core.Data.LogLineData;
 namespace StepBro.TestInterface
 {
     public class SerialTestConnection :
-        AvailabilityBase, IConnection, IRemoteProcedures, ILogLineSource, ISettableFromPropertyBlock, INotifyPropertyChanged
+        AvailabilityBase, IConnection, IRemoteProcedures, ILogLineSource, ISettableFromPropertyBlock, INotifyPropertyChanged, ILogLineParent
     {
         private class CommandData : IAsyncResult<object>, IObjectFaultDescriptor
         {
@@ -169,7 +169,7 @@ namespace StepBro.TestInterface
                         {
                             m_state = CommandState.EndResponseError;
                             var i = last.IndexOfAny(new char[] { ' ', ':' }, 6);
-                            this.FaultDescription = last.Substring(i).TrimStart(' ', ':', '-');
+                            FaultDescription = last.Substring(i).TrimStart(' ', ':', '-');
                         }
                         else
                         {
@@ -231,6 +231,9 @@ namespace StepBro.TestInterface
         private IReadBuffer<char> m_inputBuffer = null;
         private LogLineData m_firstLogLine = null;
         private LogLineData m_lastLogLine = null;
+        private object m_eventLogSync = new object();
+        private LogLineData m_lastEventLogLine = null;
+        private LogLineDataReader m_asyncLogLineReader = null;
         private readonly Queue<string> m_events = new Queue<string>();
         private readonly Queue<string> m_responseLines = new Queue<string>();
         private Task m_receiverTask = null;
@@ -250,20 +253,24 @@ namespace StepBro.TestInterface
         {
             m_instanceID = rnd.Next(1000000);
             m_newResponseDataEvent = new AutoResetEvent(false);
-            this.SetupDebugCommands();
+            SetupDebugCommands();
         }
 
         protected override void DoDispose(bool disposing)
         {
-            this.Disconnect(null);
-            this.Stream = null;
+            Disconnect(null);
+            Stream = null;
+            if (m_asyncLogLineReader != null)
+            {
+                m_asyncLogLineReader = null;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged(string name)
         {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
         #region Properties
@@ -277,14 +284,14 @@ namespace StepBro.TestInterface
                 {
                     if (m_stream != null)
                     {
-                        m_stream.IsOpenChanged -= this.m_stream_IsOpenChanged;
+                        m_stream.IsOpenChanged -= m_stream_IsOpenChanged;
                         m_stream = null;
                     }
                     if (value != null)
                     {
                         m_stream = value;
                         m_stream.NewLine = "\n";
-                        m_stream.IsOpenChanged += this.m_stream_IsOpenChanged;
+                        m_stream.IsOpenChanged += m_stream_IsOpenChanged;
                     }
                 }
             }
@@ -323,7 +330,7 @@ namespace StepBro.TestInterface
                     m_inputBuffer = m_stream.GetTextualReadBuffer(16 * 1024);
                     m_stopReceiver = false;
                     m_receiverTask = new Task(
-                        this.ReceiverTask,
+                        ReceiverTask,
                         TaskCreationOptions.LongRunning | TaskCreationOptions.DenyChildAttach);
                     context.TaskManager.RegisterTask(m_receiverTask);
                     m_receiverTask.Start();
@@ -369,8 +376,17 @@ namespace StepBro.TestInterface
                     request.Add(ArgumentToCommandString(a));
                 }
             }
-            var commandData = new CommandData(String.Join(" ", request), this.CommandResponseTimeout, null);
-            return this.EnqueueCommand(commandData);
+            var commandData = new CommandData(String.Join(" ", request), CommandResponseTimeout, null);
+            return EnqueueCommand(commandData);
+        }
+
+        public void SendDirect([Implicit] ICallContext context, string text)
+        {
+            if (context != null && context.LoggingEnabled)
+            {
+                context.Logger.Log("SerialTestConnection", "SendDirect: text");
+            }
+            DoSendDirect(text);
         }
 
         public IAsyncResult<bool> UpdateInterfaceData([Implicit] ICallContext context = null)
@@ -408,15 +424,15 @@ namespace StepBro.TestInterface
             var task = Task.Run<bool>(() =>
             {
                 // FIRST GET THE LIST OF AVAILABLE COMMANDS
-                var command = new CommandData("list commands", this.CommandResponseTimeout, typeof(List<string>));
-                var cmd = this.EnqueueCommand(command);
+                var command = new CommandData("list commands", CommandResponseTimeout, typeof(List<string>));
+                var cmd = EnqueueCommand(command);
                 if (cmd.CompletedSynchronously)
                 {
                     throw new NotImplementedException();
                 }
                 else
                 {
-                    if (cmd.AsyncWaitHandle.WaitOne(this.CommandResponseTimeout))
+                    if (cmd.AsyncWaitHandle.WaitOne(CommandResponseTimeout))
                     {
                         if (cmd.IsFaulted)
                         {
@@ -430,8 +446,8 @@ namespace StepBro.TestInterface
                             var commandName = DecodeCommandListLine(commandListLine, out id);
 
                             // THEN, GET THE INFORMATION FOR EACH COMMAND
-                            command = new CommandData("help " + commandName, this.CommandResponseTimeout, typeof(List<string>));
-                            cmd = this.EnqueueCommand(command);
+                            command = new CommandData("help " + commandName, CommandResponseTimeout, typeof(List<string>));
+                            cmd = EnqueueCommand(command);
 
                             if (cmd.CompletedSynchronously)
                             {
@@ -439,7 +455,7 @@ namespace StepBro.TestInterface
                             }
                             else
                             {
-                                if (cmd.AsyncWaitHandle.WaitOne(this.CommandResponseTimeout))
+                                if (cmd.AsyncWaitHandle.WaitOne(CommandResponseTimeout))
                                 {
                                     if (cmd.Result is List<string>)
                                     {
@@ -586,14 +602,14 @@ namespace StepBro.TestInterface
                     request.Add(ArgumentToCommandString(a));
                 }
             }
-            var command = new CommandData(String.Join(" ", request), this.CommandResponseTimeout, procedure.ReturnType);
-            return this.EnqueueCommand(command);
+            var command = new CommandData(String.Join(" ", request), CommandResponseTimeout, procedure.ReturnType);
+            return EnqueueCommand(command);
         }
 
         public IAsyncResult<object> Invoke(string procedure, params object[] arguments)
         {
             var cmd = new RemoteProcedureInfo(procedure);
-            return this.Invoke(cmd, arguments);
+            return Invoke(cmd, arguments);
         }
 
         public IEnumerable<RemoteProcedureInfo> Procedures
@@ -618,12 +634,23 @@ namespace StepBro.TestInterface
                 {
                     m_firstLogLine = m_lastLogLine;
                 }
+                if (type == LogType.ReceivedAsync)
+                {
+                    if (m_asyncLogLineReader != null)
+                    {
+                        lock (m_eventLogSync)
+                        {
+                            m_lastEventLogLine = new LogLineData(m_lastEventLogLine, type, id, text);
+                            m_asyncLogLineReader.NotifyNew(m_lastEventLogLine);
+                        }
+                    }
+                }
+                LinesAdded?.Invoke(this, new LogLineEventArgs(m_lastLogLine));
             }
             catch (Exception ex)
             {
                 StepBro.Core.Main.RootLogger.LogError("SerialTestConnection.AddToLog", $"Unexpected error. Exception: {ex}");
             }
-            this.LinesAdded?.Invoke(this, new LogLineEventArgs(m_lastLogLine));
         }
 
         private void ReceiverTask()
@@ -641,8 +668,8 @@ namespace StepBro.TestInterface
                         if (to <= 0)
                         {
                             m_currentExecutingCommand.SetTimeoutResult();
-                            this.AddToLog(LogType.ReceivedError, 0, "<timeout>");
-                            this.OnEndCommand();
+                            AddToLog(LogType.ReceivedError, 0, "<timeout>");
+                            OnEndCommand();
                         }
                         else if (to < 3000) nextWaitTime = (int)to;
                     }
@@ -665,11 +692,11 @@ namespace StepBro.TestInterface
                             knownCount = m_inputBuffer.Count;
 
                             var s = new string(line, 1, line.Length - 1);
-                            if (line[0] == this.EventLineChar)
+                            if (line[0] == EventLineChar)
                             {
                                 lock (m_sync)
                                 {
-                                    this.AddToLog(LogType.ReceivedAsync, 0, new string(line));
+                                    AddToLog(LogType.ReceivedAsync, 0, new string(line));
                                 }
                                 m_events.Enqueue(new string(line, 1, line.Length - 1));
                                 while (m_events.Count > 1000)
@@ -679,20 +706,20 @@ namespace StepBro.TestInterface
                             }
                             else
                             {
-                                if (line[0] == this.ResponseMultiLineChar)
+                                if (line[0] == ResponseMultiLineChar)
                                 {
                                     lock (m_sync)
                                     {
-                                        this.AddToLog(LogType.ReceivedPartial, 0, new string(line));
+                                        AddToLog(LogType.ReceivedPartial, 0, new string(line));
                                     }
                                     m_responseLines.Enqueue(s);
                                 }
-                                else if (line[0] == this.ResponseEndLineChar)
+                                else if (line[0] == ResponseEndLineChar)
                                 {
                                     var l = new string(line);
                                     lock (m_sync)
                                     {
-                                        this.AddToLog((l.StartsWith(this.ResponseErrorPrefix)) ? LogType.ReceivedError : LogType.ReceivedEnd, 0, l);
+                                        AddToLog((l.StartsWith(ResponseErrorPrefix)) ? LogType.ReceivedError : LogType.ReceivedEnd, 0, l);
                                     }
                                     if (m_currentExecutingCommand != null)
                                     {
@@ -704,7 +731,7 @@ namespace StepBro.TestInterface
                                         {
                                         }
                                     }
-                                    this.OnEndCommand();
+                                    OnEndCommand();
                                 }
                             }
                         }
@@ -729,7 +756,7 @@ namespace StepBro.TestInterface
                 m_currentExecutingCommand = null;
                 if (m_commandQueue.Count > 0)
                 {
-                    this.DoSendCommand(m_commandQueue.Dequeue());
+                    DoSendCommand(m_commandQueue.Dequeue());
                 }
             }
         }
@@ -740,7 +767,7 @@ namespace StepBro.TestInterface
             {
                 if (m_currentExecutingCommand == null)
                 {
-                    this.DoSendCommand(command);
+                    DoSendCommand(command);
                 }
                 else
                 {
@@ -756,8 +783,12 @@ namespace StepBro.TestInterface
             var commandstring = command.GetAndMarkActive();
             m_loopbackAnswers?.TryGetValue(commandstring, out commandstring);
             if (m_nextResponse != null) commandstring = m_nextResponse;
-            this.AddToLog(LogType.Sent, 0, command.Command);
-            m_stream.Write(null, commandstring + "\n");
+            DoSendDirect(commandstring);
+        }
+        private void DoSendDirect(string text)
+        {
+            AddToLog(LogType.Sent, 0, text);
+            m_stream.Write(null, text + "\n");
         }
 
         private static string ArgumentToCommandString(object arg)
@@ -810,14 +841,14 @@ namespace StepBro.TestInterface
                         if (e.BlockEntryType == PropertyBlockEntryType.Value)
                         {
                             var pbv = e as PropertyBlockValue;
-                            var value = pbv.Value as string;
+                            string value = pbv.Value as string;
                             if (value != null)
                             {
                                 uiCommands.Add(new Tuple<string, string>(value, value));
                             }
                             else
                             {
-                                logger?.LogError(this.GetType().Name + ".Setup", "commands entry is not a string");
+                                logger?.LogError(GetType().Name + ".Setup", "commands entry is not a string");
                             }
                         }
                         else if (e.BlockEntryType == PropertyBlockEntryType.Block)
@@ -832,22 +863,22 @@ namespace StepBro.TestInterface
                                 }
                                 else
                                 {
-                                    logger?.LogError(this.GetType().Name + ".Setup", "commands entry is not property with name and string value.");
+                                    logger?.LogError(GetType().Name + ".Setup", "commands entry is not property with name and string value.");
                                 }
                             }
                         }
                         else
                         {
-                            logger?.LogError(this.GetType().Name + ".Setup", "Command entry type is not supported.");
+                            logger?.LogError(GetType().Name + ".Setup", "Command entry type is not supported.");
                             return;
                         }
                     }
                     m_uiCommands = uiCommands;
-                    this.NotifyPropertyChanged(nameof(this.UICommands));
+                    NotifyPropertyChanged(nameof(UICommands));
                 }
                 else
                 {
-                    logger?.LogError(this.GetType().Name + ".Setup", "'commands' type is not an array.");
+                    logger?.LogError(GetType().Name + ".Setup", "'commands' type is not an array.");
                 }
             }
         }
@@ -864,10 +895,25 @@ namespace StepBro.TestInterface
 
         #region LogLineSource
 
-        public LogLineData FirstEntry { get { throw new NotImplementedException(); } }
+        //private object m_eventLogSync = new object();
+        //private LogLineData m_firstEventLogLine = null;
+        //private LogLineData m_lastEventLogLine = null;
+
+        public LogLineData FirstEntry { get { return m_firstLogLine; } }
 
         public event LogLineAddEventHandler LinesAdded;
 
+        public ILineReader AsyncData
+        {
+            get
+            {
+                if (m_asyncLogLineReader == null)
+                {
+                    m_asyncLogLineReader = new LogLineDataReader(null, m_eventLogSync);
+                }
+                return m_asyncLogLineReader;
+            }
+        }
         #endregion
     }
 }

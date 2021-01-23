@@ -62,6 +62,10 @@ namespace StepBro.TestInterface.Controls
                     return true;
                 }
             }
+            else if (keyData == Keys.Up && textBoxCommand.Focused)
+            {
+
+            }
             return base.ProcessCmdKey(ref msg, keyData);
         }
 

@@ -267,11 +267,12 @@ namespace StepBro.Core
                         }
                         catch (Exception ex)
                         {
+                            m_lastParsingErrorCount = 1;    // At least one...
                             context.Logger.LogError("File Parsing", ex.ToString());
                         }
                         finally
                         {
-                            context.UpdateStatus("Finished parsing");
+                            context.UpdateStatus($"Finished parsing. {m_lastParsingErrorCount} parsing error(s).");
                             m_parsingInQueue = null;
                             ParsingCompleted?.Invoke(null, EventArgs.Empty);
                         }

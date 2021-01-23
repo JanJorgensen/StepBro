@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Template generated code from Antlr4BuildTasks.Template v 8.10 -->
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>StepBro.Core</RootNamespace>
+    <AssemblyName>StepBro.Core</AssemblyName>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Antlr4 Include="Arithmetic.g4">
+      <Package>StepBro.Core</Package>
+    </Antlr4>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.0" />
+    <PackageReference Include="Antlr4BuildTasks" Version="8.10" PrivateAssets="all" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>3021;1701;1702</NoWarn>
+    <OutputPath>..\bin5</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\bin5</OutputPath>
+  </PropertyGroup>
+
+</Project>
