@@ -4,7 +4,7 @@ using StepBro.Core.Tasks;
 
 namespace StepBro.Core
 {
-    public enum ServiceState { Initial, Started, Stopped, StartFailed, StopFailed }
+    public enum ServiceState { Initial, Initialized, Started, Stopped, InitFailed, StartFailed, StopFailed }
 
     public interface IService
     {
@@ -13,6 +13,7 @@ namespace StepBro.Core
         object ServiceObject { get; }
         string Name { get; }
         IEnumerable<Type> Dependencies { get; }
+        void Initialize(ServiceManager manager, ITaskContext context);
         void Start(ServiceManager manager, ITaskContext context);
         void Stop(ServiceManager manager, ITaskContext context);
     }
@@ -64,6 +65,20 @@ namespace StepBro.Core
 
             public ServiceState State { get; protected set; } = ServiceState.Initial;
 
+            public void Initialize(ServiceManager manager, ITaskContext context)
+            {
+                try
+                {
+                    m_service.Initialize(manager, context);
+                    this.State = ServiceState.Initialized;
+                }
+                catch
+                {
+                    this.State = ServiceState.InitFailed;
+                    throw;
+                }
+            }
+
             public void Start(ServiceManager manager, ITaskContext context)
             {
                 try
@@ -100,6 +115,8 @@ namespace StepBro.Core
             m_myInterface = new MyServiceInterface(this as TThis, name, dependencies);
             serviceAccess = m_myInterface as IService;
         }
+
+        protected virtual void Initialize(ServiceManager manager, ITaskContext context) { }
 
         protected virtual void Start(ServiceManager manager, ITaskContext context) { }
 

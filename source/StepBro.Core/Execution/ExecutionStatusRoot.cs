@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
-using StepBro.Core.Controls;
 
 namespace StepBro.Core.Execution
 {
@@ -57,7 +55,7 @@ namespace StepBro.Core.Execution
 
         #region Dead part of the ITaskStatusUpdate interface
 
-        public Brush ProgressColor
+        public AttentionColor ProgressColor
         {
             get
             {
@@ -74,7 +72,7 @@ namespace StepBro.Core.Execution
         public event EventHandler Disposed;
         public event EventHandler ExpectedTimeExceeded;
 
-        public void AddActionButton(string title, ButtonActivationType type, Action<bool> activationAction)
+        public void AddActionButton(string title, Func<bool,bool> activationAction)
         {
             throw new NotImplementedException();
         }

@@ -1,6 +1,7 @@
 ﻿using ActiproSoftware.Text;
 using ActiproSoftware.Text.Implementation;
 using StepBro.Core.Parser;
+using StepBro.UI.SyntaxEditorSupport;
 using StepBro.Workbench.Editor;
 using System.Windows;
 using System.Windows.Input;

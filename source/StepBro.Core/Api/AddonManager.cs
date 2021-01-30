@@ -17,13 +17,17 @@ namespace StepBro.Core.Api
         private Dictionary<string, Type> m_typeLookup = new Dictionary<string, Type>();
         private List<Tuple<string, Type>> m_types = new List<Tuple<string, Type>>();
         private Dictionary<string, IIdentifierInfo> m_lookup = new Dictionary<string, IIdentifierInfo>();
-        private List<Type> m_panelCreatorTypes = new List<Type>();
-        private List<ObjectPanelCreator> m_panelCreators = new List<ObjectPanelCreator>();
+        private List<IAddonTypeHandler> m_specialTypeHandlers = new List<IAddonTypeHandler>();
 
         public AddonManager(Action<IAddonManager> basicModulesLoader, out IService serviceAccess) :
             base("AddonManager", out serviceAccess, typeof(Logging.IMainLogger))
         {
             m_basicModulesLoader = basicModulesLoader;
+        }
+
+        public void AddTypeHandler(IAddonTypeHandler handler)
+        {
+            m_specialTypeHandlers.Add(handler);
         }
 
         public static IAddonManager Create(Action<IAddonManager> basicModulesLoader = null)
@@ -37,22 +41,6 @@ namespace StepBro.Core.Api
             if (m_basicModulesLoader != null)
             {
                 m_basicModulesLoader(this);
-            }
-
-            foreach (Type t in m_panelCreatorTypes)
-            {
-                try
-                {
-                    var creator = Activator.CreateInstance(t) as ObjectPanelCreator;
-                    if (creator != null)
-                    {
-                        m_panelCreators.Add(creator);
-                    }
-                }
-                catch (Exception)
-                {
-                    throw new NotImplementedException();
-                }
             }
         }
 
@@ -99,11 +87,16 @@ namespace StepBro.Core.Api
                 }
                 if (type.IsClass || type.IsInterface || type.IsEnum)
                 {
-                    if (type.IsClass && typeof(ObjectPanelCreator).IsAssignableFrom(type))
+                    bool handled = false;
+                    foreach (var th in m_specialTypeHandlers)
                     {
-                        m_panelCreatorTypes.Add(type);
+                        if (th.CheckForSpecialHandling(type))
+                        {
+                            handled = true;
+                            break;
+                        }
                     }
-                    else
+                    if (!handled)
                     {
                         this.AddTypeLookup(type);
                     }
@@ -349,11 +342,6 @@ namespace StepBro.Core.Api
                 m_lookup.Add(name, new IdentifierInfo(subName, name, IdentifierType.DotNetNamespace, null, subList));
                 return subList;
             }
-        }
-
-        public IEnumerable<ObjectPanelCreator> GetPanelCreators()
-        {
-            foreach (var c in m_panelCreators) yield return c;
         }
     }
 }

@@ -220,13 +220,6 @@ namespace StepBro.Core.Parser
             array.AddRange(childs);
         }
 
-        public override void EnterPropertyblockArrayEntry([NotNull] SBP.PropertyblockArrayEntryContext context)
-        {
-        }
-        public override void ExitPropertyblockArrayEntry([NotNull] SBP.PropertyblockArrayEntryContext context)
-        {
-        }
-
         public override void EnterPropertyblockArrayEntryPropertyBlock([NotNull] SBP.PropertyblockArrayEntryPropertyBlockContext context)
         {
         }

@@ -1,5 +1,4 @@
 ﻿using StepBro.Core.Api;
-using StepBro.Core.Controls;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.General;
@@ -32,7 +31,6 @@ namespace StepBro.Core
         //private static List<ScriptFile> m_loadedFiles = new List<ScriptFile>();
         private static ScriptExecutionManager m_scriptExecutionManager = null;
         private static DynamicObjectManager m_dynamicObjectManager = null;
-        private static ObjectPanelManager m_objectPanelManager = null;
         private static UICalculator m_uiCalculator = null;
         //private static readonly object m_mainObject = new object();
         //private static readonly bool m_isInDebugMode = true;
@@ -50,7 +48,7 @@ namespace StepBro.Core
 
         public static bool IsInitialized { get { return m_initialized; } }
 
-        public static void Initialize()
+        public static void Initialize(IEnumerable<IService> hostServices = null)
         {
             IService service;
             m_mainLogger = new MainLogger(out service);
@@ -104,11 +102,16 @@ namespace StepBro.Core
             m_dynamicObjectManager = new DynamicObjectManager(out service);
             m_serviceManagerAdmin.Manager.Register(service);
 
-            m_objectPanelManager = new ObjectPanelManager(out service);
-            m_serviceManagerAdmin.Manager.Register(service);
-
             m_uiCalculator = new UICalculator(out service);
             m_serviceManagerAdmin.Manager.Register(service);
+
+            if (hostServices != null)
+            {
+                foreach (var hs in hostServices)
+                {
+                    m_serviceManagerAdmin.Manager.Register(hs);
+                }
+            }
 
             TaskContextDummy taskContext = new TaskContextDummy();
 
@@ -152,7 +155,6 @@ namespace StepBro.Core
                 m_logSinkManager = null;
                 m_scriptExecutionManager = null;
                 m_dynamicObjectManager = null;
-                m_objectPanelManager = null;
                 m_uiCalculator = null;
 
                 m_serviceManagerAdmin = ServiceManager.Create();
@@ -403,9 +405,9 @@ namespace StepBro.Core
             public long m_progress = -1;
             public long m_progressPokeCount = 0;
             public Func<long, string> m_progressFormatter = null;
-            public List<Tuple<string, ButtonActivationType, Action<bool>>> m_buttons = new List<Tuple<string, ButtonActivationType, Action<bool>>>();
+            public List<Tuple<string, Func<bool,bool>>> m_buttons = new List<Tuple<string, Func<bool,bool>>>();
 
-            public System.Windows.Media.Brush ProgressColor
+            public AttentionColor ProgressColor
             {
                 get;
                 set;
@@ -422,7 +424,7 @@ namespace StepBro.Core
             public event EventHandler Disposed;
             public event EventHandler ExpectedTimeExceeded;
 
-            public void AddActionButton(string title, ButtonActivationType type, Action<bool> activationAction)
+            public void AddActionButton(string title, Func<bool,bool> activationAction)
             {
                 throw new AccessViolationException();
                 //MiniLogger.Instance.Add("TaskUpdate(" + m_level + ").AddActionButton: " + title);

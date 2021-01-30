@@ -9,6 +9,7 @@ namespace StepBro.Core.Api
 {
     public interface IAddonManager
     {
+        void AddTypeHandler(IAddonTypeHandler handler);
         void LoadAssembly(string path, bool loadOnlyTypesWithPublicAttribute);
 
         void AddAssembly(Assembly assembly, bool loadOnlyTypesWithPublicAttribute);
@@ -20,8 +21,5 @@ namespace StepBro.Core.Api
         IEnumerable<MethodInfo> ListExtensionMethods(Type type, Func<MethodInfo, bool> filter = null);
 
         Type TryGetType(IEnumerable<UsingData> usings, string name);
-
-        IEnumerable<ObjectPanelCreator> GetPanelCreators();
-
     }
 }

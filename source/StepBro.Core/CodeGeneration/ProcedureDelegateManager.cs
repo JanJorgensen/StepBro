@@ -19,8 +19,9 @@ namespace StepBro.Core.CodeGeneration
 
         static ProcedureDelegateManager()
         {
-            var assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(
-                new AssemblyName("ProcedureDelegateManager"), AssemblyBuilderAccess.RunAndCollect);
+            var assembly = AssemblyBuilder.DefineDynamicAssembly(
+                new AssemblyName("ProcedureDelegateManager"),
+                AssemblyBuilderAccess.RunAndCollect);
             m_module = assembly.DefineDynamicModule("ProcedureDelegateManager");
         }
 

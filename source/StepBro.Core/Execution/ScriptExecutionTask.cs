@@ -1,5 +1,4 @@
-﻿using StepBro.Core.Controls;
-using StepBro.Core.Data;
+﻿using StepBro.Core.Data;
 using StepBro.Core.General;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
@@ -161,9 +160,9 @@ namespace StepBro.Core.Execution
             public long m_progress = -1;
             public long m_progressPokeCount = 0;
             public Func<long, string> m_progressFormatter = null;
-            public List<Tuple<string, ButtonActivationType, Action<bool>>> m_buttons = new List<Tuple<string, ButtonActivationType, Action<bool>>>();
+            public List<Tuple<string, Func<bool,bool>>> m_buttons = new List<Tuple<string, Func<bool,bool>>>();
 
-            public System.Windows.Media.Brush ProgressColor
+            public AttentionColor ProgressColor
             {
                 get;
                 set;
@@ -178,7 +177,7 @@ namespace StepBro.Core.Execution
             public event EventHandler Disposed;
             public event EventHandler ExpectedTimeExceeded;
 
-            public void AddActionButton(string title, ButtonActivationType type, Action<bool> activationAction)
+            public void AddActionButton(string title, Func<bool,bool> activationAction)
             {
                 System.Diagnostics.Debug.WriteLine("AddActionButton " + title);
                 // TODO: Implement ....

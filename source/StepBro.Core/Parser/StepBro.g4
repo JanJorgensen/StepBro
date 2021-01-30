@@ -622,8 +622,8 @@ primaryExpression
 
 expression
     :   primary															# ExpPrimary
-    |   expression DOT IDENTIFIER										# ExpDotIdentifier
-    |   expression methodArguments										# ExpParens
+    |   expression DOT IDENTIFIER                                       # ExpDotIdentifier
+    |   expression methodArguments                                      # ExpParens
     |   expression OPEN_BRACKET argumentList CLOSE_BRACKET				# ExpBracket
     //|   expression '.' explicitGenericInvocation
     |   OPEN_BRACKET argumentList CLOSE_BRACKET							# ExpArray

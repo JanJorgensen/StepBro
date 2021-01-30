@@ -1,13 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
 using StepBro.Core.Tasks;
 
 namespace StepBro.Core.Execution
 {
+    public enum AttentionColor
+    {
+        Normal,
+        Warning,
+        Error
+    }
+
     public interface IExecutionScopeStatusUpdate : IDisposable, ITaskStateReporting
     {
         /// <summary>
@@ -39,7 +41,7 @@ namespace StepBro.Core.Execution
             long progressMax = -1,
             Func<long, string> progressFormatter = null);
 
-        void AddActionButton(string title, Controls.ButtonActivationType type, Action<bool> activationAction);
+        void AddActionButton(string title, Func<bool, bool> activationAction);
 
         /// <summary>
         /// Notifies exit of the subtask.
@@ -51,7 +53,7 @@ namespace StepBro.Core.Execution
         /// </summary>
         event EventHandler ExpectedTimeExceeded;
 
-        Brush ProgressColor { get; set; }
+        AttentionColor ProgressColor { get; set; }
 
         //void SetProgress(long progress);
         //void IndicateProgress();

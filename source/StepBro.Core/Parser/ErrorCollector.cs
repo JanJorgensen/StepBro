@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using StepBro.Core.ScriptData;
+using System.IO;
 
 namespace StepBro.Core.Parser
 {
@@ -85,15 +86,15 @@ namespace StepBro.Core.Parser
 
         public IScriptFile File { get { return m_file; } }
 
-        public override void SyntaxError(IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
+        public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
         {
             m_errors.Add(new ErrorData(recognizer, offendingSymbol, line, charPositionInLine, msg, e));
             this.NotifyListChanged();
             System.Diagnostics.Trace.WriteLine("PARSING ERROR: " + msg);
             if (m_throwOnSyntax) throw new Exception(msg);
         }
-
-        public void SyntaxError(IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
+ 
+        public void SyntaxError(TextWriter output, IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
         {
             m_errors.Add(new ErrorData(recognizer, offendingSymbol, line, charPositionInLine, msg, e));
             this.NotifyListChanged();

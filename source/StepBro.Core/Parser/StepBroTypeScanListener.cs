@@ -275,7 +275,12 @@ namespace StepBro.Core.Parser
             this.TopElement.Childs.Add(element);
         }
 
-        public override void EnterFileVariable([NotNull] SBP.FileVariableContext context)
+        public override void EnterFileVariableSimple([NotNull] SBP.FileVariableSimpleContext context)
+        {
+            m_elementStartLine = context.Start.Line;
+        }
+
+        public override void EnterFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)
         {
             m_elementStartLine = context.Start.Line;
         }

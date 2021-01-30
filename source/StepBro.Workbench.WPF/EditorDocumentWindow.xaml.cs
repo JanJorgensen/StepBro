@@ -7,7 +7,7 @@ using System;
 using System.Windows;
 using System.Windows.Data;
 using System.ComponentModel;
-using StepBro.Core.Parser;
+using StepBro.UI.SyntaxEditorSupport;
 
 namespace StepBro.Workbench
 {

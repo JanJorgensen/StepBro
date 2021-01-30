@@ -36,30 +36,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ActiproSoftware.DataGrid.Contrib.Wpf, Version=20.1.1.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL">
-      <HintPath>..\StepBro.Core\packages\ActiproSoftware.Controls.WPF.DataGrid.Contrib.20.1.1\lib\net40\ActiproSoftware.DataGrid.Contrib.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="ActiproSoftware.Docking.Wpf, Version=20.1.1.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL">
-      <HintPath>..\StepBro.Core\packages\ActiproSoftware.Controls.WPF.Docking.20.1.1\lib\net40\ActiproSoftware.Docking.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="ActiproSoftware.Editors.Wpf, Version=20.1.1.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL">
-      <HintPath>..\StepBro.Core\packages\ActiproSoftware.Controls.WPF.Editors.20.1.1\lib\net40\ActiproSoftware.Editors.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="ActiproSoftware.Grids.Wpf, Version=20.1.1.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL">
-      <HintPath>..\StepBro.Core\packages\ActiproSoftware.Controls.WPF.Grids.20.1.1\lib\net40\ActiproSoftware.Grids.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="ActiproSoftware.Shared.Wpf, Version=20.1.1.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL">
-      <HintPath>..\StepBro.Core\packages\ActiproSoftware.Controls.WPF.Shared.20.1.1\lib\net40\ActiproSoftware.Shared.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="ActiproSoftware.SyntaxEditor.Wpf, Version=20.1.1.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL">
-      <HintPath>..\StepBro.Core\packages\ActiproSoftware.Controls.WPF.SyntaxEditor.20.1.1\lib\net40\ActiproSoftware.SyntaxEditor.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="ActiproSoftware.Text.LLParser.Wpf, Version=20.1.1.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL">
-      <HintPath>..\StepBro.Core\packages\ActiproSoftware.Controls.WPF.SyntaxEditor.20.1.1\lib\net40\ActiproSoftware.Text.LLParser.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="ActiproSoftware.Text.Wpf, Version=20.1.1.0, Culture=neutral, PublicKeyToken=36ff2196ab5654b9, processorArchitecture=MSIL">
-      <HintPath>..\StepBro.Core\packages\ActiproSoftware.Controls.WPF.SyntaxEditor.20.1.1\lib\net40\ActiproSoftware.Text.Wpf.dll</HintPath>
-    </Reference>
     <Reference Include="ReachFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />

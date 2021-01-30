@@ -117,13 +117,14 @@ namespace StepBro.Core.Parser
             else throw new NotImplementedException();
         }
 
-        public override void EnterFileVariable([NotNull] SBP.FileVariableContext context)
+        public override void EnterFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)
         {
             m_variableModifier = VariableModifier.Static;
         }
 
         public override void EnterFileVariableSimple([NotNull] SBP.FileVariableSimpleContext context)
         {
+            m_variableModifier = VariableModifier.Static;
             this.CreateVariablesList();
         }
 
@@ -261,9 +262,9 @@ namespace StepBro.Core.Parser
                 var @delegate = lambdaExpr.Compile();
                 return (VariableContainerAction)@delegate;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -441,9 +442,9 @@ namespace StepBro.Core.Parser
                     var @delegate = lambdaExpr.Compile();
                     action = (VariableContainerAction)@delegate;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    throw ex;
+                    throw;
                 }
             }
             return action;
@@ -524,7 +525,7 @@ namespace StepBro.Core.Parser
 
         public override void EnterEveryRule([NotNull] ParserRuleContext context)
         {
-            //base.EnterEveryRule(context);
+            base.EnterEveryRule(context);
             //var txt = context.GetText();
             //var lf = txt.IndexOf('\r');
             //if (lf > 0) txt = txt.Substring(0, lf);
@@ -535,13 +536,22 @@ namespace StepBro.Core.Parser
         public override void ExitEveryRule([NotNull] ParserRuleContext context)
         {
             //System.Diagnostics.Debug.WriteLine("EXIT " + context.GetType().Name);
-            //base.ExitEveryRule(context);
+            base.ExitEveryRule(context);
         }
 
         public override void VisitErrorNode([NotNull] IErrorNode node)
         {
-            //m_errors.InternalError(-1, -1, "VisitErrorNode");
-            //base.VisitErrorNode(node);
+            System.Diagnostics.Debug.WriteLine(node.Payload.GetType().Name);
+            var t = node.Payload as CommonToken;
+            if (t != null)
+            {
+                m_errors.SyntaxError(null, null, t.Type, t.Line, t.Column, node.GetText(), null);
+            }
+            else
+            {
+                m_errors.SyntaxError(null, null, -1, -1, -1, node.GetText(), null);
+            }
+            base.VisitErrorNode(node);
         }
     }
 }

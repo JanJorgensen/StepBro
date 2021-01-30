@@ -36,7 +36,7 @@ namespace StepBro.Core.Parser
             m_parser.RemoveErrorListeners();
             m_parser.AddErrorListener(m_errors);
 #if DEBUG
-            m_parser.Interpreter.PredictionMode = PredictionMode.LlExactAmbigDetection;
+            m_parser.Interpreter.PredictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;
 #endif
             m_parser.BuildParseTree = true;
             m_listener = new StepBroListener(m_errors, addons, file);
@@ -49,6 +49,7 @@ namespace StepBro.Core.Parser
             var addons = AddonManager.Create();
             addons.AddAssembly(AddonManager.StepBroCoreAssembly, true);
             addons.AddAssembly(typeof(System.Math).Assembly, false);
+            addons.AddAssembly(typeof(System.Console).Assembly, false);
             addons.AddAssembly(typeof(System.Linq.Enumerable).Assembly, false);
 
             var file = new ScriptFile();
@@ -835,9 +836,9 @@ namespace StepBro.Core.Parser
 
         public static void Test()
         {
-            var resolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
+            //var resolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
 
-            var contract = resolver.ResolveContract(typeof(Account));
+            //var contract = resolver.ResolveContract(typeof(Account));
         }
     }
 }

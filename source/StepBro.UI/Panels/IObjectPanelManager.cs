@@ -1,0 +1,33 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using StepBro.Core.Data;
+
+namespace StepBro.UI.Panels
+{
+    public interface IObjectPanelManager
+    {
+        /// <summary>
+        /// List all the registered panel types.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<ObjectPanelInfo> ListPanelTypes();
+
+        /// <summary>
+        /// Searches through the list of known panels, to find the panel with the specified name.
+        /// </summary>
+        /// <param name="name">The name of the panel.</param>
+        /// <returns>Information object for the found panel type, or <code>null</code> if not found.</returns>
+        ObjectPanelInfo FindPanel(string name);
+
+        PanelCreationOption GetPanelCreationOption(ObjectPanelInfo type, object @object = null);
+
+        ObjectPanel CreateStaticPanel(ObjectPanelInfo type);
+        ObjectPanel CreateObjectPanel(ObjectPanelInfo type, IObjectContainer container);
+        ObjectPanel CreateObjectPanel(ObjectPanelInfo type, string objectReference);
+
+        IEnumerable<ObjectPanel> ListCreatedPanels();
+    }
+}

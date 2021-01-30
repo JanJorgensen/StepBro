@@ -137,16 +137,17 @@ namespace StepBro.Core.Language
         }
     }
 
-    internal class StepBroEditorSupportVisitor : Parser.Grammar.StepBroBaseVisitor<StepBroFileSection>
-    {
-        public override StepBroFileSection VisitExpression([NotNull] SBP.ExpressionContext context)
-        {
-            return base.VisitExpression(context);
-        }
+    //internal class StepBroEditorSupportVisitor : Parser.Grammar.StepBroBaseVisitor<StepBroFileSection>
+    //{
+    //    override VisitExpre
+    //    public override StepBroFileSection VisitExpression([NotNull] SBP.ExpressionContext context)
+    //    {
+    //        return base.VisitExpression(context);
+    //    }
 
-        public override StepBroFileSection VisitCompilationUnit([NotNull] SBP.CompilationUnitContext context)
-        {
-            return base.VisitCompilationUnit(context);
-        }
-    }
+    //    public override StepBroFileSection VisitCompilationUnit([NotNull] SBP.CompilationUnitContext context)
+    //    {
+    //        return base.VisitCompilationUnit(context);
+    //    }
+    //}
 }

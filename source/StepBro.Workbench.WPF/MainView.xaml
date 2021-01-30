@@ -249,7 +249,7 @@
                     <MenuItem Header="Step Over" IsEnabled="False"/>
                     <MenuItem Header="Step Out" IsEnabled="False"/>
                     <Separator />
-                    <MenuItem Header="Parse All Files"/>
+                    <MenuItem Header="Parse All Files" Command="{Binding ParseAllFilesCommand}"/>
                     <MenuItem Header="Debug Mode" IsEnabled="False"/>
                 </MenuItem>
                 <MenuItem Header="Macros">

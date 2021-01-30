@@ -76,6 +76,17 @@
       <Generator>MSBuild:Compile</Generator>
       <CustomToolNamespace>StepBro.Core.Parser.Grammar</CustomToolNamespace>
     </Antlr4>
+    <Compile Include="..\StepBro.UI\ButtonActivationType.cs">
+      <Link>Controls\ButtonActivationType.cs</Link>
+    </Compile>
+    <Compile Include="..\StepBro.UI\Controls\ObjectPanel.xaml.cs">
+      <Link>Controls\ObjectPanel.xaml.cs</Link>
+      <DependentUpon>ObjectPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\StepBro.UI\Controls\SimpleLogViewer.xaml.cs">
+      <Link>Controls\SimpleLogViewer.xaml.cs</Link>
+      <DependentUpon>SimpleLogViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="..\StepBroInfo.cs">
       <Link>Properties\StepBroInfo.cs</Link>
     </Compile>
@@ -87,14 +98,7 @@
     <Compile Include="Api\ModuleLoadAttribute.cs" />
     <Compile Include="Attributes\ClassPanelAttribute.cs" />
     <Compile Include="Attributes\ObjectPanelAttribute.cs" />
-    <Compile Include="Controls\SimpleLogViewer.xaml.cs">
-      <DependentUpon>SimpleLogViewer.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Controls\WinForms\ComboboxItem.cs" />
-    <Compile Include="Controls\ObjectPanel.xaml.cs">
-      <DependentUpon>ObjectPanel.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\ObjectPanelBindingState.cs" />
     <Compile Include="Controls\WinForms\DataView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -266,7 +270,6 @@
     <Compile Include="Api\PreParseAttribute.cs" />
     <Compile Include="Api\PrivateAttribute.cs" />
     <Compile Include="Api\PublicAttribute.cs" />
-    <Compile Include="Controls\ButtonActivationType.cs" />
     <Compile Include="Data\AlphaID.cs" />
     <Compile Include="Data\ArrayReference.cs" />
     <Compile Include="Data\ByteArray.cs" />
@@ -461,13 +464,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Controls\ObjectPanel.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="..\StepBro.UI\Controls\ObjectPanel.xaml">
+      <Link>Controls\ObjectPanel.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\SimpleLogViewer.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="..\StepBro.UI\Controls\SimpleLogViewer.xaml">
+      <Link>Controls\SimpleLogViewer.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -481,8 +486,10 @@
     </PropertyGroup>
     <Error Condition="!Exists('packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.props'))" />
     <Error Condition="!Exists('packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.targets'))" />
+    <Error Condition="!Exists('packages\Microsoft.NETFramework.ReferenceAssemblies.net461.1.0.0\build\Microsoft.NETFramework.ReferenceAssemblies.net461.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.NETFramework.ReferenceAssemblies.net461.1.0.0\build\Microsoft.NETFramework.ReferenceAssemblies.net461.targets'))" />
   </Target>
   <Import Project="packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.targets" Condition="Exists('packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.targets')" />
+  <Import Project="packages\Microsoft.NETFramework.ReferenceAssemblies.net461.1.0.0\build\Microsoft.NETFramework.ReferenceAssemblies.net461.targets" Condition="Exists('packages\Microsoft.NETFramework.ReferenceAssemblies.net461.1.0.0\build\Microsoft.NETFramework.ReferenceAssemblies.net461.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

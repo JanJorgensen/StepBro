@@ -637,7 +637,7 @@ namespace StepBro.Core.Parser
                 scopeCode = subStatements[0].GetOnlyStatementCode();
             }
 
-            var usingVariable = m_scopeStack.Peek().AddVariable("usingVariable_" + context.start.Line.ToString(), new TypeReference(typeof(IDisposable)), null, EntryModifiers.Private);
+            var usingVariable = m_scopeStack.Peek().AddVariable("usingVariable_" + context.Start.Line.ToString(), new TypeReference(typeof(IDisposable)), null, EntryModifiers.Private);
             var variableAssignment = m_scopeStack.Peek().UsingVariableAssignment;
             var usingVariableAssignment = Expression.Assign(usingVariable.VariableExpression, variableAssignment);
 

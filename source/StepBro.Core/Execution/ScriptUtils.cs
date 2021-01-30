@@ -36,7 +36,7 @@ namespace StepBro.Core.Execution
                 using (reporter)
                 {
                     bool skipClicked = false;
-                    reporter.AddActionButton("Skip Delay", Controls.ButtonActivationType.ToggleWhenClicked, b => { skipClicked |= b; });
+                    reporter.AddActionButton("Skip Delay", b => { skipClicked |= b; return b; });
                     var entry = DateTime.Now;
                     var timeout = entry + time;
                     var timeLeft = time;

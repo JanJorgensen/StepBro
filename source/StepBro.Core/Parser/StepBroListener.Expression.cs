@@ -5,6 +5,7 @@ using StepBro.Core.ScriptData;
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using Range = StepBro.Core.Data.Range;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
@@ -94,7 +95,7 @@ namespace StepBro.Core.Parser
         {
             if (context.Start.Type == Grammar.StepBro.IDENTIFIER)
             {
-                m_expressionData.Push(SBExpressionData.CreateIdentifier(context.GetText(), token: context.start));
+                m_expressionData.Push(SBExpressionData.CreateIdentifier(context.GetText(), token: context.Start));
             }
             else if (context.Start.Type == Grammar.StepBro.THIS)
             {
@@ -106,7 +107,7 @@ namespace StepBro.Core.Parser
                     SBExpressionType.PropertyReference,
                     new TypeReference(typeof(IProcedureThis)),
                     thisProperty,
-                    token: context.start));
+                    token: context.Start));
             }
         }
 
@@ -315,7 +316,7 @@ namespace StepBro.Core.Parser
             else
             {
                 m_expressionData.Push(new SBExpressionData(
-                    SBExpressionType.OperationError, "Error parsing binary operation.", context.GetText(), new TokenOrSection(context.Start, context.stop, context.GetText())));
+                    SBExpressionType.OperationError, "Error parsing binary operation.", context.GetText(), new TokenOrSection(context.Start, context.Stop, context.GetText())));
             }
         }
 

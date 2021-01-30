@@ -83,7 +83,7 @@ namespace StepBro.Core.Data
         {
             if (m_state != State.TargetVoid && m_state != State.MonitorDisposed)
             {
-                var o = (m_reference.IsAlive) ? m_reference.Target : null;
+                var o = m_reference.IsAlive ? m_reference.Target : null;
                 if (o == null)
                 {
                     m_lastTargetState = "<void>";

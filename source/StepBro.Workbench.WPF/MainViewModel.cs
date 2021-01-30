@@ -48,6 +48,7 @@ namespace StepBro.Workbench
         /// </summary>
         public MainViewModel()
         {
+            var cmd = ApplicationCommands.Save;
             m_calculatorViewModel = new CalculatorViewModel() { State = ToolItemState.Docked };
             m_toolItems.Add(m_calculatorViewModel);
             m_userDocumentItems.CollectionChanged += DocumentItems_CollectionChanged;
@@ -148,7 +149,7 @@ namespace StepBro.Workbench
 
         private void LoadedFiles_FileClosed(object sender, LoadedFileEventArgs args)
         {
-            var foundDocument = m_userDocumentItems.FirstOrDefault(f => Object.ReferenceEquals(args.File, false));
+            var foundDocument = m_userDocumentItems.FirstOrDefault(f => Object.ReferenceEquals(args.File, f.LoadedFile));
             if (foundDocument != null)
             {
                 // File was forced closed by the StepBro.Core.

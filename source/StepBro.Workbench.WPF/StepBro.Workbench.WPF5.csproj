@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -6,22 +6,67 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>StepBro.Workbench</RootNamespace>
     <AssemblyName>StepBro.Workbench.WPF</AssemblyName>
+    <OutputPath>..\bin5</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>..\bin5</OutputPath>
-  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>StepBroWorkbenchTest</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Properties\AssemblyInfo.cs" />
+    <Compile Remove="ToolItem1ViewModel.cs" />
+  </ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>..\bin5</OutputPath>
-  </PropertyGroup>
+  <ItemGroup>
+    <Page Remove="OverviewDocument.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="OverviewDocument.xaml" />
+    <None Include="ToolItem1ViewModel.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ActiproSoftware.Controls.WPF" Version="20.1.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\StepBro.Core5\StepBro.Core5.csproj" />
+    <ProjectReference Include="..\StepBro.Core\StepBro.Core5.csproj" />
+    <ProjectReference Include="..\StepBro.UI\StepBro.UI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Images\ActiproAppIcon.ico" />
+    <Resource Include="Resources\Images\ActiproIcon.ico" />
+    <Resource Include="Resources\Images\ActiproMetro24.png" />
+    <Resource Include="Resources\Images\BreakpointEnable_16x.png" />
+    <Resource Include="Resources\Images\Calculator_16x.png" />
+    <Resource Include="Resources\Images\ClassView16.png" />
+    <Resource Include="Resources\Images\CSProjectNode_16x.png" />
+    <Resource Include="Resources\Images\Find16.png" />
+    <Resource Include="Resources\Images\FindResults16.png" />
+    <Resource Include="Resources\Images\NewFile_16x.png" />
+    <Resource Include="Resources\Images\OpenFile_16x.png" />
+    <Resource Include="Resources\Images\Output16.png" />
+    <Resource Include="Resources\Images\Properties16.png" />
+    <Resource Include="Resources\Images\Property_16x.png" />
+    <Resource Include="Resources\Images\Redo_16x.png" />
+    <Resource Include="Resources\Images\Reference16.png" />
+    <Resource Include="Resources\Images\Run_16x.png" />
+    <Resource Include="Resources\Images\Save_16x.png" />
+    <Resource Include="Resources\Images\Solution16.png" />
+    <Resource Include="Resources\Images\SolutionExplorer16.png" />
+    <Resource Include="Resources\Images\StepIn_16x.png" />
+    <Resource Include="Resources\Images\StepOut_16x.png" />
+    <Resource Include="Resources\Images\StepOver_16x.png" />
+    <Resource Include="Resources\Images\Stop_16x.png" />
+    <Resource Include="Resources\Images\TextDocument16.png" />
+    <Resource Include="Resources\Images\Undo_16x.png" />
+    <Resource Include="Resources\Images\Wrench16.png" />
   </ItemGroup>
 
 </Project>

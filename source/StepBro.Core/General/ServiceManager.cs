@@ -15,7 +15,7 @@ namespace StepBro.Core
             void StopServices(ITaskContext context, bool reset = false);
         }
 
-        public enum ServiceManagerState { Initial, Starting, Started, StartFailed, Stopped, StopFailed }
+        public enum ServiceManagerState { Initial, Initialized, Starting, Started, InitOrStartFailed, Stopped, StopFailed }
 
         private List<IService> m_services = new List<IService>();
         private readonly object m_lock = new object();
@@ -174,12 +174,27 @@ namespace StepBro.Core
                     string failed = String.Join(", ", this.ListUnregisteredDependencies().Select(t => t.Name));
                     string message = $"Failed starting services. Some dependencies are missing ({failed}).";
                     context.UpdateStatus(message, 0);
-                    this.State = ServiceManagerState.StartFailed;
+                    this.State = ServiceManagerState.InitOrStartFailed;
                     throw new Exception(message);
                 }
 
-                context.ProgressSetup(0, m_services.Count, null);
+                context.ProgressSetup(0, m_services.Count * 2, null);
                 long i = 0;
+                foreach (var s in m_services)
+                {
+                    try
+                    {
+                        context.UpdateStatus("Initializing service " + s.Name, i);
+                        s.Initialize(this, context);
+                    }
+                    catch (Exception ex)
+                    {
+                        context.UpdateStatus("Failed initializing service " + s.Name, i);
+                        this.State = ServiceManagerState.InitOrStartFailed;
+                        throw new Exception("Failed initializing service " + s.Name, ex);
+                    }
+                    i++;
+                }
                 foreach (var s in m_services)
                 {
                     try
@@ -190,12 +205,12 @@ namespace StepBro.Core
                     catch (Exception ex)
                     {
                         context.UpdateStatus("Failed starting service " + s.Name, i);
-                        this.State = ServiceManagerState.StartFailed;
+                        this.State = ServiceManagerState.InitOrStartFailed;
                         throw new Exception("Failed starting service " + s.Name, ex);
                     }
                     i++;
                 }
-                context.UpdateStatus("Started all services", m_services.Count);
+                context.UpdateStatus("Started all services", m_services.Count * 2);
                 this.State = ServiceManagerState.Started;
             }
             else
@@ -206,7 +221,7 @@ namespace StepBro.Core
         }
         private void StopServices(ITaskContext context, bool reset)
         {
-            if (this.State == ServiceManagerState.Started || this.State == ServiceManagerState.StartFailed)
+            if (this.State == ServiceManagerState.Started || this.State == ServiceManagerState.InitOrStartFailed)
             {
                 context.ProgressSetup(0, m_services.Count, null);
                 List<IService> reversed = new List<IService>(m_services);
@@ -232,7 +247,7 @@ namespace StepBro.Core
                 if (fails)
                 {
                     context.UpdateStatus("Failed stopping all services", m_services.Count);
-                    if (this.State != ServiceManagerState.StartFailed)      // If start failed, keep that state
+                    if (this.State != ServiceManagerState.InitOrStartFailed)      // If start failed, keep that state
                     {
                         this.State = ServiceManagerState.StopFailed;
                     }
@@ -241,7 +256,7 @@ namespace StepBro.Core
                 else
                 {
                     context.UpdateStatus("Stopped all services", m_services.Count);
-                    if (this.State != ServiceManagerState.StartFailed)      // If start failed, keep that state
+                    if (this.State != ServiceManagerState.InitOrStartFailed)      // If start failed, keep that state
                     {
                         this.State = ServiceManagerState.Stopped;
                     }

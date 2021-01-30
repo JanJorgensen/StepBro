@@ -1,7 +1,5 @@
-﻿using StepBro.Core.Controls;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Windows.Media;
 
 namespace StepBro.Core.Execution
 {
@@ -23,9 +21,9 @@ namespace StepBro.Core.Execution
         private string m_progressText = null;
         private readonly long m_progress = -1L;
         private readonly Func<long, string> m_progressFormatter = null;
-        private Brush m_progressColor = Brushes.Blue;
+        private AttentionColor m_progressColor = AttentionColor.Normal;
 
-        public List<Tuple<string, ButtonActivationType, Action<bool>>> m_buttons = null;
+        public List<Tuple<string, Func<bool,bool>>> m_buttons = null;
 
         private ExecutionScopeStatusUpdater m_child = null;
 
@@ -152,13 +150,13 @@ namespace StepBro.Core.Execution
             System.Diagnostics.Debug.WriteLine(String.Format("[{0}] UpdateStatus: {1}, {2}", m_level, String.IsNullOrEmpty(text) ? "<no text>" : text, (progress >= 0) ? progress.ToString() : "<no progress>"));
         }
 
-        public void AddActionButton(string title, ButtonActivationType type, Action<bool> activationAction)
+        public void AddActionButton(string title, Func<bool, bool> activationAction)
         {
             if (m_buttons == null)
             {
-                m_buttons = new List<Tuple<string, ButtonActivationType, Action<bool>>>();
+                m_buttons = new List<Tuple<string, Func<bool,bool>>>();
             }
-            m_buttons.Add(new Tuple<string, ButtonActivationType, Action<bool>>(title, type, activationAction));
+            m_buttons.Add(new Tuple<string, Func<bool,bool>>(title, activationAction));
         }
 
         public bool EnterPauseIfRequested(string state)
@@ -171,7 +169,7 @@ namespace StepBro.Core.Execution
             throw new NotImplementedException();
         }
 
-        public Brush ProgressColor
+        public AttentionColor ProgressColor
         {
             get
             {

@@ -27,9 +27,9 @@ DOC_COMMENT:        	    '/// ' InputCharacter*          -> channel(DOC_COMMENTS
 SINGLE_LINE_COMMENT:		'//'  InputCharacter*           -> channel(COMMENTS_CHANNEL);
 DELIMITED_COMMENT:			'/*'  .*? '*/'                  -> channel(COMMENTS_CHANNEL);
 
-//DATATABLE_ROW_START	: '|' {_input.La(-2) == '\n'}? Whitespace* ('_'+ | '@' | '//')? Whitespace* '|' -> mode(DATATABLE_ROW_MODE); 
+//DATATABLE_ROW_START	: '|' {InputStream.LA(-2) == '\n'}? Whitespace* ('_'+ | '@' | '//')? Whitespace* '|' -> mode(DATATABLE_ROW_MODE); 
 DATATABLE_ROW_START	: 
-    '|' {_input.Index <= 1 || _input.La(-2) == '\n'}? 
+    '|' {InputStream.Index <= 1 || InputStream.LA(-2) == '\n'}? 
     (('_'+ '@') | '_'+ | (Whitespace* '@') | (Whitespace? IdentifierOrKeyword Whitespace*) | '//' Whitespace* | Whitespace+ '//' | Whitespace*)
     //(('_'+ '@') | '_'+ | (Whitespace* '@') | (Whitespace* (('//' | IdentifierOrKeyword) Whitespace*)?) | Whitespace*)
     '|' -> mode(DATATABLE_ROW_MODE); 
@@ -384,7 +384,7 @@ fragment Exponent : ('e'|'E') ('+'|'-')? INT ;
 
 fragment
 EscapeSequence
-    :   BACK_SLASH ('a'|'b'|'f'|'n'|'r'|'t'|'v'|'\"'|'\''|'\\')
+    :   BACK_SLASH ('a'|'b'|'f'|'n'|'r'|'t'|'v'|'"'|'\''|'\\')
     //:   '\\' [btnfr\"\'\\] 
     |   UnicodeEscape
     |   OctalEscape
