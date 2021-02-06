@@ -63,25 +63,15 @@ namespace StepBro.Core
                 {
                     // **** LOAD THE ADDON MODULES ****
 
+                    m.AddAssembly(typeof(DateTime).Assembly, false);
                     m.AddAssembly(typeof(Enumerable).Assembly, false);
                     m.AddAssembly(typeof(Math).Assembly, false);
                     m.AddAssembly(AddonManager.StepBroCoreAssembly, true);
 
-                    var modulesFolder = Path.Combine(Path.GetDirectoryName(typeof(AddonManager).Assembly.Location), "modules");
+                    var modulesFolder = Path.Combine(Path.GetDirectoryName(typeof(AddonManager).Assembly.Location), "Modules");
                     foreach (var f in Directory.GetFiles(modulesFolder, "*.dll"))
                     {
-                        try
-                        {
-                            m.LoadAssembly(f, false);
-                        }
-                        catch (BadImageFormatException)
-                        {
-                            m_rootLogger.LogError("Main.Initialize", $"Error loading assembly '{f}'.");
-                        }
-                        catch (Exception ex)
-                        {
-                            m_rootLogger.LogError("Main.Initialize", $"Unexpected error loading assembly '{f}'. Exception: {ex}");
-                        }
+                        m.LoadAssembly(f, false);
                     }
                 },
                 out service);

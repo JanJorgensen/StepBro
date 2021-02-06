@@ -131,5 +131,13 @@ namespace StepBro.Core.Data
             }
             return g_type;
         }
+
+        /// <summary>
+        /// Deletes the created type. This is only used in unit tests.
+        /// </summary>
+        internal static void Reset()
+        {
+            g_type = null;
+        }
     }
 }

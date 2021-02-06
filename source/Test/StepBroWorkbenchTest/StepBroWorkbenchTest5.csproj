@@ -3,18 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
     <IsPackable>false</IsPackable>
+    <OutputPath>..\..\bin5</OutputPath>
     <AssemblyName>StepBroWorkbenchTest</AssemblyName>
     <RootNamespace>StepBroWorkbenchTest</RootNamespace>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>..\..\bin5</OutputPath>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>..\..\bin5</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

@@ -449,9 +449,10 @@ namespace StepBro.Core.Execution
         public static IProcedureReference<T> GetPartnerReference<T>(
             IScriptCallContext context, IFileElement element, string partnerName)
         {
-            while (element != null)
+            var e = element;
+            while (e != null)
             {
-                var partner = element.ListPartners().FirstOrDefault(p => p.Name.Equals(partnerName, StringComparison.InvariantCulture));
+                var partner = e.ListPartners().FirstOrDefault(p => p.Name.Equals(partnerName, StringComparison.InvariantCulture));
                 if (partner != null)
                 {
                     if (partner.ProcedureReference.ProcedureReference is IProcedureReference<T>)
@@ -464,9 +465,9 @@ namespace StepBro.Core.Execution
                         return null;
                     }
                 }
-                element = element.BaseElement;
+                e = e.BaseElement;
             }
-            context.ReportError(description: $"The procedure has no partner named \"{partnerName}\".");
+            context.ReportError(description: $"The element \"{element.FullName}\" has no partner named \"{partnerName}\".");
             return null;
         }
 
@@ -579,7 +580,7 @@ namespace StepBro.Core.Execution
                         $"Exception executing method '{name}' on the object of type '{instance.GetType().Name}'.",
                         ex);
                 }
-                throw ex;
+                throw;
             }
         }
 

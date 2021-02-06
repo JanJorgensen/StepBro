@@ -12,6 +12,7 @@ namespace StepBro.Core.Api
     {
         private readonly Action<IAddonManager> m_basicModulesLoader;
         private List<Assembly> m_assemblies = new List<Assembly>();
+        private List<Tuple<string, Exception>> m_assembliesFailedLoading = new List<Tuple<string, Exception>>();
         private List<NamespaceList> m_rootNamespaces = new List<NamespaceList>();
         private Dictionary<string, NamespaceList> m_namespaceLookup = new Dictionary<string, NamespaceList>();
         private Dictionary<string, Type> m_typeLookup = new Dictionary<string, Type>();
@@ -46,8 +47,15 @@ namespace StepBro.Core.Api
 
         public void LoadAssembly(string path, bool loadOnlyTypesWithPublicAttribute)
         {
-            var fileAssembly = Assembly.LoadFrom(path);
-            this.AddAssembly(fileAssembly, loadOnlyTypesWithPublicAttribute);
+            try
+            {
+                var fileAssembly = Assembly.LoadFrom(path);
+                this.AddAssembly(fileAssembly, loadOnlyTypesWithPublicAttribute);
+            }
+            catch (Exception ex)
+            {
+                m_assembliesFailedLoading.Add(new Tuple<string, Exception>(path, ex));
+            }
         }
 
         public void AddAssembly(Assembly assembly, bool loadOnlyTypesWithPublicAttribute)
@@ -75,6 +83,7 @@ namespace StepBro.Core.Api
             System.Diagnostics.Debug.WriteLine("MODULE ASSEMBLY UPDATE: " + assembly.FullName);
             foreach (Type type in assembly.GetExportedTypes())
             {
+                string name = type.TypeName();
                 if (loadOnlyTypesWithPublicAttribute)
                 {
                     PublicAttribute pubAttrib = type.GetCustomAttribute<PublicAttribute>(true);
@@ -85,7 +94,7 @@ namespace StepBro.Core.Api
                     loadType = type;
                     continue;   // Don't load this type
                 }
-                if (type.IsClass || type.IsInterface || type.IsEnum)
+                if (type.IsTypeDefinition)
                 {
                     bool handled = false;
                     foreach (var th in m_specialTypeHandlers)

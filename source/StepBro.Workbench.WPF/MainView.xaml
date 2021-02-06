@@ -10,6 +10,9 @@
     xmlns:localviews="clr-namespace:StepBro.Workbench.ToolViews"
     >
     <!--Icon="/Resources/Images/ActiproAppIcon.ico"-->
+    <UserControl.InputBindings>
+        <KeyBinding Key="F6" Command="{Binding ParseAllFilesCommand}" />
+    </UserControl.InputBindings>
     <UserControl.Resources>
 
         <local:ToolItemDockSideConverter x:Key="ToolItemDockSideConverter" />
@@ -41,31 +44,28 @@
         <DataTemplate DataType="{x:Type local:TextDocumentItemViewModel}">
             <local:TextDocumentItemView />
         </DataTemplate>
-        <!--<DataTemplate DataType="{x:Type local:StepBroDocumentItemViewModel}">
-            <local:StepBroDocumentItemView />
-        </DataTemplate>-->
 
         <local:ToolItemTemplateSelector x:Key="ToolItemTemplateSelector">
+            <local:ToolItemTemplateSelector.OutputViewTemplate>
+                <DataTemplate>
+                    <localviews:OutputView />
+                </DataTemplate>
+            </local:ToolItemTemplateSelector.OutputViewTemplate>
+            <local:ToolItemTemplateSelector.ErrorsViewTemplate>
+                <DataTemplate>
+                    <localviews:ErrorsView />
+                </DataTemplate>
+            </local:ToolItemTemplateSelector.ErrorsViewTemplate>
             <local:ToolItemTemplateSelector.CalculatorTemplate>
                 <DataTemplate>
                     <localviews:CalculatorView />
                 </DataTemplate>
             </local:ToolItemTemplateSelector.CalculatorTemplate>
-            <local:ToolItemTemplateSelector.ToolItem1Template>
+            <local:ToolItemTemplateSelector.ObjectPanelTemplate>
                 <DataTemplate>
-                    <localviews:ToolItem1View />
+                    <localviews:ObjectPanelToolView />
                 </DataTemplate>
-            </local:ToolItemTemplateSelector.ToolItem1Template>
-            <local:ToolItemTemplateSelector.ToolItem2Template>
-                <DataTemplate>
-                    <localviews:ToolItem2View />
-                </DataTemplate>
-            </local:ToolItemTemplateSelector.ToolItem2Template>
-            <local:ToolItemTemplateSelector.ToolItem3Template>
-                <DataTemplate>
-                    <localviews:ToolItem3View />
-                </DataTemplate>
-            </local:ToolItemTemplateSelector.ToolItem3Template>
+            </local:ToolItemTemplateSelector.ObjectPanelTemplate>
         </local:ToolItemTemplateSelector>
 
     </UserControl.Resources>
@@ -147,57 +147,57 @@
                     <!--<MenuItem Header="Print" Command="ApplicationCommands.Print" Icon="" />
                     <MenuItem Header="Print Preview" Command="ApplicationCommands.PrintPreview" Icon="" />
                     <Separator />-->
-                    <MenuItem Header="Exit" Command="ApplicationCommands.Close" Icon=""/>
+                    <MenuItem Header="Exit" Command="Close" Icon=""/>
                 </MenuItem>
                 <MenuItem Header="Edit">
-                    <MenuItem CommandTarget="{Binding ElementName=editor}" Command="ApplicationCommands.Undo">
+                    <MenuItem Command="ApplicationCommands.Undo">
                         <MenuItem.Icon>
                             <Image Source="Resources/Images/Undo_16x.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem CommandTarget="{Binding ElementName=editor}" Command="ApplicationCommands.Redo">
+                    <MenuItem Command="ApplicationCommands.Redo">
                         <MenuItem.Icon>
                             <Image Source="Resources/Images/Redo_16x.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator />
-                    <MenuItem CommandTarget="{Binding ElementName=editor}" Command="ApplicationCommands.Cut" Icon="" />
-                    <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.CutAndAppendToClipboard" />
-                    <MenuItem CommandTarget="{Binding ElementName=editor}" Command="ApplicationCommands.Copy" Icon="" />
-                    <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.CopyAndAppendToClipboard" />
-                    <MenuItem CommandTarget="{Binding ElementName=editor}" Command="ApplicationCommands.Paste" Icon="" />
-                    <MenuItem CommandTarget="{Binding ElementName=editor}" Command="ApplicationCommands.Delete" Icon="" />
+                    <MenuItem Command="ApplicationCommands.Cut" Icon="" />
+                    <MenuItem Command="editor:EditorCommands.CutAndAppendToClipboard" />
+                    <MenuItem Command="ApplicationCommands.Copy" Icon="" />
+                    <MenuItem Command="editor:EditorCommands.CopyAndAppendToClipboard" />
+                    <MenuItem Command="ApplicationCommands.Paste" Icon="" />
+                    <MenuItem Command="ApplicationCommands.Delete" Icon="" />
                     <Separator />
-                    <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.SelectAll" />
+                    <MenuItem Command="editor:EditorCommands.SelectAll" />
                     <MenuItem Header="Advanced">
                         <!--<MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.FormatDocument" Icon="" />
                         <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.FormatSelection" Icon="" />
                         <Separator />-->
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.Indent" Icon="" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.Outdent" Icon="" />
+                        <MenuItem Command="editor:EditorCommands.Indent" Icon="" />
+                        <MenuItem Command="editor:EditorCommands.Outdent" Icon="" />
                         <Separator />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.ConvertTabsToSpaces" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.ConvertSpacesToTabs" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.TabifySelectedLines" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.UntabifySelectedLines" />
+                        <MenuItem Command="editor:EditorCommands.ConvertTabsToSpaces" />
+                        <MenuItem Command="editor:EditorCommands.ConvertSpacesToTabs" />
+                        <MenuItem Command="editor:EditorCommands.TabifySelectedLines" />
+                        <MenuItem Command="editor:EditorCommands.UntabifySelectedLines" />
                         <Separator />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.CommentLines" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.UncommentLines" />
+                        <MenuItem Command="editor:EditorCommands.CommentLines" />
+                        <MenuItem Command="editor:EditorCommands.UncommentLines" />
                         <Separator />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.MakeUppercase" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.MakeLowercase" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.ToggleCharacterCasing" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.Capitalize" />
+                        <MenuItem Command="editor:EditorCommands.MakeUppercase" />
+                        <MenuItem Command="editor:EditorCommands.MakeLowercase" />
+                        <MenuItem Command="editor:EditorCommands.ToggleCharacterCasing" />
+                        <MenuItem Command="editor:EditorCommands.Capitalize" />
                         <Separator />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.DeleteHorizontalWhitespace" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.TrimAllTrailingWhitespace" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.TrimTrailingWhitespace" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.DeleteLine" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.Duplicate" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.DeleteBlankLines" />
+                        <MenuItem Command="editor:EditorCommands.DeleteHorizontalWhitespace" />
+                        <MenuItem Command="editor:EditorCommands.TrimAllTrailingWhitespace" />
+                        <MenuItem Command="editor:EditorCommands.TrimTrailingWhitespace" />
+                        <MenuItem Command="editor:EditorCommands.DeleteLine" />
+                        <MenuItem Command="editor:EditorCommands.Duplicate" />
+                        <MenuItem Command="editor:EditorCommands.DeleteBlankLines" />
                         <Separator />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.MoveSelectedLinesUp" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.MoveSelectedLinesDown" />
+                        <MenuItem Command="editor:EditorCommands.MoveSelectedLinesUp" />
+                        <MenuItem Command="editor:EditorCommands.MoveSelectedLinesDown" />
                         <!--<MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.TransposeLines" />
                         <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.TransposeWords" />
                         <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.TransposeCharacters" />
@@ -205,41 +205,57 @@
                         <!--<MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.IncrementalSearch" />-->
                     </MenuItem>
                     <MenuItem Header="Outlining">
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.CollapseToDefinitions" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.HideSelection" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.ToggleOutliningExpansion" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.ToggleAllOutliningExpansion" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.StopOutlining" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.StopHidingCurrent" />
-                        <MenuItem CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.StartAutomaticOutlining" />
+                        <MenuItem Command="editor:EditorCommands.CollapseToDefinitions" />
+                        <MenuItem Command="editor:EditorCommands.HideSelection" />
+                        <MenuItem Command="editor:EditorCommands.ToggleOutliningExpansion" />
+                        <MenuItem Command="editor:EditorCommands.ToggleAllOutliningExpansion" />
+                        <MenuItem Command="editor:EditorCommands.StopOutlining" />
+                        <MenuItem Command="editor:EditorCommands.StopHidingCurrent" />
+                        <MenuItem Command="editor:EditorCommands.StartAutomaticOutlining" />
                     </MenuItem>
 
                 </MenuItem>
                 <MenuItem Header="View">
+                    <MenuItem Header="Error List" Command="{Binding ShowErrorsViewCommand}"/>
+                    <MenuItem Header="Output" Command="{Binding ShowOutputViewCommand}"/>
                     <MenuItem Header="Calculator" Command="{Binding ShowCalculatorToolCommand}"/>
-                    <MenuItem Header="Editor Settings">
+                    <MenuItem Header="Object Panel TBD" Command="{Binding CreateObjectPanelCommand}"/>
+                    <!--<MenuItem Header="Open Object Panel" ItemsSource="{Binding CreateableObjectPanelsList}">
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="MenuItem">
+                                <Setter Property="Header" Value="{Binding Path=ItemType.Name}" />
+                                <Setter Property="Command" Value="{Binding Path=AddItemCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}" />
+                                <Setter Property="CommandParameter" Value="{Binding}" />
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>-->
+                    <!--<MenuItem Header="Editor Settings">
                         <MenuItem Header="Indicator Margin Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsIndicatorMarginVisible, Mode=TwoWay}" />
                         <MenuItem Header="Line Number Margin Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsLineNumberMarginVisible, Mode=TwoWay}" />
                         <MenuItem Header="Outlining Margin Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsOutliningMarginVisible, Mode=TwoWay}" />
                         <MenuItem Header="Ruler Margin Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsRulerMarginVisible, Mode=TwoWay}" />
                         <MenuItem Header="Selection Margin Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsSelectionMarginVisible, Mode=TwoWay}" />
                         <Separator />
-                        <!--<MenuItem x:Name="wordWrapMenuItem" Header="Word Wrap"/>
+                        -->
+                    <!--<MenuItem x:Name="wordWrapMenuItem" Header="Word Wrap"/>
                         <MenuItem Header="Word Wrap Glyphs Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=AreWordWrapGlyphsVisible, Mode=TwoWay}" />
                         <MenuItem Header="Whitespace Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsWhitespaceVisible, Mode=TwoWay}" />
                         <Separator />-->
-                        <!--<MenuItem Header="Can Scroll Past Document End" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=CanScrollPastDocumentEnd, Mode=TwoWay}" />
+                    <!--<MenuItem Header="Can Scroll Past Document End" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=CanScrollPastDocumentEnd, Mode=TwoWay}" />
                         <MenuItem Header="Virtual Space at Line End" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsVirtualSpaceAtLineEndEnabled, Mode=TwoWay}" />
                         <Separator />-->
+                    <!--
                         <MenuItem Header="Indentation Guides Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=AreIndentationGuidesVisible, Mode=TwoWay}" />
                         <MenuItem Header="Line Modification Marks Visible" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=AreLineModificationMarksVisible, Mode=TwoWay}" />
                         <MenuItem Header="Current Line Highlighting Enabled" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsCurrentLineHighlightingEnabled, Mode=TwoWay}" />
                         <MenuItem Header="Delimiter Highlighting Enabled" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsDelimiterHighlightingEnabled, Mode=TwoWay}" />
                         <MenuItem Header="Search Result Highlighting Enabled" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsSearchResultHighlightingEnabled, Mode=TwoWay}" />
                         <MenuItem Header="Auto-Correct Enabled" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=IsAutoCorrectEnabled, Mode=TwoWay}" />
-                        <!--<Separator />-->
-                        <!--<MenuItem x:Name="toggleTokenInfoMenuItem" Header="Toggle Token Info in Status Bar" IsCheckable="True"/>-->
-                    </MenuItem>
+                        -->
+                    <!--<Separator />-->
+                    <!--<MenuItem x:Name="toggleTokenInfoMenuItem" Header="Toggle Token Info in Status Bar" IsCheckable="True"/>-->
+                    <!--
+                    </MenuItem>-->
                 </MenuItem>
                 <MenuItem Header="Script">
                     <MenuItem Header="Run"/>
@@ -249,23 +265,19 @@
                     <MenuItem Header="Step Over" IsEnabled="False"/>
                     <MenuItem Header="Step Out" IsEnabled="False"/>
                     <Separator />
-                    <MenuItem Header="Parse All Files" Command="{Binding ParseAllFilesCommand}"/>
+                    <MenuItem Header="Parse All Files" Command="{Binding ParseAllFilesCommand}" InputGestureText="F6"/>
                     <MenuItem Header="Debug Mode" IsEnabled="False"/>
                 </MenuItem>
                 <MenuItem Header="Macros">
                     <MenuItem Header="Run Saved Macro">
                     </MenuItem>
-                    <MenuItem Header="Run Recorded Macro" Icon=""  
-							  CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.RunMacro" />
-                    <MenuItem x:Name="recordMacroMenuItem" Header="Record Macro" Icon=""  
-							  CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.ToggleMacroRecording" />
-                    <MenuItem x:Name="pauseRecordingMenuItem" Header="Pause Recording" Icon=""  
-							  CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.PauseResumeMacroRecording" />
-                    <MenuItem x:Name="cancelRecordingMenuItem" Header="Cancel Recording" Icon=""  
-							  CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.CancelMacroRecording" />
+                    <MenuItem Header="Run Recorded Macro" Icon="" Command="editor:EditorCommands.RunMacro" />
+                    <MenuItem x:Name="recordMacroMenuItem" Header="Record Macro" Icon="" Command="editor:EditorCommands.ToggleMacroRecording" />
+                    <MenuItem x:Name="pauseRecordingMenuItem" Header="Pause Recording" Icon="" Command="editor:EditorCommands.PauseResumeMacroRecording" />
+                    <MenuItem x:Name="cancelRecordingMenuItem" Header="Cancel Recording" Icon="" Command="editor:EditorCommands.CancelMacroRecording" />
                     <Separator />
-                    <MenuItem x:Name="repeatActionMenuItem" Header="Repeat Action" Icon="" 
-                              Command="{Binding CustomEditCommands.RepeatActivationCommand}" />
+                    <MenuItem x:Name="repeatActionMenuItem" Header="Repeat Action" Icon="" />
+                    <!--Command="{Binding CustomEditCommands.RepeatActivationCommand}" />-->
                     <!--CommandTarget="{Binding ElementName=editor}"-->
                 </MenuItem>
                 <MenuItem Header="Window">
@@ -298,23 +310,23 @@
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                     <Separator />-->
-                    <Button CommandTarget="{Binding ElementName=editor}" Command="ApplicationCommands.Cut" ToolTip="Cut">
+                    <Button Command="ApplicationCommands.Cut" ToolTip="Cut">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
-                    <Button CommandTarget="{Binding ElementName=editor}" Command="ApplicationCommands.Copy" ToolTip="Copy">
+                    <Button Command="ApplicationCommands.Copy" ToolTip="Copy">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
-                    <Button CommandTarget="{Binding ElementName=editor}" Command="ApplicationCommands.Paste" ToolTip="Paste">
+                    <Button Command="ApplicationCommands.Paste" ToolTip="Paste">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
-                    <Button CommandTarget="{Binding ElementName=editor}" Command="ApplicationCommands.Delete" ToolTip="Delete">
+                    <Button Command="ApplicationCommands.Delete" ToolTip="Delete">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                     <Separator />
-                    <Button CommandTarget="{Binding ElementName=editor}" Command="ApplicationCommands.Undo" ToolTip="Undo">
+                    <Button Command="ApplicationCommands.Undo" ToolTip="Undo">
                         <Image Source="Resources/Images/Undo_16x.png"/>
                     </Button>
-                    <Button CommandTarget="{Binding ElementName=editor}" Command="ApplicationCommands.Redo" ToolTip="Redo">
+                    <Button Command="ApplicationCommands.Redo" ToolTip="Redo">
                         <Image Source="Resources/Images/Redo_16x.png"/>
                     </Button>
                     <Separator />
@@ -334,17 +346,17 @@
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                     <Separator />-->
-                    <Button CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.Outdent" ToolTip="Outdent">
+                    <Button Command="editor:EditorCommands.Outdent" ToolTip="Outdent">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
-                    <Button CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.Indent" ToolTip="Indent">
+                    <Button Command="editor:EditorCommands.Indent" ToolTip="Indent">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                     <Separator />
-                    <Button CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.CommentLines" ToolTip="Comment out the selected lines">
+                    <Button Command="editor:EditorCommands.CommentLines" ToolTip="Comment out the selected lines">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
-                    <Button CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.UncommentLines" ToolTip="Uncomment the selected lines">
+                    <Button Command="editor:EditorCommands.UncommentLines" ToolTip="Uncomment the selected lines">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                     <Separator />
@@ -355,16 +367,16 @@
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                     <Separator />-->
-                    <Button CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.RunMacro" ToolTip="Run Recorded Macro">
+                    <Button Command="editor:EditorCommands.RunMacro" ToolTip="Run Recorded Macro">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
-                    <Button x:Name="recordMacroButton" CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.ToggleMacroRecording" ToolTip="Record Macro">
+                    <Button x:Name="recordMacroButton" Command="editor:EditorCommands.ToggleMacroRecording" ToolTip="Record Macro">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
-                    <ToggleButton x:Name="pauseRecordingButton" CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.PauseResumeMacroRecording" ToolTip="Pause Recording">
+                    <ToggleButton x:Name="pauseRecordingButton" Command="editor:EditorCommands.PauseResumeMacroRecording" ToolTip="Pause Recording">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </ToggleButton>
-                    <Button CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.CancelMacroRecording" ToolTip="Cancel Recording">
+                    <Button Command="editor:EditorCommands.CancelMacroRecording" ToolTip="Cancel Recording">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                 </ToolBar>

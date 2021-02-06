@@ -88,12 +88,21 @@ namespace StepBro.Workbench
 
         private void SaveCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
+            TextDocumentItemView control = (TextDocumentItemView)sender;
+            e.CanExecute = control.editor.Document.IsModified && m_currentData != null;
         }
 
         private void SaveExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             System.Diagnostics.Trace.WriteLine("");
+            try
+            {
+                editor.Document.SaveFile(m_currentData.LoadedFile.FilePath, LineTerminator.CarriageReturnNewline);
+            }
+            catch
+            {
+                MessageBox.Show("Error saving file: " + m_currentData.LoadedFile.FilePath, "Save File", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         #endregion
@@ -181,6 +190,14 @@ namespace StepBro.Workbench
         private void OnEditorUserInterfaceUpdate(object sender, System.Windows.RoutedEventArgs e)
         {
 
+        }
+
+        private void editor_ViewSelectionChanged(object sender, ActiproSoftware.Windows.Controls.SyntaxEditor.EditorViewSelectionEventArgs e)
+        {
+            if (sender == editor.ActiveView && m_currentData != null)
+            {
+                m_currentData.CurrentSelectionStart = new System.Tuple<int, int>(e.View.Selection.StartPosition.Line, e.View.Selection.StartPosition.Character);
+            }
         }
     }
 

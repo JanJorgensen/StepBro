@@ -58,9 +58,9 @@ namespace StepBro.Core.Execution
                 m_value = runtimeProcedure.DynamicInvoke(invokeArguments);
                 return m_value;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
             finally
             {

@@ -113,7 +113,7 @@ namespace StepBro.Core.Data
             var pt = parameter.ParameterType;
             if (pt.IsGenericTypeDefinition) throw new ArgumentException("Generic type definition not supported.");
             if (input.IsGenericTypeDefinition) throw new ArgumentException("Generic type definition not supported.");
-            if (input.IsGenericType && pt.ContainsGenericParameters)
+            if (input.IsGenericType && pt.ContainsGenericParameters && pt.IsGenericType)
             {
                 var thistypeGenericDefinition = input.GetGenericTypeDefinition();
                 var ptTypedefinition = pt.GetGenericTypeDefinition();

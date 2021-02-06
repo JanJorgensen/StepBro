@@ -70,8 +70,11 @@ namespace StepBro.Core.Data
             this.OnMonitorDispose();
             m_state = State.MonitorDisposed;
             m_reference = null;
-            m_next.m_previous = m_previous;
-            m_previous.m_next = m_next;
+            if (m_previous != null) m_previous.m_next = m_next;
+            if (m_next != null) m_next.m_previous = m_previous;
+            m_previous = null;
+            m_next = null;
+            
             this.StateChanged?.Invoke(this, EventArgs.Empty);
         }
 

@@ -30,6 +30,7 @@ namespace StepBroWorkbenchTest
 
             var file = mainViewModel.LoadScriptFile(@"C:\SW_development\Private\StepBro\examples\scripts\Demo Procedure.sbs");
             Assert.AreEqual(1, mainViewModel.DocumentItems.Count);
+            Assert.IsTrue(mainViewModel.DocumentItems[0].IsOpen);
         }
 
         [TestMethod]
@@ -39,7 +40,8 @@ namespace StepBroWorkbenchTest
             Assert.AreEqual(0, mainViewModel.DocumentItems.Count);
 
             var file = StepBroMain.LoadScriptFile(new object(), @"C:\SW_development\Private\StepBro\examples\scripts\Demo Procedure.sbs");
-            Assert.AreEqual(0, mainViewModel.DocumentItems.Count);
+            Assert.AreEqual(1, mainViewModel.DocumentItems.Count);
+            Assert.IsFalse(mainViewModel.DocumentItems[0].IsOpen);
         }
 
         [TestMethod]

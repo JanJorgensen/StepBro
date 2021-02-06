@@ -14,7 +14,8 @@ namespace StepBro.Core.Utils
         }
         public static string ToMinutesTimestamp(this DateTime time, DateTime zero)
         {
-            return (time - zero).ToMinutesTimestamp();
+            if (time >= zero) return (time - zero).ToMinutesTimestamp();
+            else return "-" + ((zero - time).ToMinutesTimestamp());
         }
     }
 }

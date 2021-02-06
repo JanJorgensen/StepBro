@@ -9,6 +9,7 @@ namespace StepBro.Core.Data
         private string m_specifiedDataType;
         private string m_name;
         private bool m_isArrayEntry = false;
+        private bool? m_isUsedOrApproved;
 
         protected PropertyBlockEntry(int line, PropertyBlockEntryType type, string name = null)
         {
@@ -75,6 +76,16 @@ namespace StepBro.Core.Data
         public bool Is(string name, PropertyBlockEntryType type)
         {
             return m_name == name && BlockEntryType == type;
+        }
+
+        public bool IsUsedOrApproved
+        {
+            get { return m_isUsedOrApproved.HasValue ? m_isUsedOrApproved.Value : false; }
+            set
+            {
+                if (!value) throw new ArgumentOutOfRangeException();
+                m_isUsedOrApproved = true;
+            }
         }
     }
 }

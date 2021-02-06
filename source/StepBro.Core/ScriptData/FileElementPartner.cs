@@ -58,5 +58,19 @@ namespace StepBro.Core.ScriptData
             get;
             private set;
         }
+
+        private string ReferencedProcedure
+        {
+            get
+            {
+                if (this.ProcedureReference == null) return "<unresolved " + ProcedureName + ">";
+                else return ProcedureReference.FullName;
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"Partner \"{Name}\" on \"{ParentElement.FullName}\" => {ReferencedProcedure}";
+        }
     }
 }

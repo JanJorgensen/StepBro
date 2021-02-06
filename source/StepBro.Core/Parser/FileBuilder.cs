@@ -48,6 +48,7 @@ namespace StepBro.Core.Parser
         {
             var addons = AddonManager.Create();
             addons.AddAssembly(AddonManager.StepBroCoreAssembly, true);
+            addons.AddAssembly(typeof(System.DateTime).Assembly, false);
             addons.AddAssembly(typeof(System.Math).Assembly, false);
             addons.AddAssembly(typeof(System.Console).Assembly, false);
             addons.AddAssembly(typeof(System.Linq.Enumerable).Assembly, false);

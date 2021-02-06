@@ -7,6 +7,7 @@ using StepBro.Workbench.ToolViews;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Windows.Input;
 using StepBroMain = StepBro.Core.Main;
 
@@ -22,7 +23,6 @@ namespace StepBro.Workbench
         private int m_documentIndex = 1;
         private DeferrableObservableCollection<DocumentItemViewModel> m_userDocumentItems = new DeferrableObservableCollection<DocumentItemViewModel>();
         private DeferrableObservableCollection<ToolItemViewModel> m_toolItems = new DeferrableObservableCollection<ToolItemViewModel>();
-        private DeferrableObservableCollection<LoadedFileViewModel> m_loadedFilesList = new DeferrableObservableCollection<LoadedFileViewModel>();
 
         private DelegateCommand<object> m_commandActivateNextDocument;
         private DelegateCommand<object> m_commandCloseActiveDocument;
@@ -32,12 +32,18 @@ namespace StepBro.Workbench
         private DelegateCommand<string> m_commandOpenFile;
         private DelegateCommand<object> m_commandSelectFirstDocument;
         private DelegateCommand<object> m_commandParseAllFiles;
+        private DelegateCommand<object> m_commandCreateObjectPanel;
+        private ICommand m_commandShowErrorsView;
+        private ICommand m_commandShowOutputView;
         private ICommand m_commandShowCalculatorTool;
+        private readonly ErrorsViewModel m_errorsViewModel = null;
+        private readonly OutputViewModel m_outputViewModel = null;
         private readonly CalculatorViewModel m_calculatorViewModel = null;
         private readonly CommandLineOptions m_commandLineOptions = null;
         private ILoadedFilesManager m_loadedFiles = null;
         private ITask m_fileParsingTask = null;
         private string m_documentToActivateWhenLoaded = null;
+        private readonly SynchronizationContext m_syncContext;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         // OBJECT
@@ -48,11 +54,19 @@ namespace StepBro.Workbench
         /// </summary>
         public MainViewModel()
         {
+            m_syncContext = SynchronizationContext.Current;
             var cmd = ApplicationCommands.Save;
+
+            // Initialize before the views start asking for the different services.
+            StepBroMain.Initialize();
+
+            m_outputViewModel = new OutputViewModel();
+            m_errorsViewModel = new ErrorsViewModel();
             m_calculatorViewModel = new CalculatorViewModel() { State = ToolItemState.Docked };
+            m_toolItems.Add(m_outputViewModel);
+            m_toolItems.Add(m_errorsViewModel);
             m_toolItems.Add(m_calculatorViewModel);
             m_userDocumentItems.CollectionChanged += DocumentItems_CollectionChanged;
-            StepBroMain.Initialize();
             m_loadedFiles = StepBroMain.GetLoadedFilesManager();
             m_loadedFiles.FileLoaded += LoadedFiles_FileLoaded;
             m_loadedFiles.FileClosed += LoadedFiles_FileClosed;
@@ -88,14 +102,6 @@ namespace StepBro.Workbench
             }
         }
 
-        public IList<LoadedFileViewModel> LoadedFiles
-        {
-            get
-            {
-                return m_loadedFilesList;
-            }
-        }
-
         public bool FileParsingRunning
         {
             get
@@ -125,9 +131,21 @@ namespace StepBro.Workbench
         #region MODEL EVENTS
         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        private void Invoke(SendOrPostCallback func)
+        {
+            if (m_syncContext != null)
+            {
+                m_syncContext.Post(func, null);
+            }
+            else
+            {
+                func(null);
+            }
+        }
+
         private void LoadedFiles_FileLoaded(object sender, LoadedFileEventArgs args)
         {
-            if (args.File.IsDependantOf(this))
+            Invoke(o =>
             {
                 var docViewModel = new TextDocumentItemViewModel();
                 docViewModel.LoadedFile = args.File;
@@ -136,15 +154,18 @@ namespace StepBro.Workbench
                 docViewModel.PropertyChanged += DocViewModel_PropertyChanged;
 
                 m_userDocumentItems.Add(docViewModel);
-                if (String.Equals(m_documentToActivateWhenLoaded, docViewModel.FileName, StringComparison.InvariantCulture))
+                if (args.File.IsDependantOf(this))
                 {
-                    docViewModel.IsActive = true;
+                    if (String.Equals(m_documentToActivateWhenLoaded, docViewModel.FileName, StringComparison.InvariantCulture))
+                    {
+                        docViewModel.IsActive = true;
+                    }
+                    else
+                    {
+                        docViewModel.IsOpen = true;
+                    }
                 }
-                else
-                {
-                    docViewModel.IsOpen = true;
-                }
-            }
+            });
         }
 
         private void LoadedFiles_FileClosed(object sender, LoadedFileEventArgs args)
@@ -179,15 +200,29 @@ namespace StepBro.Workbench
         {
             if (String.Equals(e.PropertyName, nameof(ILoadedFile.RegisteredDependantsCount), StringComparison.InvariantCulture))
             {
-                var file = sender as ILoadedFile;
-                if (file.IsDependantOf(this))
+                Invoke(o =>
                 {
-                    // TODO: Check if not in m_documentItems yet (then add)
-                }
-                else
-                {
-                    // TODO: Check if in m_documentItems (then remove)
-                }
+                    var file = sender as ILoadedFile;
+                    var docItem = m_userDocumentItems.FirstOrDefault(d => d.LoadedFile == file);    // If document has just been closed (removed from the list).
+                    if (docItem != null)
+                    {
+                        if (file.IsDependantOf(this))
+                        {
+                            if (String.Equals(m_documentToActivateWhenLoaded, docItem.FileName, StringComparison.InvariantCulture))
+                            {
+                                docItem.IsActive = true;
+                            }
+                            else
+                            {
+                                docItem.IsOpen = true;
+                            }
+                        }
+                        else
+                        {
+                            docItem.IsOpen = false;
+                        }
+                    }
+                });
             }
         }
 
@@ -310,6 +345,25 @@ namespace StepBro.Workbench
 
         #region Application Commands
 
+        public void ShowErrorsTool(bool activate)
+        {
+            m_errorsViewModel.IsOpen = true;
+            if (activate)
+            {
+                m_errorsViewModel.IsActive = true;
+                m_errorsViewModel.IsSelected = true;
+            }
+        }
+
+        public void ShowOutputTool(bool activate)
+        {
+            m_outputViewModel.IsOpen = true;
+            if (activate)
+            {
+                m_outputViewModel.IsActive = true;
+                m_outputViewModel.IsSelected = true;
+            }
+        }
 
         public void ShowCalculatorTool(bool activate)
         {
@@ -320,6 +374,21 @@ namespace StepBro.Workbench
                 m_calculatorViewModel.IsSelected = true;
             }
         }
+
+        public void CreateObjectPanel(bool activate)
+        {
+            var panel = new ObjectPanelToolViewModel
+            {
+                IsOpen = true
+            };
+            m_toolItems.Add(panel);
+            if (activate)
+            {
+                panel.IsActive = true;
+                panel.IsSelected = true;
+            }
+        }
+
 
         ///// <summary>
         ///// Gets the create new image document command.
@@ -394,6 +463,38 @@ namespace StepBro.Workbench
             }
         }
 
+        public ICommand ShowErrorsViewCommand
+        {
+            get
+            {
+                if (m_commandShowErrorsView == null)
+                    m_commandShowErrorsView = new DelegateCommand<object>(
+                        (param) =>
+                        {
+                            ShowErrorsTool(true);
+                        }
+                    );
+
+                return m_commandShowErrorsView;
+            }
+        }
+
+        public ICommand ShowOutputViewCommand
+        {
+            get
+            {
+                if (m_commandShowOutputView == null)
+                    m_commandShowOutputView = new DelegateCommand<object>(
+                        (param) =>
+                        {
+                            ShowOutputTool(true);
+                        }
+                    );
+
+                return m_commandShowOutputView;
+            }
+        }
+
         public ICommand ShowCalculatorToolCommand
         {
             get
@@ -409,6 +510,23 @@ namespace StepBro.Workbench
                 return m_commandShowCalculatorTool;
             }
         }
+
+        public ICommand CreateObjectPanelCommand
+        {
+            get
+            {
+                if (m_commandCreateObjectPanel == null)
+                    m_commandCreateObjectPanel = new DelegateCommand<object>(
+                        (param) =>
+                        {
+                            CreateObjectPanel(true);
+                        }
+                    );
+
+                return m_commandCreateObjectPanel;
+            }
+        }
+
 
         /// <summary>
         /// Gets the select first document command.
@@ -521,10 +639,13 @@ namespace StepBro.Workbench
         {
             if (m_fileParsingTask.Control.CurrentState == TaskExecutionState.Ended)
             {
-                m_fileParsingTask.Control.CurrentStateChanged -= FileParsing_CurrentStateChanged;
-                m_fileParsingTask = null;
-                m_commandParseAllFiles.RaiseCanExecuteChanged();
-                NotifyPropertyChanged(nameof(FileParsingRunning));
+                Invoke(o =>
+                {
+                    m_fileParsingTask.Control.CurrentStateChanged -= FileParsing_CurrentStateChanged;
+                    m_fileParsingTask = null;
+                    m_commandParseAllFiles.RaiseCanExecuteChanged();
+                    NotifyPropertyChanged(nameof(FileParsingRunning));
+                });
             }
         }
 

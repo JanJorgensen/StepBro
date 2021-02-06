@@ -541,16 +541,16 @@ namespace StepBro.Core.Parser
 
         public override void VisitErrorNode([NotNull] IErrorNode node)
         {
-            System.Diagnostics.Debug.WriteLine(node.Payload.GetType().Name);
-            var t = node.Payload as CommonToken;
-            if (t != null)
-            {
-                m_errors.SyntaxError(null, null, t.Type, t.Line, t.Column, node.GetText(), null);
-            }
-            else
-            {
-                m_errors.SyntaxError(null, null, -1, -1, -1, node.GetText(), null);
-            }
+            //System.Diagnostics.Debug.WriteLine(node.Payload.GetType().Name);
+            //var t = node.Payload as CommonToken;
+            //if (t != null)
+            //{
+            //    m_errors.SyntaxError(null, null, t.Type, t.Line, t.Column, node.GetText(), null);
+            //}
+            //else
+            //{
+            //    m_errors.SyntaxError(null, null, -1, -1, -1, node.GetText(), null);
+            //}
             base.VisitErrorNode(node);
         }
     }

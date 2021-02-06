@@ -13,5 +13,6 @@ namespace StepBro.Core.Execution
         bool HasErrors { get; }
         bool HasFailsOrErrors { get; }
         ErrorID LastError { get; }
+        string Name { get; }
     }
 }

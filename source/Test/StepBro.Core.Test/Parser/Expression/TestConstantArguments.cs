@@ -48,7 +48,7 @@ namespace StepBroCoreTest.Parser
         public void ParseArgumentsWithoutSeparator()
         {
             var result = FileBuilder.ParseSimpleArguments("(1 2)");
-            Assert.AreEqual(2, result.Item2.ErrorCount);
+            Assert.AreEqual(1, result.Item2.ErrorCount);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace StepBro.Core.Logging
 
             m_oldest = new LogEntry(
                 UniqueInteger.Get(),
-                DateTime.UtcNow,
+                DateTime.Now,
                 System.Threading.Thread.CurrentThread.ManagedThreadId,
                 location,
                 starttext);

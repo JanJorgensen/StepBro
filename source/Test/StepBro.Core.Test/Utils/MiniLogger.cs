@@ -16,7 +16,7 @@ namespace StepBroCoreTest.Utils
 
             public Entry(string text, Entry previous)
             {
-                m_timestamp = DateTime.UtcNow;
+                m_timestamp = DateTime.Now;
                 m_text = text;
                 if (previous != null)
                 {

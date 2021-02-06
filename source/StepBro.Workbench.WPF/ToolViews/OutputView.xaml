@@ -4,11 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:StepBro.Workbench.ToolViews"
-             xmlns:grids="http://schemas.actiprosoftware.com/winfx/xaml/grids" 
-             x:Class="StepBro.Workbench.ToolViews.PropertiesView"
+   		     xmlns:syntaxeditor="http://schemas.actiprosoftware.com/winfx/xaml/syntaxeditor"
+		     xmlns:Controls="clr-namespace:StepBro.Workbench.Controls" 
+             xmlns:StepBroUIControls="clr-namespace:StepBro.UI.Controls;assembly=StepBro.UI" 
+             x:Class="StepBro.Workbench.ToolViews.OutputView" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <grids:PropertyGrid/>
-    </Grid>
+    <DockPanel>
+        <StepBroUIControls:LogViewer/>
+    </DockPanel>
 </UserControl>

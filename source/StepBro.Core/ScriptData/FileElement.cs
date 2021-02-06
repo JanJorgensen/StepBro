@@ -216,7 +216,9 @@ namespace StepBro.Core.ScriptData
                 {
                     if (this.ParsePropertyBlockFlag(entry.Name))
                     {
-                        continue;   // Flag was a known one
+                        // Flag was a known one.
+                        entry.IsUsedOrApproved = true;
+                        continue;
                     }
                     if (i == 0)
                     {
@@ -225,6 +227,7 @@ namespace StepBro.Core.ScriptData
                         {
                             throw new ParsingErrorException(entry.Line, m_baseElementName, "Base element unknown.");
                         }
+                        entry.IsUsedOrApproved = true;
                     }
                     continue;
                 }
@@ -234,9 +237,12 @@ namespace StepBro.Core.ScriptData
                     var typename = entry.SpecifiedTypeName;
                     object value = valueProp.Value;
 
-                    if (this.ParsePartnerProperty(listener, entry.Line, typename, entry.Name, value)) continue;
+                    if (this.ParsePartnerProperty(listener, entry.Line, typename, entry.Name, value))
+                    {
+                        entry.IsUsedOrApproved = true;
+                        continue;
+                    }
                 }
-
             }
         }
 

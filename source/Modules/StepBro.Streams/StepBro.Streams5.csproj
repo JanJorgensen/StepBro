@@ -2,15 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>StepBro.Streams</AssemblyName>
+    <RootNamespace>StepBro.Streams</RootNamespace>
     <OutputPath>..\..\bin5\Modules</OutputPath>
-    <AssemblyName>TestModule</AssemblyName>
-    <RootNamespace>TestModule</RootNamespace>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove=".gitignore" />
+    <PackageReference Include="System.IO.Ports" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

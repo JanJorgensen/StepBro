@@ -587,7 +587,7 @@ namespace StepBro.Core.Parser
                         right.Token);
                 }
             }
-            else if (leftType.IsClass)
+            else if (leftType.IsTypeDefinition)
             {
                 var methods = leftType.GetMethods().Where(mi => mi.Name == rightString).ToList();
                 methods.AddRange(m_addonManager.ListExtensionMethods(leftType).Where(mi => mi.Name == rightString));

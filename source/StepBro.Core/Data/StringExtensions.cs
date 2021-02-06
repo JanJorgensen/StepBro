@@ -15,7 +15,7 @@ namespace StepBro.Core.Data
 
         public static DateTime ParseDateTime(this string s)
         {
-            return DateTime.UtcNow; // TODO
+            return DateTime.Now; // TODO
         }
     }
 }

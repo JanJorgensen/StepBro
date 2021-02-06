@@ -24,6 +24,7 @@
                                    DocumentIsModifiedChanged="OnEditorDocumentIsModifiedChanged"
 								   DocumentParseDataChanged="OnEditorDocumentParseDataChanged"
 								   ViewSearch="OnEditorViewSearch"
+                                   ViewSelectionChanged="editor_ViewSelectionChanged"
 								   UserInterfaceUpdate="OnEditorUserInterfaceUpdate"
                                    />
 

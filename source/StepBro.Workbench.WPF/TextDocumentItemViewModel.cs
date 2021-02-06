@@ -9,6 +9,7 @@ namespace StepBro.Workbench
     public class TextDocumentItemViewModel : DocumentItemViewModel
     {
         private string text;
+        private Tuple<int, int> m_surrentSelectionStart;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         // OBJECT
@@ -21,6 +22,7 @@ namespace StepBro.Workbench
         {
             this.Description = "Text document";
             this.ImageSource = new BitmapImage(new Uri("Resources/Images/TextDocument16.png", UriKind.Relative));
+            m_surrentSelectionStart = new Tuple<int, int>(-1, -1);
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,6 +45,22 @@ namespace StepBro.Workbench
                 {
                     text = value;
                     this.NotifyPropertyChanged(nameof(Text));
+                }
+            }
+        }
+
+        public Tuple<int, int> CurrentSelectionStart
+        {
+            get
+            {
+                return m_surrentSelectionStart;
+            }
+            set
+            {
+                if (m_surrentSelectionStart != value)
+                {
+                    m_surrentSelectionStart = value;
+                    this.NotifyPropertyChanged(nameof(CurrentSelectionStart));
                 }
             }
         }

@@ -26,5 +26,20 @@ namespace StepBroCoreTest
             var result = taskContext.CallProcedure(procedure);
             Assert.AreEqual(false, (bool)result);
         }
+
+        [TestMethod]
+        public void TestThisReferenceProcedureName()
+        {
+            var f = new StringBuilder();
+            f.AppendLine("string MyProcedure() {");
+            f.AppendLine("   return this.Name;");
+            f.AppendLine("}");
+            var file = FileBuilder.ParseFile(null, f.ToString());
+            var procedure = file.GetFileElement<IFileProcedure>("MyProcedure"); ;
+
+            var taskContext = ExecutionHelper.ExeContext();
+            var result = taskContext.CallProcedure(procedure);
+            Assert.AreEqual("MyProcedure", (string)result);
+        }
     }
 }

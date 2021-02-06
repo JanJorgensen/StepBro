@@ -17,7 +17,7 @@ namespace StepBro.Core.Execution
         private ScriptTaskContext m_task;
         private ScriptCallContext m_parentContext;
         private ContextLogOption m_callLoggingOption;
-        private IFileProcedure m_procedure = null;
+        private IFileProcedure m_procedure;
         private readonly bool m_isDynamicCall;
         private TaskManager m_taskManager;
         private int m_fileLine = -1;
@@ -416,6 +416,7 @@ namespace StepBro.Core.Execution
         bool IProcedureThis.HasFailsOrErrors { get { return m_expectFailCount > 0 | m_errorCount > 0; } }
 
         ErrorID IProcedureThis.LastError { get { throw new NotImplementedException(); } }
+        string IProcedureThis.Name { get { return m_procedure.Name; } }
 
         public TaskManager TaskManager { get { return m_taskManager; } }
     }

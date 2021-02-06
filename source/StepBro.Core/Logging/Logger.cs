@@ -97,7 +97,7 @@ namespace StepBro.Core.Logging
 
         private LogEntry Log(LogEntry.Type type, string location, string text)
         {
-            return m_root.Log(m_scopeStartEntry, type, UniqueInteger.Get(), DateTime.UtcNow, m_threadID, location, text);
+            return m_root.Log(m_scopeStartEntry, type, UniqueInteger.Get(), DateTime.Now, m_threadID, location, text);
         }
 
 

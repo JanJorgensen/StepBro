@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
 
 namespace StepBro.UI.Panels
 {
@@ -13,7 +14,8 @@ namespace StepBro.UI.Panels
         public bool IsObjectPanel { get; private set; }
         public bool AllowMultipleInstances { get; private set; }
 
-        internal abstract ObjectPanel CreatePanel();
+
+        protected abstract UserControl CreatePanelView();
 
         internal ObjectPanelInfo(string name, string description, bool isObjectPanel, bool allowMultpile)
         {
@@ -38,7 +40,7 @@ namespace StepBro.UI.Panels
         }
     }
 
-    public class ObjectPanelInfo<TPanel, TObject> : ObjectPanelInfo where TPanel : ObjectPanel
+    public class ObjectPanelInfo<TPanel, TObject> : ObjectPanelInfo where TPanel : UserControl
     {
         public ObjectPanelInfo(string name, string description, bool allowMultpile) :
             base(name, description, true, allowMultpile)
@@ -52,14 +54,14 @@ namespace StepBro.UI.Panels
             return type.IsAssignableFrom(typeof(TObject));
         }
 
-        internal override ObjectPanel CreatePanel()
+        protected override UserControl CreatePanelView()
         {
             var panel = System.Activator.CreateInstance<TPanel>();
-            return (ObjectPanel)panel;
+            return (UserControl)panel;
         }
     }
 
-    public class ObjectPanelInfo<TPanel> : ObjectPanelInfo where TPanel : ObjectPanel
+    public class ObjectPanelInfo<TPanel> : ObjectPanelInfo where TPanel : UserControl
     {
         public ObjectPanelInfo(string name, string description, bool allowMultpile) :
             base(name, description, false, allowMultpile)
@@ -67,10 +69,10 @@ namespace StepBro.UI.Panels
         }
         public override string TypeIdentification { get { return typeof(TPanel).FullName; } }
 
-        internal override ObjectPanel CreatePanel()
+        protected override UserControl CreatePanelView()
         {
             var panel = System.Activator.CreateInstance<TPanel>();
-            return (ObjectPanel)panel;
+            return (UserControl)panel;
         }
     }
 

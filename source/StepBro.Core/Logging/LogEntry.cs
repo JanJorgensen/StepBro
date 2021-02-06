@@ -10,7 +10,7 @@ namespace StepBro.Core.Logging
     {
         public enum Type { Normal, Pre, Post, TaskEntry, Detail, Error, UserAction, System }
 
-        private LogEntry m_previous;
+        //private LogEntry m_previous;
         private LogEntry m_next = null;
         private LogEntry m_parent;
         private Type m_type;
@@ -22,7 +22,7 @@ namespace StepBro.Core.Logging
 
         internal LogEntry(uint id, DateTime timestamp, int thread, string location, string text)
         {
-            m_previous = null;
+            //m_previous = null;
             m_parent = null;
             m_type = Type.Pre;
             m_id = id;
@@ -34,8 +34,8 @@ namespace StepBro.Core.Logging
 
         internal LogEntry(LogEntry previous, LogEntry parent, Type type, uint id, DateTime timestamp, int thread, string location, string text)
         {
-            m_previous = previous;
-            m_previous.m_next = this;
+            //m_previous = previous;
+            previous.m_next = this;
             m_parent = parent;
             m_type = type;
             m_id = id;
@@ -52,13 +52,13 @@ namespace StepBro.Core.Logging
 
         public int IndentLevel { get { return (m_parent != null) ? m_parent.IndentLevel + 1 : 0; } }
 
-        public LogEntry Previous
-        {
-            get
-            {
-                return m_previous;
-            }
-        }
+        //public LogEntry Previous
+        //{
+        //    get
+        //    {
+        //        return m_previous;
+        //    }
+        //}
 
         public LogEntry Next
         {

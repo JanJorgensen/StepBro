@@ -3,8 +3,6 @@ using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using System;
-using System.Management;
-using System.Collections.Generic;
 
 namespace StepBro.Streams
 {
@@ -91,6 +89,9 @@ namespace StepBro.Streams
     [Public]
     public class SerialPort : Stream
     {
+        public delegate void OpenPortFailureExplorer(ICallContext context, Exception ex);
+        private static OpenPortFailureExplorer s_OpenPortFailureExplorer = null;
+
         private System.IO.Ports.SerialPort m_port;
         private long m_dataReceivedCounter = 0L;
         private ArrayFifo<byte> m_binaryFifo = null;
@@ -157,32 +158,42 @@ namespace StepBro.Streams
             return m_textualFifo;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
         protected override bool DoOpen(StepBro.Core.Execution.ICallContext context)
         {
             try
             {
                 m_port.Open();
             }
-            catch
+            catch (Exception ex)
             {
-                if (context != null && context.LoggingEnabled)
+                if (s_OpenPortFailureExplorer != null)
                 {
-                    ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\cimv2",
-                        "SELECT * FROM Win32_PnPEntity WHERE ClassGuid=\"{4d36e978-e325-11ce-bfc1-08002be10318}\"");
-
-                    // Add all available (COM)-ports to the combobox
-                    foreach (ManagementObject queryObj in searcher.Get())
-                    {
-                        context.Logger.Log("SerialPort.Open", "Available port: " + (queryObj["Caption"] as string));
-                    }
+                    s_OpenPortFailureExplorer(context, ex);
                 }
+                //if (context != null && context.LoggingEnabled)
+                //{
+                //    using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\cimv2",
+                //        "SELECT * FROM Win32_PnPEntity WHERE ClassGuid=\"{4d36e978-e325-11ce-bfc1-08002be10318}\""))
+                //    {
+
+                //        // Add all available (COM)-ports to the combobox
+                //        foreach (ManagementObject queryObj in searcher.Get())
+                //        {
+                //            context.Logger.Log("SerialPort.Open", "Available port: " + (queryObj["Caption"] as string));
+                //        }
+                //    }
+                //}
                 throw;
             }
             try
             {
                 m_port.DiscardInBuffer();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                context.ReportError(description: "Error discarding in-buffer.", exception: ex);
+            }
             return m_port.IsOpen;
         }
 

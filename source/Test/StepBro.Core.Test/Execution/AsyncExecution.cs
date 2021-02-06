@@ -48,10 +48,16 @@ namespace StepBroCoreTest.Execution
                     }
                 }
                 Assert.IsTrue(isRunning);
-                while ((DateTime.Now - execution.Task.StartTime) < TimeSpan.FromMilliseconds(5000))
+                while ((DateTime.Now - execution.Task.StartTime) < TimeSpan.FromMilliseconds(10000))
                 {
-                    if (execution.Task.CurrentState > StepBro.Core.Tasks.TaskExecutionState.Running) break;
+                    var state = execution.Task.CurrentState;
+                    if (state > StepBro.Core.Tasks.TaskExecutionState.Running)
+                    {
+                        break;
+                    }
+                    System.Threading.Thread.Sleep(1);
                 }
+                System.Diagnostics.Debug.WriteLine($"Execution time: {(execution.Task.EndTime - execution.Task.StartTime).ToString()}");
                 Assert.AreEqual(StepBro.Core.Tasks.TaskExecutionState.Ended, execution.Task.CurrentState);
 
                 var log = new LogInspector(ServiceManager.Global.Get<IMainLogger>().Logger);

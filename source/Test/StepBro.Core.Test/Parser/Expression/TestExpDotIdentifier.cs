@@ -23,7 +23,7 @@ namespace StepBroCoreTest.Parser
         public void ParseIllegalEnumValue()
         {
             var errors = ExpressionParser.ParseError("ConsoleColor.12");
-            Assert.AreEqual(2, errors.ErrorCount);
+            Assert.AreEqual(1, errors.ErrorCount);
             Assert.AreEqual("mismatched input '12' expecting IDENTIFIER", errors[0].Message);
         }
 
