@@ -100,7 +100,7 @@ namespace StepBro.Core.Parser
 
         public override void EnterFileElementFunction([NotNull] SBP.FileElementFunctionContext context)
         {
-            if (m_file.TypeScanIncluded && m_currentProcedure.IsFunction == true) throw new Exception("Procedure from type scanning is set to be a \"function\" type.");
+            //if (m_file.TypeScanIncluded && m_currentProcedure.IsFunction == true) throw new Exception("Procedure from type scanning is set to be a \"function\" type.");
             m_procedureIsFunction = true;  // In case no type scanning hsa beed performed.
         }
 

@@ -15,11 +15,11 @@ namespace StepBro.Core.Data
         /// </summary>
         FileByName,
         /// <summary>
-        /// A namespace in one or more T# script files.
+        /// A namespace in one or more StepBro script files.
         /// </summary>
         FileNamespace,
         /// <summary>
-        /// An element in a T# script file (variable, procedure, enum type etc.).
+        /// An element in a StepBro script file (variable, procedure, enum type etc.).
         /// </summary>
         FileElement,
         /// <summary>

@@ -43,6 +43,10 @@ namespace StepBroCoreTest.Data
         static public DummyClass OneInstance { get { return new DummyClass(928L); } }
         static public IDummyClass OneInstanceInterface { get { return (IDummyClass)(new DummyClass(726L)); } }
 
+        public DummyClass() : this(0)
+        {
+        }
+
         public DummyClass(long propInt)
         {
             m_propInt = propInt;

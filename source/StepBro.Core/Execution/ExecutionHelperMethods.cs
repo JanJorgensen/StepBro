@@ -284,7 +284,7 @@ namespace StepBro.Core.Execution
             {
                 foreach (var file in ServiceManager.Global.Get<ILoadedFilesManager>().ListFiles<ScriptFile>())
                 {
-                    var container = file.GetVariableContainer<T>(id);
+                    var container = file.TryGetVariableContainer<T>(id);
                     if (container != null)
                     {
                         return container;
@@ -293,7 +293,7 @@ namespace StepBro.Core.Execution
             }
             else
             {
-                var container = ((StepBro.Core.ScriptData.ScriptFile)context.Self.ParentFile).GetVariableContainer<T>(id);
+                var container = ((StepBro.Core.ScriptData.ScriptFile)context.Self.ParentFile).TryGetVariableContainer<T>(id);
                 if (container != null)
                 {
                     return container;

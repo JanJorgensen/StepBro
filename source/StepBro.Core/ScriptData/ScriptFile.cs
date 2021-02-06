@@ -359,7 +359,7 @@ namespace StepBro.Core.ScriptData
             return m_elements.FirstOrDefault(e => String.Equals(name, e.Name, StringComparison.InvariantCulture)) as T;
         }
 
-        public IValueContainer<T> GetVariableContainer<T>(int id)
+        public IValueContainer<T> TryGetVariableContainer<T>(int id)
         {
             var t = typeof(T);
             foreach (var v in m_fileScopeVariables)
@@ -380,11 +380,29 @@ namespace StepBro.Core.ScriptData
             foreach (var uf in m_fileUsings)
             {
                 var file = uf.Identifier.Reference as ScriptFile;
-                var found = file.GetVariableContainer<T>(id);
+                var found = file.TryGetVariableContainer<T>(id);
                 if (found != null) return found;
             }
+            foreach (var un in m_namespaceUsings)
+            {
+                if (un.Identifier.Type == IdentifierType.FileNamespace && un.Identifier.Reference != null)
+                {
+                    var files = un.Identifier.Reference as List<ScriptFile>;
+                    if (files != null)
+                    {
+                        foreach (var f in files)
+                        {
+                            var found = f.TryGetVariableContainer<T>(id);
+                            if (found != null)
+                            {
+                                return found;
+                            }
+                        }
+                    }
+                }
+            }
 
-            throw new ArgumentException("The specified variable id was not found.");
+            return null;
         }
 
         public void SaveCurrentFileVariables()
