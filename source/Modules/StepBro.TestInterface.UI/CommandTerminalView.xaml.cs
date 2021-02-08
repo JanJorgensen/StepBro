@@ -12,6 +12,6 @@ namespace StepBro.TestInterface.Controls
         public CommandTerminal()
         {
             this.InitializeComponent();
-        }
+       }
     }
 }

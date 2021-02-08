@@ -40,12 +40,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Images\ActiproAppIcon.ico" />
-    <Resource Include="Resources\Images\ActiproIcon.ico" />
-    <Resource Include="Resources\Images\ActiproMetro24.png" />
     <Resource Include="Resources\Images\BreakpointEnable_16x.png" />
     <Resource Include="Resources\Images\Calculator_16x.png" />
     <Resource Include="Resources\Images\ClassView16.png" />
+    <Resource Include="Resources\Images\Compile_16x.png" />
     <Resource Include="Resources\Images\CSProjectNode_16x.png" />
     <Resource Include="Resources\Images\Find16.png" />
     <Resource Include="Resources\Images\FindResults16.png" />

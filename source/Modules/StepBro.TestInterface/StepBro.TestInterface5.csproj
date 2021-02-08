@@ -28,9 +28,7 @@
     <ProjectReference Include="..\..\StepBro.Core\StepBro.Core5.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\StepBro.Streams\StepBro.Streams5.csproj">
-      <Private>false</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\StepBro.Streams\StepBro.Streams.csproj" />
   </ItemGroup>
 
 </Project>

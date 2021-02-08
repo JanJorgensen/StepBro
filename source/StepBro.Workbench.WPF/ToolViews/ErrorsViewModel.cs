@@ -10,21 +10,6 @@ namespace StepBro.Workbench.ToolViews
 {
     public class ErrorsViewModel : ToolItemViewModel
     {
-        public class ErrorInfo
-        {
-            public string Severity { get; private set; }
-            public string Description { get; private set; }
-            public string File { get; private set; }
-            public int DisplayLine { get; private set; }
-            public ErrorInfo(string severity, string description, string file, int line)
-            {
-                this.Severity = severity;
-                this.Description = description;
-                this.File = file;
-                this.DisplayLine = line;
-            }
-        }
-
         private readonly DeferrableObservableCollection<ErrorInfo> m_errors = new DeferrableObservableCollection<ErrorInfo>();
         //private DelegateCommand<object> m_commandActivateError;
 
@@ -33,7 +18,15 @@ namespace StepBro.Workbench.ToolViews
             this.SerializationId = "ToolErrors";
             this.Title = "Errors";
 
-            m_errors.Add(new ErrorInfo("Low", "Remember the breakfast", "todo.txt", 23));
+            //m_errors.Add(new ErrorInfo(ErrorType.Environment, "Info", "Remember the breakfast", "todo.txt", 23));
+        }
+
+        public ErrorsViewModel(DeferrableObservableCollection<ErrorInfo> errors) : this()
+        {
+            this.SerializationId = "ToolErrors";
+            this.Title = "Errors";
+
+            m_errors = errors;
         }
 
 

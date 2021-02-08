@@ -11,7 +11,10 @@
     >
     <!--Icon="/Resources/Images/ActiproAppIcon.ico"-->
     <UserControl.InputBindings>
+        <KeyBinding Key="F5" Command="{Binding StartOrContinueExecutionCommand}" />
+        <KeyBinding Key="F5" Modifiers="Ctrl+Shift" Command="{Binding StartExecutionOfSelectedFileElementCommand}" />
         <KeyBinding Key="F6" Command="{Binding ParseAllFilesCommand}" />
+        <KeyBinding Key="C" Modifiers="Ctrl+Shift" Command="{Binding ShowCalculatorToolCommand}" />
     </UserControl.InputBindings>
     <UserControl.Resources>
 
@@ -217,8 +220,16 @@
                 </MenuItem>
                 <MenuItem Header="View">
                     <MenuItem Header="Error List" Command="{Binding ShowErrorsViewCommand}"/>
-                    <MenuItem Header="Output" Command="{Binding ShowOutputViewCommand}"/>
-                    <MenuItem Header="Calculator" Command="{Binding ShowCalculatorToolCommand}"/>
+                    <MenuItem Header="Output" Command="{Binding ShowOutputViewCommand}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/Images/Output16.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Calculator" Command="{Binding ShowCalculatorToolCommand}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/Images/Calculator_16x.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <MenuItem Header="Object Panel TBD" Command="{Binding CreateObjectPanelCommand}"/>
                     <!--<MenuItem Header="Open Object Panel" ItemsSource="{Binding CreateableObjectPanelsList}">
                         <MenuItem.ItemContainerStyle>
@@ -258,23 +269,47 @@
                     </MenuItem>-->
                 </MenuItem>
                 <MenuItem Header="Script">
-                    <MenuItem Header="Run"/>
-                    <MenuItem Header="Run Element Selected In Editor"/>
+                    <MenuItem Header="Run" Command="{Binding StartOrContinueExecutionCommand}" InputGestureText="F5">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/Images/Run_16x.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Run Element Selected In Editor" Command="{Binding StartExecutionOfSelectedFileElementCommand}" InputGestureText="Ctrl+Shift+F5">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/Images/Run_16x.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <Separator />
-                    <MenuItem Header="Step Into" IsEnabled="False"/>
-                    <MenuItem Header="Step Over" IsEnabled="False"/>
-                    <MenuItem Header="Step Out" IsEnabled="False"/>
+                    <MenuItem Header="Step Into" IsEnabled="False">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/Images/StepIn_16x.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Step Over" IsEnabled="False">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/Images/StepOver_16x.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Step Out" IsEnabled="False">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/Images/StepOut_16x.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <Separator />
-                    <MenuItem Header="Parse All Files" Command="{Binding ParseAllFilesCommand}" InputGestureText="F6"/>
+                    <MenuItem Header="Parse All Files" Command="{Binding ParseAllFilesCommand}" InputGestureText="F6">
+                        <MenuItem.Icon>
+                            <Image Source="Resources/Images/Compile_16x.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <MenuItem Header="Debug Mode" IsEnabled="False"/>
                 </MenuItem>
                 <MenuItem Header="Macros">
                     <MenuItem Header="Run Saved Macro">
                     </MenuItem>
-                    <MenuItem Header="Run Recorded Macro" Icon="" Command="editor:EditorCommands.RunMacro" />
-                    <MenuItem x:Name="recordMacroMenuItem" Header="Record Macro" Icon="" Command="editor:EditorCommands.ToggleMacroRecording" />
-                    <MenuItem x:Name="pauseRecordingMenuItem" Header="Pause Recording" Icon="" Command="editor:EditorCommands.PauseResumeMacroRecording" />
-                    <MenuItem x:Name="cancelRecordingMenuItem" Header="Cancel Recording" Icon="" Command="editor:EditorCommands.CancelMacroRecording" />
+                    <MenuItem Header="Run Recorded Macro" Command="editor:EditorCommands.RunMacro" />
+                    <MenuItem x:Name="recordMacroMenuItem" Header="Record Macro" Command="editor:EditorCommands.ToggleMacroRecording" />
+                    <MenuItem x:Name="pauseRecordingMenuItem" Header="Pause Recording" Command="editor:EditorCommands.PauseResumeMacroRecording" />
+                    <MenuItem x:Name="cancelRecordingMenuItem" Header="Cancel Recording" Command="editor:EditorCommands.CancelMacroRecording" />
                     <Separator />
                     <MenuItem x:Name="repeatActionMenuItem" Header="Repeat Action" Icon="" />
                     <!--Command="{Binding CustomEditCommands.RepeatActivationCommand}" />-->
@@ -310,7 +345,7 @@
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                     <Separator />-->
-                    <Button Command="ApplicationCommands.Cut" ToolTip="Cut">
+                    <!--<Button Command="ApplicationCommands.Cut" ToolTip="Cut">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                     <Button Command="ApplicationCommands.Copy" ToolTip="Copy">
@@ -322,15 +357,15 @@
                     <Button Command="ApplicationCommands.Delete" ToolTip="Delete">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
-                    <Separator />
+                    <Separator />-->
                     <Button Command="ApplicationCommands.Undo" ToolTip="Undo">
                         <Image Source="Resources/Images/Undo_16x.png"/>
                     </Button>
                     <Button Command="ApplicationCommands.Redo" ToolTip="Redo">
                         <Image Source="Resources/Images/Redo_16x.png"/>
                     </Button>
-                    <Separator />
-                    <!--<Button CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.RequestIntelliPromptCompletionSession" ToolTip="Display an Object Member List">
+                    <!--<Separator />
+                    <Button CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.RequestIntelliPromptCompletionSession" ToolTip="Display an Object Member List">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                     <Button CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.RequestIntelliPromptParameterInfoSession" ToolTip="Display Parameter Info">
@@ -344,22 +379,22 @@
                     </Button>
                     <Button CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.RequestIntelliPromptInsertSnippetSession" ToolTip="Insert Snippet">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
-                    </Button>
-                    <Separator />-->
+                    </Button>-->
+                    <Separator />
                     <Button Command="editor:EditorCommands.Outdent" ToolTip="Outdent">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                     <Button Command="editor:EditorCommands.Indent" ToolTip="Indent">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
-                    <Separator />
+                    <!--<Separator />
                     <Button Command="editor:EditorCommands.CommentLines" ToolTip="Comment out the selected lines">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                     <Button Command="editor:EditorCommands.UncommentLines" ToolTip="Uncomment the selected lines">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
-                    </Button>
-                    <Separator />
+                    </Button>-->
+                    <!--<Separator />-->
                     <!--<Button CommandTarget="{Binding ElementName=editor}" Command="editor:EditorCommands.FormatDocument" ToolTip="Format Document">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
@@ -367,7 +402,7 @@
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                     <Separator />-->
-                    <Button Command="editor:EditorCommands.RunMacro" ToolTip="Run Recorded Macro">
+                    <!--<Button Command="editor:EditorCommands.RunMacro" ToolTip="Run Recorded Macro">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                     <Button x:Name="recordMacroButton" Command="editor:EditorCommands.ToggleMacroRecording" ToolTip="Record Macro">
@@ -378,6 +413,24 @@
                     </ToggleButton>
                     <Button Command="editor:EditorCommands.CancelMacroRecording" ToolTip="Cancel Recording">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
+                    </Button>-->
+                </ToolBar>
+                <ToolBar>
+                    <Button Command="{Binding ParseAllFilesCommand}" ToolTip="Parse all files">
+                        <Image Source="Resources/Images/Compile_16x.png"/>
+                    </Button>
+                    <Button Command="{Binding StartOrContinueExecutionCommand}" ToolTip="Start or continue execution">
+                        <Image Source="Resources/Images/Run_16x.png"/>
+                    </Button>
+                    <editor:SyntaxEditor x:Name="executionTarget" IsMultiLine="False" MinWidth="160" ToolTip="Start or continue execution"/>
+                    <Button ToolTip="Step Into">
+                        <Image Source="Resources/Images/StepIn_16x.png"/>
+                    </Button>
+                    <Button ToolTip="Step Over">
+                        <Image Source="Resources/Images/StepOver_16x.png"/>
+                    </Button>
+                    <Button ToolTip="Step Out">
+                        <Image Source="Resources/Images/StepOut_16x.png"/>
                     </Button>
                 </ToolBar>
             </ToolBarTray>

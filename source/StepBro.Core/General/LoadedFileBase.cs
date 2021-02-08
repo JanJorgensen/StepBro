@@ -56,7 +56,7 @@ namespace StepBro.Core.General
         {
             get
             {
-                return LoadedFileType.Unknown;
+                return m_fileType;
             }
         }
 

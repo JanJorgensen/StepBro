@@ -399,7 +399,7 @@ namespace StepBroCoreTest.Execution
 
             var files = FileBuilder.ParseFiles((ILogger)null,
                 new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()),
-                new Tuple<string, string>("TestFramework." + Main.StepBroFileExtension, this.CreateTestFrameworkFile()));
+                new Tuple<string, string>("TestFramework." + Main.StepBroFileExtension, CreateTestFrameworkFile()));
             var myfile = files.First(file => file.FileName == "myfile." + Main.StepBroFileExtension);
             var framework = files.First(file => file.FileName == "TestFramework." + Main.StepBroFileExtension);
 
@@ -519,8 +519,8 @@ namespace StepBroCoreTest.Execution
             var files = FileBuilder.ParseFiles((ILogger)null, typeof(DummyClass).Assembly,
                 new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()),
                 new Tuple<string, string>("SomeTool." + Main.StepBroFileExtension, tf.ToString()),
-                new Tuple<string, string>("CompanyTestFramework." + Main.StepBroFileExtension, this.CreateCompanyTestFrameworkFile()),
-                new Tuple<string, string>("TestFramework." + Main.StepBroFileExtension, this.CreateTestFrameworkFile()));
+                new Tuple<string, string>("CompanyTestFramework." + Main.StepBroFileExtension, CreateCompanyTestFrameworkFile()),
+                new Tuple<string, string>("TestFramework." + Main.StepBroFileExtension, CreateTestFrameworkFile()));
             var myfile = files.First(file => file.FileName == "myfile." + Main.StepBroFileExtension);
             var company = files.First(file => file.FileName == "CompanyTestFramework." + Main.StepBroFileExtension);
             var framework = files.First(file => file.FileName == "TestFramework." + Main.StepBroFileExtension);
@@ -593,7 +593,7 @@ namespace StepBroCoreTest.Execution
             log.ExpectEnd();
         }
 
-        public string CreateCompanyTestFrameworkFile()
+        public static string CreateCompanyTestFrameworkFile()
         {
             var f = new StringBuilder();
             f.AppendLine("public using \"TestFramework.sbs\";");
@@ -625,7 +625,7 @@ namespace StepBroCoreTest.Execution
             return f.ToString();
         }
 
-        public string CreateTestFrameworkFile()
+        public static string CreateTestFrameworkFile()
         {
             var f = new StringBuilder();
             f.AppendLine("procedure void TestCaseBase() :");

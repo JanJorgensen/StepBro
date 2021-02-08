@@ -628,7 +628,7 @@ namespace StepBro.Core.Execution
                         $"Exception executing method '{name}' on the object of type '{instance.GetType().Name}'.",
                         ex);
                 }
-                throw ex;
+                throw;
             }
         }
 

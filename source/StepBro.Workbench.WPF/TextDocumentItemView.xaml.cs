@@ -1,8 +1,10 @@
 ﻿using ActiproSoftware.Text;
 using ActiproSoftware.Text.Implementation;
+using ActiproSoftware.Windows.Controls.SyntaxEditor;
 using StepBro.Core.Parser;
 using StepBro.UI.SyntaxEditorSupport;
 using StepBro.Workbench.Editor;
+using System;
 using System.Windows;
 using System.Windows.Input;
 
@@ -99,8 +101,9 @@ namespace StepBro.Workbench
             {
                 editor.Document.SaveFile(m_currentData.LoadedFile.FilePath, LineTerminator.CarriageReturnNewline);
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
                 MessageBox.Show("Error saving file: " + m_currentData.LoadedFile.FilePath, "Save File", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -194,7 +197,7 @@ namespace StepBro.Workbench
 
         private void editor_ViewSelectionChanged(object sender, ActiproSoftware.Windows.Controls.SyntaxEditor.EditorViewSelectionEventArgs e)
         {
-            if (sender == editor.ActiveView && m_currentData != null)
+            if (((SyntaxEditor)sender).ActiveView == editor.ActiveView && m_currentData != null)
             {
                 m_currentData.CurrentSelectionStart = new System.Tuple<int, int>(e.View.Selection.StartPosition.Line, e.View.Selection.StartPosition.Character);
             }

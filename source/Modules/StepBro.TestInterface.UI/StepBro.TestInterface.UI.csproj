@@ -21,9 +21,6 @@
     <ProjectReference Include="..\..\StepBro.UI\StepBro.UI.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\StepBro.Streams\StepBro.Streams5.csproj">
-      <Private>false</Private>
-    </ProjectReference>
     <ProjectReference Include="..\StepBro.TestInterface\StepBro.TestInterface5.csproj">
       <Private>false</Private>
     </ProjectReference>

@@ -469,10 +469,10 @@ namespace StepBro.Core.ScriptData
                     var lambdaExpr = Expression.Lambda(m_delegateType, body, m_parametersInternal.Select(p => (ParameterExpression)p.Reference));
                     m_runtimeProcedure = lambdaExpr.Compile();
                 }
-                catch (Exception ex)
+                catch
                 {
                     m_runtimeProcedure = null;
-                    throw ex;
+                    throw;
                 }
             }
             else

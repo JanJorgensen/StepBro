@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using StepBro.Core.ScriptData;
 using System.IO;
+using System.Collections.Specialized;
 
 namespace StepBro.Core.Parser
 {
@@ -14,7 +15,8 @@ namespace StepBro.Core.Parser
         bool JustWarning { get; }
         string Message { get; }
     }
-    public interface IErrorCollector
+
+    public interface IErrorCollector : INotifyCollectionChanged
     {
         IScriptFile File { get; }
         int ErrorCount { get; }
@@ -23,7 +25,7 @@ namespace StepBro.Core.Parser
         event EventHandler EventListChanged;
     }
 
-    internal class ErrorCollector : BaseErrorListener, IErrorCollector, IAntlrErrorListener<IToken>, IAntlrErrorListener<int>
+    internal class ErrorCollector : BaseErrorListener, IErrorCollector, IAntlrErrorListener<IToken>, IAntlrErrorListener<int>, INotifyCollectionChanged
     {
         public class ErrorData : IErrorData
         {
@@ -88,24 +90,27 @@ namespace StepBro.Core.Parser
 
         public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
         {
-            m_errors.Add(new ErrorData(recognizer, offendingSymbol, line, charPositionInLine, msg, e));
-            this.NotifyListChanged();
+            var err = new ErrorData(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
+            m_errors.Add(err);
+            this.NotifyAdd(err);
             System.Diagnostics.Trace.WriteLine("PARSING ERROR: " + msg);
             if (m_throwOnSyntax) throw new Exception(msg);
         }
  
         public void SyntaxError(TextWriter output, IRecognizer recognizer, int offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
         {
-            m_errors.Add(new ErrorData(recognizer, offendingSymbol, line, charPositionInLine, msg, e));
-            this.NotifyListChanged();
+            var err = new ErrorData(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
+            m_errors.Add(err);
+            this.NotifyAdd(err);
             System.Diagnostics.Trace.WriteLine("LEXER ERROR: " + msg);
             if (m_throwOnSyntax) throw new Exception(msg);
         }
 
         public void SymanticError(int line, int charPositionInLine, bool justWarning, string description)
         {
-            m_errors.Add(new ErrorData(line, charPositionInLine, description, justWarning));
-            this.NotifyListChanged();
+            var err = new ErrorData(line, charPositionInLine, description, justWarning);
+            m_errors.Add(err);
+            this.NotifyAdd(err);
             if (m_throwOnSyntax) throw new Exception(description);
         }
 
@@ -136,8 +141,9 @@ namespace StepBro.Core.Parser
 
         public void InternalError(int line, int charPositionInLine, string description)
         {
-            m_errors.Add(new ErrorData(line, charPositionInLine, "INTERNAL ERROR. " + description, false));
-            this.NotifyListChanged();
+            var err = new ErrorData(line, charPositionInLine, "INTERNAL ERROR. " + description, false);
+            m_errors.Add(err);
+            this.NotifyAdd(err);
 #if (DEBUG)
             throw new Exception("INTERNAL ERROR. " + description);
 #endif
@@ -158,15 +164,23 @@ namespace StepBro.Core.Parser
             if (m_errors.Count > 0)
             {
                 m_errors.Clear();
-                this.NotifyListChanged();
+                NotifyReset();
             }
         }
 
-        private void NotifyListChanged()
+        private void NotifyAdd(ErrorData error)
         {
-            this.EventListChanged?.Invoke(this, EventArgs.Empty);
+            this.CollectionChanged?.Invoke(m_file, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, error));
+            this.EventListChanged?.Invoke(this, new EventArgs());
         }
 
+        private void NotifyReset()
+        {
+            this.CollectionChanged?.Invoke(m_file, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            this.EventListChanged?.Invoke(this, new EventArgs());
+        }
+
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
         public event EventHandler EventListChanged;
     }
 }

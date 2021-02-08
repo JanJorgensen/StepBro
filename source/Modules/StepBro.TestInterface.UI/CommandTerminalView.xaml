@@ -56,8 +56,7 @@
                 <Button DockPanel.Dock="Right" Content="Show Toolbar"/>
             </StackPanel>
         </StackPanel>
-        <TextBlock/>
-        <Controls:SimpleLogViewer />
+        <Controls:SimpleLogViewer Name="logViewer"/>
         <!--<controls:SimpleLogViewer x:Name="log"/>-->
     </DockPanel>
 </UserControl>

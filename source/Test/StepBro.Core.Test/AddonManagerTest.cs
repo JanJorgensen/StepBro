@@ -43,18 +43,15 @@ namespace StepBroCoreTest
             typeReference = addons.TryGetType(usings, "TestClassWithOnlyProperties");
             Assert.IsNotNull(typeReference);
             Assert.AreEqual("TestClassWithOnlyProperties", typeReference.Name);
-            typeReference = null;
 
             typeReference = addons.TryGetType(usings, "SubNamespace.Deep.VeryDeep.MuchDeeper.TestClassInDeepNamespace.SubClass");
             Assert.IsNotNull(typeReference);
             Assert.AreEqual("SubClass", typeReference.Name);
-            typeReference = null;
 
             usings = new UsingData[] { new UsingData(-1, addons.Lookup(null, "TestModule")), new UsingData(-1, addons.Lookup(null, "TestModule.SubNamespace.Deep")) };
             typeReference = addons.TryGetType(usings, "VeryDeep.MuchDeeper.TestClassInDeepNamespace.SubClass");
             Assert.IsNotNull(typeReference);
             Assert.AreEqual("SubClass", typeReference.Name);
-            typeReference = null;
 
             //var moduleClass = typeReference as ICodeModuleClass;
             //Assert.IsNotNull(moduleClass);

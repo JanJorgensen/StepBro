@@ -7,7 +7,7 @@ using StepBroMain = StepBro.Core.Main;
 namespace StepBroWorkbenchTest
 {
     [TestClass]
-    public class TestMainViewModel
+    public class TestFileLoading
     {
         [TestCleanup]
         public void Cleanup()

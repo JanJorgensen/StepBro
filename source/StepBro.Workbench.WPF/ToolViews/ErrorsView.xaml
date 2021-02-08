@@ -6,9 +6,6 @@
              xmlns:local="clr-namespace:StepBro.Workbench.ToolViews"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.DataContext>
-        <local:ErrorsViewModel/>
-    </UserControl.DataContext>
     <Grid>
         <ListView x:Name="errorListView" BorderThickness="0" ItemsSource="{Binding ErrorList}">
             <ListView.ItemContainerStyle>
@@ -31,7 +28,7 @@
                 <GridView>
                     <GridViewColumn Header="" Width="40" DisplayMemberBinding="{Binding Path=Severity}" />
                     <GridViewColumn Header="Description" Width="400" DisplayMemberBinding="{Binding Path=Description}" />
-                    <GridViewColumn Header="File" Width="160" DisplayMemberBinding="{Binding Path=File}" />
+                    <GridViewColumn Header="File" Width="160" DisplayMemberBinding="{Binding Path=FileName}" />
                     <GridViewColumn Header="Line" Width="40" DisplayMemberBinding="{Binding Path=DisplayLine}" />
                 </GridView>
             </ListView.View>

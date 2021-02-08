@@ -776,36 +776,45 @@ namespace StepBro.Core.Parser
             #region STEP 4: PARSE ALL THE FILES #
             //=================================//
             int totalErrors = 0;
-            foreach (var file in filesToParse)
+            try
             {
-                file.SaveCurrentFileVariables();
-                StepBroListener listener;
-                if (file.Errors.ErrorCount == 0)
+                foreach (var file in filesToParse)
                 {
-                    if (fileListeners.TryGetValue(file, out listener))
+                    file.SaveCurrentFileVariables();
+                    StepBroListener listener;
+                    if (file.Errors.ErrorCount == 0)
                     {
-                        var context = fileContexts[file];
-
-                        try
+                        if (fileListeners.TryGetValue(file, out listener))
                         {
-                            var walker = new ParseTreeWalker();
-                            walker.Walk(listener, context);
+                            var context = fileContexts[file];
+
+                            try
+                            {
+                                var walker = new ParseTreeWalker();
+                                walker.Walk(listener, context);
+                            }
+                            finally { }
                         }
-                        finally { }
+                        else
+                        {
+                            throw new NotImplementedException();
+                        }
                     }
-                    else
+                    totalErrors += file.Errors.ErrorCount;
+                    if (file.Errors.ErrorCount == 0)
                     {
-                        throw new NotImplementedException();
+                        file.InitializeFileVariables(logger);
+                        file.LastParsing = DateTime.Now;
+                        file.DisposeUnusedFileVariables(logger);
                     }
                 }
-                totalErrors += file.Errors.ErrorCount;
-                if (file.Errors.ErrorCount == 0)
+            }
+            finally
+            {
+                foreach (var file in filesToParse)
                 {
-                    file.InitializeFileVariables(logger);
-                    file.LastParsing = DateTime.Now;
-                    file.DisposeUnusedFileVariables(logger);
+                    file.DisposeFileStream();
                 }
-                file.DisposeFileStream();
             }
             #endregion
 

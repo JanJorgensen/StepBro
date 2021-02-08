@@ -1,6 +1,8 @@
 ﻿using ActiproSoftware.Windows;
 using ActiproSoftware.Windows.Input;
+using StepBro.Core.Execution;
 using StepBro.Core.General;
+using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using StepBro.Workbench.ToolViews;
@@ -21,17 +23,20 @@ namespace StepBro.Workbench
     {
 
         private int m_documentIndex = 1;
-        private DeferrableObservableCollection<DocumentItemViewModel> m_userDocumentItems = new DeferrableObservableCollection<DocumentItemViewModel>();
-        private DeferrableObservableCollection<ToolItemViewModel> m_toolItems = new DeferrableObservableCollection<ToolItemViewModel>();
+        private readonly DeferrableObservableCollection<DocumentItemViewModel> m_userDocumentItems = new DeferrableObservableCollection<DocumentItemViewModel>();
+        private readonly DeferrableObservableCollection<ToolItemViewModel> m_toolItems = new DeferrableObservableCollection<ToolItemViewModel>();
+        private readonly DeferrableObservableCollection<ErrorInfo> m_errors = new DeferrableObservableCollection<ErrorInfo>();
+        private readonly DeferrableObservableCollection<IFileElement> m_allFileElements = new DeferrableObservableCollection<IFileElement>();
 
         private DelegateCommand<object> m_commandActivateNextDocument;
         private DelegateCommand<object> m_commandCloseActiveDocument;
-        //private DelegateCommand<object> createNewImageDocumentCommand;
         private DelegateCommand<object> m_commandCreateNewStepBroDocument;
         private DelegateCommand<object> m_commandCreateNewTextDocument;
         private DelegateCommand<string> m_commandOpenFile;
         private DelegateCommand<object> m_commandSelectFirstDocument;
         private DelegateCommand<object> m_commandParseAllFiles;
+        private DelegateCommand<object> m_commandStartExecution;
+        private DelegateCommand<object> m_commandStartExecutionOfSelectedFileElement;
         private DelegateCommand<object> m_commandCreateObjectPanel;
         private ICommand m_commandShowErrorsView;
         private ICommand m_commandShowOutputView;
@@ -42,6 +47,7 @@ namespace StepBro.Workbench
         private readonly CommandLineOptions m_commandLineOptions = null;
         private ILoadedFilesManager m_loadedFiles = null;
         private ITask m_fileParsingTask = null;
+        private IScriptExecution m_mainScriptExecution = null;
         private string m_documentToActivateWhenLoaded = null;
         private readonly SynchronizationContext m_syncContext;
 
@@ -61,7 +67,8 @@ namespace StepBro.Workbench
             StepBroMain.Initialize();
 
             m_outputViewModel = new OutputViewModel();
-            m_errorsViewModel = new ErrorsViewModel();
+            m_errorsViewModel = new ErrorsViewModel(m_errors);
+            m_errors.Add(new ErrorInfo(ErrorType.Environment, "Info", "Remember the breakfast", "todo.txt", 23));
             m_calculatorViewModel = new CalculatorViewModel() { State = ToolItemState.Docked };
             m_toolItems.Add(m_outputViewModel);
             m_toolItems.Add(m_errorsViewModel);
@@ -112,6 +119,11 @@ namespace StepBro.Workbench
 
         #endregion
 
+        private DocumentItemViewModel GetActiveDocument()
+        {
+            return m_userDocumentItems.FirstOrDefault(d => d.IsActive);
+        }
+
         #region VIEWMODEL EVENTS
 
         private void DocumentItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -153,6 +165,12 @@ namespace StepBro.Workbench
                 docViewModel.Text = args.File.OffDiskFileContent;
                 docViewModel.PropertyChanged += DocViewModel_PropertyChanged;
 
+                var scriptFile = args.File as IScriptFile;
+                if (scriptFile != null)
+                {
+                    scriptFile.Errors.CollectionChanged += ScriptFileErrors_CollectionChanged;
+                }
+
                 m_userDocumentItems.Add(docViewModel);
                 if (args.File.IsDependantOf(this))
                 {
@@ -164,6 +182,27 @@ namespace StepBro.Workbench
                     {
                         docViewModel.IsOpen = true;
                     }
+                }
+            });
+        }
+
+        private void ScriptFileErrors_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            Invoke(o =>
+            {
+                switch (e.Action)
+                {
+                    case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                        m_errors.Add(new ErrorInfo((IScriptFile)sender, (IErrorData)e.NewItems[0]));
+                        break;
+                    case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                        for (int i = m_errors.Count - 1; i >= 0; i--)
+                        {
+                            if (m_errors[i].Type == ErrorType.ParsingError) m_errors.RemoveAt(i);
+                        }
+                        break;
+                    default:
+                        break;
                 }
             });
         }
@@ -647,6 +686,133 @@ namespace StepBro.Workbench
                     NotifyPropertyChanged(nameof(FileParsingRunning));
                 });
             }
+        }
+
+        public ICommand StartOrContinueExecutionCommand
+        {
+            get
+            {
+                if (m_commandStartExecution == null)
+                    m_commandStartExecution = new DelegateCommand<object>(
+                        (param) =>
+                        {
+                            //m_fileParsingTask = StepBroMain.StartFileParsing(false);
+                            //m_fileParsingTask.Control.CurrentStateChanged += FileParsing_CurrentStateChanged;
+                            //m_commandParseAllFiles.RaiseCanExecuteChanged();
+                            //NotifyPropertyChanged(nameof(FileParsingRunning));
+                        },
+                        (param) =>
+                        {
+                            return (m_fileParsingTask == null && m_userDocumentItems.Count > 0);
+                        }
+                    );
+
+                return m_commandStartExecution;
+            }
+        }
+
+        public ICommand StartExecutionOfSelectedFileElementCommand
+        {
+            get
+            {
+                if (m_commandStartExecutionOfSelectedFileElement == null)
+                    m_commandStartExecutionOfSelectedFileElement = new DelegateCommand<object>(
+                        (param) =>
+                        {
+                            var active = GetActiveDocument();
+                            if (active != null && active.LoadedFile != null && active.LoadedFile.Type == LoadedFileType.StepBroScript)
+                            {
+                                var editModel = active as TextDocumentItemViewModel;
+                                var file = active.LoadedFile as IScriptFile;
+                                IFileElement element = null;
+                                var selectionLine = editModel.CurrentSelectionStart.Item1;    // Make line number 1-based
+                                foreach (var fe in file.ListElements())
+                                {
+                                    if (fe.Line <= selectionLine && (element == null || element.Line < fe.Line))
+                                    {
+                                        element = fe;
+                                    }
+                                }
+                                if (element != null)
+                                {
+                                    if (element is IFileProcedure)
+                                    {
+                                        m_mainScriptExecution = StepBro.Core.Main.StartProcedureExecution(element as IFileProcedure);
+                                        m_mainScriptExecution.Task.CurrentStateChanged += MainScriptExecution_CurrentStateChanged;
+                                    }
+                                    else
+                                    {
+                                        // TODO: Show comment in status bar
+                                    }
+                                }
+                                else
+                                {
+                                    // TODO: Show comment in status bar
+                                }
+                            }
+                        },
+                        (param) =>
+                        {
+                            var active = GetActiveDocument();
+                            return (m_fileParsingTask == null &&
+                                    m_mainScriptExecution == null &&
+                                    m_userDocumentItems.Count > 0 &&
+                                    active != null &&
+                                    !active.IsModified &&
+                                    active.LoadedFile != null &&
+                                    active.LoadedFile.Type == LoadedFileType.StepBroScript);
+                        }
+                    );
+
+                return m_commandStartExecutionOfSelectedFileElement;
+            }
+        }
+
+        private void MainScriptExecution_CurrentStateChanged(object sender, EventArgs e)
+        {
+            switch (m_mainScriptExecution.Task.CurrentState)
+            {
+                case TaskExecutionState.Created:
+                    Invoke(OnScriptExecutionRunning);
+                    break;
+                case TaskExecutionState.Started:
+                case TaskExecutionState.AwaitingStartCondition:
+                    break;
+                case TaskExecutionState.Running:
+                    Invoke(OnScriptExecutionRunning);
+                    break;
+                case TaskExecutionState.RunningNotResponding:
+                    break;
+                case TaskExecutionState.PauseRequested:
+                    break;
+                case TaskExecutionState.Paused:
+                    Invoke(OnScriptExecutionPaused);
+                    break;
+                case TaskExecutionState.StopRequested:
+                    break;
+                case TaskExecutionState.KillRequested:
+                    break;
+                case TaskExecutionState.Terminating:
+                    break;
+                case TaskExecutionState.Ended:
+                    Invoke(OnScriptExecutionEnded);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        void OnScriptExecutionRunning(object? state)
+        {
+        }
+        void OnScriptExecutionPaused(object? state)
+        {
+        }
+        void OnScriptExecutionEnded(object? state)
+        {
+            m_mainScriptExecution.Task.CurrentStateChanged -= this.MainScriptExecution_CurrentStateChanged;
+            m_mainScriptExecution = null;
         }
 
         #endregion
