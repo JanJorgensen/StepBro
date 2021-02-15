@@ -75,6 +75,27 @@ namespace StepBro.Core.Parser
             }
         }
 
+        public override void EnterUsingDeclarationWithIdentifierAlias([NotNull] SBP.UsingDeclarationWithIdentifierAliasContext context)
+        {
+            m_expressionData.PushStackLevel("Using identifier alias");
+        }
+
+        public override void ExitUsingDeclarationWithIdentifierAlias([NotNull] SBP.UsingDeclarationWithIdentifierAliasContext context)
+        {
+            var stack = m_expressionData.PopStackLevel();
+            if (!m_file.TypeScanIncluded)
+            {
+                var identifierExpression = stack.Pop();
+                if (identifierExpression.IsUnresolvedIdentifier)
+                {
+                    var identifier = (string)identifierExpression.Value;
+                    // TODO: check the identifier
+                    m_file.AddNamespaceUsing(context.Start.Line, identifier);
+                    throw new NotImplementedException();
+                }
+            }
+        }
+
         public override void EnterUsingDeclarationWithPath([NotNull] SBP.UsingDeclarationWithPathContext context)
         {
         }

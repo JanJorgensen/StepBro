@@ -120,7 +120,7 @@ namespace StepBro.Core.Parser
                 while (argumentStack.Count > 0) arguments.Insert(0, this.ResolveIfIdentifier(argumentStack.Pop(), true)); // First pushed first in list.
             }
 
-            var matchingMethods = new List<MethodInfo>();
+            var matchingMethods = new List<Tuple<MethodInfo, int>>();
             var suggestedAssignmentsForMatchingMethods = new List<List<SBExpressionData>>();
             Expression instance = null;
             var callType = ParansExpressionType.MethodCall;
@@ -337,7 +337,7 @@ namespace StepBro.Core.Parser
                 var constructedMethod = m;
                 var extensionInstance = m.IsExtension() ? instance : null;
                 List<SBExpressionData> suggestedAssignments = new List<SBExpressionData>();
-                if (this.CheckMethodArguments(
+                int score = this.CheckMethodArguments(
                     ref constructedMethod,
                     callType == ParansExpressionType.ProcedureCall || callType == ParansExpressionType.FunctionCall,
                     firstParIsThis,
@@ -345,22 +345,53 @@ namespace StepBro.Core.Parser
                     m_currentProcedure?.ContextReferenceInternal,
                     extensionInstance,
                     arguments,
-                    suggestedAssignments))
+                    suggestedAssignments);
+                if (score > 0)
                 {
-                    matchingMethods.Add(constructedMethod);
+                    matchingMethods.Add(new Tuple<MethodInfo, int>(constructedMethod, score));
                     suggestedAssignmentsForMatchingMethods.Add(suggestedAssignments);
                 }
             }
 
+            int bestMatch = -1;
             if (matchingMethods.Count == 1)
             {
-                selectedMethod = matchingMethods[0];
+                bestMatch = 0;
+            }
+            else if (matchingMethods.Count > 1)
+            {
+                int max = matchingMethods[0].Item2;
+                int maxAt = 0;
+                int numAtMax = 1;
+                for (var i = 1; i < matchingMethods.Count; i++)
+                {
+                    if (matchingMethods[i].Item2 > max) 
+                    {
+                        max = matchingMethods[i].Item2;
+                        maxAt = i;
+                        numAtMax = 1;
+                    }
+                    else if (matchingMethods[i].Item2 == max)
+                    {
+                        numAtMax++;
+                    }
+                }
+                if (numAtMax == 1)
+                {
+                    bestMatch = maxAt;
+                }
+            }
+
+            if (bestMatch >= 0)
+            {
+                selectedMethod = matchingMethods[bestMatch].Item1;
+                var suggestedAssignments = suggestedAssignmentsForMatchingMethods[bestMatch];
+
                 returnType = new TypeReference(selectedMethod.ReturnType);
                 if (selectedMethod.IsExtension())
                 {
                     instance = null;
                 }
-                var suggestedAssignments = suggestedAssignmentsForMatchingMethods[0];
                 methodArguments = new List<SBExpressionData>();
                 int i = 0;
                 foreach (var p in selectedMethod.GetParameters())
@@ -617,7 +648,7 @@ namespace StepBro.Core.Parser
             NoArguments
         }
 
-        internal bool CheckMethodArguments(
+        internal int CheckMethodArguments(
             ref MethodInfo method,
             bool isProcedure, bool firstParIsThis,
             Expression instance,
@@ -630,6 +661,8 @@ namespace StepBro.Core.Parser
             ListElementPicker<SBExpressionData> argPicker = new ListElementPicker<SBExpressionData>(arguments);
             ArgumentInsertState state = ArgumentInsertState.Initial;
             bool thisParameterHandled = false;
+            int matchScore = 1000;
+
             if (isProcedure) state = ArgumentInsertState.ProcedureContext;
             else if (extensionInstance != null) state = ArgumentInsertState.ExtensionInstance;
 
@@ -724,7 +757,7 @@ namespace StepBro.Core.Parser
                             else
                             {
                                 // TODO: report error; unexpected that args before current are not picked.
-                                return false;
+                                return 0;
                             }
                         }
                         else if (IsParameterAssignableFromArgument(p, argPicker.Current))
@@ -764,7 +797,7 @@ namespace StepBro.Core.Parser
                     }
                     else
                     {
-                        return false;   // Wrong type of 'this' reference
+                        return 0;   // Wrong type of 'this' reference
                     }
                 }
 
@@ -789,7 +822,7 @@ namespace StepBro.Core.Parser
                         else
                         {
                             // TODO: Report argument not found, maybe
-                            return false;
+                            return 0;
                         }
                     }
                 }
@@ -802,7 +835,7 @@ namespace StepBro.Core.Parser
                     if (!argPicker.AllBeforeCurrentArePickedAndOthersUnpicked())
                     {
                         // TODO: report error, maybe
-                        return false;
+                        return 0;
                     }
                     if (argPicker.UnpickedCount == 1 && p.ParameterType.IsAssignableFrom(argPicker.Current.DataType.Type))
                     {
@@ -825,7 +858,7 @@ namespace StepBro.Core.Parser
                             else
                             {
                                 // TODO: report error, maybe
-                                return false;
+                                return 0;
                             }
                         }
                         suggestedAssignmentsOut.Add(new SBExpressionData(Expression.NewArrayInit(t, paramsArgs)));
@@ -858,7 +891,7 @@ namespace StepBro.Core.Parser
                         else
                         {
                             // TODO: Report argument not found, maybe
-                            return false;
+                            return 0;
                         }
                     }
                 }
@@ -867,9 +900,9 @@ namespace StepBro.Core.Parser
             if (suggestedAssignmentsOut.Count >= parameters.Length)
             {
                 if (argPicker.PickedCount < arguments.Count) throw new Exception("Not all passed arguments are used!");   // TODO: report in a better way.
-                return true;
+                return matchScore;
             }
-            return false;
+            return 0;
         }
 
         internal bool CreateArgumentsForDynamicCall(

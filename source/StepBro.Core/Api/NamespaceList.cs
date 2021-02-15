@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using StepBro.Core.Data;
 
 namespace StepBro.Core.Api
 {
-    public class NamespaceList
+    public class NamespaceList : IIdentifierInfo
     {
         private string m_name;
         private string m_fullName;
@@ -15,6 +16,12 @@ namespace StepBro.Core.Api
 
         public string Name { get { return m_name; } }
         public string FullName { get { return m_fullName; } }
+
+        public IdentifierType Type { get { return IdentifierType.DotNetNamespace; } }
+
+        public TypeReference DataType { get { return null; } }
+
+        public object Reference { get { return this; } }
 
         public override string ToString()
         {

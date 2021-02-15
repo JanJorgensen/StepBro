@@ -3,7 +3,7 @@ using ActiproSoftware.Windows.Controls.SyntaxEditor;
 using ActiproSoftware.Windows.Controls.SyntaxEditor.IntelliPrompt;
 using ActiproSoftware.Windows.Controls.SyntaxEditor.IntelliPrompt.Implementation;
 
-namespace StepBro.Workbench
+namespace StepBro.UI.Controls
 {
 
 	/// <summary>
@@ -105,35 +105,35 @@ namespace StepBro.Workbench
 			var highlightingStyleRegistry = view.HighlightingStyleRegistry;
 			session.Items.Add(
 				new CompletionItem(
-					"aField", 
+					"Andros", 
 					new CommonImageSourceProvider(CommonImageKind.MethodPublic),
 					new HtmlContentProvider("<img src=\"resource:FieldPrivate\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">int</span> <b>Foo.aField</b>")));
 			
-			session.Items.Add(new CompletionItem("AMethod", new CommonImageSourceProvider(CommonImageKind.MethodPublic),
-				new HtmlContentProvider("<img src=\"resource:MethodPublic\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">void</span> <b>Foo.AMethod</b>()")));
+			//session.Items.Add(new CompletionItem("AMethod", new CommonImageSourceProvider(CommonImageKind.MethodPublic),
+			//	new HtmlContentProvider("<img src=\"resource:MethodPublic\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">void</span> <b>Foo.AMethod</b>()")));
 			
-			session.Items.Add(new CompletionItem("AnIntValue", new CommonImageSourceProvider(CommonImageKind.PropertyPublic),
-				new HtmlContentProvider("<img src=\"resource:PropertyPublic\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">int</span> <b>Foo.AnIntValue</b>")));
+			//session.Items.Add(new CompletionItem("AnIntValue", new CommonImageSourceProvider(CommonImageKind.PropertyPublic),
+			//	new HtmlContentProvider("<img src=\"resource:PropertyPublic\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">int</span> <b>Foo.AnIntValue</b>")));
 			
-			session.Items.Add(new CompletionItem("AStringValue", new CommonImageSourceProvider(CommonImageKind.PropertyPublic),
-				new HtmlContentProvider("<img src=\"resource:PropertyPublic\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">string</span> <b>Foo.AStringValue</b>")));
+			//session.Items.Add(new CompletionItem("AStringValue", new CommonImageSourceProvider(CommonImageKind.PropertyPublic),
+			//	new HtmlContentProvider("<img src=\"resource:PropertyPublic\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">string</span> <b>Foo.AStringValue</b>")));
 			
-			session.Items.Add(new CompletionItem("Equals", new CommonImageSourceProvider(CommonImageKind.MethodPublic),
-				new HtmlContentProvider("<img src=\"resource:MethodPublic\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() +
-					";\">bool</span> <b>object.Equals</b>(<span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">object</span> obj)<br/><span style=\"color: " +
-					HtmlContentProvider.GetCommentForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">Determines whether the specified <b>System.Object</b> is equal to the current <b>System.Object</b>.</span>")));
+			//session.Items.Add(new CompletionItem("Equals", new CommonImageSourceProvider(CommonImageKind.MethodPublic),
+			//	new HtmlContentProvider("<img src=\"resource:MethodPublic\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() +
+			//		";\">bool</span> <b>object.Equals</b>(<span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">object</span> obj)<br/><span style=\"color: " +
+			//		HtmlContentProvider.GetCommentForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">Determines whether the specified <b>System.Object</b> is equal to the current <b>System.Object</b>.</span>")));
 			
-			session.Items.Add(new CompletionItem("GetHashCode", new CommonImageSourceProvider(CommonImageKind.MethodPublic),
-				new HtmlContentProvider("<img src=\"resource:MethodPublic\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() +
-				";\">int</span> <b>object.GetHashCode</b>()<br/><span style=\"color: " + HtmlContentProvider.GetCommentForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">Gets a hash code for this <b>System.Object</b>.</span>")));
+			//session.Items.Add(new CompletionItem("GetHashCode", new CommonImageSourceProvider(CommonImageKind.MethodPublic),
+			//	new HtmlContentProvider("<img src=\"resource:MethodPublic\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() +
+			//	";\">int</span> <b>object.GetHashCode</b>()<br/><span style=\"color: " + HtmlContentProvider.GetCommentForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">Gets a hash code for this <b>System.Object</b>.</span>")));
 			
-			session.Items.Add(new CompletionItem("GetType", new CommonImageSourceProvider(CommonImageKind.MethodPublic),
-				new HtmlContentProvider("<img src=\"resource:MethodPublic\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetTypeNameForegroundColor(highlightingStyleRegistry).ToWebColor() +
-				";\">Type</span> <b>object.GetType</b>()<br/><span style=\"color: " + HtmlContentProvider.GetCommentForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">Gets the <b>System.Type</b> of the current instance.</span>")));
+			//session.Items.Add(new CompletionItem("GetType", new CommonImageSourceProvider(CommonImageKind.MethodPublic),
+			//	new HtmlContentProvider("<img src=\"resource:MethodPublic\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetTypeNameForegroundColor(highlightingStyleRegistry).ToWebColor() +
+			//	";\">Type</span> <b>object.GetType</b>()<br/><span style=\"color: " + HtmlContentProvider.GetCommentForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">Gets the <b>System.Type</b> of the current instance.</span>")));
 			
-			session.Items.Add(new CompletionItem("ToString", new CommonImageSourceProvider(CommonImageKind.MethodPublic),
-				new HtmlContentProvider("<img src=\"resource:MethodPublic\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() +
-				";\">string</span> <b>object.ToString</b>()<br/><span style=\"color: " + HtmlContentProvider.GetCommentForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">Returns the string representation of the object.</span>")));
+			//session.Items.Add(new CompletionItem("ToString", new CommonImageSourceProvider(CommonImageKind.MethodPublic),
+			//	new HtmlContentProvider("<img src=\"resource:MethodPublic\" align=\"absbottom\" /> <span style=\"color: " + HtmlContentProvider.GetKeywordForegroundColor(highlightingStyleRegistry).ToWebColor() +
+			//	";\">string</span> <b>object.ToString</b>()<br/><span style=\"color: " + HtmlContentProvider.GetCommentForegroundColor(highlightingStyleRegistry).ToWebColor() + ";\">Returns the string representation of the object.</span>")));
 
 			if (session.Items.Count > 0)
 			{

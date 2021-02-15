@@ -449,12 +449,15 @@ namespace StepBro.Core.Execution
         public static IProcedureReference<T> GetPartnerReference<T>(
             IScriptCallContext context, IFileElement element, string partnerName)
         {
+            Type t = typeof(T);
             var e = element;
             while (e != null)
             {
                 var partner = e.ListPartners().FirstOrDefault(p => p.Name.Equals(partnerName, StringComparison.InvariantCulture));
                 if (partner != null)
                 {
+                    System.Diagnostics.Debug.WriteLine("Expected type: " + typeof(T).FullName);
+                    System.Diagnostics.Debug.WriteLine("Found type:    " + partner.ProcedureReference.ProcedureReference.GetType().GetGenericArguments()[0].FullName);
                     if (partner.ProcedureReference.ProcedureReference is IProcedureReference<T>)
                     {
                         return partner.ProcedureReference.ProcedureReference as IProcedureReference<T>;

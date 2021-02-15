@@ -23,6 +23,7 @@ namespace StepBro.Core.Data
             //{
             //    throw new Exception();
             //}
+            var tn = type.Name;
             m_type = type;
             m_dynamicType = reference;
         }
@@ -44,8 +45,8 @@ namespace StepBro.Core.Data
             {
                 var trObj = obj as TypeReference;
                 if (trObj == null || trObj.Type != this.Type) return false;
-                if ((this.DynamicType == null) != (trObj.DynamicType != null)) return false;
-                if (this.DynamicType != null && Object.ReferenceEquals(this.DynamicType, trObj.DynamicType)) return false;
+                if ((this.DynamicType == null) != (trObj.DynamicType == null)) return false;
+                if (this.DynamicType != null && !Object.ReferenceEquals(this.DynamicType, trObj.DynamicType)) return false;
                 return true;
             }
             else if (obj is Type)

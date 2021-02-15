@@ -1,4 +1,5 @@
 ﻿using Antlr4.Runtime;
+using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.General;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace StepBro.Core.ScriptData
 {
@@ -28,6 +30,11 @@ namespace StepBro.Core.ScriptData
         private DateTime m_lastFileChange = DateTime.MinValue;
         private readonly DateTime m_lastTypeScan = DateTime.MinValue;
         private readonly DateTime m_lastParsing = DateTime.MinValue;
+
+        /// <summary>
+        /// Reachable script elements and namespaces with this files current usings.
+        /// </summary>
+        private Dictionary<string, List<IIdentifierInfo>> m_rootIdentifiers = null;
 
         public event EventHandler ObjectContainerListChanged;
 
@@ -223,23 +230,23 @@ namespace StepBro.Core.ScriptData
             m_fileProperties = props;
         }
 
-        internal bool AddNamespaceUsing(int line, string namespaceOrType)
+        internal bool AddNamespaceUsing(int line, string namespaceOrType, string alias = null)
         {
             if (m_namespaceUsings.Select(u => u.Identifier.Name).FirstOrDefault(u => String.Equals(u, namespaceOrType, StringComparison.InvariantCultureIgnoreCase)) != null)
             {
                 return false;
             }
-            m_namespaceUsings.Add(new UsingData(line, new IdentifierInfo(namespaceOrType, namespaceOrType, IdentifierType.UnresolvedType, null, null)));
+            m_namespaceUsings.Add(new UsingData(line, alias, new IdentifierInfo(namespaceOrType, namespaceOrType, IdentifierType.UnresolvedType, null, null)));
             return true;
         }
 
-        internal bool AddNamespaceUsing(int line, IIdentifierInfo identifier)
+        internal bool AddNamespaceUsing(int line, IIdentifierInfo identifier, string alias = null)
         {
             if (m_namespaceUsings.Select(u => u.Identifier.FullName).FirstOrDefault(u => String.Equals(u, identifier.FullName, StringComparison.InvariantCultureIgnoreCase)) != null)
             {
                 return false;
             }
-            m_namespaceUsings.Add(new UsingData(line, identifier));
+            m_namespaceUsings.Add(new UsingData(line, alias, identifier));
             return true;
         }
 
@@ -475,6 +482,13 @@ namespace StepBro.Core.ScriptData
             }
         }
 
+        public IEnumerable<IFileElement> ListPublicElements(string userNamespace, bool onlyLocal = false)
+        {
+            AccessModifier access = AccessModifier.Public;
+            if (String.Equals(userNamespace, m_namespace, StringComparison.InvariantCulture)) access = AccessModifier.Protected;
+            foreach (var element in this.ListElements().Where(e => e.AccessLevel >= access)) yield return element;
+        }
+
         public IFileElement this[string name]
         {
             get
@@ -542,9 +556,116 @@ namespace StepBro.Core.ScriptData
             }
         }
 
+        internal void UpdateRootIdentifiers()
+        {
+            if (m_rootIdentifiers == null) m_rootIdentifiers = new Dictionary<string, List<IIdentifierInfo>>();
+            else m_rootIdentifiers.Clear();
+
+            foreach (var element in this.ListElements())
+            {
+                this.AddRootIdentifier(element.Name, element);
+            }
+
+            foreach (var fu in this.ListResolvedFileUsings())
+            {
+                foreach (var element in fu.ListPublicElements(m_namespace))
+                {
+                    this.AddRootIdentifier(element.Name, element);
+                }
+            }
+            foreach (var nu in this.ListResolvedNamespaceUsings())
+            {
+                switch (nu.Type)
+                {
+                    case IdentifierType.DotNetNamespace:
+                        {
+                            var ns = nu.Reference as NamespaceList;
+                            foreach (var sub in ns.ListSubNamespaces(false))
+                            {
+                                this.AddRootIdentifier(sub.Name, sub);
+                            }
+                            foreach (var type in ns.ListTypes(false))
+                            {
+                                this.AddRootIdentifier(type.Name, new IdentifierInfo(type.Name, type.FullName, IdentifierType.DotNetType, new TypeReference(type), null));
+                            }
+                        }
+                        break;
+                    case IdentifierType.DotNetType:
+                        {
+                            var types = nu.DataType.Type.GetNestedTypes();
+                            foreach (var t in types)
+                            {
+                                this.AddRootIdentifier(t.Name, new IdentifierInfo(t.Name, t.FullName, IdentifierType.DotNetType, new TypeReference(t), null));
+                            }
+                            var methods = nu.DataType.Type.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                            foreach (var m in methods)
+                            {
+                                if (!m.IsSpecialName)
+                                {
+                                    this.AddRootIdentifier(m.Name, new IdentifierInfo(m.Name, m.Name, IdentifierType.DotNetMethod, null, m));
+                                }
+                            }
+                        }
+                        break;
+                    case IdentifierType.FileByName:
+                        throw new NotImplementedException();
+
+                    case IdentifierType.FileNamespace:
+                        foreach (var file in ((IEnumerable<ScriptFile>)nu.Reference))
+                        {
+                            foreach (var element in file.ListPublicElements(m_namespace))
+                            {
+                                this.AddRootIdentifier(element.Name, element);
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            foreach (var na in ListResolvedAliasUsings())
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        private void AddRootIdentifier(string name, IIdentifierInfo info)
+        {
+            if (!m_rootIdentifiers.ContainsKey(name))
+            {
+                var list = new List<IIdentifierInfo>();
+                list.Add(info);
+                m_rootIdentifiers[name] = list;
+            }
+            else
+            {
+                m_rootIdentifiers[name].Add(info);
+            }
+        }
+
+        public List<IIdentifierInfo> LookupIdentifier(string identifier)
+        {
+            List<IIdentifierInfo> result = null;
+            if (m_rootIdentifiers != null)
+            {
+                m_rootIdentifiers.TryGetValue(identifier, out result);
+            }
+            else
+            {
+                result = this.ListElements().Where(e => e.Name.Equals(identifier, StringComparison.InvariantCulture)).Cast<IIdentifierInfo>().ToList();
+                if (result.Count == 0) return null;
+            }
+            return result;
+        }
+
         internal IEnumerable<IIdentifierInfo> ListResolvedNamespaceUsings()
         {
-            return m_namespaceUsings.Where(e => e.Identifier.Type != IdentifierType.UnresolvedType).Select(nu => nu.Identifier);
+            return m_namespaceUsings.Where(e => e.Identifier.Type != IdentifierType.UnresolvedType && !e.IsAlias).Select(nu => nu.Identifier);
+        }
+        internal IEnumerable<Tuple<string, IIdentifierInfo>> ListResolvedAliasUsings()
+        {
+            return m_namespaceUsings.Where(e => e.Identifier.Type != IdentifierType.UnresolvedType && e.IsAlias).
+                Select(nu => new Tuple<string, IIdentifierInfo>(nu.Alias, nu.Identifier));
         }
 
         internal IEnumerable<ScriptFile> ListResolvedFileUsings()

@@ -60,11 +60,7 @@ namespace StepBro.Core.Parser.BinaryOperators
                 #region Variable
                 if (first.IsValueType && last.IsValueType)
                 {
-                    if (first.IsInt && last.IsInt)
-                    {
-                        return new SBExpressionData(this.EqualityExpression(first.ExpressionCode, last.ExpressionCode));
-                    }
-                    else if (first.IsDecimal && last.IsDecimal)
+                    if (first.DataType.Equals(last.DataType))
                     {
                         return new SBExpressionData(this.EqualityExpression(first.ExpressionCode, last.ExpressionCode));
                     }
@@ -76,16 +72,9 @@ namespace StepBro.Core.Parser.BinaryOperators
                     {
                         return new SBExpressionData(this.EqualityExpression(first.ExpressionCode, last.ConvertToDouble().ExpressionCode));
                     }
-                    else if (first.IsTimespan && last.IsTimespan)
-                    {
-                        return new SBExpressionData(this.EqualityExpression(first.ExpressionCode, last.ConvertToDouble().ExpressionCode));
-                    }
-                    else if (first.IsDateTime && last.IsDateTime)
-                    {
-                        return new SBExpressionData(this.EqualityExpression(first.ExpressionCode, last.ConvertToDouble().ExpressionCode));
-                    }
                     else
                     {
+                        if (first.DataType.Equals(last.DataType)) throw new NotImplementedException();
                         throw new NotImplementedException();
                     }
                 }

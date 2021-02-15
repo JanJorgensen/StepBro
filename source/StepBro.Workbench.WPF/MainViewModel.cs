@@ -49,6 +49,7 @@ namespace StepBro.Workbench
         private ITask m_fileParsingTask = null;
         private IScriptExecution m_mainScriptExecution = null;
         private string m_documentToActivateWhenLoaded = null;
+        private string m_executionTarget = "tadaa!";
         private readonly SynchronizationContext m_syncContext;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,6 +115,19 @@ namespace StepBro.Workbench
             get
             {
                 return (m_fileParsingTask != null);
+            }
+        }
+
+        public string ExecutionTarget
+        {
+            get { return m_executionTarget; }
+            set
+            {
+                if (!value.Equals(m_executionTarget, StringComparison.InvariantCulture))
+                {
+                    m_executionTarget = value;
+                    this.NotifyPropertyChanged(nameof(ExecutionTarget));
+                }
             }
         }
 
@@ -660,9 +674,12 @@ namespace StepBro.Workbench
                         (param) =>
                         {
                             m_fileParsingTask = StepBroMain.StartFileParsing(false);
-                            m_fileParsingTask.Control.CurrentStateChanged += FileParsing_CurrentStateChanged;
-                            m_commandParseAllFiles.RaiseCanExecuteChanged();
-                            NotifyPropertyChanged(nameof(FileParsingRunning));
+                            if (m_fileParsingTask != null)
+                            {
+                                m_fileParsingTask.Control.CurrentStateChanged += FileParsing_CurrentStateChanged;
+                                m_commandParseAllFiles.RaiseCanExecuteChanged();
+                                NotifyPropertyChanged(nameof(FileParsingRunning));
+                            }
                         },
                         (param) =>
                         {
@@ -737,6 +754,7 @@ namespace StepBro.Workbench
                                 {
                                     if (element is IFileProcedure)
                                     {
+                                        this.ExecutionTarget = element.FullName;
                                         m_mainScriptExecution = StepBro.Core.Main.StartProcedureExecution(element as IFileProcedure);
                                         m_mainScriptExecution.Task.CurrentStateChanged += MainScriptExecution_CurrentStateChanged;
                                     }

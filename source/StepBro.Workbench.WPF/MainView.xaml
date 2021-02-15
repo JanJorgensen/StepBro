@@ -1,4 +1,4 @@
-<UserControl x:Class="StepBro.Workbench.MainView"
+<UserControl
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:themes="http://schemas.actiprosoftware.com/winfx/xaml/themes"
@@ -6,40 +6,31 @@
     xmlns:shared="http://schemas.actiprosoftware.com/winfx/xaml/shared" 
 	xmlns:editor="http://schemas.actiprosoftware.com/winfx/xaml/syntaxeditor"
     xmlns:local="clr-namespace:StepBro.Workbench"
-    xmlns:localeditor="clr-namespace:StepBro.Workbench.Editor"
     xmlns:localviews="clr-namespace:StepBro.Workbench.ToolViews"
+    x:Class="StepBro.Workbench.MainView"
     >
-    <!--Icon="/Resources/Images/ActiproAppIcon.ico"-->
-    <UserControl.InputBindings>
-        <KeyBinding Key="F5" Command="{Binding StartOrContinueExecutionCommand}" />
-        <KeyBinding Key="F5" Modifiers="Ctrl+Shift" Command="{Binding StartExecutionOfSelectedFileElementCommand}" />
-        <KeyBinding Key="F6" Command="{Binding ParseAllFilesCommand}" />
-        <KeyBinding Key="C" Modifiers="Ctrl+Shift" Command="{Binding ShowCalculatorToolCommand}" />
-    </UserControl.InputBindings>
     <UserControl.Resources>
-
         <local:ToolItemDockSideConverter x:Key="ToolItemDockSideConverter" />
         <local:ToolItemStateConverter x:Key="ToolItemStateConverter" />
-
-        <Style x:Key="DockingWindowStyle" TargetType="docking:DockingWindow">
-            <Setter Property="Description" Value="{Binding Path=Description, Mode=TwoWay}" />
-            <Setter Property="ImageSource" Value="{Binding Path=ImageSource, Mode=TwoWay}" />
-            <Setter Property="IsActive" Value="{Binding Path=IsActive, Mode=TwoWay}" />
-            <Setter Property="IsFloating" Value="{Binding Path=IsFloating, Mode=TwoWay}" />
-            <Setter Property="IsOpen" Value="{Binding Path=IsOpen, Mode=TwoWay}" />
-            <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}" />
-            <Setter Property="SerializationId" Value="{Binding Path=SerializationId, Mode=TwoWay}" />
-            <Setter Property="Title" Value="{Binding Path=Title, Mode=TwoWay}" />
-            <Setter Property="WindowGroupName" Value="{Binding Path=WindowGroupName, Mode=TwoWay}" />
+        <Style x:Key="DockingWindowStyle" TargetType="{x:Type docking:DockingWindow}">
+            <Setter Property="Description" Value="{Binding Description, Mode=TwoWay}" />
+            <Setter Property="ImageSource" Value="{Binding ImageSource, Mode=TwoWay}" />
+            <Setter Property="IsActive" Value="{Binding IsActive, Mode=TwoWay}" />
+            <Setter Property="IsFloating" Value="{Binding IsFloating, Mode=TwoWay}" />
+            <Setter Property="IsOpen" Value="{Binding IsOpen, Mode=TwoWay}" />
+            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+            <Setter Property="SerializationId" Value="{Binding SerializationId, Mode=TwoWay}" />
+            <Setter Property="Title" Value="{Binding Title, Mode=TwoWay}" />
+            <Setter Property="WindowGroupName" Value="{Binding WindowGroupName, Mode=TwoWay}" />
         </Style>
 
-        <Style x:Key="DocumentWindowStyle" TargetType="docking:DocumentWindow" BasedOn="{StaticResource DockingWindowStyle}">
-            <Setter Property="FileName" Value="{Binding Path=FileName, Mode=TwoWay}" />
-            <Setter Property="IsReadOnly" Value="{Binding Path=IsReadOnly, Mode=TwoWay}" />
+        <Style x:Key="DocumentWindowStyle" TargetType="{x:Type docking:DocumentWindow}" BasedOn="{StaticResource DockingWindowStyle}">
+            <Setter Property="FileName" Value="{Binding FileName, Mode=TwoWay}" />
+            <Setter Property="IsReadOnly" Value="{Binding IsReadOnly, Mode=TwoWay}" />
         </Style>
-        <Style x:Key="ToolWindowStyle" TargetType="docking:ToolWindow" BasedOn="{StaticResource DockingWindowStyle}">
-            <Setter Property="DefaultDockSide" Value="{Binding Path=DefaultDockSide, Mode=TwoWay, Converter={StaticResource ToolItemDockSideConverter}}" />
-            <Setter Property="State" Value="{Binding Path=State, Mode=TwoWay, Converter={StaticResource ToolItemStateConverter}}" />
+        <Style x:Key="ToolWindowStyle" TargetType="{x:Type docking:ToolWindow}" BasedOn="{StaticResource DockingWindowStyle}">
+            <Setter Property="DefaultDockSide" Value="{Binding DefaultDockSide, Converter={StaticResource ToolItemDockSideConverter}, Mode=TwoWay}" />
+            <Setter Property="State" Value="{Binding State, Converter={StaticResource ToolItemStateConverter}, Mode=TwoWay}" />
         </Style>
 
         <!-- NOTE: The implicit DataTemplates defined here should normally be placed in Application.Resources so that they will be found by floating windows -->
@@ -72,6 +63,13 @@
         </local:ToolItemTemplateSelector>
 
     </UserControl.Resources>
+    <!--Icon="/Resources/Images/ActiproAppIcon.ico"-->
+    <UserControl.InputBindings>
+        <KeyBinding Key="F5" Command="{Binding StartOrContinueExecutionCommand}" />
+        <KeyBinding Key="F5" Modifiers="Ctrl+Shift" Command="{Binding StartExecutionOfSelectedFileElementCommand}" />
+        <KeyBinding Key="F6" Command="{Binding ParseAllFilesCommand}" />
+        <KeyBinding Key="C" Modifiers="Ctrl+Shift" Command="{Binding ShowCalculatorToolCommand}" />
+    </UserControl.InputBindings>
     <UserControl.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Open" CanExecute="OpenCanExecute" Executed="OpenExecuted" />
     </UserControl.CommandBindings>
@@ -96,7 +94,7 @@
 
                 <docking:ToolWindowContainer>
                     <docking:ToolWindow Title="Documents List" ImageSource="/Resources/Images/TextDocument16.png" ContainerDockedSize="200, 150">
-                        <ListView ItemsSource="{Binding ElementName=dockSite, Path=DocumentItemsSource}" SelectedIndex="0" BorderThickness="0">
+                        <ListView ItemsSource="{Binding DocumentItemsSource, ElementName=dockSite}" SelectedIndex="0" BorderThickness="0">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="150" Header="Title" DisplayMemberBinding="{Binding Title}" />
@@ -108,7 +106,7 @@
                         </ListView>
                     </docking:ToolWindow>
                     <docking:ToolWindow Title="Tools List" ImageSource="/Resources/Images/TextDocument16.png" ContainerDockedSize="200, 150">
-                        <ListView ItemsSource="{Binding ElementName=dockSite, Path=ToolItemsSource}" SelectedIndex="0" BorderThickness="0">
+                        <ListView ItemsSource="{Binding ToolItemsSource, ElementName=dockSite}" SelectedIndex="0" BorderThickness="0">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="150" Header="Title" DisplayMemberBinding="{Binding Title}" />
@@ -304,8 +302,7 @@
                     <MenuItem Header="Debug Mode" IsEnabled="False"/>
                 </MenuItem>
                 <MenuItem Header="Macros">
-                    <MenuItem Header="Run Saved Macro">
-                    </MenuItem>
+                    <MenuItem Header="Run Saved Macro"/>
                     <MenuItem Header="Run Recorded Macro" Command="editor:EditorCommands.RunMacro" />
                     <MenuItem x:Name="recordMacroMenuItem" Header="Record Macro" Command="editor:EditorCommands.ToggleMacroRecording" />
                     <MenuItem x:Name="pauseRecordingMenuItem" Header="Pause Recording" Command="editor:EditorCommands.PauseResumeMacroRecording" />
@@ -422,7 +419,7 @@
                     <Button Command="{Binding StartOrContinueExecutionCommand}" ToolTip="Start or continue execution">
                         <Image Source="Resources/Images/Run_16x.png"/>
                     </Button>
-                    <editor:SyntaxEditor x:Name="executionTarget" IsMultiLine="False" MinWidth="160" ToolTip="Start or continue execution"/>
+                    <editor:SyntaxEditor x:Name="editor" IsMultiLine="False" MinWidth="240" IsTextDataBindingEnabled="True" ToolTip="Procedure or partner to execute" Text="{Binding ExecutionTarget}"/>
                     <Button ToolTip="Step Into">
                         <Image Source="Resources/Images/StepIn_16x.png"/>
                     </Button>

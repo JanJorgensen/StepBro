@@ -83,5 +83,91 @@ namespace StepBro.Core.Data
         {
             return String.Join(", ", list.Cast<object>().Select(o => (o != null) ? Convert.ToString(o, System.Globalization.CultureInfo.InvariantCulture) : "<null>"));
         }
+
+        public static Predicate<string> CreateComparer(this string text)
+        {
+            var numStars = text.Count(ch => ch == '*');
+            if (numStars == 1)
+            {
+                if (text.StartsWith('*'))
+                {
+                    return new EndsWithStringMatch(text.Substring(1)).Matches;
+                }
+                else if (text.EndsWith('*'))
+                {
+                    return new StartsWithStringMatch(text.Substring(0, text.Length - 1)).Matches;
+                }
+                else
+                {
+                    int index = text.IndexOf('*');
+                    return new StartsWithAndEndsWithStringMatch(text.Substring(0, index), text.Substring(index + 1)).Matches;
+                }
+            }
+            return new EqualsStringMatch(text).Matches;
+        }
+
+
+        public class EqualsStringMatch
+        {
+            private string m_text;
+            public EqualsStringMatch(string text)
+            {
+                m_text = text;
+            }
+            public bool Matches(string text)
+            {
+                return text.Equals(m_text, StringComparison.InvariantCulture);
+            }
+        }
+        public class StartsWithStringMatch
+        {
+            private string m_start;
+            public StartsWithStringMatch(string start)
+            {
+                m_start = start;
+            }
+            public bool Matches(string text)
+            {
+                return text.StartsWith(m_start, StringComparison.InvariantCulture);
+            }
+        }
+        public class EndsWithStringMatch
+        {
+            private string m_end;
+            public EndsWithStringMatch(string end)
+            {
+                m_end = end;
+            }
+            public bool Matches(string text)
+            {
+                return text.EndsWith(m_end, StringComparison.InvariantCulture);
+            }
+        }
+        public class StartsWithAndEndsWithStringMatch
+        {
+            private string m_start;
+            private string m_end;
+            public StartsWithAndEndsWithStringMatch(string start, string end)
+            {
+                m_start = start;
+                m_end = end;
+            }
+            public bool Matches(string text)
+            {
+                return text.StartsWith(m_start, StringComparison.InvariantCulture) &&  text.EndsWith(m_end, StringComparison.InvariantCulture);
+            }
+        }
+        public class ContainsStringMatch
+        {
+            private string m_text;
+            public ContainsStringMatch(string text)
+            {
+                m_text = text;
+            }
+            public bool Matches(string text)
+            {
+                return text.Contains(m_text, StringComparison.InvariantCulture);
+            }
+        }
     }
 }

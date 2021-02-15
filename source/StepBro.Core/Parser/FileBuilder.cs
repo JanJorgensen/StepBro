@@ -23,6 +23,7 @@ namespace StepBro.Core.Parser
         private SBP m_parser = null;
         private readonly StepBroListener m_listener = null;
         private readonly ScriptFile m_file = null;
+        public static readonly AccessModifier DefaultAccess = AccessModifier.Public;
 
         internal FileBuilder(AntlrInputStream code, IAddonManager addons = null, ScriptFile file = null)
         {
@@ -70,6 +71,7 @@ namespace StepBro.Core.Parser
                     file.AddNamespaceUsing(-1, addons.Lookup(null, u.Namespace));
                 }
             }
+            file.UpdateRootIdentifiers();
 
             return new FileBuilder(new AntlrInputStream(content), addons, file);
         }
@@ -680,6 +682,30 @@ namespace StepBro.Core.Parser
             #region STEP 2: COLLECT ALL THE PROCEDURE SIGNATURES //
             //===================================================//
             // TODO: Sort files after dependencies (usings)
+
+            var beforeSorting = filesToParse;
+            List<ScriptFile> sortedAfterDependencies = new List<ScriptFile>();
+            var filesToCheck = new Queue<ScriptFile>(filesToParse);
+            while (filesToCheck.Count > 0)
+            {
+                var file = filesToCheck.Dequeue();
+                bool addNow = true;
+                foreach (var fu in file.ListReferencedScriptFiles())
+                {
+                    if (!sortedAfterDependencies.Contains(fu))
+                    {
+                        filesToCheck.Enqueue(file); // Put back in queue.
+                        addNow = false;
+                        break;
+                    }
+                }
+                if (addNow)
+                {
+                    sortedAfterDependencies.Add(file);
+                }
+            }
+            filesToParse = sortedAfterDependencies;
+
             foreach (var file in filesToParse)
             {
                 var fileScanData = file.PreScanFileContent;
@@ -687,7 +713,8 @@ namespace StepBro.Core.Parser
                 {
                     foreach (var element in fileScanData.TopElement.Childs)
                     {
-                        var accessModifier = (element.Modifiers != null && element.Modifiers.Count > 0) ? (AccessModifier)Enum.Parse(typeof(AccessModifier), element.Modifiers[0], true) : AccessModifier.Private;
+                        var firstPropFlag = (element.PropertyFlags != null) ? element.PropertyFlags[0] : null; 
+                        var accessModifier = (element.Modifiers != null && element.Modifiers.Count > 0) ? (AccessModifier)Enum.Parse(typeof(AccessModifier), element.Modifiers[0], true) : DefaultAccess;
                         switch (element.Type)
                         {
                             case FileElementType.Using:
@@ -703,7 +730,8 @@ namespace StepBro.Core.Parser
                                     var procedure = new FileProcedure(file, accessModifier, element.Line, null, file.Namespace, element.Name)
                                     {
                                         IsFunction = element.IsFunction,
-                                        HasBody = element.HasBody
+                                        HasBody = element.HasBody,
+                                        BaseElementName = firstPropFlag
                                     };
                                     file.AddProcedure(procedure);
                                     procedure.CheckForPrototypeChange(element.Parameters, element.ReturnTypeData);
@@ -713,7 +741,10 @@ namespace StepBro.Core.Parser
                                 break;
                             case FileElementType.TestList:
                                 {
-                                    var testlist = new FileTestList(file, accessModifier, element.Line, null, file.Namespace, element.Name);
+                                    var testlist = new FileTestList(file, accessModifier, element.Line, null, file.Namespace, element.Name)
+                                    {
+                                        BaseElementName = firstPropFlag
+                                    };
                                     file.AddTestList(testlist);
                                 }
                                 break;
@@ -742,6 +773,13 @@ namespace StepBro.Core.Parser
                         file.ListElements().Cast<FileElement>().Select(e => new Tuple<FileElement, StepBroListener>(e, listener)));
                 }
             }
+
+            // Update the lookup tables before further parsing.
+            foreach (var file in filesToParse)
+            {
+                file.UpdateRootIdentifiers();
+            }
+
             var numberToParse = signaturesToParseNow.Count;
             var numberParsedLast = int.MaxValue;
             var signaturesToParseAgain = new List<Tuple<FileElement, StepBroListener>>();
@@ -750,6 +788,7 @@ namespace StepBro.Core.Parser
             {
                 foreach (var d in signaturesToParseNow)
                 {
+                    d.Item1.ParseBaseElement();
                     if (d.Item1.ParseSignature(d.Item2, false) > 0)
                     {
                         signaturesToParseAgain.Add(d);

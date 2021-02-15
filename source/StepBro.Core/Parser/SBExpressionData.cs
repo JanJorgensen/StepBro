@@ -23,6 +23,7 @@ namespace StepBro.Core.Parser
         TypeReference,
         PropertyReference,
         MethodReference,
+        ScriptNamespace,
         ProcedureReference,
         ProcedurePartner,
         ProcedurePropertyReference,

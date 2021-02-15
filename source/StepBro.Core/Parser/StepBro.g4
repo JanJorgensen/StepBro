@@ -16,8 +16,9 @@ fileProperties : elementPropertyblock ;
 usingDeclarations : usingDeclaration* ;
 
 usingDeclaration 
-    :	PUBLIC? USING identifierOrQualified SEMICOLON		            # UsingDeclarationWithIdentifier
-    |	PUBLIC? USING (REGULAR_STRING | VERBATIUM_STRING) SEMICOLON		# UsingDeclarationWithPath
+    :   PUBLIC? USING identifierOrQualified SEMICOLON		                    # UsingDeclarationWithIdentifier
+    |   PUBLIC? USING IDENTIFIER ASSIGNMENT identifierOrQualified SEMICOLON		# UsingDeclarationWithIdentifierAlias
+    |   PUBLIC? USING (REGULAR_STRING | VERBATIUM_STRING) SEMICOLON		        # UsingDeclarationWithPath
     ;
 
 namespace : identifierOrQualified ;

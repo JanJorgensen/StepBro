@@ -256,5 +256,39 @@ namespace StepBroCoreTest.Data
             yield return "Chrushtor";
             yield return "Dowfick";
         }
+
+        public static List<string> CreateListOfStrings()
+        {
+            var list = new List<string>();
+            list.AddRange(new string[] { 
+                "Anders",
+                "Anders",
+                "Andres", // ! 
+                "Anders",
+                "Anders",
+                "Anders",
+                "Anders",
+                "Bent Fabric",
+                "Bente Bent",
+                "Anders",
+                "Anders",
+                "Bent Nollerik",
+                "Bodil",
+                "Anders",
+                "Anders",
+                "Anders",
+                "Anders",
+                "Bente Birk",
+                "Anders A",
+                "Anders B",
+                "Anders C",
+                "Anders D",
+                "Anders E",
+                "Anders F",
+                "Anders G",
+                "Christian",
+            });
+            return list;
+        }
     }
 }

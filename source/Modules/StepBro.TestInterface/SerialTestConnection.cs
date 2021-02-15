@@ -233,7 +233,7 @@ namespace StepBro.TestInterface
         private LogLineData m_lastLogLine = null;
         private object m_eventLogSync = new object();
         private LogLineData m_lastEventLogLine = null;
-        private LogLineDataReader m_asyncLogLineReader = null;
+        private LogLineLineReader m_asyncLogLineReader = null;
         private readonly Queue<string> m_events = new Queue<string>();
         private readonly Queue<string> m_responseLines = new Queue<string>();
         private Task m_receiverTask = null;
@@ -367,6 +367,10 @@ namespace StepBro.TestInterface
 
         public IAsyncResult<object> SendCommand([Implicit] ICallContext context, string command, params object[] arguments)
         {
+            if (context != null && context.LoggingEnabled)
+            {
+                context.Logger.Log("SerialTestConnection.SendCommand", command);
+            }
             var request = new List<string>();
             request.Add(command);
             if (arguments != null && arguments.Length > 0)
@@ -384,7 +388,7 @@ namespace StepBro.TestInterface
         {
             if (context != null && context.LoggingEnabled)
             {
-                context.Logger.Log("SerialTestConnection", "SendDirect: text");
+                context.Logger.Log("SerialTestConnection", "SendDirect: \"" + text + "\"");
             }
             DoSendDirect(text);
         }
@@ -629,6 +633,7 @@ namespace StepBro.TestInterface
         {
             try
             {
+                System.Diagnostics.Debug.WriteLine($"TESTCONNECTION {type} {id}: {text}");
                 m_lastLogLine = new LogLineData(m_lastLogLine, type, id, text);
                 if (m_firstLogLine == null)
                 {
@@ -895,21 +900,17 @@ namespace StepBro.TestInterface
 
         #region LogLineSource
 
-        //private object m_eventLogSync = new object();
-        //private LogLineData m_firstEventLogLine = null;
-        //private LogLineData m_lastEventLogLine = null;
-
         public LogLineData FirstEntry { get { return m_firstLogLine; } }
 
         public event LogLineAddEventHandler LinesAdded;
 
-        public ILineReader AsyncData
+        public ILineReader AsyncLog
         {
             get
             {
                 if (m_asyncLogLineReader == null)
                 {
-                    m_asyncLogLineReader = new LogLineDataReader(null, m_eventLogSync);
+                    m_asyncLogLineReader = new LogLineLineReader(null, m_eventLogSync);
                 }
                 return m_asyncLogLineReader;
             }

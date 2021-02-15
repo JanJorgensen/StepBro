@@ -2,7 +2,7 @@
 
 namespace StepBro.Core.Data
 {
-    public class LogLineData
+    public class LogLineData : ILineReaderEntry
     {
         public enum LogType
         {
@@ -20,7 +20,8 @@ namespace StepBro.Core.Data
         public LogType Type { get; private set; }
         public uint ID { get; private set; }
         public DateTime Timestamp { get; private set; }
-        public string LineText { get; private set; }
+        public string Text { get; private set; }
+        string ILineReaderEntry.Text { get { return this.Text.Substring(1); } }
 
         public LogLineData(LogLineData previous, LogType type, uint id, string text)
         {
@@ -29,7 +30,7 @@ namespace StepBro.Core.Data
             this.Type = type;
             this.ID = id;
             this.Timestamp = DateTime.Now;
-            LineText = text;
+            Text = text;
         }
     }
 

@@ -996,27 +996,34 @@ namespace StepBro.Core.Parser
             //    throw new NotImplementedException();
             //}
 
-            var expectVerdict = Expression.Condition(
-                expression.ExpressionCode,
-                Expression.Constant(Verdict.Pass),
-                Expression.Condition(Expression.Constant(false), Expression.Constant(Verdict.Error), Expression.Constant(Verdict.Fail)));
+            if (!(expression.ExpressionCode.Type == typeof(bool)))
+            {
+                m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Expression for 'expect' statement is not boolean.");
+            }
+            else
+            {
+                var expectVerdict = Expression.Condition(
+                    expression.ExpressionCode,
+                    Expression.Constant(Verdict.Pass),
+                    Expression.Condition(Expression.Constant(false), Expression.Constant(Verdict.Error), Expression.Constant(Verdict.Fail)));
 
-            var expectCall = Expression.Call(
-                m_currentProcedure.ContextReferenceInternal,
-                typeof(ICallContext).GetMethod(nameof(ICallContext.ReportExpectResult), new Type[] { typeof(string), typeof(string), typeof(string), typeof(Verdict) }),
-                Expression.Constant(title),
-                Expression.Constant(expressionText),
-                Expression.Condition(expression.ExpressionCode, Expression.Constant("true"), Expression.Constant("true")),
-                expectVerdict);
+                var expectCall = Expression.Call(
+                    m_currentProcedure.ContextReferenceInternal,
+                    typeof(ICallContext).GetMethod(nameof(ICallContext.ReportExpectResult), new Type[] { typeof(string), typeof(string), typeof(string), typeof(Verdict) }),
+                    Expression.Constant(title),
+                    Expression.Constant(expressionText),
+                    Expression.Condition(expression.ExpressionCode, Expression.Constant("true"), Expression.Constant("true")),
+                    expectVerdict);
 
-            var statementBlock = Expression.TryCatch(
-                Expression.Block(
-                        expectCall),
-                        Expression.Catch(
-                            typeof(Exception),
-                            Expression.Empty()));       // TODO: Log the exception
+                var statementBlock = Expression.TryCatch(
+                    Expression.Block(
+                            expectCall),
+                            Expression.Catch(
+                                typeof(Exception),
+                                Expression.Empty()));       // TODO: Log the exception
 
-            m_scopeStack.Peek().AddStatementCode(statementBlock);
+                m_scopeStack.Peek().AddStatementCode(statementBlock);
+            }
         }
 
         #endregion

@@ -41,6 +41,7 @@ namespace StepBro.Core.Parser
             public List<ParameterData> Parameters { get; set; } = null;
             public List<NamedString> Values { get; set; } = null;   // For enum values.
             public List<FileElement> Childs { get; set; } = new List<FileElement>();
+            public List<string> PropertyFlags { get; set; } = null;
             public bool IsFunction { get; set; } = false;
             public bool HasBody { get; set; } = true;
             public FileElement(FileElement parent, int line, ScriptData.FileElementType type, string name)
@@ -99,6 +100,8 @@ namespace StepBro.Core.Parser
         private Tuple<string, IToken> m_returnType = null;
         private List<ParameterData> m_procedureParameters = null;
         private List<string> m_modifiers = null;
+        private List<string> m_elementPropFlags = null;
+        private bool m_acceptElementPropFlags = true;
         private string m_varName = null;
         private Stack<Tuple<string, IToken>> m_typeStack = new Stack<Tuple<string, IToken>>();
         private bool m_isFunction = false;
@@ -178,6 +181,8 @@ namespace StepBro.Core.Parser
         public override void EnterFileElement([NotNull] SBP.FileElementContext context)
         {
             m_modifiers = null;
+            m_elementPropFlags = null;
+            m_acceptElementPropFlags = true;
         }
 
         public override void ExitFileElement([NotNull] SBP.FileElementContext context)
@@ -239,6 +244,39 @@ namespace StepBro.Core.Parser
             m_type = context.GetText();
         }
 
+        #region Element PropertyList
+
+        public override void EnterElementPropertyList([NotNull] SBP.ElementPropertyListContext context)
+        {
+        }
+
+        public override void ExitElementPropertyList([NotNull] SBP.ElementPropertyListContext context)
+        {
+        }
+
+        public override void EnterPropertyblockStatementValueIdentifierOnly([NotNull] SBP.PropertyblockStatementValueIdentifierOnlyContext context)
+        {
+            if (m_acceptElementPropFlags)
+            {
+                if (m_elementPropFlags == null) m_elementPropFlags = new List<string>();
+                m_elementPropFlags.Add(context.GetText());
+            }
+        }
+        public override void EnterPropertyblockStatementNamed([NotNull] SBP.PropertyblockStatementNamedContext context)
+        {
+            m_acceptElementPropFlags = false;
+        }
+        public override void EnterPropertyblockEventVerdict([NotNull] SBP.PropertyblockEventVerdictContext context)
+        {
+            m_acceptElementPropFlags = false;
+        }
+        public override void EnterPropertyblockEventAssignment([NotNull] SBP.PropertyblockEventAssignmentContext context)
+        {
+            m_acceptElementPropFlags = false;
+        }
+
+        #endregion
+
         public override void EnterProcedureBodyOrNothing([NotNull] SBP.ProcedureBodyOrNothingContext context)
         {
             var name = m_name;
@@ -250,6 +288,7 @@ namespace StepBro.Core.Parser
             element.ReturnTypeData = m_returnType;
             element.IsFunction = m_isFunction;
             element.HasBody = context.Start.Type != SBP.SEMICOLON;
+            element.PropertyFlags = m_elementPropFlags;
             this.TopElement.Childs.Add(element);
         }
 
@@ -270,6 +309,7 @@ namespace StepBro.Core.Parser
 
             var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.TestList, name);
             element.Modifiers = m_modifiers;
+            element.PropertyFlags = m_elementPropFlags;
             //element.Parameters = parameters;
             //element.HasBody = context.Start.Type != SBP.SEMICOLON;
             this.TopElement.Childs.Add(element);

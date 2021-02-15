@@ -304,6 +304,7 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpBinary([NotNull] SBP.ExpBinaryContext context)
         {
+            var ctxt = context.GetText();
             var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
             var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
             if (first.IsResolved && last.IsResolved)
@@ -316,7 +317,10 @@ namespace StepBro.Core.Parser
             else
             {
                 m_expressionData.Push(new SBExpressionData(
-                    SBExpressionType.OperationError, "Error parsing binary operation.", context.GetText(), new TokenOrSection(context.Start, context.Stop, context.GetText())));
+                    SBExpressionType.OperationError, 
+                    "Error parsing binary operation.", 
+                    context.GetText(), 
+                    new TokenOrSection(context.Start, context.Stop, context.GetText())));
             }
         }
 

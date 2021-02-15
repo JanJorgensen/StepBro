@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using StepBro.Core;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
+using static StepBro.Core.Data.StringUtils;
 
 namespace StepBro.Core.Execution
 {
@@ -108,5 +110,107 @@ namespace StepBro.Core.Execution
         {
             throw new NotImplementedException();
         }
+
+        #region LineReader
+
+        [Public]
+        public static bool Matches(this ILineReader reader, string text)
+        {
+            var comparer = StringUtils.CreateComparer(text);
+            return Matches(reader, comparer);
+        }
+
+        [Public]
+        public static bool Matches(this ILineReader reader, Predicate<string> comparer)
+        {
+            ILineReaderEntry entry = reader.Current;
+            if (entry == null) return false;
+            return comparer(entry.Text);
+        }
+
+        [Public]
+        public static bool Find(this ILineReader reader, string text, bool flushIfNotFound = false)
+        {
+            //if (context != null && context.LoggingEnabled) context.Logger.Log("Find", "\"" + text + "\"");
+            var comparer = StringUtils.CreateComparer(text);
+            return Find(reader, comparer, flushIfNotFound);
+        }
+
+        [Public]
+        public static bool Find(this ILineReader reader, Predicate<string> comparer, bool flushIfNotFound = false)
+        {
+            var peaker = reader.Peak();
+            ILineReaderEntry last = null;
+            foreach (var entry in peaker)
+            {
+                if (comparer(entry.Text))
+                {
+                    reader.Flush(entry);
+                    return true;
+                }
+                last = entry;
+            }
+            if (flushIfNotFound)
+            {
+                reader.Flush(last);     // First flush until the last seen entry
+                reader.Next();          // ... then also flush the last seen.
+            }
+            return false;
+        }
+
+        [Public]
+        public static bool Await(this ILineReader reader, string text, TimeSpan timeout)
+        {
+            //if (context != null && context.LoggingEnabled) context.Logger.Log("Await", "\"" + text + "\"");
+            var comparer = StringUtils.CreateComparer(text);
+            return Await(reader, comparer, timeout);
+        }
+
+        [Public]
+        public static bool Await(this ILineReader reader, Predicate<string> comparer, TimeSpan timeout)
+        {
+            // If the reader has timestampe, set the timeout relative to the time of the current entry; otherwise just use current wall time.
+            DateTime entry = (reader.LinesHaveTimestamp && reader.Current != null) ? reader.Current.Timestamp : DateTime.Now;
+
+            // The time where the timeout expires.
+            DateTime to = (timeout == TimeSpan.MaxValue) ? DateTime.MaxValue : entry + timeout;
+
+            //bool sleep = false;
+            do
+            {
+                //if (sleep) System.Threading.Thread.Sleep(5);
+                if (reader.Find(comparer, true))
+                {
+                    return true;
+                }
+                lock (reader.Sync)
+                {
+                    if (reader.Current == null)
+                    {
+                        Monitor.Wait(reader.Sync, 50);
+                    }
+                }
+                //sleep = true;
+            } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero);
+
+            return false;
+        }
+
+        [Public]
+        public static ILineReader ToLineReader(this List<string> list)
+        {
+            return new StringListLineReader(list);
+        }
+
+        [Public]
+        public static ILineReader ToLineReader(this List<Tuple<DateTime, string>> list)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
     }
+
+    //[Public]
+    //public delegate bool LinePredicate(DateTime timestamp, string text);
 }

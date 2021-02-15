@@ -1,6 +1,6 @@
 ﻿using ActiproSoftware.Windows;
 
-namespace StepBro.Workbench
+namespace StepBro.UI.Controls
 {
 
     /// <summary>

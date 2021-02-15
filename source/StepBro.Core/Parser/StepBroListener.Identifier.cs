@@ -248,7 +248,7 @@ namespace StepBro.Core.Parser
                     foundIdentifier = m_addonManager.Lookup(m_file?.Usings, identifier);
                     if (foundIdentifier != null)
                     {
-                        return this.IdentifierToExpressionData(foundIdentifier);
+                        return this.IdentifierToExpressionData(foundIdentifier, token);
                     }
                     var foundScriptUtilsAccess = this.ResolveDotIdentifierTypeReference(s_ScriptUtilsTypeData, SBExpressionData.CreateIdentifier(identifier, token: token));
                     if (foundScriptUtilsAccess != null)
@@ -259,13 +259,25 @@ namespace StepBro.Core.Parser
             }
             if (m_file != null)
             {
-                foundIdentifier = this.TryGetFileElementInScope(m_file?.Usings, identifier);
-                if (foundIdentifier != null) goto returnFound;
+                var identifiers = m_file.LookupIdentifier(identifier);
+                if (identifiers != null)
+                {
+                    if (identifiers.Count > 1)
+                    {
+                        throw new ParsingErrorException((token != null) ? token.Line : -1, identifier, "More than one alternative. ");
+                    }
+                    foundIdentifier = identifiers[0];
+                }
+                if (foundIdentifier == null)
+                {
+                    foundIdentifier = this.TryGetFileElementInScope(m_file?.Usings, identifier);
+                }
             }
+
         returnFound:
             if (foundIdentifier != null)
             {
-                return this.IdentifierToExpressionData(foundIdentifier);
+                return this.IdentifierToExpressionData(foundIdentifier, token);
             }
 
             var foundType = this.ResolveSingleIdentifierType(identifier, false, token);
@@ -316,23 +328,26 @@ namespace StepBro.Core.Parser
         private SBExpressionData ResolveSingleIdentifierType(string identifier, bool reportUnresolved = false, IToken token = null)
         {
             IIdentifierInfo foundIdentifier = null;
-            if (m_addonManager != null)
-            {
-                foundIdentifier = m_addonManager.Lookup(m_file?.Usings, identifier);
-                if (foundIdentifier != null)
-                {
-                    return this.IdentifierToExpressionData(foundIdentifier);
-                }
-            }
 
             if (m_file != null)
             {
+                var identifiers = m_file.LookupIdentifier(identifier);
+                if (identifiers != null)
+                {
+                    if (identifiers.Count > 1)
+                    {
+                        throw new ParsingErrorException((token != null) ? token.Line : -1, identifier, "More than one alternative. ");
+                    }
+                    return this.IdentifierToExpressionData(identifiers[0], token);
+                }
+
                 foundIdentifier = this.TryGetFileElementInScope(m_file?.Usings, identifier);    // File elements can also act as types.
                 if (foundIdentifier != null)
                 {
-                    return this.IdentifierToExpressionData(foundIdentifier);
+                    return this.IdentifierToExpressionData(foundIdentifier, token);
                 }
 
+                #region TBD
                 foreach (var nsUsing in m_file.ListResolvedNamespaceUsings())
                 {
                     var foundViaUsing = this.ResolveDotIdentifier(nsUsing, SBExpressionData.CreateIdentifier(identifier, token: token));
@@ -341,7 +356,17 @@ namespace StepBro.Core.Parser
                         return foundViaUsing;
                     }
                 }
+                #endregion
             }
+            if (m_addonManager != null)
+            {
+                foundIdentifier = m_addonManager.Lookup(m_file?.Usings, identifier);
+                if (foundIdentifier != null)
+                {
+                    return this.IdentifierToExpressionData(foundIdentifier, token);
+                }
+            }
+
             if (reportUnresolved)
             {
                 if (token != null)
@@ -356,12 +381,24 @@ namespace StepBro.Core.Parser
             return null;
         }
 
-        private SBExpressionData IdentifierToExpressionData(IIdentifierInfo identifier)
+        private SBExpressionData IdentifierToExpressionData(IIdentifierInfo identifier, IToken token = null)
         {
             SBExpressionData result = null;
             if (identifier.Type == IdentifierType.DotNetType)
             {
                 result = new SBExpressionData(HomeType.Immediate, SBExpressionType.TypeReference, (TypeReference)identifier.DataType, null, null);
+            }
+            else if (identifier.Type == IdentifierType.DotNetMethod)
+            {
+                var methods = new List<MethodInfo>();
+                methods.Add(identifier.Reference as MethodInfo);
+                result = new SBExpressionData(
+                    HomeType.Immediate,
+                    SBExpressionType.MethodReference,   // Expression type
+                    null,                               // Data type
+                    null,                               // The instance expression
+                    methods,                            // The instance expression
+                    token: token);
             }
             else if (identifier.Type == IdentifierType.DotNetNamespace)
             {
@@ -472,8 +509,8 @@ namespace StepBro.Core.Parser
                 //case IdentifierType.FileByName:
                 //    break;
                 case IdentifierType.FileNamespace:
-                    throw new NotImplementedException();
-                //break;
+                    leftAsExpData = new SBExpressionData(HomeType.Immediate, SBExpressionType.ScriptNamespace, null, null, left.Reference);
+                    break;
                 default:
                     throw new NotImplementedException();
             }
@@ -507,6 +544,7 @@ namespace StepBro.Core.Parser
                 case SBExpressionType.TypeReference:
                     result = this.ResolveDotIdentifierTypeReference(left, right);
                     break;
+                case SBExpressionType.ScriptNamespace:
                 case SBExpressionType.ProcedureReference:
                     result = this.ResolveDotIdentifierInstanceReference(left, right, true);
                     break;
@@ -598,7 +636,7 @@ namespace StepBro.Core.Parser
                         SBExpressionType.MethodReference,   // Expression type
                         left.DataType,                      // Data type
                         left.ExpressionCode,                // The instance expression
-                        methods,                            // The instance expression
+                        methods,                            // The method list
                         token: right.Token);
                 }
                 var properties = leftType.GetProperties().Where(pi => String.Equals(pi.Name, rightString, StringComparison.InvariantCulture)).ToArray();

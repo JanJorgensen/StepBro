@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using ActiproSoftware.Windows.Controls.SyntaxEditor.IntelliPrompt;
+using Microsoft.Win32;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -12,6 +13,10 @@ namespace StepBro.Workbench
         public MainView()
         {
             InitializeComponent();
+
+            editor.Document.Language = new StepBro.UI.Controls.ExecutionTargetSelectorLanguage();
+            editor.Document.Language.RegisterService<ICompletionProvider>(new StepBro.UI.Controls.ExecutionTargetCompletionProvider());
+
         }
 
         #region Open File Command

@@ -75,6 +75,12 @@ namespace StepBro.Core.ScriptData
 
         public AccessModifier AccessLevel { get { return m_accessModifier; } }
 
+        internal string BaseElementName
+        {
+            get { return m_baseElementName; }
+            set { m_baseElementName = value; }
+        }
+
         public IFileElement BaseElement
         {
             get
@@ -180,22 +186,31 @@ namespace StepBro.Core.ScriptData
         {
             if (!String.IsNullOrEmpty(m_baseElementName) && m_parentFile != null)
             {
-                var parentFile = m_parentFile as ScriptFile;
-                var files = new List<ScriptFile>();
-                files.Add(parentFile);
-                files.AddRange(parentFile.ListResolvedFileUsings());
-                files.AddRange(parentFile.ListResolvedNamespaceUsings().Where(u => u.Type == IdentifierType.FileNamespace).SelectMany(u => ((IEnumerable<ScriptFile>)u.Reference)));
-                foreach (var f in files)
+                var file = m_parentFile as ScriptFile;
+                var found = file.LookupIdentifier(m_baseElementName);
+                var element = (found != null) ? (found[0] as IFileElement) : null;
+                if (element != null && element.ElementType == this.ElementType)
                 {
-                    foreach (var e in f.ListElements())
-                    {
-                        if (e.ElementType == this.ElementType && e.Name.Equals(m_baseElementName, StringComparison.InvariantCulture))
-                        {
-                            this.BaseElement = e;
-                            return true;
-                        }
-                    }
+                    this.BaseElement = element;
+                    return true;
                 }
+
+                //var parentFile = m_parentFile as ScriptFile;
+                //var files = new List<ScriptFile>();
+                //files.Add(parentFile);
+                //files.AddRange(parentFile.ListResolvedFileUsings());
+                //files.AddRange(parentFile.ListResolvedNamespaceUsings().Where(u => u.Type == IdentifierType.FileNamespace).SelectMany(u => ((IEnumerable<ScriptFile>)u.Reference)));
+                //foreach (var f in files)
+                //{
+                //    foreach (var e in f.ListElements())
+                //    {
+                //        if (e.ElementType == this.ElementType && e.Name.Equals(m_baseElementName, StringComparison.InvariantCulture))
+                //        {
+                //            this.BaseElement = e;
+                //            return true;
+                //        }
+                //    }
+                //}
             }
             return false;
         }
