@@ -24,7 +24,7 @@ namespace StepBro.Core.Data
         public StringListLineReader(List<string> list)
         {
             m_list = list;
-            m_index = -1;   // Start before the first.
+            m_index = (m_list.Count > 0) ? 0 : -1;
         }
 
 
