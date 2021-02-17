@@ -235,6 +235,10 @@ namespace StepBro.Workbench
                 {
                     System.Diagnostics.Debug.Assert(alreadyOpenedDoc.LoadedFile == null || Object.Equals(alreadyOpenedDoc.LoadedFile, args.File));
                     alreadyOpenedDoc.LoadedFile = args.File;
+                    if (alreadyOpenedDoc.LoadedFile as IScriptFile != null)
+                    {
+                        (alreadyOpenedDoc.LoadedFile as IScriptFile).Errors.CollectionChanged += ScriptFileErrors_CollectionChanged;
+                    }
                 }
                 else
                 {
@@ -292,6 +296,11 @@ namespace StepBro.Workbench
         private void LoadedFiles_FileClosed(object sender, LoadedFileEventArgs args)
         {
             var foundDocument = m_userDocumentItems.FirstOrDefault(f => Object.ReferenceEquals(args.File, f.LoadedFile));
+            if (args.File as IScriptFile != null)
+            {
+                (args.File as IScriptFile).Errors.CollectionChanged -= ScriptFileErrors_CollectionChanged;
+            }
+
             if (foundDocument != null)
             {
                 // File was forced closed by the StepBro.Core.
