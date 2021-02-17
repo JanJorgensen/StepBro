@@ -23,9 +23,6 @@ namespace StepBro.Workbench.ToolViews
 
         public ErrorsViewModel(DeferrableObservableCollection<ErrorInfo> errors) : this()
         {
-            this.SerializationId = "ToolErrors";
-            this.Title = "Errors";
-
             m_errors = errors;
         }
 

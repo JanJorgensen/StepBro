@@ -7,7 +7,7 @@
 	xmlns:editor="http://schemas.actiprosoftware.com/winfx/xaml/syntaxeditor"
     xmlns:local="clr-namespace:StepBro.Workbench"
     xmlns:localviews="clr-namespace:StepBro.Workbench.ToolViews"
-    x:Class="StepBro.Workbench.MainView"
+    x:Class="StepBro.Workbench.MainView" Unloaded="UserControl_Unloaded"
     >
     <UserControl.Resources>
         <local:ToolItemDockSideConverter x:Key="ToolItemDockSideConverter" />
@@ -65,6 +65,7 @@
     </UserControl.Resources>
     <!--Icon="/Resources/Images/ActiproAppIcon.ico"-->
     <UserControl.InputBindings>
+        <KeyBinding Key="o" Modifiers="Ctrl" Command="{Binding ApplicationCommands.Open}" />
         <KeyBinding Key="F5" Command="{Binding StartOrContinueExecutionCommand}" />
         <KeyBinding Key="F5" Modifiers="Ctrl+Shift" Command="{Binding StartExecutionOfSelectedFileElementCommand}" />
         <KeyBinding Key="F6" Command="{Binding ParseAllFilesCommand}" />
@@ -72,6 +73,7 @@
     </UserControl.InputBindings>
     <UserControl.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Open" CanExecute="OpenCanExecute" Executed="OpenExecuted" />
+        <CommandBinding Command="ApplicationCommands.Close" CanExecute="CloseCanExecute" Executed="CloseExecuted" />
     </UserControl.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -93,8 +95,8 @@
                 </docking:Workspace>
 
                 <docking:ToolWindowContainer>
-                    <docking:ToolWindow Title="Documents List" ImageSource="/Resources/Images/TextDocument16.png" ContainerDockedSize="200, 150">
-                        <ListView ItemsSource="{Binding DocumentItemsSource, ElementName=dockSite}" SelectedIndex="0" BorderThickness="0">
+                    <docking:ToolWindow Title="Documents List" ImageSource="/Resources/Images/TextDocument16.png" ContainerDockedSize="200, 150" SerializationId="ToolDocumentList">
+                        <ListView x:Name="dockumentList" ItemsSource="{Binding DocumentItemsSource, ElementName=dockSite}" SelectedIndex="0" BorderThickness="0" MouseDoubleClick="dockumentList_MouseDoubleClick">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="150" Header="Title" DisplayMemberBinding="{Binding Title}" />
@@ -105,7 +107,7 @@
                             </ListView.View>
                         </ListView>
                     </docking:ToolWindow>
-                    <docking:ToolWindow Title="Tools List" ImageSource="/Resources/Images/TextDocument16.png" ContainerDockedSize="200, 150">
+                    <docking:ToolWindow Title="Tools List" ImageSource="/Resources/Images/TextDocument16.png" ContainerDockedSize="200, 150" SerializationId="ToolToolsList">
                         <ListView ItemsSource="{Binding ToolItemsSource, ElementName=dockSite}" SelectedIndex="0" BorderThickness="0">
                             <ListView.View>
                                 <GridView>
@@ -148,7 +150,7 @@
                     <!--<MenuItem Header="Print" Command="ApplicationCommands.Print" Icon="" />
                     <MenuItem Header="Print Preview" Command="ApplicationCommands.PrintPreview" Icon="" />
                     <Separator />-->
-                    <MenuItem Header="Exit" Command="Close" Icon=""/>
+                    <MenuItem Header="Exit" Command="ApplicationCommands.Close"/>
                 </MenuItem>
                 <MenuItem Header="Edit">
                     <MenuItem Command="ApplicationCommands.Undo">
@@ -449,7 +451,9 @@
                     </ItemsPanelTemplate>
                 </StatusBar.ItemsPanel>
 
-                <StatusBarItem x:Name="messagePanel" Content="Ready" />
+                <StatusBarItem x:Name="messagePanel">
+                    <TextBlock Text="{Binding ApplicationStateMessage}"/>
+                </StatusBarItem>
 
                 <StatusBarItem Grid.Column="1">
                     <StackPanel Margin="0,0,10,0" Orientation="Horizontal">

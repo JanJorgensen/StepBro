@@ -386,12 +386,12 @@ namespace StepBro.Core.Parser
         public override void EnterEveryRule([NotNull] ParserRuleContext context)
         {
             base.EnterEveryRule(context);
-            System.Diagnostics.Debug.WriteLine("TypeScan Enter " + context.GetType().Name);
+            //System.Diagnostics.Debug.WriteLine("TypeScan Enter " + context.GetType().Name);
         }
 
         public override void ExitEveryRule([NotNull] ParserRuleContext context)
         {
-            System.Diagnostics.Debug.WriteLine("TypeScan Exit " + context.GetType().Name);
+            //System.Diagnostics.Debug.WriteLine("TypeScan Exit " + context.GetType().Name);
             base.ExitEveryRule(context);
         }
 

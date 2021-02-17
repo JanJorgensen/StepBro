@@ -21,5 +21,6 @@ namespace StepBro.Core.Data
         void Flush(ILineReaderEntry stopAt = null);
         IEnumerable<ILineReaderEntry> Peak();
         event EventHandler LinesAdded;
+        void DebugDump();
     }
 }

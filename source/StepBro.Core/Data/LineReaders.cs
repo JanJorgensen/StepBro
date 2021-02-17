@@ -86,5 +86,10 @@ namespace StepBro.Core.Data
             }
             else yield break;
         }
+
+        public void DebugDump()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

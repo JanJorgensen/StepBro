@@ -176,7 +176,7 @@ namespace StepBro.UI.Panels
         {
             foreach (var p in ListPanelTypes())
             {
-                if (string.Equals(p.TypeIdentification, name, System.StringComparison.InvariantCulture))
+                if (string.Equals(p.TypeIdentification, name))
                 {
                     return p;
                 }

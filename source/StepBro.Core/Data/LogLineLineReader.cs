@@ -161,5 +161,19 @@ namespace StepBro.Core.Data
         {
             return new Enumerator(this);
         }
+
+        public void DebugDump()
+        {
+            var entry = m_entry;
+            if (entry == null)
+            {
+                System.Diagnostics.Debug.WriteLine("LogLine: <none>");
+            }
+            while (entry != null)
+            {
+                System.Diagnostics.Debug.WriteLine("LogLine: " + entry.Text);
+                entry = entry.Next;
+            }
+        }
     }
 }

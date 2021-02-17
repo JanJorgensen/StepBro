@@ -12,7 +12,7 @@ namespace StepBro.Workbench.ToolViews
     {
         public ObjectPanelToolViewModel()
         {
-            this.SerializationId = "ObjectPanelxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+            this.SerializationId = "ToolObjectPanel:Grigferlig";
             this.Title = "ObjectPanel";
 
             m_contentControl = CreateBindProblemIndicator();
@@ -27,15 +27,26 @@ namespace StepBro.Workbench.ToolViews
             grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1000, GridUnitType.Star) });
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1000, GridUnitType.Star) });
             grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(40) });
+            grid.RowDefinitions.Add(new RowDefinition() { Height = GridLength.Auto });
             grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1000, GridUnitType.Star) });
             ctrl.Content = grid;
+            var header = new TextBlock()
+            {
+                Text = "Cannot show panel", 
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
             var text = new TextBlock()
             {
-                Text = "WE ARE HERE"
+                Text = "Waiting for it to be created",
+                HorizontalAlignment = HorizontalAlignment.Center
             };
+            grid.Children.Add(header);
+            Grid.SetColumn(header, 1);
+            Grid.SetRow(header, 1);
             grid.Children.Add(text);
             Grid.SetColumn(text, 1);
-            Grid.SetRow(text, 1);
+            Grid.SetRow(text, 3);
             return ctrl;
         }
 

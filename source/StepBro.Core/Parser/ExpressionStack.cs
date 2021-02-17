@@ -19,14 +19,14 @@ namespace StepBro.Core.Parser
 
         public void PushStackLevel(string name)
         {
-            System.Diagnostics.Debug.WriteLine("Pushing expression stack: " + name);
+            //System.Diagnostics.Debug.WriteLine("Pushing expression stack: " + name);
             m_expressionData.Push(new Stack<SBExpressionData>());
             m_levelName.Push(name);
         }
 
         public Stack<SBExpressionData> PopStackLevel()
         {
-            System.Diagnostics.Debug.WriteLine("Popping expression stack: " + m_levelName.Pop());
+            //System.Diagnostics.Debug.WriteLine("Popping expression stack: " + m_levelName.Pop());
             return m_expressionData.Pop();
         }
 
@@ -34,7 +34,7 @@ namespace StepBro.Core.Parser
 
         public void Push(SBExpressionData data)
         {
-            System.Diagnostics.Debug.WriteLine("Push: " + data.ToString());
+            //System.Diagnostics.Debug.WriteLine("Push: " + data.ToString());
             m_expressionData.Peek().Push(data);
         }
 

@@ -13,7 +13,7 @@ namespace StepBro.Workbench.ToolViews
 
         public OutputViewModel()
         {
-            this.SerializationId = "Output";
+            this.SerializationId = "ToolOutput";
             this.Title = "Output";
             //m_logViewModel = new LogViewerViewModel();
         }

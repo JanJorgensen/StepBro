@@ -131,6 +131,8 @@ namespace StepBro.Core.Execution
         [Public]
         public static bool Find(this ILineReader reader, string text, bool flushIfNotFound = false)
         {
+            System.Diagnostics.Debug.WriteLine("Reader.Find: " + text);
+            reader.DebugDump();
             //if (context != null && context.LoggingEnabled) context.Logger.Log("Find", "\"" + text + "\"");
             var comparer = StringUtils.CreateComparer(text);
             return Find(reader, comparer, flushIfNotFound);
@@ -159,16 +161,19 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static bool Await(this ILineReader reader, string text, TimeSpan timeout)
+        public static bool Await(this ILineReader reader, string text, TimeSpan timeout, bool removeFound = true)
         {
+            System.Diagnostics.Debug.WriteLine("Reader.Await: " + text);
             //if (context != null && context.LoggingEnabled) context.Logger.Log("Await", "\"" + text + "\"");
             var comparer = StringUtils.CreateComparer(text);
-            return Await(reader, comparer, timeout);
+            return Await(reader, comparer, timeout, removeFound);
         }
 
         [Public]
-        public static bool Await(this ILineReader reader, Predicate<string> comparer, TimeSpan timeout)
+        public static bool Await(this ILineReader reader, Predicate<string> comparer, TimeSpan timeout, bool removeFound = true)
         {
+            reader.DebugDump();
+
             // If the reader has timestampe, set the timeout relative to the time of the current entry; otherwise just use current wall time.
             DateTime entry = (reader.LinesHaveTimestamp && reader.Current != null) ? reader.Current.Timestamp : DateTime.Now;
 
@@ -181,6 +186,10 @@ namespace StepBro.Core.Execution
                 //if (sleep) System.Threading.Thread.Sleep(5);
                 if (reader.Find(comparer, true))
                 {
+                    if (removeFound)
+                    {
+                        reader.Next();
+                    }
                     return true;
                 }
                 lock (reader.Sync)

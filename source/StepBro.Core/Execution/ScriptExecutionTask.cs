@@ -116,12 +116,16 @@ namespace StepBro.Core.Execution
             try
             {
                 resultValue = m_taskContext.CallProcedure(m_targetElement as IFileProcedure, m_arguments);
+                this.SetState(TaskExecutionState.Ended);
+            }
+            catch
+            {
+                this.SetState(TaskExecutionState.EndedByException);
             }
             finally
             {
                 logger.LogExit("Script Execution", "Script execution ended. Result value: " + StringUtils.ObjectToString(resultValue));
                 m_end = DateTime.Now;
-                this.SetState(TaskExecutionState.Ended);
             }
         }
 

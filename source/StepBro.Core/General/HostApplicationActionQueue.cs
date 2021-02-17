@@ -54,6 +54,8 @@ namespace StepBro.Core.General
             private readonly TaskContext m_context = null;
             private TaskExecutionState m_state = TaskExecutionState.Created;
             private Task m_task = null;
+            private DateTime m_startTime = DateTime.MinValue;
+            private DateTime m_endTime = DateTime.MinValue;
 
             public TaskData(string title, bool blockUI, System.Func<bool> precondition, TaskDelegate taskFunction) : base(title)
             {
@@ -89,9 +91,9 @@ namespace StepBro.Core.General
 
             public TaskExecutionState CurrentState { get { return m_state; } }
 
-            public DateTime StartTime => throw new NotImplementedException();
+            public DateTime StartTime { get { return m_startTime; } }
 
-            public DateTime EndTime => throw new NotImplementedException();
+            public DateTime EndTime { get { return m_endTime; } }
 
             public BreakOption BreakOptions => throw new NotImplementedException();
 
@@ -178,12 +180,17 @@ namespace StepBro.Core.General
                     this.ChangeState(TaskExecutionState.Running);
                     try
                     {
+                        m_startTime = DateTime.Now;
                         m_taskFunction(m_context);
                         this.ChangeState(TaskExecutionState.Ended);
                     }
-                    catch (Exception)
+                    catch
                     {
-                        this.ChangeState(TaskExecutionState.Ended);
+                        this.ChangeState(TaskExecutionState.EndedByException);
+                    }
+                    finally
+                    {
+                        m_endTime = DateTime.Now;
                     }
                 }
             }
@@ -216,7 +223,7 @@ namespace StepBro.Core.General
                             if (DateTime.Now > (entry + timeout)) return false;
                             Thread.Sleep(10);
                         }
-                        return m_task.Wait(DateTime.Now.TimeTill( entry + timeout) );
+                        return m_task.Wait(DateTime.Now.TimeTill(entry + timeout));
                     }
                 }
                 else

@@ -30,6 +30,7 @@
         StopRequested,
         KillRequested,
         Terminating,
-        Ended
+        Ended,
+        EndedByException
     }
 }

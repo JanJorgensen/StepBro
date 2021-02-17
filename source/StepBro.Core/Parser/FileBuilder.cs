@@ -492,7 +492,7 @@ namespace StepBro.Core.Parser
             }
             else
             {
-                filesToParse = filesManager.ListFiles<ScriptFile>().Reverse().ToList();
+                filesToParse = filesManager.ListFiles<ScriptFile>().ToList();
             }
             var fileListeners = new Dictionary<ScriptFile, StepBroListener>();
             var fileContexts = new Dictionary<ScriptFile, SBP.CompilationUnitContext>();
@@ -625,7 +625,7 @@ namespace StepBro.Core.Parser
                             {
                                 loadedFile.UnregisterDependant(dummyUser);
                                 fileParsingStack.Enqueue(loadedFile);
-                                filesToParse.Insert(0, loadedFile);      // Put in front
+                                filesToParse.Add(loadedFile);
                                 return loadedFile;
                             }
                         }

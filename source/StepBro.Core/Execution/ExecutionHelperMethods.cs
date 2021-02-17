@@ -371,9 +371,12 @@ namespace StepBro.Core.Execution
 
         public static void LogList(IScriptCallContext context, IEnumerable<string> list)
         {
-            foreach (string s in list)
+            if (list != null)
             {
-                context.Log(s);
+                foreach (string s in list)
+                {
+                    context.Log(s);
+                }
             }
         }
 

@@ -631,6 +631,7 @@ namespace StepBro.Core.ScriptData
 
         private void AddRootIdentifier(string name, IIdentifierInfo info)
         {
+            System.Diagnostics.Debug.WriteLine($"AddRootIdentifier {this.FileName}: {name}");
             if (!m_rootIdentifiers.ContainsKey(name))
             {
                 var list = new List<IIdentifierInfo>();

@@ -21,7 +21,13 @@ namespace StepBro.Core.Data
         public uint ID { get; private set; }
         public DateTime Timestamp { get; private set; }
         public string Text { get; private set; }
-        string ILineReaderEntry.Text { get { return this.Text.Substring(1); } }
+        string ILineReaderEntry.Text
+        {
+            get
+            {
+                return this.Text.Substring(1);
+            }
+        }
 
         public LogLineData(LogLineData previous, LogType type, uint id, string text)
         {
