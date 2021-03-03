@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using static StepBro.Core.Data.LogLineData;
@@ -15,11 +16,12 @@ using static StepBro.Core.Data.LogLineData;
 namespace StepBro.TestInterface
 {
     public class SerialTestConnection :
-        AvailabilityBase, IConnection, IRemoteProcedures, ILogLineSource, ISettableFromPropertyBlock, INotifyPropertyChanged, ILogLineParent
+        AvailabilityBase, IConnection, IRemoteProcedures, INameable, ILogLineSource, ISettableFromPropertyBlock, INotifyPropertyChanged, ILogLineParent
     {
         private class CommandData : IAsyncResult<object>, IObjectFaultDescriptor
         {
             public enum CommandState { InQueue, Running, EndResponseReceived, EndTimeout, EndResponseError, EndResultFormatError }
+            private ICallContext m_context = null;
             private readonly DateTime m_start;
             private DateTime m_activated = DateTime.MinValue;
             private TimeSpan m_timeoutTimeSpan;
@@ -34,8 +36,9 @@ namespace StepBro.TestInterface
             private object m_result = null;
             private readonly Func<string[], string, object> m_resultDecoder = null;
 
-            public CommandData(string command, TimeSpan timeout, Type expectedDataType) : base()
+            public CommandData(ICallContext context, string command, TimeSpan timeout, Type expectedDataType) : base()
             {
+                m_context = context;
                 m_start = DateTime.Now;
                 m_command = command;
                 m_timeoutTimeSpan = timeout;
@@ -55,6 +58,7 @@ namespace StepBro.TestInterface
             //    m_result = result;
             //}
 
+            public ICallContext Context { get { return m_context; } }
             public string Command { get { return m_command; } }
             public CommandState State { get { return m_state; } }
             public DateTime ActivationTimestamp { get { return m_activated; } }
@@ -227,8 +231,10 @@ namespace StepBro.TestInterface
         }
 
         private readonly object m_sync = new object();
+        private string m_name = null;
         private Stream m_stream = null;
         private IReadBuffer<char> m_inputBuffer = null;
+        private ILogger m_mainLogger = null;
         private LogLineData m_firstLogLine = null;
         private LogLineData m_lastLogLine = null;
         private object m_eventLogSync = new object();
@@ -254,6 +260,7 @@ namespace StepBro.TestInterface
             m_instanceID = rnd.Next(1000000);
             m_newResponseDataEvent = new AutoResetEvent(false);
             SetupDebugCommands();
+            m_mainLogger = StepBro.Core.Main.RootLogger;
         }
 
         protected override void DoDispose(bool disposing)
@@ -265,6 +272,19 @@ namespace StepBro.TestInterface
                 m_asyncLogLineReader = null;
             }
         }
+
+        public string Name
+        {
+            get { return m_name; }
+            set
+            {
+                if (String.IsNullOrWhiteSpace(value)) throw new ArgumentException();
+                if (m_name != null) throw new InvalidOperationException("The object is already named.");
+                m_name = value;
+            }
+        }
+
+        public string DisplayName { get { return (m_name != null) ? m_name : "SerialTestConnection"; } }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -290,6 +310,7 @@ namespace StepBro.TestInterface
                     if (value != null)
                     {
                         m_stream = value;
+                        m_stream.Encoding = new ASCIIEncoding();
                         m_stream.NewLine = "\n";
                         m_stream.IsOpenChanged += m_stream_IsOpenChanged;
                     }
@@ -380,7 +401,7 @@ namespace StepBro.TestInterface
                     request.Add(ArgumentToCommandString(a));
                 }
             }
-            var commandData = new CommandData(String.Join(" ", request), CommandResponseTimeout, null);
+            var commandData = new CommandData(context, String.Join(" ", request), CommandResponseTimeout, null);
             return EnqueueCommand(commandData);
         }
 
@@ -428,7 +449,7 @@ namespace StepBro.TestInterface
             var task = Task.Run<bool>(() =>
             {
                 // FIRST GET THE LIST OF AVAILABLE COMMANDS
-                var command = new CommandData("list commands", CommandResponseTimeout, typeof(List<string>));
+                var command = new CommandData(context, "list commands", CommandResponseTimeout, typeof(List<string>));
                 var cmd = EnqueueCommand(command);
                 if (cmd.CompletedSynchronously)
                 {
@@ -450,7 +471,7 @@ namespace StepBro.TestInterface
                             var commandName = DecodeCommandListLine(commandListLine, out id);
 
                             // THEN, GET THE INFORMATION FOR EACH COMMAND
-                            command = new CommandData("help " + commandName, CommandResponseTimeout, typeof(List<string>));
+                            command = new CommandData(context, "help " + commandName, CommandResponseTimeout, typeof(List<string>));
                             cmd = EnqueueCommand(command);
 
                             if (cmd.CompletedSynchronously)
@@ -606,7 +627,7 @@ namespace StepBro.TestInterface
                     request.Add(ArgumentToCommandString(a));
                 }
             }
-            var command = new CommandData(String.Join(" ", request), CommandResponseTimeout, procedure.ReturnType);
+            var command = new CommandData(null, String.Join(" ", request), CommandResponseTimeout, procedure.ReturnType);
             return EnqueueCommand(command);
         }
 
@@ -639,16 +660,36 @@ namespace StepBro.TestInterface
                 {
                     m_firstLogLine = m_lastLogLine;
                 }
-                if (type == LogType.ReceivedAsync)
+                switch (type)
                 {
-                    if (m_asyncLogLineReader != null)
-                    {
-                        lock (m_eventLogSync)
+                    case LogType.ReceivedEnd:
+                    case LogType.ReceivedPartial:
+                    case LogType.ReceivedError:
+                        if (m_currentExecutingCommand != null)
                         {
-                            m_lastEventLogLine = new LogLineData(m_lastEventLogLine, type, id, text);
-                            m_asyncLogLineReader.NotifyNew(m_lastEventLogLine);
+                            var logger = m_currentExecutingCommand?.Context?.Logger;
+                            if (logger != null && m_currentExecutingCommand.Context.LoggingEnabled)
+                            {
+                                logger.LogDetail(this.DisplayName, "Received: " + text);
+                            }
                         }
-                    }
+                        break;
+                    case LogType.ReceivedAsync:
+                        if (m_mainLogger != null)
+                        {
+                            m_mainLogger.LogAsync(m_name, "Event: " + text);
+                        }
+                        if (m_asyncLogLineReader != null)
+                        {
+                            lock (m_eventLogSync)
+                            {
+                                m_lastEventLogLine = new LogLineData(m_lastEventLogLine, type, id, text);
+                                m_asyncLogLineReader.NotifyNew(m_lastEventLogLine);
+                            }
+                        }
+                        break;
+                    default:
+                        break;
                 }
                 LinesAdded?.Invoke(this, new LogLineEventArgs(m_lastLogLine));
             }
@@ -788,6 +829,7 @@ namespace StepBro.TestInterface
             var commandstring = command.GetAndMarkActive();
             m_loopbackAnswers?.TryGetValue(commandstring, out commandstring);
             if (m_nextResponse != null) commandstring = m_nextResponse;
+            if (command.Context != null && command.Context.LoggingEnabled) command.Context.Logger.LogDetail(this.DisplayName, "Send: " + commandstring);
             DoSendDirect(commandstring);
         }
         private void DoSendDirect(string text)
@@ -910,7 +952,7 @@ namespace StepBro.TestInterface
             {
                 if (m_asyncLogLineReader == null)
                 {
-                    m_asyncLogLineReader = new LogLineLineReader(null, m_eventLogSync);
+                    m_asyncLogLineReader = new LogLineLineReader(this, null, m_eventLogSync);
                 }
                 return m_asyncLogLineReader;
             }

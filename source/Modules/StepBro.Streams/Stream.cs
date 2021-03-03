@@ -90,6 +90,15 @@ namespace StepBro.Streams
         /// </summary>
         public virtual bool IsFiniteStream { get { return false; } }
 
+        public System.Text.Encoding Encoding
+        {
+            get { return this.GetEncoding(); }
+            set { this.SetEncoding(value); }
+        }
+
+        protected abstract void SetEncoding(System.Text.Encoding encoding);
+        protected abstract System.Text.Encoding GetEncoding();
+
         protected abstract bool DoOpen(StepBro.Core.Execution.ICallContext context);
         protected abstract void DoClose(StepBro.Core.Execution.ICallContext context);
         public abstract bool IsOpen { get; }
@@ -117,11 +126,11 @@ namespace StepBro.Streams
                     }
                     return result;
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
                     if (context != null)
                     {
-                        context.ReportError(description: $"Could not open stream; {e.Message}", exception: e);
+                        context.ReportError($"Could not open stream; {ex.Message}", exception: ex);
                     }
                     return false;
                 }

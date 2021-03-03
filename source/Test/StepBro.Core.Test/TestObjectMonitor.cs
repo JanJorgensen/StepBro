@@ -79,17 +79,22 @@ namespace StepBroCoreTest
             var obj = new MyClass();
             var monitor = ObjectMonitorManager.Global.CreateObjectMonitor(obj);
             System.GC.Collect();
+            GC.WaitForPendingFinalizers();
+
             monitor.UpdateState();
             Assert.AreEqual(ObjectMonitor.State.TargetActive, monitor.CurrentState);
 
             obj.Dispose();
             System.GC.Collect();
+            GC.WaitForPendingFinalizers();
+            
             monitor.UpdateState();
             Assert.AreEqual(ObjectMonitor.State.TargetDisposed, monitor.CurrentState);
 
             Assert.IsTrue(obj.IsDisposed);      // This line also ensures object reference right until this point.
             obj = null;
             System.GC.Collect();
+            GC.WaitForPendingFinalizers();
 
             monitor.UpdateState();
             Assert.AreEqual(ObjectMonitor.State.TargetVoid, monitor.CurrentState);

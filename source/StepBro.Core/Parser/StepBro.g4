@@ -371,8 +371,7 @@ blockStatementAttributes : attributes ;
 subStatement : block | statement ;
 
 statement
-    :   ASSERT (REGULAR_STRING COLON)? parExpression SEMICOLON						# assertStatement
-    |   EXPECT (REGULAR_STRING COLON)? parExpression SEMICOLON						# expectStatement
+    :   (ASSERT | EXPECT) (REGULAR_STRING COLON)? parExpression SEMICOLON			# expectStatement
     |   IF parExpression subStatement (ELSE subStatement)?							# ifStatement
     |   FOR OPEN_PARENS forControl CLOSE_PARENS subStatement						# forStatement
     |   FOREACH OPEN_PARENS foreachControl CLOSE_PARENS subStatement				# foreachStatement

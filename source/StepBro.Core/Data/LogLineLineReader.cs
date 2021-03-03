@@ -31,7 +31,7 @@ namespace StepBro.Core.Data
             {
                 get { return m_current; }
             }
-            
+
             ILineReaderEntry IEnumerator<ILineReaderEntry>.Current
             {
                 get
@@ -82,8 +82,9 @@ namespace StepBro.Core.Data
 
         public event EventHandler LinesAdded;
 
-        public LogLineLineReader(LogLineData first, object sync)
+        public LogLineLineReader(INameable source, LogLineData first, object sync)
         {
+            this.Source = source;
             m_sync = sync;
             m_entry = first;
         }
@@ -115,6 +116,8 @@ namespace StepBro.Core.Data
         public object Sync { get { return m_sync; } }
 
         public ILineReaderEntry Current { get { return m_entry; } }
+
+        public INameable Source { get; private set; }
 
         public bool Next()
         {

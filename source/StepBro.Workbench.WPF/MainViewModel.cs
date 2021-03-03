@@ -1,5 +1,6 @@
 ﻿using ActiproSoftware.Windows;
 using ActiproSoftware.Windows.Input;
+using StepBro.Core;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.General;
@@ -7,6 +8,7 @@ using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using StepBro.Core.Utils;
+using StepBro.UI.Panels;
 using StepBro.Workbench.ToolViews;
 using System;
 using System.Collections.Generic;
@@ -23,12 +25,12 @@ namespace StepBro.Workbench
     /// </summary>
     public class MainViewModel : ObservableObjectBase
     {
-
         private int m_documentIndex = 1;
         private readonly DeferrableObservableCollection<DocumentItemViewModel> m_userDocumentItems = new DeferrableObservableCollection<DocumentItemViewModel>();
         private readonly DeferrableObservableCollection<ToolItemViewModel> m_toolItems = new DeferrableObservableCollection<ToolItemViewModel>();
         private readonly DeferrableObservableCollection<ErrorInfo> m_errors = new DeferrableObservableCollection<ErrorInfo>();
-        private readonly DeferrableObservableCollection<IFileElement> m_allFileElements = new DeferrableObservableCollection<IFileElement>();
+        private readonly DeferrableObservableCollection<CreateCustomPanelMenuItemViewModel> m_creatableCustomPanels = new DeferrableObservableCollection<CreateCustomPanelMenuItemViewModel>();
+        //private readonly DeferrableObservableCollection<IFileElement> m_allFileElements = new DeferrableObservableCollection<IFileElement>();
 
         private DelegateCommand<object> m_commandActivateNextDocument;
         private DelegateCommand<object> m_commandCloseActiveDocument;
@@ -40,7 +42,6 @@ namespace StepBro.Workbench
         private DelegateCommand<object> m_commandParseAllFiles;
         private DelegateCommand<object> m_commandStartExecution;
         private DelegateCommand<object> m_commandStartExecutionOfSelectedFileElement;
-        private DelegateCommand<object> m_commandCreateObjectPanel;
         private ICommand m_commandShowErrorsView;
         private ICommand m_commandShowOutputView;
         private ICommand m_commandShowCalculatorTool;
@@ -55,7 +56,8 @@ namespace StepBro.Workbench
         private string m_documentToActivateWhenLoaded = null;
         private string m_executionTarget = "tadaa!";
         private Tuple<IFileElement, string> m_executionTargetResolved = null;
-        private readonly SynchronizationContext m_syncContext;
+        private static SynchronizationContext g_syncContext = null;
+        private readonly CustomPanelManager m_panelManager = null;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         // OBJECT
@@ -66,11 +68,13 @@ namespace StepBro.Workbench
         /// </summary>
         public MainViewModel()
         {
-            m_syncContext = SynchronizationContext.Current;
+            g_syncContext = SynchronizationContext.Current;
             var cmd = ApplicationCommands.Save;
 
+            IService panelManagerService;
+            m_panelManager = new CustomPanelManager(out panelManagerService);
             // Initialize before the views start asking for the different services.
-            StepBroMain.Initialize();
+            StepBroMain.Initialize(new IService[] { panelManagerService });
 
             m_outputViewModel = new OutputViewModel();
             m_errorsViewModel = new ErrorsViewModel(m_errors);
@@ -80,6 +84,7 @@ namespace StepBro.Workbench
             m_toolItems.Add(m_errorsViewModel);
             m_toolItems.Add(m_calculatorViewModel);
             m_userDocumentItems.CollectionChanged += DocumentItems_CollectionChanged;
+            m_toolItems.CollectionChanged += ToolItems_CollectionChanged;
             m_loadedFiles = StepBroMain.GetLoadedFilesManager();
             m_loadedFiles.FileLoaded += LoadedFiles_FileLoaded;
             m_loadedFiles.FileClosed += LoadedFiles_FileClosed;
@@ -87,6 +92,8 @@ namespace StepBro.Workbench
 
             //this.SeSBPlashScreen();
             m_commandLineOptions = StepBro.Core.General.CommandLineParser.Parse<CommandLineOptions>(null, Environment.GetCommandLineArgs());
+
+            this.UpdateCustomPanelsMenu();
         }
 
         public void LogUserAction(string text)
@@ -130,6 +137,14 @@ namespace StepBro.Workbench
             get
             {
                 return m_toolItems;
+            }
+        }
+
+        public IList<CreateCustomPanelMenuItemViewModel> CreateableCustomPanelMenuItems
+        {
+            get
+            {
+                return m_creatableCustomPanels;
             }
         }
 
@@ -179,7 +194,6 @@ namespace StepBro.Workbench
             m_commandParseAllFiles?.RaiseCanExecuteChanged();
             m_commandStartExecution?.RaiseCanExecuteChanged();
             m_commandStartExecutionOfSelectedFileElement?.RaiseCanExecuteChanged();
-            m_commandCreateObjectPanel?.RaiseCanExecuteChanged();
         }
 
         #region VIEWMODEL EVENTS
@@ -207,17 +221,35 @@ namespace StepBro.Workbench
             }
         }
 
+        private void ToolItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+        }
+
+        private void Tool_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ToolItemViewModel.IsOpen))
+            {
+                if ((sender is ToolItemViewModel) && 
+                    (sender as ToolItemViewModel).DestructWhenClosed &&
+                    !(sender as ToolItemViewModel).IsOpen)
+                {
+                    (sender as ToolItemViewModel).PropertyChanged -= Tool_PropertyChanged;
+                    m_toolItems.Remove(sender as ToolItemViewModel);
+                }
+            }
+        }
+
         #endregion
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         #region MODEL EVENTS
         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void Invoke(SendOrPostCallback func)
+        internal static void Invoke(SendOrPostCallback func)
         {
-            if (m_syncContext != null)
+            if (g_syncContext != null)
             {
-                m_syncContext.Post(func, null);
+                g_syncContext.Post(func, null);
             }
             else
             {
@@ -544,21 +576,31 @@ namespace StepBro.Workbench
             this.UpdateCommandStates();
         }
 
-        public void CreateObjectPanel(bool activate)
+        public void CreateCustomPanel(bool activate)
         {
-            var panel = new ObjectPanelToolViewModel
+            var panel = new CustomPanelToolViewModel(StepBroMain.ServiceManager)
             {
                 IsOpen = true
             };
-            m_toolItems.Add(panel);
+            this.AddCustomPanel(panel, activate);
+        }
+
+        internal void AddCustomPanel(CustomPanelToolViewModel panel, bool activate = true)
+        {
+            this.AddTool(panel, activate);
+        }
+
+        private void AddTool(ToolItemViewModel tool, bool activate = true)
+        {
+            m_toolItems.Add(tool);
+            tool.PropertyChanged += Tool_PropertyChanged;
             if (activate)
             {
-                panel.IsActive = true;
-                panel.IsSelected = true;
+                tool.IsActive = true;
+                tool.IsSelected = true;
             }
             this.UpdateCommandStates();
         }
-
 
         ///// <summary>
         ///// Gets the create new image document command.
@@ -698,23 +740,6 @@ namespace StepBro.Workbench
             }
         }
 
-        public ICommand CreateObjectPanelCommand
-        {
-            get
-            {
-                if (m_commandCreateObjectPanel == null)
-                    m_commandCreateObjectPanel = new DelegateCommand<object>(
-                        (param) =>
-                        {
-                            CreateObjectPanel(true);
-                        }
-                    );
-
-                return m_commandCreateObjectPanel;
-            }
-        }
-
-
         /// <summary>
         /// Gets the select first document command.
         /// </summary>
@@ -850,6 +875,7 @@ namespace StepBro.Workbench
                     m_commandParseAllFiles.RaiseCanExecuteChanged();
                     NotifyPropertyChanged(nameof(FileParsingRunning));
                     this.UpdateCommandStates();
+                    this.UpdateCustomPanelsMenu();
                 });
             }
         }
@@ -997,6 +1023,75 @@ namespace StepBro.Workbench
         }
 
         #endregion
+
+        #endregion
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+        #region PRIVATE FUNCTIONS
+
+        private void UpdateCustomPanelsMenu()
+        {
+            var command = new DelegateCommand<CreateCustomPanelMenuItemViewModel>(
+            (param) =>
+            {
+                this.OpenCustomPanel(param);
+            });
+            var dynamicObjects = StepBroMain.GetService<IDynamicObjectManager>().ListKnownObjects().ToList();
+            m_creatableCustomPanels.BeginUpdate();
+            m_creatableCustomPanels.Clear();
+            foreach (var pt in m_panelManager.ListPanelTypes())
+            {
+                if (!pt.IsObjectPanel)
+                {
+                    var menuItem = new CreateCustomPanelMenuItemViewModel(pt, command);
+                    m_creatableCustomPanels.Add(menuItem);
+                }
+            }
+
+            foreach (var vc in dynamicObjects)
+            {
+                var objectMenu = new CreateCustomPanelMenuItemViewModel((vc as IValueContainer).Name);
+                if (vc.Object != null)
+                {
+                    foreach (var pt in m_panelManager.ListPanelTypes())
+                    {
+                        if (pt.IsObjectPanel && pt.IsCompatibleWithType(vc.Object.GetType())) // TODO: Check if more of this type can be created.
+                        {
+                            var menuItem = new CreateCustomPanelMenuItemViewModel(pt, vc, command, pt.Name);
+                            objectMenu.AddSubItem(menuItem);
+                        }
+                    }
+                }
+                if (objectMenu.SubItems != null)
+                {
+                    m_creatableCustomPanels.Add(objectMenu);
+                }
+            }
+
+            m_creatableCustomPanels.EndUpdate();
+        }
+
+        private void OpenCustomPanel(CreateCustomPanelMenuItemViewModel activation)
+        {
+            CustomPanelInstanceData panelData;
+            if (activation.PanelType.IsObjectPanel)
+            {
+                panelData = m_panelManager.CreateObjectPanel(activation.PanelType, activation.Variable);
+            }
+            else
+            {
+                panelData = m_panelManager.CreateStaticPanel(activation.PanelType);
+            }
+
+            var panel = new CustomPanelToolViewModel(StepBroMain.ServiceManager, panelData)
+            {
+                IsOpen = true
+            };
+            m_toolItems.Add(panel);
+            panel.IsActive = true;
+            panel.IsSelected = true;
+            this.UpdateCommandStates();
+        }
 
         #endregion
     }

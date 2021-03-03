@@ -37,11 +37,11 @@ namespace StepBro.Core.Execution
             }
         }
 
-        public TestResult CurrentProcedureResult
+        public ProcedureResult Result
         {
             get
             {
-                return m_context.CurrentProcedureResult;
+                return m_context.Result;
             }
         }
 
@@ -184,7 +184,7 @@ namespace StepBro.Core.Execution
         {
         }
 
-        public bool ReportError(ErrorID error = null, string description = "", Exception exception = null)
+        public bool ReportParsingError(ErrorID error = null, string description = "", Exception exception = null)
         {
             return true;
         }
@@ -192,6 +192,21 @@ namespace StepBro.Core.Execution
         public void ReportExpectResult(string title, string expected, string actual, Verdict verdict)
         {
             m_context.ReportExpectResult(title, expected, actual, verdict);
+        }
+
+        public bool SetResultFromSub(IScriptCallContext sub)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReportFailure(string failureDescription, ErrorID id = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReportError(string errorDescription, ErrorID id = null, Exception exception = null)
+        {
+            throw new NotImplementedException();
         }
     }
 }

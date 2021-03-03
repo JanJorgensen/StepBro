@@ -100,13 +100,19 @@ namespace StepBro.Core.Execution
             var report = internalContext.ListReports().FirstOrDefault(r => String.Equals(ID, r.ID, StringComparison.InvariantCulture));
             if (report == null)
             {
-                context.ReportError(description: "Failed to find report named \"" + ID + "\".");
+                context.ReportError("Failed to find report named \"" + ID + "\".");
             }
             return report;
         }
 
         [Public]
         public static void SaveAsPlainText(this DataReport report, string filepath)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Public]
+        public static void SaveAsHtml(this DataReport report, string filepath)
         {
             throw new NotImplementedException();
         }
@@ -121,34 +127,35 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static bool Matches(this ILineReader reader, Predicate<string> comparer)
+        public static bool Matches(this ILineReader reader, Func<string, string> comparer)
         {
             ILineReaderEntry entry = reader.Current;
             if (entry == null) return false;
-            return comparer(entry.Text);
+            return comparer(entry.Text) != null;
         }
 
         [Public]
-        public static bool Find(this ILineReader reader, string text, bool flushIfNotFound = false)
+        public static string Find(this ILineReader reader, [Implicit] ICallContext context, string text, bool flushIfNotFound = false)
         {
             System.Diagnostics.Debug.WriteLine("Reader.Find: " + text);
             reader.DebugDump();
             //if (context != null && context.LoggingEnabled) context.Logger.Log("Find", "\"" + text + "\"");
             var comparer = StringUtils.CreateComparer(text);
-            return Find(reader, comparer, flushIfNotFound);
+            return Find(reader, context, comparer, flushIfNotFound);
         }
 
         [Public]
-        public static bool Find(this ILineReader reader, Predicate<string> comparer, bool flushIfNotFound = false)
+        public static string Find(this ILineReader reader, [Implicit] ICallContext context, Func<string, string> comparer, bool flushIfNotFound = false)
         {
             var peaker = reader.Peak();
             ILineReaderEntry last = null;
             foreach (var entry in peaker)
             {
-                if (comparer(entry.Text))
+                var result = comparer(entry.Text);
+                if (result != null)
                 {
                     reader.Flush(entry);
-                    return true;
+                    return result;
                 }
                 last = entry;
             }
@@ -157,21 +164,15 @@ namespace StepBro.Core.Execution
                 reader.Flush(last);     // First flush until the last seen entry
                 reader.Next();          // ... then also flush the last seen.
             }
-            return false;
+            return null;
         }
 
         [Public]
-        public static bool Await(this ILineReader reader, string text, TimeSpan timeout, bool removeFound = true)
+        public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan timeout, bool removeFound = true)
         {
             System.Diagnostics.Debug.WriteLine("Reader.Await: " + text);
-            //if (context != null && context.LoggingEnabled) context.Logger.Log("Await", "\"" + text + "\"");
+            if (context != null && context.LoggingEnabled) context.Logger.Log("Await", "\"" + text + "\"");
             var comparer = StringUtils.CreateComparer(text);
-            return Await(reader, comparer, timeout, removeFound);
-        }
-
-        [Public]
-        public static bool Await(this ILineReader reader, Predicate<string> comparer, TimeSpan timeout, bool removeFound = true)
-        {
             reader.DebugDump();
 
             // If the reader has timestampe, set the timeout relative to the time of the current entry; otherwise just use current wall time.
@@ -183,14 +184,14 @@ namespace StepBro.Core.Execution
             //bool sleep = false;
             do
             {
-                //if (sleep) System.Threading.Thread.Sleep(5);
-                if (reader.Find(comparer, true))
+                var result = reader.Find(null, comparer, true);
+                if (result != null)
                 {
                     if (removeFound)
                     {
                         reader.Next();
                     }
-                    return true;
+                    return result;
                 }
                 lock (reader.Sync)
                 {
@@ -202,7 +203,17 @@ namespace StepBro.Core.Execution
                 //sleep = true;
             } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero);
 
-            return false;
+            if ((context as IScriptCallContext) != null)
+            {
+                var ctx = context as IScriptCallContext;
+                var readerName = reader.Source.Name;
+                if (readerName == null)
+                {
+                    readerName = "log reader";
+                }
+                ctx.ReportFailure($"No entry matching \"{text}\" was found in {readerName}.");
+            }
+            return null;
         }
 
         [Public]

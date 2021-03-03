@@ -108,6 +108,11 @@ namespace StepBroCoreTest.Mocks
             throw new NotImplementedException();
         }
 
+        void ILogger.LogAsync(string location, string text)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         #region IDisposable Support

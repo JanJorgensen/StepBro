@@ -7,17 +7,15 @@
         mc:Ignorable="d"
         Title="StepBro Workbench"	
 	    Width="800" Height="600"
-	    WindowStartupLocation="CenterScreen">
+	    WindowStartupLocation="CenterScreen" Closed="Window_Closed" Closing="Window_Closing">
 
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Close" CanExecute="CloseCanExecute" Executed="CloseExecuted" />
+    </Window.CommandBindings>
     <local:MainView x:Name="view" IsTabStop="False" Focusable="False">
-        <local:MainView.ContentTemplate>
-            <DataTemplate>
-                <local:MainView />
-            </DataTemplate>
-        </local:MainView.ContentTemplate>
-        <local:MainView.Content>
+        <local:MainView.DataContext>
             <local:MainViewModel />
-        </local:MainView.Content>
+        </local:MainView.DataContext>
     </local:MainView>
 
 </Window>

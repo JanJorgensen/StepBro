@@ -257,6 +257,7 @@ namespace StepBro.Core.Parser
         public override void ExitLambdaExpression([NotNull] SBP.LambdaExpressionContext context)
         {
             var lambdaExpressionCode = m_expressionData.Pop();
+            lambdaExpressionCode = this.ResolveForGetOperation(lambdaExpressionCode);
 
             var scope = m_scopeStack.Pop();
             var parameters = new List<ParameterExpression>(scope.GetLambdaParameters());

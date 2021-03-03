@@ -299,7 +299,7 @@ namespace StepBro.Core.Execution
                     return container;
                 }
             }
-            context.ReportError(description: String.Format("INTERNAL ERROR: Could not find variable container with id = {0}.", id));
+            context.ReportError(String.Format("INTERNAL ERROR: Could not find variable container with id = {0}.", id));
             return null;
         }
 
@@ -313,7 +313,7 @@ namespace StepBro.Core.Execution
                 {
                     if (context != null)
                     {
-                        context.ReportError(description: String.Format("INTERNAL ERROR: Could not find procedure with id = {0}.", procedureID));
+                        context.ReportError(String.Format("INTERNAL ERROR: Could not find procedure with id = {0}.", procedureID));
                     }
                     else
                     {
@@ -328,7 +328,7 @@ namespace StepBro.Core.Execution
                 {
                     if (context != null)
                     {
-                        context.ReportError(description: String.Format("INTERNAL ERROR: Could not find script file with id = {0}.", fileID));
+                        context.ReportError(String.Format("INTERNAL ERROR: Could not find script file with id = {0}.", fileID));
                     }
                     else
                     {
@@ -342,7 +342,7 @@ namespace StepBro.Core.Execution
                     {
                         if (context != null)
                         {
-                            context.ReportError(description: String.Format("INTERNAL ERROR: Could not find procedure with id = {0}.", procedureID));
+                            context.ReportError(String.Format("INTERNAL ERROR: Could not find procedure with id = {0}.", procedureID));
                         }
                         else
                         {
@@ -359,12 +359,24 @@ namespace StepBro.Core.Execution
             return GetProcedure(context, fileID, procedureID) as IProcedureReference<T>;
         }
 
+        public static bool PostProcedureCallResultHandling(IScriptCallContext context, IScriptCallContext sub)
+        {
+            if ((context.Self.Flags & ProcedureFlags.NoSubResultInheritance) == ProcedureFlags.None)
+            {
+                return context.SetResultFromSub(sub);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public static IFileElement GetFileElement(IScriptCallContext context, int id)
         {
             var element = ((ScriptFile)context.Self.ParentFile).GetFileElement(id);
             if (element == null)
             {
-                context.ReportError(description: String.Format("INTERNAL ERROR: Could not find procedure with id = {0}.", id));
+                context.ReportError(String.Format("INTERNAL ERROR: Could not find procedure with id = {0}.", id));
             }
             return element;
         }
@@ -412,7 +424,7 @@ namespace StepBro.Core.Execution
             }
             catch (Exception ex)
             {
-                context.ReportError(description: "Exception in dynamic procedure call.", exception: ex);
+                context.ReportError("Exception in dynamic procedure call.", exception: ex);
                 return null;
             }
             finally
@@ -429,7 +441,7 @@ namespace StepBro.Core.Execution
             object[] sequencialLastArguments)
         {
             if (procedure == null) throw new ArgumentNullException("procedure");
-            if (!procedure.ProcedureData.IsFunction) throw new ArgumentException("The procedure is not marked as being a function.");
+            if ((procedure.ProcedureData.Flags & ProcedureFlags.IsFunction) == ProcedureFlags.None) throw new ArgumentException("The procedure is not marked as being a function.");
             throw new NotImplementedException();
         }
 
@@ -438,7 +450,7 @@ namespace StepBro.Core.Execution
             if (reference is IProcedureReference<T>) return (IProcedureReference<T>)reference;
             else
             {
-                context.ReportError(description: "The procedure reference is not the expected type. Type: " + reference.GetType().Name);
+                context.ReportError("The procedure reference is not the expected type. Type: " + reference.GetType().Name);
                 return null;
             }
         }
@@ -467,13 +479,13 @@ namespace StepBro.Core.Execution
                     }
                     else
                     {
-                        context.ReportError(description: "The partner procedure is not the expected type.");
+                        context.ReportError("The partner procedure is not the expected type.");
                         return null;
                     }
                 }
                 e = e.BaseElement;
             }
-            context.ReportError(description: $"The element \"{element.FullName}\" has no partner named \"{partnerName}\".");
+            context.ReportError($"The element \"{element.FullName}\" has no partner named \"{partnerName}\".");
             return null;
         }
 
@@ -527,11 +539,11 @@ namespace StepBro.Core.Execution
             {
                 if (result is IObjectFaultDescriptor)
                 {
-                    context.ReportError(description: "Async operation failed. Fault: " + ((IObjectFaultDescriptor)result).FaultDescription);
+                    context.ReportError("Async operation failed. Fault: " + ((IObjectFaultDescriptor)result).FaultDescription);
                 }
                 else
                 {
-                    context.ReportError(description: "Async operation failed.");
+                    context.ReportError("Async operation failed.");
                 }
                 return default(T);
             }
@@ -540,14 +552,22 @@ namespace StepBro.Core.Execution
                 object v = result?.Result;
                 if (v != null)
                 {
-                    if (typeof(T).IsAssignableFrom(v.GetType()))
+                    var valueType = v.GetType();
+                    if (typeof(T).IsAssignableFrom(valueType))
                     {
                         return (T)v;
                     }
-                    else
+                    else if (valueType == typeof(string))
                     {
-                        throw new InvalidCastException($"The async result value type is \"{v.GetType().TypeName()}\", and cannot be converted into a \"{typeof(T).TypeName()}\".");
+                        try
+                        {
+                            object value = Convert.ChangeType(v, typeof(T));
+                            return (T)value;
+                        }
+                        catch { }
                     }
+
+                    throw new InvalidCastException($"The async result value type is \"{v.GetType().TypeName()}\", and cannot be converted into a \"{typeof(T).TypeName()}\".");
                 }
             }
             return default(T);
@@ -572,8 +592,8 @@ namespace StepBro.Core.Execution
                 if (context != null)
                 {
                     context.ReportError(
-                        new DynamicMethodNotFoundError(),
-                        $"Method named '{name}' was not found on the object of type '{instance.GetType().Name}'.");
+                        $"Method named '{name}' was not found on the object of type '{instance.GetType().Name}'.",
+                        new DynamicMethodNotFoundError());
                 }
                 throw;
             }
@@ -582,9 +602,8 @@ namespace StepBro.Core.Execution
                 if (context != null)
                 {
                     context.ReportError(
-                        null,
                         $"Exception executing method '{name}' on the object of type '{instance.GetType().Name}'.",
-                        ex);
+                        exception: ex);
                 }
                 throw;
             }
@@ -620,8 +639,8 @@ namespace StepBro.Core.Execution
                 if (context != null)
                 {
                     context.ReportError(
-                        new DynamicMethodNotFoundError(),
-                        $"Method named '{name}' was not found on the object of type '{instance.GetType().Name}'.");
+                        $"Method named '{name}' was not found on the object of type '{instance.GetType().Name}'.",
+                        new DynamicMethodNotFoundError());
                 }
                 throw;
             }
@@ -630,9 +649,8 @@ namespace StepBro.Core.Execution
                 if (context != null)
                 {
                     context.ReportError(
-                        null,
                         $"Exception executing method '{name}' on the object of type '{instance.GetType().Name}'.",
-                        ex);
+                        exception: ex);
                 }
                 throw;
             }
@@ -702,6 +720,45 @@ namespace StepBro.Core.Execution
                         @object.Setup(logger, props as PropertyBlock);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Executes the evaluation of an expect statement.
+        /// </summary>
+        /// <param name="context">Execution call context.</param>
+        /// <param name="evaluation">The expect statement evaluation code.</param>
+        /// <param name="negativeVerdict">The verdict for negative evaluation result.</param>
+        /// <param name="title">The expect statement title.</param>
+        /// <param name="expected">String representation of the expectation.</param>
+        /// <returns>Whether the procedure should skip the rest and return immediately.</returns>
+        public static bool ExpectStatement(
+            IScriptCallContext context,
+            ExpectStatementEvaluationDelegate evaluation,
+            Verdict negativeVerdict,
+            string title,
+            string expected)
+        {
+            bool success;
+            try
+            {
+                string actual;
+                success = evaluation(context, out actual);
+                context.ReportExpectResult(title, expected, actual, success ? Verdict.Pass : negativeVerdict);
+
+                if (success) return false;
+                else if (negativeVerdict == Verdict.Error) return true;
+                else return (context.Self.Flags & ProcedureFlags.ContinueOnFail) == ProcedureFlags.None;
+            }
+            catch (Exception ex)
+            {
+                if (context != null) context.ReportError($"Exception thrown during expect statement execution.", exception: ex);
+                else
+                {
+                    throw;
+                }
+
+                return true; // Do exit the procedure
             }
         }
     }

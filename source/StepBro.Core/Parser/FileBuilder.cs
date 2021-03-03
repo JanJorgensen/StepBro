@@ -459,6 +459,7 @@ namespace StepBro.Core.Parser
             TaskContextDummy taskContext = new TaskContextDummy();
             services.StartServices(taskContext);
 
+            addonManager.AddAssembly(typeof(System.Convert).Assembly, false);
             addonManager.AddAssembly(typeof(Math).Assembly, false);
             addonManager.AddAssembly(typeof(Enumerable).Assembly, false);
             addonManager.AddAssembly(AddonManager.StepBroCoreAssembly, true);
@@ -729,7 +730,7 @@ namespace StepBro.Core.Parser
                                 {
                                     var procedure = new FileProcedure(file, accessModifier, element.Line, null, file.Namespace, element.Name)
                                     {
-                                        IsFunction = element.IsFunction,
+                                        Flags = (element.IsFunction ? ProcedureFlags.IsFunction : ProcedureFlags.None),
                                         HasBody = element.HasBody,
                                         BaseElementName = firstPropFlag
                                     };

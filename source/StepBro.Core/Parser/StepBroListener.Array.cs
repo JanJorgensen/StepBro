@@ -71,7 +71,12 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpArray([NotNull] SBP.ExpArrayContext context)
         {
-            var valueParserExpressions = m_expressionData.PopStackLevel();
+            var valueParserExpressions = m_expressionData.PopStackLevel().ToList();
+            for (int i = 0; i < valueParserExpressions.Count;i++)
+            {
+                valueParserExpressions[i] = this.ResolveForGetOperation(valueParserExpressions[i]);
+            }
+
             bool first = true, same = true;
             Type firstElementType = null;
             foreach (var t in valueParserExpressions.Select(exp => exp.DataType.Type))

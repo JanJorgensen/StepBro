@@ -3,6 +3,7 @@ using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using System;
+using System.Text;
 
 namespace StepBro.Streams
 {
@@ -102,6 +103,7 @@ namespace StepBro.Streams
             m_port = new System.IO.Ports.SerialPort();
             m_port.ErrorReceived += this.Port_ErrorReceived;
             m_port.DataReceived += this.Port_DataReceived;
+            m_port.Encoding = new ASCIIEncoding();
         }
 
         internal System.IO.Ports.SerialPort Port { get { return m_port; } }
@@ -114,6 +116,9 @@ namespace StepBro.Streams
         public StopBits StopBits { get { return (StopBits)m_port.StopBits; } set { m_port.StopBits = (System.IO.Ports.StopBits)value; } }
 
         public override string NewLine { get { return m_port.NewLine; } set { m_port.NewLine = value; } }
+
+        protected override void SetEncoding(System.Text.Encoding encoding) { m_port.Encoding = encoding; }
+        protected override System.Text.Encoding GetEncoding() { return m_port.Encoding; }
 
         private void Port_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
@@ -192,7 +197,7 @@ namespace StepBro.Streams
             }
             catch (Exception ex)
             {
-                context.ReportError(description: "Error discarding in-buffer.", exception: ex);
+                context.ReportError("Error discarding in-buffer.", exception: ex);
             }
             return m_port.IsOpen;
         }
@@ -228,7 +233,7 @@ namespace StepBro.Streams
             }
             else
             {
-                if (context != null) context.ReportError(description: "Write, but port is not open.");
+                if (context != null) context.ReportError("Write, but port is not open.");
             }
         }
 
@@ -300,13 +305,13 @@ namespace StepBro.Streams
                             break;
                         }
                     }
-                    if (context != null) context.ReportError(description: "No lines read.");
+                    if (context != null) context.ReportError("No lines read.");
                     return null;
                 }
             }
             else
             {
-                if (context != null) context.ReportError(description: "ReadLine, but port is not open.");
+                if (context != null) context.ReportError("ReadLine, but port is not open.");
             }
             return null;
         }

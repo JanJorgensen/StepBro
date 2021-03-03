@@ -10,25 +10,25 @@ namespace StepBro.Core.Test.Data
         [TestMethod]
         public void WildcardCStringComparers()
         {
-            Predicate<string> equalsMatcher = new EqualsStringMatch("AbsaLon").Matches;
-            Assert.IsTrue(equalsMatcher("AbsaLon"));
-            Assert.IsFalse(equalsMatcher("Absalon"));
-            Assert.IsFalse(equalsMatcher("mAbsaLon"));
-            Assert.IsFalse(equalsMatcher("AbsaLons"));
+            Func<string, string> equalsMatcher = new EqualsStringMatch("AbsaLon").Matches;
+            Assert.AreEqual("AbsaLon", equalsMatcher("AbsaLon"));
+            Assert.AreEqual(null, equalsMatcher("Absalon"));
+            Assert.AreEqual(null, equalsMatcher("mAbsaLon"));
+            Assert.AreEqual(null, equalsMatcher("AbsaLons"));
 
-            Predicate<string> startsWithMatcher = new StartsWithStringMatch("AbsaLon").Matches;
-            Assert.IsTrue(startsWithMatcher("AbsaLon"));
-            Assert.IsFalse(startsWithMatcher("Absalon"));
-            Assert.IsFalse(startsWithMatcher("mAbsaLon"));
-            Assert.IsTrue(startsWithMatcher("AbsaLons"));
-            Assert.IsFalse(startsWithMatcher("Absalonsk"));
+            Func<string, string> startsWithMatcher = new StartsWithStringMatch("AbsaLon").Matches;
+            Assert.AreEqual("", startsWithMatcher("AbsaLon"));
+            Assert.AreEqual(null, startsWithMatcher("Absalon"));
+            Assert.AreEqual(null, startsWithMatcher("mAbsaLon"));
+            Assert.AreEqual("s", startsWithMatcher("AbsaLons"));
+            Assert.AreEqual(null, startsWithMatcher("Absalonsk"));
 
-            Predicate<string> endsWithMatcher = new EndsWithStringMatch("AbsaLon").Matches;
-            Assert.IsTrue(endsWithMatcher("AbsaLon"));
-            Assert.IsFalse(endsWithMatcher("Absalon"));
-            Assert.IsTrue(endsWithMatcher("mAbsaLon"));
-            Assert.IsFalse(endsWithMatcher("mAbsalon"));
-            Assert.IsFalse(endsWithMatcher("AbsaLonsk"));
+            Func<string, string> endsWithMatcher = new EndsWithStringMatch("AbsaLon").Matches;
+            Assert.AreEqual("", endsWithMatcher("AbsaLon"));
+            Assert.AreEqual(null, endsWithMatcher("Absalon"));
+            Assert.AreEqual("m", endsWithMatcher("mAbsaLon"));
+            Assert.AreEqual(null, endsWithMatcher("mAbsalon"));
+            Assert.AreEqual(null, endsWithMatcher("AbsaLonsk"));
         }
     }
 }

@@ -7,12 +7,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
 {
     internal partial class StepBroListener
     {
+        private static MethodInfo s_ExpectStatement = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ExpectStatement));
+
         private TypeReference m_procedureReturnType = null;
         private bool m_procedureIsFunction = false;
         private List<ParameterData> m_parameters = null;
@@ -49,7 +52,7 @@ namespace StepBro.Core.Parser
                 {
                     m_currentProcedure = proc as FileProcedure;
                     m_currentFileElement = proc as FileElement;
-                    if (m_currentProcedure.IsFunction != m_procedureIsFunction) throw new Exception("Procedure from type scanning is different type (procedure/function) than in the current parsing.");
+                    if (((m_currentProcedure.Flags & ProcedureFlags.IsFunction) == ProcedureFlags.IsFunction) != m_procedureIsFunction) throw new Exception("Procedure from type scanning is different type (procedure/function) than in the current parsing.");
                 }
                 else
                 {
@@ -61,7 +64,7 @@ namespace StepBro.Core.Parser
                 m_currentProcedure = new FileProcedure(m_file, m_fileElementModifier, m_elementStart.Line, null, m_currentNamespace, name);
             }
             m_currentProcedure.ReturnType = m_procedureReturnType;
-            m_currentProcedure.IsFunction = m_procedureIsFunction;
+            m_currentProcedure.Flags = (m_currentProcedure.Flags & ~ProcedureFlags.IsFunction) | (m_procedureIsFunction ? ProcedureFlags.IsFunction : ProcedureFlags.None);
 
             m_currentFileElement = m_currentProcedure;
             m_lastProcedure = m_currentProcedure;
@@ -345,15 +348,6 @@ namespace StepBro.Core.Parser
 
         #endregion
 
-        public override void EnterAssertStatement([NotNull] SBP.AssertStatementContext context)
-        {
-            this.AddEnterStatement(context);
-        }
-
-        public override void ExitAssertStatement([NotNull] SBP.AssertStatementContext context)
-        {
-        }
-
         public override void EnterIfStatement([NotNull] SBP.IfStatementContext context)
         {
             this.AddEnterStatement(context);
@@ -480,7 +474,7 @@ namespace StepBro.Core.Parser
             // TODO: Add some logging, interactive break check, timeout and other stuff
             #region Attribute Handling
 
-            if (m_currentProcedure.IsFunction == false && props != null)
+            if ((m_currentProcedure.Flags & ProcedureFlags.IsFunction) == ProcedureFlags.None && props != null)
             {
                 foreach (var property in props)
                 {
@@ -771,7 +765,7 @@ namespace StepBro.Core.Parser
             }
 
             var exp = stack.Pop();
-            exp = this.ResolveIfIdentifier(exp, m_inFunctionScope);
+            exp = this.ResolveForGetOperation(exp).NarrowGetValueType();
             var code = exp.ExpressionCode;
             if (exp.IsError())
             {
@@ -779,7 +773,7 @@ namespace StepBro.Core.Parser
                 return;
             }
 
-            // If container, get the value of teh container
+            // If container, get the value of the container.
             if (exp.ExpressionCode.Type.IsGenericType && exp.ExpressionCode.Type.GetGenericTypeDefinition() == typeof(IValueContainer<>))
             {
                 code = Expression.Call(
@@ -787,6 +781,7 @@ namespace StepBro.Core.Parser
                     code.Type.GetMethod("GetTypedValue"),
                     Expression.Convert(Expression.Constant(null), typeof(Logging.ILogger)));
             }
+
 
             m_scopeStack.Peek().AddStatementCode(Expression.Return(m_currentProcedure.ReturnLabel, code));
         }
@@ -979,6 +974,8 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpectStatement([NotNull] SBP.ExpectStatementContext context)
         {
+            var isAssert = (context.children[0].GetText() == "assert");
+
             var stack = m_expressionData.PopStackLevel();
             var expression = stack.Pop();
             expression = this.ResolveForGetOperation(expression);
@@ -1002,27 +999,39 @@ namespace StepBro.Core.Parser
             }
             else
             {
-                var expectVerdict = Expression.Condition(
-                    expression.ExpressionCode,
-                    Expression.Constant(Verdict.Pass),
-                    Expression.Condition(Expression.Constant(false), Expression.Constant(Verdict.Error), Expression.Constant(Verdict.Fail)));
+                LabelTarget returnLabel = Expression.Label(typeof(bool));
+                var contextParameter = Expression.Parameter(typeof(IScriptCallContext), "context");
+                var actualValueParameter = Expression.Parameter(typeof(string).MakeByRefType(), "actualValue");
+
+                // delegate bool ExpectStatementEvaluationDelegate(IScriptCallContext context, out string actualValue);
+
+                var evaluationDelegate = Expression.Lambda<ExpectStatementEvaluationDelegate>(
+                        Expression.Block(
+                            Expression.Condition(
+                                expression.ExpressionCode,
+                                Expression.Block(
+                                    Expression.Assign(actualValueParameter, Expression.Constant("<TRUE>")),
+                                    Expression.Label(returnLabel, Expression.Constant(true))),
+                                Expression.Block(
+                                    Expression.Assign(actualValueParameter, Expression.Constant("<FALSE>")),
+                                    Expression.Label(returnLabel, Expression.Constant(false))))),
+                        contextParameter,
+                        actualValueParameter);
 
                 var expectCall = Expression.Call(
+                    s_ExpectStatement,
                     m_currentProcedure.ContextReferenceInternal,
-                    typeof(ICallContext).GetMethod(nameof(ICallContext.ReportExpectResult), new Type[] { typeof(string), typeof(string), typeof(string), typeof(Verdict) }),
+                    evaluationDelegate,
+                    isAssert ? Expression.Constant(Verdict.Error) : Expression.Constant(Verdict.Fail),
                     Expression.Constant(title),
-                    Expression.Constant(expressionText),
-                    Expression.Condition(expression.ExpressionCode, Expression.Constant("true"), Expression.Constant("true")),
-                    expectVerdict);
+                    Expression.Constant(expressionText));
 
-                var statementBlock = Expression.TryCatch(
-                    Expression.Block(
-                            expectCall),
-                            Expression.Catch(
-                                typeof(Exception),
-                                Expression.Empty()));       // TODO: Log the exception
+                var conditionalReturn = Expression.Condition(
+                    expectCall,
+                    Expression.Return(m_currentProcedure.ReturnLabel, Expression.Default(m_currentProcedure.ReturnType.Type)),
+                    Expression.Empty());
 
-                m_scopeStack.Peek().AddStatementCode(statementBlock);
+                m_scopeStack.Peek().AddStatementCode(conditionalReturn);
             }
         }
 

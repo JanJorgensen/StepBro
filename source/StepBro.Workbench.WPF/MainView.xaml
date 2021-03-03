@@ -7,7 +7,7 @@
 	xmlns:editor="http://schemas.actiprosoftware.com/winfx/xaml/syntaxeditor"
     xmlns:local="clr-namespace:StepBro.Workbench"
     xmlns:localviews="clr-namespace:StepBro.Workbench.ToolViews"
-    x:Class="StepBro.Workbench.MainView" Unloaded="UserControl_Unloaded"
+    x:Class="StepBro.Workbench.MainView"
     >
     <UserControl.Resources>
         <local:ToolItemDockSideConverter x:Key="ToolItemDockSideConverter" />
@@ -55,11 +55,11 @@
                     <localviews:CalculatorView />
                 </DataTemplate>
             </local:ToolItemTemplateSelector.CalculatorTemplate>
-            <local:ToolItemTemplateSelector.ObjectPanelTemplate>
+            <local:ToolItemTemplateSelector.CustomPanelTemplate>
                 <DataTemplate>
-                    <localviews:ObjectPanelToolView />
+                    <localviews:CustomPanelToolView />
                 </DataTemplate>
-            </local:ToolItemTemplateSelector.ObjectPanelTemplate>
+            </local:ToolItemTemplateSelector.CustomPanelTemplate>
         </local:ToolItemTemplateSelector>
 
     </UserControl.Resources>
@@ -73,7 +73,7 @@
     </UserControl.InputBindings>
     <UserControl.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Open" CanExecute="OpenCanExecute" Executed="OpenExecuted" />
-        <CommandBinding Command="ApplicationCommands.Close" CanExecute="CloseCanExecute" Executed="CloseExecuted" />
+        <!--<CommandBinding Command="ApplicationCommands.Close" CanExecute="CloseCanExecute" Executed="CloseExecuted" />-->
     </UserControl.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -127,21 +127,21 @@
         <!-- Main Menu -->
         <shared:PixelSnapper Panel.ZIndex="1">
             <Menu>
-                <MenuItem Header="File">
-                    <MenuItem Header="New">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_New">
                         <MenuItem.Icon>
                             <Image Source="Resources/Images/NewFile_16x.png"/>
                         </MenuItem.Icon>
                         <MenuItem Header="StepBro File" Tag=".sbs" Command="{Binding CreateNewStepBroDocumentCommand}"/>
                         <MenuItem Header="Text File" Tag=".txt" Command="{Binding CreateNewTextDocumentCommand}"/>
                     </MenuItem>
-                    <MenuItem Header="Open..." Command="ApplicationCommands.Open">
+                    <MenuItem Header="_Open..." Command="ApplicationCommands.Open">
                         <MenuItem.Icon>
                             <Image Source="Resources/Images/OpenFile_16x.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator />
-                    <MenuItem Header="Save" Command="ApplicationCommands.Save">
+                    <MenuItem Header="_Save" Command="ApplicationCommands.Save">
                         <MenuItem.Icon>
                             <Image Source="Resources/Images/Save_16x.png"/>
                         </MenuItem.Icon>
@@ -150,9 +150,9 @@
                     <!--<MenuItem Header="Print" Command="ApplicationCommands.Print" Icon="" />
                     <MenuItem Header="Print Preview" Command="ApplicationCommands.PrintPreview" Icon="" />
                     <Separator />-->
-                    <MenuItem Header="Exit" Command="ApplicationCommands.Close"/>
+                    <MenuItem Header="E_xit" Command="ApplicationCommands.Close"/>
                 </MenuItem>
-                <MenuItem Header="Edit">
+                <MenuItem Header="_Edit">
                     <MenuItem Command="ApplicationCommands.Undo">
                         <MenuItem.Icon>
                             <Image Source="Resources/Images/Undo_16x.png"/>
@@ -230,7 +230,19 @@
                             <Image Source="Resources/Images/Calculator_16x.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="Object Panel TBD" Command="{Binding CreateObjectPanelCommand}"/>
+                    <!--<MenuItem Header="Custom Panel TBD">
+                        <MenuItem Header="Object Panel TBD" Command="{Binding CreateObjectPanelCommand}"/>
+                    </MenuItem>-->
+                    <MenuItem Header="Custom Panel" ItemsSource="{Binding CreateableCustomPanelMenuItems}">
+                        <MenuItem.Resources>
+                            <Style TargetType="{x:Type MenuItem}">
+                                <Setter Property="Header" Value="{Binding Path=Header}"/>
+                                <Setter Property="Command" Value="{Binding Path=Command}"/>
+                                <Setter Property="CommandParameter" Value="{Binding Path=Self}"/>
+                            </Style>
+                            <HierarchicalDataTemplate DataType="{x:Type local:CreateCustomPanelMenuItemViewModel}" ItemsSource="{Binding SubItems}"></HierarchicalDataTemplate>
+                        </MenuItem.Resources>
+                    </MenuItem>
                     <!--<MenuItem Header="Open Object Panel" ItemsSource="{Binding CreateableObjectPanelsList}">
                         <MenuItem.ItemContainerStyle>
                             <Style TargetType="MenuItem">
@@ -280,17 +292,17 @@
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator />
-                    <MenuItem Header="Step Into" IsEnabled="False">
+                    <MenuItem Header="Step Into" IsEnabled="False" Visibility="Collapsed">
                         <MenuItem.Icon>
                             <Image Source="Resources/Images/StepIn_16x.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="Step Over" IsEnabled="False">
+                    <MenuItem Header="Step Over" IsEnabled="False" Visibility="Collapsed">
                         <MenuItem.Icon>
                             <Image Source="Resources/Images/StepOver_16x.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="Step Out" IsEnabled="False">
+                    <MenuItem Header="Step Out" IsEnabled="False" Visibility="Collapsed">
                         <MenuItem.Icon>
                             <Image Source="Resources/Images/StepOut_16x.png"/>
                         </MenuItem.Icon>
@@ -301,9 +313,9 @@
                             <Image Source="Resources/Images/Compile_16x.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="Debug Mode" IsEnabled="False"/>
+                    <MenuItem Header="Debug Mode" IsEnabled="False" Visibility="Collapsed"/>
                 </MenuItem>
-                <MenuItem Header="Macros">
+                <MenuItem Header="Macros" Visibility="Collapsed">
                     <MenuItem Header="Run Saved Macro"/>
                     <MenuItem Header="Run Recorded Macro" Command="editor:EditorCommands.RunMacro" />
                     <MenuItem x:Name="recordMacroMenuItem" Header="Record Macro" Command="editor:EditorCommands.ToggleMacroRecording" />
@@ -314,7 +326,7 @@
                     <!--Command="{Binding CustomEditCommands.RepeatActivationCommand}" />-->
                     <!--CommandTarget="{Binding ElementName=editor}"-->
                 </MenuItem>
-                <MenuItem Header="Window">
+                <MenuItem Header="Window" Visibility="Collapsed">
                     <!--<MenuItem Header="Can Split Horizontally" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=CanSplitHorizontally, Mode=TwoWay}" />
                     <MenuItem Header="Has Horizontal Split" IsCheckable="True" IsChecked="{Binding ElementName=editor, Path=HasHorizontalSplit, Mode=TwoWay}" />
                     <Separator />
@@ -380,10 +392,10 @@
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>-->
                     <Separator />
-                    <Button Command="editor:EditorCommands.Outdent" ToolTip="Outdent">
+                    <Button Command="editor:EditorCommands.Outdent" ToolTip="Outdent" Visibility="Collapsed">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
-                    <Button Command="editor:EditorCommands.Indent" ToolTip="Indent">
+                    <Button Command="editor:EditorCommands.Indent" ToolTip="Indent" Visibility="Collapsed">
                         <Image Source="Resources/Images/NewFile_16x.png"/>
                     </Button>
                     <!--<Separator />
@@ -422,13 +434,13 @@
                         <Image Source="Resources/Images/Run_16x.png"/>
                     </Button>
                     <editor:SyntaxEditor x:Name="editor" IsMultiLine="False" MinWidth="240" IsTextDataBindingEnabled="True" ToolTip="Procedure or partner to execute" Text="{Binding ExecutionTarget}"/>
-                    <Button ToolTip="Step Into">
+                    <Button ToolTip="Step Into" Visibility="Collapsed">
                         <Image Source="Resources/Images/StepIn_16x.png"/>
                     </Button>
-                    <Button ToolTip="Step Over">
+                    <Button ToolTip="Step Over" Visibility="Collapsed">
                         <Image Source="Resources/Images/StepOver_16x.png"/>
                     </Button>
-                    <Button ToolTip="Step Out">
+                    <Button ToolTip="Step Out" Visibility="Collapsed">
                         <Image Source="Resources/Images/StepOut_16x.png"/>
                     </Button>
                 </ToolBar>

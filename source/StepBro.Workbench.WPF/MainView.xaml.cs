@@ -1,6 +1,7 @@
 ﻿using ActiproSoftware.Windows.Controls.Docking.Serialization;
 using ActiproSoftware.Windows.Controls.SyntaxEditor.IntelliPrompt;
 using Microsoft.Win32;
+using StepBro.Workbench.ToolViews;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,23 +43,25 @@ namespace StepBro.Workbench
             return System.IO.Path.Combine(folder, System.IO.Path.ChangeExtension(documentFile, "layout"));
         }
 
-        private void SaveLayout()
-        {
-            layoutSerializer.SaveToFile(m_layoutfile, dockSite);
-        }
-
         private void OnLayoutSerializerDockingWindowDeserializing(object sender, DockingWindowDeserializingEventArgs e)
         {
             var viewModel = (MainViewModel)DataContext;
             if (e.Node.SerializationId.StartsWith("Tool"))
             {
+                if (e.Node.SerializationId.StartsWith("ToolCustomPanel"))
+                {
+                    var panelViewModel = new CustomPanelToolViewModel(StepBro.Core.Main.ServiceManager);
+                    panelViewModel.SerializationId = e.Node.SerializationId;
+                    viewModel.AddCustomPanel(panelViewModel, false);
+                    e.Window = dockSite.ContainerFromToolItem(panelViewModel);
+                }
             }
             else
             {
                 if (e.Node.IsOpen)
                 {
-                    var docVM = viewModel.OpenUserDocument(e.Node.SerializationId);
-                    e.Window = dockSite.ContainerFromDocumentItem(docVM);
+                    var docViewModel = viewModel.OpenUserDocument(e.Node.SerializationId);
+                    e.Window = dockSite.ContainerFromDocumentItem(docViewModel);
                 }
             }
             System.Diagnostics.Debug.WriteLine($"DockingWindowDeserializing: {e.Node.SerializationId}");
@@ -140,30 +143,52 @@ namespace StepBro.Workbench
 
         #region Close Command
 
-        private void CloseCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        //private void CloseCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        //{
+        //    e.CanExecute = true;
+        //}
+
+        //private void CloseExecuted(object sender, ExecutedRoutedEventArgs e)
+        //{
+        //    System.Diagnostics.Trace.WriteLine("CloseExecuted");
+        //    if (this.ApplicationCloseActivated != null)
+        //    {
+        //        this.ApplicationCloseActivated(this, EventArgs.Empty);
+        //    }
+        //    else
+        //    {
+        //        System.Windows.Application.Current.Shutdown();
+        //    }
+        //}
+
+        public bool CanClose
         {
-            e.CanExecute = true;
+            get
+            {
+                return true;
+            }
         }
 
-        private void CloseExecuted(object sender, ExecutedRoutedEventArgs e)
+        public bool TryClose()
         {
-            System.Diagnostics.Trace.WriteLine("CloseExecuted");
             if (!string.IsNullOrEmpty(m_layoutfile))
             {
-                this.SaveLayout();
+                layoutSerializer.SaveToFile(m_layoutfile, dockSite);
             }
-            System.Windows.Application.Current.Shutdown();
+            return true;
         }
 
+        //public event EventHandler ApplicationCloseActivated;
+ 
         #endregion
 
-        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
-        {
-            if (!string.IsNullOrEmpty(m_layoutfile))
-            {
-                this.SaveLayout();
-            }
-        }
+        //private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+        //{
+        //    if (!string.IsNullOrEmpty(m_layoutfile))
+        //    {
+        //        this.SaveLayout();
+        //    }
+        //}
 
         private void dockumentList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {

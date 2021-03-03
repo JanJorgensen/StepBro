@@ -19,12 +19,14 @@ namespace StepBro.Core.Parser
         private static MethodInfo s_GetGlobalVariable = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetGlobalVariable));
         private static MethodInfo s_GetProcedure = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetProcedure));
         private static MethodInfo s_GetProcedureTyped = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetProcedureTyped));
+        private static MethodInfo s_PostProcedureCallResultHandling = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.PostProcedureCallResultHandling));
         private static MethodInfo s_GetFileElement = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetFileElement));
         private static MethodInfo s_DynamicProcedureCall = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.DynamicProcedureCall));
         private static MethodInfo s_DynamicFunctionCall = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.DynamicFunctionCall));
         private static MethodInfo s_CastProcedureReference = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.CastToSpecificProcedureType));
         private static MethodInfo s_GetPartnerFromProcedure = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetPartnerReferenceFromProcedureReference));
         private static MethodInfo s_GetPartner = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetPartnerReference));
+
         private static string s_ScriptUtilsFullNamePrefix = typeof(Execution.ScriptUtils).FullName + ".";
         private static SBExpressionData s_ScriptUtilsTypeData = new SBExpressionData(HomeType.Immediate, SBExpressionType.TypeReference, new TypeReference(typeof(Execution.ScriptUtils)));
 

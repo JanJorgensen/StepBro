@@ -12,6 +12,7 @@ namespace StepBro.Core.Logging
         ILoggerScope LogEntering(string location, string text);
         void Log(string location, string text);
         void LogDetail(string location, string text);
+        void LogAsync(string location, string text);
         void LogError(string location, string text);
         void LogUserAction(string location, string text);
         void LogSystem(string location, string text);

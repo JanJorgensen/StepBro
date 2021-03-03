@@ -22,7 +22,7 @@ namespace StepBro.Core.Data
 
     public delegate bool VariableContainerAction(IValueContainerOwnerAccess container, ILogger logger);
 
-    public class VariableContainer<T> : AvailabilityBase, IValueContainer<T>, IValueContainerRich, IObjectContainer
+    public class VariableContainer<T> : AvailabilityBase, IValueContainer<T>, IValueContainerRich, IObjectContainer, INameable
     {
         #region Owner Access
         private class OwnerAccessor : IValueContainerOwnerAccess
@@ -138,6 +138,10 @@ namespace StepBro.Core.Data
             get
             {
                 return m_name;
+            }
+            set
+            {
+                throw new InvalidOperationException();
             }
         }
 

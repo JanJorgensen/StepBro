@@ -13,6 +13,7 @@ namespace StepBro.Core.Data
     [Public]
     public interface ILineReader
     {
+        INameable Source { get; }
         object Sync { get; }
         ILineReaderEntry Current { get; }
         bool LinesHaveTimestamp { get; }

@@ -9,7 +9,7 @@
     xmlns:ribbon="http://schemas.actiprosoftware.com/winfx/xaml/ribbon" 
     xmlns:shared="http://schemas.actiprosoftware.com/winfx/xaml/shared"
     xmlns:Controls="clr-namespace:StepBro.Core.Controls;assembly=StepBro.UI"
-    x:Class="StepBro.TestInterface.Controls.CommandTerminal"
+    x:Class="StepBro.TestInterface.Controls.CommandTerminalView"
     mc:Ignorable="d">
 
     <DockPanel LastChildFill="True">
@@ -38,21 +38,21 @@
                 </Menu>
             </ToolBar>
             <DockPanel Margin="0,4,4,4" LastChildFill="True">
-                <Button DockPanel.Dock="Right" Content="Send Prevous" Margin="8,2,0,2" VerticalAlignment="Center" Width="80"/>
-                <ComboBox x:Name="comboBox"/>
+                <Button DockPanel.Dock="Right" Content="Send Prevous" Margin="8,2,0,2" VerticalAlignment="Center" Width="80" Visibility="Collapsed" />
+                <ComboBox x:Name="commandHistory" ToolTip="Previous commands."/>
             </DockPanel>
             <DockPanel Margin="0,0,4,0">
-                <Button DockPanel.Dock="Right" Content="Send" Margin="8,2,0,2" VerticalAlignment="Center" Width="80"/>
-                <syntaxeditor:SyntaxEditor IsMultiLine="False" VerticalAlignment="Center"/>
+                <Button x:Name="sendButton" DockPanel.Dock="Right" Content="Send" Margin="8,2,0,2" VerticalAlignment="Center" Width="80" Click="sendButton_Click"/>
+                <syntaxeditor:SyntaxEditor x:Name="commandTextBox" IsMultiLine="False" VerticalAlignment="Center"/>
             </DockPanel>
-            <StackPanel Orientation="Horizontal" Margin="4">
-                <CheckBox x:Name="repeat2" Content="Repeat" VerticalAlignment="Center" Margin="0,0,8,0" IsEnabled="False" />
-                <TextBlock VerticalAlignment="Center" IsEnabled="False" ><Run Text="Count:"/></TextBlock>
-                <editors:Int32EditBox VerticalAlignment="Center" Margin="2,0,8,0" PickerKind="Default" Minimum="0" LargeChange="100"/>
-                <CheckBox x:Name="awaitResponse2" Content="Await response" VerticalAlignment="Center" Margin="8,0" IsEnabled="False" IsChecked="True" />
-                <TextBlock VerticalAlignment="Center" ><Run Text="Delay:"/></TextBlock>
-                <editors:TimeSpanEditBox VerticalAlignment="Center" Margin="2,0,8,0" Minimum="0" Maximum="0:10:0" LargeChange="0:0:10" SmallChange="0:0:0.01"/>
-                <Button DockPanel.Dock="Right" Content="Show Toolbar" Margin="8,2,0,2" VerticalAlignment="Center" Width="80"/>
+            <StackPanel Orientation="Horizontal" Margin="4" Visibility="Collapsed">
+                <CheckBox x:Name="repeat" Content="Repeat" VerticalAlignment="Center" Margin="0,0,8,0" IsEnabled="False"/>
+                <TextBlock VerticalAlignment="Center" IsEnabled="False" Visibility="Collapsed"><Run Text="Count:"/></TextBlock>
+                <editors:Int32EditBox VerticalAlignment="Center" Margin="2,0,8,0" PickerKind="Default" Minimum="0" LargeChange="100" Visibility="Collapsed"/>
+                <CheckBox x:Name="awaitResponse2" Content="Await response" VerticalAlignment="Center" Margin="8,0" IsEnabled="False" IsChecked="True" Visibility="Collapsed"/>
+                <TextBlock VerticalAlignment="Center" Visibility="Collapsed"><Run Text="Delay:"/></TextBlock>
+                <editors:TimeSpanEditBox VerticalAlignment="Center" Margin="2,0,8,0" Minimum="0" Maximum="0:10:0" LargeChange="0:0:10" SmallChange="0:0:0.01" Visibility="Collapsed"/>
+                <Button DockPanel.Dock="Right" Content="Show Toolbar" Margin="8,2,0,2" VerticalAlignment="Center" Width="80" Visibility="Collapsed"/>
             </StackPanel>
         </StackPanel>
         <!--<controls:SimpleLogViewer x:Name="log"/>-->

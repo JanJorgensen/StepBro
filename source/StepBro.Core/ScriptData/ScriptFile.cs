@@ -435,6 +435,12 @@ namespace StepBro.Core.ScriptData
                 {
                     logger?.Log("Variable " + v.VariableOwnerAccess.Container.Name, "Create data");
                     v.VariableOwnerAccess.DataCreator?.Invoke(v.VariableOwnerAccess, logger);
+                    var obj = v.VariableOwnerAccess.Container.GetValue();
+                    if (obj != null && obj is INameable && (obj as INameable).Name == null)
+                    {
+                        // Set the name of the object to the same as the container/variable;
+                        (obj as INameable).Name = v.VariableOwnerAccess.Container.Name;
+                    }
                 }
                 if (doInit)
                 {

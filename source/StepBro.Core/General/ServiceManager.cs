@@ -150,7 +150,7 @@ namespace StepBro.Core
                 var service = m_services.FirstOrDefault(s => s.ServiceType == typeof(T));
                 if (service != null)
                 {
-                    if (service.State != ServiceState.Started)
+                    if (service.State < ServiceState.Initialized)
                     {
                         throw new Exception("");
                     }

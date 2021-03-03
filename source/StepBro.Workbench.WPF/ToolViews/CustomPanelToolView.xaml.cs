@@ -18,9 +18,9 @@ namespace StepBro.Workbench.ToolViews
     /// <summary>
     /// Interaction logic for ObjectPanelToolView.xaml
     /// </summary>
-    public partial class ObjectPanelToolView : UserControl
+    public partial class CustomPanelToolView : UserControl
     {
-        public ObjectPanelToolView()
+        public CustomPanelToolView()
         {
             InitializeComponent();
         }

@@ -10,14 +10,27 @@
         <local:LogViewerViewModel/>
     </UserControl.DataContext>
     <Grid>
-        <ListView x:Name="LogEntryList" ItemsSource="{Binding LogEntries}">
+        <ListView x:Name="LogEntryList" ItemsSource="{Binding LogEntries}" ScrollViewer.VerticalScrollBarVisibility="Visible">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Timestamp" Width="70" DisplayMemberBinding="{Binding Timestamp}"></GridViewColumn>
                     <GridViewColumn Header="Type" Width="70" DisplayMemberBinding="{Binding Type}"></GridViewColumn>
-                    <GridViewColumn Header="Message" Width="440" DisplayMemberBinding="{Binding Message}"></GridViewColumn>
+                    <GridViewColumn Header="Message" Width="440">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Message}" Margin="{Binding LeftMargin}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem x:Name="clearLog" Header="Clear Log" Click="clearLog_Click" />
+                    <MenuItem x:Name="saveAsText" Header="Save as clear text file" Click="saveAsText_Click" />
+                    <MenuItem x:Name="saveAsHtml" Header="Save as HTML file" Click="saveAsHtml_Click" />
+                </ContextMenu>
+            </ListView.ContextMenu>
         </ListView>
     </Grid>
 </UserControl>

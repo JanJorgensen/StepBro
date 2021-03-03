@@ -69,6 +69,16 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
+        public void TestLinqWhereAndCount()
+        {
+            Assert.AreEqual(1L, ParseAndRun<long>(
+                "count",
+                "var arr = [ false, true, false ]; " +
+                "var count = arr.Where(e => e).Count();",
+                false));
+        }
+
+        [TestMethod]
         public void TestLocalVariableFromLambdaWithParameters()
         {
             Assert.AreEqual(12L, ParseAndRun<long>(

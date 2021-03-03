@@ -44,7 +44,9 @@ namespace StepBro.Core.ScriptData
             //m_parametersInternal.Add(new IdentifierInfo("callcontext", "callcontext", IdentifierType.Parameter, delegatetype, m_callContextParameter));
             m_returnLabel = Expression.Label();
             this.LogOption = logOption;
-            this.SeparateStateLevel = separateStateLevel;
+            this.Flags = 
+                (this.Flags & ProcedureFlags.SeparateStateLevel) |
+                (separateStateLevel ? ProcedureFlags.SeparateStateLevel : ProcedureFlags.None);
         }
 
         internal static IProcedureReference<T> Create<T>(IScriptFile file, string @namespace, string name, ContextLogOption logOption, T runtime) where T : class
@@ -157,11 +159,10 @@ namespace StepBro.Core.ScriptData
             }
         }
 
+        public ProcedureFlags Flags { get; internal set; }
+
         public ContextLogOption LogOption { get; set; }
 
-        public bool SeparateStateLevel { get; set; }
-
-        public bool IsFunction { get; internal set; } = false;
         public bool HasBody { get; internal set; } = false;
 
         public bool DictatesParameters { get { return !m_freeParameters; } }
@@ -351,9 +352,19 @@ namespace StepBro.Core.ScriptData
 
         protected override bool ParsePropertyBlockFlag(string name)
         {
-            if (name.Equals("FreeParameters", StringComparison.InvariantCulture))
+            if (name.Equals("FreeParameters"))
             {
                 m_freeParameters = true;
+                return true;
+            }
+            if (name.Equals("ContinueOnFail"))  // Default is 'SkipRestOnFail' (exit procedure)
+            {
+                this.Flags |= ProcedureFlags.ContinueOnFail;
+                return true;
+            }
+            if (name.Equals("NoSubResultInheritance"))
+            {
+                this.Flags &= ProcedureFlags.NoSubResultInheritance;
                 return true;
             }
             return base.ParsePropertyBlockFlag(name);

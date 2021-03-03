@@ -22,7 +22,27 @@ namespace StepBro.Workbench
         public MainWindow()
         {
             InitializeComponent();
-            
+            Application.Current.MainWindow = this;
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("Closed");
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = !view.TryClose();
+        }
+
+        private void CloseCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = view.CanClose;
+        }
+
+        private void CloseExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

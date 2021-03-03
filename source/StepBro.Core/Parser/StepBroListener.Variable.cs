@@ -125,8 +125,12 @@ namespace StepBro.Core.Parser
                             }
                             else
                             {
-                                m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "");
-                                throw new NotImplementedException("Convertion of variable initializer is not implemented.");
+                                m_variableInitializer.NarrowGetValueType();
+                                if (m_variableInitializer.DataType.Type != m_variableType.Type)
+                                {
+                                    //m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "");
+                                    throw new ParsingErrorException(context.Start.Line, "Data Type", "Convertion of variable initializer is not implemented.");
+                                }
                             }
                         }
                     }

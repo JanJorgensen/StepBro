@@ -190,7 +190,7 @@ namespace StepBro.Core.Parser
                         callType = isCallStatement ? ParansExpressionType.ProcedureCall : ParansExpressionType.FunctionCall;
                         // Note: never anonymous procedure here.
                         var procedure = (left.Value as IProcedureReference).ProcedureData;
-                        if (!isCallStatement && !procedure.IsFunction)
+                        if (!isCallStatement && (procedure.Flags & ProcedureFlags.IsFunction) == ProcedureFlags.None )
                         {
                             m_errors.SymanticError(context.Start.Line, -1, false, "Only procedures marked as 'function' can be called from expressions.");
                         }
@@ -538,12 +538,21 @@ namespace StepBro.Core.Parser
 
                     var completeProcedureCall = Expression.Block(
                         new ParameterExpression[] { procRefVar, subCallContextContainer },
-                        Expression.TryFinally(
+                        Expression.TryCatchFinally(
                             Expression.Block(
                                 assignProcRefVar,
                                 Expression.Assign(subCallContextContainer, createSubContext),
-                                callProcedure),
-                            disposeSubContext));
+                                callProcedure,
+                                Expression.Condition(
+                                    Expression.Call(s_PostProcedureCallResultHandling, m_currentProcedure.ContextReferenceInternal, subCallContext),
+                                    Expression.Return(m_currentProcedure.ReturnLabel, Expression.Default(m_currentProcedure.ReturnType.Type)),  // When told to exit the procedure now.
+                                    Expression.Empty())
+                                ),
+                            disposeSubContext,
+                            Expression.Catch(
+                                typeof(Exception),
+                                Expression.Rethrow())
+                            ));
 
                     m_scopeStack.Peek().AddStatementCode(completeProcedureCall);
                 }
@@ -766,6 +775,7 @@ namespace StepBro.Core.Parser
                             if (p.ParameterType == typeof(object))
                             {
                                 a = a.NewExpressionCode(Expression.Convert(a.ExpressionCode, typeof(object)));
+                                matchScore -= 10;    // Matching an object parameter is not as good as matching the exact same type.
                             }
                             suggestedAssignmentsOut.Add(a);
                             continue;   // next parameter
@@ -778,6 +788,7 @@ namespace StepBro.Core.Parser
                         else if (argPicker.Current.DataType.Type == typeof(Double) && p.ParameterType == typeof(Single))
                         {
                             suggestedAssignmentsOut.Add(new SBExpressionData(Expression.Convert(argPicker.Pick().ExpressionCode, p.ParameterType)));
+                            matchScore -= 5;    // Matching a 'single' is not as good as matching the exact same type.
                             continue;   // next parameter
                         }
                         else

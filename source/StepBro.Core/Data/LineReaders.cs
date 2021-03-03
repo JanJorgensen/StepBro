@@ -21,10 +21,11 @@ namespace StepBro.Core.Data
         private int m_index;
         private EntryWrapper m_current;
 
-        public StringListLineReader(List<string> list)
+        public StringListLineReader(List<string> list, INameable source = null)
         {
             m_list = list;
             m_index = (m_list.Count > 0) ? 0 : -1;
+            this.Source = source;
         }
 
 
@@ -44,6 +45,8 @@ namespace StepBro.Core.Data
         public bool LinesHaveTimestamp { get { return false; } }
 
         public bool HasMore { get { return (m_index < (m_list.Count - 1)); } }
+
+        public INameable Source { get; private set; }
 
         public event EventHandler LinesAdded;
 
@@ -89,7 +92,17 @@ namespace StepBro.Core.Data
 
         public void DebugDump()
         {
-            throw new NotImplementedException();
+            if (m_index < m_list.Count)
+            {
+                for (int i = m_index; i < m_list.Count; i++)
+                {
+                    System.Diagnostics.Debug.WriteLine("LogLine: " + m_list[i]);
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("LogLine: <none>");
+            }
         }
     }
 }

@@ -138,12 +138,22 @@ namespace StepBro.Core.Execution
             return m_parentContext.GetFolders();
         }
 
-        public bool ReportError(ErrorID error = null, string description = "", Exception exception = null)
+        public bool ReportParsingError(ErrorID error = null, string description = "", Exception exception = null)
         {
             throw new NotImplementedException();
         }
 
         public void ReportExpectResult(string title, string expected, string actual, Verdict verdict)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReportFailure(string failureDescription, ErrorID id = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReportError(string errorDescription, ErrorID id = null, Exception exception = null)
         {
             throw new NotImplementedException();
         }

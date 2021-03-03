@@ -8,7 +8,7 @@ namespace StepBro.Core.Logging
 {
     public class LogEntry
     {
-        public enum Type { Normal, Pre, Post, TaskEntry, Detail, Error, UserAction, System }
+        public enum Type { Normal, Pre, Post, TaskEntry, Detail, Async, Error, UserAction, System }
 
         //private LogEntry m_previous;
         private LogEntry m_next = null;

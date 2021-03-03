@@ -9,7 +9,7 @@ namespace StepBro.Workbench
         public DataTemplate ErrorsViewTemplate { get; set; }
         public DataTemplate OutputViewTemplate { get; set; }
         public DataTemplate CalculatorTemplate { get; set; }
-        public DataTemplate ObjectPanelTemplate { get; set; }
+        public DataTemplate CustomPanelTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
@@ -19,8 +19,8 @@ namespace StepBro.Workbench
                 return this.OutputViewTemplate;
             else if (item is CalculatorViewModel)
                 return this.CalculatorTemplate;
-            else if (item is ObjectPanelToolViewModel)
-                return this.ObjectPanelTemplate;
+            else if (item is CustomPanelToolViewModel)
+                return this.CustomPanelTemplate;
             else
                 return null;
         }

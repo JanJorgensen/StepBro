@@ -84,7 +84,9 @@ namespace StepBro.Core.Data
             return String.Join(", ", list.Cast<object>().Select(o => (o != null) ? Convert.ToString(o, System.Globalization.CultureInfo.InvariantCulture) : "<null>"));
         }
 
-        public static Predicate<string> CreateComparer(this string text)
+        #region String Comparison
+
+        public static Func<string, string> CreateComparer(this string text)
         {
             var numStars = text.Count(ch => ch == '*');
             if (numStars == 1)
@@ -114,9 +116,9 @@ namespace StepBro.Core.Data
             {
                 m_text = text;
             }
-            public bool Matches(string text)
+            public string Matches(string text)
             {
-                return text.Equals(m_text, StringComparison.InvariantCulture);
+                return text.Equals(m_text) ? text : null;
             }
         }
         public class StartsWithStringMatch
@@ -126,9 +128,9 @@ namespace StepBro.Core.Data
             {
                 m_start = start;
             }
-            public bool Matches(string text)
+            public string Matches(string text)
             {
-                return text.StartsWith(m_start, StringComparison.InvariantCulture);
+                return text.StartsWith(m_start) ? text.Substring(m_start.Length) : null;
             }
         }
         public class EndsWithStringMatch
@@ -138,9 +140,9 @@ namespace StepBro.Core.Data
             {
                 m_end = end;
             }
-            public bool Matches(string text)
+            public string Matches(string text)
             {
-                return text.EndsWith(m_end, StringComparison.InvariantCulture);
+                return text.EndsWith(m_end) ? text.Substring(0, text.Length - m_end.Length) : null;
             }
         }
         public class StartsWithAndEndsWithStringMatch
@@ -152,9 +154,13 @@ namespace StepBro.Core.Data
                 m_start = start;
                 m_end = end;
             }
-            public bool Matches(string text)
+            public string Matches(string text)
             {
-                return text.StartsWith(m_start, StringComparison.InvariantCulture) &&  text.EndsWith(m_end, StringComparison.InvariantCulture);
+                if (text.StartsWith(m_start) && text.EndsWith(m_end))
+                {
+                    return text.Substring(m_start.Length, text.Length - (m_start.Length + m_end.Length));
+                }
+                else return null;
             }
         }
         public class ContainsStringMatch
@@ -169,5 +175,7 @@ namespace StepBro.Core.Data
                 return text.Contains(m_text, StringComparison.InvariantCulture);
             }
         }
+
+        #endregion
     }
 }

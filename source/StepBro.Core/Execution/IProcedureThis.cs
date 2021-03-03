@@ -14,5 +14,8 @@ namespace StepBro.Core.Execution
         bool HasFailsOrErrors { get; }
         ErrorID LastError { get; }
         string Name { get; }
+        void ReportFailure(string failureDescription, ErrorID id = null);
+        void ReportError(string errorDescription, ErrorID id = null);
+        ProcedureResult Result { get; }
     }
 }

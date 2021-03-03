@@ -11,6 +11,9 @@
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>StepBro.Workbench</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>StepBro.UI.UnitTest</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
@@ -18,6 +21,7 @@
   <ItemGroup>
     <PackageReference Include="ActiproSoftware.Controls.WPF" Version="20.1.1" />
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Html.Abstractions" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

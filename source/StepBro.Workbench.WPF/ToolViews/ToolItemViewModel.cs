@@ -15,6 +15,7 @@
     {
         private ToolItemDockSide defaultDockSide = ToolItemDockSide.Right;
         private ToolItemState state = ToolItemState.Docked;
+        private bool destructWhenClosed = false;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         // PUBLIC PROCEDURES
@@ -35,7 +36,7 @@
                 if (defaultDockSide != value)
                 {
                     defaultDockSide = value;
-                    this.NotifyPropertyChanged("DefaultDockSide");
+                    this.NotifyPropertyChanged(nameof(DefaultDockSide));
                 }
             }
         }
@@ -69,7 +70,23 @@
                 if (state != value)
                 {
                     state = value;
-                    this.NotifyPropertyChanged("State");
+                    this.NotifyPropertyChanged(nameof(State));
+                }
+            }
+        }
+
+        public bool DestructWhenClosed
+        {
+            get
+            {
+                return destructWhenClosed;
+            }
+            set
+            {
+                if (destructWhenClosed != value)
+                {
+                    destructWhenClosed = value;
+                    this.NotifyPropertyChanged(nameof(DestructWhenClosed));
                 }
             }
         }

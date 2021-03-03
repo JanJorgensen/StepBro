@@ -32,8 +32,13 @@ namespace StepBro.Core.Execution
         private int m_currentTestStepIndex = -1;
         private string m_currentTestStepTitle = null;
         private bool m_loggingEnabled;
-        private int m_expectFailCount = 0;
-        private readonly int m_errorCount = 0;
+        private Verdict m_verdict = Verdict.Unset;
+        private int m_failureLine = -1;
+        private string m_failureDescription = null;
+        private ErrorID m_failureID = null;
+        private Exception m_errorException = null;
+        private int m_failCount = 0;
+        private int m_errorCount = 0;
         private RuntimeErrorListener m_errorListener = null;
         private List<DataReport> m_currentReports = null;
 
@@ -323,7 +328,7 @@ namespace StepBro.Core.Execution
             }
         }
 
-        public bool ReportError(ErrorID error = null, string description = "", Exception exception = null)
+        public bool ReportParsingError(ErrorID error = null, string description = "", Exception exception = null)
         {
             m_errorListener?.Invoke(m_procedure, m_currentStatementLine, error, description, exception);
             this.LogError(description);
@@ -332,18 +337,35 @@ namespace StepBro.Core.Execution
 
         public void ReportExpectResult(string title, string expected, string actual, Verdict verdict)
         {
-            if (verdict >= Verdict.Fail) m_expectFailCount++;
-            if (m_currentReports != null)
-            {
-                this.AddToReports(new ExpectResultData(this.GetLocationDescription(), title, expected, actual, verdict));
-            }
+            string resultDescription;
             if (String.IsNullOrEmpty(title))
             {
-                m_loggerInside.Log(m_currentStatementLine.ToString(), $"EXPECT: {actual} => {verdict}; Expected: {expected}");
+                resultDescription = $"EXPECT: {expected}; Actual: {actual}  =>  {verdict}";
             }
             else
             {
-                m_loggerInside.Log(m_currentStatementLine.ToString(), $"EXPECT \"{title}\": {actual} => {verdict}; Expected: {expected}");
+                resultDescription = $"EXPECT: {expected}; Actual: {actual}  =>  {verdict}";
+            }
+
+            if (verdict == Verdict.Error)
+            {
+                m_loggerInside.LogError(m_currentStatementLine.ToString(), resultDescription);
+                this.ReportError(resultDescription, null, null);
+            }
+            else if (verdict >= Verdict.Fail)
+            {
+                m_loggerInside.LogError(m_currentStatementLine.ToString(), resultDescription);
+                this.ReportFailure(resultDescription);
+            }
+            else
+            {
+                m_loggerInside.Log(m_currentStatementLine.ToString(), resultDescription);
+                this.SetPassVerdict();  // To indicate that the procedure actually has a verdict set now.
+            }
+
+            if (m_currentReports != null)
+            {
+                this.AddToReports(new ExpectResultData(this.GetLocationDescription(), title, expected, actual, verdict));
             }
         }
 
@@ -391,13 +413,70 @@ namespace StepBro.Core.Execution
             m_loggerInside.LogError(m_currentStatementLine.ToString(), text);
         }
 
-        private TestResult CurrentProcedureResult { get; }
+        public void SetPassVerdict()
+        {
+            if (m_verdict == Verdict.Unset)
+            {
+                m_verdict = Verdict.Pass;
+            }
+        }
 
-        TestResult IScriptCallContext.CurrentProcedureResult
+        public void ReportFailure(string failureDescription, ErrorID id = null)
+        {
+            m_failCount++;
+            if (m_verdict <= Verdict.Pass)  // Only override if no failures reported before.
+            {
+                m_verdict = Verdict.Fail;
+                m_failureDescription = failureDescription;
+                m_failureLine = m_currentStatementLine;
+                m_failureID = id;
+            }
+        }
+
+        public void ReportError(string errorDescription, ErrorID id = null)
+        {
+            this.ReportError(errorDescription, id, null);
+        }
+
+        public void ReportError(string errorDescription, ErrorID id = null, Exception ex = null)
+        {
+            m_errorCount++;
+            if (m_verdict <= Verdict.Fail)  // Only override if no errors reported before.
+            {
+                m_verdict = Verdict.Error;
+                m_failureDescription = errorDescription;
+                m_failureLine = m_currentStatementLine;
+                m_failureID = id;
+                m_errorException = ex;
+            }
+        }
+
+        public bool SetResultFromSub(IScriptCallContext sub)
+        {
+            if (sub.Result.Verdict > m_verdict)
+            {
+                m_verdict = sub.Result.Verdict;
+                if (sub.Result.Verdict >= Verdict.Fail)
+                {
+                    m_failureLine = m_currentStatementLine;
+                    m_failureID = sub.Result.ErrorID;
+                    m_failureDescription = $"Failure in called procedure \"{sub.Self.FullName}\".";
+
+                    if (m_verdict == Verdict.Error) return true;
+                    else if (m_verdict == Verdict.Fail)
+                    {
+                        return (m_procedure.Flags & ProcedureFlags.ContinueOnFail) == ProcedureFlags.None;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public ProcedureResult Result
         {
             get
             {
-                throw new NotImplementedException();
+                return new ProcedureResult(m_verdict, m_failureLine, m_failureDescription, m_failureID);
             }
         }
 
@@ -409,11 +488,11 @@ namespace StepBro.Core.Execution
             }
         }
 
-        bool IProcedureThis.HasFails { get { return m_expectFailCount > 0; } }
+        bool IProcedureThis.HasFails { get { return m_failCount > 0; } }
 
         bool IProcedureThis.HasErrors { get { return m_errorCount > 0; } }
 
-        bool IProcedureThis.HasFailsOrErrors { get { return m_expectFailCount > 0 | m_errorCount > 0; } }
+        bool IProcedureThis.HasFailsOrErrors { get { return m_failCount > 0 | m_errorCount > 0; } }
 
         ErrorID IProcedureThis.LastError { get { throw new NotImplementedException(); } }
         string IProcedureThis.Name { get { return m_procedure.Name; } }

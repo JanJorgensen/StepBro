@@ -5,7 +5,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <RootNamespace>StepBro.Workbench</RootNamespace>
-    <AssemblyName>StepBro.Workbench.WPF</AssemblyName>
+    <AssemblyName>StepBro.Workbench</AssemblyName>
     <OutputPath>..\bin5</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>

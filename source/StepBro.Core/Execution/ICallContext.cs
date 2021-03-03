@@ -22,7 +22,11 @@ namespace StepBro.Core.Execution
         int CurrentTestStepIndex { get; }
         string CurrentTestStepTitle { get; }
 
-        bool ReportError(ErrorID error = null, string description = "", Exception exception = null);
+        bool ReportParsingError(ErrorID error = null, string description = "", Exception exception = null);
+
+
+        void ReportFailure(string failureDescription, ErrorID id = null);
+        void ReportError(string errorDescription, ErrorID id = null, Exception exception = null);
         void ReportExpectResult(string title, string expected, string actual, Verdict verdict);
 
         /// <summary>

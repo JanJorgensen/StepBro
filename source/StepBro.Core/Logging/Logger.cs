@@ -85,6 +85,11 @@ namespace StepBro.Core.Logging
             this.Log(LogEntry.Type.Error, location, text);
         }
 
+        public void LogAsync(string location, string text)
+        {
+            this.Log(LogEntry.Type.Async, location, text);
+        }
+
         public void LogUserAction(string location, string text)
         {
             this.Log(LogEntry.Type.UserAction, location, text);
