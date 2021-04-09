@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.UI.SyntaxEditorSupport
 {
-    public class SyntaxEditorStepBroParseData : IParseData
+    public class StepBroParseData : IParseData
     {
     }
 }

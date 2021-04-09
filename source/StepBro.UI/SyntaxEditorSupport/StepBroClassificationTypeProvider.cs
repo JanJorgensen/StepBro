@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 namespace StepBro.UI.SyntaxEditorSupport
 {
-    public partial class SyntaxEditorStepBroClassificationTypeProvider : ISyntaxEditorStepBroClassificationTypeProvider
+    public partial class StepBroClassificationTypeProvider : IStepBroClassificationTypeProvider
     {
 
         private IHighlightingStyleRegistry registryValue;
@@ -33,7 +33,7 @@ namespace StepBro.UI.SyntaxEditorSupport
         /// <summary>
         /// Initializes a new instance of the <c>SyntaxEditorStepBroClassificationTypeProvider</c> class.
         /// </summary>
-        public SyntaxEditorStepBroClassificationTypeProvider() :
+        public StepBroClassificationTypeProvider() :
                 this(null)
         {
         }
@@ -42,7 +42,7 @@ namespace StepBro.UI.SyntaxEditorSupport
         /// Initializes a new instance of the <c>SyntaxEditorStepBroClassificationTypeProvider</c> class.
         /// </summary>
         /// <param name="targetRegistry">The <see cref="IHighlightingStyleRegistry"/> to use when registering classification types and highlighting styles.</param>
-        public SyntaxEditorStepBroClassificationTypeProvider(IHighlightingStyleRegistry targetRegistry)
+        public StepBroClassificationTypeProvider(IHighlightingStyleRegistry targetRegistry)
         {
             if ((targetRegistry != null))
             {

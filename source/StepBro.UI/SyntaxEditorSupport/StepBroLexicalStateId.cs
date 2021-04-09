@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.UI.SyntaxEditorSupport
 {
-    public partial class SyntaxEditorStepBroLexicalStateId : LexicalStateIdProviderBase
+    public partial class StepBroLexicalStateId : LexicalStateIdProviderBase
     {
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace StepBro.UI.SyntaxEditorSupport
         /// <returns>The actual string representation for the specified lexical state ID.</returns>
         public override String GetDescription(Int32 id)
         {
-            FieldInfo[] fields = typeof(SyntaxEditorStepBroLexicalStateId).GetFields((BindingFlags.Public | BindingFlags.Static));
+            FieldInfo[] fields = typeof(StepBroLexicalStateId).GetFields((BindingFlags.Public | BindingFlags.Static));
             for (Int32 index = 0; (index < fields.Length); index = (index + 1))
             {
                 FieldInfo field = fields[index];
@@ -99,7 +99,7 @@ namespace StepBro.UI.SyntaxEditorSupport
         /// <returns>The string-based key for the specified lexical state ID.</returns>
         public override String GetKey(Int32 id)
         {
-            FieldInfo[] fields = typeof(SyntaxEditorStepBroLexicalStateId).GetFields((BindingFlags.Public | BindingFlags.Static));
+            FieldInfo[] fields = typeof(StepBroLexicalStateId).GetFields((BindingFlags.Public | BindingFlags.Static));
             for (Int32 index = 0; (index < fields.Length); index = (index + 1))
             {
                 FieldInfo field = fields[index];

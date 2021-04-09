@@ -18,7 +18,7 @@ namespace StepBro.Workbench
     {
         private bool hasPendingParseData;
         //private CSharpSyntaxLanguage cSharpSyntaxLanguage;
-        private SyntaxEditorStepBroSyntaxLanguage stepBroSyntaxLanguage;
+        private StepBroSyntaxLanguage stepBroSyntaxLanguage;
 
         /// <summary>
         /// Initializes an instance of the <c>EditorDocumentWindow</c> class.
@@ -140,7 +140,7 @@ End Class
             {
                 case ".sbs":
                     if (stepBroSyntaxLanguage == null)
-                        stepBroSyntaxLanguage = new SyntaxEditorStepBroSyntaxLanguage();
+                        stepBroSyntaxLanguage = new StepBroSyntaxLanguage();
                     return stepBroSyntaxLanguage;
                 //case ".cs":
                 //    if (cSharpSyntaxLanguage == null)

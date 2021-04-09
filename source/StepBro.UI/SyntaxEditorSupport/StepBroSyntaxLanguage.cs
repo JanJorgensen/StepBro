@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace StepBro.UI.SyntaxEditorSupport
 {
-    public class SyntaxEditorStepBroSyntaxLanguage : SyntaxLanguage
+    public class StepBroSyntaxLanguage : SyntaxLanguage
     {
-        public SyntaxEditorStepBroSyntaxLanguage() : base("StepBro")
+        public StepBroSyntaxLanguage() : base("StepBro")
         {
-            this.RegisterParser(new SyntaxEditorStepBroParser());
-            this.RegisterLexer(new SyntaxEditorStepBroLexer());
-            this.RegisterService(new SyntaxEditorStepBroTokenTaggerProvider(new SyntaxEditorStepBroClassificationTypeProvider()));
+            this.RegisterParser(new StepBroParser());
+            this.RegisterLexer(new StepBroLexer());
+            this.RegisterService(new StepBroTokenTaggerProvider(new StepBroClassificationTypeProvider()));
 
 
             //this.RegisterService(new TokenTaggerProvider<MyCustomTokenTagger>());

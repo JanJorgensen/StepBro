@@ -9,15 +9,15 @@ using System.Threading.Tasks;
 
 namespace StepBro.UI.SyntaxEditorSupport
 {
-    public class SyntaxEditorStepBroTokenTaggerProvider : TaggerProviderBase<SyntaxEditorStepBroTokenTagger>, ICodeDocumentTaggerProvider
+    public class StepBroTokenTaggerProvider : TaggerProviderBase<StepBroTokenTagger>, ICodeDocumentTaggerProvider
     {
-        private ISyntaxEditorStepBroClassificationTypeProvider classificationTypeProviderValue;
+        private IStepBroClassificationTypeProvider classificationTypeProviderValue;
 
         /// <summary>
         /// Initializes a new instance of the <c>SyntaxEditorStepBroTokenTaggerProvider</c> class.
         /// </summary>
-        /// <param name="classificationTypeProvider">A <see cref="ISyntaxEditorStepBroClassificationTypeProvider"/> that provides classification types.</param>
-        public SyntaxEditorStepBroTokenTaggerProvider(ISyntaxEditorStepBroClassificationTypeProvider classificationTypeProvider)
+        /// <param name="classificationTypeProvider">A <see cref="IStepBroClassificationTypeProvider"/> that provides classification types.</param>
+        public StepBroTokenTaggerProvider(IStepBroClassificationTypeProvider classificationTypeProvider)
         {
             if ((classificationTypeProvider == null))
             {
@@ -37,10 +37,10 @@ namespace StepBro.UI.SyntaxEditorSupport
         public ITagger<T> GetTagger<T>(ICodeDocument document)
             where T : ITag
         {
-            if (typeof(ITagger<T>).IsAssignableFrom(typeof(SyntaxEditorStepBroTokenTagger)))
+            if (typeof(ITagger<T>).IsAssignableFrom(typeof(StepBroTokenTagger)))
             {
                 TaggerFactory factory = new TaggerFactory(this, document);
-                return ((ITagger<T>)(document.Properties.GetOrCreateSingleton(typeof(ITagger<ITokenTag>), new ActiproSoftware.Text.Utility.PropertyDictionary.Creator<SyntaxEditorStepBroTokenTagger>(factory.CreateTagger))));
+                return ((ITagger<T>)(document.Properties.GetOrCreateSingleton(typeof(ITagger<ITokenTag>), new ActiproSoftware.Text.Utility.PropertyDictionary.Creator<StepBroTokenTagger>(factory.CreateTagger))));
             }
             else
             {
@@ -55,14 +55,14 @@ namespace StepBro.UI.SyntaxEditorSupport
         {
             private ICodeDocument documentValue;
 
-            private SyntaxEditorStepBroTokenTaggerProvider providerValue;
+            private StepBroTokenTaggerProvider providerValue;
 
             /// <summary>
             /// Initializes a new instance of the <c>TaggerFactory</c> class.
             /// </summary>
             /// <param name="provider">The owner <see cref="SimpleTokenTaggerProvider"/>.</param>
             /// <param name="document">The <see cref="ICodeDocument"/> that requires an <see cref="SimpleTokenTagger"/>.</param>
-            internal TaggerFactory(SyntaxEditorStepBroTokenTaggerProvider provider, ICodeDocument document)
+            internal TaggerFactory(StepBroTokenTaggerProvider provider, ICodeDocument document)
             {
                 // Initialize
                 this.providerValue = provider;
@@ -73,9 +73,9 @@ namespace StepBro.UI.SyntaxEditorSupport
             /// Creates an <see cref="SimpleTokenTagger"/> for the <see cref="ICodeDocument"/>.
             /// </summary>
             /// <returns>An <see cref="SimpleTokenTagger"/> for the <see cref="ICodeDocument"/>.</returns>
-            public SyntaxEditorStepBroTokenTagger CreateTagger()
+            public StepBroTokenTagger CreateTagger()
             {
-                return new SyntaxEditorStepBroTokenTagger(this.documentValue, this.providerValue.classificationTypeProviderValue);
+                return new StepBroTokenTagger(this.documentValue, this.providerValue.classificationTypeProviderValue);
             }
         }
     }

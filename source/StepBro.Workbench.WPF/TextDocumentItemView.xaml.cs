@@ -1,6 +1,7 @@
 ﻿using ActiproSoftware.Text;
 using ActiproSoftware.Text.Implementation;
 using ActiproSoftware.Windows.Controls.SyntaxEditor;
+using ActiproSoftware.Windows.Controls.SyntaxEditor.Implementation;
 using StepBro.Core.Parser;
 using StepBro.UI.SyntaxEditorSupport;
 using StepBro.Workbench.Editor;
@@ -16,7 +17,7 @@ namespace StepBro.Workbench
     /// </summary>
     public partial class TextDocumentItemView
     {
-        private SyntaxEditorStepBroSyntaxLanguage stepBroSyntaxLanguage;
+        private StepBroSyntaxLanguage stepBroSyntaxLanguage;
         private TextDocumentItemViewModel m_currentData = null;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,7 +31,7 @@ namespace StepBro.Workbench
         {
             InitializeComponent();
             CommandBindings.Add(new CommandBinding(ApplicationCommands.Save, SaveExecuted, SaveCanExecute));
-            AddEditorCommandBinding(CustomEditCommands.RepeatActivationCommand);
+            AddEditorCommandBinding(CustomEditCommands.RepeatActivationCommand, Key.R, ModifierKeys.Control);
             editor.DocumentIsModifiedChanged += Editor_DocumentIsModifiedChanged;
             //this.AddCommandBinding(new InsertCalculatorResultAction());
         }
@@ -40,9 +41,14 @@ namespace StepBro.Workbench
             if (m_currentData != null) m_currentData.IsModified = editor.Document.IsModified;
         }
 
-        private void AddEditorCommandBinding(ICommand action)
+        private void AddEditorCommandBinding(EditActionBase action)
         {
-            editor.CommandBindings.Add(new CommandBinding(action));
+            editor.CommandBindings.Add(action.CreateCommandBinding());
+        }
+        private void AddEditorCommandBinding(EditActionBase action, Key key, ModifierKeys modifiers)
+        {
+            editor.CommandBindings.Add(action.CreateCommandBinding());
+            editor.InputBindings.Add(new KeyBinding(action, key, modifiers));
         }
 
         private TextDocumentItemViewModel Data
@@ -67,10 +73,16 @@ namespace StepBro.Workbench
                 {
                     m_currentData = (TextDocumentItemViewModel)DataContext;
                     m_currentData.PropertyChanged += CurrentData_PropertyChanged;
+                    m_currentData.EditorCalculationRequest += EditorCalculationRequest;
                     LoadFile();
                     AssignLanguage();
                 }
             }
+        }
+
+        private void EditorCalculationRequest(object sender, DocumentItemViewModel.CalculationRequestEventArgs e)
+        {
+            editor.ActiveView.ExecuteEditAction(new CalculateAction(e.Expression));
         }
 
         private void CurrentData_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -139,7 +151,7 @@ namespace StepBro.Workbench
             {
                 case ".sbs":
                     if (stepBroSyntaxLanguage == null)
-                        stepBroSyntaxLanguage = new SyntaxEditorStepBroSyntaxLanguage();
+                        stepBroSyntaxLanguage = new StepBroSyntaxLanguage();
                     return stepBroSyntaxLanguage;
                 //case ".cs":
                 //    if (cSharpSyntaxLanguage == null)
@@ -199,7 +211,10 @@ namespace StepBro.Workbench
         {
             if (((SyntaxEditor)sender).ActiveView == editor.ActiveView && m_currentData != null)
             {
-                m_currentData.CurrentSelectionStart = new System.Tuple<int, int>(e.View.Selection.StartPosition.Line, e.View.Selection.StartPosition.Character);
+                m_currentData.CaretPosition = new System.Tuple<int, int>(e.CaretPosition.Line, e.CaretPosition.Character);
+                m_currentData.CaretLine = e.CaretPosition.DisplayLine;
+                m_currentData.CaretCharacter = e.CaretPosition.DisplayCharacter;
+                m_currentData.CaretDisplayCharColumn = e.CaretDisplayCharacterColumn;
             }
         }
     }

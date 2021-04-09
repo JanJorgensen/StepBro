@@ -12,27 +12,46 @@
     <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>StepBroWorkbenchTest</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="DocumentData.cs" />
+    <Compile Remove="DocumentHelper.cs" />
+    <Compile Remove="EditorDocumentWindow.xaml.cs" />
     <Compile Remove="Properties\AssemblyInfo.cs" />
     <Compile Remove="ToolItem1ViewModel.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="licenses.licx" />
+  </ItemGroup>
 
   <ItemGroup>
+    <Page Remove="EditorDocumentWindow.xaml" />
     <Page Remove="OverviewDocument.xaml" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="licenses.licx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="DocumentData.cs" />
+    <None Include="DocumentHelper.cs" />
+    <None Include="EditorDocumentWindow.xaml" />
+    <None Include="EditorDocumentWindow.xaml.cs" />
     <None Include="OverviewDocument.xaml" />
     <None Include="ToolItem1ViewModel.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ActiproSoftware.Controls.WPF" Version="20.1.1" />
+    <PackageReference Include="ActiproSoftware.Controls.WPF" Version="21.1.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -66,6 +85,21 @@
     <Resource Include="Resources\Images\TextDocument16.png" />
     <Resource Include="Resources\Images\Undo_16x.png" />
     <Resource Include="Resources\Images\Wrench16.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
 </Project>

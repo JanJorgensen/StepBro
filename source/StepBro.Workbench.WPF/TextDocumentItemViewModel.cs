@@ -9,6 +9,9 @@ namespace StepBro.Workbench
     public class TextDocumentItemViewModel : DocumentItemViewModel
     {
         private string text;
+        private int m_caretLine = -1;
+        private int m_caretCharacter = -1;
+        private int m_caretDisplayCharColumn = -1;
         private Tuple<int, int> m_surrentSelectionStart;
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +52,7 @@ namespace StepBro.Workbench
             }
         }
 
-        public Tuple<int, int> CurrentSelectionStart
+        public Tuple<int, int> CaretPosition
         {
             get
             {
@@ -60,7 +63,57 @@ namespace StepBro.Workbench
                 if (m_surrentSelectionStart != value)
                 {
                     m_surrentSelectionStart = value;
-                    this.NotifyPropertyChanged(nameof(CurrentSelectionStart));
+                    this.NotifyPropertyChanged(nameof(CaretPosition));
+                }
+            }
+        }
+
+        public int CaretLine
+        {
+            get
+            {
+                return m_caretLine;
+            }
+            set
+            {
+                if (m_caretLine != value)
+                {
+                    m_caretLine = value;
+                    this.NotifyPropertyChanged(nameof(CaretLine));
+                }
+            }
+        }
+
+
+        public int CaretCharacter
+        {
+            get
+            {
+                return m_caretCharacter;
+            }
+            set
+            {
+                if (m_caretCharacter != value)
+                {
+                    m_caretCharacter = value;
+                    this.NotifyPropertyChanged(nameof(CaretCharacter));
+                }
+            }
+        }
+
+
+        public int CaretDisplayCharColumn
+        {
+            get
+            {
+                return m_caretDisplayCharColumn;
+            }
+            set
+            {
+                if (m_caretDisplayCharColumn != value)
+                {
+                    m_caretDisplayCharColumn = value;
+                    this.NotifyPropertyChanged(nameof(CaretDisplayCharColumn));
                 }
             }
         }

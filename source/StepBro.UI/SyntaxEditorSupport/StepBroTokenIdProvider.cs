@@ -3,12 +3,12 @@ using StepBro.Core.Parser.Grammar;
 
 namespace StepBro.UI.SyntaxEditorSupport
 {
-    public class SyntaxEditorStepBroTokenIdProvider : ITokenIdProvider
+    public class StepBroTokenIdProvider : ITokenIdProvider
     {
         private readonly int m_maxId;
-        public SyntaxEditorStepBroTokenIdProvider()
+        public StepBroTokenIdProvider()
         {
-            m_maxId = ((Antlr4.Runtime.Vocabulary)StepBroLexer.DefaultVocabulary).getMaxTokenType();
+            m_maxId = ((Antlr4.Runtime.Vocabulary)Core.Parser.Grammar.StepBroLexer.DefaultVocabulary).getMaxTokenType();
         }
 
         public int MaxId { get { return m_maxId; } }
@@ -22,12 +22,12 @@ namespace StepBro.UI.SyntaxEditorSupport
 
         public string GetDescription(int id)
         {
-            return StepBroLexer.DefaultVocabulary.GetLiteralName(id);
+            return Core.Parser.Grammar.StepBroLexer.DefaultVocabulary.GetLiteralName(id);
         }
 
         public string GetKey(int id)
         {
-            return StepBroLexer.DefaultVocabulary.GetSymbolicName(id);
+            return Core.Parser.Grammar.StepBroLexer.DefaultVocabulary.GetSymbolicName(id);
         }
     }
 }

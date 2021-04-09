@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.UI.SyntaxEditorSupport
 {
-    public interface ISyntaxEditorStepBroClassificationTypeProvider
+    public interface IStepBroClassificationTypeProvider
     {
         /// <summary>
         /// Gets the <c>Comment</c> classification type.

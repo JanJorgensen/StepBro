@@ -15,6 +15,9 @@ namespace StepBro.Workbench.Editor
         public string Key { get { return "InsertCalculatorResult"; } }
     }
 
+    /// <summary>
+    /// Action to insert the last calculator result into the editor document as text.
+    /// </summary>
     public class InsertCalculatorResultAction : EditActionBase
     {
         public InsertCalculatorResultAction() : base("InsertCalculatorResult") { }

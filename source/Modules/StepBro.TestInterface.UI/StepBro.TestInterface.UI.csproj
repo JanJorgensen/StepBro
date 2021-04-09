@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ActiproSoftware.Controls.WPF.SyntaxEditor" Version="20.1.1" />
+    <PackageReference Include="ActiproSoftware.Controls.WPF.SyntaxEditor" Version="21.1.1" />
   </ItemGroup>
 
   <ItemGroup>

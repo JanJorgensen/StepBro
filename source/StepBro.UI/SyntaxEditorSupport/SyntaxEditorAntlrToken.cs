@@ -26,7 +26,7 @@ namespace StepBro.UI.SyntaxEditorSupport
         {
             get
             {
-                if (m_key == null) m_key = StepBroLexer.DefaultVocabulary.GetSymbolicName(m_token.Type);
+                if (m_key == null) m_key = Core.Parser.Grammar.StepBroLexer.DefaultVocabulary.GetSymbolicName(m_token.Type);
                 return m_key;
             }
         }

@@ -15,26 +15,7 @@
     <DockPanel LastChildFill="True">
         <StackPanel DockPanel.Dock="Bottom">
             <ToolBar x:Name="toolBar">
-                <Button Content="About"/>
-                <Menu>
-                    <MenuItem Header="List">
-                        <MenuItem Header="Commands"/>
-                        <MenuItem Header="Get Last"/>
-                    </MenuItem>
-                </Menu>
-                <Menu>
-                    <MenuItem Header="ADC">
-                        <MenuItem Header="List"/>
-                        <MenuItem Header="Get Last"/>
-                    </MenuItem>
-                </Menu>
-                <Menu>
-                    <MenuItem Header="Login">
-                        <MenuItem Header="Dev Login"/>
-                        <MenuItem Header="Tech Login"/>
-                        <Separator/>
-                        <MenuItem Header="Logout"/>
-                    </MenuItem>
+                <Menu x:Name="toolBarMenu">
                 </Menu>
             </ToolBar>
             <DockPanel Margin="0,4,4,4" LastChildFill="True">
@@ -43,7 +24,7 @@
             </DockPanel>
             <DockPanel Margin="0,0,4,0">
                 <Button x:Name="sendButton" DockPanel.Dock="Right" Content="Send" Margin="8,2,0,2" VerticalAlignment="Center" Width="80" Click="sendButton_Click"/>
-                <syntaxeditor:SyntaxEditor x:Name="commandTextBox" IsMultiLine="False" VerticalAlignment="Center"/>
+                <syntaxeditor:SyntaxEditor x:Name="commandTextBox" IsMultiLine="False" VerticalAlignment="Center" DocumentTextChanged="commandTextBox_DocumentTextChanged"/>
             </DockPanel>
             <StackPanel Orientation="Horizontal" Margin="4" Visibility="Collapsed">
                 <CheckBox x:Name="repeat" Content="Repeat" VerticalAlignment="Center" Margin="0,0,8,0" IsEnabled="False"/>
@@ -55,6 +36,7 @@
                 <Button DockPanel.Dock="Right" Content="Show Toolbar" Margin="8,2,0,2" VerticalAlignment="Center" Width="80" Visibility="Collapsed"/>
             </StackPanel>
         </StackPanel>
+        <ListView></ListView>
         <!--<controls:SimpleLogViewer x:Name="log"/>-->
     </DockPanel>
 </UserControl>

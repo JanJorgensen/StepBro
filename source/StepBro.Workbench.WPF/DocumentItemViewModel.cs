@@ -89,6 +89,23 @@ namespace StepBro.Workbench
             }
         }
 
+
+        public void ExecuteEditorCalculation(string expression)
+        {
+            this.EditorCalculationRequest?.Invoke(this, new CalculationRequestEventArgs(expression));
+        }
+
+        public class CalculationRequestEventArgs : System.EventArgs
+        {
+            private string m_expression;
+            public CalculationRequestEventArgs(string expression)
+            {
+                m_expression = expression;
+            }
+            public string Expression { get { return m_expression; } }
+        }
+
+        public event System.EventHandler<CalculationRequestEventArgs> EditorCalculationRequest;
     }
 
 }

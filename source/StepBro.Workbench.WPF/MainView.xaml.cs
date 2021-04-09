@@ -60,7 +60,7 @@ namespace StepBro.Workbench
             {
                 if (e.Node.IsOpen)
                 {
-                    var docViewModel = viewModel.OpenUserDocument(e.Node.SerializationId);
+                    var docViewModel = viewModel.OpenDocumentWindow(e.Node.SerializationId, false);
                     e.Window = dockSite.ContainerFromDocumentItem(docViewModel);
                 }
             }
@@ -90,18 +90,6 @@ namespace StepBro.Workbench
             }
         }
 
-        //private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        //{
-        //    if (e.PropertyName == nameof(MainViewModel.UILayoutFile))
-        //    {
-        //        var currentLayoutFile = m_layoutfile;
-        //        m_layoutfile = ((MainViewModel)DataContext).UILayoutFile;
-        //        if (string.IsNullOrEmpty(currentLayoutFile))
-        //        {
-        //        }
-        //    }
-        //}
-
         #region Open File Command
 
         private void OpenCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -117,49 +105,28 @@ namespace StepBro.Workbench
             if (dialog.ShowDialog() == true)
             {
                 var viewModel = (MainViewModel)DataContext;
-                if (viewModel.OpenDocumentCommand.CanExecute(null))
+                // Check if there's a layout file to be loaded instead of the file directly.
+                if (viewModel.DocumentItems.Count == 0)
                 {
-                    // Check if there's a layout file to be loaded instead of the file directly.
-                    if (viewModel.DocumentItems.Count == 0)
+                    var path = dialog.FileName;
+                    var folder = System.IO.Path.GetDirectoryName(path);
+                    var layoutfile = System.IO.Path.Combine(folder, System.IO.Path.ChangeExtension(path, "layout"));
+                    if (System.IO.File.Exists(layoutfile))
                     {
-                        var path = dialog.FileName;
-                        var folder = System.IO.Path.GetDirectoryName(path);
-                        var layoutfile = System.IO.Path.Combine(folder, System.IO.Path.ChangeExtension(path, "layout"));
-                        if (System.IO.File.Exists(layoutfile))
-                        {
-                            m_layoutfile = layoutfile;  // Save for later, when the layout should be saved again.
-                            layoutSerializer.LoadFromFile(m_layoutfile, dockSite);
-                            return;
-                        }
+                        m_layoutfile = layoutfile;  // Save for later, when the layout should be saved again.
+                        layoutSerializer.LoadFromFile(m_layoutfile, dockSite);
+                        return;
                     }
-
-                    // If no layout file was loaded, load the selected file.
-                    viewModel.OpenFileCommand.Execute(dialog.FileName);
                 }
+
+                // If no layout file was loaded, load the selected file.
+                viewModel.OpenDocumentWindow(dialog.FileName, true);
             }
         }
 
         #endregion
 
         #region Close Command
-
-        //private void CloseCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        //{
-        //    e.CanExecute = true;
-        //}
-
-        //private void CloseExecuted(object sender, ExecutedRoutedEventArgs e)
-        //{
-        //    System.Diagnostics.Trace.WriteLine("CloseExecuted");
-        //    if (this.ApplicationCloseActivated != null)
-        //    {
-        //        this.ApplicationCloseActivated(this, EventArgs.Empty);
-        //    }
-        //    else
-        //    {
-        //        System.Windows.Application.Current.Shutdown();
-        //    }
-        //}
 
         public bool CanClose
         {
@@ -178,17 +145,7 @@ namespace StepBro.Workbench
             return true;
         }
 
-        //public event EventHandler ApplicationCloseActivated;
- 
         #endregion
-
-        //private void UserControl_Unloaded(object sender, RoutedEventArgs e)
-        //{
-        //    if (!string.IsNullOrEmpty(m_layoutfile))
-        //    {
-        //        this.SaveLayout();
-        //    }
-        //}
 
         private void dockumentList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -198,6 +155,13 @@ namespace StepBro.Workbench
                 var doc = viewModel.DocumentItems[dockumentList.SelectedIndex];
                 doc.IsActive = true;
             }
+        }
+
+        private void dockSite_PrimaryDocumentChanged(object sender, ActiproSoftware.Windows.Controls.Docking.DockingWindowEventArgs e)
+        {
+            var viewModel = (MainViewModel)DataContext;
+            var doc = e.Window.DataContext as DocumentItemViewModel;
+            viewModel.SetSelectedDocument(doc);
         }
     }
 }

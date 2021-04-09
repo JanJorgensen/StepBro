@@ -6,13 +6,13 @@ using SBLexer = StepBro.Core.Parser.Grammar.StepBroLexer;
 
 namespace StepBro.UI.SyntaxEditorSupport
 {
-    public class SyntaxEditorStepBroLexer : ActiproLex.ILexer
+    public class StepBroLexer : ActiproLex.ILexer
     {
-        public SyntaxEditorStepBroLexer()
+        public StepBroLexer()
         {
         }
 
-        private readonly ActiproLex.ITokenIdProvider m_tokenIdProvider = new SyntaxEditorStepBroTokenIdProvider();
+        private readonly ActiproLex.ITokenIdProvider m_tokenIdProvider = new StepBroTokenIdProvider();
 
         public ActiproLex.ITokenIdProvider TokenIdProvider { get { return m_tokenIdProvider; } }
 
