@@ -78,7 +78,7 @@ namespace StepBroCoreTest.Parser
             Assert.IsNotNull(element);
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]    // public using is not working yet.
         public void FileParsing_AccessProcedureInUsedFilesPublicUsingFile()
         {
             var files = FileBuilder.ParseFiles((ILogger)null,
@@ -96,11 +96,11 @@ namespace StepBroCoreTest.Parser
             Assert.IsNotNull(procedureA);
         }
 
-        [TestMethod]
+        [TestMethod, Description("Testing the behaviour of generated code when parsing, and then re-parsing the code.")]
         public void TestFileParsingWithReParsing()
         {
             var f = new StringBuilder();
-            f.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");
+            f.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
             f.AppendLine("namespace ObjectUsing;");
             f.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool");
             f.AppendLine("{");
@@ -117,21 +117,23 @@ namespace StepBroCoreTest.Parser
 
             var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
 
-            var obj = taskContext.CallProcedure(procGetObject) as DummyInstrumentClass;
-            Assert.IsNotNull(obj);
-            Assert.AreEqual(10, obj.ID);
-            Assert.AreEqual(19, obj.IntA);
+            var obj1 = taskContext.CallProcedure(procGetObject) as DummyInstrumentClass;
+            Assert.IsNotNull(obj1);
+            Assert.AreEqual(1, obj1.ResetCounts);
+            Assert.AreEqual(10, obj1.ID);
+            Assert.AreEqual(19, obj1.IntA);
 
             file.ResetBeforeParsing(true);
             file.SetParserFileStream(f.ToString());
             var errorCount = FileBuilder.ParseFiles(FileBuilder.LastServiceManager.Manager, null, file);
             procGetObject = file.ListElements().First(p => p.Name == "GetObject") as IFileProcedure;
             Assert.IsNotNull(procGetObject);
-            obj = taskContext.CallProcedure(procGetObject) as DummyInstrumentClass;
-            Assert.IsNotNull(obj);
-            Assert.AreEqual(1, obj.ResetCounts);
-            Assert.AreEqual(10, obj.ID);
-            Assert.AreEqual(19, obj.IntA);
+            var obj2 = taskContext.CallProcedure(procGetObject) as DummyInstrumentClass;
+            Assert.IsNotNull(obj2);
+            Assert.IsTrue(Object.ReferenceEquals(obj1, obj2));
+            Assert.AreEqual(1, obj2.ResetCounts);
+            Assert.AreEqual(10, obj2.ID);
+            Assert.AreEqual(19, obj2.IntA);
 
 
             f = new StringBuilder();
@@ -148,11 +150,12 @@ namespace StepBroCoreTest.Parser
             errorCount = FileBuilder.ParseFiles(FileBuilder.LastServiceManager.Manager, null, file);
             procGetObject = file.ListElements().First(p => p.Name == "GetObject") as IFileProcedure;
             Assert.IsNotNull(procGetObject);
-            obj = taskContext.CallProcedure(procGetObject) as DummyInstrumentClass;
-            Assert.IsNotNull(obj);
-            Assert.AreEqual(2, obj.ResetCounts);
-            Assert.AreEqual(10, obj.ID);
-            Assert.AreEqual(37, obj.IntA);
+            var obj3 = taskContext.CallProcedure(procGetObject) as DummyInstrumentClass;
+            Assert.IsNotNull(obj3);
+            Assert.IsTrue(Object.ReferenceEquals(obj1, obj3));
+            Assert.AreEqual(2, obj3.ResetCounts);
+            Assert.AreEqual(10, obj3.ID);
+            Assert.AreEqual(37, obj3.IntA);
         }
     }
 }

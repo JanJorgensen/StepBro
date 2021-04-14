@@ -448,6 +448,7 @@ namespace StepBro.Core.Execution
                 m_failureLine = m_currentStatementLine;
                 m_failureID = id;
                 m_errorException = ex;
+                m_errorListener?.Invoke(m_procedure, m_currentStatementLine, id, errorDescription, ex);
             }
         }
 

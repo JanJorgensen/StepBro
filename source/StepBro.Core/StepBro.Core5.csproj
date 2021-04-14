@@ -45,6 +45,9 @@
       <Package>StepBro.Core.Parser.Grammar</Package>
     </Antlr4>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" Link="README.md" />
+  </ItemGroup>
   
 
   <ItemGroup>

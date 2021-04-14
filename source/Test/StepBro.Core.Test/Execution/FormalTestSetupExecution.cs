@@ -659,30 +659,30 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("3 - Pre - <DYNAMIC CALL> myfile.FirstTestCase - <arguments>");
             log.ExpectNext("4 - Normal - 19 - log: Inside FirstTestCase: 20");
             log.ExpectNext("4 - Post");
-            log.ExpectNext("3 - Pre - CompanyTestFramework.TestCaseCleanup - <arguments>");
-            log.ExpectNext("4 - Normal - 10 - log: TestCaseCleanup FirstTestCase");
+            log.ExpectNext("3 - Pre - SpecialTest.TestCaseCleanup - <arguments>");
+            log.ExpectNext("4 - Normal - 8 - log: TestCaseCleanup FirstTestCase");
             log.ExpectNext("4 - Post");
 
             log.ExpectNext("3 - Normal - 34 - log: Starting Test: SecondTestCase");
-            log.ExpectNext("3 - Pre - CompanyTestFramework.TestCaseSpecialSetup - <arguments>");
-            log.ExpectNext("4 - Normal - 12 - log: TestCaseSpecialSetup SecondTestCase");
+            log.ExpectNext("3 - Pre - SpecialTest.TestCaseSpecialSetup - <arguments>");
+            log.ExpectNext("4 - Normal - 10 - log: TestCaseSpecialSetup SecondTestCase");
             log.ExpectNext("4 - Post");
             log.ExpectNext("3 - Pre - <DYNAMIC CALL> myfile.SecondTestCase - <arguments>");
-            log.ExpectNext("4 - Normal - 21 - log: Inside SecondTestCase: 1986");
+            log.ExpectNext("4 - Normal - 22 - log: Inside SecondTestCase: 1986");
             log.ExpectNext("4 - Post");
-            log.ExpectNext("3 - Pre - CompanyTestFramework.TestCaseCleanup - <arguments>");
-            log.ExpectNext("4 - Normal - 10 - log: TestCaseCleanup SecondTestCase");
+            log.ExpectNext("3 - Pre - SpecialTest.TestCaseCleanup - <arguments>");
+            log.ExpectNext("4 - Normal - 8 - log: TestCaseCleanup SecondTestCase");
             log.ExpectNext("4 - Post");
 
             log.ExpectNext("3 - Normal - 34 - log: Starting Test: ThirdTestCase");
-            log.ExpectNext("3 - Pre - CompanyTestFramework.TestCaseSetup - <arguments>");
-            log.ExpectNext("4 - Normal - 8 - log: TestCaseSetup ThirdTestCase");
+            log.ExpectNext("3 - Pre - SpecialTest.TestCaseSetup - <arguments>");
+            log.ExpectNext("4 - Normal - 6 - log: TestCaseSetup ThirdTestCase");
             log.ExpectNext("4 - Post");
             log.ExpectNext("3 - Pre - <DYNAMIC CALL> myfile.ThirdTestCase - <arguments>");
-            log.ExpectNext("4 - Normal - 23 - log: Inside ThirdTestCase: 729");
+            log.ExpectNext("4 - Normal - 24 - log: Inside ThirdTestCase: 729");
             log.ExpectNext("4 - Post");
-            log.ExpectNext("3 - Pre - CompanyTestFramework.TestCaseCleanup - <arguments>");
-            log.ExpectNext("4 - Normal - 10 - log: TestCaseCleanup ThirdTestCase");
+            log.ExpectNext("3 - Pre - SpecialTest.TestCaseCleanup - <arguments>");
+            log.ExpectNext("4 - Normal - 8 - log: TestCaseCleanup ThirdTestCase");
             log.ExpectNext("4 - Post");
 
             log.ExpectNext("3 - Post");
@@ -694,11 +694,9 @@ namespace StepBroCoreTest.Execution
         {
             var f = new StringBuilder();
             f.AppendLine("public using \"TestFramework.sbs\";");
-            f.AppendLine("public procedure SpecialTestCase() :");
-            f.AppendLine("TestCase,");
-            f.AppendLine("FreeParameters,");
-            f.AppendLine("partner override Setup:     TestCaseSetup,");
-            f.AppendLine("partner override Cleanup:   TestCaseCleanup;");
+            f.AppendLine("public procedure SpecialTestCase() : TestCase, FreeParameters,");
+            f.AppendLine("    partner override Setup:     TestCaseSetup,");
+            f.AppendLine("    partner override Cleanup:   TestCaseCleanup;");
 
             f.AppendLine("public procedure void TestCaseSetup(this TestCase testcase)");
             f.AppendLine("{ log(this.Name + \" \" + testcase.Name); }") ;
