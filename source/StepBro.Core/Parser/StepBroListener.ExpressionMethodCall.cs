@@ -190,7 +190,7 @@ namespace StepBro.Core.Parser
                         callType = isCallStatement ? ParansExpressionType.ProcedureCall : ParansExpressionType.FunctionCall;
                         // Note: never anonymous procedure here.
                         var procedure = (left.Value as IProcedureReference).ProcedureData;
-                        if (!isCallStatement && (procedure.Flags & ProcedureFlags.IsFunction) == ProcedureFlags.None )
+                        if (!isCallStatement && (procedure.Flags & ProcedureFlags.IsFunction) == ProcedureFlags.None)
                         {
                             m_errors.SymanticError(context.Start.Line, -1, false, "Only procedures marked as 'function' can be called from expressions.");
                         }
@@ -283,6 +283,9 @@ namespace StepBro.Core.Parser
             MethodInfo selectedMethod = null;
             List<SBExpressionData> methodArguments = null;
 
+            Expression earlyExitExpression = null;
+            if (m_currentProcedure != null) earlyExitExpression = Expression.Return(m_currentProcedure.ReturnLabel, Expression.Default(m_currentProcedure.ReturnType.Type));  // When told to exit the procedure now.
+
             #region Dynamic Procedure Call
 
             if (callType == ParansExpressionType.DynamicProcedureCall)
@@ -296,22 +299,34 @@ namespace StepBro.Core.Parser
                     ref namedArguments,
                     ref sequencialLastArguments))
                 {
-                    //this IProcedureReference procedure,
-                    //IScriptCallContext context,
-                    //PropertyBlock propertyBlock,
-                    //object[] sequencialFirstArguments,
-                    //ArgumentList namedArguments,
-                    //object[] sequencialLastArguments
-
-                    m_scopeStack.Peek().AddStatementCode(
-                        Expression.Call(
+                    Expression callProcedure = Expression.Call(
                             s_DynamicProcedureCall,
                             instance,
                             m_currentProcedure?.ContextReferenceInternal,
                             Expression.Constant(null, typeof(PropertyBlock)),
                             sequencialFirstArguments.ExpressionCode,
                             namedArguments.ExpressionCode,
-                            sequencialLastArguments.ExpressionCode));
+                            sequencialLastArguments.ExpressionCode);
+                    
+                    if (m_callAssignmentTarget != null)
+                    {
+                        callProcedure = Expression.Assign(m_callAssignmentTarget.ExpressionCode, callProcedure);
+                    }
+
+                    m_scopeStack.Peek().AddStatementCode(
+                        Expression.TryCatch(
+                            Expression.Block(typeof(void), callProcedure),
+                            Expression.Catch(
+                                typeof(RequestEarlyExitException),
+                                earlyExitExpression),
+                            Expression.Catch(
+                                typeof(Exception),
+                                Expression.Rethrow()))
+                        );
+                }
+                else
+                {
+                    throw new NotImplementedException();
                 }
                 return;     // All done.
             }
@@ -365,7 +380,7 @@ namespace StepBro.Core.Parser
                 int numAtMax = 1;
                 for (var i = 1; i < matchingMethods.Count; i++)
                 {
-                    if (matchingMethods[i].Item2 > max) 
+                    if (matchingMethods[i].Item2 > max)
                     {
                         max = matchingMethods[i].Item2;
                         maxAt = i;
@@ -499,20 +514,24 @@ namespace StepBro.Core.Parser
                     // finally { callcontext.Dispose(); }
 
                     var procRefVar = Expression.Variable(procedureReferenceType, "procRef");
+                    var callArgsArray = Expression.Variable(typeof(object[]), "__callArgs" + context.Start.Line + "_" + context.Start.Column);
                     var subCallContextContainer = Expression.Variable(typeof(InternalDisposer<IScriptCallContext>), "subCallContextContainer");
                     var subCallContext = Expression.Property(subCallContextContainer, "Value");
                     // Replace the callContext argument with new context reference.
                     methodArguments[0] = new SBExpressionData(subCallContext);
+                    // TODO: Generate list of arguments in callArgsArray (inputs only)
+                    // TODO: Replace input arguments (not out's and ref's) of methodArguments with __callArgs[n].
                     var assignProcRefVar = Expression.Assign(procRefVar, procedureReferenceExp);
 
                     var createSubContext = Expression.New(
                                     typeof(InternalDisposer<IScriptCallContext>).GetConstructor(new Type[] { typeof(IScriptCallContext) }),
                                     Expression.Call(
                                         m_currentProcedure.ContextReferenceInternal,
-                                        typeof(IScriptCallContext).GetMethod(nameof(IScriptCallContext.EnterNewScriptContext), new Type[] { typeof(IProcedureReference), typeof(ContextLogOption), typeof(bool) }),
+                                        typeof(IScriptCallContext).GetMethod(nameof(IScriptCallContext.EnterNewScriptContext), new Type[] { typeof(IProcedureReference), typeof(ContextLogOption), typeof(bool), typeof(object[]) }),
                                         procRefVar,
                                         Expression.Constant(ContextLogOption.Normal),
-                                        Expression.Constant(false)));
+                                        Expression.Constant(false),
+                                        callArgsArray));
 
                     var invokeMethod = delegateType.GetMethod("Invoke");
 
@@ -537,15 +556,16 @@ namespace StepBro.Core.Parser
                         typeof(InternalDisposer<IScriptCallContext>).GetMethod("Dispose"));
 
                     var completeProcedureCall = Expression.Block(
-                        new ParameterExpression[] { procRefVar, subCallContextContainer },
+                        new ParameterExpression[] { procRefVar, callArgsArray, subCallContextContainer },
                         Expression.TryCatchFinally(
                             Expression.Block(
                                 assignProcRefVar,
+                                Expression.Assign(callArgsArray, Expression.Convert(Expression.Constant(null), typeof(object[]))),
                                 Expression.Assign(subCallContextContainer, createSubContext),
                                 callProcedure,
                                 Expression.Condition(
                                     Expression.Call(s_PostProcedureCallResultHandling, m_currentProcedure.ContextReferenceInternal, subCallContext),
-                                    Expression.Return(m_currentProcedure.ReturnLabel, Expression.Default(m_currentProcedure.ReturnType.Type)),  // When told to exit the procedure now.
+                                    earlyExitExpression,
                                     Expression.Empty())
                                 ),
                             disposeSubContext,

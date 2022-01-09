@@ -141,12 +141,19 @@ namespace StepBro.Core.Parser
         public override void EnterFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)
         {
             m_variableModifier = VariableModifier.Static;
+            m_variableOverride = false;
         }
 
         public override void EnterFileVariableSimple([NotNull] SBP.FileVariableSimpleContext context)
         {
             m_variableModifier = VariableModifier.Static;
+            m_variableOverride = false;
             this.CreateVariablesList();
+        }
+
+        public override void ExitFileVariableOverride([NotNull] SBP.FileVariableOverrideContext context)
+        {
+            m_variableOverride = true;
         }
 
         public override void ExitFileVariableSimple([NotNull] SBP.FileVariableSimpleContext context)
@@ -182,55 +189,58 @@ namespace StepBro.Core.Parser
             VariableContainerAction initAction = null;
             VariableContainerAction resetAction = null;
 
-            if (m_variableType.Type.IsValueType || m_variableType.Type == typeof(string))
+            if (!m_variableOverride)
             {
-                var code = Expression.Constant(Activator.CreateInstance(type.Type), type.Type);
-                createAction = CreateVariableContainerValueAssignAction(code);
-                resetAction = createAction;
-            }
-            else
-            {
-                #region Creator Action
-                var ctor = type.Type.GetConstructor(new Type[] { });
-                if (ctor != null)
+                if (m_variableType.Type.IsValueType || m_variableType.Type == typeof(string))
                 {
-                    var code = Expression.New(ctor);
+                    var code = Expression.Constant(Activator.CreateInstance(type.Type), type.Type);
                     createAction = CreateVariableContainerValueAssignAction(code);
+                    resetAction = createAction;
                 }
                 else
                 {
-                    var createMethods =
-                        type.Type.GetMethods().Where(
-                            m => String.Equals(m.Name, "Create", StringComparison.InvariantCulture) && m.IsStatic).ToArray();
-                    throw new NotImplementedException();
+                    #region Creator Action
+                    var ctor = type.Type.GetConstructor(new Type[] { });
+                    if (ctor != null)
+                    {
+                        var code = Expression.New(ctor);
+                        createAction = CreateVariableContainerValueAssignAction(code);
+                    }
+                    else
+                    {
+                        var createMethods =
+                            type.Type.GetMethods().Where(
+                                m => String.Equals(m.Name, "Create", StringComparison.InvariantCulture) && m.IsStatic).ToArray();
+                        throw new NotImplementedException();
+                    }
+                    #endregion
+                    #region Reset Action
+                    var resettable = type.Type.GetInterface(nameof(IResettable));
+                    if (resettable != null)
+                    {
+                        LabelTarget returnLabel = Expression.Label(typeof(bool));
+
+                        var parameterContainer = Expression.Parameter(typeof(IValueContainerOwnerAccess), "container");
+                        var parameterLogger = Expression.Parameter(typeof(ILogger), "logger");
+
+                        var callSetValue = Expression.Call(
+                            typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ResetFileVariable), new Type[] { typeof(IValueContainerOwnerAccess), typeof(ILogger) }),
+                            parameterContainer,
+                            parameterLogger);
+
+                        var lambdaExpr = Expression.Lambda(
+                            typeof(VariableContainerAction),
+                            Expression.Block(
+                                callSetValue,
+                                Expression.Label(returnLabel, Expression.Constant(true))),
+                            parameterContainer,
+                            parameterLogger);
+
+                        var @delegate = lambdaExpr.Compile();
+                        resetAction = (VariableContainerAction)@delegate;
+                    }
+                    #endregion
                 }
-                #endregion
-                #region Reset Action
-                var resettable = type.Type.GetInterface(nameof(IResettable));
-                if (resettable != null)
-                {
-                    LabelTarget returnLabel = Expression.Label(typeof(bool));
-
-                    var parameterContainer = Expression.Parameter(typeof(IValueContainerOwnerAccess), "container");
-                    var parameterLogger = Expression.Parameter(typeof(ILogger), "logger");
-
-                    var callSetValue = Expression.Call(
-                        typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ResetFileVariable), new Type[] { typeof(IValueContainerOwnerAccess), typeof(ILogger) }),
-                        parameterContainer,
-                        parameterLogger);
-
-                    var lambdaExpr = Expression.Lambda(
-                        typeof(VariableContainerAction),
-                        Expression.Block(
-                            callSetValue,
-                            Expression.Label(returnLabel, Expression.Constant(true))),
-                        parameterContainer,
-                        parameterLogger);
-
-                    var @delegate = lambdaExpr.Compile();
-                    resetAction = (VariableContainerAction)@delegate;
-                }
-                #endregion
             }
 
             PropertyBlock customProperties = null;

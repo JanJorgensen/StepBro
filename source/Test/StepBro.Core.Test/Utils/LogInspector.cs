@@ -11,13 +11,13 @@ namespace StepBroCoreTest.Utils
 {
     public class LogInspector : StepBro.Utils.SequenceInspector<string>
     {
-        public LogInspector(LoggerRoot logger, bool dump = false) :
+        public LogInspector(Logger logger, bool dump = false) :
             base(ListEntries(logger.GetOldestEntry()).Select(LogEntryToString))
         {
             this.SetExpectFailureAction(FailureHandler);
         }
 
-        public LogInspector(ILogger logger, bool dump = false) : this(LoggerRoot.Root(logger), dump)
+        public LogInspector(ILogger logger, bool dump = false) : this(Logger.Root(logger), dump)
         {
 
         }

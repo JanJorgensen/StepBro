@@ -11,6 +11,7 @@ namespace StepBro.Core.Host
     public interface IHost
     {
         //System.Windows.Forms.Form GetMainForm();
+        bool IsWPFApplication { get; }
         IEnumerable<Type> ListHostCodeModuleTypes();
         IEnumerable<NamedData<object>> ListHostCodeModuleInstances();
     }

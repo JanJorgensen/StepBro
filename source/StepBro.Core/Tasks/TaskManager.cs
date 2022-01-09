@@ -114,7 +114,7 @@ namespace StepBro.Core.Tasks
             //}
         }
 
-        public TaskManager(out IService serviceAccess) : base("TaskManager", out serviceAccess, typeof(IMainLogger))
+        public TaskManager(out IService serviceAccess) : base("TaskManager", out serviceAccess, typeof(ILogger))
         {
 
         }

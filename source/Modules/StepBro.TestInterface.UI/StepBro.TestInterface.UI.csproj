@@ -5,14 +5,31 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>StepBro.TestInterface.UI</AssemblyName>
     <RootNamespace>StepBro.TestInterface.UI</RootNamespace>
-    <OutputPath>..\..\bin5\Modules</OutputPath>
+    <OutputPath>..\..\bin\Modules</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ActiproSoftware.Controls.WPF.SyntaxEditor" Version="21.1.1" />
+    <PackageReference Include="ActiproSoftware.Controls.WPF.SyntaxEditor" Version="21.1.3" />
   </ItemGroup>
 
   <ItemGroup>

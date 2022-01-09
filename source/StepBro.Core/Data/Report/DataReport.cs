@@ -77,7 +77,11 @@ namespace StepBro.Core
             {
                 if (context is ScriptCallContext)
                 {
-                    (context as ScriptCallContext).RemoveReport(this.ID);
+                    var registeredReport = (context as ScriptCallContext).TryGetReport();
+                    if (registeredReport != null && Object.ReferenceEquals(registeredReport, this))
+                    {
+                        (context as ScriptCallContext).RemoveReport();
+                    }
                 }
                 this.Dispose();
             }

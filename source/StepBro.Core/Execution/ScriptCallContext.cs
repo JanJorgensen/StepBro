@@ -9,6 +9,7 @@ using StepBro.Core.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace StepBro.Core.Execution
 {
@@ -37,10 +38,12 @@ namespace StepBro.Core.Execution
         private string m_failureDescription = null;
         private ErrorID m_failureID = null;
         private Exception m_errorException = null;
+        private List<ProcedureResult> m_subResults = new List<ProcedureResult>();
         private int m_failCount = 0;
         private int m_errorCount = 0;
         private RuntimeErrorListener m_errorListener = null;
-        private List<DataReport> m_currentReports = null;
+        private DataReport m_currentReport = null;
+        private ProcedureResult m_lastCallResult = null;
 
         internal ScriptCallContext(
             ScriptTaskContext task,
@@ -48,7 +51,8 @@ namespace StepBro.Core.Execution
             ContextLogOption callLoggingOption,
             IExecutionScopeStatusUpdate statusUpdater,
             IFileProcedure procedure,
-            TaskManager taskManager)
+            TaskManager taskManager,
+            object[] arguments)
         {
             m_task = task;
             m_parentContext = null;
@@ -59,10 +63,15 @@ namespace StepBro.Core.Execution
             m_procedure = procedure;
             m_taskManager = taskManager;
             m_isDynamicCall = false;
-            this.SetupFromProcedure();
+            this.SetupFromProcedure(arguments);
         }
 
-        internal ScriptCallContext(ScriptCallContext parent, IFileProcedure procedure, ContextLogOption callLoggingOption, bool isDynamicCall)
+        internal ScriptCallContext(
+            ScriptCallContext parent,
+            IFileProcedure procedure, 
+            ContextLogOption callLoggingOption, 
+            bool isDynamicCall, 
+            object[] arguments)
         {
             m_task = parent.m_task;
             m_parentContext = parent;
@@ -77,9 +86,9 @@ namespace StepBro.Core.Execution
 
             m_procedure = procedure;
             m_isDynamicCall = isDynamicCall;
-            this.SetupFromProcedure();
+            this.SetupFromProcedure(arguments);
 
-            m_currentReports = parent.m_currentReports; // Simply inherit the list.
+            m_currentReport = parent.m_currentReport;
 
             //m_createdlogger = logger.LogEntering(procedure.ElementName, procedure.Purpose);
             //if (separateStateLevel)
@@ -95,7 +104,7 @@ namespace StepBro.Core.Execution
             //}
         }
 
-        private void SetupFromProcedure()
+        private void SetupFromProcedure(object[] arguments)
         {
             m_loggingEnabled = GetContextLoggingState(
                 m_parentContext != null ? m_parentContext.m_loggingEnabled : true,
@@ -105,7 +114,23 @@ namespace StepBro.Core.Execution
 
             if (m_loggingEnabled || m_parentContext == null || m_parentContext.LoggingEnabled)
             {
-                m_loggerInsideScope = m_loggerOnEntry.LogEntering((m_isDynamicCall ? "<DYNAMIC CALL> " : "") + m_procedure.FullName, "<arguments>");
+                StringBuilder argText = new StringBuilder();
+                if (arguments != null && arguments.Length > 0)
+                {
+                    argText.Append("( ");
+                    var args = new List<string>();
+                    foreach (var a in arguments)
+                    {
+                        args.Add(StringUtils.ObjectToString(a));
+                    }
+                    argText.Append(String.Join(", ", args));
+                    argText.Append(" )");
+                }
+                else
+                {
+                    argText.Append("<no arguments>");
+                }
+                m_loggerInsideScope = m_loggerOnEntry.LogEntering((m_isDynamicCall ? "<DYNAMIC CALL> " : "") + m_procedure.FullName, argText.ToString());
                 m_loggerInside = m_loggerInsideScope;
             }
             else
@@ -256,14 +281,14 @@ namespace StepBro.Core.Execution
             throw new NotImplementedException();
         }
 
-        public virtual IScriptCallContext EnterNewScriptContext(IFileProcedure procedure, ContextLogOption callerLoggingOption, bool isDynamicCall)
+        public virtual IScriptCallContext EnterNewScriptContext(IFileProcedure procedure, ContextLogOption callerLoggingOption, bool isDynamicCall, object[] arguments)
         {
-            return new ScriptCallContext(this, procedure, callerLoggingOption, isDynamicCall);
+            return new ScriptCallContext(this, procedure, callerLoggingOption, isDynamicCall, arguments);
         }
 
-        public IScriptCallContext EnterNewScriptContext(IProcedureReference procedure, ContextLogOption callerLoggingOption, bool isDynamicCall)
+        public IScriptCallContext EnterNewScriptContext(IProcedureReference procedure, ContextLogOption callerLoggingOption, bool isDynamicCall, object[] arguments)
         {
-            return this.EnterNewScriptContext(procedure.ProcedureData, callerLoggingOption, isDynamicCall);
+            return this.EnterNewScriptContext(procedure.ProcedureData, callerLoggingOption, isDynamicCall, arguments);
         }
 
         public IEnumerable<IFolderShortcut> GetFolders()
@@ -283,48 +308,43 @@ namespace StepBro.Core.Execution
             }
         }
 
-        public DataReport AddReport(DataReport report)
+        public void AddReport(DataReport report)
         {
-            if (m_currentReports == null) m_currentReports = new List<DataReport>();
-            m_currentReports.Add(report);
-            return report;
+            if (m_currentReport != null)
+            {
+                throw new OperationNotAllowedException("A report is already registered.");
+            }
+            m_currentReport = report;
         }
 
-        public bool RemoveReport(string id)
+        public void RemoveReport()
         {
-            if (m_currentReports != null)
+            if (m_currentReport == null)
             {
-                var report = m_currentReports.FirstOrDefault(r => String.Equals(id, r.ID, StringComparison.InvariantCulture));
-                if (report != null)
-                {
-                    m_currentReports.Remove(report);
-                    return true;
-                }
-                else { return false; }
+                throw new ArgumentException("No report registered.");
             }
-            else
-            {
-                return false;
-            }
+            m_currentReport = null;
         }
 
-        public IEnumerable<DataReport> ListReports()
+        public DataReport GetReport()
         {
-            if (m_currentReports == null) yield break;
-            else
+            if (m_currentReport == null)
             {
-                foreach (var report in m_currentReports)
-                {
-                    yield return report;
-                }
+                throw new Exception("No report is registered.");
             }
+            return m_currentReport;
         }
 
-        private void AddToReports(ReportData data)
+        public DataReport TryGetReport()
         {
-            foreach (var report in m_currentReports)
+            return m_currentReport;
+        }
+
+        private void AddToReport(ReportData data)
+        {
+            if (m_currentReport != null)
             {
-                report.AddData(data);
+                m_currentReport.AddData(data);
             }
         }
 
@@ -363,10 +383,7 @@ namespace StepBro.Core.Execution
                 this.SetPassVerdict();  // To indicate that the procedure actually has a verdict set now.
             }
 
-            if (m_currentReports != null)
-            {
-                this.AddToReports(new ExpectResultData(this.GetLocationDescription(), title, expected, actual, verdict));
-            }
+            this.AddToReport(new ExpectResultData(this.GetLocationDescription(), title, expected, actual, verdict));
         }
 
         public void EnterTestStep(int line, int column, int index, string title)
@@ -451,23 +468,37 @@ namespace StepBro.Core.Execution
                 m_errorListener?.Invoke(m_procedure, m_currentStatementLine, id, errorDescription, ex);
             }
         }
+        public void AddPartResult(IProcedureReference procedure, ProcedureResult result)
+        {
+            m_subResults.Add(result);
+        }
+
 
         public bool SetResultFromSub(IScriptCallContext sub)
         {
-            if (sub.Result.Verdict > m_verdict)
+            m_lastCallResult = sub.Result;
+            if ((this.Self.Flags & ProcedureFlags.NoSubResultInheritance) == ProcedureFlags.None)
             {
-                m_verdict = sub.Result.Verdict;
-                if (sub.Result.Verdict >= Verdict.Fail)
+                if (sub.Result.Verdict > m_verdict)
                 {
-                    m_failureLine = m_currentStatementLine;
-                    m_failureID = sub.Result.ErrorID;
-                    m_failureDescription = $"Failure in called procedure \"{sub.Self.FullName}\".";
-
-                    if (m_verdict == Verdict.Error) return true;
-                    else if (m_verdict == Verdict.Fail)
+                    m_verdict = sub.Result.Verdict;
+                    if (sub.Result.Verdict >= Verdict.Fail)
                     {
-                        return (m_procedure.Flags & ProcedureFlags.ContinueOnFail) == ProcedureFlags.None;
+                        m_failureLine = m_currentStatementLine;
+                        m_failureID = sub.Result.ErrorID;
+                        m_failureDescription = $"Failure in called procedure \"{sub.Self.FullName}\".";
+                        m_subResults.Clear();   // When procedure has its own verdict, the sub-results are not useful.
+
+                        if (m_verdict == Verdict.Error) return true;
+                        else if (m_verdict == Verdict.Fail)
+                        {
+                            return (m_procedure.Flags & ProcedureFlags.ContinueOnFail) == ProcedureFlags.None;
+                        }
                     }
+                }
+                else if (m_verdict <= Verdict.Pass && sub.Result.SubResultCount > 0)
+                {
+                    m_subResults.AddRange(sub.Result.ListSubResults());
                 }
             }
             return false;
@@ -477,7 +508,7 @@ namespace StepBro.Core.Execution
         {
             get
             {
-                return new ProcedureResult(m_verdict, m_failureLine, m_failureDescription, m_failureID);
+                return new ProcedureResult(m_procedure.FullName, m_verdict, m_failureLine, m_failureDescription, m_failureID, m_subResults);
             }
         }
 
@@ -497,6 +528,8 @@ namespace StepBro.Core.Execution
 
         ErrorID IProcedureThis.LastError { get { throw new NotImplementedException(); } }
         string IProcedureThis.Name { get { return m_procedure.Name; } }
+
+        ProcedureResult IProcedureThis.LastCallResult { get { return m_lastCallResult; } }
 
         public TaskManager TaskManager { get { return m_taskManager; } }
     }

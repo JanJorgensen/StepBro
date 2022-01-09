@@ -34,7 +34,7 @@ namespace StepBro.Core.Execution
                 {
                     context.Logger.Log("delay", $"{(long)time.TotalMilliseconds}ms");
                 }
-                var reporter = context.StatusUpdater.CreateProgressReporter("", time);
+                var reporter = context.StatusUpdater.CreateProgressReporter("delay", time);
                 using (reporter)
                 {
                     bool skipClicked = false;
@@ -53,6 +53,10 @@ namespace StepBro.Core.Execution
                             System.Threading.Thread.Sleep(timeLeft);    // Last time to sleep; take whats left.
                         }
                         timeLeft = DateTime.Now.TimeTill(timeout);
+                    }
+                    if (skipClicked)
+                    {
+                        context.Logger.LogUserAction("delay", "User pressed the \"Skip delay\" button.");
                     }
                 }
             }
@@ -90,17 +94,26 @@ namespace StepBro.Core.Execution
         public static DataReport StartReport([Implicit] ICallContext context, string ID, string title)
         {
             var internalContext = context as ScriptCallContext;
-            return internalContext.AddReport(new DataReport(ID));
+            var report = new DataReport(ID);
+            try
+            {
+                internalContext.AddReport(report);
+                return report;
+            }
+            catch
+            {
+                report.Dispose();
+                throw;
+            }
         }
 
         [Public]
-        public static DataReport GetReport([Implicit] ICallContext context, string ID)
+        public static DataReport GetReport([Implicit] ICallContext context)
         {
             var internalContext = context as ScriptCallContext;
-            var report = internalContext.ListReports().FirstOrDefault(r => String.Equals(ID, r.ID, StringComparison.InvariantCulture));
-            if (report == null)
+            var report = internalContext.TryGetReport();
             {
-                context.ReportError("Failed to find report named \"" + ID + "\".");
+                context.ReportError("No has been registered.");
             }
             return report;
         }

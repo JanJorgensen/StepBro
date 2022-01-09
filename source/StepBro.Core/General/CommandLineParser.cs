@@ -11,9 +11,9 @@ namespace StepBro.Core.General
     {
         private CommandLineParser() { }
 
-        static public T Parse<T>(Logging.ILogger logging, string[] arguments) where T : CoreCommandlineOptions
+        static public T Parse<T>(Logging.ILogger logging, string[] arguments, System.IO.TextWriter outputTarget = null) where T : CoreCommandlineOptions
         {
-            var parser = new CommandLine.Parser(config => config.HelpWriter = Console.Out);
+            var parser = new CommandLine.Parser(config => config.HelpWriter = outputTarget);
             T options = null;
             IEnumerable<Error> errors = null;
 

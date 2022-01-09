@@ -46,7 +46,7 @@ namespace StepBroCoreTest
         private static object DoDynamicInvoke(IFileProcedure procedure, bool debug, params object[] args)
         {
             var taskContext = ExeContext();
-            LoggerRoot.Root(taskContext.Logger).IsDebugging = debug;
+            Logger.Root(taskContext.Logger).IsDebugging = debug;
 
             return taskContext.CallProcedure(procedure, args);
         }
@@ -56,7 +56,7 @@ namespace StepBroCoreTest
             ScriptTaskContext taskContext = new ScriptTaskContext();
             RuntimeErrors = new RuntimeErrorCollector();
             taskContext.SetErrorListener(RuntimeErrors.ReportError);
-            var logger = new LoggerRoot("", false, "TestRun", "Starting");
+            var logger = new Logger("", false, "TestRun", "Starting");
             if (debugging)
             {
                 logger.IsDebugging = true;
@@ -75,7 +75,7 @@ namespace StepBroCoreTest
                 loadedFiles = new LoadedFilesManager(out service);
                 taskManager = new TaskManager(out service);
             }
-            taskContext.Setup(logger.m_rootLogger, ContextLogOption.Normal, taskStatusUpdater, loadedFiles, taskManager);
+            taskContext.Setup(logger.m_rootScope, ContextLogOption.Normal, taskStatusUpdater, loadedFiles, taskManager);
             return taskContext;
         }
     }

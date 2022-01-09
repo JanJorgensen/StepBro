@@ -15,7 +15,7 @@ namespace StepBro.Core.Execution
         private TaskExecutionState m_currentState = TaskExecutionState.Created;
         private readonly object m_sync = new object();
         private ILogger m_logger;
-        private readonly ILogSinkManager m_logSinkManager;
+        //private readonly ILogSinkManager m_logSinkManager;
         private ScriptTaskContext m_taskContext;
         private ExecutionScopeStatusUpdaterMock m_statusUpdate;
         private readonly ILoadedFilesManager m_filesManager;
@@ -24,6 +24,7 @@ namespace StepBro.Core.Execution
         private readonly object[] m_arguments;
         private DateTime m_start = DateTime.MinValue;
         private DateTime m_end = DateTime.MinValue;
+        private object m_returnValue = null;
 
         public ITaskControl Task { get { return this as ITaskControl; } }
         public IExecutionResult Result { get { return this as IExecutionResult; } }
@@ -32,15 +33,13 @@ namespace StepBro.Core.Execution
 
         BreakOption ITaskControl.BreakOptions => throw new NotImplementedException();
 
-        Verdict IExecutionResult.Verdict => throw new NotImplementedException();
+        ProcedureResult IExecutionResult.ProcedureResult { get { return m_taskContext.Result; } }
 
-        TimeSpan IExecutionResult.ExecutionTime => throw new NotImplementedException();
+        TimeSpan IExecutionResult.ExecutionTime { get { return m_end - m_start; } }
 
-        ExecutionFailure IExecutionResult.Failure => throw new NotImplementedException();
+        object IExecutionResult.ReturnValue { get { return m_returnValue; } }
 
-        object IExecutionResult.ReturnValue => throw new NotImplementedException();
-
-        public IFileElement TargetElement => throw new NotImplementedException();
+        public IFileElement TargetElement { get { return m_targetElement; } }
 
         DateTime ITaskControl.StartTime { get { return m_start; } }
 
@@ -48,14 +47,14 @@ namespace StepBro.Core.Execution
 
         public ScriptExecutionTask(
             ILogger logger,
-            ILogSinkManager logSinkManager,
+            //ILogSinkManager logSinkManager,
             ILoadedFilesManager filesManager,
             TaskManager taskManager,
             IFileElement targetElement,
             object[] arguments)
         {
             m_logger = logger;
-            m_logSinkManager = logSinkManager;
+            //m_logSinkManager = logSinkManager;
             m_filesManager = filesManager;
             m_taskManager = taskManager;
             m_targetElement = targetElement;
@@ -108,14 +107,13 @@ namespace StepBro.Core.Execution
         private void ProcedureExecutionTask()
         {
             var logger = m_logger.LogEntering("Script Execution", m_targetElement.Name);
-            m_taskContext.Setup(m_logger, ContextLogOption.Normal, m_statusUpdate, m_filesManager, m_taskManager);
+            m_taskContext.Setup(logger, ContextLogOption.Normal, m_statusUpdate, m_filesManager, m_taskManager);
             m_start = DateTime.Now;
             this.SetState(TaskExecutionState.Running);
-            object resultValue = null;
 
             try
             {
-                resultValue = m_taskContext.CallProcedure(m_targetElement as IFileProcedure, m_arguments);
+                m_returnValue = m_taskContext.CallProcedure(m_targetElement as IFileProcedure, m_arguments);
                 this.SetState(TaskExecutionState.Ended);
             }
             catch
@@ -124,8 +122,8 @@ namespace StepBro.Core.Execution
             }
             finally
             {
-                logger.LogExit("Script Execution", "Script execution ended. Result value: " + StringUtils.ObjectToString(resultValue));
                 m_end = DateTime.Now;
+                logger.LogExit("Script Execution", "Script execution ended. " + m_taskContext.Result.ResultText(m_returnValue));
             }
         }
 
@@ -164,7 +162,7 @@ namespace StepBro.Core.Execution
             public long m_progress = -1;
             public long m_progressPokeCount = 0;
             public Func<long, string> m_progressFormatter = null;
-            public List<Tuple<string, Func<bool,bool>>> m_buttons = new List<Tuple<string, Func<bool,bool>>>();
+            public List<Tuple<string, Func<bool, bool>>> m_buttons = new List<Tuple<string, Func<bool, bool>>>();
 
             public AttentionColor ProgressColor
             {
@@ -181,7 +179,7 @@ namespace StepBro.Core.Execution
             public event EventHandler Disposed;
             public event EventHandler ExpectedTimeExceeded;
 
-            public void AddActionButton(string title, Func<bool,bool> activationAction)
+            public void AddActionButton(string title, Func<bool, bool> activationAction)
             {
                 System.Diagnostics.Debug.WriteLine("AddActionButton " + title);
                 // TODO: Implement ....

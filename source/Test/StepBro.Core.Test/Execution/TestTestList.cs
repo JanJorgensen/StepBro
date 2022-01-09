@@ -60,12 +60,12 @@ namespace StepBroCoreTest.Execution
             var log = new LogInspector(taskContext.Logger);
             log.DebugDump();
             log.ExpectNext("0 - Pre - TestRun - Starting");
-            log.ExpectNext("1 - Pre - MyFile.ExecuteAllTests - <arguments>");
-            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.FirstTestCase - <arguments>");
+            log.ExpectNext("1 - Pre - MyFile.ExecuteAllTests - <no arguments>");
+            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.FirstTestCase - ( (<empty>) )");
             log.ExpectNext("3 - Post");
-            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.SecondTestCase - <arguments>");
+            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.SecondTestCase - ( (<empty>) )");
             log.ExpectNext("3 - Post");
-            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.ThirdTestCase - <arguments>");
+            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.ThirdTestCase - ( (<empty>) )");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
@@ -110,8 +110,8 @@ namespace StepBroCoreTest.Execution
             if (exeException != null) throw exeException;
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
-            log.ExpectNext("1 - Pre - myfile.ExecuteAllTests - <arguments>");
-            log.ExpectNext("2 - Pre - <DYNAMIC CALL> myfile.FirstTestCase - <arguments>");
+            log.ExpectNext("1 - Pre - myfile.ExecuteAllTests - <no arguments>");
+            log.ExpectNext("2 - Pre - <DYNAMIC CALL> myfile.FirstTestCase - ( (<empty>) )");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();

@@ -16,6 +16,8 @@ namespace StepBro.Core.Execution
         string Name { get; }
         void ReportFailure(string failureDescription, ErrorID id = null);
         void ReportError(string errorDescription, ErrorID id = null);
+        void AddPartResult(IProcedureReference procedure, ProcedureResult result);
         ProcedureResult Result { get; }
+        ProcedureResult LastCallResult { get; }
     }
 }

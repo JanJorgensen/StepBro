@@ -29,7 +29,7 @@ namespace StepBroCoreTest.Execution
             {
                 var file = FileBuilder.ParseFiles(
                     StepBro.Core.Main.ServiceManager,
-                    StepBro.Core.Main.GetService<IMainLogger>().Logger.RootLogger,
+                    StepBro.Core.Main.GetService<ILogger>(),
                     new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()))[0];
 
                 Assert.AreEqual(1, file.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
@@ -60,17 +60,17 @@ namespace StepBroCoreTest.Execution
                 System.Diagnostics.Debug.WriteLine($"Execution time: {(execution.Task.EndTime - execution.Task.StartTime).ToString()}");
                 Assert.AreEqual(StepBro.Core.Tasks.TaskExecutionState.Ended, execution.Task.CurrentState);
 
-                var log = new LogInspector(ServiceManager.Global.Get<IMainLogger>().Logger);
+                var log = new LogInspector((ServiceManager.Global.Get<ILogger>() as LoggerScope).Logger);
                 log.DebugDump();
 
                 log.ExpectNext("0 - Pre - StepBro - Main logger created");
-                log.ExpectNext("1 - Normal - MainLogger - Service started");
+                //log.ExpectNext("1 - Normal - MainLogger - Service started");
                 log.ExpectNext("1 - Pre - Script Execution - Main");
-                log.ExpectNext("1 - Pre - myfile.Main - <arguments>");
-                log.ExpectNext("2 - Normal - 3 - log: Started");
-                log.ExpectNext("2 - Normal - 5 - log: Ending");
-                log.ExpectNext("2 - Post");
-                log.ExpectNext("2 - Post - Script Execution - Script execution ended. Result value: <null>");
+                log.ExpectNext("2 - Pre - myfile.Main - <no arguments>");
+                log.ExpectNext("3 - Normal - 3 - log: Started");
+                log.ExpectNext("3 - Normal - 5 - log: Ending");
+                log.ExpectNext("3 - Post");
+                log.ExpectNext("2 - Post - Script Execution - Script execution ended. Succes.");
                 log.ExpectEnd();
             }
             finally

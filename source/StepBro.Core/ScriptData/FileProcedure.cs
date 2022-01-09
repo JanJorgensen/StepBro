@@ -364,7 +364,7 @@ namespace StepBro.Core.ScriptData
             }
             if (name.Equals("NoSubResultInheritance"))
             {
-                this.Flags &= ProcedureFlags.NoSubResultInheritance;
+                this.Flags |= ProcedureFlags.NoSubResultInheritance;
                 return true;
             }
             return base.ParsePropertyBlockFlag(name);

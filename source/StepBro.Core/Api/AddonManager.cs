@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Data;
+using StepBro.Core.Host;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using System;
@@ -10,18 +11,20 @@ namespace StepBro.Core.Api
 {
     internal class AddonManager : ServiceBase<IAddonManager, AddonManager>, IAddonManager
     {
+        private bool m_hostIsWPF = false;
         private readonly Action<IAddonManager> m_basicModulesLoader;
         private List<Assembly> m_assemblies = new List<Assembly>();
-        private List<Tuple<string, Exception>> m_assembliesFailedLoading = new List<Tuple<string, Exception>>();
+        private List<Tuple<string, bool, Exception>> m_scannedFiles = new List<Tuple<string, bool, Exception>>();
         private List<NamespaceList> m_rootNamespaces = new List<NamespaceList>();
         private Dictionary<string, NamespaceList> m_namespaceLookup = new Dictionary<string, NamespaceList>();
         private Dictionary<string, Type> m_typeLookup = new Dictionary<string, Type>();
         private List<Tuple<string, Type>> m_types = new List<Tuple<string, Type>>();
         private Dictionary<string, IIdentifierInfo> m_lookup = new Dictionary<string, IIdentifierInfo>();
         private List<IAddonTypeHandler> m_specialTypeHandlers = new List<IAddonTypeHandler>();
+        private List<IAddon> m_addons = new List<IAddon>();
 
         public AddonManager(Action<IAddonManager> basicModulesLoader, out IService serviceAccess) :
-            base("AddonManager", out serviceAccess, typeof(Logging.IMainLogger))
+            base("AddonManager", out serviceAccess, typeof(Logging.ILogger))
         {
             m_basicModulesLoader = basicModulesLoader;
         }
@@ -43,18 +46,42 @@ namespace StepBro.Core.Api
             {
                 m_basicModulesLoader(this);
             }
+            var host = manager.Get<IHost>();
+            m_hostIsWPF = (host != null) ? host.IsWPFApplication : false;
         }
 
         public void LoadAssembly(string path, bool loadOnlyTypesWithPublicAttribute)
         {
+            bool skipped = false;
+            Exception loadException = null;
             try
             {
                 var fileAssembly = Assembly.LoadFrom(path);
-                this.AddAssembly(fileAssembly, loadOnlyTypesWithPublicAttribute);
+                if (!IsUIModuleAttribute.HasAttribute(fileAssembly) || m_hostIsWPF)
+                {
+                    this.AddAssembly(fileAssembly, loadOnlyTypesWithPublicAttribute);
+                }
+                else
+                {
+                    skipped = true;
+                }
             }
+            catch (BadImageFormatException) { skipped = true; }
             catch (Exception ex)
             {
-                m_assembliesFailedLoading.Add(new Tuple<string, Exception>(path, ex));
+                loadException = ex;
+            }
+            m_scannedFiles.Add(new Tuple<string, bool, Exception>(path, skipped, loadException));
+        }
+
+        public IEnumerable<Tuple<string, bool, Exception>> ScannedFiles
+        {
+            get
+            {
+                foreach (var f in m_scannedFiles)
+                {
+                    yield return new Tuple<string, bool, Exception>(f.Item1, f.Item2, f.Item3);
+                }
             }
         }
 
@@ -81,6 +108,7 @@ namespace StepBro.Core.Api
         private void AddAssemblyData(Assembly assembly, bool loadOnlyTypesWithPublicAttribute, ref Type loadType)
         {
             System.Diagnostics.Debug.WriteLine("MODULE ASSEMBLY UPDATE: " + assembly.FullName);
+            var attribs = assembly.GetCustomAttributes();
             foreach (Type type in assembly.GetExportedTypes())
             {
                 string name = type.TypeName();
@@ -93,6 +121,20 @@ namespace StepBro.Core.Api
                 {
                     loadType = type;
                     continue;   // Don't load this type
+                }
+                if (typeof(IAddon).IsAssignableFrom(type))
+                {
+                    try
+                    {
+                        IAddon addon = (IAddon)Activator.CreateInstance(type);
+                        m_addons.Add(addon);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Trace.WriteLine("Error creating addon instance of '" + type.Name + "'. Error: " + ex.ToString());
+                        // TODO: Register error somewhere.
+                    }
+                    continue;
                 }
                 if (type.IsTypeDefinition)
                 {
@@ -241,6 +283,26 @@ namespace StepBro.Core.Api
             {
                 return null;
             }
+        }
+
+        public IEnumerable<IAddon> GetAddons
+        {
+            get
+            {
+                foreach (var a in m_addons) yield return a;
+            }
+        }
+
+        public T TryGetAddon<T>(string name) where T : class, IAddon
+        {
+            foreach (var a in m_addons)
+            {
+                if (String.Equals(a.ShortName, name, StringComparison.InvariantCulture) && a is T)
+                {
+                    return a as T;
+                }
+            }
+            return null;
         }
 
         public void AddTypeLookup(Type type)

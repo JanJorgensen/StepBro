@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "StepBro.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "ConsoleTest.sbs -t --lf AzureLog -e ExpectGreaterThanTen -a 8",
+      "workingDirectory": "..\\..\\test files\\smoketest"
+    }
+  }
+}

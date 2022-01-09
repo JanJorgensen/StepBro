@@ -35,7 +35,7 @@ namespace StepBro.Core.Data
 
         public override void GetTestString(StringBuilder text)
         {
-            if (String.IsNullOrEmpty(this.Name))
+            if (IsArrayEntry || String.IsNullOrEmpty(this.Name))
             {
                 text.Append("{ ");
             }

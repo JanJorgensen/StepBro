@@ -79,6 +79,10 @@ namespace StepBro.Core.Parser.BinaryOperators
                     {
                         return new SBExpressionData(Expression.GreaterThanOrEqual(first.ExpressionCode, last.ConvertToDouble().ExpressionCode));
                     }
+                    else if (first.DataType.Type.IsEnum && last.DataType.Type.IsEnum)
+                    {
+                        return new SBExpressionData(Expression.GreaterThanOrEqual(first.ConvertToInt64().ExpressionCode, last.ConvertToInt64().ExpressionCode));
+                    }
                     else
                     {
                         throw new NotImplementedException();

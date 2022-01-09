@@ -21,5 +21,11 @@ namespace StepBro.Core.Api
         IEnumerable<MethodInfo> ListExtensionMethods(Type type, Func<MethodInfo, bool> filter = null);
 
         Type TryGetType(IEnumerable<UsingData> usings, string name);
+
+        IEnumerable<IAddon> GetAddons { get; }
+
+        T TryGetAddon<T>(string name) where T : class, IAddon;
+
+        IEnumerable<Tuple<string, bool, Exception>> ScannedFiles { get; }
     }
 }

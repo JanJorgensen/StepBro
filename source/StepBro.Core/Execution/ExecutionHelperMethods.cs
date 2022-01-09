@@ -361,14 +361,7 @@ namespace StepBro.Core.Execution
 
         public static bool PostProcedureCallResultHandling(IScriptCallContext context, IScriptCallContext sub)
         {
-            if ((context.Self.Flags & ProcedureFlags.NoSubResultInheritance) == ProcedureFlags.None)
-            {
-                return context.SetResultFromSub(sub);
-            }
-            else
-            {
-                return false;
-            }
+            return context.SetResultFromSub(sub);
         }
 
         public static IFileElement GetFileElement(IScriptCallContext context, int id)
@@ -406,7 +399,7 @@ namespace StepBro.Core.Execution
             IScriptCallContext subContext = null;
             try
             {
-                subContext = context.EnterNewScriptContext(procedure, Logging.ContextLogOption.Normal, true);
+                subContext = context.EnterNewScriptContext(procedure, Logging.ContextLogOption.Normal, true, sequencialFirstArguments); // TODO: collect all arguments
 
                 var methodInfo = ((FileProcedure)procedure.ProcedureData).DelegateType.GetMethod("Invoke");
                 var arguments = new List<object>();
@@ -420,7 +413,16 @@ namespace StepBro.Core.Execution
                     i++;
                 }
                 Delegate runtimeProcedure = ((FileProcedure)procedure.ProcedureData).RuntimeProcedure;
-                return runtimeProcedure.DynamicInvoke(arguments.ToArray());
+                object value = runtimeProcedure.DynamicInvoke(arguments.ToArray());
+                if (PostProcedureCallResultHandling(context, subContext))
+                {
+                    throw new RequestEarlyExitException();
+                }
+                return value;
+            }
+            catch (RequestEarlyExitException)
+            {
+                throw;  // Just pass this right through.
             }
             catch (Exception ex)
             {

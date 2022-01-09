@@ -233,7 +233,7 @@ namespace StepBro.Core.General
             }
         }
 
-        private IMainLogger m_logger = null;
+        private ILogger m_logger = null;
         private Queue<TaskData> m_tasks = new Queue<TaskData>();
         private TaskData m_currentTaskData = null;
         private Task m_currentTask = null;
@@ -248,13 +248,13 @@ namespace StepBro.Core.General
         public uint FinishedTasks { get { return m_finishedTasks; } }
 
         public HostApplicationActionQueue(out IService serviceAccess) :
-            base("HostApplicationActionQueue", out serviceAccess, typeof(IMainLogger))
+            base("HostApplicationActionQueue", out serviceAccess, typeof(ILogger))
         {
         }
 
         protected override void Start(ServiceManager manager, ITaskContext context)
         {
-            m_logger = manager.Get<IMainLogger>();
+            m_logger = manager.Get<ILogger>();
         }
 
         public ITask AddTask(string title, bool blockUI, System.Func<bool> precondition, TaskDelegate taskFunction)
@@ -280,7 +280,7 @@ namespace StepBro.Core.General
                     m_currentTaskData = m_tasks.Dequeue();
                     m_currentTask = new Task(new Action<object>(this.TaskCaller), m_currentTaskData);
                     m_currentTaskData.SetTaskReference(m_currentTask);
-                    m_currentTaskData.SetTaskLogger(m_logger.Logger.RootLogger.LogEntering("Application Action", m_currentTaskData.Title));
+                    m_currentTaskData.SetTaskLogger(m_logger.LogEntering("Application Action", m_currentTaskData.Title));
                     m_currentTask.Start();
                 }
             }
@@ -292,7 +292,7 @@ namespace StepBro.Core.General
             {
                 this.TaskStarted?.Invoke(this, EventArgs.Empty);
                 var taskData = data as TaskData;
-                taskData.SetTaskLogger(m_logger.Logger.RootLogger.LogEntering("Starting Application Task", taskData.Title));
+                taskData.SetTaskLogger(m_logger.LogEntering("Starting Application Task", taskData.Title));
                 taskData.RunTask();
             }
             finally

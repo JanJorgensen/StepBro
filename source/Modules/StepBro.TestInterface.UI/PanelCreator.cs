@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
+[assembly: StepBro.Core.Api.IsUIModule]  // Only load this module if host is a WPF application.
+
 namespace StepBro.TestInterface.UI
 {
     public class PanelCreator : CustomPanelCreator

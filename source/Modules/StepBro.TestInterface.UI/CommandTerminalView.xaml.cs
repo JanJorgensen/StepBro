@@ -136,7 +136,7 @@ namespace StepBro.TestInterface.Controls
             {
                 foreach (var c in connection.UICommands)
                 {
-                    var baseMenu = toolBarMenu as ItemsControl;
+                    var baseMenu = this.toolBarMenu as ItemsControl;
                     var titleparts = c.Item1.Split('|');
                     for (int i = 0; i < (titleparts.Length - 1); i++)
                     {

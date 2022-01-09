@@ -134,7 +134,7 @@ namespace StepBroCoreTest
 
             context.Logger.Log("Step 1", "");
 
-            using (var callcontext = context.EnterNewScriptContext(MySecond, ContextLogOption.Normal, false).Disposer())
+            using (var callcontext = context.EnterNewScriptContext(MySecond, ContextLogOption.Normal, false, null).Disposer())
             {
                 MySecondProcedure(callcontext.Value, v1, v2);
             }
@@ -147,7 +147,7 @@ namespace StepBroCoreTest
                 {
                     context.Logger.Log("Step 3", String.Format("Loop iteration #{0}", i + 1));
                     loopStatus.UpdateStatus(progress: i + 1L);
-                    using (var callcontext = context.EnterNewScriptContext(MyThird, ContextLogOption.Normal, false).Disposer())
+                    using (var callcontext = context.EnterNewScriptContext(MyThird, ContextLogOption.Normal, false, null).Disposer())
                     {
                         MyThirdProcedure(callcontext.Value, false);
                         v1 += 2;
@@ -200,19 +200,19 @@ namespace StepBroCoreTest
             foreach (ContextLogOption lo in Enum.GetValues(typeof(ContextLogOption)))
             {
                 context.Logger.Log("Step 1.3", "Mode: " + lo.ToString());
-                using (var callcontext = context.EnterNewScriptContext(ProcLog2ForceAlways, lo, false).Disposer())
+                using (var callcontext = context.EnterNewScriptContext(ProcLog2ForceAlways, lo, false, null).Disposer())
                 {
                     ProcLog2Procedure(callcontext.Value);
                 }
-                using (var callcontext = context.EnterNewScriptContext(ProcLog2Normal, lo, false).Disposer())
+                using (var callcontext = context.EnterNewScriptContext(ProcLog2Normal, lo, false, null).Disposer())
                 {
                     ProcLog2Procedure(callcontext.Value);
                 }
-                using (var callcontext = context.EnterNewScriptContext(ProcLog2DebugOnly, lo, false).Disposer())
+                using (var callcontext = context.EnterNewScriptContext(ProcLog2DebugOnly, lo, false, null).Disposer())
                 {
                     ProcLog2Procedure(callcontext.Value);
                 }
-                using (var callcontext = context.EnterNewScriptContext(ProcLog2Disabled, lo, false).Disposer())
+                using (var callcontext = context.EnterNewScriptContext(ProcLog2Disabled, lo, false, null).Disposer())
                 {
                     ProcLog2Procedure(callcontext.Value);
                 }
@@ -227,19 +227,19 @@ namespace StepBroCoreTest
             foreach (ContextLogOption lo in Enum.GetValues(typeof(ContextLogOption)))
             {
                 context.Logger.Log("Step 2.3", "Mode: " + lo.ToString());
-                using (var callcontext = context.EnterNewScriptContext(ProcLog3ForceAlways, lo, false).Disposer())
+                using (var callcontext = context.EnterNewScriptContext(ProcLog3ForceAlways, lo, false, null).Disposer())
                 {
                     ProcLog3Procedure(callcontext.Value);
                 }
-                using (var callcontext = context.EnterNewScriptContext(ProcLog3Normal, lo, false).Disposer())
+                using (var callcontext = context.EnterNewScriptContext(ProcLog3Normal, lo, false, null).Disposer())
                 {
                     ProcLog3Procedure(callcontext.Value);
                 }
-                using (var callcontext = context.EnterNewScriptContext(ProcLog3DebugOnly, lo, false).Disposer())
+                using (var callcontext = context.EnterNewScriptContext(ProcLog3DebugOnly, lo, false, null).Disposer())
                 {
                     ProcLog3Procedure(callcontext.Value);
                 }
-                using (var callcontext = context.EnterNewScriptContext(ProcLog3Disabled, lo, false).Disposer())
+                using (var callcontext = context.EnterNewScriptContext(ProcLog3Disabled, lo, false, null).Disposer())
                 {
                     ProcLog3Procedure(callcontext.Value);
                 }
@@ -260,7 +260,7 @@ namespace StepBroCoreTest
         {
             if (context.LoggingEnabled) context.Logger.Log("Step 1.1", "Normal");
             if (context.LoggingEnabled && context.Logger.IsDebugging) context.Logger.Log("Step 1.2", "Debugging");
-            using (var callcontext = context.EnterNewScriptContext(ProcL2, ContextLogOption.Normal, false).Disposer())
+            using (var callcontext = context.EnterNewScriptContext(ProcL2, ContextLogOption.Normal, false, null).Disposer())
             {
                 ProcL2Procedure(callcontext.Value);
             }
@@ -269,7 +269,7 @@ namespace StepBroCoreTest
         {
             if (context.LoggingEnabled) context.Logger.Log("Step 2.1", "Normal");
             if (context.LoggingEnabled && context.Logger.IsDebugging) context.Logger.Log("Step 2.2", "Debugging");
-            using (var callcontext = context.EnterNewScriptContext(ProcL3, ContextLogOption.Disabled, false).Disposer())
+            using (var callcontext = context.EnterNewScriptContext(ProcL3, ContextLogOption.Disabled, false, null).Disposer())
             {
                 ProcL3Procedure(callcontext.Value);
             }

@@ -145,12 +145,12 @@ namespace StepBro.Core.Execution
             throw new NotImplementedException();
         }
 
-        public IScriptCallContext EnterNewScriptContext(IProcedureReference procedure, ContextLogOption procedureLoggingOption, bool isDynamicCall)
+        public IScriptCallContext EnterNewScriptContext(IProcedureReference procedure, ContextLogOption procedureLoggingOption, bool isDynamicCall, object[] arguments)
         {
             throw new NotImplementedException();
         }
 
-        public IScriptCallContext EnterNewScriptContext(IFileProcedure procedure, ContextLogOption procedureLoggingOption, bool isDynamicCall)
+        public IScriptCallContext EnterNewScriptContext(IFileProcedure procedure, ContextLogOption procedureLoggingOption, bool isDynamicCall, object[] arguments)
         {
             throw new NotImplementedException();
         }

@@ -10,6 +10,7 @@ namespace StepBro.Core.Parser
     internal partial class StepBroListener
     {
         private VariableModifier m_variableModifier = VariableModifier.None;
+        private bool m_variableOverride = false;
         private TypeReference m_variableType;
         private string m_variableName = "";
         private SBExpressionData m_variableInitializer = null;

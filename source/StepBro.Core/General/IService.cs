@@ -116,6 +116,14 @@ namespace StepBro.Core
             serviceAccess = m_myInterface as IService;
         }
 
+        /// <summary>
+        /// Constructor for using when the derived object is not actually used as a service.
+        /// </summary>
+        protected ServiceBase()
+        {
+            m_myInterface = null;
+        }
+
         protected virtual void Initialize(ServiceManager manager, ITaskContext context) { }
 
         protected virtual void Start(ServiceManager manager, ITaskContext context) { }

@@ -17,8 +17,8 @@ namespace StepBro.Core.Execution
         void EnterTestStep(int line, int column, int index, string title);
         void EnterStatement(int line, int column);
 
-        IScriptCallContext EnterNewScriptContext(IFileProcedure procedure, ContextLogOption procedureLoggingOption, bool isDynamicCall);
-        IScriptCallContext EnterNewScriptContext(IProcedureReference procedure, ContextLogOption procedureLoggingOption, bool isDynamicCall);
+        IScriptCallContext EnterNewScriptContext(IFileProcedure procedure, ContextLogOption procedureLoggingOption, bool isDynamicCall, object[] arguments);
+        IScriptCallContext EnterNewScriptContext(IProcedureReference procedure, ContextLogOption procedureLoggingOption, bool isDynamicCall, object[] arguments);
 
         bool SetResultFromSub(IScriptCallContext sub);
         ProcedureResult Result { get; }

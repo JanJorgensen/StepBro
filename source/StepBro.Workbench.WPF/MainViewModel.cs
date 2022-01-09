@@ -8,7 +8,6 @@ using StepBro.Core.Host;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
-using StepBro.Core.Utils;
 using StepBro.UI.Panels;
 using StepBro.Workbench.ToolViews;
 using System;
@@ -103,7 +102,7 @@ namespace StepBro.Workbench
             StepBro.Core.Main.GetService<UICalculator>().ResultUpdated += MainViewModel_ResultUpdated;
 
             //this.SeSBPlashScreen();
-            m_commandLineOptions = StepBro.Core.General.CommandLineParser.Parse<CommandLineOptions>(null, Environment.GetCommandLineArgs());
+            m_commandLineOptions = StepBro.Core.General.CommandLineParser.Parse<CommandLineOptions>(null, Environment.GetCommandLineArgs(), System.Console.Out);
 
             this.UpdateCustomPanelsMenu();
         }
@@ -1088,6 +1087,7 @@ namespace StepBro.Workbench
                                     if (fe.Line <= selectionLine && (element == null || element.Line < fe.Line))
                                     {
                                         element = fe;
+                                        break;
                                     }
                                 }
                                 if (element != null)
@@ -1133,7 +1133,7 @@ namespace StepBro.Workbench
             switch (m_mainScriptExecution.Task.CurrentState)
             {
                 case TaskExecutionState.Created:
-                    Invoke(OnScriptExecutionRunning);
+                    Invoke(OnScriptExecutionStarted);
                     break;
                 case TaskExecutionState.Started:
                 case TaskExecutionState.AwaitingStartCondition:
@@ -1156,7 +1156,7 @@ namespace StepBro.Workbench
                     break;
                 case TaskExecutionState.Ended:
                 case TaskExecutionState.EndedByException:
-                    Invoke(OnScriptExecutionEnded);
+                    Invoke(OnScriptExecutionEnded, m_mainScriptExecution.Result);
                     break;
                 default:
                     break;
@@ -1164,16 +1164,23 @@ namespace StepBro.Workbench
 
         }
 
-        void OnScriptExecutionRunning(object? state)
+        void OnScriptExecutionStarted(object state)
+        {
+            this.ApplicationStateMessage = $"Started script execution.";
+        }
+        void OnScriptExecutionRunning(object state)
+        {
+            this.ApplicationStateMessage = $"Script execution running ...";
+        }
+        void OnScriptExecutionPaused(object state)
         {
         }
-        void OnScriptExecutionPaused(object? state)
-        {
-        }
-        void OnScriptExecutionEnded(object? state)
+        void OnScriptExecutionEnded(object state)
         {
             m_mainScriptExecution.Task.CurrentStateChanged -= this.MainScriptExecution_CurrentStateChanged;
             m_mainScriptExecution = null;
+
+            this.ApplicationStateMessage = $"Finished script execution. {((IExecutionResult)state).ResultText()}";
             this.UpdateCommandStates();
         }
 

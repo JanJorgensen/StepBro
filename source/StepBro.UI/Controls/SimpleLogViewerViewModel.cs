@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ActiproSoftware.Windows;
 using StepBro.Core.Data;
-using StepBro.Core.Utils;
 
 namespace StepBro.UI.Controls
 {

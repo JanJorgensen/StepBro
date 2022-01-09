@@ -24,7 +24,7 @@ namespace StepBroCoreTest
             taskContext.CallProcedure(procedure);
             var log = new LogInspector(taskContext.Logger);
             log.ExpectNext("0 - Pre - TestRun - Starting");
-            log.ExpectNext("1 - Pre - MyFile.Anders - <arguments>");
+            log.ExpectNext("1 - Pre - MyFile.Anders - <no arguments>");
             log.ExpectNext("2 - Normal - 4 - STEP #1");
             log.ExpectNext("2 - Normal - 5 - STEP #2");
             log.ExpectNext("2 - Normal - 6 - STEP #3");
@@ -40,7 +40,7 @@ namespace StepBroCoreTest
             taskContext.CallProcedure(procedure);
             var log = new LogInspector(taskContext.Logger);
             log.ExpectNext("0 - Pre - TestRun - Starting");
-            log.ExpectNext("1 - Pre - MyFile.Bent - <arguments>");
+            log.ExpectNext("1 - Pre - MyFile.Bent - <no arguments>");
             log.ExpectNext("2 - Normal - 10 - STEP #1 : First");
             log.ExpectNext("2 - Normal - 11 - STEP #2 : Second");
             log.ExpectNext("2 - Normal - 12 - STEP #3 : Third");
@@ -56,7 +56,7 @@ namespace StepBroCoreTest
             taskContext.CallProcedure(procedure);
             var log = new LogInspector(taskContext.Logger);
             log.ExpectNext("0 - Pre - TestRun - Starting");
-            log.ExpectNext("1 - Pre - MyFile.Christian - <arguments>");
+            log.ExpectNext("1 - Pre - MyFile.Christian - <no arguments>");
             log.ExpectNext("2 - Normal - 16 - STEP #1 : First");
             log.ExpectNext("2 - Normal - 17 - STEP #2 : Second");
             log.ExpectNext("2 - Normal - 18 - STEP #3 : Third");

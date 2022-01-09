@@ -3,7 +3,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading;
 using StepBro.Core.Data;
-using StepBro.Core.Utils;
 using StepBro.Core.Logging;
 using System.ComponentModel;
 using System.Windows;
@@ -11,7 +10,7 @@ using System.IO;
 
 namespace StepBro.UI.Controls
 {
-    public class LogViewerViewModel : ObservableObjectBase, ILogSink
+    public class LogViewerViewModel : ObservableObjectBase
     {
         public class LogEntryViewModel
         {
@@ -94,59 +93,59 @@ namespace StepBro.UI.Controls
             m_entries = new ObservableCollection<LogEntryViewModel>();
             m_zeroTime = DateTime.Now;
             m_syncContext = SynchronizationContext.Current;
-            var logSinkManager = StepBro.Core.Main.GetService<ILogSinkManager>();
-            logSinkManager.Add(this);
+            //var logSinkManager = StepBro.Core.Main.GetService<ILogSinkManager>();
+            //logSinkManager.Add(this);
         }
 
 
-        public void Start(LogEntry entry)
-        {
-            if (m_firstSeen == null)
-            {
-                this.Add(entry);
-            }
-        }
+        //public void Start(LogEntry entry)
+        //{
+        //    if (m_firstSeen == null)
+        //    {
+        //        this.Add(entry);
+        //    }
+        //}
 
-        public void Stop()
-        {
-        }
+        //public void Stop()
+        //{
+        //}
 
-        public void Add(LogEntry entry)
-        {
-            lock (m_sync)
-            {
-                if (!m_updating)
-                {
-                    m_updating = true;
-                    m_received = entry;
-                    m_syncContext.Post(o =>
-                    {
-                        if (m_firstSeen == null)
-                        {
-                            m_firstSeen = m_received;
-                            m_lastHandled = m_firstSeen;
-                            LogEntries.Add(new LogEntryViewModel(m_lastHandled, m_zeroTime));
-                        }
-                        LogEntry next;
-                        while (true)
-                        {
-                            lock (m_sync)
-                            {
-                                next = m_lastHandled.Next;
-                                if (next == null)
-                                {
-                                    m_updating = false;
-                                    break;
-                                }
-                            }
-                            LogEntries.Add(new LogEntryViewModel(next, m_zeroTime));
-                            m_lastHandled = next;
-                        }
-                        this.EntriesAdded?.Invoke(this, EventArgs.Empty);
-                    }, null);
-                }
-            }
-        }
+        //public void Add(LogEntry entry)
+        //{
+        //    lock (m_sync)
+        //    {
+        //        if (!m_updating)
+        //        {
+        //            m_updating = true;
+        //            m_received = entry;
+        //            m_syncContext.Post(o =>
+        //            {
+        //                if (m_firstSeen == null)
+        //                {
+        //                    m_firstSeen = m_received;
+        //                    m_lastHandled = m_firstSeen;
+        //                    LogEntries.Add(new LogEntryViewModel(m_lastHandled, m_zeroTime));
+        //                }
+        //                LogEntry next;
+        //                while (true)
+        //                {
+        //                    lock (m_sync)
+        //                    {
+        //                        next = m_lastHandled.Next;
+        //                        if (next == null)
+        //                        {
+        //                            m_updating = false;
+        //                            break;
+        //                        }
+        //                    }
+        //                    LogEntries.Add(new LogEntryViewModel(next, m_zeroTime));
+        //                    m_lastHandled = next;
+        //                }
+        //                this.EntriesAdded?.Invoke(this, EventArgs.Empty);
+        //            }, null);
+        //        }
+        //    }
+        //}
 
         public event EventHandler EntriesAdded;
 

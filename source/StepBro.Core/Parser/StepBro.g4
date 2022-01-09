@@ -69,9 +69,11 @@ elementModifier
     |	PROTECTED		// Shared within the namespace
     ;
 
+fileVariableOverride : OVERRIDE ;
+
 fileVariable
-    :   elementModifier? variableType variableDeclaratorId elementPropertyblock     #FileVariableWithPropertyBlock
-    |   elementModifier? variableType variableDeclarator SEMICOLON                  #FileVariableSimple
+    :   elementModifier? fileVariableOverride? variableType variableDeclaratorId elementPropertyblock     #FileVariableWithPropertyBlock
+    |   elementModifier? fileVariableOverride? variableType variableDeclarator SEMICOLON                  #FileVariableSimple
     ;
     
 //modifiers

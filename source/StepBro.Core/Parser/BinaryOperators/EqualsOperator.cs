@@ -76,11 +76,15 @@ namespace StepBro.Core.Parser.BinaryOperators
                     {
                         return new SBExpressionData(this.EqualityExpression(first.ExpressionCode, last.ExpressionCode));
                     }
-                    else if ((first.IsString && last.IsObject && last.IsConstant && last.Value == null && last.DataType.Type == typeof(object)) ||
-                        (last.IsString && first.IsObject && first.IsConstant && first.Value == null && first.DataType.Type == typeof(object)))
+                    else if ((last.IsObject && last.IsConstant && last.Value == null && last.DataType.Type == typeof(object)) ||
+                        (first.IsObject && first.IsConstant && first.Value == null && first.DataType.Type == typeof(object)))
                     {
                         return new SBExpressionData(this.EqualityExpression(first.ExpressionCode, last.ExpressionCode));
                     }
+                    //else if (first.IsNull || last.IsNull)
+                    //{
+
+                    //}
                     else
                     {
                         if (first.DataType.Equals(last.DataType)) throw new NotImplementedException();

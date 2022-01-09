@@ -21,11 +21,11 @@ namespace StepBro.Core
         public static readonly string StepBroFileExtension = "sbs";
         private static bool m_initialized = false;
         private static ServiceManager.IServiceManagerAdministration m_serviceManagerAdmin = null;
-        private static MainLogger m_mainLogger = null;
-        private static ILogger m_rootLogger = null;
+        private static Logger m_mainLogger = null;
+        private static ILogger m_logRootScope = null;
         private static ILoadedFilesManager m_loadedFilesManager = null;
         private static IAddonManager m_addonManager = null;
-        private static ILogSinkManager m_logSinkManager = null;
+        //private static ILogSinkManager m_logSinkManager = null;
         private static TaskManager m_taskManager = null;
         private static HostApplicationActionQueue m_hostActions = null;
         //private static List<ScriptFile> m_loadedFiles = new List<ScriptFile>();
@@ -48,11 +48,11 @@ namespace StepBro.Core
 
         public static bool IsInitialized { get { return m_initialized; } }
 
-        public static void Initialize(IEnumerable<IService> hostServices = null)
+        public static void Initialize(params IService[] hostServices)
         {
-            IService service;
-            m_mainLogger = new MainLogger(out service);
-            m_rootLogger = m_mainLogger.Logger.RootLogger;
+            m_mainLogger = new Logger("", false, "StepBro", "Main logger created");
+            IService service = m_mainLogger.RootScopeService;
+            m_logRootScope = m_mainLogger.RootLogger;
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_loadedFilesManager = new LoadedFilesManager(out service);
@@ -77,8 +77,8 @@ namespace StepBro.Core
                 out service);
             m_serviceManagerAdmin.Manager.Register(service);
 
-            m_logSinkManager = new LogSinkManager(out service);
-            m_serviceManagerAdmin.Manager.Register(service);
+            //m_logSinkManager = new LogSinkManager(out service);
+            //m_serviceManagerAdmin.Manager.Register(service);
 
             m_taskManager = new TaskManager(out service);
             m_serviceManagerAdmin.Manager.Register(service);
@@ -142,7 +142,7 @@ namespace StepBro.Core
                 m_mainLogger = null;
                 m_loadedFilesManager = null;
                 m_addonManager = null;
-                m_logSinkManager = null;
+                //m_logSinkManager = null;
                 m_scriptExecutionManager = null;
                 m_dynamicObjectManager = null;
                 m_uiCalculator = null;
@@ -156,7 +156,9 @@ namespace StepBro.Core
             return m_serviceManagerAdmin.Manager.Get<T>();
         }
 
-        public static ILogger RootLogger { get { return m_rootLogger; } }
+        public static Logger Logger { get { return m_mainLogger; } }
+
+        public static ILogger RootLogger { get { return m_logRootScope; } }
 
         public static ServiceManager ServiceManager { get { return m_serviceManagerAdmin.Manager; } }
 
@@ -296,7 +298,7 @@ namespace StepBro.Core
                 ILoggerScope logger = null;
                 try
                 {
-                    logger = m_rootLogger.LogEntering("StepBro.Main", "Starting file parsing");
+                    logger = m_logRootScope.LogEntering("StepBro.Main", "Starting file parsing");
                     foreach (var f in m_loadedFilesManager.ListFiles<ScriptFile>())
                     {
                         f.ResetBeforeParsing(preserveUpdateableElements: force == false);
@@ -350,10 +352,9 @@ namespace StepBro.Core
             return null;
         }
 
-        public static object ExecuteProcedure(IFileProcedure procedure, params object[] arguments)
+        public static IExecutionResult ExecuteProcedure(IFileProcedure procedure, params object[] arguments)
         {
-            var result = m_scriptExecutionManager.ExecuteFileElement(procedure, null, arguments);
-            return result.ReturnValue;
+            return m_scriptExecutionManager.ExecuteFileElement(procedure, null, arguments);
         }
 
         public static IScriptExecution StartProcedureExecution(IFileProcedure procedure, params object[] arguments)
@@ -395,7 +396,7 @@ namespace StepBro.Core
             public long m_progress = -1;
             public long m_progressPokeCount = 0;
             public Func<long, string> m_progressFormatter = null;
-            public List<Tuple<string, Func<bool,bool>>> m_buttons = new List<Tuple<string, Func<bool,bool>>>();
+            public List<Tuple<string, Func<bool, bool>>> m_buttons = new List<Tuple<string, Func<bool, bool>>>();
 
             public AttentionColor ProgressColor
             {
@@ -414,7 +415,7 @@ namespace StepBro.Core
             public event EventHandler Disposed;
             public event EventHandler ExpectedTimeExceeded;
 
-            public void AddActionButton(string title, Func<bool,bool> activationAction)
+            public void AddActionButton(string title, Func<bool, bool> activationAction)
             {
                 throw new AccessViolationException();
                 //MiniLogger.Instance.Add("TaskUpdate(" + m_level + ").AddActionButton: " + title);
@@ -488,7 +489,7 @@ namespace StepBro.Core
 
         public static void DumpCurrentObjectsToLog()
         {
-            var logger = m_mainLogger.Logger.RootLogger;
+            var logger = m_mainLogger.RootLogger;
             foreach (var oc in m_dynamicObjectManager.ListKnownObjects())
             {
                 logger.Log("Dynamic object", oc.FullName);

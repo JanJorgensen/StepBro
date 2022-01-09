@@ -57,7 +57,7 @@ namespace StepBroCoreTest.Execution
             log.DebugDump();
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
-            log.ExpectNext("1 - Pre - ObjectUsing.UseIt - <arguments>");
+            log.ExpectNext("1 - Pre - ObjectUsing.UseIt - <no arguments>");
             log.ExpectNext("2 - Normal - HighLayerCodeModule.Fcn - i: 4");
             log.ExpectNext("2 - Normal - MidLayerCodeModule.Fcn - i: 8");
             log.ExpectNext("2 - Normal - LowLayerCodeModule.Fcn - i: 19");

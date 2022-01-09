@@ -1,0 +1,1 @@
+..\..\bin\stepbro.exe ConsoleTest.sbs -v -e HelloStepBro

@@ -1,4 +1,7 @@
-﻿using System;
+﻿using StepBro.Core.Execution;
+using StepBro.Core.Logging;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -6,6 +9,49 @@ namespace StepBro.Core.Data
 {
     public static class StringUtils
     {
+        //private const long TicksPer10thMillisecond = TimeSpan.TicksPerMillisecond / 10;
+        private const long TicksPerHalfMillisecond = TimeSpan.TicksPerMillisecond / 2;
+        private const long TicksPerMillisecond = TimeSpan.TicksPerMillisecond;
+
+        public static string ToMinutesTimestamp(this TimeSpan time)
+        {
+            return String.Concat(time.Minutes.ToString("00"), ":", time.Seconds.ToString("00"), ".", time.Milliseconds.ToString("000"));
+        }
+
+        public static string ToMinutesTimestamp(this DateTime time, DateTime zero)
+        {
+            if (time >= zero) return (time - zero).ToMinutesTimestamp();
+            else return "-" + ((zero - time).ToMinutesTimestamp());
+        }
+
+        public static string ToSecondsTimestamp(this DateTime time, DateTime zero)
+        {
+            var ticks = time.Ticks;
+            var ticksZero = zero.Ticks;
+            long first, second;
+            string prefix = "";
+            if (ticks >= ticksZero)
+            {
+                first = ticksZero;
+                second = ticks;
+            }
+            else
+            {
+                first = ticks;
+                second = ticksZero;
+                prefix = "-";
+            }
+            var ms = ((second - first) + TicksPerHalfMillisecond) / TicksPerMillisecond;
+            var seconds = ms / 1000;
+            var fraction = ms % 1000;
+            return String.Concat(prefix, seconds.ToString(), ".", fraction.ToString("000"));
+        }
+
+        public static string ToFileName(this DateTime time)
+        {
+            return time.ToString("yyyyMMdd_HHmmss");
+        }
+
         public static string DecodeLiteral(this string s)
         {
             int l = s.Length;
@@ -74,6 +120,24 @@ namespace StepBro.Core.Data
             var t = value.GetType();
             if (t == typeof(string)) return "\"" + ((string)value).EscapeString() + "\"";
             if (t == typeof(Identifier)) return identifierBare ? ((Identifier)value).Name : ("'" + ((Identifier)value).Name + "'");
+            if (t == typeof(ArgumentList))
+            {
+                var list = value as ArgumentList;
+                var args = new List<string>();
+                foreach (var arg in list)
+                {
+                    args.Add(ObjectToString(arg));
+                }
+                if (args.Count > 0)
+                {
+                    StringBuilder argText = new StringBuilder();
+                    argText.Append("(");
+                    argText.Append(String.Join(", ", args));
+                    argText.Append(")");
+                    return argText.ToString();
+                }
+                else return "(<empty>)";
+            }
             if (typeof(System.Collections.IEnumerable).IsAssignableFrom(t)) return ListToString((System.Collections.IEnumerable)value);
             return Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
         }
@@ -82,6 +146,129 @@ namespace StepBro.Core.Data
         public static string ListToString(System.Collections.IEnumerable list)
         {
             return String.Join(", ", list.Cast<object>().Select(o => (o != null) ? Convert.ToString(o, System.Globalization.CultureInfo.InvariantCulture) : "<null>"));
+        }
+
+        public static string ResultText(this ProcedureResult result, object returnvalue)
+        {
+            if (returnvalue != null)
+            {
+                return $"Return value: {StringUtils.ObjectToString(returnvalue)}";
+            }
+            else
+            {
+                if (result.ErrorID != null)
+                {
+                    if (String.IsNullOrEmpty(result.Description))
+                    {
+                        return $"Result: {result.Verdict}, {result.ErrorID.Name}";
+                    }
+                    else
+                    {
+                        return $"Result: {result.Verdict}, {result.ErrorID.Name}, {result.Description}";
+                    }
+                }
+                else
+                {
+                    if (result.Verdict > Verdict.Unset)
+                    {
+                        if (String.IsNullOrEmpty(result.Description))
+                        {
+                            return $"Result: {result.Verdict}";
+                        }
+                        else
+                        {
+                            return $"Result: {result.Verdict}, {result.Description}";
+                        }
+                    }
+                    else
+                    {
+                        if (result.SubResultCount > 0)
+                        {
+                            if (result.CountSubFails() > 0)
+                            {
+                                return $"Result: Failed {result.CountSubFails()} out of {result.SubResultCount} tests.";
+                            }
+                            else
+                            {
+                                return $"Result: Passed all {result.SubResultCount} tests.";
+                            }
+                        }
+                        else
+                        {
+                            return "Succes.";
+                        }
+                    }
+                }
+
+            }
+        }
+
+        public static string ResultText(this IExecutionResult result)
+        {
+            return result.ProcedureResult.ResultText(result.ReturnValue);
+        }
+
+        public static string ToClearText(this LogEntry entry, DateTime zero, bool forceShow = false)
+        {
+            var timestamp = entry.Timestamp.ToSecondsTimestamp(zero);
+            var timestampIndent = new string(' ', Math.Max(0, 8 - timestamp.Length));
+
+            StringBuilder text = new StringBuilder(1000);
+            text.Append(timestampIndent);
+            text.Append(timestamp);
+            text.Append(new string(' ', 1 + entry.IndentLevel * 3));
+
+            string type;
+            switch (entry.EntryType)
+            {
+                case LogEntry.Type.Detail:
+                    type = "detail - ";
+                    break;
+                case LogEntry.Type.Async:
+                    type = "Async - ";
+                    break;
+                case LogEntry.Type.TaskEntry:
+                    type = "TaskEntry - ";
+                    break;
+                case LogEntry.Type.Error:
+                    type = "Error - ";
+                    break;
+                case LogEntry.Type.UserAction:
+                    type = "UserAction - ";
+                    break;
+                case LogEntry.Type.System:
+                    type = "System - ";
+                    break;
+                default:
+                    type = "";
+                    break;
+            }
+            text.Append(type);
+
+            if (entry.Text != null)
+            {
+                if (entry.Location != null)
+                {
+                    text.Append(entry.Location);
+                    text.Append(" - ");
+                }
+                text.Append(entry.Text);
+            }
+            else
+            {
+                if (forceShow || !String.IsNullOrEmpty(type) || entry.Location != null)
+                {
+                    if (entry.Location != null)
+                    {
+                        text.Append(entry.Location);
+                    }
+                }
+                else
+                {
+                    return null;    // "Don't show this entry"
+                }
+            }
+            return text.ToString();
         }
 
         #region String Comparison

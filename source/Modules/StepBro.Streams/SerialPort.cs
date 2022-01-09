@@ -141,7 +141,7 @@ namespace StepBro.Streams
 
         private void Port_ErrorReceived(object sender, System.IO.Ports.SerialErrorReceivedEventArgs e)
         {
-            Core.Main.GetService<IMainLogger>().Logger.RootLogger.LogError(this.GetType().Name, e.EventType.ToString());
+            Core.Main.GetService<ILogger>().LogError(this.GetType().Name, e.EventType.ToString());
         }
 
         protected override void DoDispose()

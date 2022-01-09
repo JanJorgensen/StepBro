@@ -15,7 +15,7 @@ namespace StepBro.Core.Data
 
         public UICallContext(ServiceManager serviceManager)
         {
-            m_logger = serviceManager.Get<IMainLogger>().Logger.RootLogger;
+            m_logger = serviceManager.Get<ILogger>();
             m_taskManager = serviceManager.Get<TaskManager>();
         }
 

@@ -19,9 +19,9 @@ namespace StepBroCoreTest
             var servicesAdmin = ServiceManager.Create();
             var services = servicesAdmin.Manager;
 
+            var mainLogger = new Logger("", false, "StepBro", "Main logger created in TestHostApplicationActionQueue.Setup");
+            services.Register(mainLogger.RootScopeService);
             IService service;
-            var loggerService = new MainLogger(out service);
-            services.Register(service);
             var queueService = new HostApplicationActionQueue(out service);
             services.Register(service);
 

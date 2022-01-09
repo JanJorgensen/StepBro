@@ -24,10 +24,6 @@ namespace StepBro.Core.General
         //[Option('p', "project", HelpText = "Project file to use.")]
         //public string ProjectFile { get; set; }
 
-        [Option('v', "verbose", Default = false,
-          HelpText = "Prints all messages to the logging output.")]
-        public bool Verbose { get; set; }
-
         /// <summary>
         /// Whether there were errors when parsing the command line.
         /// </summary>

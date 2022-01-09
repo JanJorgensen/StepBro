@@ -162,6 +162,14 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
+        public void TestPropertyArraysWithBlocks()
+        {
+            var block = FileBuilder.ParsePropertyBlock(
+                "{stuff = [{ a = 4, b = true }, \"Up\", { name = \"Hans\", aliases = [\"Henrik\", \"Knold\"], baudrate = 460800 }]}");
+            Assert.AreEqual("{ stuff = [ { a=4, b=True }, Up, { name=Hans, aliases = [ Henrik, Knold ], baudrate=460800 } ] }", block.GetTestString());
+        }
+
+        [TestMethod]
         public void TestPropertySimpleEvent()
         {
             var block = FileBuilder.ParsePropertyBlock("{ on Timeout : error }");

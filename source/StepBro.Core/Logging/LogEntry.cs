@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Logging
 {
-    public class LogEntry
+    public class LogEntry : ILogHistoryEntry
     {
-        public enum Type { Normal, Pre, Post, TaskEntry, Detail, Async, Error, UserAction, System }
+        public enum Type { Normal, Pre, Post, TaskEntry, Detail, Async, Error, Failure, UserAction, System }
 
-        //private LogEntry m_previous;
         private LogEntry m_next = null;
         private LogEntry m_parent;
         private Type m_type;
@@ -22,7 +21,6 @@ namespace StepBro.Core.Logging
 
         internal LogEntry(uint id, DateTime timestamp, int thread, string location, string text)
         {
-            //m_previous = null;
             m_parent = null;
             m_type = Type.Pre;
             m_id = id;
@@ -34,7 +32,6 @@ namespace StepBro.Core.Logging
 
         internal LogEntry(LogEntry previous, LogEntry parent, Type type, uint id, DateTime timestamp, int thread, string location, string text)
         {
-            //m_previous = previous;
             previous.m_next = this;
             m_parent = parent;
             m_type = type;
@@ -52,76 +49,20 @@ namespace StepBro.Core.Logging
 
         public int IndentLevel { get { return (m_parent != null) ? m_parent.IndentLevel + 1 : 0; } }
 
-        //public LogEntry Previous
-        //{
-        //    get
-        //    {
-        //        return m_previous;
-        //    }
-        //}
+        public LogEntry Next { get { return m_next; } }
 
-        public LogEntry Next
-        {
-            get
-            {
-                return m_next;
-            }
-        }
+        public LogEntry Parent { get { return m_parent; } }
 
-        public LogEntry Parent
-        {
-            get
-            {
-                return m_parent;
-            }
-        }
+        public Type EntryType { get { return m_type; } }
 
-        public Type EntryType
-        {
-            get
-            {
-                return m_type;
-            }
-        }
+        public uint Id { get { return m_id; } }
 
-        public uint Id
-        {
-            get
-            {
-                return m_id;
-            }
-        }
+        public DateTime Timestamp { get { return m_timestamp; } }
 
-        public DateTime Timestamp
-        {
-            get
-            {
-                return m_timestamp;
-            }
-        }
+        public int ThreadId { get { return m_threadId; } }
 
-        public int ThreadId
-        {
-            get
-            {
-                return m_threadId;
-            }
-        }
+        public string Location { get { return m_location; } }
 
-        public string Location
-        {
-            get
-            {
-                return m_location;
-            }
-        }
-
-        public string Text
-        {
-            get
-            {
-                return m_text;
-            }
-        }
+        public string Text { get { return m_text; } }
     }
 }

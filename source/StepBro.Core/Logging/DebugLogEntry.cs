@@ -1,4 +1,4 @@
-﻿using StepBro.Core.Utils;
+﻿using StepBro.Core.Data;
 using System;
 
 namespace StepBro.Core.Logging

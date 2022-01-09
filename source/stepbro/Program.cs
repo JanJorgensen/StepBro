@@ -1,95 +1,102 @@
-﻿using StepBro.Core.Logging;
+﻿using StepBro.Core;
+using StepBro.Core.Addons;
+using StepBro.Core.Data;
+using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using StepBroMain = StepBro.Core.Main;
 
 namespace StepBro.Cmd
 {
     internal class Program
     {
+        private class ExitException : Exception { }
+        private static HostAccess m_hostAccess;
         private static CommandLineOptions m_commandLineOptions = null;
-
-        private class ConsoleLogSink : ILogSink
-        {
-            private static readonly string[] indentStrings;
-            private DateTime m_startTime = DateTime.Now;
-            static ConsoleLogSink()
-            {
-                indentStrings = new string[32];
-                for (int i = 0; i < 32; i++) indentStrings[i] = new string(' ', i * 4);
-            }
-
-            public void Add(LogEntry entry)
-            {
-                string time = String.Format("{0,6}", ((long)(((TimeSpan)(DateTime.Now - m_startTime)).TotalMilliseconds)));
-                //string time = ((long)(((TimeSpan)(DateTime.Now - m_startTime)).TotalMilliseconds)).ToString("D,6");
-                if (String.IsNullOrEmpty(entry.Location))
-                {
-                    if (!String.IsNullOrEmpty(entry.Text))
-                    {
-                        Console.WriteLine(String.Concat(
-                        time,
-                        indentStrings[entry.IndentLevel],
-                        entry.Text));
-                    }
-                }
-                else if (!String.IsNullOrEmpty(entry.Text))
-                {
-                    if (String.IsNullOrEmpty(entry.Text))
-                    {
-                        Console.WriteLine(String.Concat(
-                        time,
-                        indentStrings[entry.IndentLevel],
-                        entry.Text));
-                    }
-                    else
-                    {
-                        Console.WriteLine(String.Concat(
-                            time,
-                            indentStrings[entry.IndentLevel],
-                            entry.Location,
-                            " - ",
-                            entry.Text));
-                    }
-                }
-            }
-
-            public void Start(LogEntry entry)
-            {
-                m_startTime = DateTime.Now;
-            }
-
-            public void Stop() { }
-        }
+        private static bool m_executionRunning = false;
+        private static bool m_dumpingExecutionLog = false;
+        private static ILogEntryToTextAddon m_logDumpAddon = null;
+        private static List<string> m_bufferedOutput = new List<string>();
 
         private static int Main(string[] args)
         {
+            IService m_hostService = null;
+            m_hostAccess = new HostAccess(out m_hostService);
+            var selectedLogDumpAddon = SimpleLogEntryToCleartextAddon.Name;
+
             object consoleResourceUserObject = new object();
             int retval = 0;
-            Console.WriteLine("StepBro console application. Type 'stepbro --help' to show the help text.");
 
-            m_commandLineOptions = StepBro.Core.General.CommandLineParser.Parse<CommandLineOptions>(null, args);
-
+            StringBuilder sb = new StringBuilder();
+            System.IO.StringWriter sw = new System.IO.StringWriter(sb);
+            m_commandLineOptions = StepBro.Core.General.CommandLineParser.Parse<CommandLineOptions>(null, args, sw);
+            // Print output from the command line parsing, and skip empty lines.
+            foreach (var line in sb.ToString().Split(System.Environment.NewLine))
+            {
+                if (!String.IsNullOrWhiteSpace(line)) ConsoleWriteLine(line);
+            }
+            if (m_commandLineOptions.Verbose || args.Length == 0)
+            {
+                ConsoleWriteLine("StepBro console application. Type 'stepbro --help' to show the help text.");
+            }
             if (m_commandLineOptions.HasParsingErrors)
             {
-                return -1;
+                if (m_commandLineOptions.ParsingErrors.Count() == 1 && m_commandLineOptions.ParsingErrors.First().Tag == CommandLine.ErrorType.HelpRequestedError)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return -1;
+                }
             }
 
             try
             {
-                StepBroMain.Initialize();
+                StepBroMain.Initialize(m_hostService);
 
                 if (m_commandLineOptions.Verbose)
                 {
-                    var logSinkManager = StepBro.Core.Main.GetService<ILogSinkManager>();
-                    logSinkManager.Add(new ConsoleLogSink());
+                    m_commandLineOptions.TraceToConsole = true;
                 }
+                if (!String.IsNullOrEmpty(m_commandLineOptions.LogFormat))
+                {
+                    selectedLogDumpAddon = m_commandLineOptions.LogFormat;
+                    m_commandLineOptions.TraceToConsole = true;
+                }
+
+                m_logDumpAddon = StepBroMain.GetService<Core.Api.IAddonManager>().TryGetAddon<ILogEntryToTextAddon>(selectedLogDumpAddon);
+                if (m_logDumpAddon == null)
+                {
+                    ConsoleWriteLine("Error: Log dump format (addon) \'" + selectedLogDumpAddon + "\' was found.");
+                    retval = -1;
+                    throw new ExitException();
+                }
+
+                if (m_commandLineOptions.Verbose)
+                {
+                    //var logSinkManager = StepBro.Core.Main.GetService<ILogSinkManager>();
+                    //logSinkManager.Add(new ConsoleLogSink());
+
+                    var addonManager = StepBro.Core.Main.GetService<Core.Api.IAddonManager>();
+                    foreach (var f in addonManager.ScannedFiles)
+                    {
+                        String prefix = "Assembly loaded: ";
+                        if (f.Item2 == true) prefix = "Assembly skipped: ";
+                        else if (f.Item3 != null) prefix = "Assembly error: ";
+                        ConsoleWriteLine(prefix + f.Item1);
+                    }
+                }
+
 
                 if (!String.IsNullOrEmpty(m_commandLineOptions.InputFile))
                 {
-                    if (m_commandLineOptions.Verbose) Console.WriteLine("Filename: {0}", m_commandLineOptions.InputFile);
+                    if (m_commandLineOptions.Verbose) ConsoleWriteLine("Filename: {0}", m_commandLineOptions.InputFile);
                     IScriptFile file = null;
                     try
                     {
@@ -97,72 +104,105 @@ namespace StepBro.Cmd
                         if (file == null)
                         {
                             retval = -1;
-                            Console.WriteLine("Error: Loading script file failed ( " + m_commandLineOptions.InputFile + " )");
+                            ConsoleWriteLine("Error: Loading script file failed ( " + m_commandLineOptions.InputFile + " )");
                         }
                     }
                     catch (Exception ex)
                     {
                         retval = -1;
-                        Console.WriteLine("Error: Loading script file failed: " + ex.GetType().Name + ", " + ex.Message);
+                        ConsoleWriteLine("Error: Loading script file failed: " + ex.GetType().Name + ", " + ex.Message);
                     }
 
                     if (file != null)
                     {
+                        m_executionRunning = true;
+                        if (m_commandLineOptions.TraceToConsole)
+                        {
+                            m_dumpingExecutionLog = true;
+                            var logTask = new Task(() => LogDumpTask());
+                            logTask.Start();
+                        }
+
                         var parsingSuccess = StepBroMain.ParseFiles(true);
                         if (parsingSuccess)
                         {
                             if (!String.IsNullOrEmpty(m_commandLineOptions.TargetElement))
                             {
                                 IFileElement element = StepBroMain.TryFindFileElement(m_commandLineOptions.TargetElement);
-                                if (element != null && element is IFileProcedure)
+                                if (element != null)
                                 {
-                                    var procedure = element as IFileProcedure;
-                                    object[] arguments = m_commandLineOptions?.Arguments.Select(
-                                        (a) => StepBroMain.ParseExpression(procedure?.ParentFile, a)).ToArray();
-                                    try
+                                    if (element is IFileProcedure)
                                     {
-                                        object result = StepBroMain.ExecuteProcedure(procedure, arguments);
-                                        if (result != null)
+                                        var procedure = element as IFileProcedure;
+                                        object[] arguments = m_commandLineOptions?.Arguments.Select(
+                                            (a) => StepBroMain.ParseExpression(procedure?.ParentFile, a)).ToArray();
+                                        try
                                         {
-                                            Console.WriteLine("Procedure execution ended. Result: " + result.ToString());
+                                            var result = StepBroMain.ExecuteProcedure(procedure, arguments);
+
+                                            if (m_commandLineOptions.Verbose)
+                                            {
+                                                if (result != null)
+                                                {
+                                                    ConsoleWriteLine("Procedure execution ended. " + result.ResultText());
+                                                }
+                                                else
+                                                {
+                                                    ConsoleWriteLine("Procedure execution ended.");
+                                                }
+                                            }
+                                        }
+                                        catch (TargetParameterCountException)
+                                        {
+                                            retval = -1;
+                                            ConsoleWriteLine("Error: The number of arguments does not match the target procedure.");
+                                        }
+                                    }
+                                    else if (element is ITestList)
+                                    {
+                                        if (!String.IsNullOrEmpty(m_commandLineOptions.Model))
+                                        {
+                                            throw new NotImplementedException("Handling of test list as execution target is not implemented.");
                                         }
                                         else
                                         {
-                                            Console.WriteLine("Procedure execution ended.");
+                                            retval = -1;
+                                            ConsoleWriteLine($"Error: Model parameter must be specified when target element is a test list.");
                                         }
                                     }
-                                    catch (TargetParameterCountException)
+                                    else
                                     {
                                         retval = -1;
-                                        Console.WriteLine("Error: The number of arguments does not match the target procedure.");
+                                        ConsoleWriteLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
                                     }
-                                }
-                                else if (element != null && element is ITestList)
-                                {
-                                    throw new NotImplementedException("Handling of test list tarteg not implemented.");
                                 }
                                 else
                                 {
                                     retval = -1;
-                                    if (element == null)
-                                    {
-                                        Console.WriteLine($"Error: File element named '{m_commandLineOptions.TargetElement} was not found.");
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine($"Error: File element type for '{m_commandLineOptions.TargetElement} cannot be used as an execution target.");
-                                    }
+                                    ConsoleWriteLine($"Error: File element named '{m_commandLineOptions.TargetElement} was not found.");
+                                }
+                            }
+                            else
+                            {
+                                if (!String.IsNullOrEmpty(m_commandLineOptions.Model))
+                                {
+                                    retval = -1;
+                                    ConsoleWriteLine("Error: Model has been specified, but not a target element.");
+                                }
+                                else
+                                {
+                                    ConsoleWriteLine("No target element specified; no execution started.");
                                 }
                             }
                         }
                         else
                         {
-                            Console.WriteLine("Parsing errors!");
+                            ConsoleWriteLine("Parsing errors!");
                             foreach (var err in file.Errors.GetList())
                             {
                                 if (!err.JustWarning)
                                 {
-                                    Console.WriteLine($"    Line {err.Line}: {err.Message}");
+                                    ConsoleWriteLine($"    Line {err.Line}: {err.Message}");
                                 }
                             }
                             retval = -1;
@@ -173,22 +213,30 @@ namespace StepBro.Cmd
                 {
                     // If no file should be opened, what then?
                     retval = -1;
-                    Console.WriteLine("Error: File could not be opened.");
+                    ConsoleWriteLine("Error: File could not be opened.");
                 }
             }
+            catch (ExitException) { }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.GetType().Name}, {ex.Message}");
+                ConsoleWriteLine($"Error: {ex.GetType().Name}, {ex.Message}");
                 retval = -1;
             }
             finally
             {
+                m_executionRunning = false;
+                while (m_dumpingExecutionLog)
+                {
+                    System.Threading.Thread.Sleep(50);
+                }
+                FlushBufferedConsoleOutput();
+
                 StepBroMain.Deinitialize();
             }
 
             if (m_commandLineOptions.AwaitKeypress)
             {
-                Console.WriteLine("<press any key to continue>");
+                ConsoleWriteLine("<press any key to continue>");
                 while (!Console.KeyAvailable)
                 {
                     System.Threading.Thread.Sleep(25);
@@ -196,6 +244,49 @@ namespace StepBro.Cmd
                 Console.ReadKey();
             }
             return retval;
+        }
+
+        private static void ConsoleWriteLine(string value, params object[] args)
+        {
+            if (m_executionRunning)
+            {
+                m_bufferedOutput.Add(String.Format(value, args));
+            }
+            else
+            {
+                FlushBufferedConsoleOutput();
+                Console.WriteLine(value, args);
+            }
+        }
+        private static void FlushBufferedConsoleOutput()
+        {
+            foreach (var s in m_bufferedOutput)
+            {
+                Console.WriteLine(s);
+            }
+            m_bufferedOutput.Clear();
+        }
+
+        private static void LogDumpTask()
+        {
+            var logEntry = StepBroMain.Logger.GetOldestEntry();
+            var zero = logEntry.Timestamp;
+            while (logEntry != null || m_executionRunning)
+            {
+                var txt = m_logDumpAddon.Convert(logEntry, zero);
+                if (txt != null)
+                {
+                    Console.WriteLine(txt);
+                }
+                LogEntry next;
+                // Wait until log is empty and there is no running execution.
+                while ((next = logEntry.Next) == null && m_executionRunning == true)
+                {
+                    System.Threading.Thread.Sleep(50);
+                }
+                logEntry = next;
+            }
+            m_dumpingExecutionLog = false;  // Signal to main thread.
         }
     }
 }

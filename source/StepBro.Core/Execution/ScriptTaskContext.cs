@@ -1,4 +1,5 @@
 ﻿using System;
+using StepBro.Core.Data;
 using StepBro.Core.General;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
@@ -16,6 +17,7 @@ namespace StepBro.Core.Execution
         private TaskManager m_taskManager;
         private RuntimeErrorListener m_errorListener = null;
         private Exception m_executionException = null;
+        private ProcedureResult m_result = null;
 
         public void Setup(
             ILogger logger, 
@@ -52,10 +54,11 @@ namespace StepBro.Core.Execution
             ScriptCallContext context = null;
             try
             {
-                context = new ScriptCallContext(this, m_logger, m_logOption, m_statusUpdate, procedure, m_taskManager);
+                context = new ScriptCallContext(this, m_logger, m_logOption, m_statusUpdate, procedure, m_taskManager, arguments);
                 context.SetErrorListener(m_errorListener);
                 invokeArguments[0] = context;
                 m_value = runtimeProcedure.DynamicInvoke(invokeArguments);
+                m_result = context.Result;
                 return m_value;
             }
             catch (Exception)
@@ -88,7 +91,7 @@ namespace StepBro.Core.Execution
             }
             catch (Exception ex)
             {
-                LoggerRoot.Root(this.Logger).DebugDump();
+                Logging.Logger.Root(this.Logger).DebugDump();
                 m_executionException = ex;
                 return null;
             }
@@ -97,6 +100,7 @@ namespace StepBro.Core.Execution
         public ILogger Logger { get { return m_logger; } }
 
         public object ReturnValue { get { return m_value; } }
+        public ProcedureResult Result { get { return m_result; } }
         public Exception ExecutionExeception { get { return m_executionException; } }
 
         public ILoadedFilesManager LoadedFilesManager { get { return m_loadedFilesManager; } }

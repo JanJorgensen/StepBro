@@ -150,7 +150,7 @@ namespace StepBro.Core.Parser
         {
             var builder = new FileBuilder(new AntlrInputStream(expression), addons, fileContext);
             builder.Listener.PrepareForExpressionParsing("StepBroFileBuilder.ParseExpression");
-            var context = builder.Parser.parExpression();
+            var context = builder.Parser.expression();
 
             var walker = new ParseTreeWalker();
             walker.Walk(builder.Listener, context);
@@ -451,8 +451,8 @@ namespace StepBro.Core.Parser
             services.Manager.Register(service);
             var loadedFiles = new LoadedFilesManager(out service);
             services.Manager.Register(service);
-            var mainLogger = new MainLogger(out service);
-            services.Manager.Register(service);
+            var mainLogger = new Logger("", false, "StepBro", "Main logger created in CreateFileParsingSetup");
+            services.Manager.Register(mainLogger.RootScopeService);
             var taskManager = new TaskManager(out service);
             services.Manager.Register(service);
 

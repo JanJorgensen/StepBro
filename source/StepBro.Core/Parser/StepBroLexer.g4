@@ -83,6 +83,7 @@ OBJECT : 'object' ;
 ON : 'on' ;
 OUT : 'out' ;
 OR : 'or' ;
+OVERRIDE : 'override' ;
 PASS : 'pass' ;
 PRIVATE : 'private' ;
 PROCEDURE : 'procedure' ;

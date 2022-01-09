@@ -2,174 +2,105 @@
 
 namespace StepBro.Core.Logging
 {
-    internal class Logger : ILoggerScope, IProtectedLogger
+    public class Logger : /*LogStorage<LogEntry>, */IDisposable
     {
-        private LoggerRoot m_root;
-        private readonly LogEntry m_scopeStartEntry;
-        private bool m_disposeProtected;
-        private bool m_ended = false;
-        private int m_threadID = -1;
+        private readonly object m_sync = new object();
+        private long m_firstIndex = 0;      // Will only change when entries are disposed.
+        private long m_totalCount = 0;
+        private readonly string m_outputfile;
+        private readonly bool m_directLogToFile;
+        private readonly LogEntry m_oldest = null;
+        private LogEntry m_newest = null;
+        internal IProtectedLogger m_rootScope;
+        private Predicate<LogEntry> m_breaker = null;
+        private IService m_rootScopeService = null;
 
-        internal Logger(LoggerRoot root, LogEntry scopeStartEntry, bool disposeProtected = false)
+        public Logger(string outputFile, bool directLogToFile, string location, string starttext)
         {
-            m_root = root;
-            m_scopeStartEntry = scopeStartEntry;
-            m_disposeProtected = disposeProtected;
-            m_threadID = scopeStartEntry.ThreadId;
+            m_outputfile = outputFile;
+            m_directLogToFile = directLogToFile && !String.IsNullOrEmpty(outputFile);
+
+            m_oldest = new LogEntry(
+                UniqueInteger.Get(),
+                DateTime.Now,
+                System.Threading.Thread.CurrentThread.ManagedThreadId,
+                location,
+                starttext);
+            m_totalCount++;
+            m_newest = m_oldest;
+            m_rootScope = new LoggerScope(this, m_newest, out m_rootScopeService);
         }
 
-        internal LoggerRoot Root { get { return m_root; } }
+        public IService RootScopeService { get { return m_rootScopeService; } }
 
-        public bool IsDebugging
+        internal LogEntry Log(LogEntry parent, LogEntry.Type type, DateTime timestamp, int thread, string location, string text)
         {
-            get
+            lock (m_sync)
             {
-                return m_root.IsDebugging;
+                m_newest = new LogEntry(m_newest, parent, type, UniqueInteger.Get(), timestamp, 0, location, text);
+                m_totalCount++;
+                if (m_breaker != null && m_breaker(m_newest))
+                {
+                    this.BreakHere();
+                }
+                return m_newest;
             }
+        }
+
+        public void SetBreaker(Predicate<LogEntry> breaker)
+        {
+            m_breaker = breaker;
+        }
+
+        private void BreakHere()
+        {
+            System.Diagnostics.Debug.Assert(false, "Break here!");
         }
 
         public void Dispose()
         {
-            if (m_disposeProtected)
+            throw new NotImplementedException();
+        }
+
+        public ILogger RootLogger { get { return m_rootScope; } }
+
+        public bool IsDebugging { get; set; } = false;
+
+        public LogEntry GetOldestEntry()
+        {
+            return m_oldest;
+        }
+
+        public LogEntry GetNewestEntry()
+        {
+            return m_newest;
+        }
+
+        public void DebugDump()
+        {
+            var entry = m_oldest;
+            while (entry != null)
             {
-                throw new NotSupportedException("This logger cannot be disposed by the Dispose method.");
+                var s = String.Format("{0} - {1} - {2} - {3}",
+                    entry.IndentLevel,
+                    entry.EntryType,
+                    String.IsNullOrEmpty(entry.Location) ? "<empty>" : entry.Location,
+                    String.IsNullOrEmpty(entry.Text) ? "<empty>" : entry.Text);
+                System.Diagnostics.Debug.WriteLine(s);
+                entry = entry.Next;
             }
-            this.DoDispose();
         }
 
-        public void DisposeProtected()
+        internal static Logger Root(ILogger logger)
         {
-            this.DoDispose();
-        }
-
-        private void DoDispose()
-        {
-            if (!m_ended)
+            if (logger is LoggerScope)
             {
-                this.Log(LogEntry.Type.Post, null, null);
-                m_ended = true;
-            }
-        }
-
-        public ILoggerScope LogEntering(string location, string text)
-        {
-            var entry = this.Log(LogEntry.Type.Pre, location, text);
-            return new Logger(m_root, entry);
-        }
-
-        public void LogExit(string location, string text)
-        {
-            if (m_ended)
-            {
-                this.Log(LogEntry.Type.Error, location, "<already ended> " + text);
+                return ((LoggerScope)logger).Logger;
             }
             else
             {
-                this.Log(LogEntry.Type.Post, location, text);
-                m_ended = true;
+                throw new ArgumentException();
             }
         }
-
-        public void Log(string location, string text)
-        {
-            this.Log(LogEntry.Type.Normal, location, text);
-        }
-
-        public void LogDetail(string location, string text)
-        {
-            this.Log(LogEntry.Type.Detail, location, text);
-        }
-
-        public void LogError(string location, string text)
-        {
-            this.Log(LogEntry.Type.Error, location, text);
-        }
-
-        public void LogAsync(string location, string text)
-        {
-            this.Log(LogEntry.Type.Async, location, text);
-        }
-
-        public void LogUserAction(string location, string text)
-        {
-            this.Log(LogEntry.Type.UserAction, location, text);
-        }
-
-        public void LogSystem(string location, string text)
-        {
-            this.Log(LogEntry.Type.System, location, text);
-        }
-
-        private LogEntry Log(LogEntry.Type type, string location, string text)
-        {
-            return m_root.Log(m_scopeStartEntry, type, UniqueInteger.Get(), DateTime.Now, m_threadID, location, text);
-        }
-
-
-        public void EnteredParallelTask(string location, string text)
-        {
-            System.Diagnostics.Debug.Assert(m_threadID == m_scopeStartEntry.ThreadId);  // Assert this one has not been called before.
-            m_threadID = System.Threading.Thread.CurrentThread.ManagedThreadId;
-            System.Diagnostics.Debug.Assert(m_threadID != m_scopeStartEntry.ThreadId);  // Assert this is on a different thread than the task that started this task.
-            this.Log(LogEntry.Type.TaskEntry, location, text);
-        }
-
-        public IProtectedLogger GetProtectedLogger()
-        {
-            m_disposeProtected = true;
-            return (IProtectedLogger)this;
-        }
-
-        public object FirstLogEntryInScope
-        {
-            get { return m_scopeStartEntry; }
-        }
-
-        //private class ProtectedLogger : ILogger
-        //{
-        //    private Logger m_scope;
-        //    public ProtectedLogger(Logger scope)
-        //    {
-        //        m_scope = scope;
-        //    }
-
-        //    public bool IsDebugging
-        //    {
-        //        get
-        //        {
-        //            return m_scope.IsDebugging;
-        //        }
-        //    }
-
-        //    public void Log(string location, string text)
-        //    {
-        //        m_scope.Log(location, text);
-        //    }
-
-        //    public void LogDetail(string location, string text)
-        //    {
-        //        m_scope.Log(location, text);
-        //    }
-
-        //    public ILoggerScope LogEntering(string location, string text)
-        //    {
-        //        return m_scope.LogEntering(location, text);
-        //    }
-
-        //    public void LogError(string location, string text)
-        //    {
-        //        m_scope.LogError(location, text);
-        //    }
-
-        //    public void LogSystem(string location, string text)
-        //    {
-        //        m_scope.LogSystem(location, text);
-        //    }
-
-        //    public void LogUserAction(string location, string text)
-        //    {
-        //        m_scope.LogUserAction(location, text);
-        //    }
-        //}
     }
 }
