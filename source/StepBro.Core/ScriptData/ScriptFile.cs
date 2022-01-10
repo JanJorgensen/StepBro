@@ -17,6 +17,7 @@ namespace StepBro.Core.ScriptData
     {
         private StreamReader m_fileStream = null;
         private AntlrInputStream m_parserFileStream;
+        private int m_parsingFloor = 0;     // The lower the floor(number), the earlier in the parsing sequence.
         private string m_namespace = "";
         private bool m_wasLoadedByNamespace;
         private readonly ErrorCollector m_errors;
@@ -107,6 +108,12 @@ namespace StepBro.Core.ScriptData
         internal void SetParserFileStream(string content)
         {
             m_parserFileStream = new AntlrInputStream(content);
+        }
+
+        internal int ParsingFloor
+        {
+            get { return m_parsingFloor; }
+            set { m_parsingFloor = value; }
         }
 
         internal AntlrInputStream GetParserFileStream()

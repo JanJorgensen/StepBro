@@ -687,6 +687,7 @@ namespace StepBro.Core.Parser
             var beforeSorting = filesToParse;
             List<ScriptFile> sortedAfterDependencies = new List<ScriptFile>();
             var filesToCheck = new Queue<ScriptFile>(filesToParse);
+            int parsingFloor = 0;
             while (filesToCheck.Count > 0)
             {
                 var file = filesToCheck.Dequeue();
@@ -702,6 +703,7 @@ namespace StepBro.Core.Parser
                 }
                 if (addNow)
                 {
+                    file.ParsingFloor = parsingFloor++;
                     sortedAfterDependencies.Add(file);
                 }
             }
