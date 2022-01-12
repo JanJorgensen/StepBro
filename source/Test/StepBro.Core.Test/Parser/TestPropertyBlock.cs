@@ -58,9 +58,9 @@ namespace StepBroCoreTest.Parser
             AssertBlockWithOneValue(block, "dennis", 45L);
 
             block = FileBuilder.ParsePropertyBlock("{ erik += 56 }");
-            AssertBlockWithOneValue(block, "erik", 56L);
+            AssertBlockWithOneAdditionValue(block, "erik", 56L);
             block = FileBuilder.ParsePropertyBlock("{frank+=67}");
-            AssertBlockWithOneValue(block, "frank", 67L);
+            AssertBlockWithOneAdditionValue(block, "frank", 67L);
         }
 
         [TestMethod]
@@ -183,6 +183,56 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual("{ on Timeout : Error, aksel=Jeps, date=06/12/2016 00:00:00, ages = [ 12.4, 5.3, 7.4 ], Timeout=00:00:00.5000000 }", block.GetTestString());
         }
 
+        [TestMethod]
+        public void TestPropertyBlockMerging_SimpleUnique()
+        {
+            var block1 = FileBuilder.ParsePropertyBlock("{ anders = \"Jens\", berit = true, chris=23.7s }");
+            var block2 = FileBuilder.ParsePropertyBlock("{ dennis = 82 }");
+
+            var block3 = block1.Merge(block2);
+            Assert.AreEqual("{ anders=Jens, berit=True, chris=00:00:23.7000000, dennis=82 }", block3.GetTestString());
+        }
+
+        [TestMethod]
+        public void TestPropertyBlockMerging_SimpleOverride()
+        {
+            var block1 = FileBuilder.ParsePropertyBlock("{ anders = \"Jens\", berit = true, chris=23.7s }");
+            var block2 = FileBuilder.ParsePropertyBlock("{ berit = false }");
+
+            var block3 = block1.Merge(block2);
+            Assert.AreEqual("{ anders=Jens, berit=False, chris=00:00:23.7000000 }", block3.GetTestString());
+        }
+
+        [TestMethod]
+        public void TestPropertyBlockMerging_WithArraysUnique()
+        {
+            var block1 = FileBuilder.ParsePropertyBlock("{ ak = [7,6,5,4,3,2,1,0], be = [true, true, false, true], cy = [\"Mor\", \"Far\"] }");
+            var block2 = FileBuilder.ParsePropertyBlock("{ dk = [7,6,5,4,3,2,1,0] }");
+
+            var block3 = block1.Merge(block2);
+            Assert.AreEqual("{ ak = [ 7, 6, 5, 4, 3, 2, 1, 0 ], be = [ True, True, False, True ], cy = [ Mor, Far ], dk = [ 7, 6, 5, 4, 3, 2, 1, 0 ] }", block3.GetTestString());
+        }
+
+        [TestMethod]
+        public void TestPropertyBlockMerging_WithArraysOverride()
+        {
+            var block1 = FileBuilder.ParsePropertyBlock("{ ak = [7,6,5,4,3,2,1,0], be = [true, true, false, true], cy = [\"Mor\", \"Far\"] }");
+            var block2 = FileBuilder.ParsePropertyBlock("{ be = [Muf, Lom, Kir] }");
+
+            var block3 = block1.Merge(block2);
+            Assert.AreEqual("{ ak = [ 7, 6, 5, 4, 3, 2, 1, 0 ], be = [ Muf, Lom, Kir ], cy = [ Mor, Far ] }", block3.GetTestString());
+        }
+
+        [TestMethod]
+        public void TestPropertyBlockMerging_WithArrayAddition()
+        {
+            var block1 = FileBuilder.ParsePropertyBlock("{ ak = [3,2,1,0] }");
+            var block2 = FileBuilder.ParsePropertyBlock("{ ak += [300,320] }");
+
+            var block3 = block1.Merge(block2);
+            Assert.AreEqual("{ ak = [ 3, 2, 1, 0, 300, 320 ] }", block3.GetTestString());
+        }
+
         #region Utils
         private void AssertBlockWithOneValue(PropertyBlock block, string name, object expected)
         {
@@ -191,6 +241,16 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(name, block[0].Name, false, CultureInfo.InvariantCulture);
             Assert.AreEqual(PropertyBlockEntryType.Value, block[0].BlockEntryType);
             Assert.AreEqual(expected, (block[0] as PropertyBlockValue).Value);
+            Assert.AreEqual(false, block[0].IsAdditionAssignment);
+        }
+        private void AssertBlockWithOneAdditionValue(PropertyBlock block, string name, object expected)
+        {
+            Assert.AreEqual(1, block.Count);
+            Assert.IsNull(block[0].SpecifiedTypeName);
+            Assert.AreEqual(name, block[0].Name, false, CultureInfo.InvariantCulture);
+            Assert.AreEqual(PropertyBlockEntryType.Value, block[0].BlockEntryType);
+            Assert.AreEqual(expected, (block[0] as PropertyBlockValue).Value);
+            Assert.AreEqual(true, block[0].IsAdditionAssignment);
         }
         private void AssertBlockWithOneValue(PropertyBlock block, string type, string name, object expected)
         {
@@ -199,6 +259,7 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(name, block[0].Name, false, CultureInfo.InvariantCulture);
             Assert.AreEqual(PropertyBlockEntryType.Value, block[0].BlockEntryType);
             Assert.AreEqual(expected, (block[0] as PropertyBlockValue).Value);
+            Assert.AreEqual(false, block[0].IsAdditionAssignment);
         }
         #endregion
     }

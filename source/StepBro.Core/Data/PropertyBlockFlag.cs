@@ -16,5 +16,10 @@ namespace StepBro.Core.Data
         {
             text.Append("Flag: " + this.Name);
         }
+
+        public override PropertyBlockEntry Clone()
+        {
+            return new PropertyBlockFlag(this.Line, this.Name).CloneBase(this);
+        }
     }
 }

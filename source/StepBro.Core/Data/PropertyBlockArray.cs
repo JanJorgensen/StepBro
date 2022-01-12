@@ -18,7 +18,7 @@ namespace StepBro.Core.Data
         public void AddRange(IEnumerable<PropertyBlockEntry> children)
         {
             m_entries.AddRange(children);
-            foreach (var entry in children)
+            foreach (var entry in m_entries)
             {
                 entry.IsArrayEntry = true;
             }
@@ -32,13 +32,14 @@ namespace StepBro.Core.Data
             }
             else
             {
+                string assignment = this.IsAdditionAssignment ? "+=" : "=";
                 if (String.IsNullOrEmpty(this.SpecifiedTypeName))
                 {
-                    text.AppendFormat("{0} = [ ", this.Name);
+                    text.AppendFormat("{0} {1} [ ", this.Name, assignment);
                 }
                 else
                 {
-                    text.AppendFormat("{0} {1} = [ ", this.SpecifiedTypeName, this.Name);
+                    text.AppendFormat("{0} {1} {2} [ ", this.SpecifiedTypeName, this.Name, assignment);
                 }
             }
 
@@ -144,5 +145,12 @@ namespace StepBro.Core.Data
         }
 
         #endregion
+
+        public override PropertyBlockEntry Clone()
+        {
+            var array = new PropertyBlockArray(this.Line, null).CloneBase(this) as PropertyBlockArray;
+            array.AddRange(m_entries.Select(c => c.Clone()));
+            return array;
+        }
     }
 }

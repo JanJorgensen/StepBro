@@ -123,6 +123,10 @@ namespace StepBro.Core.Parser
             if (type != null && type[0] == '\"') type = type.Substring(1, type.Length - 2);
             entry.Name = name;
             entry.SpecifiedTypeName = type;
+            if (context.op.Type == SBP.OP_ADD_ASSIGNMENT)
+            {
+                entry.MarkAsAdditionAssignment();
+            }
             var stack = m_expressionData.PopStackLevel();
         }
 

@@ -24,6 +24,7 @@ namespace StepBro.Core
         private static Logger m_mainLogger = null;
         private static ILogger m_logRootScope = null;
         private static ILoadedFilesManager m_loadedFilesManager = null;
+        private static IConfigurationFileManager m_configurationFileManager = null;
         private static IAddonManager m_addonManager = null;
         //private static ILogSinkManager m_logSinkManager = null;
         private static TaskManager m_taskManager = null;
@@ -56,6 +57,8 @@ namespace StepBro.Core
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_loadedFilesManager = new LoadedFilesManager(out service);
+            m_serviceManagerAdmin.Manager.Register(service);
+            m_configurationFileManager = new ConfigurationFileManager(out service);
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_addonManager = new AddonManager(
@@ -103,7 +106,7 @@ namespace StepBro.Core
                 }
             }
 
-            TaskContextDummy taskContext = new TaskContextDummy();
+            TaskContextDummy taskContext = new TaskContextDummy((ILoggerScope)m_logRootScope);
 
             try
             {

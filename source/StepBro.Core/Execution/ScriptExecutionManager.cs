@@ -16,7 +16,8 @@ namespace StepBro.Core.Execution
         private readonly List<WeakReference<ScriptExecutionTask>> m_tasks = new List<WeakReference<ScriptExecutionTask>>();
 
         public ScriptExecutionManager(out IService serviceAccess) :
-            base(nameof(ScriptExecutionManager), out serviceAccess, typeof(ILogger), typeof(ILoadedFilesManager), typeof(TaskManager))
+            base(nameof(ScriptExecutionManager), out serviceAccess, 
+                typeof(ILogger), typeof(ILoadedFilesManager), typeof(TaskManager), typeof(IConfigurationFileManager))
         {
         }
 

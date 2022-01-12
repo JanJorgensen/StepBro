@@ -41,13 +41,14 @@ namespace StepBro.Core.Data
             }
             else
             {
+                string assignment = this.IsAdditionAssignment ? "+=" : "=";
                 if (String.IsNullOrEmpty(this.SpecifiedTypeName))
                 {
-                    text.AppendFormat("{0} = {{ ", this.Name);
+                    text.AppendFormat("{0} {1} {{ ", this.Name, assignment);
                 }
                 else
                 {
-                    text.AppendFormat("{0} {1} = {{ ", this.SpecifiedTypeName, this.Name);
+                    text.AppendFormat("{0} {1} {2} {{ ", this.SpecifiedTypeName, this.Name, assignment);
                 }
             }
 
@@ -149,5 +150,10 @@ namespace StepBro.Core.Data
         }
 
         #endregion
+
+        public override PropertyBlockEntry Clone()
+        {
+            return new PropertyBlock(this.Line, null, m_children.Select(c => c.Clone())).CloneBase(this);
+        }
     }
 }

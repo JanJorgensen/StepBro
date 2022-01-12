@@ -10,6 +10,7 @@ namespace StepBro.Core.Data
         private string m_name;
         private bool m_isArrayEntry = false;
         private bool? m_isUsedOrApproved;
+        private bool m_isAdditionAssignment = false;
 
         protected PropertyBlockEntry(int line, PropertyBlockEntryType type, string name = null)
         {
@@ -60,6 +61,16 @@ namespace StepBro.Core.Data
             }
         }
 
+        public bool IsAdditionAssignment
+        {
+            get { return m_isAdditionAssignment; }
+        }
+
+        internal void MarkAsAdditionAssignment()
+        {
+            m_isAdditionAssignment = true;
+        }
+
         public PropertyBlockEntryType BlockEntryType { get; private set; }
 
         public object Tag { get; set; }
@@ -75,7 +86,7 @@ namespace StepBro.Core.Data
 
         public bool Is(string name, PropertyBlockEntryType type)
         {
-            return m_name == name && BlockEntryType == type;
+            return String.Equals(m_name, name) && BlockEntryType == type;
         }
 
         public bool IsUsedOrApproved
@@ -86,6 +97,15 @@ namespace StepBro.Core.Data
                 if (!value) throw new ArgumentOutOfRangeException();
                 m_isUsedOrApproved = true;
             }
+        }
+        public abstract PropertyBlockEntry Clone();
+
+        internal PropertyBlockEntry CloneBase(PropertyBlockEntry baseElement)
+        {
+            m_name = baseElement.m_name;
+            m_specifiedDataType = baseElement.m_specifiedDataType;
+            m_isAdditionAssignment = baseElement.m_isAdditionAssignment;
+            return this;
         }
     }
 }
