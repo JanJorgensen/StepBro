@@ -125,7 +125,7 @@ namespace StepBro.Core.Parser
             entry.SpecifiedTypeName = type;
             if (context.op.Type == SBP.OP_ADD_ASSIGNMENT)
             {
-                entry.MarkAsAdditionAssignment();
+                entry.IsAdditionAssignment = true;
             }
             var stack = m_expressionData.PopStackLevel();
         }

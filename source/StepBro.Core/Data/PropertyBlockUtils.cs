@@ -34,27 +34,6 @@ namespace StepBro.Core.Data
             return text.ToPropertyBlock();
         }
 
-        /// <summary>
-        /// Creates a clone of a PropertyBlock, where the general device entries used in the station properties file has been removed.
-        /// </summary>
-        /// <remarks>This function will typically be used on a device configuration entry read from the station properties file.</remarks>
-        /// <param name="props">The device properties.</param>
-        /// <returns>Filtered clone of the specified properties.</returns>
-        public static PropertyBlock CloneWithoutGeneralDeviceConfigEntries(this PropertyBlock props)
-        {
-            var result = new PropertyBlock(props.Line, props.Name);
-            string[] generalEntries = new string[] { "type", "aliases" };
-            foreach (var entry in props)
-            {
-                if (entry.BlockEntryType == PropertyBlockEntryType.Value &&
-                    generalEntries.Count(g => String.Equals(entry.Name, g, StringComparison.InvariantCultureIgnoreCase)) > 0)
-                {
-                    continue;
-                }
-                result.Add(entry.Clone());
-            }
-            return props;
-        }
 
         public static PropertyBlock Merge(this PropertyBlock props, PropertyBlock other)
         {

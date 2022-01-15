@@ -146,10 +146,10 @@ namespace StepBro.Core.Data
 
         #endregion
 
-        public override PropertyBlockEntry Clone()
+        public override PropertyBlockEntry Clone(bool skipUsedOrApproved = false)
         {
             var array = new PropertyBlockArray(this.Line, null).CloneBase(this) as PropertyBlockArray;
-            array.AddRange(m_entries.Select(c => c.Clone()));
+            array.AddRange(m_entries.Where(c => !skipUsedOrApproved || !c.IsUsedOrApproved).Select(c => c.Clone(skipUsedOrApproved)));
             return array;
         }
     }

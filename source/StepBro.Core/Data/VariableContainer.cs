@@ -1,5 +1,6 @@
 ﻿using StepBro.Core.Logging;
 using System;
+using System.Collections.Generic;
 
 namespace StepBro.Core.Data
 {
@@ -17,7 +18,7 @@ namespace StepBro.Core.Data
         int FileLine { get; set; }
         int FileColumn { get; set; }
         int CodeHash { get; set; }
-        object Tag { get; set; }
+        Dictionary<string,object> Tags { get; set; }
     }
 
     public delegate bool VariableContainerAction(IValueContainerOwnerAccess container, ILogger logger);
@@ -72,7 +73,7 @@ namespace StepBro.Core.Data
             public int FileLine { get; set; }
             public int FileColumn { get; set; }
             public int CodeHash { get; set; }
-            public object Tag { get; set; } = null;
+            public Dictionary<string,object> Tags { get; set; } = null;
 
             public bool IsStillValid { get { return disposedValue == false; } }
 

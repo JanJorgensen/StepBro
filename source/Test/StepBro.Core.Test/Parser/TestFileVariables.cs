@@ -101,7 +101,7 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        public void TesSBPecialFileVariableWithPropblockConfig()
+        public void TestSpecialFileVariableWithPropblockConfig()
         {
             var f = new StringBuilder();
             f.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");
@@ -170,7 +170,7 @@ namespace StepBroCoreTest.Parser
 
     public class DummyInstrumentClass : IDisposable, IResettable
     {
-        private static long m_nextInstanceID = 10;
+        public static long m_nextInstanceID = 10;
 
         private List<string> m_names = new List<string>();
         private long m_id;

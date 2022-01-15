@@ -845,8 +845,16 @@ namespace StepBro.Core.Parser
                     totalErrors += file.Errors.ErrorCount;
                     if (file.Errors.ErrorCount == 0)
                     {
-                        file.InitializeFileVariables(logger);
                         file.LastParsing = DateTime.Now;
+                    }
+                }
+                foreach (var file in filesToParse)
+                {
+                    if (file.Errors.ErrorCount == 0)
+                    {
+                        // Initialize file variables after ALL files have been parsed,
+                        // because parsing a file can change data in other files.
+                        file.InitializeFileVariables(logger);
                         file.DisposeUnusedFileVariables(logger);
                     }
                 }

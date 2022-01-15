@@ -69,11 +69,12 @@ elementModifier
     |	PROTECTED		// Shared within the namespace
     ;
 
-fileVariableOverride : OVERRIDE ;
+fileVariableNameReference : variableDeclaratorQualifiedId ;
 
 fileVariable
-    :   elementModifier? fileVariableOverride? variableType variableDeclaratorId elementPropertyblock     #FileVariableWithPropertyBlock
-    |   elementModifier? fileVariableOverride? variableType variableDeclarator SEMICOLON                  #FileVariableSimple
+    :   elementModifier? OVERRIDE variableType fileVariableNameReference elementPropertyblock   #FileVariableOverrideWithPropertyBlock
+    |   elementModifier? variableType variableDeclaratorId elementPropertyblock                 #FileVariableWithPropertyBlock
+    |   elementModifier? variableType variableDeclarator SEMICOLON                              #FileVariableSimple
     ;
     
 //modifiers
@@ -195,7 +196,8 @@ variableDeclaratorWithoutAssignment : variableDeclaratorId ;
 //variableDeclaratorWithPropertyBlock : variableDeclaratorId ;
 //variableDeclaratorWithoutAssignment : variableDeclaratorId elementPropertyblock;
 
-variableDeclaratorId : IDENTIFIER (OPEN_BRACKET CLOSE_BRACKET)* ;
+variableDeclaratorId : IDENTIFIER ;
+variableDeclaratorQualifiedId : identifierOrQualified ;
 
 variableInitializer
     :   arrayInitializer		# VariableInitializerArray
@@ -440,12 +442,16 @@ logModifier
     |   ERROR
     ;
 
+keywordType : CONFIG | OBJECT | OVERRIDE | PRIVATE | PUBLIC | VERDICT ;
+
 keyword
-    : USING | BREAK | CONTINUE | CONFIG | DO | ELSE | ERROR | EXECUTION | EXPECT | FAIL
-    | FOR | FUNCTION | IF | IGNORE | IN | INTERLEAVE | IS | LOG | NOT | OBJECT | ON | OUT | OVERRIDE
-    | PASS | PRIVATE | PROCEDURE | PUBLIC | REF | REPORT | RETURN 
-    | SESSION | STEP | THIS | TIMEOUT | THROW | VERDICT | WARNING //| WITH
+    : BREAK | CONTINUE | DO | ELSE | ERROR | EXECUTION | EXPECT | FAIL
+    | FOR | FUNCTION | IF | IGNORE | IN | INTERLEAVE | IS | LOG | NOT | ON | OUT
+    | PASS | PROCEDURE | REF | REPORT | RETURN 
+    | SESSION | STEP | THIS | TIMEOUT | THROW | WARNING //| WITH
     ;
+
+keywordWide : keywordType | keyword ;
 
 //catches
 //    :   catchClause (catchClause)*
@@ -536,9 +542,9 @@ propertyblockStatementNamed
         op=(COLON | ASSIGNMENT | OP_ADD_ASSIGNMENT) 
         propertyblockStatementNamedValue ;
 
-propertyblockStatementNameSpecifier : identifierOrQualified | primitiveType | keyword | REGULAR_STRING ;
+propertyblockStatementNameSpecifier : identifierOrQualified | primitiveType | keywordWide | REGULAR_STRING ;
 
-propertyblockStatementTypeSpecifier : identifierOrQualified | primitiveType | keyword ;
+propertyblockStatementTypeSpecifier : identifierOrQualified | primitiveType | keywordWide ;
 
 propertyblockStatementNamedValue
     :	propertyblock

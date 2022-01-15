@@ -15,6 +15,9 @@ namespace StepBro.Core.ScriptData
 {
     internal class ScriptFile : LoadedFileBase, IScriptFile, IParsingContext
     {
+        public static readonly string VARIABLE_CUSTOM_PROPS_TAG = "CustomPropsTag";
+        public static readonly string VARIABLE_ALL_DATA_PROPS = "AllDataProps";
+
         private StreamReader m_fileStream = null;
         private AntlrInputStream m_parserFileStream;
         private int m_parsingFloor = 0;     // The lower the floor(number), the earlier in the parsing sequence.
@@ -291,6 +294,7 @@ namespace StepBro.Core.ScriptData
             VariableContainerAction resetter = null,
             VariableContainerAction creator = null,
             VariableContainerAction initializer = null,
+            PropertyBlock fileSetupData = null,
             PropertyBlock customSetupData = null)
         {
             var existing = m_fileScopeVariablesBefore.FirstOrDefault(
@@ -314,6 +318,10 @@ namespace StepBro.Core.ScriptData
                     existing.VariableOwnerAccess.DataInitializer = initializer;
                 }
                 existing.VariableOwnerAccess.CodeHash = codeHash;
+                if (fileSetupData != null)
+                {
+                    SetFileVariableAllData(existing, fileSetupData);
+                }
                 if (customSetupData != null)
                 {
                     SetFileVariableCustomData(existing, customSetupData);
@@ -322,6 +330,10 @@ namespace StepBro.Core.ScriptData
             }
 
             var vc = FileVariable.Create(this, access, @namespace, name, datatype, @readonly, line, column, codeHash, resetter, creator, initializer);
+            if (fileSetupData != null)
+            {
+                SetFileVariableAllData(vc, fileSetupData);
+            }
             if (customSetupData != null)
             {
                 SetFileVariableCustomData(vc, customSetupData);
@@ -331,10 +343,35 @@ namespace StepBro.Core.ScriptData
             return vc.ID;
         }
 
-        private static void SetFileVariableCustomData(FileVariable variable, PropertyBlock customSetupData)
+        internal static void SetFileVariableAllData(FileVariable variable, PropertyBlock data)
         {
-            System.Diagnostics.Debug.Assert(variable.VariableOwnerAccess.Tag != null && variable.VariableOwnerAccess.Tag is Dictionary<Type, Object>);
-            (variable.VariableOwnerAccess.Tag as Dictionary<Type, Object>)[typeof(PropertyBlock)] = customSetupData;
+            System.Diagnostics.Debug.Assert(variable.VariableOwnerAccess.Tags != null);
+            variable.VariableOwnerAccess.Tags[VARIABLE_ALL_DATA_PROPS] = data;
+        }
+        internal static void SetFileVariableCustomData(FileVariable variable, PropertyBlock customSetupData)
+        {
+            System.Diagnostics.Debug.Assert(variable.VariableOwnerAccess.Tags != null);
+            variable.VariableOwnerAccess.Tags[VARIABLE_CUSTOM_PROPS_TAG] = customSetupData;
+        }
+        internal static PropertyBlock GetFileVariableAllData(FileVariable variable)
+        {
+            System.Diagnostics.Debug.Assert(variable.VariableOwnerAccess.Tags != null);
+            object value;
+            if (variable.VariableOwnerAccess.Tags.TryGetValue(VARIABLE_ALL_DATA_PROPS, out value))
+            {
+                return value as PropertyBlock;
+            }
+            else return null;
+        }
+        internal static PropertyBlock GetFileVariableCustomData(FileVariable variable)
+        {
+            System.Diagnostics.Debug.Assert(variable.VariableOwnerAccess.Tags != null);
+            object value;
+            if (variable.VariableOwnerAccess.Tags.TryGetValue(VARIABLE_CUSTOM_PROPS_TAG, out value))
+            {
+                return value as PropertyBlock;
+            }
+            else return null;
         }
 
         internal void SetFileVariableModifier(int id, AccessModifier access)

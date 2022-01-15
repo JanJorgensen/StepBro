@@ -10,7 +10,6 @@ namespace StepBro.Core.Parser
     internal partial class StepBroListener
     {
         private VariableModifier m_variableModifier = VariableModifier.None;
-        private bool m_variableOverride = false;
         private TypeReference m_variableType;
         private string m_variableName = "";
         private SBExpressionData m_variableInitializer = null;
@@ -47,6 +46,11 @@ namespace StepBro.Core.Parser
         }
 
         public override void EnterVariableDeclaratorId([NotNull] SBP.VariableDeclaratorIdContext context)
+        {
+            m_variableName = context.GetText();
+        }
+
+        public override void EnterVariableDeclaratorQualifiedId([NotNull] SBP.VariableDeclaratorQualifiedIdContext context)
         {
             m_variableName = context.GetText();
         }

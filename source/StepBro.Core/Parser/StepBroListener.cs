@@ -2,8 +2,10 @@
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Newtonsoft.Json.Serialization;
+using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.General;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using System;
@@ -27,6 +29,7 @@ namespace StepBro.Core.Parser
         protected string m_currentNamespace = null;
         protected FileTestList m_currentTestList = null;
         protected Stack<SBExpressionData> m_testListEntryArguments = null;
+        protected SBExpressionData m_overrideVariable = null;
 
         public StepBroListener(ErrorCollector errorCollector)
         {
@@ -141,19 +144,12 @@ namespace StepBro.Core.Parser
         public override void EnterFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)
         {
             m_variableModifier = VariableModifier.Static;
-            m_variableOverride = false;
         }
 
         public override void EnterFileVariableSimple([NotNull] SBP.FileVariableSimpleContext context)
         {
             m_variableModifier = VariableModifier.Static;
-            m_variableOverride = false;
             this.CreateVariablesList();
-        }
-
-        public override void ExitFileVariableOverride([NotNull] SBP.FileVariableOverrideContext context)
-        {
-            m_variableOverride = true;
         }
 
         public override void ExitFileVariableSimple([NotNull] SBP.FileVariableSimpleContext context)
@@ -189,58 +185,55 @@ namespace StepBro.Core.Parser
             VariableContainerAction initAction = null;
             VariableContainerAction resetAction = null;
 
-            if (!m_variableOverride)
+            if (m_variableType.Type.IsValueType || m_variableType.Type == typeof(string))
             {
-                if (m_variableType.Type.IsValueType || m_variableType.Type == typeof(string))
+                var code = Expression.Constant(Activator.CreateInstance(type.Type), type.Type);
+                createAction = CreateVariableContainerValueAssignAction(code);
+                resetAction = createAction;
+            }
+            else
+            {
+                #region Creator Action
+                var ctor = type.Type.GetConstructor(new Type[] { });
+                if (ctor != null)
                 {
-                    var code = Expression.Constant(Activator.CreateInstance(type.Type), type.Type);
+                    var code = Expression.New(ctor);
                     createAction = CreateVariableContainerValueAssignAction(code);
-                    resetAction = createAction;
                 }
                 else
                 {
-                    #region Creator Action
-                    var ctor = type.Type.GetConstructor(new Type[] { });
-                    if (ctor != null)
-                    {
-                        var code = Expression.New(ctor);
-                        createAction = CreateVariableContainerValueAssignAction(code);
-                    }
-                    else
-                    {
-                        var createMethods =
-                            type.Type.GetMethods().Where(
-                                m => String.Equals(m.Name, "Create", StringComparison.InvariantCulture) && m.IsStatic).ToArray();
-                        throw new NotImplementedException();
-                    }
-                    #endregion
-                    #region Reset Action
-                    var resettable = type.Type.GetInterface(nameof(IResettable));
-                    if (resettable != null)
-                    {
-                        LabelTarget returnLabel = Expression.Label(typeof(bool));
-
-                        var parameterContainer = Expression.Parameter(typeof(IValueContainerOwnerAccess), "container");
-                        var parameterLogger = Expression.Parameter(typeof(ILogger), "logger");
-
-                        var callSetValue = Expression.Call(
-                            typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ResetFileVariable), new Type[] { typeof(IValueContainerOwnerAccess), typeof(ILogger) }),
-                            parameterContainer,
-                            parameterLogger);
-
-                        var lambdaExpr = Expression.Lambda(
-                            typeof(VariableContainerAction),
-                            Expression.Block(
-                                callSetValue,
-                                Expression.Label(returnLabel, Expression.Constant(true))),
-                            parameterContainer,
-                            parameterLogger);
-
-                        var @delegate = lambdaExpr.Compile();
-                        resetAction = (VariableContainerAction)@delegate;
-                    }
-                    #endregion
+                    var createMethods =
+                        type.Type.GetMethods().Where(
+                            m => String.Equals(m.Name, "Create", StringComparison.InvariantCulture) && m.IsStatic).ToArray();
+                    throw new NotImplementedException();
                 }
+                #endregion
+                #region Reset Action
+                var resettable = type.Type.GetInterface(nameof(IResettable));
+                if (resettable != null)
+                {
+                    LabelTarget returnLabel = Expression.Label(typeof(bool));
+
+                    var parameterContainer = Expression.Parameter(typeof(IValueContainerOwnerAccess), "container");
+                    var parameterLogger = Expression.Parameter(typeof(ILogger), "logger");
+
+                    var callSetValue = Expression.Call(
+                        typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ResetFileVariable), new Type[] { typeof(IValueContainerOwnerAccess), typeof(ILogger) }),
+                        parameterContainer,
+                        parameterLogger);
+
+                    var lambdaExpr = Expression.Lambda(
+                        typeof(VariableContainerAction),
+                        Expression.Block(
+                            callSetValue,
+                            Expression.Label(returnLabel, Expression.Constant(true))),
+                        parameterContainer,
+                        parameterLogger);
+
+                    var @delegate = lambdaExpr.Compile();
+                    resetAction = (VariableContainerAction)@delegate;
+                }
+                #endregion
             }
 
             PropertyBlock customProperties = null;
@@ -261,9 +254,59 @@ namespace StepBro.Core.Parser
                 resetter: resetAction,
                 creator: createAction,
                 initializer: initAction,
+                fileSetupData: props,
                 customSetupData: customProperties);
             m_file.SetFileVariableModifier(id, m_fileElementModifier);
 
+            m_variableName = null;
+        }
+
+        public override void EnterFileVariableNameReference([NotNull] SBP.FileVariableNameReferenceContext context)
+        {
+            m_overrideVariable = null;
+            m_expressionData.PushStackLevel("VariableName");
+        }
+
+        public override void ExitFileVariableNameReference([NotNull] SBP.FileVariableNameReferenceContext context)
+        {
+            m_overrideVariable = m_expressionData.Peek().Pop();
+            m_expressionData.PopStackLevel();
+        }
+
+        public override void ExitFileVariableOverrideWithPropertyBlock([NotNull] SBP.FileVariableOverrideWithPropertyBlockContext context)
+        {
+            TypeReference type = m_variableType;
+            if (type == null)
+            {
+                return;
+            }
+            if (m_overrideVariable == null)
+            {
+                return;
+            }
+
+            var parent = this.ResolveIfIdentifier(m_overrideVariable, false, type);
+            if (!parent.IsResolved)
+            {
+                return;
+            }
+
+            FileVariable fileVariable = parent.Value as FileVariable;
+            var parentProperties = ScriptFile.GetFileVariableAllData(fileVariable);
+            var mergedProps = parentProperties.Merge(m_lastElementPropertyBlock);
+            ScriptFile.SetFileVariableAllData(fileVariable, mergedProps);
+
+            if (mergedProps != null && mergedProps.Count > 0)
+            {
+                var initAction = this.CreateVariableContainerObjectInitAction(type.Type, mergedProps, m_errors, context.Start);
+                fileVariable.VariableOwnerAccess.DataInitializer = initAction;
+                if (mergedProps.Count(e => e.Tag == null) > 0)
+                {
+                    var customProperties = new PropertyBlock(context.Start.Line);
+                    customProperties.AddRange(mergedProps.Where(e => e.Tag == null));
+                    ScriptFile.SetFileVariableCustomData(fileVariable, customProperties);
+                }
+            }
             m_variableName = null;
         }
 
@@ -309,6 +352,21 @@ namespace StepBro.Core.Parser
 
             var dataSetters = new List<Expression>();
             var objectReference = Expression.Variable(objectType);
+
+            var deviceEntry = properties.TryGetElement(Constants.VARIABLE_DEVICE_REFERENCE);
+            if (deviceEntry != null && deviceEntry.BlockEntryType != PropertyBlockEntryType.Value && (deviceEntry as PropertyBlockValue).Value is string)
+            {
+                var deviceName = (deviceEntry as PropertyBlockValue).Value as string;
+                var devices = StationPropertiesHelper.TryGetStationPropertiesDeviceData();
+                if (devices != null)
+                {
+                    var deviceProps = devices.TryGetDeviceFromStationProperties(deviceName);
+                    if (deviceProps != null)
+                    {
+                        deviceProps = deviceProps.MergeStationPropertiesWithLocalProperties(properties);
+                    }
+                }
+            }
 
             foreach (var entry in properties)
             {

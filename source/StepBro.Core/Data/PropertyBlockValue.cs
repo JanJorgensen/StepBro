@@ -74,7 +74,7 @@ namespace StepBro.Core.Data
             }
         }
 
-        public override PropertyBlockEntry Clone()
+        public override PropertyBlockEntry Clone(bool skipUsedOrApproved = false)
         {
             return new PropertyBlockValue(this.Line, null, m_value, m_solver).CloneBase(this);
         }

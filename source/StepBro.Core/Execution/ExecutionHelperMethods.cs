@@ -710,14 +710,13 @@ namespace StepBro.Core.Execution
 
         public static void SetupObjectWithPropertyBlock(ILogger logger, IValueContainerOwnerAccess containerOwner)
         {
-            if (containerOwner != null && (containerOwner.Tag as Dictionary<Type, Object>) != null)
+            if (containerOwner != null && (containerOwner.Tags != null))
             {
                 var @object = containerOwner.Container.GetValue(logger) as ISettableFromPropertyBlock;
                 if (@object != null)
                 {
-                    var dict = containerOwner.Tag as Dictionary<Type, Object>;
                     object props;
-                    if (dict != null && dict.TryGetValue(typeof(PropertyBlock), out props) && props is PropertyBlock)
+                    if (containerOwner.Tags.TryGetValue(ScriptFile.VARIABLE_CUSTOM_PROPS_TAG, out props) && props is PropertyBlock)
                     {
                         @object.Setup(logger, props as PropertyBlock);
                     }

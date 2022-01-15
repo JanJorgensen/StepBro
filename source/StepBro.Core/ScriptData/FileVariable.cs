@@ -36,7 +36,7 @@ namespace StepBro.Core.ScriptData
             vcOwnerAccess.FileLine = line;
             vcOwnerAccess.FileColumn = column;
             vcOwnerAccess.CodeHash = codeHash;
-            vcOwnerAccess.Tag = new Dictionary<Type, Object>();
+            vcOwnerAccess.Tags = new Dictionary<string, Object>();
             if (resetter != null)
             {
                 vcOwnerAccess.DataResetter = resetter;

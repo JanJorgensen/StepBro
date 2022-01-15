@@ -33,6 +33,11 @@ namespace StepBro.Core.Data
             m_children.AddRange(children);
         }
 
+        public PropertyBlockEntry TryGetElement(string name)
+        {
+            return m_children.FirstOrDefault(e => String.Equals(name, e.Name, StringComparison.InvariantCultureIgnoreCase));
+        }
+
         public override void GetTestString(StringBuilder text)
         {
             if (IsArrayEntry || String.IsNullOrEmpty(this.Name))
@@ -151,9 +156,9 @@ namespace StepBro.Core.Data
 
         #endregion
 
-        public override PropertyBlockEntry Clone()
+        public override PropertyBlockEntry Clone(bool skipUsedOrApproved = false)
         {
-            return new PropertyBlock(this.Line, null, m_children.Select(c => c.Clone())).CloneBase(this);
+            return new PropertyBlock(this.Line, null, m_children.Where( c => !skipUsedOrApproved || !c.IsUsedOrApproved).Select(c => c.Clone(skipUsedOrApproved))).CloneBase(this);
         }
     }
 }

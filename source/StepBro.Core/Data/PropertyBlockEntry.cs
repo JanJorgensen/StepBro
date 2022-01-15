@@ -10,7 +10,6 @@ namespace StepBro.Core.Data
         private string m_name;
         private bool m_isArrayEntry = false;
         private bool? m_isUsedOrApproved;
-        private bool m_isAdditionAssignment = false;
 
         protected PropertyBlockEntry(int line, PropertyBlockEntryType type, string name = null)
         {
@@ -61,15 +60,7 @@ namespace StepBro.Core.Data
             }
         }
 
-        public bool IsAdditionAssignment
-        {
-            get { return m_isAdditionAssignment; }
-        }
-
-        internal void MarkAsAdditionAssignment()
-        {
-            m_isAdditionAssignment = true;
-        }
+        public bool IsAdditionAssignment { get; set; } = false;
 
         public PropertyBlockEntryType BlockEntryType { get; private set; }
 
@@ -98,13 +89,13 @@ namespace StepBro.Core.Data
                 m_isUsedOrApproved = true;
             }
         }
-        public abstract PropertyBlockEntry Clone();
+        public abstract PropertyBlockEntry Clone(bool skipUsedOrApproved = false);
 
         internal PropertyBlockEntry CloneBase(PropertyBlockEntry baseElement)
         {
             m_name = baseElement.m_name;
             m_specifiedDataType = baseElement.m_specifiedDataType;
-            m_isAdditionAssignment = baseElement.m_isAdditionAssignment;
+            this.IsAdditionAssignment = baseElement.IsAdditionAssignment;
             return this;
         }
     }

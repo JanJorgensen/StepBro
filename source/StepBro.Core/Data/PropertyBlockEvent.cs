@@ -22,7 +22,7 @@ namespace StepBro.Core.Data
             text.Append("on " + this.Name + " : " + m_verdict.ToString());
         }
 
-        public override PropertyBlockEntry Clone()
+        public override PropertyBlockEntry Clone(bool skipUsedOrApproved = false)
         {
             return new PropertyBlockEvent(this.Line, null, m_verdict).CloneBase(this);
         }
