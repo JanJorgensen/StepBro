@@ -13,26 +13,31 @@ namespace StepBro.Core.Execution
 {
     internal class CallContext : ICallContext
     {
-        ICallContext m_parentContext;
-        CallContext m_childContext = null;
-        CallEntry m_callEntry;
-        bool m_break;
-        ILogger m_entryLogger;
+        private ScriptCallContext m_parentScriptContext;
+        private ICallContext m_parentContext;
+        private ILoggerScope m_logger;
+        private CallContext m_childContext = null;
+        private CallEntry m_callEntry;
+        private bool m_break;
 
-        public CallContext(CallContext parent)
+        public CallContext(CallContext parent, string location)
         {
+            m_parentScriptContext = parent.m_parentScriptContext;
             m_parentContext = parent;
-            m_entryLogger = parent.Logger;
+            m_logger = parent.m_logger.LogEntering(location, null);
             m_callEntry = parent.CurrentCallEntry;
             m_break = false;
         }
 
-        public CallContext(ScriptCallContext parent, CallEntry callEntry, bool breakSet)
+        public CallContext(ScriptCallContext parent, CallEntry callEntry, bool breakSet, string location)
         {
+            m_parentScriptContext = parent;
             m_parentContext = parent;
-            m_entryLogger = parent.Logger;
+            m_logger = parent.Logger.LogEntering(location, null);
             m_callEntry = callEntry;
             m_break = breakSet;
+            //if (String.IsNullOrEmpty(locationPrefix)) m_locationIdentification = parent.ShortLocationDescription();
+            //else m_locationIdentification = parent.ShortLocationDescription() + "." + location;
         }
 
         internal event EventHandler Disposing;
@@ -52,6 +57,8 @@ namespace StepBro.Core.Execution
                 m_parentContext = null;
             }
         }
+
+        internal ICallContext ParentContext { get { return m_parentContext; } }
 
         public CallEntry CurrentCallEntry
         {
@@ -73,13 +80,13 @@ namespace StepBro.Core.Execution
         {
             get
             {
-                return m_parentContext.Logger;
+                return m_logger;
             }
         }
 
         public bool LoggingEnabled
         {
-            get { throw new NotImplementedException(); }
+            get { return m_parentContext.LoggingEnabled; }
         }
 
         public IExecutionScopeStatusUpdate StatusUpdater
@@ -98,31 +105,31 @@ namespace StepBro.Core.Execution
             }
         }
 
-        public int CurrentTestStepIndex
-        {
-            get
-            {
-                return m_parentContext.CurrentTestStepIndex;
-            }
-        }
+        //public int CurrentTestStepIndex
+        //{
+        //    get
+        //    {
+        //        return m_parentContext.CurrentTestStepIndex;
+        //    }
+        //}
 
-        public string CurrentTestStepTitle
-        {
-            get
-            {
-                return m_parentContext.CurrentTestStepTitle;
-            }
-        }
+        //public string CurrentTestStepTitle
+        //{
+        //    get
+        //    {
+        //        return m_parentContext.CurrentTestStepTitle;
+        //    }
+        //}
 
-        public TaskManager TaskManager => throw new NotImplementedException();
+        public TaskManager TaskManager { get { return m_parentContext.TaskManager; } }
 
-        public ICallContext EnterNewContext(string shortDescription, bool separateStateLevel)
+        public ICallContext EnterNewContext(string location, bool separateStateLevel)
         {
             if (m_childContext != null)
             {
                 throw new Exception();
             }
-            m_childContext = new CallContext(this);
+            m_childContext = new CallContext(this, location);
             m_childContext.Disposing += M_childContext_Disposing;
             return m_childContext;
         }
@@ -135,7 +142,7 @@ namespace StepBro.Core.Execution
 
         public IEnumerable<IFolderShortcut> GetFolders()
         {
-            return m_parentContext.GetFolders();
+            return m_parentScriptContext.GetFolders();
         }
 
         public bool ReportParsingError(ErrorID error = null, string description = "", Exception exception = null)
@@ -150,12 +157,12 @@ namespace StepBro.Core.Execution
 
         public void ReportFailure(string failureDescription, ErrorID id = null)
         {
-            throw new NotImplementedException();
+            m_parentScriptContext.ReportFailure(failureDescription, id);
         }
 
         public void ReportError(string errorDescription, ErrorID id = null, Exception exception = null)
         {
-            throw new NotImplementedException();
+            m_parentScriptContext.ReportError(errorDescription, id, exception);
         }
     }
 }

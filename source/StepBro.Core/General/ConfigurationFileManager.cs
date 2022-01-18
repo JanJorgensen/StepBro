@@ -36,24 +36,24 @@ namespace StepBro.Core.General
                     {
                         m_stationProperties = stationPropFile.GetPropertyBlockFromFile();
 #if DEBUG
-                        context.Logger.LogSystem("ConfigurationFileManager", $"Successfully read the station properties file.");
+                        context.Logger.LogSystem($"Successfully read the station properties file.");
 #else
-                        context.Logger.LogSystem("ConfigurationFileManager", $"Station properties file: {stationPropFile}.");
+                        context.Logger.LogSystem($"Station properties file: {stationPropFile}.");
 #endif
                     }
                     catch
                     {
-                        context.Logger.LogError("ConfigurationFileManager", $"Error reading station properties file ({stationPropFile}).");
+                        context.Logger.LogError($"Error reading station properties file ({stationPropFile}).");
                     }
                 }
                 else
                 {
-                    context.Logger.LogError("ConfigurationFileManager", $"Station properties file ({stationPropFile}) was not found.");
+                    context.Logger.LogError($"Station properties file ({stationPropFile}) was not found.");
                 }
             }
             else
             {
-                context.Logger.LogSystem("ConfigurationFileManager", $"Environment variable \"{Constants.STEPBRO_STATION_PROPERTIES}\" for station properties file reference is not created.");
+                context.Logger.LogSystem($"Environment variable \"{Constants.STEPBRO_STATION_PROPERTIES}\" for station properties file reference is not created.");
             }
         }
 

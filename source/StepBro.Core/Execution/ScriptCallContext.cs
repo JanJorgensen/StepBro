@@ -22,7 +22,7 @@ namespace StepBro.Core.Execution
         private readonly bool m_isDynamicCall;
         private TaskManager m_taskManager;
         private int m_fileLine = -1;
-        private ILogger m_loggerOnEntry;
+        private ILoggerScope m_loggerOnEntry;
         private ILogger m_loggerInside;
         private ILoggerScope m_loggerInsideScope;
         private IExecutionScopeStatusUpdate m_statusUpdaterOnEntry;
@@ -30,6 +30,7 @@ namespace StepBro.Core.Execution
         //ITaskStatusUpdate m_currentStatusUpdater = null;
         private int m_currentStatementLine = 0;
         private int m_currentStatementColumn = 0;
+        private string m_currentLogLocation = "0";
         private int m_currentTestStepIndex = -1;
         private string m_currentTestStepTitle = null;
         private bool m_loggingEnabled;
@@ -47,7 +48,7 @@ namespace StepBro.Core.Execution
 
         internal ScriptCallContext(
             ScriptTaskContext task,
-            ILogger logger,
+            ILoggerScope logger,
             ContextLogOption callLoggingOption,
             IExecutionScopeStatusUpdate statusUpdater,
             IFileProcedure procedure,
@@ -78,7 +79,7 @@ namespace StepBro.Core.Execution
 
             m_taskManager = parent.m_taskManager;
             m_callLoggingOption = callLoggingOption;
-            m_loggerOnEntry = parent.Logger;
+            m_loggerOnEntry = parent.Logger as ILoggerScope;
             m_loggerInside = m_loggerOnEntry;
             m_statusUpdaterOnEntry = parent.StatusUpdater;
             m_loggingEnabled = parent.LoggingEnabled;
@@ -130,7 +131,7 @@ namespace StepBro.Core.Execution
                 {
                     argText.Append("<no arguments>");
                 }
-                m_loggerInsideScope = m_loggerOnEntry.LogEntering((m_isDynamicCall ? "<DYNAMIC CALL> " : "") + m_procedure.FullName, argText.ToString());
+                m_loggerInsideScope = m_loggerOnEntry.LogEntering((m_isDynamicCall ? "<DYNAMIC CALL> " : "") + m_procedure.FullName, argText.ToString(), new LoggerDynamicLocationSource(this.GetDynamicLogLocation));
                 m_loggerInside = m_loggerInsideScope;
             }
             else
@@ -155,6 +156,16 @@ namespace StepBro.Core.Execution
         public void Dispose()
         {
             throw new NotSupportedException("The ScriptCallContext is attempted disposed by an object without the authority to do so.");
+        }
+
+        internal Logger GetRootLogger()
+        {
+            return (m_loggerInside as LoggerScope).Logger;
+        }
+
+        private string GetDynamicLogLocation()
+        {
+            return m_currentLogLocation;
         }
 
         public void SetErrorListener(RuntimeErrorListener listener)
@@ -296,6 +307,18 @@ namespace StepBro.Core.Execution
             throw new NotImplementedException();
         }
 
+        public string ShortLocationDescription()
+        {
+            if (m_currentStatementLine > 0)
+            {
+                return m_currentStatementLine.ToString();
+            }
+            else
+            {
+                return m_procedure.Name;
+            }
+        }
+
         private string GetLocationDescription()
         {
             if (m_currentTestStepIndex > 0)
@@ -369,17 +392,18 @@ namespace StepBro.Core.Execution
 
             if (verdict == Verdict.Error)
             {
-                m_loggerInside.LogError(m_currentStatementLine.ToString(), resultDescription);
+                //m_loggerInside.LogError(m_currentStatementLine.ToString(), resultDescription);
                 this.ReportError(resultDescription, null, null);
             }
             else if (verdict >= Verdict.Fail)
             {
-                m_loggerInside.LogError(m_currentStatementLine.ToString(), resultDescription);
+                //m_loggerInside.LogError(m_currentStatementLine.ToString(), resultDescription);
                 this.ReportFailure(resultDescription);
             }
             else
             {
-                m_loggerInside.Log(m_currentStatementLine.ToString(), resultDescription);
+                //m_loggerInside.Log(m_currentStatementLine.ToString(), resultDescription);
+                m_loggerInside.Log(resultDescription);
                 this.SetPassVerdict();  // To indicate that the procedure actually has a verdict set now.
             }
 
@@ -395,11 +419,11 @@ namespace StepBro.Core.Execution
             {
                 if (String.IsNullOrWhiteSpace(title))
                 {
-                    m_loggerInside.Log(m_currentStatementLine.ToString(), String.Concat("STEP #", m_currentTestStepIndex.ToString()));
+                    m_loggerInside.Log(String.Concat("STEP #", m_currentTestStepIndex.ToString()));
                 }
                 else
                 {
-                    m_loggerInside.Log(m_currentStatementLine.ToString(), String.Concat("STEP #", m_currentTestStepIndex.ToString(), " : " + title));
+                    m_loggerInside.Log(String.Concat("STEP #", m_currentTestStepIndex.ToString(), " : " + title));
                 }
             }
         }
@@ -408,6 +432,7 @@ namespace StepBro.Core.Execution
         {
 
             m_currentStatementLine = line;
+            m_currentLogLocation = line.ToString();   // TODO: Add "Line " to the text.
             m_currentStatementColumn = column;
             if (this.Logger != null && this.Logger.IsDebugging && m_procedure.IsBreakpointOnLine(line))
             {
@@ -417,17 +442,17 @@ namespace StepBro.Core.Execution
 
         public void Log(string text)
         {
-            m_loggerInside.Log(m_currentStatementLine.ToString(), text);
+            m_loggerInside.Log(text);
         }
 
         public void LogDetail(string text)
         {
-            m_loggerInside.LogDetail(m_currentStatementLine.ToString(), text);
+            m_loggerInside.LogDetail(text);
         }
 
         public void LogError(string text)
         {
-            m_loggerInside.LogError(m_currentStatementLine.ToString(), text);
+            m_loggerInside.LogError(text);
         }
 
         public void SetPassVerdict()
@@ -448,6 +473,7 @@ namespace StepBro.Core.Execution
                 m_failureLine = m_currentStatementLine;
                 m_failureID = id;
             }
+            this.LogError(failureDescription);
         }
 
         public void ReportError(string errorDescription, ErrorID id = null)
@@ -467,6 +493,7 @@ namespace StepBro.Core.Execution
                 m_errorException = ex;
                 m_errorListener?.Invoke(m_procedure, m_currentStatementLine, id, errorDescription, ex);
             }
+            this.LogError(errorDescription);
         }
         public void AddPartResult(IProcedureReference procedure, ProcedureResult result)
         {

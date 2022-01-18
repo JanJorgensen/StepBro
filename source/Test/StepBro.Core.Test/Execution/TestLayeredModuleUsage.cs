@@ -58,9 +58,10 @@ namespace StepBroCoreTest.Execution
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - ObjectUsing.UseIt - <no arguments>");
-            log.ExpectNext("2 - Normal - HighLayerCodeModule.Fcn - i: 4");
-            log.ExpectNext("2 - Normal - MidLayerCodeModule.Fcn - i: 8");
-            log.ExpectNext("2 - Normal - LowLayerCodeModule.Fcn - i: 19");
+            log.ExpectNext("2 - Pre - highLevelObject.Fcn");
+            log.ExpectNext("3 - Normal - highLevelObject.Fcn - HighLayerCodeModule.Fcn - i: 4");
+            log.ExpectNext("3 - Normal - highLevelObject.Fcn - MidLayerCodeModule.Fcn - i: 8");
+            log.ExpectNext("3 - Normal - highLevelObject.Fcn - LowLayerCodeModule.Fcn - i: 19");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
         }
@@ -76,7 +77,7 @@ namespace StepBroCoreTest.Execution
         }
         public long Fcn([Implicit] ICallContext context, long i)    // i = 19
         {
-            context.Logger.Log("LowLayerCodeModule.Fcn", $"i: {i}");
+            context.Logger.Log($"LowLayerCodeModule.Fcn - i: {i}");
             return this.IntProp + i * 63L;      // 12 + 19 * 63 = 1209
         }
     }
@@ -92,7 +93,7 @@ namespace StepBroCoreTest.Execution
         }
         public long Fcn([Implicit] ICallContext context, long i)    // i = 8
         {
-            context.Logger.Log("MidLayerCodeModule.Fcn", $"i: {i}");
+            context.Logger.Log($"MidLayerCodeModule.Fcn - i: {i}");
             var low = this.LowLayer.Fcn(context, 19L);
             return low + this.IntProp * 100 + i * 9L;   // low(19) + 2 * 100 + 8 * 9 = 1481
         }
@@ -109,7 +110,7 @@ namespace StepBroCoreTest.Execution
         }
         public long Fcn([Implicit] ICallContext context, long i)    // i = 4
         {
-            context.Logger.Log("HighLayerCodeModule.Fcn", $"i: {i}");
+            context.Logger.Log($"HighLayerCodeModule.Fcn - i: {i}");
             var mid = this.MidLayer.Fcn(context, 8L);
             return mid + this.IntProp * 3L + i * 11L;    // mid(8) + 41 * 3 + 4 * 11
         }

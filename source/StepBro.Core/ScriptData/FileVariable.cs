@@ -33,6 +33,7 @@ namespace StepBro.Core.ScriptData
             VariableContainerAction initializer)
         {
             var vcOwnerAccess = VariableContainer.Create(@namespace, name, type, readOnly);
+            System.Diagnostics.Debug.WriteLine($"Creating variable \"{name}\" (in {file.FileName}), with ID {vcOwnerAccess.Container.UniqueID}");
             vcOwnerAccess.FileLine = line;
             vcOwnerAccess.FileColumn = column;
             vcOwnerAccess.CodeHash = codeHash;

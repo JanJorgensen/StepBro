@@ -9,14 +9,27 @@ namespace StepBro.Core.Logging
         private bool m_disposeProtected;
         private bool m_ended = false;
         private int m_threadID = -1;
+        private string m_location;
+        private LoggerDynamicLocationSource m_dynamicLocation;
 
-        internal LoggerScope(Logger logger, LogEntry scopeStartEntry, bool disposeProtected = false) : base()
+        internal LoggerScope(Logger logger, LogEntry scopeStartEntry, bool disposeProtected = false, LoggerDynamicLocationSource dynamicLocation = null) : base()
         {
             m_logger = logger;
             m_scopeStartEntry = scopeStartEntry;
             m_disposeProtected = disposeProtected;
             m_threadID = scopeStartEntry.ThreadId;
+            m_location = scopeStartEntry.Location;
+            if (dynamicLocation != null)
+            {
+                m_dynamicLocation = dynamicLocation;
+            }
+            else
+            {
+                m_dynamicLocation = new LoggerDynamicLocationSource(GetStaticLocation);
+            }
         }
+
+        private string GetStaticLocation() { return m_location; }
 
         internal LoggerScope(Logger logger, LogEntry scopeStartEntry, out IService service) : base("LoggerRootScope", out service)
         {
@@ -24,6 +37,8 @@ namespace StepBro.Core.Logging
             m_scopeStartEntry = scopeStartEntry;
             m_disposeProtected = true;
             m_threadID = scopeStartEntry.ThreadId;
+            m_location = scopeStartEntry.Location;
+            m_dynamicLocation = new LoggerDynamicLocationSource(GetStaticLocation);
         }
 
         internal Logger Logger { get { return m_logger; } }
@@ -54,72 +69,79 @@ namespace StepBro.Core.Logging
         {
             if (!m_ended)
             {
-                this.Log(LogEntry.Type.Post, null, null);
+                this.Log(LogEntry.Type.Post, null);
                 m_ended = true;
             }
         }
+
+        public string Location { get { return m_dynamicLocation(); } }
 
         public ILoggerScope LogEntering(string location, string text)
         {
-            var entry = this.Log(LogEntry.Type.Pre, location, text);
+            var entry = m_logger.Log(m_scopeStartEntry, LogEntry.Type.Pre, DateTime.Now, m_threadID, location, text);
             return new LoggerScope(m_logger, entry);
         }
 
-        public void LogExit(string location, string text)
+        public ILoggerScope LogEntering(string location, string text, LoggerDynamicLocationSource dynamicLocation)
+        {
+            var entry = m_logger.Log(m_scopeStartEntry, LogEntry.Type.Pre, DateTime.Now, m_threadID, location, text);
+            return new LoggerScope(m_logger, entry, dynamicLocation: dynamicLocation);
+        }
+
+        public void LogExit(string text)
         {
             if (m_ended)
             {
-                this.Log(LogEntry.Type.Error, location, "<already ended> " + text);
+                this.Log(LogEntry.Type.Error, "<already ended> " + text);
             }
             else
             {
-                this.Log(LogEntry.Type.Post, location, text);
+                this.Log(LogEntry.Type.Post, text);
                 m_ended = true;
             }
         }
 
-        public void Log(string location, string text)
+        public void Log(string text)
         {
-            this.Log(LogEntry.Type.Normal, location, text);
+            this.Log(LogEntry.Type.Normal, text);
         }
 
-        public void LogDetail(string location, string text)
+        public void LogDetail(string text)
         {
-            this.Log(LogEntry.Type.Detail, location, text);
+            this.Log(LogEntry.Type.Detail, text);
         }
 
-        public void LogError(string location, string text)
+        public void LogError(string text)
         {
-            this.Log(LogEntry.Type.Error, location, text);
+            this.Log(LogEntry.Type.Error, text);
         }
 
-        public void LogAsync(string location, string text)
+        public void LogAsync(string text)
         {
-            this.Log(LogEntry.Type.Async, location, text);
+            this.Log(LogEntry.Type.Async, text);
         }
 
-        public void LogUserAction(string location, string text)
+        public void LogUserAction(string text)
         {
-            this.Log(LogEntry.Type.UserAction, location, text);
+            this.Log(LogEntry.Type.UserAction, text);
         }
 
-        public void LogSystem(string location, string text)
+        public void LogSystem(string text)
         {
-            this.Log(LogEntry.Type.System, location, text);
+            this.Log(LogEntry.Type.System, text);
         }
 
-        private LogEntry Log(LogEntry.Type type, string location, string text)
+        private LogEntry Log(LogEntry.Type type, string text)
         {
-            return m_logger.Log(m_scopeStartEntry, type, DateTime.Now, m_threadID, location, text);
+            return m_logger.Log(m_scopeStartEntry, type, DateTime.Now, m_threadID, (type != LogEntry.Type.Post) ? m_dynamicLocation() : null, text);
         }
 
-
-        public void EnteredParallelTask(string location, string text)
+        public void EnteredParallelTask(string text)
         {
             System.Diagnostics.Debug.Assert(m_threadID == m_scopeStartEntry.ThreadId);  // Assert this one has not been called before.
             m_threadID = System.Threading.Thread.CurrentThread.ManagedThreadId;
             System.Diagnostics.Debug.Assert(m_threadID != m_scopeStartEntry.ThreadId);  // Assert this is on a different thread than the task that started this task.
-            this.Log(LogEntry.Type.TaskEntry, location, text);
+            this.Log(LogEntry.Type.TaskEntry, text);
         }
 
         public IProtectedLogger GetProtectedLogger()

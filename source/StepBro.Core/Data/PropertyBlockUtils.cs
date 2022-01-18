@@ -81,5 +81,14 @@ namespace StepBro.Core.Data
             return merged;
         }
 
+        public static string ValueAsString(this PropertyBlockValue valueProp)
+        {
+            if (valueProp.Value is string) return valueProp.Value as string;
+            else
+            {
+                if (valueProp.Value is not Identifier) throw new ArgumentException("PropertyBlockValue is not a string or an identifier.");
+                return ((Identifier)(valueProp.Value)).Name;
+            }
+        }
     }
 }

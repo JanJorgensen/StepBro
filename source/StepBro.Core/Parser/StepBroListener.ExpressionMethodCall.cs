@@ -123,6 +123,7 @@ namespace StepBro.Core.Parser
             var matchingMethods = new List<Tuple<MethodInfo, int>>();
             var suggestedAssignmentsForMatchingMethods = new List<List<SBExpressionData>>();
             Expression instance = null;
+            string instanceName = left.Instance;
             var callType = ParansExpressionType.MethodCall;
             var firstParIsThis = false; // Whether the first parameter of procedure (or method?) is a 'this' reference.
             TypeReference returnType = null;
@@ -130,7 +131,6 @@ namespace StepBro.Core.Parser
             #region Identify call type and list methods with matching name
 
             IEnumerable<MethodInfo> methods = null;
-            // Find the list of methods matching the given arguments.
             switch (left.ReferencedType)
             {
                 case SBExpressionType.Namespace:
@@ -307,7 +307,7 @@ namespace StepBro.Core.Parser
                             sequencialFirstArguments.ExpressionCode,
                             namedArguments.ExpressionCode,
                             sequencialLastArguments.ExpressionCode);
-                    
+
                     if (m_callAssignmentTarget != null)
                     {
                         callProcedure = Expression.Assign(m_callAssignmentTarget.ExpressionCode, callProcedure);
@@ -356,7 +356,8 @@ namespace StepBro.Core.Parser
                     ref constructedMethod,
                     callType == ParansExpressionType.ProcedureCall || callType == ParansExpressionType.FunctionCall,
                     firstParIsThis,
-                    instance,
+                    instance, 
+                    instanceName,
                     m_currentProcedure?.ContextReferenceInternal,
                     extensionInstance,
                     arguments,
@@ -680,7 +681,7 @@ namespace StepBro.Core.Parser
         internal int CheckMethodArguments(
             ref MethodInfo method,
             bool isProcedure, bool firstParIsThis,
-            Expression instance,
+            Expression instance, string instanceName,
             Expression contextReference,
             Expression extensionInstance,
             List<SBExpressionData> arguments,
@@ -737,7 +738,18 @@ namespace StepBro.Core.Parser
                             }
                             else
                             {
-                                suggestedAssignmentsOut.Add(new SBExpressionData(m_currentProcedure.ContextReference));
+                                string prefix = method.Name;
+                                if (!String.IsNullOrEmpty(instanceName))
+                                {
+                                    prefix = instanceName + "." + prefix;
+                                }
+                                var contextCreator = Expression.Call(
+                                    s_CreateMethodCallContext,
+                                    contextReference,
+                                    Expression.Constant(prefix));
+                                suggestedAssignmentsOut.Add(new SBExpressionData(contextCreator));
+
+                                //suggestedAssignmentsOut.Add(new SBExpressionData(m_currentProcedure.ContextReference));
                             }
                             continue;
                         }

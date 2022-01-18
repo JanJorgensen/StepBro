@@ -26,6 +26,8 @@ namespace StepBro.Core.Data
 
         public object Value { get { return m_value; } }
 
+        public bool IsStringOrIdentifier { get { return m_value is string || m_value is Identifier; } }
+
         public override string ToString()
         {
             var sb = new StringBuilder();
@@ -65,9 +67,9 @@ namespace StepBro.Core.Data
                 }
                 else
                 {
-                    text.AppendFormat("{0}{1}{2}{3}", 
-                        spectype, 
-                        this.Name, 
+                    text.AppendFormat("{0}{1}{2}{3}",
+                        spectype,
+                        this.Name,
                         assignment,
                         Convert.ToString(m_value, System.Globalization.CultureInfo.InvariantCulture));
                 }

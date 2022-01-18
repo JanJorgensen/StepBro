@@ -762,5 +762,11 @@ namespace StepBro.Core.Execution
                 return true; // Do exit the procedure
             }
         }
+    
+        public static ICallContext CreateMethodCallContext(IScriptCallContext context, string locationPrefix)
+        {
+            var newContext = new CallContext((ScriptCallContext)context, CallEntry.Subsequent, false, locationPrefix);  // TODO: set the last two arguments.
+            return newContext;
+        }
     }
 }

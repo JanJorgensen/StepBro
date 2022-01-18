@@ -72,7 +72,7 @@ namespace StepBro.UI.Panels
                 }
                 catch (Exception ex)
                 {
-                    context.Logger.LogError(GetType().Name, $"Error updating panel list for {creator.GetType().FullName}. {ex}");
+                    context.Logger.LogError($"Error updating panel list for {creator.GetType().FullName}. {ex}");
                     deadCreators.Add(creator);
                 }
             }

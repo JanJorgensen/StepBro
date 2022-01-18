@@ -19,9 +19,6 @@ namespace StepBro.Core.Execution
         /// </summary>
         CallEntry CurrentCallEntry { get; }
 
-        int CurrentTestStepIndex { get; }
-        string CurrentTestStepTitle { get; }
-
         bool ReportParsingError(ErrorID error = null, string description = "", Exception exception = null);
 
 
@@ -32,11 +29,11 @@ namespace StepBro.Core.Execution
         /// <summary>
         /// Creates a new named call context.
         /// </summary>
-        /// <param name="shortDescription">A desctiption or title for the new context (or task).</param>
+        /// <param name="location">A descriptive identification of the static or dynamic location of the entered context/scope.</param>
         /// <param name="separateStateLevel">Whether the new context should be displayed in a new progress/state level./</param>
         /// <remarks>The new call context must be disposed upon exit of the context scope.</remarks>
         /// <returns>Reference to a new call context object.</returns>
-        ICallContext EnterNewContext(string shortDescription, bool separateStateLevel);
+        ICallContext EnterNewContext(string location, bool separateStateLevel);
 
         /// <summary>
         /// The list of folder shortcuts defined in the environment (OS), the host application, the configuration and the current script file.

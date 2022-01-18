@@ -221,11 +221,9 @@ namespace StepBro.Core.Data
             string type;
             switch (entry.EntryType)
             {
-                case LogEntry.Type.Detail:
-                    type = "detail - ";
-                    break;
                 case LogEntry.Type.Async:
-                    type = "Async - ";
+                    //type = "Async - ";
+                    type = "<A> ";
                     break;
                 case LogEntry.Type.TaskEntry:
                     type = "TaskEntry - ";
@@ -233,12 +231,15 @@ namespace StepBro.Core.Data
                 case LogEntry.Type.Error:
                     type = "Error - ";
                     break;
+                case LogEntry.Type.Failure:
+                    type = "Fail - ";
+                    break;
                 case LogEntry.Type.UserAction:
                     type = "UserAction - ";
                     break;
-                case LogEntry.Type.System:
-                    type = "System - ";
-                    break;
+                //case LogEntry.Type.System:
+                //    type = "System - ";
+                //    break;
                 default:
                     type = "";
                     break;
@@ -256,7 +257,8 @@ namespace StepBro.Core.Data
             }
             else
             {
-                if (forceShow || !String.IsNullOrEmpty(type) || entry.Location != null)
+                //if (forceShow || !String.IsNullOrEmpty(type) || entry.Location != null)
+                if (forceShow && (entry.Location != null || !String.IsNullOrEmpty(type)))
                 {
                     if (entry.Location != null)
                     {

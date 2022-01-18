@@ -346,6 +346,7 @@ namespace StepBro.Core.Parser
             Type objectType, PropertyBlock properties, ErrorCollector errors, IToken startToken)
         {
             VariableContainerAction action = null;
+            var effectiveProperties = properties;
 
             var resolver = new DefaultContractResolver();
             var contract = resolver.ResolveContract(objectType) as JsonObjectContract;
@@ -354,28 +355,29 @@ namespace StepBro.Core.Parser
             var objectReference = Expression.Variable(objectType);
 
             var deviceEntry = properties.TryGetElement(Constants.VARIABLE_DEVICE_REFERENCE);
-            if (deviceEntry != null && deviceEntry.BlockEntryType != PropertyBlockEntryType.Value && (deviceEntry as PropertyBlockValue).Value is string)
+            if (deviceEntry != null && deviceEntry.BlockEntryType == PropertyBlockEntryType.Value && (deviceEntry as PropertyBlockValue).IsStringOrIdentifier)
             {
-                var deviceName = (deviceEntry as PropertyBlockValue).Value as string;
+                var deviceName = (deviceEntry as PropertyBlockValue).ValueAsString();
+                deviceEntry.IsUsedOrApproved = true;
                 var devices = StationPropertiesHelper.TryGetStationPropertiesDeviceData();
                 if (devices != null)
                 {
                     var deviceProps = devices.TryGetDeviceFromStationProperties(deviceName);
                     if (deviceProps != null)
                     {
-                        deviceProps = deviceProps.MergeStationPropertiesWithLocalProperties(properties);
+                        effectiveProperties = deviceProps.MergeStationPropertiesWithLocalProperties(properties);
                     }
                 }
             }
 
-            foreach (var entry in properties)
+            foreach (var entry in effectiveProperties)
             {
                 if (entry.BlockEntryType == PropertyBlockEntryType.Value)
                 {
                     var valueEntry = entry as PropertyBlockValue;
                     if (String.IsNullOrEmpty(valueEntry.SpecifiedTypeName))
                     {
-                        var objectProperty = contract.Properties.FirstOrDefault(p => String.Equals(entry.Name, p.PropertyName, StringComparison.InvariantCulture));
+                        var objectProperty = contract.Properties.FirstOrDefault(p => String.Equals(entry.Name, p.PropertyName, StringComparison.InvariantCultureIgnoreCase));
                         if (objectProperty != null)
                         {
                             entry.Tag = "Property";

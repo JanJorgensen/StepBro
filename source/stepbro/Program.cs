@@ -131,49 +131,80 @@ namespace StepBro.Cmd
                                 IFileElement element = StepBroMain.TryFindFileElement(m_commandLineOptions.TargetElement);
                                 if (element != null)
                                 {
-                                    if (element is IFileProcedure)
-                                    {
-                                        var procedure = element as IFileProcedure;
-                                        object[] arguments = m_commandLineOptions?.Arguments.Select(
-                                            (a) => StepBroMain.ParseExpression(procedure?.ParentFile, a)).ToArray();
-                                        try
-                                        {
-                                            var result = StepBroMain.ExecuteProcedure(procedure, arguments);
+                                    List<object> arguments = m_commandLineOptions?.Arguments.Select(
+                                        (a) => StepBroMain.ParseExpression(element?.ParentFile, a)).ToList();
 
-                                            if (m_commandLineOptions.Verbose)
+                                    if (!String.IsNullOrEmpty(m_commandLineOptions.Model))
+                                    {
+                                        var partner = element.ListPartners().First(p => String.Equals(m_commandLineOptions.Model, p.Name, StringComparison.InvariantCultureIgnoreCase));
+                                        if (partner != null)
+                                        {
+                                            var procedure = partner.ProcedureReference;
+                                            if (procedure.IsFirstParameterThisReference)
                                             {
-                                                if (result != null)
+                                                arguments.Insert(0, element);
+                                            }
+                                            try
+                                            {
+                                                var result = StepBroMain.ExecuteProcedure(procedure, arguments.ToArray());
+
+                                                if (m_commandLineOptions.Verbose)
                                                 {
-                                                    ConsoleWriteLine("Procedure execution ended. " + result.ResultText());
-                                                }
-                                                else
-                                                {
-                                                    ConsoleWriteLine("Procedure execution ended.");
+                                                    if (result != null)
+                                                    {
+                                                        ConsoleWriteLine("Procedure execution ended. " + result.ResultText());
+                                                    }
+                                                    else
+                                                    {
+                                                        ConsoleWriteLine("Procedure execution ended.");
+                                                    }
                                                 }
                                             }
-                                        }
-                                        catch (TargetParameterCountException)
-                                        {
-                                            retval = -1;
-                                            ConsoleWriteLine("Error: The number of arguments does not match the target procedure.");
-                                        }
-                                    }
-                                    else if (element is ITestList)
-                                    {
-                                        if (!String.IsNullOrEmpty(m_commandLineOptions.Model))
-                                        {
-                                            throw new NotImplementedException("Handling of test list as execution target is not implemented.");
+                                            catch (TargetParameterCountException)
+                                            {
+                                                retval = -1;
+                                                ConsoleWriteLine("Error: The number of arguments does not match the target procedure.");
+                                            }
+
                                         }
                                         else
                                         {
                                             retval = -1;
-                                            ConsoleWriteLine($"Error: Model parameter must be specified when target element is a test list.");
+                                            ConsoleWriteLine($"Error: The specified file element does not have a model named \"{m_commandLineOptions.Model}\".");
                                         }
                                     }
                                     else
                                     {
-                                        retval = -1;
-                                        ConsoleWriteLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
+                                        if (element is IFileProcedure)
+                                        {
+                                            var procedure = element as IFileProcedure;
+                                            try
+                                            {
+                                                var result = StepBroMain.ExecuteProcedure(procedure, arguments);
+
+                                                if (m_commandLineOptions.Verbose)
+                                                {
+                                                    if (result != null)
+                                                    {
+                                                        ConsoleWriteLine("Procedure execution ended. " + result.ResultText());
+                                                    }
+                                                    else
+                                                    {
+                                                        ConsoleWriteLine("Procedure execution ended.");
+                                                    }
+                                                }
+                                            }
+                                            catch (TargetParameterCountException)
+                                            {
+                                                retval = -1;
+                                                ConsoleWriteLine("Error: The number of arguments does not match the target procedure.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            retval = -1;
+                                            ConsoleWriteLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
+                                        }
                                     }
                                 }
                                 else
@@ -202,7 +233,7 @@ namespace StepBro.Cmd
                             {
                                 if (!err.JustWarning)
                                 {
-                                    ConsoleWriteLine($"    Line {err.Line}: {err.Message}");
+                                    ConsoleWriteLine($"   {file.FileName} line {err.Line}: {err.Message}");
                                 }
                             }
                             retval = -1;
@@ -276,6 +307,33 @@ namespace StepBro.Cmd
                 var txt = m_logDumpAddon.Convert(logEntry, zero);
                 if (txt != null)
                 {
+                    switch (logEntry.EntryType)
+                    {
+                        case LogEntry.Type.Normal:
+                        case LogEntry.Type.Pre:
+                        case LogEntry.Type.Post:
+                        case LogEntry.Type.TaskEntry:
+                            Console.ForegroundColor = ConsoleColor.White;
+                            break;
+                        case LogEntry.Type.Async:
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            break;
+                        case LogEntry.Type.Error:
+                        case LogEntry.Type.Failure:
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            break;
+                        case LogEntry.Type.UserAction:
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            break;
+                        case LogEntry.Type.Detail:
+                            Console.ForegroundColor = ConsoleColor.DarkGray;
+                            break;
+                        case LogEntry.Type.System:
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            break;
+                        default:
+                            break;
+                    }
                     Console.WriteLine(txt);
                 }
                 LogEntry next;
@@ -286,6 +344,7 @@ namespace StepBro.Cmd
                 }
                 logEntry = next;
             }
+            Console.ForegroundColor = ConsoleColor.White;
             m_dumpingExecutionLog = false;  // Signal to main thread.
         }
     }

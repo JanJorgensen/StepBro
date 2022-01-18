@@ -28,6 +28,7 @@ namespace StepBro.Core.ScriptData
     {
         TypeReference ReturnType { get; }
         NamedData<TypeReference>[] Parameters { get; }
+        bool IsFirstParameterThisReference { get; }
         IProcedureReference ProcedureReference { get; }
         ProcedureFlags Flags { get; }
         ContextLogOption LogOption { get; }

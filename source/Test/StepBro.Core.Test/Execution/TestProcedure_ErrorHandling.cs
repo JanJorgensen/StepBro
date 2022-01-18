@@ -1,7 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using StepBro.Core;
+using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
+using StepBroCoreTest.Data;
 using StepBroCoreTest.Utils;
+using System;
+using System.Linq;
 using System.Text;
 
 namespace StepBroCoreTest
@@ -407,6 +412,60 @@ namespace StepBroCoreTest
             log.ExpectNext("2 - Normal - 23 - log: ResultS1: Fail");
             log.ExpectNext("2 - Normal - 24 - log: ResultS1: MySub");
             log.ExpectNext("2 - Post");
+        }
+
+        [TestMethod]
+        public void ErrorHandling_ObjectMethod_Fail()
+        {
+            var f = new StringBuilder();
+            f.AppendLine("using " + typeof(DummyClass).Namespace + ";");
+            f.AppendLine("int MyProc()");
+            f.AppendLine("{");
+            f.AppendLine("   " + typeof(DummyClass).FullName + "." + nameof(DummyClass.MethodReportingFail) + "(); ");
+            f.AppendLine("   log(\"After the failure.\");");  // This should not be executed.
+            f.AppendLine("   return 9;");                     // This should not be used; default (0) should be returned
+            f.AppendLine("}");
+
+            var file = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly, new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()))[0];
+            var procedure = file.ListElements().First(p => p.Name == "MyProc") as IFileProcedure;
+
+            var taskContext = ExecutionHelper.ExeContext();
+            object result = taskContext.CallProcedure(procedure);
+            Assert.AreEqual(0L, (long)result);  // 
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - myfile.MyProc - <no arguments>");
+            log.ExpectNext("2 - Error - 4 - <the failure description>");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
+
+        [TestMethod]
+        public void ErrorHandling_ObjectMethod_Error()
+        {
+            var f = new StringBuilder();
+            f.AppendLine("using " + typeof(DummyClass).Namespace + ";");
+            f.AppendLine("int MyProc()");
+            f.AppendLine("{");
+            f.AppendLine("   " + typeof(DummyClass).FullName + "." + nameof(DummyClass.MethodReportingError) + "(); ");
+            f.AppendLine("   log(\"After the error.\");");  // This should not be executed.
+            f.AppendLine("   return 11;");                  // This should not be used; default (0) should be returned
+            f.AppendLine("}");
+
+            var file = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly, new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()))[0];
+            var procedure = file.ListElements().First(p => p.Name == "MyProc") as IFileProcedure;
+
+            var taskContext = ExecutionHelper.ExeContext();
+            object result = taskContext.CallProcedure(procedure);
+            Assert.AreEqual(0L, (long)result);  // 
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - myfile.MyProc - <no arguments>");
+            log.ExpectNext("2 - Error - 4 - <the error description>");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
         }
     }
 }

@@ -265,7 +265,7 @@ namespace StepBro.Core
                         catch (Exception ex)
                         {
                             m_lastParsingErrorCount = 1;    // At least one...
-                            context.Logger.LogError("File Parsing", ex.ToString());
+                            context.Logger.LogError(ex.ToString());
                         }
                         finally
                         {
@@ -301,7 +301,7 @@ namespace StepBro.Core
                 ILoggerScope logger = null;
                 try
                 {
-                    logger = m_logRootScope.LogEntering("StepBro.Main", "Starting file parsing");
+                    logger = m_logRootScope.LogEntering("StepBro.Main.FileParsing", "Starting file parsing");
                     foreach (var f in m_loadedFilesManager.ListFiles<ScriptFile>())
                     {
                         f.ResetBeforeParsing(preserveUpdateableElements: force == false);
@@ -311,7 +311,7 @@ namespace StepBro.Core
                 }
                 finally
                 {
-                    logger.LogExit("StepBro.Main", $"Ended file parsing. {m_lastParsingErrorCount} errors.");
+                    logger.LogExit($"Ended file parsing. {m_lastParsingErrorCount} errors.");
                 }
                 return (m_lastParsingErrorCount == 0);
             }
@@ -495,7 +495,7 @@ namespace StepBro.Core
             var logger = m_mainLogger.RootLogger;
             foreach (var oc in m_dynamicObjectManager.ListKnownObjects())
             {
-                logger.Log("Dynamic object", oc.FullName);
+                logger.Log("Dynamic object: " + oc.FullName);
             }
         }
     }

@@ -97,6 +97,7 @@ namespace StepBro.Streams
         private long m_dataReceivedCounter = 0L;
         private ArrayFifo<byte> m_binaryFifo = null;
         private ArrayFifo<char> m_textualFifo = null;
+        private ILogger m_asyncLogger = null;
 
         public SerialPort()
         {
@@ -104,6 +105,7 @@ namespace StepBro.Streams
             m_port.ErrorReceived += this.Port_ErrorReceived;
             m_port.DataReceived += this.Port_DataReceived;
             m_port.Encoding = new ASCIIEncoding();
+            m_asyncLogger = Core.Main.GetService<ILogger>().LogEntering("<find a name for SerialPort>", "Create SerialPort");
         }
 
         internal System.IO.Ports.SerialPort Port { get { return m_port; } }
@@ -116,6 +118,11 @@ namespace StepBro.Streams
         public StopBits StopBits { get { return (StopBits)m_port.StopBits; } set { m_port.StopBits = (System.IO.Ports.StopBits)value; } }
 
         public override string NewLine { get { return m_port.NewLine; } set { m_port.NewLine = value; } }
+
+        protected override string GetTargetIdentification()
+        {
+            return String.IsNullOrEmpty(this.PortName) ? "Serial Port" : this.PortName;
+        }
 
         protected override void SetEncoding(System.Text.Encoding encoding) { m_port.Encoding = encoding; }
         protected override System.Text.Encoding GetEncoding() { return m_port.Encoding; }
@@ -141,7 +148,7 @@ namespace StepBro.Streams
 
         private void Port_ErrorReceived(object sender, System.IO.Ports.SerialErrorReceivedEventArgs e)
         {
-            Core.Main.GetService<ILogger>().LogError(this.GetType().Name, e.EventType.ToString());
+            m_asyncLogger.LogError(e.EventType.ToString());
         }
 
         protected override void DoDispose()
@@ -227,7 +234,7 @@ namespace StepBro.Streams
                     {
                         s = "Write \"" + s + "\"";
                     }
-                    context.Logger.Log("SerialPort", s);
+                    context.Logger.Log(s);
                 }
                 m_port.Write(text);
             }
@@ -259,7 +266,7 @@ namespace StepBro.Streams
                         var line = m_port.ReadLine();
                         if (context != null && context.LoggingEnabled)
                         {
-                            context.Logger.Log("SerialPort", "ReadLine : " + StringUtils.ObjectToString(line));
+                            context.Logger.Log("ReadLine : " + StringUtils.ObjectToString(line));
                         }
                         return line;
                     }
@@ -285,7 +292,7 @@ namespace StepBro.Streams
                                     if (newLineCharsSeen == newLineLen)
                                     {
                                         var line = new string(m_textualFifo.Get(0, knownCount + (1 - newLineLen), knownCount + 1));
-                                        context.Logger.Log("SerialPort", "ReadLine : " + StringUtils.ObjectToString(line));
+                                        context.Logger.Log("ReadLine : " + StringUtils.ObjectToString(line));
                                         return line;
                                     }
                                 }

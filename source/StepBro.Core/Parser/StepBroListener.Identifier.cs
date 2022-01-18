@@ -456,6 +456,7 @@ namespace StepBro.Core.Parser
                                     context,
                                     Expression.Constant((container as IValueContainer).UniqueID)),
                                 identifier);
+                            result.Instance = identifier.Name;
                         }
                         break;
 
@@ -597,6 +598,7 @@ namespace StepBro.Core.Parser
                 (TypeReference)datatype,
                 getValue,
                 left.Value);
+            instance.Instance = left.Instance;  // Preserve the instance reference, if it's there.
 
             return this.ResolveDotIdentifierInstanceReference(instance, right, true);
         }
@@ -734,9 +736,11 @@ namespace StepBro.Core.Parser
 
                 if (methods.Count > 0)
                 {
-                    return new SBExpressionData(
+                    var result = new SBExpressionData(
                         left.ExpressionCode,                // The instance expression
                         methods);                           // Reference to the found methods
+                    result.Instance = left.Instance;        // Preserve the instance name if present.
+                    return result;
                 }
             }
 

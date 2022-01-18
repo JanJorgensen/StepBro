@@ -15,6 +15,7 @@ namespace StepBro.Core.Parser
     internal partial class StepBroListener
     {
         private static MethodInfo s_ExpectStatement = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ExpectStatement));
+        private static MethodInfo s_CreateMethodCallContext = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.CreateMethodCallContext));
 
         private TypeReference m_procedureReturnType = null;
         private bool m_procedureIsFunction = false;
@@ -1105,6 +1106,8 @@ namespace StepBro.Core.Parser
 
         #endregion
 
+        #region Expression Statement
+
         public override void EnterExpressionStatement([NotNull] SBP.ExpressionStatementContext context)
         {
             m_expressionData.PushStackLevel("ExpressionStatement @" + context.Start.Line.ToString() + ", " + context.Start.Column.ToString());
@@ -1126,6 +1129,8 @@ namespace StepBro.Core.Parser
                         expressionStatement));
             }
         }
+
+        #endregion
 
         #endregion
 

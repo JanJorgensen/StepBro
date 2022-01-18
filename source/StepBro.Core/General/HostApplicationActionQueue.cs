@@ -140,7 +140,7 @@ namespace StepBro.Core.General
 
             public void UpdateStatus(string text = null, long progress = -1)
             {
-                this.Logger.Log(this.Title, text);
+                this.Logger.Log(text);
             }
 
             #endregion
@@ -163,13 +163,13 @@ namespace StepBro.Core.General
             {
                 try
                 {
-                    m_logger.EnteredParallelTask(this.Title, null);
+                    m_logger.EnteredParallelTask(this.Title);
                     this.ExecuteTaskFunction(m_context);
-                    m_logger.LogExit("Ended successfully", "");
+                    m_logger.LogExit("Ended successfully");
                 }
                 catch (Exception ex)
                 {
-                    m_logger.LogExit("Ended with fail", ex.ToString());
+                    m_logger.LogExit("Ended with fail: " + ex.ToString());
                 }
             }
 

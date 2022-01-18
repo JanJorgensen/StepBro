@@ -10,7 +10,7 @@ namespace StepBro.Core.Execution
     internal class ScriptTaskContext
     {
         private object m_value = null;
-        private ILogger m_logger = null;
+        private ILoggerScope m_logger = null;
         private ContextLogOption m_logOption = ContextLogOption.Normal;
         private IExecutionScopeStatusUpdate m_statusUpdate = null;
         private ILoadedFilesManager m_loadedFilesManager = null;
@@ -20,7 +20,7 @@ namespace StepBro.Core.Execution
         private ProcedureResult m_result = null;
 
         public void Setup(
-            ILogger logger, 
+            ILoggerScope logger, 
             ContextLogOption callerLoggingOption, 
             IExecutionScopeStatusUpdate statusUpdate, 
             ILoadedFilesManager loadedFilesManager,

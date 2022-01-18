@@ -160,5 +160,22 @@ namespace StepBro.Core.Data
         {
             return new PropertyBlock(this.Line, null, m_children.Where( c => !skipUsedOrApproved || !c.IsUsedOrApproved).Select(c => c.Clone(skipUsedOrApproved))).CloneBase(this);
         }
+
+        public PropertyBlock Clone(Predicate<PropertyBlockEntry> filter = null)
+        {
+            return new PropertyBlock(this.Line, null, m_children.Where(c => (filter == null) || filter(c))).CloneBase(this) as PropertyBlock;
+        }
+
+        public override string ToString()
+        {
+            if (String.IsNullOrEmpty(this.Name))
+            {
+                return $"Unnamed block with {this.Count} entries.";
+            }
+            else
+            {
+                return $"Block \"{this.Name}\" with {this.Count} entries.";
+            }
+        }
     }
 }

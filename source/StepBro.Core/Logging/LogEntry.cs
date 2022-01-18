@@ -8,7 +8,31 @@ namespace StepBro.Core.Logging
 {
     public class LogEntry : ILogHistoryEntry
     {
-        public enum Type { Normal, Pre, Post, TaskEntry, Detail, Async, Error, Failure, UserAction, System }
+        public enum Type
+        {
+            /// <summary>
+            /// Normal information about a unning task in the current scope.
+            /// </summary>
+            Normal,
+            /// <summary>
+            /// Entering a new scope.
+            /// </summary>
+            Pre, 
+            /// <summary>
+            /// Exit of the current scope.
+            /// </summary>
+            Post, 
+            /// <summary>
+            /// Details from the parallell task just entered.
+            /// </summary>
+            TaskEntry,
+            Detail, 
+            Async, 
+            Error, 
+            Failure, 
+            UserAction, 
+            System
+        }
 
         private LogEntry m_next = null;
         private LogEntry m_parent;

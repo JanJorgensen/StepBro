@@ -68,17 +68,19 @@ namespace StepBroCoreTest.Mocks
 
         bool ILogger.IsDebugging => throw new NotImplementedException();
 
-        void ILoggerScope.EnteredParallelTask(string location, string text)
+        string ILogger.Location => throw new NotImplementedException();
+
+        void ILoggerScope.EnteredParallelTask(string text)
         {
             throw new NotImplementedException();
         }
 
-        void ILogger.Log(string location, string text)
+        void ILogger.Log(string text)
         {
             throw new NotImplementedException();
         }
 
-        void ILogger.LogDetail(string location, string text)
+        void ILogger.LogDetail(string text)
         {
             throw new NotImplementedException();
         }
@@ -88,27 +90,32 @@ namespace StepBroCoreTest.Mocks
             throw new NotImplementedException();
         }
 
-        void ILogger.LogError(string location, string text)
+        ILoggerScope ILoggerScope.LogEntering(string location, string text, LoggerDynamicLocationSource dynamicLocation)
         {
             throw new NotImplementedException();
         }
 
-        void ILoggerScope.LogExit(string location, string text)
+        void ILogger.LogError(string text)
         {
             throw new NotImplementedException();
         }
 
-        void ILogger.LogSystem(string location, string text)
+        void ILoggerScope.LogExit(string text)
         {
             throw new NotImplementedException();
         }
 
-        void ILogger.LogUserAction(string location, string text)
+        void ILogger.LogSystem(string text)
         {
             throw new NotImplementedException();
         }
 
-        void ILogger.LogAsync(string location, string text)
+        void ILogger.LogUserAction(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ILogger.LogAsync(string text)
         {
             throw new NotImplementedException();
         }

@@ -158,9 +158,9 @@ namespace StepBroCoreTest.Data
         public long MethodLongOut5(long a = 5L, bool b = true, TimeSpan c = default(TimeSpan)) { return a + 5005L; }
 
         public long MethodWithCallContextA([Implicit] ICallContext context)
-        { context.Logger.Log(nameof(MethodWithCallContextA), "740"); return 740L + m_propInt; }
+        { context.Logger.Log("740"); return 740L + m_propInt; }
         public long MethodWithCallContextB([Implicit] ICallContext context, string s)
-        { context.Logger.Log(nameof(MethodWithCallContextB), s); return s.Length * 14L + m_propInt; }
+        { context.Logger.Log(s); return s.Length * 14L + m_propInt; }
         //spublic IDisposable MethodWithCallContextC([Implicit] ICallContext context) { return 740L; }
 
         #region Static methods with same name
@@ -289,6 +289,17 @@ namespace StepBroCoreTest.Data
                 "Christian",
             });
             return list;
+        }
+    
+        public static object MethodReportingError([Implicit] ICallContext context)
+        {
+            context.ReportError("<the error description>");
+            return null;
+        }
+        public static object MethodReportingFail([Implicit] ICallContext context)
+        {
+            context.ReportFailure("<the failure description>");
+            return null;
         }
     }
 }

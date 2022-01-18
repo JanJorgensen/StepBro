@@ -23,6 +23,17 @@ namespace StepBro.Core.Execution
         private static TimeSpan g_50mills;
         private static TimeSpan g_80mills;
 
+        private static ScriptCallContext ToScriptContext(ICallContext context)
+        {
+            var ctx = context;
+            while (ctx != null)
+            {
+                if (ctx is ScriptCallContext) return ctx as ScriptCallContext;
+                ctx = (ctx as CallContext).ParentContext;
+            }
+            return null;
+        }
+
         [Public]
 #pragma warning disable IDE1006 // Naming Styles
         public static void delay([Implicit] ICallContext context, TimeSpan time)
@@ -32,7 +43,7 @@ namespace StepBro.Core.Execution
             {
                 if (context != null && context.LoggingEnabled)
                 {
-                    context.Logger.Log("delay", $"{(long)time.TotalMilliseconds}ms");
+                    context.Logger.Log($"delay {(long)time.TotalMilliseconds}ms");
                 }
                 var reporter = context.StatusUpdater.CreateProgressReporter("delay", time);
                 using (reporter)
@@ -56,7 +67,7 @@ namespace StepBro.Core.Execution
                     }
                     if (skipClicked)
                     {
-                        context.Logger.LogUserAction("delay", "User pressed the \"Skip delay\" button.");
+                        context.Logger.LogUserAction("    User pressed the \"Skip delay\" button.");
                     }
                 }
             }
@@ -93,7 +104,7 @@ namespace StepBro.Core.Execution
         [Public]
         public static DataReport StartReport([Implicit] ICallContext context, string ID, string title)
         {
-            var internalContext = context as ScriptCallContext;
+            var internalContext = ToScriptContext(context);
             var report = new DataReport(ID);
             try
             {
@@ -184,7 +195,7 @@ namespace StepBro.Core.Execution
         public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan timeout, bool removeFound = true)
         {
             System.Diagnostics.Debug.WriteLine("Reader.Await: " + text);
-            if (context != null && context.LoggingEnabled) context.Logger.Log("Await", "\"" + text + "\"");
+            if (context != null && context.LoggingEnabled) context.Logger.Log("Await \"" + text + "\"");
             var comparer = StringUtils.CreateComparer(text);
             reader.DebugDump();
 

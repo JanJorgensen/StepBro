@@ -14,6 +14,9 @@ namespace StepBro.Core.Execution
         int CurrentScriptFileLine { get; set; }
         ContextLogOption CallLoggingOption { get; }
 
+        int CurrentTestStepIndex { get; }
+        string CurrentTestStepTitle { get; }
+
         void EnterTestStep(int line, int column, int index, string title);
         void EnterStatement(int line, int column);
 

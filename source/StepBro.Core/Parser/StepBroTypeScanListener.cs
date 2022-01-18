@@ -126,13 +126,13 @@ namespace StepBro.Core.Parser
         private void PushType(string location, string type, IToken token)
         {
             m_typeStack.Push(new Tuple<string, IToken>(type, token));
-            System.Diagnostics.Debug.WriteLine($"   Push type: {type} @ {location}");
+            //System.Diagnostics.Debug.WriteLine($"   Push type: {type} @ {location}");
         }
 
         private Tuple<string, IToken> PopType(string location)
         {
             var type = m_typeStack.Pop();
-            System.Diagnostics.Debug.WriteLine($"   Pop type: {type} @ {location}");
+            //System.Diagnostics.Debug.WriteLine($"   Pop type: {type} @ {location}");
             return type;
         }
 

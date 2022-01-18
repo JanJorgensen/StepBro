@@ -132,20 +132,20 @@ namespace StepBroCoreTest
             long v1 = 17L;
             string v2 = "Mette";
 
-            context.Logger.Log("Step 1", "");
+            context.Logger.Log("Step 1");
 
             using (var callcontext = context.EnterNewScriptContext(MySecond, ContextLogOption.Normal, false, null).Disposer())
             {
                 MySecondProcedure(callcontext.Value, v1, v2);
             }
 
-            context.Logger.Log("Step 2", "");
+            context.Logger.Log("Step 2");
 
             using (var loopStatus = context.StatusUpdater.CreateProgressReporter("Loop", TimeSpan.FromSeconds(20), 10L, p => String.Format("Iteration #{0}", p + 1L)))
             {
                 for (long i = 0L; i < 10L; i++)
                 {
-                    context.Logger.Log("Step 3", String.Format("Loop iteration #{0}", i + 1));
+                    context.Logger.Log(String.Format("Step 3 Loop iteration #{0}", i + 1));
                     loopStatus.UpdateStatus(progress: i + 1L);
                     using (var callcontext = context.EnterNewScriptContext(MyThird, ContextLogOption.Normal, false, null).Disposer())
                     {
@@ -161,13 +161,13 @@ namespace StepBroCoreTest
         public static void MySecondProcedure(IScriptCallContext context, long a, string b)
         {
             //context.Setup(MySecond, ContextLogOption.Normal, true);
-            context.Logger.Log("", "Here I am, in the middle of MySecondProcedure");
+            context.Logger.Log("Here I am, in the middle of MySecondProcedure");
         }
 
         public static void MyThirdProcedure(IScriptCallContext context, bool b1)
         {
             //context.Setup(MyThird, ContextLogOption.DebugOnly, true);
-            context.Logger.Log("", "Here I am, in the middle of MyThirdProcedure");
+            context.Logger.Log("Here I am, in the middle of MyThirdProcedure");
         }
 
         public static double SquareRootProcedure(IScriptCallContext context, double v)
@@ -195,11 +195,11 @@ namespace StepBroCoreTest
         public static void ProcLog1Procedure(IScriptCallContext context)
         {
             //context.Setup(ProcLog1, ContextLogOption.Normal, true);
-            if (context.LoggingEnabled) context.Logger.Log("Step 1.1", "Normal");
-            if (context.LoggingEnabled && context.Logger.IsDebugging) context.Logger.Log("Step 1.2", "Debugging");
+            if (context.LoggingEnabled) context.Logger.Log("Step 1.1 Normal");
+            if (context.LoggingEnabled && context.Logger.IsDebugging) context.Logger.Log("Step 1.2 Debugging");
             foreach (ContextLogOption lo in Enum.GetValues(typeof(ContextLogOption)))
             {
-                context.Logger.Log("Step 1.3", "Mode: " + lo.ToString());
+                context.Logger.Log("Step 1.3 Mode: " + lo.ToString());
                 using (var callcontext = context.EnterNewScriptContext(ProcLog2ForceAlways, lo, false, null).Disposer())
                 {
                     ProcLog2Procedure(callcontext.Value);
@@ -222,11 +222,11 @@ namespace StepBroCoreTest
         public static void ProcLog2Procedure(IScriptCallContext context)
         {
             //context.Setup(ProcLog2ForceAlways, ContextLogOption.ForceAlways, true);
-            if (context.LoggingEnabled) context.Logger.Log("Step 2.1", "Normal");
-            if (context.LoggingEnabled && context.Logger.IsDebugging) context.Logger.Log("Step 2.2", "Debugging");
+            if (context.LoggingEnabled) context.Logger.Log("Step 2.1 Normal");
+            if (context.LoggingEnabled && context.Logger.IsDebugging) context.Logger.Log("Step 2.2 Debugging");
             foreach (ContextLogOption lo in Enum.GetValues(typeof(ContextLogOption)))
             {
-                context.Logger.Log("Step 2.3", "Mode: " + lo.ToString());
+                context.Logger.Log("Step 2.3 Mode: " + lo.ToString());
                 using (var callcontext = context.EnterNewScriptContext(ProcLog3ForceAlways, lo, false, null).Disposer())
                 {
                     ProcLog3Procedure(callcontext.Value);
@@ -248,8 +248,8 @@ namespace StepBroCoreTest
 
         public static void ProcLog3Procedure(IScriptCallContext context)
         {
-            if (context.LoggingEnabled) context.Logger.Log("Step 3.1", "Normal");
-            if (context.LoggingEnabled && context.Logger.IsDebugging) context.Logger.Log("Step 3.2", "Debugging");
+            if (context.LoggingEnabled) context.Logger.Log("Step 3.1 Normal");
+            if (context.LoggingEnabled && context.Logger.IsDebugging) context.Logger.Log("Step 3.2 Debugging");
         }
 
         public static IFileProcedure ProcL1 = FileProcedure.Create<ProcedureDelegateVoidVoid>(m_file, "", "ProcL1", ContextLogOption.Normal, ProcL1Procedure).ProcedureData;
@@ -258,8 +258,8 @@ namespace StepBroCoreTest
 
         public static void ProcL1Procedure(IScriptCallContext context)
         {
-            if (context.LoggingEnabled) context.Logger.Log("Step 1.1", "Normal");
-            if (context.LoggingEnabled && context.Logger.IsDebugging) context.Logger.Log("Step 1.2", "Debugging");
+            if (context.LoggingEnabled) context.Logger.Log("Step 1.1 Normal");
+            if (context.LoggingEnabled && context.Logger.IsDebugging) context.Logger.Log("Step 1.2 Debugging");
             using (var callcontext = context.EnterNewScriptContext(ProcL2, ContextLogOption.Normal, false, null).Disposer())
             {
                 ProcL2Procedure(callcontext.Value);
@@ -267,8 +267,8 @@ namespace StepBroCoreTest
         }
         public static void ProcL2Procedure(IScriptCallContext context)
         {
-            if (context.LoggingEnabled) context.Logger.Log("Step 2.1", "Normal");
-            if (context.LoggingEnabled && context.Logger.IsDebugging) context.Logger.Log("Step 2.2", "Debugging");
+            if (context.LoggingEnabled) context.Logger.Log("Step 2.1 Normal");
+            if (context.LoggingEnabled && context.Logger.IsDebugging) context.Logger.Log("Step 2.2 Debugging");
             using (var callcontext = context.EnterNewScriptContext(ProcL3, ContextLogOption.Disabled, false, null).Disposer())
             {
                 ProcL3Procedure(callcontext.Value);
@@ -276,8 +276,8 @@ namespace StepBroCoreTest
         }
         public static void ProcL3Procedure(IScriptCallContext context)
         {
-            if (context.LoggingEnabled) context.Logger.Log("Step 3.1", "Normal");
-            if (context.LoggingEnabled && context.Logger.IsDebugging) context.Logger.Log("Step 3.2", "Debugging");
+            if (context.LoggingEnabled) context.Logger.Log("Step 3.1 Normal");
+            if (context.LoggingEnabled && context.Logger.IsDebugging) context.Logger.Log("Step 3.2 Debugging");
         }
 
         #endregion

@@ -109,7 +109,7 @@ namespace StepBro.Workbench
 
         public void LogUserAction(string text)
         {
-            StepBroMain.RootLogger.LogSystem("StepBro Workbench", text);
+            StepBroMain.RootLogger.LogSystem("StepBro Workbench: " + text);
         }
 
         #region Properties

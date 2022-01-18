@@ -16,30 +16,33 @@ namespace StepBro.Core.Addons
 
         public string Convert(LogEntry entry, DateTime zero)
         {
-            var prefix = "";
-            switch (entry.EntryType)
-            {
-                case LogEntry.Type.Pre:
-                    //prefix = "##[group]";
-                    prefix = "##[section]";
-                    break;
-                //case LogEntry.Type.Post:
-                //    prefix = "##[endgroup]";
-                //    break;
-                case LogEntry.Type.Error:
-                case LogEntry.Type.Failure:
-                    prefix = "##[error]";
-                    break;
-                case LogEntry.Type.UserAction:
-                case LogEntry.Type.System:
-                    prefix = "##[command]";
-                    break;
-                default:
-                    break;
-            }
             var txt = entry.ToClearText(zero, false);
-            if (txt != null) return prefix + txt;
-            else return (String.IsNullOrEmpty(prefix) ? null : prefix);
+            if (txt != null)
+            {
+                var prefix = "";
+                switch (entry.EntryType)
+                {
+                    case LogEntry.Type.Pre:
+                        //prefix = "##[group]";
+                        prefix = "##[section]";
+                        break;
+                    //case LogEntry.Type.Post:
+                    //    prefix = "##[endgroup]";
+                    //    break;
+                    case LogEntry.Type.Error:
+                    case LogEntry.Type.Failure:
+                        prefix = "##[error]";
+                        break;
+                    case LogEntry.Type.UserAction:
+                    case LogEntry.Type.System:
+                        prefix = "##[command]";
+                        break;
+                    default:
+                        break;
+                }
+                return prefix + txt;
+            }
+            else { return null; }
         }
     }
 }

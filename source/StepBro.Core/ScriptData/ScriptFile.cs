@@ -302,6 +302,7 @@ namespace StepBro.Core.ScriptData
                         v.VariableOwnerAccess.Container.DataType.Type == datatype.Type));
             if (existing != null)
             {
+                System.Diagnostics.Debug.WriteLine($"Using existing variable \"{name}\" (in {this.FileName}), with ID {existing.ID}");
                 existing.VariableOwnerAccess.InitNeeded = (existing.VariableOwnerAccess.CodeHash != codeHash);
                 m_fileScopeVariables.Add(existing);
                 m_fileScopeVariablesBefore.RemoveAt(m_fileScopeVariablesBefore.IndexOf(existing));
@@ -477,7 +478,7 @@ namespace StepBro.Core.ScriptData
                 bool doInit = !v.VariableOwnerAccess.DataCreated || v.VariableOwnerAccess.InitNeeded;
                 if (!v.VariableOwnerAccess.DataCreated)
                 {
-                    logger?.Log("Variable " + v.VariableOwnerAccess.Container.Name, "Create data");
+                    logger?.Log("Variable " + v.VariableOwnerAccess.Container.Name + " - Create data");
                     v.VariableOwnerAccess.DataCreator?.Invoke(v.VariableOwnerAccess, logger);
                     var obj = v.VariableOwnerAccess.Container.GetValue();
                     if (obj != null && obj is INameable && (obj as INameable).Name == null)
@@ -488,7 +489,16 @@ namespace StepBro.Core.ScriptData
                 }
                 if (doInit)
                 {
-                    logger?.Log("Variable " + v.VariableOwnerAccess.Container.Name, "Reset and initialize");
+                    if (logger != null)
+                    {
+                        var text = "Reset and initialize";
+                        var props = GetFileVariableAllData(v);
+                        if (props != null)
+                        {
+                            text = $"{text}, data: {props.GetTestString()}";
+                        }
+                        logger.Log("Variable " + v.VariableOwnerAccess.Container.Name + " init: " + text);
+                    }
                     v.VariableOwnerAccess.DataResetter?.Invoke(v.VariableOwnerAccess, logger);
                     v.VariableOwnerAccess.DataInitializer?.Invoke(v.VariableOwnerAccess, logger);
                 }
@@ -499,7 +509,7 @@ namespace StepBro.Core.ScriptData
         {
             foreach (var v in m_fileScopeVariablesBefore)
             {
-                logger?.Log("Variable " + v.VariableOwnerAccess.Container.Name, "Dispose");
+                logger?.Log("Variable " + v.VariableOwnerAccess.Container.Name + " - Dispose");
                 v.VariableOwnerAccess.Dispose();
             }
             m_fileScopeVariablesBefore = null;

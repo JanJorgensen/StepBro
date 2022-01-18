@@ -58,7 +58,7 @@ namespace StepBro.Core
             if (context.LoggingEnabled)
             {
                 var logger = context.Logger;
-                logger.Log("ReportData.DumpToLog", "<some data to go>");
+                logger.Log("<some data to go>");
             }
         }
 

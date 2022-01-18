@@ -123,7 +123,7 @@ namespace StepBro.Core.Execution
             finally
             {
                 m_end = DateTime.Now;
-                logger.LogExit("Script Execution", "Script execution ended. " + m_taskContext.Result.ResultText(m_returnValue));
+                logger.LogExit("Script execution ended. " + m_taskContext.Result.ResultText(m_returnValue));
             }
         }
 

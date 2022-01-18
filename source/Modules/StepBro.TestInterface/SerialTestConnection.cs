@@ -311,7 +311,7 @@ namespace StepBro.TestInterface
                     {
                         m_stream = value;
                         m_stream.Encoding = new ASCIIEncoding();
-                        m_stream.NewLine = "\n";
+                        m_stream.NewLine = "\r";
                         m_stream.IsOpenChanged += m_stream_IsOpenChanged;
                     }
                 }
@@ -390,7 +390,7 @@ namespace StepBro.TestInterface
         {
             if (context != null && context.LoggingEnabled)
             {
-                context.Logger.Log("SerialTestConnection.SendCommand", command);
+                context.Logger.Log(command);
             }
             var request = new List<string>();
             request.Add(command);
@@ -409,7 +409,7 @@ namespace StepBro.TestInterface
         {
             if (context != null && context.LoggingEnabled)
             {
-                context.Logger.Log("SerialTestConnection", "SendDirect: \"" + text + "\"");
+                context.Logger.Log("SendDirect: \"" + text + "\"");
             }
             DoSendDirect(text);
         }
@@ -670,14 +670,14 @@ namespace StepBro.TestInterface
                             var logger = m_currentExecutingCommand?.Context?.Logger;
                             if (logger != null && m_currentExecutingCommand.Context.LoggingEnabled)
                             {
-                                logger.LogDetail(this.DisplayName, "Received: " + text);
+                                logger.LogDetail("Received: " + text);
                             }
                         }
                         break;
                     case LogType.ReceivedAsync:
                         if (m_mainLogger != null)
                         {
-                            m_mainLogger.LogAsync(m_name, "Event: " + text);
+                            m_mainLogger.LogAsync("Event: " + text);
                         }
                         if (m_asyncLogLineReader != null)
                         {
@@ -695,7 +695,7 @@ namespace StepBro.TestInterface
             }
             catch (Exception ex)
             {
-                StepBro.Core.Main.RootLogger.LogError("SerialTestConnection.AddToLog", $"Unexpected error. Exception: {ex}");
+                StepBro.Core.Main.RootLogger.LogError($"SerialTestConnection.AddToLog unexpected error. Exception: {ex}");
             }
         }
 
@@ -829,13 +829,13 @@ namespace StepBro.TestInterface
             var commandstring = command.GetAndMarkActive();
             m_loopbackAnswers?.TryGetValue(commandstring, out commandstring);
             if (m_nextResponse != null) commandstring = m_nextResponse;
-            if (command.Context != null && command.Context.LoggingEnabled) command.Context.Logger.LogDetail(this.DisplayName, "Send: " + commandstring);
+            if (command.Context != null && command.Context.LoggingEnabled) command.Context.Logger.LogDetail("Send: " + commandstring);
             DoSendDirect(commandstring);
         }
         private void DoSendDirect(string text)
         {
             AddToLog(LogType.Sent, 0, text);
-            m_stream.Write(null, text + "\n");
+            m_stream.Write(null, text + m_stream.NewLine);
         }
 
         private static string ArgumentToCommandString(object arg)
@@ -895,7 +895,7 @@ namespace StepBro.TestInterface
                             }
                             else
                             {
-                                logger?.LogError(GetType().Name + ".Setup", "commands entry is not a string");
+                                logger?.LogError("Command entry is not a string");
                             }
                         }
                         else if (e.BlockEntryType == PropertyBlockEntryType.Block)
@@ -910,13 +910,13 @@ namespace StepBro.TestInterface
                                 }
                                 else
                                 {
-                                    logger?.LogError(GetType().Name + ".Setup", "commands entry is not property with name and string value.");
+                                    logger?.LogError("Command entry is not property with name and string value.");
                                 }
                             }
                         }
                         else
                         {
-                            logger?.LogError(GetType().Name + ".Setup", "Command entry type is not supported.");
+                            logger?.LogError("Command entry type is not supported.");
                             return;
                         }
                     }
@@ -925,7 +925,7 @@ namespace StepBro.TestInterface
                 }
                 else
                 {
-                    logger?.LogError(GetType().Name + ".Setup", "'commands' type is not an array.");
+                    logger?.LogError("'commands' type is not an array.");
                 }
             }
         }

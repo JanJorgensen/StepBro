@@ -96,6 +96,7 @@ namespace StepBro.Streams
             set { this.SetEncoding(value); }
         }
 
+        protected abstract string GetTargetIdentification();
         protected abstract void SetEncoding(System.Text.Encoding encoding);
         protected abstract System.Text.Encoding GetEncoding();
 
@@ -109,13 +110,13 @@ namespace StepBro.Streams
             var wasOpen = this.IsOpen;
             if (wasOpen)
             {
-                if (context != null && context.LoggingEnabled) context.Logger.Log(this.GetType().Name, "Open (but already open)");
+                if (context != null && context.LoggingEnabled) context.Logger.Log("Open (but already open)");
                 // TODO: Report error and let script handle it.
                 return true;
             }
             else
             {
-                if (context != null && context.LoggingEnabled) context.Logger.Log(this.GetType().Name, "Open");
+                if (context != null && context.LoggingEnabled) context.Logger.Log($"Open ({this.GetTargetIdentification()})");
                 try
                 {
                     var result = this.DoOpen(context);
@@ -139,7 +140,7 @@ namespace StepBro.Streams
 
         public void Close([Implicit] StepBro.Core.Execution.ICallContext context)
         {
-            if (context != null && context.LoggingEnabled) context.Logger.Log(this.GetType().Name, "Close");
+            if (context != null && context.LoggingEnabled) context.Logger.Log("Close");
             var wasOpen = this.IsOpen;
             this.DoClose(context);
             if (this.IsOpen != wasOpen)

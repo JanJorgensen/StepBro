@@ -46,24 +46,25 @@ namespace StepBro.Core.Api
                     if (aliases.Any(
                         ae =>
                             (ae.BlockEntryType == PropertyBlockEntryType.Value) &&
-                            (ae as PropertyBlockValue).Value is string &&
-                            String.Equals(deviceName, ((ae as PropertyBlockValue).Value as string), StringComparison.InvariantCultureIgnoreCase)))
+                            (ae as PropertyBlockValue).IsStringOrIdentifier &&
+                            String.Equals(deviceName, ((ae as PropertyBlockValue).ValueAsString()), StringComparison.InvariantCultureIgnoreCase)))
                     {
                         found = device;
                         break;
                     }
                 }
             }
-            if (found != null)
-            {
-                var foundFiltered = new PropertyBlock(-1);
-                var type = found.TryGetElement(Constants.STATION_PROPERTIES_DEVICE_TYPE_ENTRY) as PropertyBlockValue;
-                if (type != null)
-                {
-                    foundFiltered.Tag = type.Value as string;
-                }
-            }
-            return found;
+            //if (found != null)
+            //{
+            //    var foundFiltered = found.Clone();
+            //    var type = found.TryGetElement(Constants.STATION_PROPERTIES_DEVICE_TYPE_ENTRY) as PropertyBlockValue;
+            //    if (type != null)
+            //    {
+            //        foundFiltered.Tag = type.Value as string;
+            //    }
+            //    found = foundFiltered;
+            //}
+            return CloneWithoutGeneralDeviceConfigEntries(found);
         }
 
         /// <summary>
@@ -78,19 +79,19 @@ namespace StepBro.Core.Api
             string[] generalEntries = new string[] { Constants.STATION_PROPERTIES_DEVICE_TYPE_ENTRY, Constants.STATION_PROPERTIES_DEVICE_ALIAS_ENTRY };
             foreach (var entry in props)
             {
-                if (entry.BlockEntryType == PropertyBlockEntryType.Value &&
-                    generalEntries.Count(g => String.Equals(entry.Name, g, StringComparison.InvariantCultureIgnoreCase)) > 0)
+                if (generalEntries.Count(g => String.Equals(entry.Name, g, StringComparison.InvariantCultureIgnoreCase)) > 0)
                 {
                     continue;
                 }
                 result.Add(entry.Clone());
             }
-            return props;
+            return result;
         }
 
         public static PropertyBlock MergeStationPropertiesWithLocalProperties(this PropertyBlock stationProperties, PropertyBlock localProperties)
         {
-            return stationProperties.CloneWithoutGeneralDeviceConfigEntries().Merge(localProperties);
+            var localWithoutDeviceReference = localProperties.Clone(c => !String.Equals(c.Name, Constants.VARIABLE_DEVICE_REFERENCE, StringComparison.InvariantCultureIgnoreCase));
+            return stationProperties.CloneWithoutGeneralDeviceConfigEntries().Merge(localWithoutDeviceReference);
         }
     }
 }

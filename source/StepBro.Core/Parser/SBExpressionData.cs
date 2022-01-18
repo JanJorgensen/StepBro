@@ -47,6 +47,7 @@ namespace StepBro.Core.Parser
         public TypeReference DataType;
         public Expression ExpressionCode;
         public Expression InstanceCode = null;
+        public string Instance = null;
         public object Value;
         public string Argument;
         public string ParameterName;
