@@ -4,7 +4,6 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
     <AssemblyName>stepbro</AssemblyName>
-    <AssemblyVersion>0.2.0.100</AssemblyVersion>
     <ProductVersion>0.2.0.100</ProductVersion>
     <RootNamespace>StepBro</RootNamespace>
     <OutputPath>..\bin</OutputPath>
@@ -13,7 +12,7 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Authors>Jan Jorgensen</Authors>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <Version>0.2.0.101</Version>
+    <Version>0.2.1.102</Version>
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 

@@ -180,7 +180,7 @@ namespace StepBro.Cmd
                                             var procedure = element as IFileProcedure;
                                             try
                                             {
-                                                var result = StepBroMain.ExecuteProcedure(procedure, arguments);
+                                                var result = StepBroMain.ExecuteProcedure(procedure, arguments.ToArray());
 
                                                 if (m_commandLineOptions.Verbose)
                                                 {

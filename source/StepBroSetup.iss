@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "StepBro"
-#define MyAppVersion "0.2.0.100"
+#define MyAppVersion "0.2.1.102"
 #define MyAppPublisher "SchmutStein"
 #define MyAppURL "http://www.schmutstein.com/"
 #define MyAppExeName "StepBro.Workbench.exe"
@@ -76,6 +76,8 @@ Source: "bin\Newtonsoft.Json.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 
 Source: "bin\System.Resources.Extensions.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "bin\Microsoft.AspNetCore.Html.Abstractions.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "bin\System.IO.Ports.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "bin\runtimes\win\lib\netstandard2.0\System.IO.Ports.dll"; DestDir: "{app}\bin\runtimes\win\lib\netstandard2.0"; Flags: ignoreversion
 
 Source: "bin\ActiproSoftware.BarCode.Wpf.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "bin\ActiproSoftware.Charts.Wpf.dll"; DestDir: "{app}\bin"; Flags: ignoreversion

@@ -11,6 +11,7 @@
     <Authors>Jan Jorgensen</Authors>
     <InvariantGlobalization>true</InvariantGlobalization>
     <Platforms>AnyCPU;x64</Platforms>
+    <Version>0.2.1.102</Version>
   </PropertyGroup>
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
