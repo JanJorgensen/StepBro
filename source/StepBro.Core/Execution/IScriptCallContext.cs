@@ -26,6 +26,7 @@ namespace StepBro.Core.Execution
         bool SetResultFromSub(IScriptCallContext sub);
         ProcedureResult Result { get; }
 
+        void LogStatement(string text);
         void Log(string text);
         void LogDetail(string text);
         void LogError(string text);

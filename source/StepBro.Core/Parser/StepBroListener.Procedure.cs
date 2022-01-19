@@ -16,6 +16,7 @@ namespace StepBro.Core.Parser
     {
         private static MethodInfo s_ExpectStatement = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ExpectStatement));
         private static MethodInfo s_CreateMethodCallContext = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.CreateMethodCallContext));
+        private static MethodInfo s_PostExpressionStatement = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.PostExpressionStatement));
 
         private TypeReference m_procedureReturnType = null;
         private bool m_procedureIsFunction = false;
@@ -931,14 +932,10 @@ namespace StepBro.Core.Parser
                         }
                     }
                 }
-                logValue = Expression.Call(
-                    typeof(string).GetMethod("Concat", new Type[] { typeof(string), typeof(string) }),
-                    Expression.Constant("log: "),
-                    logValue);
 
                 var loggingCall = Expression.Call(
                     m_currentProcedure.ContextReferenceInternal,
-                    typeof(IScriptCallContext).GetMethod("Log", new Type[] { typeof(string) }),
+                    typeof(IScriptCallContext).GetMethod("LogStatement", new Type[] { typeof(string) }),
                     logValue);
 
                 var statementBlock = Expression.IfThen(
@@ -1123,10 +1120,17 @@ namespace StepBro.Core.Parser
             else
             {
                 var expressionStatement = statement.ExpressionCode;
+
+                var conditionalReturn = Expression.Condition(
+                    Expression.Call(s_PostExpressionStatement, m_currentProcedure.ContextReferenceInternal),
+                    Expression.Return(m_currentProcedure.ReturnLabel, Expression.Default(m_currentProcedure.ReturnType.Type)),
+                    Expression.Empty());
+
                 m_scopeStack.Peek().AddStatementCode(
                     Expression.Block(
                         this.CreateEnterStatement(context.Start.Line, context.Start.Column),
-                        expressionStatement));
+                        expressionStatement,
+                        conditionalReturn));
             }
         }
 

@@ -309,10 +309,12 @@ namespace StepBro.Cmd
                 {
                     switch (logEntry.EntryType)
                     {
-                        case LogEntry.Type.Normal:
                         case LogEntry.Type.Pre:
-                        case LogEntry.Type.Post:
                         case LogEntry.Type.TaskEntry:
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            break;
+                        case LogEntry.Type.Normal:
+                        case LogEntry.Type.Post:
                             Console.ForegroundColor = ConsoleColor.White;
                             break;
                         case LogEntry.Type.Async:
@@ -323,13 +325,13 @@ namespace StepBro.Cmd
                             Console.ForegroundColor = ConsoleColor.Red;
                             break;
                         case LogEntry.Type.UserAction:
-                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.ForegroundColor = ConsoleColor.Blue;
                             break;
                         case LogEntry.Type.Detail:
                             Console.ForegroundColor = ConsoleColor.DarkGray;
                             break;
                         case LogEntry.Type.System:
-                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.ForegroundColor = ConsoleColor.Blue;
                             break;
                         default:
                             break;

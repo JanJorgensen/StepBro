@@ -116,21 +116,21 @@ namespace StepBroCoreTest
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyProcedure - <no arguments>");
-            log.ExpectNext("2 - Normal - 15 - log: ResultA1: Unset");
-            log.ExpectNext("2 - Normal - 16 - log: ResultA1.HasFails: False");
-            log.ExpectNext("2 - Normal - 17 - log: ResultA1.HasErrors: False");
+            log.ExpectNext("2 - Normal - 15 Log - ResultA1: Unset");
+            log.ExpectNext("2 - Normal - 16 Log - ResultA1.HasFails: False");
+            log.ExpectNext("2 - Normal - 17 Log - ResultA1.HasErrors: False");
             log.ExpectNext("2 - Pre - MySub - <no arguments>");
-            log.ExpectNext("3 - Normal - 3 - log: ResultB1: Unset");
-            log.ExpectNext("3 - Normal - 4 - log: ResultB1.HasFails: False");
-            log.ExpectNext("3 - Normal - 5 - log: ResultB1.HasErrors: False");
+            log.ExpectNext("3 - Normal - 3 Log - ResultB1: Unset");
+            log.ExpectNext("3 - Normal - 4 Log - ResultB1.HasFails: False");
+            log.ExpectNext("3 - Normal - 5 Log - ResultB1.HasErrors: False");
             log.ExpectNext("3 - Normal - 6 - EXPECT: 4<10; Actual: <TRUE>  =>  Pass");
-            log.ExpectNext("3 - Normal - 7 - log: ResultB2: Pass");
-            log.ExpectNext("3 - Normal - 8 - log: ResultB2.HasFails: False");
-            log.ExpectNext("3 - Normal - 9 - log: ResultB2.HasErrors: False");
+            log.ExpectNext("3 - Normal - 7 Log - ResultB2: Pass");
+            log.ExpectNext("3 - Normal - 8 Log - ResultB2.HasFails: False");
+            log.ExpectNext("3 - Normal - 9 Log - ResultB2.HasErrors: False");
             log.ExpectNext("3 - Post");
-            log.ExpectNext("2 - Normal - 19 - log: ResultA2: Pass");
-            log.ExpectNext("2 - Normal - 20 - log: ResultA2.HasFails: False");
-            log.ExpectNext("2 - Normal - 21 - log: ResultA2.HasErrors: False");
+            log.ExpectNext("2 - Normal - 19 Log - ResultA2: Pass");
+            log.ExpectNext("2 - Normal - 20 Log - ResultA2.HasFails: False");
+            log.ExpectNext("2 - Normal - 21 Log - ResultA2.HasErrors: False");
             log.ExpectNext("2 - Post");
         }
 
@@ -174,21 +174,21 @@ namespace StepBroCoreTest
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyProcedure - <no arguments>");
-            log.ExpectNext("2 - Normal - 15 - log: ResultA1: Unset");
-            log.ExpectNext("2 - Normal - 16 - log: ResultA1.HasFails: False");
-            log.ExpectNext("2 - Normal - 17 - log: ResultA1.HasErrors: False");
+            log.ExpectNext("2 - Normal - 15 Log - ResultA1: Unset");
+            log.ExpectNext("2 - Normal - 16 Log - ResultA1.HasFails: False");
+            log.ExpectNext("2 - Normal - 17 Log - ResultA1.HasErrors: False");
             log.ExpectNext("2 - Pre - MySub - <no arguments>");
-            log.ExpectNext("3 - Normal - 3 - log: ResultB1: Unset");
-            log.ExpectNext("3 - Normal - 4 - log: ResultB1.HasFails: False");
-            log.ExpectNext("3 - Normal - 5 - log: ResultB1.HasErrors: False");
+            log.ExpectNext("3 - Normal - 3 Log - ResultB1: Unset");
+            log.ExpectNext("3 - Normal - 4 Log - ResultB1.HasFails: False");
+            log.ExpectNext("3 - Normal - 5 Log - ResultB1.HasErrors: False");
             log.ExpectNext("3 - Normal - 6 - EXPECT: 4<10; Actual: <TRUE>  =>  Pass");
-            log.ExpectNext("3 - Normal - 7 - log: ResultB2: Pass");
-            log.ExpectNext("3 - Normal - 8 - log: ResultB2.HasFails: False");
-            log.ExpectNext("3 - Normal - 9 - log: ResultB2.HasErrors: False");
+            log.ExpectNext("3 - Normal - 7 Log - ResultB2: Pass");
+            log.ExpectNext("3 - Normal - 8 Log - ResultB2.HasFails: False");
+            log.ExpectNext("3 - Normal - 9 Log - ResultB2.HasErrors: False");
             log.ExpectNext("3 - Post");
-            log.ExpectNext("2 - Normal - 20 - log: ResultA2: Pass");
-            log.ExpectNext("2 - Normal - 21 - log: ResultA2.HasFails: False");
-            log.ExpectNext("2 - Normal - 22 - log: ResultA2.HasErrors: False");
+            log.ExpectNext("2 - Normal - 20 Log - ResultA2: Pass");
+            log.ExpectNext("2 - Normal - 21 Log - ResultA2.HasFails: False");
+            log.ExpectNext("2 - Normal - 22 Log - ResultA2.HasErrors: False");
             log.ExpectNext("2 - Post");
         }
 
@@ -231,13 +231,13 @@ namespace StepBroCoreTest
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyProcedure - <no arguments>");
-            log.ExpectNext("2 - Normal - 15 - log: ResultA1: Unset");
-            log.ExpectNext("2 - Normal - 16 - log: ResultA1.HasFails: False");
-            log.ExpectNext("2 - Normal - 17 - log: ResultA1.HasErrors: False");
+            log.ExpectNext("2 - Normal - 15 Log - ResultA1: Unset");
+            log.ExpectNext("2 - Normal - 16 Log - ResultA1.HasFails: False");
+            log.ExpectNext("2 - Normal - 17 Log - ResultA1.HasErrors: False");
             log.ExpectNext("2 - Pre - MySub - <no arguments>");
-            log.ExpectNext("3 - Normal - 3 - log: ResultB1: Unset");
-            log.ExpectNext("3 - Normal - 4 - log: ResultB1.HasFails: False");
-            log.ExpectNext("3 - Normal - 5 - log: ResultB1.HasErrors: False");
+            log.ExpectNext("3 - Normal - 3 Log - ResultB1: Unset");
+            log.ExpectNext("3 - Normal - 4 Log - ResultB1.HasFails: False");
+            log.ExpectNext("3 - Normal - 5 Log - ResultB1.HasErrors: False");
             log.ExpectNext("3 - Error - 6 - EXPECT: 11<10; Actual: <FALSE>  =>  Fail");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
@@ -283,13 +283,13 @@ namespace StepBroCoreTest
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyProcedure - <no arguments>");
-            log.ExpectNext("2 - Normal - 15 - log: ResultA1: Unset");
-            log.ExpectNext("2 - Normal - 16 - log: ResultA1.HasFails: False");
-            log.ExpectNext("2 - Normal - 17 - log: ResultA1.HasErrors: False");
+            log.ExpectNext("2 - Normal - 15 Log - ResultA1: Unset");
+            log.ExpectNext("2 - Normal - 16 Log - ResultA1.HasFails: False");
+            log.ExpectNext("2 - Normal - 17 Log - ResultA1.HasErrors: False");
             log.ExpectNext("2 - Pre - MySub - <no arguments>");
-            log.ExpectNext("3 - Normal - 3 - log: ResultB1: Unset");
-            log.ExpectNext("3 - Normal - 4 - log: ResultB1.HasFails: False");
-            log.ExpectNext("3 - Normal - 5 - log: ResultB1.HasErrors: False");
+            log.ExpectNext("3 - Normal - 3 Log - ResultB1: Unset");
+            log.ExpectNext("3 - Normal - 4 Log - ResultB1.HasFails: False");
+            log.ExpectNext("3 - Normal - 5 Log - ResultB1.HasErrors: False");
             log.ExpectNext("3 - Error - 6 - EXPECT: 11<10; Actual: <FALSE>  =>  Fail");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
@@ -336,21 +336,21 @@ namespace StepBroCoreTest
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyProcedure - <no arguments>");
-            log.ExpectNext("2 - Normal - 15 - log: ResultA1: Unset");
-            log.ExpectNext("2 - Normal - 16 - log: ResultA1.HasFails: False");
-            log.ExpectNext("2 - Normal - 17 - log: ResultA1.HasErrors: False");
+            log.ExpectNext("2 - Normal - 15 Log - ResultA1: Unset");
+            log.ExpectNext("2 - Normal - 16 Log - ResultA1.HasFails: False");
+            log.ExpectNext("2 - Normal - 17 Log - ResultA1.HasErrors: False");
             log.ExpectNext("2 - Pre - MySub - <no arguments>");
-            log.ExpectNext("3 - Normal - 3 - log: ResultB1: Unset");
-            log.ExpectNext("3 - Normal - 4 - log: ResultB1.HasFails: False");
-            log.ExpectNext("3 - Normal - 5 - log: ResultB1.HasErrors: False");
+            log.ExpectNext("3 - Normal - 3 Log - ResultB1: Unset");
+            log.ExpectNext("3 - Normal - 4 Log - ResultB1.HasFails: False");
+            log.ExpectNext("3 - Normal - 5 Log - ResultB1.HasErrors: False");
             log.ExpectNext("3 - Error - 6 - EXPECT: 11<10; Actual: <FALSE>  =>  Fail");
             log.ExpectNext("3 - Post");
             // Now execution continues in MyProcedure, because its result is not influenced by the the fail in MySub. 
-            log.ExpectNext("2 - Normal - 19 - log: ResultA2: Unset");
-            log.ExpectNext("2 - Normal - 20 - log: ResultA2.HasFails: False");
-            log.ExpectNext("2 - Normal - 21 - log: ResultA2.HasErrors: False");
-            log.ExpectNext("2 - Normal - 22 - log: ResultS1: Fail");
-            log.ExpectNext("2 - Normal - 23 - log: ResultS1: MySub");
+            log.ExpectNext("2 - Normal - 19 Log - ResultA2: Unset");
+            log.ExpectNext("2 - Normal - 20 Log - ResultA2.HasFails: False");
+            log.ExpectNext("2 - Normal - 21 Log - ResultA2.HasErrors: False");
+            log.ExpectNext("2 - Normal - 22 Log - ResultS1: Fail");
+            log.ExpectNext("2 - Normal - 23 Log - ResultS1: MySub");
             log.ExpectNext("2 - Post");
         }
 
@@ -396,21 +396,21 @@ namespace StepBroCoreTest
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyProcedure - <no arguments>");
-            log.ExpectNext("2 - Normal - 15 - log: ResultA1: Unset");
-            log.ExpectNext("2 - Normal - 16 - log: ResultA1.HasFails: False");
-            log.ExpectNext("2 - Normal - 17 - log: ResultA1.HasErrors: False");
+            log.ExpectNext("2 - Normal - 15 Log - ResultA1: Unset");
+            log.ExpectNext("2 - Normal - 16 Log - ResultA1.HasFails: False");
+            log.ExpectNext("2 - Normal - 17 Log - ResultA1.HasErrors: False");
             log.ExpectNext("2 - Pre - MySub - <no arguments>");
-            log.ExpectNext("3 - Normal - 3 - log: ResultB1: Unset");
-            log.ExpectNext("3 - Normal - 4 - log: ResultB1.HasFails: False");
-            log.ExpectNext("3 - Normal - 5 - log: ResultB1.HasErrors: False");
+            log.ExpectNext("3 - Normal - 3 Log - ResultB1: Unset");
+            log.ExpectNext("3 - Normal - 4 Log - ResultB1.HasFails: False");
+            log.ExpectNext("3 - Normal - 5 Log - ResultB1.HasErrors: False");
             log.ExpectNext("3 - Error - 6 - EXPECT: 11<10; Actual: <FALSE>  =>  Fail");
             log.ExpectNext("3 - Post");
             // Now execution continues in MyProcedure, because its result is not influenced by the the fail in MySub. 
-            log.ExpectNext("2 - Normal - 20 - log: ResultA2: Unset");
-            log.ExpectNext("2 - Normal - 21 - log: ResultA2.HasFails: False");
-            log.ExpectNext("2 - Normal - 22 - log: ResultA2.HasErrors: False");
-            log.ExpectNext("2 - Normal - 23 - log: ResultS1: Fail");
-            log.ExpectNext("2 - Normal - 24 - log: ResultS1: MySub");
+            log.ExpectNext("2 - Normal - 20 Log - ResultA2: Unset");
+            log.ExpectNext("2 - Normal - 21 Log - ResultA2.HasFails: False");
+            log.ExpectNext("2 - Normal - 22 Log - ResultA2.HasErrors: False");
+            log.ExpectNext("2 - Normal - 23 Log - ResultS1: Fail");
+            log.ExpectNext("2 - Normal - 24 Log - ResultS1: MySub");
             log.ExpectNext("2 - Post");
         }
 

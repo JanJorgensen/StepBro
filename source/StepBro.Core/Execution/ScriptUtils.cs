@@ -39,12 +39,12 @@ namespace StepBro.Core.Execution
         public static void delay([Implicit] ICallContext context, TimeSpan time)
 #pragma warning restore IDE1006 // Naming Styles
         {
+            if (context != null && context.LoggingEnabled)
+            {
+                context.Logger.Log($"{(long)time.TotalMilliseconds}ms");
+            }
             if (time >= g_fiveSeconds)
             {
-                if (context != null && context.LoggingEnabled)
-                {
-                    context.Logger.Log($"delay {(long)time.TotalMilliseconds}ms");
-                }
                 var reporter = context.StatusUpdater.CreateProgressReporter("delay", time);
                 using (reporter)
                 {
@@ -227,15 +227,14 @@ namespace StepBro.Core.Execution
                 //sleep = true;
             } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero);
 
-            if ((context as IScriptCallContext) != null)
+            if (context != null)
             {
-                var ctx = context as IScriptCallContext;
                 var readerName = reader.Source.Name;
                 if (readerName == null)
                 {
                     readerName = "log reader";
                 }
-                ctx.ReportFailure($"No entry matching \"{text}\" was found in {readerName}.");
+                context.ReportFailure($"No entry matching \"{text}\" was found in {readerName}.");
             }
             return null;
         }

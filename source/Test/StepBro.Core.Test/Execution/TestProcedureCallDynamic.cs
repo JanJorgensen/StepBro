@@ -27,9 +27,9 @@ namespace StepBroCoreTest
             log.DebugDump();
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyFile.Bent - <no arguments>");
-            log.ExpectNext("2 - Normal - 6 - log: This is Bent");
+            log.ExpectNext("2 - Normal - 6 Log - This is Bent");
             log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.Anders - <no arguments>");
-            log.ExpectNext("3 - Normal - 3 - log: This is Anders");
+            log.ExpectNext("3 - Normal - 3 Log - This is Anders");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();

@@ -163,7 +163,7 @@ namespace StepBro.Core.Execution
             return (m_loggerInside as LoggerScope).Logger;
         }
 
-        private string GetDynamicLogLocation()
+        public string GetDynamicLogLocation()
         {
             return m_currentLogLocation;
         }
@@ -430,7 +430,6 @@ namespace StepBro.Core.Execution
 
         public void EnterStatement(int line, int column)
         {
-
             m_currentStatementLine = line;
             m_currentLogLocation = line.ToString();   // TODO: Add "Line " to the text.
             m_currentStatementColumn = column;
@@ -438,6 +437,13 @@ namespace StepBro.Core.Execution
             {
                 throw new NotImplementedException();
             }
+        }
+
+        public void LogStatement(string text)
+        {
+            m_currentLogLocation = m_currentStatementLine.ToString() + " Log";
+            m_loggerInside.Log(text);
+            m_currentLogLocation = m_currentStatementLine.ToString();
         }
 
         public void Log(string text)

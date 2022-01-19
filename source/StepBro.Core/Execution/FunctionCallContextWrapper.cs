@@ -172,6 +172,10 @@ namespace StepBro.Core.Execution
         {
         }
 
+        public void LogStatement(string text)
+        {
+        }
+
         public void Log(string text)
         {
         }

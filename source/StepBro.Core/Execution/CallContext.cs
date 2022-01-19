@@ -24,7 +24,7 @@ namespace StepBro.Core.Execution
         {
             m_parentScriptContext = parent.m_parentScriptContext;
             m_parentContext = parent;
-            m_logger = parent.m_logger.LogEntering(location, null);
+            m_logger = parent.m_logger.CreateSubLocation(location);
             m_callEntry = parent.CurrentCallEntry;
             m_break = false;
         }
@@ -33,7 +33,7 @@ namespace StepBro.Core.Execution
         {
             m_parentScriptContext = parent;
             m_parentContext = parent;
-            m_logger = parent.Logger.LogEntering(location, null);
+            m_logger = parent.Logger.CreateSubLocation(location);
             m_callEntry = callEntry;
             m_break = breakSet;
             //if (String.IsNullOrEmpty(locationPrefix)) m_locationIdentification = parent.ShortLocationDescription();

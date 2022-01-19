@@ -27,7 +27,7 @@ namespace StepBroCoreTest.Execution
             var log = new LogInspector(taskContext.Logger);
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - Anders - <no arguments>");
-            log.ExpectNext("2 - Normal - 2 - log: Ello!");
+            log.ExpectNext("2 - Normal - 2 Log - Ello!");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
         }
@@ -47,9 +47,9 @@ namespace StepBroCoreTest.Execution
             var log = new LogInspector(taskContext.Logger);
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - Anders - <no arguments>");
-            log.ExpectNext("2 - Normal - 2 - log: True");
-            log.ExpectNext("2 - Normal - 3 - log: 36");
-            log.ExpectNext("2 - Normal - 4 - log: Pass");
+            log.ExpectNext("2 - Normal - 2 Log - True");
+            log.ExpectNext("2 - Normal - 3 Log - 36");
+            log.ExpectNext("2 - Normal - 4 Log - Pass");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
         }

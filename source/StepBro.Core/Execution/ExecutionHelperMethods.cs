@@ -762,10 +762,24 @@ namespace StepBro.Core.Execution
                 return true; // Do exit the procedure
             }
         }
-    
+
+        public static bool PostExpressionStatement(IScriptCallContext context)
+        {
+            if (context.Result.Verdict >= Verdict.Error) return true;
+            if (context.Result.Verdict >= Verdict.Fail)
+            {
+                return (context.Self.Flags & ProcedureFlags.ContinueOnFail) == ProcedureFlags.None;
+            }
+            return false;
+        }
+
         public static ICallContext CreateMethodCallContext(IScriptCallContext context, string locationPrefix)
         {
-            var newContext = new CallContext((ScriptCallContext)context, CallEntry.Subsequent, false, locationPrefix);  // TODO: set the last two arguments.
+            var newContext = new CallContext(
+                (ScriptCallContext)context,
+                CallEntry.Subsequent,
+                false,
+                ((ScriptCallContext)context).GetDynamicLogLocation() + " " + locationPrefix);  // TODO: set the last two arguments.
             return newContext;
         }
     }

@@ -90,6 +90,11 @@ namespace StepBroCoreTest.Mocks
             throw new NotImplementedException();
         }
 
+        ILoggerScope ILogger.CreateSubLocation(string name)
+        {
+            throw new NotImplementedException();
+        }
+
         ILoggerScope ILoggerScope.LogEntering(string location, string text, LoggerDynamicLocationSource dynamicLocation)
         {
             throw new NotImplementedException();
@@ -155,6 +160,7 @@ namespace StepBroCoreTest.Mocks
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
+
         #endregion
     }
 }

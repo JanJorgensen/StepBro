@@ -58,10 +58,9 @@ namespace StepBroCoreTest.Execution
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - ObjectUsing.UseIt - <no arguments>");
-            log.ExpectNext("2 - Pre - highLevelObject.Fcn");
-            log.ExpectNext("3 - Normal - highLevelObject.Fcn - HighLayerCodeModule.Fcn - i: 4");
-            log.ExpectNext("3 - Normal - highLevelObject.Fcn - MidLayerCodeModule.Fcn - i: 8");
-            log.ExpectNext("3 - Normal - highLevelObject.Fcn - LowLayerCodeModule.Fcn - i: 19");
+            log.ExpectNext("2 - Normal - 19 highLevelObject.Fcn - HighLayerCodeModule.Fcn - i: 4");
+            log.ExpectNext("2 - Normal - 19 highLevelObject.Fcn - MidLayerCodeModule.Fcn - i: 8");
+            log.ExpectNext("2 - Normal - 19 highLevelObject.Fcn - LowLayerCodeModule.Fcn - i: 19");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
         }

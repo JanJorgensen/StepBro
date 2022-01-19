@@ -390,7 +390,7 @@ namespace StepBro.TestInterface
         {
             if (context != null && context.LoggingEnabled)
             {
-                context.Logger.Log(command);
+                context.Logger.Log("\"" + command + "\"");
             }
             var request = new List<string>();
             request.Add(command);

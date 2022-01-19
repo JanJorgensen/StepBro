@@ -4,10 +4,16 @@ namespace StepBro.Core.Logging
 {
     internal class LoggerScope : ServiceBase<ILogger, LoggerScope>, IProtectedLogger
     {
+        private enum DisposeOption
+        {
+            PublicDisposal, 
+            ProtectedDisposal, 
+            NoDisposal, 
+            DisposedOrEnded
+        }
         private Logger m_logger;
         private readonly LogEntry m_scopeStartEntry;
-        private bool m_disposeProtected;
-        private bool m_ended = false;
+        private DisposeOption m_disposeOption;
         private int m_threadID = -1;
         private string m_location;
         private LoggerDynamicLocationSource m_dynamicLocation;
@@ -16,7 +22,7 @@ namespace StepBro.Core.Logging
         {
             m_logger = logger;
             m_scopeStartEntry = scopeStartEntry;
-            m_disposeProtected = disposeProtected;
+            m_disposeOption = disposeProtected ? DisposeOption.ProtectedDisposal : DisposeOption.PublicDisposal;
             m_threadID = scopeStartEntry.ThreadId;
             m_location = scopeStartEntry.Location;
             if (dynamicLocation != null)
@@ -35,7 +41,7 @@ namespace StepBro.Core.Logging
         {
             m_logger = logger;
             m_scopeStartEntry = scopeStartEntry;
-            m_disposeProtected = true;
+            m_disposeOption = DisposeOption.ProtectedDisposal;
             m_threadID = scopeStartEntry.ThreadId;
             m_location = scopeStartEntry.Location;
             m_dynamicLocation = new LoggerDynamicLocationSource(GetStaticLocation);
@@ -53,7 +59,7 @@ namespace StepBro.Core.Logging
 
         public void Dispose()
         {
-            if (m_disposeProtected)
+            if (m_disposeOption == DisposeOption.ProtectedDisposal)
             {
                 throw new NotSupportedException("This logger cannot be disposed by the Dispose method.");
             }
@@ -67,11 +73,11 @@ namespace StepBro.Core.Logging
 
         private void DoDispose()
         {
-            if (!m_ended)
+            if (m_disposeOption < DisposeOption.NoDisposal)
             {
                 this.Log(LogEntry.Type.Post, null);
-                m_ended = true;
             }
+            m_disposeOption = DisposeOption.DisposedOrEnded;
         }
 
         public string Location { get { return m_dynamicLocation(); } }
@@ -82,6 +88,13 @@ namespace StepBro.Core.Logging
             return new LoggerScope(m_logger, entry);
         }
 
+        public ILoggerScope CreateSubLocation(string location)
+        {
+            var scope = new LoggerScope(m_logger, m_scopeStartEntry);
+            scope.m_location = location;
+            return scope;
+        }
+
         public ILoggerScope LogEntering(string location, string text, LoggerDynamicLocationSource dynamicLocation)
         {
             var entry = m_logger.Log(m_scopeStartEntry, LogEntry.Type.Pre, DateTime.Now, m_threadID, location, text);
@@ -90,14 +103,14 @@ namespace StepBro.Core.Logging
 
         public void LogExit(string text)
         {
-            if (m_ended)
+            if (m_disposeOption == DisposeOption.DisposedOrEnded)
             {
                 this.Log(LogEntry.Type.Error, "<already ended> " + text);
             }
             else
             {
                 this.Log(LogEntry.Type.Post, text);
-                m_ended = true;
+                m_disposeOption = DisposeOption.DisposedOrEnded;
             }
         }
 
@@ -146,7 +159,7 @@ namespace StepBro.Core.Logging
 
         public IProtectedLogger GetProtectedLogger()
         {
-            m_disposeProtected = true;
+            m_disposeOption = DisposeOption.ProtectedDisposal;
             return (IProtectedLogger)this;
         }
 
