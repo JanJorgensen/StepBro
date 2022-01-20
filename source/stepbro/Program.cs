@@ -20,14 +20,15 @@ namespace StepBro.Cmd
         private static CommandLineOptions m_commandLineOptions = null;
         private static bool m_executionRunning = false;
         private static bool m_dumpingExecutionLog = false;
-        private static ILogEntryToTextAddon m_logDumpAddon = null;
+        private static IOutputFormatterTypeAddon m_logDumpAddon = null;
+        private static IOutputFormatter m_logDumpFormatter = null;
         private static List<string> m_bufferedOutput = new List<string>();
 
         private static int Main(string[] args)
         {
             IService m_hostService = null;
             m_hostAccess = new HostAccess(out m_hostService);
-            var selectedLogDumpAddon = SimpleLogEntryToCleartextAddon.Name;
+            var selectedLogDumpAddon = OutputConsoleWithColorsAddon.Name;
 
             object consoleResourceUserObject = new object();
             int retval = 0;
@@ -70,12 +71,20 @@ namespace StepBro.Cmd
                     m_commandLineOptions.TraceToConsole = true;
                 }
 
-                m_logDumpAddon = StepBroMain.GetService<Core.Api.IAddonManager>().TryGetAddon<ILogEntryToTextAddon>(selectedLogDumpAddon);
+                m_logDumpAddon = StepBroMain.GetService<Core.Api.IAddonManager>().TryGetAddon<IOutputFormatterTypeAddon>(selectedLogDumpAddon);
                 if (m_logDumpAddon == null)
                 {
                     ConsoleWriteLine("Error: Log dump format (addon) \'" + selectedLogDumpAddon + "\' was found.");
                     retval = -1;
                     throw new ExitException();
+                }
+                if (m_logDumpAddon.FormatterType == OutputType.Console)
+                {
+                    m_logDumpFormatter = m_logDumpAddon.Create();
+                }
+                else
+                {
+                    m_logDumpFormatter = new OutputConsoleWithColorsAddon.TextToConsoleFormatter(m_logDumpAddon);
                 }
 
                 if (m_commandLineOptions.Verbose)
@@ -304,47 +313,14 @@ namespace StepBro.Cmd
             var zero = logEntry.Timestamp;
             while (logEntry != null || m_executionRunning)
             {
-                var txt = m_logDumpAddon.Convert(logEntry, zero);
-                if (txt != null)
-                {
-                    switch (logEntry.EntryType)
-                    {
-                        case LogEntry.Type.Pre:
-                        case LogEntry.Type.TaskEntry:
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            break;
-                        case LogEntry.Type.Normal:
-                        case LogEntry.Type.Post:
-                            Console.ForegroundColor = ConsoleColor.White;
-                            break;
-                        case LogEntry.Type.Async:
-                            Console.ForegroundColor = ConsoleColor.DarkYellow;
-                            break;
-                        case LogEntry.Type.Error:
-                        case LogEntry.Type.Failure:
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            break;
-                        case LogEntry.Type.UserAction:
-                            Console.ForegroundColor = ConsoleColor.Blue;
-                            break;
-                        case LogEntry.Type.Detail:
-                            Console.ForegroundColor = ConsoleColor.DarkGray;
-                            break;
-                        case LogEntry.Type.System:
-                            Console.ForegroundColor = ConsoleColor.Blue;
-                            break;
-                        default:
-                            break;
-                    }
-                    Console.WriteLine(txt);
-                }
-                LogEntry next;
+                m_logDumpFormatter.LogEntry(logEntry, zero);
+
                 // Wait until log is empty and there is no running execution.
-                while ((next = logEntry.Next) == null && m_executionRunning == true)
+                while (logEntry.Next == null && m_executionRunning == true)
                 {
                     System.Threading.Thread.Sleep(50);
                 }
-                logEntry = next;
+                logEntry = logEntry.Next;
             }
             Console.ForegroundColor = ConsoleColor.White;
             m_dumpingExecutionLog = false;  // Signal to main thread.
