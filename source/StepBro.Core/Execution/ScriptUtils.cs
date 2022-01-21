@@ -252,6 +252,32 @@ namespace StepBro.Core.Execution
         }
 
         #endregion
+
+        #region String Enumerable
+
+        [Public]
+        public static bool ContainsMatch(this IEnumerable<string> list, string text)
+        {
+            var comparer = StringUtils.CreateComparer(text);
+            foreach (var s in list)
+            {
+                if (comparer(s) != null) return true;
+            }
+            return false;
+        }
+
+        [Public]
+        public static string FindMatch(this IEnumerable<string> list, string text)
+        {
+            var comparer = StringUtils.CreateComparer(text);
+            foreach (var s in list)
+            {
+                if (comparer(s) != null) return s;
+            }
+            return null;
+        }
+
+        #endregion
     }
 
     //[Public]

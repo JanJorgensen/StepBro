@@ -27,5 +27,46 @@ namespace StepBroCoreTest.Parser
             object result = proc.Call();
             Assert.IsNull(result);
         }
+
+        [TestMethod]
+        public void TestContainsMatch()
+        {
+            var proc = FileBuilder.ParseProcedure(
+                "bool Func(){ var strings = [\"Anders\", \"Benny\", \"Chris\", \"Dennis\"]; bool b = strings.ContainsMatch(\"Be*\"); return b; }");
+            Assert.AreEqual(typeof(bool), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsTrue(result is bool);
+            Assert.IsTrue((bool)result);
+
+
+            proc = FileBuilder.ParseProcedure(
+                "bool Func(){ var strings = [\"Anders\", \"Benny\", \"Chris\", \"Dennis\"]; bool b = strings.ContainsMatch(\"Bes*\"); return b; }");
+            Assert.AreEqual(typeof(bool), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            result = proc.Call();
+            Assert.IsTrue(result is bool);
+            Assert.IsFalse((bool)result);
+        }
+
+        [TestMethod]
+        public void TestFindMatch()
+        {
+            var proc = FileBuilder.ParseProcedure(
+                "string Func(){ var strings = [\"Anders\", \"Benny\", \"Chris\", \"Dennis\"]; string r = strings.FindMatch(\"Be*\"); return r; }");
+            Assert.AreEqual(typeof(string), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsTrue(result is string);
+            Assert.AreEqual("Benny", (string)result);
+
+
+            proc = FileBuilder.ParseProcedure(
+                "string Func(){ var strings = [\"Anders\", \"Benny\", \"Chris\", \"Dennis\"]; string r = strings.FindMatch(\"Bes*\"); return r; }");
+            Assert.AreEqual(typeof(string), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            result = proc.Call();
+            Assert.IsNull(result);
+        }
     }
 }
