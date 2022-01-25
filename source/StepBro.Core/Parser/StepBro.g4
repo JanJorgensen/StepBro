@@ -103,12 +103,15 @@ configDeclaration : CONFIG IDENTIFIER elementPropertyblock ;
 // TESTLIST
 
 testlist : 
-    TESTLIST 
+    TESTLIST
+    testListOverride?
     testListName 
     arguments? 
     (COLON elementPropertyList)? 
     (testlistBlock | SEMICOLON)
     ;
+
+testListOverride : OVERRIDE ;
 
 testListName : IDENTIFIER ;
 

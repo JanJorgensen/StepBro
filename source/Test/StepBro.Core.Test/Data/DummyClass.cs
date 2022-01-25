@@ -151,6 +151,16 @@ namespace StepBroCoreTest.Data
             }));
         }
 
+        public StepBro.Core.Tasks.IAsyncResult<object> MethodAsyncObject([Implicit] ICallContext context, string s)
+        {
+            return new StepBro.Core.Tasks.TaskToAsyncResult<object>(System.Threading.Tasks.Task.Run(() =>
+            {
+                context.Logger.Log("Yup: " + s);
+                System.Threading.Thread.Sleep(10);
+                return (object)(long)s.Length;
+            }));
+        }
+
         public long MethodLongOut1() { return 5001L; }
         public long MethodLongOut2(long a) { return a + 5002L; }
         public long MethodLongOut3(long a = 5L) { return a + 5003L; }

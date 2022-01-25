@@ -24,6 +24,7 @@ namespace StepBro.Core.General
 
     public interface ILoadedFilesManager
     {
+        IScriptFile TopScriptFile { get; }
         void RegisterLoadedFile(ILoadedFile file);
         IEnumerable<T> ListFiles<T>() where T : class, ILoadedFile;
         void UnloadAllFilesWithoutDependants();

@@ -2,6 +2,7 @@
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -16,7 +17,7 @@ namespace StepBro.Core.General
             new List<NamedData<Tuple<List<IScriptFile>, IReadOnlyCollection<IScriptFile>>>>();
 
         public LoadedFilesManager(out IService serviceAccess) :
-            base("LoadedFilesManager", out serviceAccess, typeof(IDynamicObjectManager))
+            base("LoadedFilesManager", out serviceAccess, typeof(IDynamicObjectManager), typeof(IConfigurationFileManager))
         {
         }
 
@@ -45,8 +46,17 @@ namespace StepBro.Core.General
             }
         }
 
+        public IScriptFile TopScriptFile
+        {
+            get
+            {
+                return m_loadedFiles.Where(f => f is IScriptFile).FirstOrDefault() as IScriptFile;
+            }
+        }
+
         public void RegisterLoadedFile(ILoadedFile file)
         {
+            if (m_loadedFiles.Contains(file)) throw new ArgumentException("The specified file is already registered.");
             m_loadedFiles.Add(file);
             if (file is IScriptFile)
             {

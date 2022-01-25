@@ -12,7 +12,7 @@ namespace StepBro.Core.Execution
     /// <summary>
     /// Context interface to allow code module methods to access functionality from the script execution and the StepBro system.
     /// </summary>
-    public interface ICallContext : IDisposable
+    public interface ICallContext : IDisposable, IFolderShortcutsSource
     {
         /// <summary>
         /// Gets an indication whether the current method has been called earlier from the the same script line.
@@ -34,12 +34,6 @@ namespace StepBro.Core.Execution
         /// <remarks>The new call context must be disposed upon exit of the context scope.</remarks>
         /// <returns>Reference to a new call context object.</returns>
         ICallContext EnterNewContext(string location, bool separateStateLevel);
-
-        /// <summary>
-        /// The list of folder shortcuts defined in the environment (OS), the host application, the configuration and the current script file.
-        /// </summary>
-        /// <returns></returns>
-        IEnumerable<IFolderShortcut> GetFolders();
 
         /// <summary>
         /// Gets a reference to an object representing the host application.

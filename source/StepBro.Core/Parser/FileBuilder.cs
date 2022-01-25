@@ -449,6 +449,8 @@ namespace StepBro.Core.Parser
             services.Manager.Register(service);
             var objectManager = new DynamicObjectManager(out service);
             services.Manager.Register(service);
+            var configFileManager = new Mocks.ConfigurationFileManagerMock(out service);
+            services.Manager.Register(service);
             var loadedFiles = new LoadedFilesManager(out service);
             services.Manager.Register(service);
             var mainLogger = new Logger("", false, "StepBro", "Main logger created in CreateFileParsingSetup");
@@ -481,7 +483,7 @@ namespace StepBro.Core.Parser
             return services.Manager.Get<ILoadedFilesManager>().ListFiles<ScriptFile>().ToArray();
         }
 
-        internal static int ParseFiles(ServiceManager services, ILogger logger, ScriptFile topfile = null)
+        public static int ParseFiles(ServiceManager services, ILogger logger, IScriptFile topfile)
         {
             var addons = services.Get<IAddonManager>();
             var filesManager = services.Get<ILoadedFilesManager>();
@@ -489,11 +491,11 @@ namespace StepBro.Core.Parser
             var filesToParse = new List<ScriptFile>();
             if (topfile != null)
             {
-                filesToParse.Add(topfile);
+                filesToParse.Add(topfile as ScriptFile);
             }
             else
             {
-                filesToParse = filesManager.ListFiles<ScriptFile>().ToList();
+                filesToParse.Add(filesManager.TopScriptFile as ScriptFile);
             }
             var fileListeners = new Dictionary<ScriptFile, StepBroListener>();
             var fileContexts = new Dictionary<ScriptFile, SBP.CompilationUnitContext>();
@@ -507,7 +509,7 @@ namespace StepBro.Core.Parser
             {
                 var file = fileParsingStack.Dequeue();
                 file.MarkForTypeScanning();
-                ITokenSource lexer = new Grammar.StepBroLexer(file.GetParserFileStream());
+                ITokenSource lexer = new Grammar.StepBroLexer(file.GetParserFileStream(services.Get<ITextFileSystem>()));
                 ITokenStream tokens = new CommonTokenStream(lexer);
                 var parser = new SBP(tokens);
                 parser.RemoveErrorListeners();

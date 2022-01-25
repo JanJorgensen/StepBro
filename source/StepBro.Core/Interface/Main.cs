@@ -25,6 +25,7 @@ namespace StepBro.Core
         private static ILogger m_logRootScope = null;
         private static ILoadedFilesManager m_loadedFilesManager = null;
         private static IConfigurationFileManager m_configurationFileManager = null;
+        private static ITextFileSystem m_textFileSystem = null;
         private static IAddonManager m_addonManager = null;
         //private static ILogSinkManager m_logSinkManager = null;
         private static TaskManager m_taskManager = null;
@@ -59,6 +60,8 @@ namespace StepBro.Core
             m_loadedFilesManager = new LoadedFilesManager(out service);
             m_serviceManagerAdmin.Manager.Register(service);
             m_configurationFileManager = new ConfigurationFileManager(out service);
+            m_serviceManagerAdmin.Manager.Register(service);
+            m_textFileSystem = new TextFileSystem(out service);
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_addonManager = new AddonManager(
@@ -260,7 +263,7 @@ namespace StepBro.Core
                             }
 
                             context.UpdateStatus("Parsing files");
-                            m_lastParsingErrorCount = FileBuilder.ParseFiles(m_serviceManagerAdmin.Manager, context.Logger);
+                            m_lastParsingErrorCount = FileBuilder.ParseFiles(m_serviceManagerAdmin.Manager, context.Logger, (IScriptFile)null);
                         }
                         catch (Exception ex)
                         {
@@ -307,7 +310,7 @@ namespace StepBro.Core
                         f.ResetBeforeParsing(preserveUpdateableElements: force == false);
                     }
 
-                    m_lastParsingErrorCount = FileBuilder.ParseFiles(m_serviceManagerAdmin.Manager, logger);
+                    m_lastParsingErrorCount = FileBuilder.ParseFiles(m_serviceManagerAdmin.Manager, logger, (IScriptFile)null);
                 }
                 finally
                 {

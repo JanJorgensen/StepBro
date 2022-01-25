@@ -25,6 +25,15 @@ namespace StepBro.Core.File
         string Path { get; set; }
     }
 
+    public interface IFolderShortcutsSource
+    {
+        /// <summary>
+        /// The list of folder shortcuts defined in the environment (OS), the host application, the configuration and the current script file.
+        /// </summary>
+        /// <returns>An enumeration of the available shortcuts.</returns>
+        IEnumerable<IFolderShortcut> GetFolders();
+    }
+
     public class FolderShortcut : IFolderShortcut
     {
         private FolderShortcutOrigin m_origin;
@@ -100,11 +109,11 @@ namespace StepBro.Core.File
             }
         }
 
-        public static string ResolveShortcutPath(IEnumerable<IFolderShortcut> shortcuts, string path)
+        public static string ResolveShortcutPath(this IEnumerable<IFolderShortcut> shortcuts, string path)
         {
             if (String.IsNullOrEmpty(path))
             {
-                throw new ArgumentException("Empth path argument.");
+                throw new ArgumentException("Empty path argument.");
             }
 
             var splittedPath = FileReferenceUtils.SplitPath(path);
@@ -136,7 +145,7 @@ namespace StepBro.Core.File
             }
         }
 
-        public static string GetFullPath(IEnumerable<IFolderShortcut> shortcuts, string path)
+        public static string GetFullPath(this IEnumerable<IFolderShortcut> shortcuts, string path)
         {
             string resolved = ResolveShortcutPath(shortcuts, path);
             return System.IO.Path.GetFullPath(resolved);

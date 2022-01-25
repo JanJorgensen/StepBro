@@ -119,19 +119,19 @@ namespace StepBro.Core.ScriptData
             set { m_parsingFloor = value; }
         }
 
-        internal AntlrInputStream GetParserFileStream()
+        internal AntlrInputStream GetParserFileStream(ITextFileSystem fileSystem)
         {
             if (m_parserFileStream != null && m_fileStream == null)
             {
                 return m_parserFileStream;
             }
             var path = this.GetFullPath();
-            var exist = System.IO.File.Exists(path);
+            var exist = fileSystem.FileExists(path);
             if (m_parserFileStream != null)
             {
                 if (exist)
                 {
-                    var lastWrite = System.IO.File.GetLastWriteTime(path);
+                    var lastWrite = fileSystem.GetFileChangeTime(path);
                     if (lastWrite == m_lastFileChange)
                     {
                         return m_parserFileStream;
@@ -144,8 +144,8 @@ namespace StepBro.Core.ScriptData
             }
             if (exist)
             {
-                m_lastFileChange = System.IO.File.GetLastWriteTime(path);
-                m_fileStream = System.IO.File.OpenText(path);
+                m_lastFileChange = fileSystem.GetFileChangeTime(path);
+                m_fileStream = fileSystem.OpenFileStream(path);
                 m_parserFileStream = new Antlr4.Runtime.AntlrInputStream(m_fileStream);
                 return m_parserFileStream;
             }

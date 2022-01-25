@@ -9,8 +9,8 @@ namespace StepBro.Core.ScriptData
     public abstract class FileElement : IFileElement
     {
         private IScriptFile m_parentFile;
-        private readonly AccessModifier m_accessModifier;
-        private readonly int m_line;
+        private AccessModifier m_accessModifier;
+        private int m_line;
         private string m_baseElementName = null;
         private IFileElement m_baseElement;
         private IFileElement m_parentElement;
@@ -73,7 +73,9 @@ namespace StepBro.Core.ScriptData
 
         public string FullName { get { return m_elementFullName; } }
 
-        public AccessModifier AccessLevel { get { return m_accessModifier; } }
+        public AccessModifier AccessLevel { get { return m_accessModifier; } internal set { m_accessModifier = value; } }
+
+        public bool IsOverrider { get; internal set; }
 
         internal string BaseElementName
         {
@@ -154,6 +156,7 @@ namespace StepBro.Core.ScriptData
         public int Line
         {
             get { return m_line; }
+            internal set { m_line = value; }
         }
 
         internal virtual int ParseSignature(StepBroListener listener, bool reportErrors)

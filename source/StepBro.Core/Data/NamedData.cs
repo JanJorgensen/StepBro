@@ -11,5 +11,7 @@ namespace StepBro.Core.Data
         public readonly string Name;
         public readonly T Value;
         public NamedData(string name, T value) { this.Name = name; this.Value = value; }
+        public static NamedData<T> Empty { get; } = new NamedData<T>(null, default(T));
+        public bool IsEmpty() { return (this.Name == null && Object.Equals(this.Value, default(T))); }
     }
 }

@@ -649,14 +649,13 @@ namespace StepBro.Core.Parser
                                 {
                                     callMethod = Expression.Assign(m_callAssignmentTarget.ExpressionCode, callMethod);
                                 }
-                                m_scopeStack.Peek().AddStatementCode(callMethod);
 
                                 var conditionalReturn = Expression.Condition(
                                     Expression.Call(s_PostExpressionStatement, m_currentProcedure.ContextReferenceInternal),
                                     Expression.Return(m_currentProcedure.ReturnLabel, Expression.Default(m_currentProcedure.ReturnType.Type)),
                                     Expression.Empty());
 
-                                m_scopeStack.Peek().AddStatementCode(conditionalReturn);
+                                m_scopeStack.Peek().AddStatementCode(Expression.Block(callMethod, conditionalReturn));
                             }
                             else
                             {

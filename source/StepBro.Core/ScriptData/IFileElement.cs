@@ -17,6 +17,10 @@ namespace StepBro.Core.ScriptData
         string Purpose { get; }
         int UniqueID { get; }
         AccessModifier AccessLevel { get; }
+        /// <summary>
+        /// Wheter the element is an 'overrider' for another file element, and therefore will not be directly accessible during execution.
+        /// </summary>
+        bool IsOverrider { get; }
         IEnumerable<IPartner> ListPartners();
     }
 }

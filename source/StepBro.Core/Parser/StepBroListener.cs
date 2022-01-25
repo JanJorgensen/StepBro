@@ -548,14 +548,23 @@ namespace StepBro.Core.Parser
             m_currentTestList = new FileTestList(m_file, m_fileElementModifier, context.Start.Line, null, m_currentNamespace, "");
         }
 
+        public override void ExitTestListOverride([NotNull] SBP.TestListOverrideContext context)
+        {
+            m_currentTestList.IsOverrider = true;
+        }
+
         public override void ExitTestListName([NotNull] SBP.TestListNameContext context)
         {
             var name = context.GetText();
             m_currentTestList.SetName(m_currentNamespace, name);
-            var existing = m_file.ListElements().Where(e => e.ElementType == FileElementType.TestList).FirstOrDefault(tl => tl.Name.Equals(name));
+            var existing = m_file.ListElements().Where(e => e.ElementType == FileElementType.TestList).FirstOrDefault(tl => tl.Name.Equals(name)) as FileTestList;
             if (existing != null)
             {
-                m_currentTestList = existing as FileTestList;
+                existing.AccessLevel = m_currentTestList.AccessLevel;
+                existing.Line = m_currentTestList.Line;
+                existing.IsOverrider = m_currentTestList.IsOverrider;
+
+                m_currentTestList = existing;
             }
             else
             {
