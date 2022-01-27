@@ -23,13 +23,15 @@ namespace StepBro.Core.Parser
         protected ErrorCollector m_errors;
         protected Api.IAddonManager m_addonManager;
         protected ScriptFile m_file;
+        private FileElement m_currentFileElement = null;    // The file element currently being parsed.
         private Stack<ElementType> m_currentElementType = new Stack<ElementType>();
         protected AccessModifier m_fileElementModifier = AccessModifier.None;
+        protected bool m_elementOverride = false;
         protected IToken m_elementStart = null;
         protected string m_currentNamespace = null;
         protected FileTestList m_currentTestList = null;
         protected Stack<SBExpressionData> m_testListEntryArguments = null;
-        protected SBExpressionData m_overrideVariable = null;
+        private SBExpressionData m_overrideVariable = null;
 
         public StepBroListener(ErrorCollector errorCollector)
         {
@@ -130,6 +132,7 @@ namespace StepBro.Core.Parser
             m_lastElementPropertyBlock = null;
             m_fileElementModifier = AccessModifier.Private;    // Default is 'private'.
             m_currentFileElement = null;
+            m_elementOverride = false;
         }
 
         public override void EnterElementModifier([NotNull] SBP.ElementModifierContext context)
@@ -139,6 +142,11 @@ namespace StepBro.Core.Parser
             else if (modifier == "private") m_fileElementModifier = AccessModifier.Private;
             else if (modifier == "protected") m_fileElementModifier = AccessModifier.Protected;
             else throw new NotImplementedException();
+        }
+
+        public override void EnterElementOverride([NotNull] SBP.ElementOverrideContext context)
+        {
+            m_elementOverride = true;
         }
 
         public override void EnterFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)
@@ -548,11 +556,6 @@ namespace StepBro.Core.Parser
             m_currentTestList = new FileTestList(m_file, m_fileElementModifier, context.Start.Line, null, m_currentNamespace, "");
         }
 
-        public override void ExitTestListOverride([NotNull] SBP.TestListOverrideContext context)
-        {
-            m_currentTestList.IsOverrider = true;
-        }
-
         public override void ExitTestListName([NotNull] SBP.TestListNameContext context)
         {
             var name = context.GetText();
@@ -571,6 +574,7 @@ namespace StepBro.Core.Parser
                 m_file.AddTestList(m_currentTestList);
             }
             m_currentFileElement = m_currentTestList;
+            m_currentFileElement.IsOverrider = m_elementOverride;
         }
 
         public override void ExitTestlist([NotNull] SBP.TestlistContext context)

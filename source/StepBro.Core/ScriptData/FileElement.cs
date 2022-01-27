@@ -187,10 +187,11 @@ namespace StepBro.Core.ScriptData
 
         internal bool ParseBaseElement()
         {
-            if (!String.IsNullOrEmpty(m_baseElementName) && m_parentFile != null)
+            var baseName = (this.IsOverrider) ? m_elementName : m_baseElementName;
+            if (!String.IsNullOrEmpty(baseName) && m_parentFile != null)
             {
                 var file = m_parentFile as ScriptFile;
-                var found = file.LookupIdentifier(m_baseElementName);
+                var found = file.LookupIdentifier(baseName);
                 var element = (found != null) ? (found[0] as IFileElement) : null;
                 if (element != null && element.ElementType == this.ElementType)
                 {
@@ -291,7 +292,26 @@ namespace StepBro.Core.ScriptData
                 {
                     if (element is IFileProcedure)
                     {
-                        m_partners.Add(new FileElementPartner(this, name, reference, element as IFileProcedure));
+                        if (this.IsOverrider)
+                        {
+                            if (this.BaseElement != null)
+                            {
+                                var existing = ((FileElement)this.BaseElement).m_partners.Where(p => p.Name.Equals(name)).FirstOrDefault() as FileElementPartner;
+                                if (existing != null)
+                                {
+                                    existing.ProcedureName = reference;
+                                    existing.ProcedureReference = element as FileProcedure;
+                                }
+                                else
+                                {
+                                    ((FileElement)this.BaseElement).m_partners.Add(new FileElementPartner(this, name, reference, element as IFileProcedure));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            m_partners.Add(new FileElementPartner(this, name, reference, element as IFileProcedure));
+                        }
                     }
                     else
                     {

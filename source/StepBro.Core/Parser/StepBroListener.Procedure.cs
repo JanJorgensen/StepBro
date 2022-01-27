@@ -22,7 +22,6 @@ namespace StepBro.Core.Parser
         private bool m_procedureIsFunction = false;
         private List<ParameterData> m_parameters = null;
         private Stack<FileProcedure> m_procedureStack = new Stack<FileProcedure>();
-        private FileElement m_currentFileElement = null;    // The file element currently being parsed.
         private FileProcedure m_currentProcedure = null;    // The procedure currently being parsed.
         private bool m_inFunctionScope = false;
         private FileProcedure m_lastProcedure = null;       // The last procedure the parser ended parsing.
@@ -67,6 +66,7 @@ namespace StepBro.Core.Parser
             }
             m_currentProcedure.ReturnType = m_procedureReturnType;
             m_currentProcedure.Flags = (m_currentProcedure.Flags & ~ProcedureFlags.IsFunction) | (m_procedureIsFunction ? ProcedureFlags.IsFunction : ProcedureFlags.None);
+            m_currentProcedure.IsOverrider = m_elementOverride;
 
             m_currentFileElement = m_currentProcedure;
             m_lastProcedure = m_currentProcedure;

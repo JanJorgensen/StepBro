@@ -116,5 +116,104 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
         }
+
+        [TestMethod]
+        public void TestlistOverridePartnerInBase()
+        {
+            var f1 = new StringBuilder();
+            f1.AppendLine("using @\"basefile.sbs\";");
+            f1.AppendLine("testlist override TestSuiteBase :");
+            f1.AppendLine("    partner override Park : ParkProc;");
+            f1.AppendLine("testlist mySuite : TestSuiteBase");
+            f1.AppendLine("{");
+            f1.AppendLine("   * FirstTestCase");
+            f1.AppendLine("}");
+            f1.AppendLine("procedure void FirstTestCase()");
+            f1.AppendLine("{");
+            f1.AppendLine("   log(\"Wuf\");");
+            f1.AppendLine("}");
+            f1.AppendLine("procedure void ParkProc()");
+            f1.AppendLine("{");
+            f1.AppendLine("   log(\"Park\");");
+            f1.AppendLine("}");
+            f1.AppendLine("procedure void CallParkOnMySuite()");
+            f1.AppendLine("{");
+            f1.AppendLine("   mySuite.Park();");
+            f1.AppendLine("}");
+
+            var f2 = new StringBuilder();
+            f2.AppendLine("testlist TestSuiteBase :");
+            f2.AppendLine("    partner Park : ParkProcEmpty;");
+            f2.AppendLine("procedure void ParkProcEmpty()");
+            f2.AppendLine("{");
+            f2.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, 
+                new Tuple<string, string>("topfile.sbs", f1.ToString()),
+                new Tuple<string, string>("basefile.sbs", f2.ToString()));
+
+            Assert.AreEqual(2, files.Length);
+            var file1 = files[0];
+            Assert.AreEqual(0, file1.Errors.ErrorCount);
+            var file2 = files[1];
+            Assert.AreEqual(0, file2.Errors.ErrorCount);
+            Assert.AreEqual(2, file1.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
+            Assert.AreEqual(3, file1.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
+            Assert.AreEqual(1, file2.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
+            Assert.AreEqual(1, file2.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
+
+            var listTestSuiteBase = file2.ListElements().First(p => p.Name == "TestSuiteBase") as ITestList;
+            Assert.IsNotNull(listTestSuiteBase);
+            Assert.IsFalse(listTestSuiteBase.IsOverrider);
+
+            var listTestSuiteBaseOverride = file1.ListElements().First(p => p.Name == "TestSuiteBase") as ITestList;
+            Assert.IsNotNull(listTestSuiteBaseOverride);
+            Assert.IsTrue(listTestSuiteBaseOverride.IsOverrider);
+            Assert.AreSame(listTestSuiteBase, listTestSuiteBaseOverride.BaseElement);
+
+            var listMySuite = file1.ListElements().First(p => p.Name == "mySuite") as ITestList;
+            Assert.IsNotNull(listMySuite);
+            Assert.IsFalse(listMySuite.IsOverrider);
+            Assert.AreSame(listTestSuiteBase, listMySuite.BaseElement);
+
+
+            var procParkProc = file1.ListElements().First(p => p.Name == "ParkProc") as IFileProcedure;
+            Assert.IsNotNull(procParkProc);
+            var procParkProcEmpty = file2.ListElements().First(p => p.Name == "ParkProcEmpty") as IFileProcedure;
+            Assert.IsNotNull(procParkProcEmpty);
+
+            var partnerOverride = listMySuite.ListPartners().First();
+            Assert.IsNotNull(partnerOverride);
+            Assert.AreSame(procParkProc, partnerOverride.ProcedureReference);
+
+            var partnerOverridden = listTestSuiteBase.ListPartners().First();
+            Assert.IsNotNull(partnerOverridden);
+            Assert.AreSame(procParkProc, partnerOverridden.ProcedureReference);
+
+            var procCallParkOnMySuite = file1.ListElements().First(p => p.Name == "CallParkOnMySuite") as IFileProcedure;
+            Assert.IsNotNull(procCallParkOnMySuite);
+
+            Exception exeException = null;
+            var taskContext = ExecutionHelper.ExeContext();
+            try
+            {
+                taskContext.CallProcedure(procCallParkOnMySuite);
+            }
+            catch (Exception ex)
+            {
+                exeException = ex;
+            }
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+            if (exeException != null) throw exeException;
+
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - topfile.CallParkOnMySuite - <no arguments>");
+            log.ExpectNext("2 - Pre - topfile.ParkProc - <no arguments>");
+            log.ExpectNext("3 - Normal - 14 Log - Park");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
     }
 }

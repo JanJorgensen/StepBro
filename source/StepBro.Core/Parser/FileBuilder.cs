@@ -736,7 +736,8 @@ namespace StepBro.Core.Parser
                                     {
                                         Flags = (element.IsFunction ? ProcedureFlags.IsFunction : ProcedureFlags.None),
                                         HasBody = element.HasBody,
-                                        BaseElementName = firstPropFlag
+                                        BaseElementName = firstPropFlag,
+                                        IsOverrider = element.IsOverrider
                                     };
                                     file.AddProcedure(procedure);
                                     procedure.CheckForPrototypeChange(element.Parameters, element.ReturnTypeData);
@@ -748,7 +749,8 @@ namespace StepBro.Core.Parser
                                 {
                                     var testlist = new FileTestList(file, accessModifier, element.Line, null, file.Namespace, element.Name)
                                     {
-                                        BaseElementName = firstPropFlag
+                                        BaseElementName = firstPropFlag,
+                                        IsOverrider = element.IsOverrider
                                     };
                                     file.AddTestList(testlist);
                                 }

@@ -27,7 +27,7 @@ namespaceDeclaration : NAMESPACE namespace SEMICOLON ;
 
 fileElements : fileElement* ;
 fileElement 
-    :	attributes? elementModifier? 
+    :	attributes? elementModifier?
         (	enumDeclaration 
         |	configDeclaration 
         |   fileVariable
@@ -41,7 +41,7 @@ procedureOrFunction
     :	FUNCTION procedureReturnType procedureName procedureParameters 
             (COLON elementPropertyList)?
             procedureBodyOrNothing                                                          # FileElementFunction 
-    |	PROCEDURE? procedureReturnType procedureName procedureParameters 
+    |	PROCEDURE? elementOverride? procedureReturnType procedureName procedureParameters 
             (COLON elementPropertyList)?
             procedureBodyOrNothing                                                          # FileElementProcedure 
     ;
@@ -69,14 +69,16 @@ elementModifier
     |	PROTECTED		// Shared within the namespace
     ;
 
+elementOverride : OVERRIDE ;
+
 fileVariableNameReference : variableDeclaratorQualifiedId ;
 
 fileVariable
-    :   elementModifier? OVERRIDE variableType fileVariableNameReference elementPropertyblock   #FileVariableOverrideWithPropertyBlock
-    |   elementModifier? variableType variableDeclaratorId elementPropertyblock                 #FileVariableWithPropertyBlock
-    |   elementModifier? variableType variableDeclarator SEMICOLON                              #FileVariableSimple
+    :   elementModifier? elementOverride variableType fileVariableNameReference elementPropertyblock    #FileVariableOverrideWithPropertyBlock
+    |   elementModifier? variableType variableDeclaratorId elementPropertyblock                         #FileVariableWithPropertyBlock
+    |   elementModifier? variableType variableDeclarator SEMICOLON                                      #FileVariableSimple
     ;
-    
+ 
 //modifiers
     //:   modifier*
     //;
@@ -104,14 +106,12 @@ configDeclaration : CONFIG IDENTIFIER elementPropertyblock ;
 
 testlist : 
     TESTLIST
-    testListOverride?
+    elementOverride?
     testListName 
     arguments? 
     (COLON elementPropertyList)? 
     (testlistBlock | SEMICOLON)
     ;
-
-testListOverride : OVERRIDE ;
 
 testListName : IDENTIFIER ;
 

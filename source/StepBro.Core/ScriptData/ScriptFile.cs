@@ -546,7 +546,7 @@ namespace StepBro.Core.ScriptData
         {
             AccessModifier access = AccessModifier.Public;
             if (String.Equals(userNamespace, m_namespace, StringComparison.InvariantCulture)) access = AccessModifier.Protected;
-            foreach (var element in this.ListElements().Where(e => e.AccessLevel >= access)) yield return element;
+            foreach (var element in this.ListElements().Where(e => e.AccessLevel >= access && !e.IsOverrider)) yield return element;
         }
 
         public IFileElement this[string name]
@@ -621,7 +621,7 @@ namespace StepBro.Core.ScriptData
             if (m_rootIdentifiers == null) m_rootIdentifiers = new Dictionary<string, List<IIdentifierInfo>>();
             else m_rootIdentifiers.Clear();
 
-            foreach (var element in this.ListElements())
+            foreach (var element in this.ListElements().Where(e => e.IsOverrider == false))
             {
                 this.AddRootIdentifier(element.Name, element);
             }
@@ -704,7 +704,7 @@ namespace StepBro.Core.ScriptData
             }
         }
 
-        public List<IIdentifierInfo> LookupIdentifier(string identifier)
+        public List<IIdentifierInfo> LookupIdentifier(string identifier, bool includeLocal = true, bool includeExternal = true)
         {
             List<IIdentifierInfo> result = null;
             if (m_rootIdentifiers != null)

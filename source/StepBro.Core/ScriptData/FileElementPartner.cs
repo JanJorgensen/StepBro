@@ -29,7 +29,7 @@ namespace StepBro.Core.ScriptData
         public string ProcedureName
         {
             get;
-            private set;
+            internal set;
         }
 
         public string FullName
@@ -56,7 +56,7 @@ namespace StepBro.Core.ScriptData
         public IFileProcedure ProcedureReference
         {
             get;
-            private set;
+            internal set;
         }
 
         private string ReferencedProcedure
