@@ -45,6 +45,7 @@ namespace StepBro.Core.Execution
         private RuntimeErrorListener m_errorListener = null;
         private DataReport m_currentReport = null;
         private ProcedureResult m_lastCallResult = null;
+        private string m_nextCallHighLevelType = null;
 
         internal ScriptCallContext(
             ScriptTaskContext task,
@@ -131,7 +132,12 @@ namespace StepBro.Core.Execution
                 {
                     argText.Append("<no arguments>");
                 }
-                m_loggerInsideScope = m_loggerOnEntry.LogEntering((m_isDynamicCall ? "<DYNAMIC CALL> " : "") + m_procedure.FullName, argText.ToString(), new LoggerDynamicLocationSource(this.GetDynamicLogLocation));
+                var textPrefix = (m_parentContext?.m_nextCallHighLevelType != null) ? (m_parentContext.m_nextCallHighLevelType + " - ") : "";
+                m_loggerInsideScope = m_loggerOnEntry.LogEntering(
+                    (m_parentContext?.m_nextCallHighLevelType != null),
+                    (m_isDynamicCall ? "<DYNAMIC CALL> " : "") + m_procedure.FullName,
+                    textPrefix + argText.ToString(), 
+                    new LoggerDynamicLocationSource(this.GetDynamicLogLocation));
                 m_loggerInside = m_loggerInsideScope;
             }
             else
@@ -294,7 +300,14 @@ namespace StepBro.Core.Execution
 
         public virtual IScriptCallContext EnterNewScriptContext(IFileProcedure procedure, ContextLogOption callerLoggingOption, bool isDynamicCall, object[] arguments)
         {
-            return new ScriptCallContext(this, procedure, callerLoggingOption, isDynamicCall, arguments);
+            try
+            {
+                return new ScriptCallContext(this, procedure, callerLoggingOption, isDynamicCall, arguments);
+            }
+            finally
+            {
+                m_nextCallHighLevelType = null;
+            }
         }
 
         public IScriptCallContext EnterNewScriptContext(IProcedureReference procedure, ContextLogOption callerLoggingOption, bool isDynamicCall, object[] arguments)
@@ -330,6 +343,13 @@ namespace StepBro.Core.Execution
                 return m_procedure.FullName + " - " + m_currentStatementLine.ToString();
             }
         }
+
+        public void SetNextProcedureAsHighLevel(string type)
+        {
+            m_nextCallHighLevelType = type;
+        }
+
+        #region Report
 
         public void AddReport(DataReport report)
         {
@@ -370,6 +390,8 @@ namespace StepBro.Core.Execution
                 m_currentReport.AddData(data);
             }
         }
+
+        #endregion
 
         public bool ReportParsingError(ErrorID error = null, string description = "", Exception exception = null)
         {

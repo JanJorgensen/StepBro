@@ -66,7 +66,7 @@ namespace StepBroCoreTest.Execution
                 log.ExpectNext("0 - Pre - StepBro - Main logger created");
                 //log.ExpectNext("1 - Normal - MainLogger - Service started");
                 log.ExpectNext("1 - System - StepBro - Successfully read the station properties file.");
-                log.ExpectNext("1 - Pre - Script Execution - Main");
+                log.ExpectNext("1 - PreHighLevel - Script Execution - myfile.Main");
                 log.ExpectNext("2 - Pre - myfile.Main - <no arguments>");
                 log.ExpectNext("3 - Normal - 3 Log - Started");
                 log.ExpectNext("3 - Normal - 4 delay - 100ms");

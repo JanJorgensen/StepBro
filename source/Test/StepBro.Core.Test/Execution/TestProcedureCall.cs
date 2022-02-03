@@ -138,7 +138,49 @@ namespace StepBroCoreTest
             log.ExpectEnd();
         }
 
-        internal IFileProcedure CreateTestFileNoParams(string procedureName, string enabled)
+        [TestMethod]
+        public void ProcedureCallSimpleNoParamsNoReturn3Levels_WithHighLevel()
+        {
+            var taskContext = ExecutionHelper.ExeContext();
+
+            var procedure = this.CreateTestFileNoParams("Christian", "ABC", true);
+            taskContext.CallProcedure(procedure);
+            var log = new LogInspector(taskContext.Logger);
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - MyFile.Christian - <no arguments>");
+            log.ExpectNext("2 - Normal - 10 Log - This is Christian");
+            log.ExpectNext("2 - PreHighLevel - MyFile.Anders - TEST - <no arguments>");
+            log.ExpectNext("3 - Normal - 3 Log - This is Anders");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - PreHighLevel - MyFile.Bent - TEST - <no arguments>");
+            log.ExpectNext("3 - Normal - 6 Log - This is Bent");
+            log.ExpectNext("3 - Pre - MyFile.Anders - <no arguments>");
+            log.ExpectNext("4 - Normal - 3 Log - This is Anders");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
+
+        [TestMethod]
+        public void ProcedureCallReferenceNoParamsNoReturn_WithHighLevel()
+        {
+            var taskContext = ExecutionHelper.ExeContext();
+
+            var procedure = this.CreateTestFileNoParams("Dennis", "AD", true);
+            taskContext.CallProcedure(procedure);
+            var log = new LogInspector(taskContext.Logger);
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - MyFile.Dennis - <no arguments>");
+            log.ExpectNext("2 - Normal - 6 Log - This is Dennis");
+            log.ExpectNext("2 - PreHighLevel - MyFile.Anders - TEST - <no arguments>");
+            log.ExpectNext("3 - Normal - 3 Log - This is Anders");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
+
+        internal IFileProcedure CreateTestFileNoParams(string procedureName, string enabled, bool setHighLevelCall = false)
         {
             var f = new StringBuilder();
             f.AppendLine("namespace MyFile;");
@@ -159,7 +201,11 @@ namespace StepBroCoreTest
             {
                 f.AppendLine("procedure void Christian() {");
                 f.AppendLine("   log (\"This is Christian\");");
+                if (setHighLevelCall)
+                    f.AppendLine("   NextProcedureIsHighLevel(\"TEST\");");
                 f.AppendLine("   Anders();");
+                if (setHighLevelCall)
+                    f.AppendLine("   NextProcedureIsHighLevel(\"TEST\");");
                 f.AppendLine("   Bent();");
                 f.AppendLine("}");
             }
@@ -168,6 +214,8 @@ namespace StepBroCoreTest
                 f.AppendLine("procedure void Dennis() {");
                 f.AppendLine("   log (\"This is Dennis\");");
                 f.AppendLine("   var proc = Anders;");
+                if (setHighLevelCall)
+                    f.AppendLine("   NextProcedureIsHighLevel(\"TEST\");");
                 f.AppendLine("   proc();");
                 f.AppendLine("}");
             }

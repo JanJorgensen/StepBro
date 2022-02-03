@@ -22,7 +22,7 @@ namespace StepBro.Core
         private static bool m_initialized = false;
         private static ServiceManager.IServiceManagerAdministration m_serviceManagerAdmin = null;
         private static Logger m_mainLogger = null;
-        private static ILogger m_logRootScope = null;
+        private static ILoggerScope m_logRootScope = null;
         private static ILoadedFilesManager m_loadedFilesManager = null;
         private static IConfigurationFileManager m_configurationFileManager = null;
         private static ITextFileSystem m_textFileSystem = null;
@@ -54,7 +54,7 @@ namespace StepBro.Core
         {
             m_mainLogger = new Logger("", false, "StepBro", "Main logger created");
             IService service = m_mainLogger.RootScopeService;
-            m_logRootScope = m_mainLogger.RootLogger;
+            m_logRootScope = m_mainLogger.RootLogger as ILoggerScope;
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_loadedFilesManager = new LoadedFilesManager(out service);
@@ -304,7 +304,7 @@ namespace StepBro.Core
                 ILoggerScope logger = null;
                 try
                 {
-                    logger = m_logRootScope.LogEntering("StepBro.Main.FileParsing", "Starting file parsing");
+                    logger = m_logRootScope.LogEntering(true, "StepBro.Main.FileParsing", "Starting file parsing", null);
                     foreach (var f in m_loadedFilesManager.ListFiles<ScriptFile>())
                     {
                         f.ResetBeforeParsing(preserveUpdateableElements: force == false);

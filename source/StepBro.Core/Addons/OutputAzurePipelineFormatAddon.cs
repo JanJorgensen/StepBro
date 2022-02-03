@@ -28,7 +28,7 @@ namespace StepBro.Core.Addons
 
         private class Outputter : IOutputFormatter
         {
-            ITextWriter m_writer;
+            readonly ITextWriter m_writer;
             public Outputter(ITextWriter writer)
             {
                 m_writer = writer;
@@ -41,7 +41,7 @@ namespace StepBro.Core.Addons
                     var prefix = "";
                     switch (entry.EntryType)
                     {
-                        case Logging.LogEntry.Type.Pre:
+                        case Logging.LogEntry.Type.PreHighLevel:
                             prefix = "##[section]";
                             break;
                         case Logging.LogEntry.Type.Error:

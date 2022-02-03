@@ -55,7 +55,7 @@ namespace StepBro.Core.Data
         public static string DecodeLiteral(this string s)
         {
             int l = s.Length;
-            StringBuilder decoded = new StringBuilder(l);
+            StringBuilder decoded = new(l);
             for (int i = 0; i < l; i++)
             {
                 if (s[i] == '\\')
@@ -81,8 +81,7 @@ namespace StepBro.Core.Data
                             }
                             else
                             {
-                                ushort uc;
-                                if (!UInt16.TryParse(s.Substring(i, 4), System.Globalization.NumberStyles.HexNumber, null, out uc))
+                                if (!UInt16.TryParse(s.Substring(i, 4), System.Globalization.NumberStyles.HexNumber, null, out ushort uc))
                                 {
                                     throw new FormatException(String.Format("Error in unicode escape sequence at index {0}", i));
                                 }
@@ -130,10 +129,10 @@ namespace StepBro.Core.Data
                 }
                 if (args.Count > 0)
                 {
-                    StringBuilder argText = new StringBuilder();
-                    argText.Append("(");
+                    StringBuilder argText = new();
+                    argText.Append('(');
                     argText.Append(String.Join(", ", args));
-                    argText.Append(")");
+                    argText.Append(')');
                     return argText.ToString();
                 }
                 else return "(<empty>)";
@@ -213,37 +212,18 @@ namespace StepBro.Core.Data
             var timestamp = entry.Timestamp.ToSecondsTimestamp(zero);
             var timestampIndent = new string(' ', Math.Max(0, 8 - timestamp.Length));
 
-            StringBuilder text = new StringBuilder(1000);
+            StringBuilder text = new(1000);
             text.Append(timestampIndent);
             text.Append(timestamp);
             text.Append(new string(' ', 1 + entry.IndentLevel * 3));
-
-            string type;
-            switch (entry.EntryType)
-            {
-                case LogEntry.Type.Async:
-                    //type = "Async - ";
-                    type = "<A> ";
-                    break;
-                case LogEntry.Type.TaskEntry:
-                    type = "TaskEntry - ";
-                    break;
-                case LogEntry.Type.Error:
-                    type = "Error - ";
-                    break;
-                case LogEntry.Type.Failure:
-                    type = "Fail - ";
-                    break;
-                case LogEntry.Type.UserAction:
-                    type = "UserAction - ";
-                    break;
-                //case LogEntry.Type.System:
-                //    type = "System - ";
-                //    break;
-                default:
-                    type = "";
-                    break;
-            }
+            string type = entry.EntryType switch {
+                    LogEntry.Type.Async => "<A> ",//type = "Async - ";
+                    LogEntry.Type.TaskEntry => "TaskEntry - ",
+                    LogEntry.Type.Error => "Error - ",
+                    LogEntry.Type.Failure => "Fail - ",
+                    LogEntry.Type.UserAction => "UserAction - ",
+                    _ => ""
+            };
             text.Append(type);
 
             if (entry.Text != null)

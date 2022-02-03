@@ -12,7 +12,9 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Authors>Jan Jorgensen</Authors>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <Version>0.2.1.102</Version>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
@@ -38,6 +40,10 @@
 
   <ItemGroup>
     <None Remove="packages.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\CommonVersion.cs" Link="CommonVersion.cs" />
   </ItemGroup>
 
   <ItemGroup>

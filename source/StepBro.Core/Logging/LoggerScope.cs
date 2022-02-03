@@ -95,9 +95,9 @@ namespace StepBro.Core.Logging
             return scope;
         }
 
-        public ILoggerScope LogEntering(string location, string text, LoggerDynamicLocationSource dynamicLocation)
+        public ILoggerScope LogEntering(bool isHighLevel, string location, string text, LoggerDynamicLocationSource dynamicLocation)
         {
-            var entry = m_logger.Log(m_scopeStartEntry, LogEntry.Type.Pre, DateTime.Now, m_threadID, location, text);
+            var entry = m_logger.Log(m_scopeStartEntry, isHighLevel ? LogEntry.Type.PreHighLevel : LogEntry.Type.Pre, DateTime.Now, m_threadID, location, text);
             return new LoggerScope(m_logger, entry, dynamicLocation: dynamicLocation);
         }
 

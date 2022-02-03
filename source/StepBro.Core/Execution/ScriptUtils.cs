@@ -102,6 +102,13 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
+        public static void NextProcedureIsHighLevel([Implicit] ICallContext context, string type)
+        {
+            var internalContext = ToScriptContext(context);
+            internalContext.SetNextProcedureAsHighLevel(type);
+        }
+
+        [Public]
         public static DataReport StartReport([Implicit] ICallContext context, string ID, string title)
         {
             var internalContext = ToScriptContext(context);

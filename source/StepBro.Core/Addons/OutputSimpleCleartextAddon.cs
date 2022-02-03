@@ -30,7 +30,7 @@ namespace StepBro.Core.Addons
 
         private class Outputter : IOutputFormatter
         {
-            ITextWriter m_writer;
+            readonly ITextWriter m_writer;
             public Outputter(ITextWriter writer)
             {
                 m_writer = writer;

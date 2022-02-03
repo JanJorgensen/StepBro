@@ -9,7 +9,7 @@ namespace StepBro.Core.Execution
 {
     internal class ScriptExecutionManager : ServiceBase<IScriptExecutionManager, ScriptExecutionManager>, IScriptExecutionManager
     {
-        private ILogger m_logger = null;
+        private ILoggerScope m_logger = null;
         private ILoadedFilesManager m_loadedFilesManager = null;
         //private ILogSinkManager m_logSinkManager = null;
         private TaskManager m_taskManager = null;
@@ -23,7 +23,7 @@ namespace StepBro.Core.Execution
 
         protected override void Start(ServiceManager manager, ITaskContext context)
         {
-            m_logger = manager.Get<ILogger>();
+            m_logger = manager.Get<ILogger>() as ILoggerScope;
             m_loadedFilesManager = manager.Get<ILoadedFilesManager>();
             //m_logSinkManager = manager.Get<ILogSinkManager>();
             m_taskManager = manager.Get<TaskManager>();

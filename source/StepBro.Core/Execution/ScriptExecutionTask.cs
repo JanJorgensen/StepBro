@@ -14,7 +14,7 @@ namespace StepBro.Core.Execution
         private Task m_task = null;
         private TaskExecutionState m_currentState = TaskExecutionState.Created;
         private readonly object m_sync = new object();
-        private ILogger m_logger;
+        private ILoggerScope m_logger;
         //private readonly ILogSinkManager m_logSinkManager;
         private ScriptTaskContext m_taskContext;
         private ExecutionScopeStatusUpdaterMock m_statusUpdate;
@@ -46,7 +46,7 @@ namespace StepBro.Core.Execution
         DateTime ITaskControl.EndTime { get { return m_end; } }
 
         public ScriptExecutionTask(
-            ILogger logger,
+            ILoggerScope logger,
             //ILogSinkManager logSinkManager,
             ILoadedFilesManager filesManager,
             TaskManager taskManager,
@@ -106,7 +106,7 @@ namespace StepBro.Core.Execution
 
         private void ProcedureExecutionTask()
         {
-            var logger = m_logger.LogEntering("Script Execution", m_targetElement.Name);
+            var logger = m_logger.LogEntering(true, "Script Execution", m_targetElement.FullName, null);
             m_taskContext.Setup(logger, ContextLogOption.Normal, m_statusUpdate, m_filesManager, m_taskManager);
             m_start = DateTime.Now;
             this.SetState(TaskExecutionState.Running);

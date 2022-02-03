@@ -95,7 +95,7 @@ namespace StepBroCoreTest.Mocks
             throw new NotImplementedException();
         }
 
-        ILoggerScope ILoggerScope.LogEntering(string location, string text, LoggerDynamicLocationSource dynamicLocation)
+        ILoggerScope ILoggerScope.LogEntering(bool isHighLevel, string location, string text, LoggerDynamicLocationSource dynamicLocation)
         {
             throw new NotImplementedException();
         }

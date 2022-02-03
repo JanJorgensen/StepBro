@@ -11,7 +11,9 @@
     <Authors>Jan Jorgensen</Authors>
     <InvariantGlobalization>true</InvariantGlobalization>
     <Platforms>AnyCPU;x64</Platforms>
-    <Version>0.2.1.102</Version>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
@@ -46,6 +48,9 @@
     <Antlr4 Include="Parser\StepBroLexer.g4">
       <Package>StepBro.Core.Parser.Grammar</Package>
     </Antlr4>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CommonVersion.cs" Link="CommonVersion.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\README.md" Link="README.md" />

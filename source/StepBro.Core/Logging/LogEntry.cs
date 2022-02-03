@@ -19,6 +19,10 @@ namespace StepBro.Core.Logging
             /// </summary>
             Pre, 
             /// <summary>
+            /// Entrring a new high level scope.
+            /// </summary>
+            PreHighLevel,
+            /// <summary>
             /// Exit of the current scope.
             /// </summary>
             Post, 

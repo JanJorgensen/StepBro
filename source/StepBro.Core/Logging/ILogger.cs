@@ -14,7 +14,7 @@ namespace StepBro.Core.Logging
         /// </summary>
         string Location { get; }
         /// <summary>
-        /// Enter a new scope for logging.
+        /// Enters a new logging scope that is a sub scope of this scope.
         /// </summary>
         /// <param name="location">The name of the location inside the new scope.</param>
         /// <param name="text">Additional log text for the scope entering.</param>
@@ -38,7 +38,15 @@ namespace StepBro.Core.Logging
 
     public interface ILoggerScope : ILogger, IDisposable
     {
-        ILoggerScope LogEntering(string location, string text, LoggerDynamicLocationSource dynamicLocation);
+        /// <summary>
+        /// Enters a new logging scope that is a sub scope of this scope and where the location string of each log entry can be different.
+        /// </summary>
+        /// <param name="isHighLevel">Whether the entered scope is to be considered a high level scope in the execution.</param>
+        /// <param name="location">The name of the location inside the new scope.</param>
+        /// <param name="text">Additional log text for the scope entering.</param>
+        /// <param name="dynamicLocation">A delegate to be used for getting the location string for each new log entry within the scope.</param>
+        /// <returns>A logger to use for the scope.</returns>
+        ILoggerScope LogEntering(bool isHighLevel, string location, string text, LoggerDynamicLocationSource dynamicLocation);
         void EnteredParallelTask(string text);
         void LogExit(string text);
         object FirstLogEntryInScope { get; }
