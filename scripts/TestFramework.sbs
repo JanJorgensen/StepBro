@@ -1,74 +1,199 @@
-﻿// Basic test framework for test projects.
+// Basic test framework for test projects.
 //
-// Test projects should have a common framework file, that uses this
-// file as its basic test framework setup.
-//#####################################################################
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                                     //
+// ████████ ███████ ███████ ████████     ███████ ██████   █████  ███    ███ ███████ ██     ██  ██████  ██████  ██   ██ //
+//    ██    ██      ██         ██        ██      ██   ██ ██   ██ ████  ████ ██      ██     ██ ██    ██ ██   ██ ██  ██  //
+//    ██    █████   ███████    ██        █████   ██████  ███████ ██ ████ ██ █████   ██  █  ██ ██    ██ ██████  █████   //
+//    ██    ██           ██    ██        ██      ██   ██ ██   ██ ██  ██  ██ ██      ██ ███ ██ ██    ██ ██   ██ ██  ██  //
+//    ██    ███████ ███████    ██        ██      ██   ██ ██   ██ ██      ██ ███████  ███ ███   ██████  ██   ██ ██   ██ //
+//                                                                                                                     //
+// https://patorjk.com/software/taag/#p=display&f=ANSI%20Regular&t=TEST%20FRAMEWORK                                    //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+namespace TestFramework;
 
-public procedure TestCaseBase() :
-    FreeParameters,
-    partner Setup:                          TestCaseEmptySetup,
-    partner Cleanup:                        TestCaseEmptyCleanup,
-    partner starter TestFormal:             TestCaseFormalTest,
-    partner starter TestFormalUntilFail:    TestCaseFormalTestUntilFail;
+// Common procedure base for all test case (test procedure) procedures.
+public procedure TestCase() :
+    // Test procedures can have different parameters.
+    FreeParameters,                                    
+    // Setup procedure to be executed before the test case.    
+    partner Setup:                  TestCaseEmptySetup,
+    // cleanup procedure to be executed after the test case.
+    partner Cleanup:                TestCaseEmptyCleanup,
+    // Setup and precondition check for the test case.
+    // This will not be used when test case is executed from a test suite (test list).
+    partner PreTest:                TestCaseEmptyPreTest,
+    // Partner that keeps executing the test case until there is a fail or error.
+    partner TestUntilFail:          TestCaseTestUntilFail,
+    // Partner that first calls the Setup partner, then the test case and last the Cleanup partner.
+    partner TestFormal:             TestCaseFormalTest,
+    // Partner that keeps executing the test case until there is a fail or error.
+    // For each loop the Setup partner, the test case and the Cleanup partner are all called.
+    partner TestFormalUntilFail:    TestCaseFormalTestUntilFail;
 
-public procedure void TestCaseEmptySetup( this TestCaseBase testcase )
-{
-    log ("Empty setup for " + testcase.Name);
+// Type definition for a test case Setup partner, and an empty implementation when no setup is needed.
+public procedure void TestCaseEmptySetup( this TestCase testcase ){}
+
+// Type definition for a test case Cleanup partner, and an empty implementation when no cleanup is needed.
+public procedure void TestCaseEmptyCleanup( this TestCase testcase ){}
+
+// Type definition for a test case PreTest partner, and an empty implementation when no pre test setup is needed.
+procedure bool TestCaseEmptyPreTest( this TestCase testcase )
+{ 
+    return true; 
 }
 
-public procedure void TestCaseEmptyCleanup( this TestCaseBase testcase )
+// Procedure to be used for the 'TestFormal' partner of a test case.
+public procedure void TestCaseFormalTest( this TestCase testcase )
 {
-    log ("Empty setup for " + testcase.Name);
+    bool preconditionsOkay = false;
+    NextProcedureIsHighLevel("PreTest");
+    preconditionsOkay = testcase.PreTest();
+    if (preconditionsOkay)
+    {
+        NextProcedureIsHighLevel("Setup");
+        testcase.Setup();
+        NextProcedureIsHighLevel("Test");
+        testcase();
+        NextProcedureIsHighLevel("Cleanup");
+        testcase.Cleanup();
+    }
 }
 
-public procedure void TestCaseFormalTest( this TestCaseBase testcase )
+// Procedure to be used for the 'TestUntilFail' partner of a test case.
+public procedure void TestCaseTestUntilFail( this TestCase testcase ) :
+	NoSubResultInheritance  // The result of this procedure will not be directly affected by the results of sub procedures.
 {
-    testcase.Setup();
-    testcase();
-    testcase.Cleanup();
+	int loopIndex = 1;
+    bool preconditionsOkay = false;
+    NextProcedureIsHighLevel("PreTest");
+    preconditionsOkay = testcase.PreTest();
+    if (preconditionsOkay)
+    {
+        while ( true )
+        {
+            NextProcedureIsHighLevel("Iteration #" + loopIndex);
+            testcase();
+            loopIndex++;
+        }
+    }
 }
 
-public procedure void TestCaseFormalTestUntilFail( this TestCaseBase testcase )
+// Procedure to be used for the 'TestFormalUntilFail' partner of a test case.
+public procedure void TestCaseFormalTestUntilFail( this TestCase testcase ) : 
+	NoSubResultInheritance
 {
+	int loopIndex = 1;
+    NextProcedureIsHighLevel("PreTest");
+    testcase.PreTest();
+	while (true)
+	{
+
+        NextProcedureIsHighLevel("Setup #" + loopIndex);
+		testcase.Setup();
+
+        NextProcedureIsHighLevel("Test #" + loopIndex);
+		testcase();
+
+        NextProcedureIsHighLevel("Cleanup #" + loopIndex);
+		testcase.Cleanup();
+
+		loopIndex++;
+	}
 }
 
-public testlist TestSuiteBase :
+public testlist TestSuite :
     partner FormalTest : TestSuiteFormalTestExecution,
-    partner DirectTest : TestSuiteDirectTestExecution;
+    partner DirectTest : TestSuiteDirectTestExecution,
+    partner PreTest    : TestSuiteEmptyPreTest;         // Setup and precondition check for the test suite.
 
+
+procedure bool TestSuiteEmptyPreTest(this TestSuite suite)
+{
+    return true;
+}
 
 /// 
-public procedure void TestSuiteDirectTestExecution(this TestSuiteBase suite)
+public procedure void TestSuiteDirectTestExecution(this TestSuite suite) :
+	NoSubResultInheritance
 {
-    var iterator = suite.GetProcedureIterator();
-    while (iterator.GetNext())
+    bool passedPreTest = true;
+    NextProcedureIsHighLevel("PRETEST");
+    passedPreTest = suite.PreTest();
+    if (passedPreTest)
     {
-        log ("Starting Test: " + iterator.Procedure.Name);
-        TestCaseBase testcase = iterator.Procedure;
-        iterator.Procedure( iterator.Arguments );
+        var iterator = suite.GetProcedureIterator();
+        while (iterator.GetNext())
+        {
+            log ("Starting Test: " + iterator.Procedure.Name);
+            TestCase testcase = iterator.Procedure;
+            NextProcedureIsHighLevel("TEST");
+            iterator.Procedure( iterator.Arguments );
+        }
     }
 }
 
 /// 
-public procedure void TestSuiteFormalTestExecution(this TestSuiteBase suite)
+public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
+    NoSubResultInheritance
 {
-    var iterator = suite.GetProcedureIterator();
-    var testReport = StartReport("TestReport", suite.Name);
-    using (testReport)
+    bool passedPreTest = true;
+    NextProcedureIsHighLevel("PRETEST");
+    passedPreTest = suite.PreTest();
+    if (passedPreTest)
     {
-		// TODO: Save setup data in report
-		// TODO: Save test suite data in report
-        while (iterator.GetNext())
+        var iterator = suite.GetProcedureIterator();
+        var testReport = StartReport("TestReport", suite.Name);
+        using (testReport)
         {
-			// TODO: Start new group in report
-			// TODO: Save test case data in report
-            log ("Starting Test: " + iterator.Procedure.Name);
-            TestCaseBase testcase = iterator.Procedure;
-            testcase.Setup();
-            iterator.Procedure( iterator.Arguments );
-            testcase.Cleanup();
-			// TODO: Save test summary in report
+            // TODO: Save setup data in report
+            // TODO: Save test suite data in report
+            while (iterator.GetNext())
+            {
+                // TODO: Start new group in report
+                // TODO: Save test case data in report
+                log ("Starting Test: " + iterator.Procedure.Name);
+                TestCase testcase = iterator.Procedure;
+
+                // TODO: Start Setup group
+                NextProcedureIsHighLevel("SETUP");
+                testcase.Setup();
+
+                // TODO: Start main group, armed for documenting the next procedure call.
+                NextProcedureIsHighLevel("TEST");
+                iterator.Procedure( iterator.Arguments );
+                this.AddPartResult(iterator.Procedure, this.LastCallResult);
+
+                // TODO: Start Cleanup group
+                NextProcedureIsHighLevel("CLEANUP");
+                testcase.Cleanup();
+                
+                // TODO: Save test summary in report
+            }
+            testReport.DumpToLog();
+			
+            // TODO: Save report in selected format in the selected location (file or URL). Selection taken from configuration file.
         }
+    }
+}
+
+// Some helpers for running actions from the command line.
+
+public procedure void Action() :
+    partner PreSetup: ActionEmptyPreSetup,
+    partner WithPreSetup : RunActionWithPreSetup;
+    
+public procedure bool ActionEmptyPreSetup() { return true; }
+
+public procedure void RunActionWithPreSetup(this Action action)
+{
+    bool passedPreSetup = true;
+    NextProcedureIsHighLevel("PreSetup");
+    passedPreSetup = action.PreSetup();
+    if (passedPreSetup)
+    {
+        NextProcedureIsHighLevel("Action");
+        action();
     }
 }

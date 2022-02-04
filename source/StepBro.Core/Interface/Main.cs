@@ -314,7 +314,14 @@ namespace StepBro.Core
                 }
                 finally
                 {
-                    logger.LogExit($"Ended file parsing. {m_lastParsingErrorCount} errors.");
+                    if (m_lastParsingErrorCount > 0)
+                    {
+                        logger.LogError($"Ended file parsing. {m_lastParsingErrorCount} errors.");
+                    }
+                    else
+                    {
+                        logger.Log($"Ended file parsing. No errors.");
+                    }
                 }
                 return (m_lastParsingErrorCount == 0);
             }

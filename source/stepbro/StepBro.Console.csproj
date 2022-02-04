@@ -4,7 +4,6 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
     <AssemblyName>stepbro</AssemblyName>
-    <ProductVersion>0.2.0.100</ProductVersion>
     <RootNamespace>StepBro</RootNamespace>
     <OutputPath>..\bin</OutputPath>
     <PackageId>stepbro console</PackageId>

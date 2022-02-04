@@ -238,11 +238,14 @@ namespace StepBro.Cmd
                         else
                         {
                             ConsoleWriteLine("Parsing errors!");
-                            foreach (var err in file.Errors.GetList())
+                            foreach (var openedFile in StepBroMain.GetLoadedFilesManager().ListFiles<IScriptFile>())
                             {
-                                if (!err.JustWarning)
+                                foreach (var err in openedFile.Errors.GetList())
                                 {
-                                    ConsoleWriteLine($"   {file.FileName} line {err.Line}: {err.Message}");
+                                    if (!err.JustWarning)
+                                    {
+                                        ConsoleWriteLine($"   {openedFile.FileName} line {err.Line}: {err.Message}");
+                                    }
                                 }
                             }
                             retval = -1;
