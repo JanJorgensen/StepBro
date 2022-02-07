@@ -172,7 +172,7 @@ namespace StepBroCoreTest.Parser
             f1.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
             f1.AppendLine("using \"libfile.sbs\";");
             f1.AppendLine("namespace ObjectOverride;");
-            f1.AppendLine("public override " + typeof(DummyInstrumentClass).Name + " myTool");
+            f1.AppendLine("override myTool");
             f1.AppendLine("{");
             f1.AppendLine("   IntA:  72");
             f1.AppendLine("}");

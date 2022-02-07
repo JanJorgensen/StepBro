@@ -34,6 +34,7 @@ fileElement
         |   procedureOrFunction
         |	testlist
         |	datatable
+        |   fileElementOverride
         ) 
     ;
 
@@ -41,7 +42,7 @@ procedureOrFunction
     :	FUNCTION procedureReturnType procedureName procedureParameters 
             (COLON elementPropertyList)?
             procedureBodyOrNothing                                                          # FileElementFunction 
-    |	PROCEDURE? elementOverride? procedureReturnType procedureName procedureParameters 
+    |	PROCEDURE? procedureReturnType procedureName procedureParameters 
             (COLON elementPropertyList)?
             procedureBodyOrNothing                                                          # FileElementProcedure 
     ;
@@ -69,14 +70,17 @@ elementModifier
     |	PROTECTED		// Shared within the namespace
     ;
 
-elementOverride : OVERRIDE ;
+//elementOverride : OVERRIDE ;
 
-fileVariableNameReference : variableDeclaratorQualifiedId ;
+//fileVariableNameReference : variableDeclaratorQualifiedId ;
+
+fileElementReference : identifierOrQualified ;
+
+fileElementOverride : OVERRIDE fileElementReference elementPropertyblock ;
 
 fileVariable
-    :   elementModifier? elementOverride variableType fileVariableNameReference elementPropertyblock    #FileVariableOverrideWithPropertyBlock
-    |   elementModifier? variableType variableDeclaratorId elementPropertyblock                         #FileVariableWithPropertyBlock
-    |   elementModifier? variableType variableDeclarator SEMICOLON                                      #FileVariableSimple
+    :   elementModifier? variableType variableDeclaratorId elementPropertyblock         #FileVariableWithPropertyBlock
+    |   elementModifier? variableType variableDeclarator SEMICOLON                      #FileVariableSimple
     ;
  
 //modifiers
@@ -106,7 +110,6 @@ configDeclaration : CONFIG IDENTIFIER elementPropertyblock ;
 
 testlist : 
     TESTLIST
-    elementOverride?
     testListName 
     arguments? 
     (COLON elementPropertyList)? 

@@ -19,6 +19,7 @@ namespace StepBro.Core.General
         public LoadedFilesManager(out IService serviceAccess) :
             base("LoadedFilesManager", out serviceAccess, typeof(IDynamicObjectManager), typeof(IConfigurationFileManager))
         {
+            System.Diagnostics.Debug.WriteLine("LoadedFilesManager instance created.");
         }
 
         public event LoadedFileEventHandler FileLoaded;

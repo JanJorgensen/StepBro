@@ -3,9 +3,9 @@ namespace StepBro.Core.Data
 {
     public enum AccessModifier
     {
-        None,
         Private,
         Protected,
         Public,
+        None,   // Not specified is considered 'public'.
     }
 }

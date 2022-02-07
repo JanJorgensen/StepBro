@@ -26,12 +26,12 @@ namespace StepBro.Core.Parser
         private FileElement m_currentFileElement = null;    // The file element currently being parsed.
         private Stack<ElementType> m_currentElementType = new Stack<ElementType>();
         protected AccessModifier m_fileElementModifier = AccessModifier.None;
-        protected bool m_elementOverride = false;
         protected IToken m_elementStart = null;
         protected string m_currentNamespace = null;
         protected FileTestList m_currentTestList = null;
         protected Stack<SBExpressionData> m_testListEntryArguments = null;
         private SBExpressionData m_overrideVariable = null;
+        private SBExpressionData m_fileElementReference = null;
 
         public StepBroListener(ErrorCollector errorCollector)
         {
@@ -132,7 +132,6 @@ namespace StepBro.Core.Parser
             m_lastElementPropertyBlock = null;
             m_fileElementModifier = AccessModifier.Private;    // Default is 'private'.
             m_currentFileElement = null;
-            m_elementOverride = false;
         }
 
         public override void EnterElementModifier([NotNull] SBP.ElementModifierContext context)
@@ -142,11 +141,6 @@ namespace StepBro.Core.Parser
             else if (modifier == "private") m_fileElementModifier = AccessModifier.Private;
             else if (modifier == "protected") m_fileElementModifier = AccessModifier.Protected;
             else throw new NotImplementedException();
-        }
-
-        public override void EnterElementOverride([NotNull] SBP.ElementOverrideContext context)
-        {
-            m_elementOverride = true;
         }
 
         public override void EnterFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)
@@ -266,55 +260,6 @@ namespace StepBro.Core.Parser
                 customSetupData: customProperties);
             m_file.SetFileVariableModifier(id, m_fileElementModifier);
 
-            m_variableName = null;
-        }
-
-        public override void EnterFileVariableNameReference([NotNull] SBP.FileVariableNameReferenceContext context)
-        {
-            m_overrideVariable = null;
-            m_expressionData.PushStackLevel("VariableName");
-        }
-
-        public override void ExitFileVariableNameReference([NotNull] SBP.FileVariableNameReferenceContext context)
-        {
-            m_overrideVariable = m_expressionData.Peek().Pop();
-            m_expressionData.PopStackLevel();
-        }
-
-        public override void ExitFileVariableOverrideWithPropertyBlock([NotNull] SBP.FileVariableOverrideWithPropertyBlockContext context)
-        {
-            TypeReference type = m_variableType;
-            if (type == null)
-            {
-                return;
-            }
-            if (m_overrideVariable == null)
-            {
-                return;
-            }
-
-            var parent = this.ResolveIfIdentifier(m_overrideVariable, false, type);
-            if (!parent.IsResolved)
-            {
-                return;
-            }
-
-            FileVariable fileVariable = parent.Value as FileVariable;
-            var parentProperties = ScriptFile.GetFileVariableAllData(fileVariable);
-            var mergedProps = parentProperties.Merge(m_lastElementPropertyBlock);
-            ScriptFile.SetFileVariableAllData(fileVariable, mergedProps);
-
-            if (mergedProps != null && mergedProps.Count > 0)
-            {
-                var initAction = this.CreateVariableContainerObjectInitAction(type.Type, mergedProps, m_errors, context.Start);
-                fileVariable.VariableOwnerAccess.DataInitializer = initAction;
-                if (mergedProps.Count(e => e.Tag == null) > 0)
-                {
-                    var customProperties = new PropertyBlock(context.Start.Line);
-                    customProperties.AddRange(mergedProps.Where(e => e.Tag == null));
-                    ScriptFile.SetFileVariableCustomData(fileVariable, customProperties);
-                }
-            }
             m_variableName = null;
         }
 
@@ -565,7 +510,6 @@ namespace StepBro.Core.Parser
             {
                 existing.AccessLevel = m_currentTestList.AccessLevel;
                 existing.Line = m_currentTestList.Line;
-                existing.IsOverrider = m_currentTestList.IsOverrider;
 
                 m_currentTestList = existing;
             }
@@ -574,7 +518,6 @@ namespace StepBro.Core.Parser
                 m_file.AddTestList(m_currentTestList);
             }
             m_currentFileElement = m_currentTestList;
-            m_currentFileElement.IsOverrider = m_elementOverride;
         }
 
         public override void ExitTestlist([NotNull] SBP.TestlistContext context)
@@ -626,6 +569,75 @@ namespace StepBro.Core.Parser
         }
 
         #endregion
+
+        public override void EnterFileElementReference([NotNull] SBP.FileElementReferenceContext context)
+        {
+            m_expressionData.PushStackLevel("ReferenceName");
+        }
+
+        public override void ExitFileElementReference([NotNull] SBP.FileElementReferenceContext context)
+        {
+            m_fileElementReference = m_expressionData.Peek().Pop();
+            m_expressionData.PopStackLevel();
+
+            m_currentFileElement.SetName(m_currentNamespace, m_fileElementReference.Value as string);
+            var parent = this.ResolveIfIdentifier(m_fileElementReference, false);
+            if (!parent.IsResolved)
+            {
+                return;
+            }
+
+            IFileElement element = (parent.Value is IProcedureReference) ? (parent.Value as IProcedureReference).ProcedureData : parent.Value as FileElement;
+            m_currentFileElement.BaseElement = element;
+        }
+
+        public override void EnterFileElementOverride([NotNull] SBP.FileElementOverrideContext context)
+        {
+            m_currentFileElement = new FileElementOverride(m_file, context.Start.Line, null, m_currentNamespace, "");
+        }
+
+        public override void ExitFileElementOverride([NotNull] SBP.FileElementOverrideContext context)
+        {
+            var existing = m_file.ListElements().Where(e => e.ElementType == FileElementType.Override).FirstOrDefault(tl => tl.Name.Equals(m_currentFileElement.Name)) as FileElementOverride;
+            if (existing != null)
+            {
+                existing.Line = m_currentFileElement.Line;
+                existing.BaseElement = m_currentFileElement.BaseElement;
+                m_currentFileElement = existing;
+            }
+            else
+            {
+                m_file.AddOverrider(m_currentFileElement as FileElementOverride);
+            }
+            m_currentFileElement.BaseElementName = m_currentFileElement.Name;
+
+            if (m_currentFileElement.BaseElement == null) return;
+
+            if (m_currentFileElement.BaseElement.ElementType == FileElementType.FileVariable)
+            {
+                FileVariable fileVariable = m_currentFileElement.BaseElement as FileVariable;
+                var parentProperties = ScriptFile.GetFileVariableAllData(fileVariable);
+                var mergedProps = parentProperties.Merge(m_lastElementPropertyBlock);
+                ScriptFile.SetFileVariableAllData(fileVariable, mergedProps);
+
+                if (mergedProps != null && mergedProps.Count > 0)
+                {
+                    var initAction = this.CreateVariableContainerObjectInitAction(
+                        fileVariable.VariableOwnerAccess.Container.DataType.Type, mergedProps, m_errors, context.Start);
+                    fileVariable.VariableOwnerAccess.DataInitializer = initAction;
+                    if (mergedProps.Count(e => e.Tag == null) > 0)
+                    {
+                        var customProperties = new PropertyBlock(context.Start.Line);
+                        customProperties.AddRange(mergedProps.Where(e => e.Tag == null));
+                        ScriptFile.SetFileVariableCustomData(fileVariable, customProperties);
+                    }
+                }
+            }
+            else
+            {
+                //throw new NotImplementedException();
+            }
+        }
 
         public override void EnterEveryRule([NotNull] ParserRuleContext context)
         {

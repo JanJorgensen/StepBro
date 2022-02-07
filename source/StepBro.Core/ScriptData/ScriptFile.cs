@@ -530,6 +530,11 @@ namespace StepBro.Core.ScriptData
             m_elements.Add(table);
         }
 
+        internal void AddOverrider(FileElementOverride overrider)
+        {
+            m_elements.Add(overrider);
+        }
+
         public IEnumerable<IFileElement> ListElements()
         {
             foreach (var e in m_fileScopeVariables)
@@ -546,7 +551,7 @@ namespace StepBro.Core.ScriptData
         {
             AccessModifier access = AccessModifier.Public;
             if (String.Equals(userNamespace, m_namespace, StringComparison.InvariantCulture)) access = AccessModifier.Protected;
-            foreach (var element in this.ListElements().Where(e => e.AccessLevel >= access && !e.IsOverrider)) yield return element;
+            foreach (var element in this.ListElements().Where(e => e.AccessLevel >= access && e.ElementType != FileElementType.Override)) yield return element;
         }
 
         public IFileElement this[string name]
@@ -621,7 +626,7 @@ namespace StepBro.Core.ScriptData
             if (m_rootIdentifiers == null) m_rootIdentifiers = new Dictionary<string, List<IIdentifierInfo>>();
             else m_rootIdentifiers.Clear();
 
-            foreach (var element in this.ListElements().Where(e => e.IsOverrider == false))
+            foreach (var element in this.ListElements().Where(e => e.ElementType != FileElementType.Override))
             {
                 this.AddRootIdentifier(element.Name, element);
             }

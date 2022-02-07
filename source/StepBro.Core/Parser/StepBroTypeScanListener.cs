@@ -42,7 +42,6 @@ namespace StepBro.Core.Parser
             public List<NamedString> Values { get; set; } = null;   // For enum values.
             public List<FileElement> Childs { get; set; } = new List<FileElement>();
             public List<string> PropertyFlags { get; set; } = null;
-            public bool IsOverrider { get; set; } = false;
             public bool IsFunction { get; set; } = false;
             public bool HasBody { get; set; } = true;
             public FileElement(FileElement parent, int line, ScriptData.FileElementType type, string name)
@@ -103,8 +102,6 @@ namespace StepBro.Core.Parser
         private List<string> m_modifiers = null;
         private List<string> m_elementPropFlags = null;
         private bool m_acceptElementPropFlags = true;
-        private bool m_overrideElement = false;
-        private string m_varName = null;
         private Stack<Tuple<string, IToken>> m_typeStack = new Stack<Tuple<string, IToken>>();
         private bool m_isFunction = false;
         private string[] m_parameterModifiers = null;
@@ -185,7 +182,6 @@ namespace StepBro.Core.Parser
             m_modifiers = null;
             m_elementPropFlags = null;
             m_acceptElementPropFlags = true;
-            m_overrideElement = false;
         }
 
         public override void ExitFileElement([NotNull] SBP.FileElementContext context)
@@ -196,11 +192,6 @@ namespace StepBro.Core.Parser
         {
             if (m_modifiers == null) m_modifiers = new List<string>();
             m_modifiers.Add(context.GetText());
-        }
-
-        public override void ExitElementOverride([NotNull] SBP.ElementOverrideContext context)
-        {
-            m_overrideElement = true;
         }
 
         public override void EnterFileElementProcedure([NotNull] SBP.FileElementProcedureContext context)
@@ -297,7 +288,6 @@ namespace StepBro.Core.Parser
             element.IsFunction = m_isFunction;
             element.HasBody = context.Start.Type != SBP.SEMICOLON;
             element.PropertyFlags = m_elementPropFlags;
-            element.IsOverrider = m_overrideElement;
             this.TopElement.Childs.Add(element);
         }
 
@@ -319,10 +309,20 @@ namespace StepBro.Core.Parser
             var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.TestList, name);
             element.Modifiers = m_modifiers;
             element.PropertyFlags = m_elementPropFlags;
-            element.IsOverrider = m_overrideElement;
             //element.Parameters = parameters;
             //element.HasBody = context.Start.Type != SBP.SEMICOLON;
             this.TopElement.Childs.Add(element);
+        }
+
+        public override void ExitFileElementOverride([NotNull] SBP.FileElementOverrideContext context)
+        {
+            var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.Override, m_name);
+            this.TopElement.Childs.Add(element);
+        }
+
+        public override void EnterFileElementReference([NotNull] SBP.FileElementReferenceContext context)
+        {
+            m_name = context.GetText();
         }
 
         public override void EnterFileVariableSimple([NotNull] SBP.FileVariableSimpleContext context)
@@ -338,30 +338,27 @@ namespace StepBro.Core.Parser
         public override void ExitFileVariableSimple([NotNull] SBP.FileVariableSimpleContext context)
         {
             var type = this.PopType("ExitFileVariableSimple");
-            var name = m_varName;
 
-            var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.FileVariable, m_varName);
+            var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.FileVariable, m_name);
             element.ReturnTypeData = type;
             element.Modifiers = m_modifiers;
-            element.IsOverrider = m_overrideElement;
             this.TopElement.Childs.Add(element);
         }
 
         public override void ExitFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)
         {
             var type = this.PopType("ExitFileVariableWithPropertyBlock");
-            var name = m_varName;
+            var name = m_name;
 
-            var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.FileVariable, m_varName);
+            var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.FileVariable, m_name);
             element.ReturnTypeData = type;
             element.Modifiers = m_modifiers;
-            element.IsOverrider = m_overrideElement;
             this.TopElement.Childs.Add(element);
         }
 
         public override void EnterVariableDeclaratorId([NotNull] SBP.VariableDeclaratorIdContext context)
         {
-            m_varName = context.GetText();
+            m_name = context.GetText();
         }
 
         public override void EnterVariableModifier([NotNull] SBP.VariableModifierContext context)

@@ -75,8 +75,6 @@ namespace StepBro.Core.ScriptData
 
         public AccessModifier AccessLevel { get { return m_accessModifier; } internal set { m_accessModifier = value; } }
 
-        public bool IsOverrider { get; internal set; }
-
         internal string BaseElementName
         {
             get { return m_baseElementName; }
@@ -187,7 +185,7 @@ namespace StepBro.Core.ScriptData
 
         internal bool ParseBaseElement()
         {
-            var baseName = (this.IsOverrider) ? m_elementName : m_baseElementName;
+            var baseName = (this.ElementType == FileElementType.Override) ? m_elementName : m_baseElementName;
             if (!String.IsNullOrEmpty(baseName) && m_parentFile != null)
             {
                 var file = m_parentFile as ScriptFile;
@@ -273,54 +271,54 @@ namespace StepBro.Core.ScriptData
                 type.Equals("partner new", StringComparison.InvariantCulture) ||
                 type.Equals("partner override", StringComparison.InvariantCulture)))
             {
-                string reference = null;
+                string referenceName = null;
                 if (value is string)
                 {
-                    reference = value as string;
+                    referenceName = value as string;
                 }
                 else if (value is Identifier)
                 {
-                    reference = ((Identifier)value).Name;
+                    referenceName = ((Identifier)value).Name;
                 }
                 else
                 {
                     throw new ParsingErrorException(line, name, "Value is not a string or an identifier.");
                 }
 
-                var element = listener.TryGetFileElementInScope(reference);
-                if (element != null)
+                var referenceElement = listener.TryGetFileElementInScope(referenceName);
+                if (referenceElement != null)
                 {
-                    if (element is IFileProcedure)
+                    if (referenceElement is IFileProcedure)
                     {
-                        if (this.IsOverrider)
+                        if (this.ElementType == FileElementType.Override)
                         {
                             if (this.BaseElement != null)
                             {
                                 var existing = ((FileElement)this.BaseElement).m_partners.Where(p => p.Name.Equals(name)).FirstOrDefault() as FileElementPartner;
                                 if (existing != null)
                                 {
-                                    existing.ProcedureName = reference;
-                                    existing.ProcedureReference = element as FileProcedure;
+                                    existing.ProcedureName = referenceName;
+                                    existing.ProcedureReference = referenceElement as FileProcedure;
                                 }
                                 else
                                 {
-                                    ((FileElement)this.BaseElement).m_partners.Add(new FileElementPartner(this, name, reference, element as IFileProcedure));
+                                    ((FileElement)this.BaseElement).m_partners.Add(new FileElementPartner(this, name, referenceName, referenceElement as IFileProcedure));
                                 }
                             }
                         }
                         else
                         {
-                            m_partners.Add(new FileElementPartner(this, name, reference, element as IFileProcedure));
+                            m_partners.Add(new FileElementPartner(this, name, referenceName, referenceElement as IFileProcedure));
                         }
                     }
                     else
                     {
-                        throw new ParsingErrorException(line, name, $"Element '{reference}' is not a procedure.");
+                        throw new ParsingErrorException(line, name, $"Element '{referenceName}' is not a procedure.");
                     }
                 }
                 else
                 {
-                    throw new ParsingErrorException(line, name, $"Element '{reference}' was not found.");
+                    throw new ParsingErrorException(line, name, $"Element '{referenceName}' was not found.");
                 }
 
                 return true;

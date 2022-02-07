@@ -66,7 +66,6 @@ namespace StepBro.Core.Parser
             }
             m_currentProcedure.ReturnType = m_procedureReturnType;
             m_currentProcedure.Flags = (m_currentProcedure.Flags & ~ProcedureFlags.IsFunction) | (m_procedureIsFunction ? ProcedureFlags.IsFunction : ProcedureFlags.None);
-            m_currentProcedure.IsOverrider = m_elementOverride;
 
             m_currentFileElement = m_currentProcedure;
             m_lastProcedure = m_currentProcedure;

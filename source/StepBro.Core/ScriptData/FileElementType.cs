@@ -14,6 +14,10 @@ namespace StepBro.Core.ScriptData
         ProcedureDeclaration,
         FileVariable,
         TestList,
-        Datatable
+        Datatable,
+        /// <summary>
+        /// The element is an 'overrider' for another file element, and therefore will not be directly accessible itself during execution.
+        /// </summary>
+        Override
     }
 }

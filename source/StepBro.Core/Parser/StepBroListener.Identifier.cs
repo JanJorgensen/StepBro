@@ -186,7 +186,7 @@ namespace StepBro.Core.Parser
         public IFileElement TryGetFileElementInScope(IEnumerable<UsingData> usings, string name)
         {
             var elements = this.ListFileElementsInScope().ToList();   // Creating list for debugging purposes.
-            return elements.FirstOrDefault(e => e.Name.Equals(name, StringComparison.InvariantCulture));
+            return elements.FirstOrDefault(e => e.Name.Equals(name, StringComparison.InvariantCulture) && e.ElementType != FileElementType.Override);
         }
 
         public IFileElement TryGetFileElementInScope(string name)
@@ -481,6 +481,19 @@ namespace StepBro.Core.Parser
                                 new TypeReference(typeof(ITestList), list),
                                 getList,
                                 list);
+                        }
+                        break;
+
+                    case FileElementType.Override:
+                        {
+                            var overrider = element as IFileElement;
+
+                            result = new SBExpressionData(
+                                HomeType.Immediate,
+                                SBExpressionType.TestListReference,
+                                new TypeReference(typeof(IFileElement), overrider),
+                                null,
+                                overrider);
                         }
                         break;
 

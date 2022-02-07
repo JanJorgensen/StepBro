@@ -3,6 +3,7 @@ using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.General;
 using StepBro.Core.Logging;
+using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using System;
@@ -64,6 +65,10 @@ namespace StepBroCoreTest
             var taskStatusUpdater = new Mocks.ExecutionScopeStatusUpdaterMock();
             ILoadedFilesManager loadedFiles = null;
             TaskManager taskManager = null;
+            if (services == null && FileBuilder.LastServiceManager != null)
+            {
+                services = FileBuilder.LastServiceManager.Manager;
+            }
             if (services != null)
             {
                 loadedFiles = services.Get<ILoadedFilesManager>();

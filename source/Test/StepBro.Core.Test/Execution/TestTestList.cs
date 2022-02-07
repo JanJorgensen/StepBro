@@ -122,8 +122,10 @@ namespace StepBroCoreTest.Execution
         {
             var f1 = new StringBuilder();
             f1.AppendLine("using @\"basefile.sbs\";");
-            f1.AppendLine("testlist override TestSuiteBase :");
-            f1.AppendLine("    partner override Park : ParkProc;");
+            f1.AppendLine("override TestSuiteBase");
+            f1.AppendLine("{");
+            f1.AppendLine("    partner override Park : ParkProc");
+            f1.AppendLine("}");
             f1.AppendLine("testlist mySuite : TestSuiteBase");
             f1.AppendLine("{");
             f1.AppendLine("   * FirstTestCase");
@@ -157,23 +159,21 @@ namespace StepBroCoreTest.Execution
             Assert.AreEqual(0, file1.Errors.ErrorCount);
             var file2 = files[1];
             Assert.AreEqual(0, file2.Errors.ErrorCount);
-            Assert.AreEqual(2, file1.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
+            Assert.AreEqual(1, file1.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
             Assert.AreEqual(3, file1.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
             Assert.AreEqual(1, file2.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
             Assert.AreEqual(1, file2.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
 
             var listTestSuiteBase = file2.ListElements().First(p => p.Name == "TestSuiteBase") as ITestList;
             Assert.IsNotNull(listTestSuiteBase);
-            Assert.IsFalse(listTestSuiteBase.IsOverrider);
 
-            var listTestSuiteBaseOverride = file1.ListElements().First(p => p.Name == "TestSuiteBase") as ITestList;
+            var listTestSuiteBaseOverride = file1.ListElements().First(p => p.Name == "TestSuiteBase") as IFileElement;
             Assert.IsNotNull(listTestSuiteBaseOverride);
-            Assert.IsTrue(listTestSuiteBaseOverride.IsOverrider);
+            Assert.IsTrue(listTestSuiteBaseOverride.ElementType == FileElementType.Override);
             Assert.AreSame(listTestSuiteBase, listTestSuiteBaseOverride.BaseElement);
 
             var listMySuite = file1.ListElements().First(p => p.Name == "mySuite") as ITestList;
             Assert.IsNotNull(listMySuite);
-            Assert.IsFalse(listMySuite.IsOverrider);
             Assert.AreSame(listTestSuiteBase, listMySuite.BaseElement);
 
 
@@ -210,7 +210,7 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - topfile.CallParkOnMySuite - <no arguments>");
             log.ExpectNext("2 - Pre - topfile.ParkProc - <no arguments>");
-            log.ExpectNext("3 - Normal - 14 Log - Park");
+            log.ExpectNext("3 - Normal - 16 Log - Park");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
