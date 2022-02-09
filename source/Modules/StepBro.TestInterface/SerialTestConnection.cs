@@ -178,42 +178,79 @@ namespace StepBro.TestInterface
                         else
                         {
                             m_state = CommandState.EndResponseReceived;
-                            var s = last.Substring(1);
-                            m_result = s;
-                            try
+                            var s = last[1..];
+                            if (m_expectedReturnType == null)
                             {
-                                if (m_expectedReturnType == typeof(long) || m_expectedReturnType == typeof(int))
+                                if (last.Equals(":OK"))
                                 {
-                                    if (Int64.TryParse(s, out long v))
-                                    {
-                                        m_result = v;
-                                    }
-                                    else m_state = CommandState.EndResultFormatError;
+                                    m_state = CommandState.EndResponseReceived;
                                 }
-                                else if (m_expectedReturnType == typeof(bool))
+                                else
                                 {
-                                    if (TypeUtils.TryParse(s, out bool v))
+                                    if (s.StartsWith('\"'))
                                     {
-                                        m_result = v;
+                                        m_result = s[1..(s.Length-2)];
                                     }
-                                    else m_state = CommandState.EndResultFormatError;
-                                }
-                                else if (m_expectedReturnType == typeof(Identifier))
-                                {
-                                    m_result = new Identifier(s);
-                                }
-                                else if (m_expectedReturnType == typeof(TimeSpan))
-                                {
-                                    try
+                                    else if (TimeUtils.TryParse(s, out TimeSpan v_timespan))
                                     {
-                                        m_result = TimeUtils.ParseTimeSpan(s);
+                                        m_result = v_timespan;
                                     }
-                                    catch { m_state = CommandState.EndResultFormatError; }
+                                    else if (Int64.TryParse(s, out long v_int))
+                                    {
+                                        m_result = v_int;
+                                    }
+                                    else if (TypeUtils.TryParse(s, out bool v_bool))
+                                    {
+                                        m_result = v_bool;
+                                    }
+                                    else
+                                    {
+                                        m_result = s;
+                                    }
                                 }
                             }
-                            catch
+                            else
                             {
-                                m_state = CommandState.EndResultFormatError;
+                                m_result = s;
+                                try
+                                {
+                                    if (m_expectedReturnType == typeof(long) || m_expectedReturnType == typeof(int))
+                                    {
+                                        if (Int64.TryParse(s, out long v))
+                                        {
+                                            m_result = v;
+                                        }
+                                        else m_state = CommandState.EndResultFormatError;
+                                    }
+                                    else if (m_expectedReturnType == typeof(bool))
+                                    {
+                                        if (TypeUtils.TryParse(s, out bool v))
+                                        {
+                                            m_result = v;
+                                        }
+                                        else m_state = CommandState.EndResultFormatError;
+                                    }
+                                    else if (m_expectedReturnType == typeof(Identifier))
+                                    {
+                                        m_result = new Identifier(s);
+                                    }
+                                    else if (m_expectedReturnType == typeof(TimeSpan))
+                                    {
+                                        try
+                                        {
+                                            m_result = TimeUtils.ParseTimeSpan(s);
+                                        }
+                                        catch { m_state = CommandState.EndResultFormatError; }
+                                    }
+                                    else
+                                    {
+                                        m_state = CommandState.EndResultFormatError;
+                                    }
+                                }
+                                catch
+                                {
+                                    m_state = CommandState.EndResultFormatError;
+                                }
                             }
                         }
                     }

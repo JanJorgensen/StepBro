@@ -49,51 +49,63 @@ namespace StepBro.Core.Data
             return TimeSpan.FromTicks((long)(ts.Ticks / divider));
         }
 
-        public static TimeSpan ParseTimeSpan(string s)
+        public static bool TryParse(string s, out TimeSpan result)
         {
-            if (s.EndsWith("ms"))
+            if (String.IsNullOrEmpty(s))
             {
-                int decimalIndex = s.IndexOf('.');
-                if (decimalIndex > 0)
+                result = TimeSpan.Zero;
+                return false;
+            }
+            if (Char.IsDigit(s[0]))
+            {
+                if (s.EndsWith("ms"))
                 {
-                    long ticks = long.Parse(s.Substring(0, decimalIndex)) * TimeSpan.TicksPerMillisecond;
-                    var decimalString = s.Substring(decimalIndex + 1, s.Length - decimalIndex - 3);
-                    long decimalValue = long.Parse(decimalString);
-                    int decimalWidth = decimalString.Length;
-                    switch (decimalWidth)
+                    int decimalIndex = s.IndexOf('.');
+                    if (decimalIndex > 0)
                     {
-                        case 1: ticks += (decimalValue * TimeSpan.TicksPerMillisecond / 10); break;
-                        case 2: ticks += (decimalValue * TimeSpan.TicksPerMillisecond / 100); break;
-                        case 3: ticks += (decimalValue * TimeSpan.TicksPerMillisecond / 1000); break;
-                        case 4: ticks += (decimalValue * TimeSpan.TicksPerMillisecond / 10000); break;
-                        default:
-                            throw new FormatException("The maximum number of decimals is 4, for a timespan value in milliseconds.");
+                        long ticks = long.Parse(s.Substring(0, decimalIndex)) * TimeSpan.TicksPerMillisecond;
+                        var decimalString = s.Substring(decimalIndex + 1, s.Length - decimalIndex - 3);
+                        long decimalValue = long.Parse(decimalString);
+                        int decimalWidth = decimalString.Length;
+                        switch (decimalWidth)
+                        {
+                            case 1: ticks += (decimalValue * TimeSpan.TicksPerMillisecond / 10); break;
+                            case 2: ticks += (decimalValue * TimeSpan.TicksPerMillisecond / 100); break;
+                            case 3: ticks += (decimalValue * TimeSpan.TicksPerMillisecond / 1000); break;
+                            case 4: ticks += (decimalValue * TimeSpan.TicksPerMillisecond / 10000); break;
+                            default:
+                                throw new FormatException("The maximum number of decimals is 4, for a timespan value in milliseconds.");
+                        }
+                        result = TimeSpan.FromTicks(ticks);
+                        return true;
                     }
-                    return TimeSpan.FromTicks(ticks);
+                    else
+                    {
+                        long v = long.Parse(s.Substring(0, s.Length - 2));
+                        result = TimeSpan.FromTicks(TimeSpan.TicksPerMillisecond * v);
+                        return true;
+                    }
                 }
-                else
+                else if (s.EndsWith("s"))
                 {
-                    long v = long.Parse(s.Substring(0, s.Length - 2));
-                    return TimeSpan.FromTicks(TimeSpan.TicksPerMillisecond * v);
+                    int decimalIndex = s.IndexOf('.');
+                    if (decimalIndex > 0)
+                    {
+                        long ticks = long.Parse(s.Substring(0, decimalIndex)) * TimeSpan.TicksPerSecond;
+                        var decimalString = s.Substring(decimalIndex + 1, s.Length - decimalIndex - 2);
+                        ticks += TicksFromDecimalString(decimalString);
+                        result = TimeSpan.FromTicks(ticks);
+                        return true;
+                    }
+                    else
+                    {
+                        long v = long.Parse(s.Substring(0, s.Length - 1));
+                        result = TimeSpan.FromTicks(TimeSpan.TicksPerSecond * v);
+                        return true;
+                    }
                 }
             }
-            else if (s.EndsWith("s"))
-            {
-                int decimalIndex = s.IndexOf('.');
-                if (decimalIndex > 0)
-                {
-                    long ticks = long.Parse(s.Substring(0, decimalIndex)) * TimeSpan.TicksPerSecond;
-                    var decimalString = s.Substring(decimalIndex + 1, s.Length - decimalIndex - 2);
-                    ticks += TicksFromDecimalString(decimalString);
-                    return TimeSpan.FromTicks(ticks);
-                }
-                else
-                {
-                    long v = long.Parse(s.Substring(0, s.Length - 1));
-                    return TimeSpan.FromTicks(TimeSpan.TicksPerSecond * v);
-                }
-            }
-            else
+            else if (s[0] == '@' && s.Length > 1 && Char.IsDigit(s[1]))
             {
                 int sep1 = s.IndexOf(':');
                 if (sep1 > 0)
@@ -104,18 +116,20 @@ namespace StepBro.Core.Data
                         int dot = s.IndexOf('.', sep2);
                         if (dot > 0)
                         {
-                            return new TimeSpan(
+                            result = new TimeSpan(
                                 int.Parse(s.Substring(1, sep1 - 1)),
                                 int.Parse(s.Substring(sep1 + 1, sep2 - sep1 - 1)),
                                 int.Parse(s.Substring(sep2 + 1, dot - sep2 - 1)))
                                 + TimeSpan.FromTicks(TicksFromDecimalString(s.Substring(dot + 1)));
+                            return true;
                         }
                         else
                         {
-                            return new TimeSpan(
+                            result = new TimeSpan(
                                 int.Parse(s.Substring(1, sep1 - 1)),
                                 int.Parse(s.Substring(sep1 + 1, sep2 - sep1 - 1)),
                                 int.Parse(s.Substring(sep2 + 1)));
+                            return true;
                         }
                     }
                     else
@@ -123,25 +137,38 @@ namespace StepBro.Core.Data
                         int dot = s.IndexOf('.', sep1);
                         if (dot > 0)
                         {
-                            return new TimeSpan(
+                            result = new TimeSpan(
                                 0,
                                 int.Parse(s.Substring(1, sep1 - 1)),                // From after the '@' until ':'
                                 int.Parse(s.Substring(sep1 + 1, dot - sep1 - 1)))   // Between the two ':'
                                 + TimeSpan.FromTicks(TicksFromDecimalString(s.Substring(dot + 1)));     // From '.' and rest
+                            return true;
                         }
                         else
                         {
-                            return new TimeSpan(
+                            result = new TimeSpan(
                             0,
                             int.Parse(s.Substring(1, sep1 - 1)),    // From after the '@' until ':'
                             int.Parse(s.Substring(sep1 + 1)));      // From ':' and rest
+                            return true;
                         }
                     }
                 }
-                else
-                {
-                    throw new NotImplementedException();
-                }
+            }
+            result = TimeSpan.Zero;
+            return false;
+        }
+
+        public static TimeSpan ParseTimeSpan(string s)
+        {
+            TimeSpan ts;
+            if (TryParse(s, out ts))
+            {
+                return ts;
+            }
+            else
+            {
+                throw new FormatException();
             }
         }
 
