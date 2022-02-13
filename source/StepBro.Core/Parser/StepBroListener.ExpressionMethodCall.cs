@@ -354,7 +354,7 @@ namespace StepBro.Core.Parser
 
             #region Find matching method and setup arguments
 
-            foreach (var m in methods)
+            foreach (MethodInfo m in methods)
             {
                 var constructedMethod = m;
                 var extensionInstance = m.IsExtension() ? instance : null;
@@ -955,7 +955,11 @@ namespace StepBro.Core.Parser
 
             if (suggestedAssignmentsOut.Count >= parameters.Length)
             {
-                if (argPicker.PickedCount < arguments.Count) throw new Exception("Not all passed arguments are used!");   // TODO: report in a better way.
+                if (argPicker.PickedCount < arguments.Count)
+                {
+                    //throw new Exception("Not all passed arguments are used!");   
+                    matchScore = 0;     // TODO: report in a better way.
+                }
                 return matchScore;
             }
             return 0;

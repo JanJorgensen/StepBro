@@ -148,7 +148,7 @@ namespace StepBro.Core.Parser
                     var parameterIndex = m_argumentIndex + parametersToSkip;
                     var resolverMethodData = new PrivateMethodInfoForLambdaResolver(method, parameterIndex);
 
-                    if (parameterIndex < parameters.Length)
+                    if (parameters.Length > parameterIndex) // If enough parameters
                     {
                         var parameter = parameters[parameterIndex];
                         var targetType = parameter.ParameterType;
@@ -213,6 +213,10 @@ namespace StepBro.Core.Parser
                                 }
                             }
                         }
+                        else
+                        {
+                            matching = false;
+                        }
                     }
                     if (matching)
                     {
@@ -224,26 +228,53 @@ namespace StepBro.Core.Parser
                     }
                 }
 
-                if (methods.Count == 1)
+                if (methods.Count > 0)
                 {
                     var methodData = methods[0];
-                    var method = methodData.Method;
-
-                    var scope = new ProcedureParsingScope(m_scopeStack.Peek(), "Lambda", ProcedureParsingScope.ScopeType.Lambda);
-                    m_scopeStack.Push(scope);
-
-                    for (int i = 0; i < parameterNames.Length; i++)
+                    methods.RemoveAt(0);
+                    bool allMatching = true;
+                    foreach (var m in methods)
                     {
-                        scope.AddLambdaExpressionParameter(methodData.LambdaParameterTypes[i], parameterNames[i]);
+                        if (m.DelegateType != methodData.DelegateType)
+                        {
+                            allMatching = false; 
+                            break;
+                        }
+                        if (m.DelegateReturnType != methodData.DelegateReturnType)
+                        {
+                            allMatching = false;
+                            break;
+                        }
+                        //public List<Tuple<string, Type>> MethodGenericArguments;
+                        //public int ParameterIndex;
+                        //public List<Type> LambdaParameterTypes;
+                        //public Type DelegateType;
+                        //public Type DelegateReturnType;
                     }
+                    if (allMatching)
+                    {
+                        //var method = methodData.Method;
 
-                    m_lambdaDelegateTargetType = methodData.DelegateType;
-                    m_lambdaDelegateReturnType = methodData.DelegateReturnType;
-                    m_lambdaDelegateGenericArguments = methodData.MethodGenericArguments;
+                        var scope = new ProcedureParsingScope(m_scopeStack.Peek(), "Lambda", ProcedureParsingScope.ScopeType.Lambda);
+                        m_scopeStack.Push(scope);
+
+                        for (int i = 0; i < parameterNames.Length; i++)
+                        {
+                            scope.AddLambdaExpressionParameter(methodData.LambdaParameterTypes[i], parameterNames[i]);
+                        }
+
+                        m_lambdaDelegateTargetType = methodData.DelegateType;
+                        m_lambdaDelegateReturnType = methodData.DelegateReturnType;
+                        m_lambdaDelegateGenericArguments = methodData.MethodGenericArguments;
+                    }
+                    else
+                    {
+                        throw new NotImplementedException("Having different matching methods is not supported. Maybe it never will, and this should just be a parsing error.");
+                    }
                 }
                 else
                 {
-                    throw new NotImplementedException("Having more than one matching methods is not supported. Maybe it never will, and this should just be a parsing error.");
+                    throw new NotImplementedException("No matching lambda method.");
                 }
             }
             else

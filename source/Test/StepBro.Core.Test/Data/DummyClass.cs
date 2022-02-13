@@ -227,6 +227,28 @@ namespace StepBroCoreTest.Data
             return -1L;
         }
 
+        public static long GenerateNumber3(Predicate<long> filter, long add)
+        {
+            for (long i = 123; i < 1000; i++)
+            {
+                if (filter(i)) return i + add;
+            }
+            return -1L;
+        }
+
+        public static long GenerateNumber(Predicate<long> filter)
+        {
+            return GenerateNumber1(filter);
+        }
+        public static long GenerateNumber(long add, Predicate<long> filter)
+        {
+            return GenerateNumber2(add, filter);
+        }
+        public static long GenerateNumber(Predicate<long> filter, long add)
+        {
+            return GenerateNumber3(filter, add);
+        }
+
         private static readonly DummyDataClass[] m_dummyDatas = new DummyDataClass[] {
                 new DummyDataClass() { BoolProp = true, IntProp = 62, UIntProp = 12u, stringProp = "Anders"},
                 new DummyDataClass() { BoolProp = false, IntProp = 9, UIntProp = 125u, stringProp = "Bent"},

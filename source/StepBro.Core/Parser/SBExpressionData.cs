@@ -48,7 +48,7 @@ namespace StepBro.Core.Parser
         public Expression ExpressionCode;
         public Expression InstanceCode = null;
         public string Instance = null;
-        public object Value;
+        private object m_value;
         public string Argument;
         public string ParameterName;
         public int ArgumentIndex = 0;
@@ -74,7 +74,7 @@ namespace StepBro.Core.Parser
             ReferencedType = referencedtype;
             DataType = type ?? (code != null ? (TypeReference)(code.Type) : null);
             ExpressionCode = code;
-            Value = value;
+            m_value = value;
             Argument = argument;
             ParameterName = parameterName;
             InstanceCode = instance;
@@ -88,7 +88,7 @@ namespace StepBro.Core.Parser
             ReferencedType = type;
             DataType = null;
             ExpressionCode = null;
-            Value = value;
+            m_value = value;
             Argument = message;
             ParameterName = null;
             Token = token;
@@ -101,7 +101,7 @@ namespace StepBro.Core.Parser
             ReferencedType = SBExpressionType.Constant;
             DataType = (TypeReference)(value.GetType());
             ExpressionCode = Expression.Constant(value);
-            Value = value;
+            m_value = value;
             Argument = null;
             ParameterName = null;
             Token = token;
@@ -113,7 +113,7 @@ namespace StepBro.Core.Parser
             ReferencedType = SBExpressionType.Constant;
             DataType = type;
             ExpressionCode = Expression.Constant(value, type.Type);
-            Value = value;
+            m_value = value;
             Argument = null;
             ParameterName = null;
             Token = token;
@@ -143,7 +143,7 @@ namespace StepBro.Core.Parser
             ReferencedType = type;
             DataType = (TypeReference)expression.Type;
             ExpressionCode = expression;
-            Value = null;
+            m_value = null;
             Argument = null;
             ParameterName = null;
         }
@@ -154,7 +154,7 @@ namespace StepBro.Core.Parser
             ReferencedType = type;
             DataType = null;
             ExpressionCode = null;
-            Value = null;
+            m_value = null;
             Argument = null;
             ParameterName = null;
         }
@@ -170,14 +170,14 @@ namespace StepBro.Core.Parser
                 DataType = null;
             }
             ExpressionCode = instance;
-            Value = methods;
+            m_value = methods;
             Argument = null;
             ParameterName = null;
         }
 
         public SBExpressionData NewExpressionCode(Expression exp)
         {
-            var value = Value;
+            var value = m_value;
             if (value != null && value is List<MethodInfo>)
             {
                 value = new List<MethodInfo>(value as List<MethodInfo>);
@@ -194,6 +194,15 @@ namespace StepBro.Core.Parser
                 SuggestsAutomaticTypeConversion,
                 Token)
             { ArgumentIndex = ArgumentIndex };
+        }
+
+        public object Value
+        {
+            get { return m_value; }
+            set
+            {
+                m_value = value;
+            }
         }
 
         public bool IsError()
@@ -317,13 +326,13 @@ namespace StepBro.Core.Parser
                 case SBExpressionType.Namespace:
                     break;
                 case SBExpressionType.Constant:
-                    Value = NarrowTypeByCasting(Value);
-                    if (Value != null)
+                    m_value = NarrowTypeByCasting(Value);
+                    if (m_value != null)
                     {
-                        t = (TypeReference)Value.GetType();
+                        t = (TypeReference)m_value.GetType();
                     }
                     DataType = t;
-                    ExpressionCode = Expression.Constant(Value, t.Type);
+                    ExpressionCode = Expression.Constant(m_value, t.Type);
                     break;
 
                 case SBExpressionType.Identifier:
@@ -404,7 +413,7 @@ namespace StepBro.Core.Parser
                 case SBExpressionType.Namespace:
                     break;
                 case SBExpressionType.Constant:
-                    Value = System.Convert.ToInt64(Value);
+                    m_value = System.Convert.ToInt64(Value);
                     ExpressionCode = Expression.Constant((Int64)Value);
                     DataType = (TypeReference)typeof(Int64);
                     break;
@@ -439,8 +448,8 @@ namespace StepBro.Core.Parser
                 case SBExpressionType.Namespace:
                     break;
                 case SBExpressionType.Constant:
-                    Value = System.Convert.ToDouble(Value);
-                    ExpressionCode = Expression.Constant((Double)Value);
+                    m_value = System.Convert.ToDouble(Value);
+                    ExpressionCode = Expression.Constant((Double)m_value);
                     DataType = (TypeReference)typeof(Double);
                     break;
                 case SBExpressionType.Identifier:
@@ -484,19 +493,19 @@ namespace StepBro.Core.Parser
         {
             if (ReferencedType == SBExpressionType.MethodReference)
             {
-                if (Value == null) return 0;
-                return ((List<MethodInfo>)Value).Count;
+                if (m_value == null) return 0;
+                return ((List<MethodInfo>)m_value).Count;
             }
             throw new NotSupportedException("The reference type is not 'MethodReference'.");
         }
 
-        public List<MethodInfo> GetMethods() { return Value as List<MethodInfo>; }
+        public List<MethodInfo> GetMethods() { return m_value as List<MethodInfo>; }
 
         public void AddMethod(MethodInfo method)
         {
             if (ReferencedType == SBExpressionType.MethodReference)
             {
-                var list = Value as List<MethodInfo>;
+                var list = m_value as List<MethodInfo>;
                 if (list == null) throw new NotSupportedException("The element does not contain a method list.");
                 list.Add(method);
             }
@@ -510,7 +519,7 @@ namespace StepBro.Core.Parser
         {
             if (ReferencedType == SBExpressionType.MethodReference)
             {
-                var list = Value as List<MethodInfo>;
+                var list = m_value as List<MethodInfo>;
                 if (list == null) throw new NotSupportedException("The element does not contain a method list.");
                 if (!list.Remove(method))
                 {
@@ -525,7 +534,7 @@ namespace StepBro.Core.Parser
 
         public StepBro.Core.Api.NamespaceList NamespaceList
         {
-            get { return (StepBro.Core.Api.NamespaceList)Value; }
+            get { return (StepBro.Core.Api.NamespaceList)m_value; }
         }
     }
 }
