@@ -2,8 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0-windows</TargetFramework>
-    <AssemblyName>StepBro.CAN</AssemblyName>
-    <RootNamespace>StepBro.CAN</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>StepBro.IronPython</AssemblyName>
+    <RootNamespace>StepBro.IronPython</RootNamespace>
     <OutputPath>..\..\bin\Modules</OutputPath>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -13,36 +15,19 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-  </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Channel.cs" />
-    <Compile Remove="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\..\CommonVersion.cs" Link="CommonVersion.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Channel.cs" />
+    <PackageReference Include="IronPython" Version="3.4.0-beta1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\StepBro.Core\StepBro.Core5.csproj">
-      <Private>false</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\..\StepBro.Core\StepBro.Core5.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
 </Project>

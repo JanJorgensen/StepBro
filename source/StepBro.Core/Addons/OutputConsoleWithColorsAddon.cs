@@ -6,7 +6,7 @@ using System;
 namespace StepBro.Core.Addons
 {
     [Public]
-    public class OutputConsoleWithColorsAddon : IOutputFormatterTypeAddon, IOutputFormatter
+    public class OutputConsoleWithColorsAddon : IOutputFormatterTypeAddon
     {
         static public string Name { get { return "Console"; } }
 
@@ -20,7 +20,7 @@ namespace StepBro.Core.Addons
 
         public IOutputFormatter Create()
         {
-            return this;
+            return new TextToConsoleFormatter();
         }
 
         public IOutputFormatter Create(ITextWriter writer)
@@ -28,55 +28,48 @@ namespace StepBro.Core.Addons
             throw new NotImplementedException();
         }
 
-        void IOutputFormatter.LogEntry(LogEntry entry, DateTime zero)
-        {
-            var txt = entry.ToClearText(zero, false);
-            if (txt != null)
-            {
-                switch (entry.EntryType)
-                {
-                    case Logging.LogEntry.Type.Pre:
-                    case Logging.LogEntry.Type.TaskEntry:
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        break;
-                    case Logging.LogEntry.Type.Normal:
-                    case Logging.LogEntry.Type.Post:
-                        Console.ForegroundColor = ConsoleColor.White;
-                        break;
-                    case Logging.LogEntry.Type.Async:
-                        Console.ForegroundColor = ConsoleColor.DarkYellow;
-                        break;
-                    case Logging.LogEntry.Type.Error:
-                    case Logging.LogEntry.Type.Failure:
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        break;
-                    case Logging.LogEntry.Type.UserAction:
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        break;
-                    case Logging.LogEntry.Type.Detail:
-                        Console.ForegroundColor = ConsoleColor.DarkGray;
-                        break;
-                    case Logging.LogEntry.Type.System:
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        break;
-                    default:
-                        break;
-                }
-                Console.WriteLine(txt);
-            }
-        }
-
         public class TextToConsoleFormatter : IOutputFormatter, ITextWriter
         {
-            private IOutputFormatter m_textFormatter;
-            public TextToConsoleFormatter(IOutputFormatterTypeAddon textFormatter)
+            public TextToConsoleFormatter()
             {
-                m_textFormatter = textFormatter.Create(this);
             }
 
             public void LogEntry(LogEntry entry, DateTime zero)
             {
-                m_textFormatter.LogEntry(entry, zero);
+                var txt = entry.ToClearText(zero, false);
+                if (txt != null)
+                {
+                    switch (entry.EntryType)
+                    {
+                        case Logging.LogEntry.Type.Pre:
+                        case Logging.LogEntry.Type.TaskEntry:
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            break;
+                        case Logging.LogEntry.Type.Normal:
+                        case Logging.LogEntry.Type.Post:
+                            Console.ForegroundColor = ConsoleColor.White;
+                            break;
+                        case Logging.LogEntry.Type.Async:
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            break;
+                        case Logging.LogEntry.Type.Error:
+                        case Logging.LogEntry.Type.Failure:
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            break;
+                        case Logging.LogEntry.Type.UserAction:
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            break;
+                        case Logging.LogEntry.Type.Detail:
+                            Console.ForegroundColor = ConsoleColor.DarkGray;
+                            break;
+                        case Logging.LogEntry.Type.System:
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            break;
+                        default:
+                            break;
+                    }
+                    Console.WriteLine(txt);
+                }
             }
 
             void ITextWriter.Write(string text)

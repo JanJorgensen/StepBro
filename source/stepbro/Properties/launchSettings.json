@@ -1,9 +1,18 @@
 {
   "profiles": {
-    "StepBro.Console": {
+    "Console S3B Test": {
       "commandName": "Project",
-      "commandLineArgs": "ConsoleTest.sbs -t --lf AzureLog -e ExpectGreaterThanTen -a 8",
-      "workingDirectory": "..\\..\\test files\\smoketest"
+      "commandLineArgs": "S3BTest.sbs -t --execute S3BTests --model DirectTest",
+      "workingDirectory": "C:\\SW_development\\Platform\\esw-platform-picked\\test\\systest\\S3B"
+    },
+    "Console Help": {
+      "commandName": "Project",
+      "commandLineArgs": "--help"
+    },
+    "Harness Test": {
+      "commandName": "Project",
+      "commandLineArgs": "S3BTest.sbs -t --execute S3BTests --model DirectTest",
+      "workingDirectory": "C:\\SW_development\\Platform\\esw-platform-picked\\test\\systest\\HarnessTest"
     }
   }
 }

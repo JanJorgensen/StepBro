@@ -6,19 +6,27 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Data
 {
-    //public interface IElementIndexer
-    //{
-    //    long FirstIndex { get; }
-    //    long LastIndex { get; }
-    //    int EffectiveCount { get; }
-    //    object this[long index] { get; }
-    //}
-
-    public interface IElementIndexer<T>
+    public struct IndexerStateSnapshot
     {
-        long FirstIndex { get; }
-        long LastIndex { get; }
-        int EffectiveCount { get; }
-        T this[long index] { get; }
+        public IndexerStateSnapshot(ulong first, ulong last, ulong count)
+        {
+            this.FirstIndex = first;
+            this.LastIndex = last;
+            this.EffectiveCount = count;
+        }
+        public ulong FirstIndex { get; private set; }
+        public ulong LastIndex { get; private set; }
+        public ulong EffectiveCount { get; private set; }
+    }
+
+    public interface IElementIndexer
+    {
+        IndexerStateSnapshot GetState();
+        object this[long index] { get; }
+    }
+
+    public interface IElementIndexer<T> : IElementIndexer
+    {
+        T Get(ulong index);
     }
 }

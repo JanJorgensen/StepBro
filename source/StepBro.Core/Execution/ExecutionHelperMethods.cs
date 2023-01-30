@@ -504,7 +504,11 @@ namespace StepBro.Core.Execution
         {
             if (!result.IsCompleted)
             {
-                result.AsyncWaitHandle.WaitOne();
+                if (!result.AsyncWaitHandle.WaitOne(10000))
+                {
+                    context.ReportError("Timeout");
+                    return default(T);
+                }
             }
             return result.Result;
         }

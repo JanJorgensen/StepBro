@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Logging
 {
-    public class LogStorage<T> : ILogHistory where T : ILogHistoryEntry
+    public class LogStorage<T> : ILogHistory<T> where T : ILogHistoryEntry
     {
         private object m_addSync = new object();
         private object m_getSync = new object();

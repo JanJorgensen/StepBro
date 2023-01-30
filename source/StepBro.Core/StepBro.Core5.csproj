@@ -35,6 +35,7 @@
     <Compile Remove="Data\IObjectPanelManager.cs" />
     <Compile Remove="Data\ObjectPanelCreator.cs" />
     <Compile Remove="Data\ObjectPanelManager.cs" />
+    <Compile Remove="Logging\LogStorage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Remove=".gitignore" />

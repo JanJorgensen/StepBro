@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Logging
 {
-    public interface ILogHistoryEntry
+    public interface ILogEntry
     {
+        ulong Id { get; }
         DateTime Timestamp { get; }
     }
 
-    public interface ILogHistory : IElementIndexer<ILogHistoryEntry>
+    public interface ILogHistory<T> : IElementIndexer<T> where T : ILogEntry
     {
     }
 }

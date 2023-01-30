@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Logging
 {
-    public class LogEntry : ILogHistoryEntry
+    public class LogEntry : ILogEntry
     {
         public enum Type
         {
@@ -41,13 +41,13 @@ namespace StepBro.Core.Logging
         private LogEntry m_next = null;
         private LogEntry m_parent;
         private Type m_type;
-        private uint m_id;
+        private ulong m_id;
         private DateTime m_timestamp;
         private int m_threadId;
         private string m_location;
         private string m_text;
 
-        internal LogEntry(uint id, DateTime timestamp, int thread, string location, string text)
+        internal LogEntry(ulong id, DateTime timestamp, int thread, string location, string text)
         {
             m_parent = null;
             m_type = Type.Pre;
@@ -58,7 +58,7 @@ namespace StepBro.Core.Logging
             m_text = text;
         }
 
-        internal LogEntry(LogEntry previous, LogEntry parent, Type type, uint id, DateTime timestamp, int thread, string location, string text)
+        internal LogEntry(LogEntry previous, LogEntry parent, Type type, ulong id, DateTime timestamp, int thread, string location, string text)
         {
             previous.m_next = this;
             m_parent = parent;
@@ -83,7 +83,7 @@ namespace StepBro.Core.Logging
 
         public Type EntryType { get { return m_type; } }
 
-        public uint Id { get { return m_id; } }
+        public ulong Id { get { return m_id; } }
 
         public DateTime Timestamp { get { return m_timestamp; } }
 

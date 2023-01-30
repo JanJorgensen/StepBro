@@ -73,11 +73,28 @@ namespace StepBro.Core
                     m.AddAssembly(typeof(Enumerable).Assembly, false);
                     m.AddAssembly(typeof(Math).Assembly, false);
                     m.AddAssembly(AddonManager.StepBroCoreAssembly, true);
-
                     var modulesFolder = Path.Combine(Path.GetDirectoryName(typeof(AddonManager).Assembly.Location), "Modules");
-                    foreach (var f in Directory.GetFiles(modulesFolder, "*.dll"))
+                    var modulesListFile = Path.Combine(modulesFolder, Constants.PLUGINS_LIST_FILE);
+                    if (System.IO.File.Exists(modulesListFile))
                     {
-                        m.LoadAssembly(f, false);
+                        var modulesListData = modulesListFile.GetPropertyBlockFromFile();
+                        var list = modulesListData[0] as PropertyBlockArray;
+                        foreach (PropertyBlockValue entry in list)
+                        {
+                            var filepath = entry.Value as string;
+                            if (!System.IO.Path.IsPathFullyQualified(filepath))
+                            {
+                                filepath = Path.Combine(modulesFolder, filepath);
+                            }
+                            m.LoadAssembly(filepath, false);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var f in Directory.GetFiles(modulesFolder, "*.dll"))
+                        {
+                            m.LoadAssembly(f, false);
+                        }
                     }
                 },
                 out service);

@@ -18,5 +18,6 @@ namespace StepBro.Core.Api
         public static readonly string VARIABLE_DEVICE_REFERENCE = "device";
         public static readonly string STEPBRO_FOLDER_CONFIG_FILE = "StepBro.cfg";
         public static readonly string FOLDER_CONFIG_FILE_ROOT_FLAG = "RootFolderHere";
+        public static readonly string PLUGINS_LIST_FILE = "StepBro Plugins.cfg";
     }
 }

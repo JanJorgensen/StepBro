@@ -10,8 +10,6 @@ namespace StepBro.Core.General
 {
     public class CoreCommandlineOptions
     {
-
-        //[Option('r', "read", HelpText = "Script file to load.")]
         [Value(0, MetaName = "file", HelpText = "Script file to load.")]
         public string InputFile { get; set; }
 
@@ -21,8 +19,8 @@ namespace StepBro.Core.General
         [Option('m', "model", HelpText = "Model procedure to handle the execution of the target element.")]
         public string Model { get; set; }
 
-        //[Option('p', "project", HelpText = "Project file to use.")]
-        //public string ProjectFile { get; set; }
+        [Option('a', "arguments", Separator = ',')]
+        public IEnumerable<string> Arguments { get; set; }
 
         /// <summary>
         /// Whether there were errors when parsing the command line.
@@ -33,9 +31,5 @@ namespace StepBro.Core.General
         /// Lists the command line parsing errors, if any.
         /// </summary>
         public IEnumerable<Error> ParsingErrors { get; internal set; } = null;
-
-        [Option('a', "arguments", Separator = ',')]
-        public IEnumerable<string> Arguments { get; set; }
-
     }
 }

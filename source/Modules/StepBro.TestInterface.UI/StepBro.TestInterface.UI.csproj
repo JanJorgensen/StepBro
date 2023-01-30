@@ -6,6 +6,7 @@
     <AssemblyName>StepBro.TestInterface.UI</AssemblyName>
     <RootNamespace>StepBro.TestInterface.UI</RootNamespace>
     <OutputPath>..\..\bin\Modules</OutputPath>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <InvariantGlobalization>true</InvariantGlobalization>

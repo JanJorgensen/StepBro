@@ -189,7 +189,7 @@ namespace StepBro.TestInterface
                                 {
                                     if (s.StartsWith('\"'))
                                     {
-                                        m_result = s[1..(s.Length-2)];
+                                        m_result = s[1..(s.Length - 2)];
                                     }
                                     else if (TimeUtils.TryParse(s, out TimeSpan v_timespan))
                                     {
@@ -289,6 +289,7 @@ namespace StepBro.TestInterface
         private static Random rnd = new Random(DateTime.Now.GetHashCode());
         private Dictionary<string, string> m_loopbackAnswers = null;
         private List<Tuple<string, string>> m_uiCommands = null;
+        private List<string> m_setupCommands = null;
 
         private List<RemoteProcedureInfo> m_remoteProcedures = new List<RemoteProcedureInfo>();
 
@@ -429,16 +430,16 @@ namespace StepBro.TestInterface
             {
                 context.Logger.Log("\"" + command + "\"");
             }
-            var request = new List<string>();
-            request.Add(command);
+            var commandParts = new List<string>();
+            commandParts.Add(command);
             if (arguments != null && arguments.Length > 0)
             {
                 foreach (var a in arguments)
                 {
-                    request.Add(ArgumentToCommandString(a));
+                    commandParts.Add(ArgumentToCommandString(a));
                 }
             }
-            var commandData = new CommandData(context, String.Join(" ", request), CommandResponseTimeout, null);
+            var commandData = new CommandData(context, String.Join(" ", commandParts), CommandResponseTimeout, null);
             return EnqueueCommand(commandData);
         }
 
@@ -449,6 +450,47 @@ namespace StepBro.TestInterface
                 context.Logger.Log("SendDirect: \"" + text + "\"");
             }
             DoSendDirect(text);
+        }
+
+        public void AddSetupCommand([Implicit] ICallContext context, string command, params object[] arguments)
+        {
+            var commandParts = new List<string>();
+            commandParts.Add(command);
+            if (arguments != null && arguments.Length > 0)
+            {
+                foreach (var a in arguments)
+                {
+                    commandParts.Add(ArgumentToCommandString(a));
+                }
+            }
+            var commandString = String.Join(" ", commandParts);
+            if (context != null && context.LoggingEnabled)
+            {
+                context.Logger.Log("Command: \"" + commandString + "\"");
+            }
+            if (m_setupCommands == null) m_setupCommands = new List<string>();
+            m_setupCommands.Add(commandString);
+        }
+
+        public string CreateSetupCommandsHash([Implicit] ICallContext context)
+        {
+            var hash = (m_setupCommands != null) ? m_setupCommands.GetHashCode().ToString("X") : string.Empty;
+            if (context != null && context.LoggingEnabled)
+            {
+                context.Logger.Log("Hash: " + hash);
+            }
+            return hash;
+        }
+
+        public IAsyncResult SendSetupCommands([Implicit] ICallContext context)
+        {
+            IAsyncResult last = null;
+            foreach (var command in m_setupCommands)
+            {
+                var commandData = new CommandData(context, command, this.CommandResponseTimeout, null);
+                last = EnqueueCommand(commandData);
+            }
+            return last;    // Return the last command to allow caller to wait until all commands have been executed.
         }
 
         public IAsyncResult<bool> UpdateInterfaceData([Implicit] ICallContext context = null)
@@ -486,7 +528,7 @@ namespace StepBro.TestInterface
             var task = Task.Run<bool>(() =>
             {
                 // FIRST GET THE LIST OF AVAILABLE COMMANDS
-                var command = new CommandData(context, "list commands", CommandResponseTimeout, typeof(List<string>));
+                var command = new CommandData(context, "list commands", this.CommandResponseTimeout, typeof(List<string>));
                 var cmd = EnqueueCommand(command);
                 if (cmd.CompletedSynchronously)
                 {
@@ -494,7 +536,7 @@ namespace StepBro.TestInterface
                 }
                 else
                 {
-                    if (cmd.AsyncWaitHandle.WaitOne(CommandResponseTimeout))
+                    if (cmd.AsyncWaitHandle.WaitOne(this.CommandResponseTimeout))
                     {
                         if (cmd.IsFaulted)
                         {
@@ -508,7 +550,7 @@ namespace StepBro.TestInterface
                             var commandName = DecodeCommandListLine(commandListLine, out id);
 
                             // THEN, GET THE INFORMATION FOR EACH COMMAND
-                            command = new CommandData(context, "help " + commandName, CommandResponseTimeout, typeof(List<string>));
+                            command = new CommandData(context, "help " + commandName, this.CommandResponseTimeout, typeof(List<string>));
                             cmd = EnqueueCommand(command);
 
                             if (cmd.CompletedSynchronously)
@@ -517,7 +559,7 @@ namespace StepBro.TestInterface
                             }
                             else
                             {
-                                if (cmd.AsyncWaitHandle.WaitOne(CommandResponseTimeout))
+                                if (cmd.AsyncWaitHandle.WaitOne(this.CommandResponseTimeout))
                                 {
                                     if (cmd.Result is List<string>)
                                     {

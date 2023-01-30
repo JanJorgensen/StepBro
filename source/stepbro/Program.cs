@@ -78,14 +78,12 @@ namespace StepBro.Cmd
                     retval = -1;
                     throw new ExitException();
                 }
-                if (m_logDumpAddon.FormatterType == OutputType.Console)
+                if (m_logDumpAddon.FormatterType != OutputType.Console)
                 {
-                    m_logDumpFormatter = m_logDumpAddon.Create();
+                    m_logDumpAddon = StepBroMain.GetService<Core.Api.IAddonManager>().TryGetAddon<IOutputFormatterTypeAddon>(OutputConsoleWithColorsAddon.Name);
                 }
-                else
-                {
-                    m_logDumpFormatter = new OutputConsoleWithColorsAddon.TextToConsoleFormatter(m_logDumpAddon);
-                }
+                m_logDumpFormatter = m_logDumpAddon.Create();
+                //m_logDumpFormatter = new OutputConsoleWithColorsAddon.TextToConsoleFormatter(m_logDumpAddon);
 
                 if (m_commandLineOptions.Verbose)
                 {
@@ -301,6 +299,7 @@ namespace StepBro.Cmd
                 Console.WriteLine(value, args);
             }
         }
+
         private static void FlushBufferedConsoleOutput()
         {
             foreach (var s in m_bufferedOutput)
