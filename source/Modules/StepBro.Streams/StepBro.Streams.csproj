@@ -5,6 +5,7 @@
     <AssemblyName>StepBro.Streams</AssemblyName>
     <RootNamespace>StepBro.Streams</RootNamespace>
     <OutputPath>..\..\bin\Modules</OutputPath>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <InvariantGlobalization>true</InvariantGlobalization>
@@ -34,5 +35,4 @@
       <Private>false</Private>
     </ProjectReference>
   </ItemGroup>
-
 </Project>

@@ -104,7 +104,7 @@ namespace StepBro.Streams
             m_port = new System.IO.Ports.SerialPort();
             m_port.ErrorReceived += this.Port_ErrorReceived;
             m_port.DataReceived += this.Port_DataReceived;
-            m_port.Encoding = new ASCIIEncoding();
+            m_port.Encoding = Encoding.Latin1;
             m_asyncLogger = Core.Main.GetService<ILogger>().LogEntering("<find a name for SerialPort>", "Create SerialPort");
         }
 
