@@ -15,6 +15,7 @@ namespace StepBroCoreTest.Parser
             Assert.IsTrue(LastExecutionTime >= TimeSpan.FromTicks(TimeSpan.TicksPerMillisecond * 200));
             Assert.IsTrue(LastExecutionTime < TimeSpan.FromTicks(TimeSpan.TicksPerMillisecond * 220));
         }
+
         [TestMethod]
         public void ExecuteDelay2()
         {
@@ -26,6 +27,30 @@ namespace StepBroCoreTest.Parser
 
             object result = proc.Call();
             Assert.IsNull(result);
+        }
+
+        [TestMethod]
+        public void StringParseToInteger()
+        {
+            var proc = FileBuilder.ParseProcedure("int Func(){ var v = \"726\".ToInt(); return v; }");
+
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.GetType() == typeof(long));
+            Assert.AreEqual(726L, (long)result);
+
+            proc = FileBuilder.ParseProcedure("int Func(){ var v = \"*d7\".ToInt(); return v; }");
+
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+
+            result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.GetType() == typeof(long));
+            Assert.AreEqual(0L, (long)result);                  // Default value because the parsing failed.
         }
 
         [TestMethod]

@@ -521,7 +521,14 @@ namespace StepBro.Core.Execution
                 m_errorException = ex;
                 m_errorListener?.Invoke(m_procedure, m_currentStatementLine, id, errorDescription, ex);
             }
-            this.LogError(errorDescription);
+            if (ex != null)
+            {
+                this.LogError(errorDescription + (errorDescription.EndsWith(".") ? " " : ". ") + ex.GetType().Name + " - " + ex.Message);
+            }
+            else
+            {
+                this.LogError(errorDescription);
+            }
         }
         public void AddPartResult(IProcedureReference procedure, ProcedureResult result)
         {

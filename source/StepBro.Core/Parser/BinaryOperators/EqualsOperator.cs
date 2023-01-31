@@ -13,7 +13,7 @@ namespace StepBro.Core.Parser.BinaryOperators
         }
         private BinaryExpression EqualityExpression(Expression left, Expression right)
         {
-            if (m_invert) return Expression.Equal(left, right);
+            if (m_invert) return Expression.NotEqual(left, right);
             else return Expression.Equal(left, right);
         }
 
@@ -40,6 +40,10 @@ namespace StepBro.Core.Parser.BinaryOperators
                 else if (f is long && s is double)
                 {
                     return new SBExpressionData(((long)f == (double)s) ^ m_invert);
+                }
+                else if (f is string && s is string)
+                {
+                    return new SBExpressionData(String.Equals((string)f, (string)s) ^ m_invert);
                 }
                 else if (f is TimeSpan && s is TimeSpan)
                 {

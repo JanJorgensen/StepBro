@@ -251,5 +251,14 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(false, ParseAndRun<bool>(comparison, "datetime a = @2000-01-01 12:45:30.00001;"));
             Assert.AreEqual(false, ParseAndRun<bool>(comparison, "datetime a = @2000-01-01 12:46:00;"));
         }
+
+        [TestMethod]
+        public void TestEqualsString()
+        {
+            Assert.AreEqual(true, ParseAndRun<bool>("s1 == \"Henry\"", "var s1 = \"Henry\";"));
+            Assert.AreEqual(false, ParseAndRun<bool>("s1 != \"Henry\"", "var s1 = \"Henry\";"));
+            Assert.AreEqual(false, ParseAndRun<bool>("s1 == \"Henny\"", "var s1 = \"Henry\";"));
+            Assert.AreEqual(true, ParseAndRun<bool>("s1 != \"Henny\"", "var s1 = \"Henry\";"));
+        }
     }
 }

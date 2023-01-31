@@ -102,6 +102,21 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
+        public static long ToInt(this string text, [Implicit] ICallContext context)
+        {
+            long v = 0L;
+            if (Int64.TryParse(text, out v))
+            {
+                return v;
+            }
+            else
+            {
+                context?.ReportError($"Could not parse string \"{text}\" to an integer value.");
+                return 0;
+            }
+        }
+
+        [Public]
         public static void NextProcedureIsHighLevel([Implicit] ICallContext context, string type)
         {
             var internalContext = ToScriptContext(context);
