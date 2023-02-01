@@ -57,21 +57,25 @@ namespace StepBro.Core.Logging
 
     public static class DebugLogUtils
     {
+        private static object sync = new object();
         public static void DumpToFile(DebugLogEntry start = null)
         {
             var first = (start == null) ? DebugLogEntry.First : start;
             var entry = first;
-            using (System.IO.FileStream dump = new System.IO.FileStream(
-                System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\StepBro DebugLog.txt",
-                System.IO.FileMode.Create, System.IO.FileAccess.Write,
-                System.IO.FileShare.None))
+            lock(sync)
             {
-                using (System.IO.StreamWriter writer = new System.IO.StreamWriter(dump))
+                using (System.IO.FileStream dump = new System.IO.FileStream(
+                    System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\StepBro DebugLog.txt",
+                    System.IO.FileMode.Create, System.IO.FileAccess.Write,
+                    System.IO.FileShare.None))
                 {
-                    while (entry != null)
+                    using (System.IO.StreamWriter writer = new System.IO.StreamWriter(dump))
                     {
-                        writer.WriteLine(entry.Timestamp.ToMinutesTimestamp(first.Timestamp) + "  " + entry.ToString());
-                        entry = entry.Next;
+                        while (entry != null)
+                        {
+                            writer.WriteLine(entry.Timestamp.ToMinutesTimestamp(first.Timestamp) + "  " + entry.ToString());
+                            entry = entry.Next;
+                        }
                     }
                 }
             }
