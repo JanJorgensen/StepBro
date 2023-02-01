@@ -4,6 +4,7 @@ using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using System;
 using System.Text;
+using System.Xml.Linq;
 
 namespace StepBro.Streams
 {
@@ -88,26 +89,40 @@ namespace StepBro.Streams
     }
 
     [Public]
-    public class SerialPort : Stream
+    public class SerialPort : Stream, INameable
     {
         public delegate void OpenPortFailureExplorer(ICallContext context, Exception ex);
         private static OpenPortFailureExplorer s_OpenPortFailureExplorer = null;
 
+        private string m_objectName;
         private System.IO.Ports.SerialPort m_port;
         private long m_dataReceivedCounter = 0L;
         private ArrayFifo<byte> m_binaryFifo = null;
         private ArrayFifo<char> m_textualFifo = null;
         private ILogger m_asyncLogger = null;
+        private bool m_reportOverrun = false;
 
-        public SerialPort()
+        public SerialPort([ObjectName] string objectName = "<a SerialPort>")
         {
             m_port = new System.IO.Ports.SerialPort();
             m_port.ErrorReceived += this.Port_ErrorReceived;
             m_port.DataReceived += this.Port_DataReceived;
             m_port.Encoding = Encoding.Latin1;
-            m_asyncLogger = Core.Main.GetService<ILogger>().LogEntering("<find a name for SerialPort>", "Create SerialPort");
+            m_objectName = objectName;
+            m_asyncLogger = Core.Main.GetService<ILogger>().LogEntering(m_objectName, "Create SerialPort");
         }
 
+        [ObjectName]
+        public string Name
+        {
+            get { return m_objectName; }
+            set
+            {
+                if (String.IsNullOrWhiteSpace(value)) throw new ArgumentException();
+                if (m_objectName != null) throw new InvalidOperationException("The object is already named.");
+                m_objectName = value;
+            }
+        }
         internal System.IO.Ports.SerialPort Port { get { return m_port; } }
         public long DataReceivedCounter { get { return m_dataReceivedCounter; } }
         public string PortName { get { return m_port.PortName; } set { m_port.PortName = value; } }
@@ -148,7 +163,10 @@ namespace StepBro.Streams
 
         private void Port_ErrorReceived(object sender, System.IO.Ports.SerialErrorReceivedEventArgs e)
         {
-            m_asyncLogger.LogError(e.EventType.ToString());
+            if (m_reportOverrun || e.EventType != System.IO.Ports.SerialError.Overrun)
+            {
+                m_asyncLogger.LogError(e.EventType.ToString());
+            }
         }
 
         protected override void DoDispose()
@@ -201,6 +219,7 @@ namespace StepBro.Streams
             try
             {
                 m_port.DiscardInBuffer();
+                m_reportOverrun = true;
             }
             catch (Exception ex)
             {
@@ -214,6 +233,7 @@ namespace StepBro.Streams
             if (m_port.IsOpen)
             {
                 m_port.Close();
+                m_reportOverrun = false;
             }
         }
 

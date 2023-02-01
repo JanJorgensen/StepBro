@@ -293,8 +293,9 @@ namespace StepBro.TestInterface
 
         private List<RemoteProcedureInfo> m_remoteProcedures = new List<RemoteProcedureInfo>();
 
-        public SerialTestConnection()
+        public SerialTestConnection([ObjectName] string objectName = "<a SerialPort>")
         {
+            m_name= objectName;
             m_instanceID = rnd.Next(1000000);
             m_newResponseDataEvent = new AutoResetEvent(false);
             SetupDebugCommands();
@@ -311,6 +312,7 @@ namespace StepBro.TestInterface
             }
         }
 
+        [ObjectName]
         public string Name
         {
             get { return m_name; }

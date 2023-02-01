@@ -196,20 +196,32 @@ namespace StepBro.Core.Parser
             else
             {
                 #region Creator Action
-                var ctor = type.Type.GetConstructor(new Type[] { });
-                if (ctor != null)
+                // First check if there's a ctor with object name as parameter.
+                var ctor = type.Type.GetConstructor(new Type[] { typeof(string) });
+                if (ctor != null && ObjectNameAttribute.IsObjectName(ctor.GetParameters()[0]))
                 {
-                    var code = Expression.New(ctor);
+                    var code = Expression.New(ctor, Expression.Constant(m_variableName));
                     createAction = CreateVariableContainerValueAssignAction(code);
                 }
                 else
                 {
-                    var createMethods =
-                        type.Type.GetMethods().Where(
-                            m => String.Equals(m.Name, "Create", StringComparison.InvariantCulture) && m.IsStatic).ToArray();
-                    throw new NotImplementedException();
+                    // else, try using the default ctor.
+                    ctor = type.Type.GetConstructor(new Type[] { });
+                    if (ctor != null)
+                    {
+                        var code = Expression.New(ctor);
+                        createAction = CreateVariableContainerValueAssignAction(code);
+                    }
+                    else
+                    {
+                        var createMethods =
+                            type.Type.GetMethods().Where(
+                                m => String.Equals(m.Name, "Create", StringComparison.InvariantCulture) && m.IsStatic).ToArray();
+                        throw new NotImplementedException();
+                    }
                 }
                 #endregion
+                
                 #region Reset Action
                 var resettable = type.Type.GetInterface(nameof(IResettable));
                 if (resettable != null)

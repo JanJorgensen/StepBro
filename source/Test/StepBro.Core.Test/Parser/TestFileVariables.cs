@@ -7,6 +7,7 @@ using StepBro.Core.Data;
 using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
+using StepBro.Core.Api;
 
 namespace StepBroCoreTest.Parser
 {
@@ -87,6 +88,12 @@ namespace StepBroCoreTest.Parser
 
             Assert.AreEqual("ObjectUsing", files[0].Namespace);
 
+            var variable = files[0].ListElements().First(p => p.Name == "myTool") as FileVariable;
+            Assert.IsNotNull(variable);
+            var variableObject = variable.VariableOwnerAccess.Container.GetValue() as INameable;
+            Assert.IsNotNull(variableObject);
+            Assert.AreEqual("myTool", variableObject.Name);
+
             var procedure = files[0].ListElements().First(p => p.Name == "Test1") as IFileProcedure;
             Assert.AreEqual("Test1", procedure.Name);
             var taskContext = ExecutionHelper.ExeContext();
@@ -121,6 +128,12 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual("ObjectUsing", files[0].Namespace);
             var procedure = files[0].ListElements().First(p => p.Name == "UseObject") as IFileProcedure;
             Assert.AreEqual("UseObject", procedure.Name);
+
+            var variable = files[0].ListElements().First(p => p.Name == "myTool") as FileVariable;
+            Assert.IsNotNull(variable);
+            var variableObject = variable.VariableOwnerAccess.Container.GetValue() as INameable;
+            Assert.IsNotNull(variableObject);
+            Assert.AreEqual("myTool", variableObject.Name);
 
             var taskContext = ExecutionHelper.ExeContext();
             var result = taskContext.CallProcedure(procedure);
@@ -168,21 +181,24 @@ namespace StepBroCoreTest.Parser
 
     }
 
-    public class DummyInstrumentClass : IDisposable, IResettable
+    public class DummyInstrumentClass : IDisposable, IResettable, INameable
     {
         public static long m_nextInstanceID = 10;
 
+        private string m_objectName;
         private List<string> m_names = new List<string>();
         private long m_id;
         private long m_resetCounts = 0;
 
-        public DummyInstrumentClass()
+        public DummyInstrumentClass([ObjectName] string objectName = "<no name>")
         {
+            m_objectName = objectName;
             m_id = m_nextInstanceID++;
         }
 
-        public DummyInstrumentClass(string[] names) : this()
+        public DummyInstrumentClass(string[] names, [ObjectName] string objectName = "<no name>") : this()
         {
+            m_objectName = objectName;
             m_names = names.ToList();
         }
 
@@ -193,6 +209,9 @@ namespace StepBroCoreTest.Parser
         public bool BoolA { get; set; } = false;
         public long IntA { get; set; } = 0L;
         public List<string> Names { get { return m_names; } set { m_names = value; } }
+
+        [ObjectName] 
+        public string Name { get { return m_objectName; } set { m_objectName = value; } }
 
         public void Dispose()
         {
