@@ -31,5 +31,11 @@ namespace StepBroCoreTest.Parser
         {
             Assert.AreEqual("Prop is: False", ParseAndRun<string>("\"Prop is: \" + varDummyA.PropBool", varDummyClass: true));
         }
+
+        [TestMethod]
+        public void TestStringCharIndexing()
+        {
+            Assert.AreEqual("C", ParseAndRun<string>("\"ABCD\"[2]"));
+        }
     }
 }

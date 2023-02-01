@@ -30,6 +30,10 @@ namespace StepBro.Core.Parser
             {
                 throw new NotImplementedException();
             }
+            else if (sourceType.Type == typeof(string))
+            {
+                m_expressionData.Push(this.CreateStringIndexerExpression(source, indexingExpressions[0]));
+            }
             else
             {
                 throw new NotImplementedException();
@@ -64,6 +68,23 @@ namespace StepBro.Core.Parser
             }
         }
 
+        public SBExpressionData CreateStringIndexerExpression(SBExpressionData source, SBExpressionData indexer)
+        {
+            var indexerCode = indexer.ExpressionCode;
+
+            if (indexer.DataType.Equals(typeof(long)))
+            {
+                indexerCode = Expression.Convert(indexerCode, typeof(int));
+            }
+            else if (!indexer.DataType.Equals(typeof(int)))
+            {
+                throw new NotImplementedException("An indexer type not supported yet.");
+            }
+
+            var substringExpression = Expression.Call(source.ExpressionCode, typeof(string).GetMethod(nameof(String.Substring), new Type[] { typeof(Int32), typeof(Int32)}), indexerCode, Expression.Constant(1));
+            return new SBExpressionData(substringExpression, SBExpressionType.Expression);
+        }
+
         public override void EnterExpArray([NotNull] SBP.ExpArrayContext context)
         {
             m_expressionData.PushStackLevel("ExpressionArray");
@@ -72,7 +93,7 @@ namespace StepBro.Core.Parser
         public override void ExitExpArray([NotNull] SBP.ExpArrayContext context)
         {
             var valueParserExpressions = m_expressionData.PopStackLevel().ToList();
-            for (int i = 0; i < valueParserExpressions.Count;i++)
+            for (int i = 0; i < valueParserExpressions.Count; i++)
             {
                 valueParserExpressions[i] = this.ResolveForGetOperation(valueParserExpressions[i]);
             }
