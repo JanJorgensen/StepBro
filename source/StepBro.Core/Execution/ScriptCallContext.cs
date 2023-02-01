@@ -523,7 +523,7 @@ namespace StepBro.Core.Execution
             }
             if (ex != null)
             {
-                this.LogError(errorDescription + (errorDescription.EndsWith(".") ? " " : ". ") + ex.GetType().Name + " - " + ex.Message);
+                this.LogError(errorDescription + (errorDescription.EndsWith(".") ? " " : ".") + "\n\t" + ex.GetType().Name + " - " + ex.Message + "\n" + ex.StackTrace);
             }
             else
             {
