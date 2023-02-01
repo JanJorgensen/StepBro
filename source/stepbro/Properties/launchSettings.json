@@ -13,6 +13,11 @@
       "commandName": "Project",
       "commandLineArgs": "S3BTest.sbs -t --execute S3BTests --model DirectTest",
       "workingDirectory": "C:\\SW_development\\Platform\\esw-platform-picked\\test\\systest\\HarnessTest"
+    },
+    "SC50 Infinite Test": {
+      "commandName": "Project",
+      "commandLineArgs": "SC50_Tests.sbs -t -e TargetFirstTestList --model InfiniteTest -w",
+      "workingDirectory": "C:\\SW_development\\ESW-Platform\\esw-platform\\test\\systest\\SC50"
     }
   }
 }
