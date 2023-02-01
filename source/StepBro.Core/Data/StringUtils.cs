@@ -194,7 +194,7 @@ namespace StepBro.Core.Data
                         }
                         else
                         {
-                            return "Succes.";
+                            return "Success.";
                         }
                     }
                 }
