@@ -1,0 +1,25 @@
+{
+  "name": "stepbro-syntax-highlighting",
+  "displayName": "StepBro Syntax Highlighting",
+  "description": "Syntax highlighting for the StepBro scripting language",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "stepbro",
+      "aliases": ["StepBro", "stepbro"],
+      "extensions": [".sbs"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "stepbro",
+      "scopeName": "source.sbs",
+      "path": "./syntaxes/stepbro.tmLanguage.json"
+    }]
+  }
+}

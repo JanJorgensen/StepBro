@@ -1,0 +1,138 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "StepBro",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#procedures"
+		},
+		{
+			"include": "#usings"
+		},
+		{
+			"include": "#objects"
+		},
+		{
+			"include": "#double-slash-comments"
+		},
+		{
+			"include": "#multi-line-comments"
+		}
+	],
+	"repository": {
+		"keywords": 
+		{
+			"patterns":
+			[
+				{
+					"name": "keyword.control.stepbro",
+					"match": "\\b(if|while|for|return)\\b"
+				},
+				{
+					"name": "keyword.other.types.stepbro",
+					"match": "\\b(bool|void|testlist|int|string)\\b"
+				},
+				{
+					"name": "keyword.other.step.stepbro",
+					"match": "step"
+				},
+				{
+					"name": "keyword.other.using.stepbro",
+					"match": "using"
+				},
+				{
+					"name": "keyword.other.stepbro",
+					"match": "\\b(true|false|override)\\b"
+				},
+				{
+					"name": "keyword.control.partner.stepbro",
+					"match": "partner"
+				}
+			]
+		},
+		"procedures":
+		{
+			"patterns":
+			[
+				{
+					"name": "entity.name.function.stepbro",
+					"match": "procedure"
+				},
+				{
+					"name": "keyword.other.protection.stepbro",
+					"match": "\\b(public|private)\\b"
+				},
+				{
+					"name": "entity.name.function.stepbro",
+					"match": "([[a-zA-Z][A-Z0-9].]*[a-zA-Z][a-zA-Z0-9]* *\\()"
+				}
+			]
+		},
+		"strings": 
+		{
+			"name": "string.quoted.double.stepbro",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": 
+			[
+				{
+					"name": "constant.character.escape.stepbro",
+					"match": "\\\\."
+				}
+			]
+		},
+		"usings":
+		{
+			"patterns":
+			[
+				{
+					"name": "constant.character.escape.using-at.stepbro",
+					"match": "(?<=using) @\".*\""
+				},
+				{
+					"name": "entity.name.function.using-normal.stepbro",
+					"match": "(?<=using) (?!\\@\".*\").*"
+				}
+			]
+		},
+		"objects":
+		{
+			"patterns":
+			[
+				{
+					"name": "support.type.built-in.object-name.stepbro",
+					"match": "(?<=(public|private)) (?!procedure).* "
+				}
+			]
+		},
+		"double-slash-comments":
+		{
+			"patterns":
+			[
+				{
+					"name": "comment.line.double-slash.stepbro",
+					"match": "\/\/.*"
+				}
+			]
+		},
+		"multi-line-comments":
+		{
+			"name": "comment.block.stepbro",
+			"begin": "\/\\*",
+			"end": "\\*\/",
+			"patterns":
+			[
+				{
+					"name": "comment.block.stepbro",
+					"match": "."
+				}
+			]
+		}
+	},
+	"scopeName": "source.sbs"
+}
