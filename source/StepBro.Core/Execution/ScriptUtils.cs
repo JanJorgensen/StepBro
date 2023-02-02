@@ -221,7 +221,7 @@ namespace StepBro.Core.Execution
             var comparer = StringUtils.CreateComparer(text);
             reader.DebugDump();
 
-            // If the reader has timestampe, set the timeout relative to the time of the current entry; otherwise just use current wall time.
+            // If the reader has timestamp, set the timeout relative to the time of the current entry; otherwise just use current wall time.
             DateTime entry = (reader.LinesHaveTimestamp && reader.Current != null) ? reader.Current.Timestamp : DateTime.Now;
 
             // The time where the timeout expires.

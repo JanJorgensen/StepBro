@@ -16,6 +16,12 @@
 		},
 		{
 			"include": "#objects"
+		},
+		{
+			"include": "#double-slash-comments"
+		},
+		{
+			"include": "#multi-line-comments"
 		}
 	],
 	"repository": {
@@ -101,6 +107,29 @@
 				{
 					"name": "support.type.built-in.object-name.stepbro",
 					"match": "(?<=(public|private)) (?!procedure).* "
+				}
+			]
+		},
+		"double-slash-comments":
+		{
+			"patterns":
+			[
+				{
+					"name": "comment.line.double-slash.stepbro",
+					"match": "\/\/.*"
+				}
+			]
+		},
+		"multi-line-comments":
+		{
+			"name": "comment.block.stepbro",
+			"begin": "\/\\*",
+			"end": "\\*\/",
+			"patterns":
+			[
+				{
+					"name": "comment.block.stepbro",
+					"match": "."
 				}
 			]
 		}
