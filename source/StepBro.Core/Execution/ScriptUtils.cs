@@ -222,7 +222,10 @@ namespace StepBro.Core.Execution
             reader.DebugDump();
 
             // If the reader has timestamp, set the timeout relative to the time of the current entry; otherwise just use current wall time.
-            DateTime entry = (reader.LinesHaveTimestamp && reader.Current != null) ? reader.Current.Timestamp : DateTime.Now;
+            // TODO: Setting the entry to the readers current lines timestamp, can in extreme cases be way behind, making the await be very inconsistent
+            //       for now we just use the current wall time until we find a way for the reader to use the correct entry time.
+            // DateTime entry = (reader.LinesHaveTimestamp && reader.Current != null) ? reader.Current.Timestamp : DateTime.Now;
+            DateTime entry = DateTime.Now;
 
             // The time where the timeout expires.
             DateTime to = (timeout == TimeSpan.MaxValue) ? DateTime.MaxValue : entry + timeout;
