@@ -15,6 +15,8 @@ namespace StepBro.Core.Data
             ReceivedTrace,
         }
 
+        private object m_sync = new object();
+
         public LogLineData Previous { get; private set; }
         public LogLineData Next { get; private set; }
         public LogType Type { get; private set; }
@@ -25,18 +27,22 @@ namespace StepBro.Core.Data
         {
             get
             {
-                return this.Text.Substring(1);
+                lock (m_sync) {
+                    return this.Text.Substring(1);
+                }
             }
         }
 
         public LogLineData(LogLineData previous, LogType type, uint id, string text)
         {
-            if (previous != null) previous.Next = this;
-            this.Previous = previous;
-            this.Type = type;
-            this.ID = id;
-            this.Timestamp = DateTime.Now;
-            Text = text;
+            lock (m_sync) {
+                if (previous != null) previous.Next = this;
+                this.Previous = previous;
+                this.Type = type;
+                this.ID = id;
+                this.Timestamp = DateTime.Now;
+                Text = text;
+            }
         }
     }
 
