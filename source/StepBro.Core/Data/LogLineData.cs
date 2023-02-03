@@ -27,7 +27,10 @@ namespace StepBro.Core.Data
         {
             get
             {
-                lock (m_sync) {
+                // Without the lock, a race condition can occur where the LogLineData is in the middle
+                // of being constructed and then we get the text while this.Text is still null.
+                lock (m_sync) 
+                {
                     return this.Text.Substring(1);
                 }
             }
@@ -35,7 +38,10 @@ namespace StepBro.Core.Data
 
         public LogLineData(LogLineData previous, LogType type, uint id, string text)
         {
-            lock (m_sync) {
+            // Without the lock, a race condition can occur where the LogLineData is in the middle
+            // of being constructed and then we get the text while this.Text is still null.
+            lock (m_sync) 
+            {
                 if (previous != null) previous.Next = this;
                 this.Previous = previous;
                 this.Type = type;
