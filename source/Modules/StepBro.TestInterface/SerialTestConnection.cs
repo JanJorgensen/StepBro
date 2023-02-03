@@ -379,7 +379,7 @@ namespace StepBro.TestInterface
 
         public bool IsConnected()
         {
-            return m_stream != null && m_stream.IsOpen;
+            return m_stream != null && m_stream.IsOpen && !m_receiverTask.IsFaulted;
         }
 
         public bool Connect([Implicit] ICallContext context)
@@ -812,6 +812,7 @@ namespace StepBro.TestInterface
                             if (i == 0)
                             {
                                 m_inputBuffer.Eat(1);
+                                knownCount = m_inputBuffer.Count; // Update knownCount as we have now deleted one of the elements in the input buffer
                                 continue;
                             }
                             var line = m_inputBuffer.Get(0, i, i + 1);
