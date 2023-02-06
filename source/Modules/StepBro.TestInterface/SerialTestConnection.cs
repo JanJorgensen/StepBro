@@ -372,6 +372,8 @@ namespace StepBro.TestInterface
         public string ResponseErrorPrefix { get; set; } = ":ERROR";
         public TimeSpan CommandResponseTimeout { get; set; } = TimeSpan.FromMilliseconds(5000);
         public long InstanceID { get { return m_instanceID; } }
+        public bool AsyncLogFlushOnSendCommand { get; set; } = true;
+        public bool NoFlushOnNextCommand { get; set; } = false;
 
         #endregion
 
@@ -428,6 +430,13 @@ namespace StepBro.TestInterface
 
         public IAsyncResult<object> SendCommand([Implicit] ICallContext context, string command, params object[] arguments)
         {
+            // If we want to flush the log before we send a command, we do so
+            if (AsyncLogFlushOnSendCommand && !NoFlushOnNextCommand)
+            {
+                AsyncLog.Flush();
+            }
+            NoFlushOnNextCommand = false;
+
             if (context != null && context.LoggingEnabled)
             {
                 context.Logger.Log("\"" + command + "\"");
@@ -447,6 +456,13 @@ namespace StepBro.TestInterface
 
         public void SendDirect([Implicit] ICallContext context, string text)
         {
+            // If we want to flush the log before we send a command, we do so
+            if (AsyncLogFlushOnSendCommand && !NoFlushOnNextCommand)
+            {
+                AsyncLog.Flush();
+            }
+            NoFlushOnNextCommand = false;
+
             if (context != null && context.LoggingEnabled)
             {
                 context.Logger.Log("SendDirect: \"" + text + "\"");
