@@ -15,8 +15,6 @@ namespace StepBro.Core.Data
             ReceivedTrace,
         }
 
-        private object m_sync = new object();
-
         public LogLineData Previous { get; private set; }
         public LogLineData Next { get; private set; }
         public LogType Type { get; private set; }
@@ -27,28 +25,18 @@ namespace StepBro.Core.Data
         {
             get
             {
-                // Without the lock, a race condition can occur where the LogLineData is in the middle
-                // of being constructed and then we get the text while this.Text is still null.
-                lock (m_sync) 
-                {
-                    return this.Text.Substring(1);
-                }
+                return this.Text.Substring(1);
             }
         }
 
         public LogLineData(LogLineData previous, LogType type, uint id, string text)
         {
-            // Without the lock, a race condition can occur where the LogLineData is in the middle
-            // of being constructed and then we get the text while this.Text is still null.
-            lock (m_sync) 
-            {
-                if (previous != null) previous.Next = this;
-                this.Previous = previous;
-                this.Type = type;
-                this.ID = id;
-                this.Timestamp = DateTime.Now;
-                Text = text;
-            }
+            this.Previous = previous;
+            this.Type = type;
+            this.ID = id;
+            this.Timestamp = DateTime.Now;
+            Text = text;
+            if (previous != null) previous.Next = this;
         }
     }
 
