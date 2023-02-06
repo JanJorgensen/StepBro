@@ -31,12 +31,12 @@ namespace StepBro.Core.Data
 
         public LogLineData(LogLineData previous, LogType type, uint id, string text)
         {
-            if (previous != null) previous.Next = this;
             this.Previous = previous;
             this.Type = type;
             this.ID = id;
             this.Timestamp = DateTime.Now;
             Text = text;
+            if (previous != null) previous.Next = this;
         }
     }
 

@@ -372,6 +372,8 @@ namespace StepBro.TestInterface
         public string ResponseErrorPrefix { get; set; } = ":ERROR";
         public TimeSpan CommandResponseTimeout { get; set; } = TimeSpan.FromMilliseconds(5000);
         public long InstanceID { get { return m_instanceID; } }
+        public bool AsyncLogFlushOnSendCommand { get; set; } = true;
+        public bool NoFlushOnNextCommand { get; set; } = false;
 
         #endregion
 
@@ -379,7 +381,7 @@ namespace StepBro.TestInterface
 
         public bool IsConnected()
         {
-            return m_stream != null && m_stream.IsOpen;
+            return m_stream != null && m_stream.IsOpen && !m_receiverTask.IsFaulted;
         }
 
         public bool Connect([Implicit] ICallContext context)
@@ -428,6 +430,12 @@ namespace StepBro.TestInterface
 
         public IAsyncResult<object> SendCommand([Implicit] ICallContext context, string command, params object[] arguments)
         {
+            if (AsyncLogFlushOnSendCommand && !NoFlushOnNextCommand)
+            {
+                AsyncLog.Flush();
+            }
+            NoFlushOnNextCommand = false;
+
             if (context != null && context.LoggingEnabled)
             {
                 context.Logger.Log("\"" + command + "\"");
@@ -447,6 +455,12 @@ namespace StepBro.TestInterface
 
         public void SendDirect([Implicit] ICallContext context, string text)
         {
+            if (AsyncLogFlushOnSendCommand && !NoFlushOnNextCommand)
+            {
+                AsyncLog.Flush();
+            }
+            NoFlushOnNextCommand = false;
+
             if (context != null && context.LoggingEnabled)
             {
                 context.Logger.Log("SendDirect: \"" + text + "\"");
@@ -812,6 +826,7 @@ namespace StepBro.TestInterface
                             if (i == 0)
                             {
                                 m_inputBuffer.Eat(1);
+                                knownCount = m_inputBuffer.Count; // Update knownCount as we have now deleted one of the elements in the input buffer
                                 continue;
                             }
                             var line = m_inputBuffer.Get(0, i, i + 1);
