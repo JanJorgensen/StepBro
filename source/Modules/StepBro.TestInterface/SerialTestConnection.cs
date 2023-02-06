@@ -430,7 +430,6 @@ namespace StepBro.TestInterface
 
         public IAsyncResult<object> SendCommand([Implicit] ICallContext context, string command, params object[] arguments)
         {
-            // If we want to flush the log before we send a command, we do so
             if (AsyncLogFlushOnSendCommand && !NoFlushOnNextCommand)
             {
                 AsyncLog.Flush();
