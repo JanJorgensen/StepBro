@@ -30,7 +30,7 @@ namespace StepBro.Core.Parser
         protected string m_currentNamespace = null;
         protected FileTestList m_currentTestList = null;
         protected Stack<SBExpressionData> m_testListEntryArguments = null;
-        private SBExpressionData m_overrideVariable = null;
+        //private SBExpressionData m_overrideVariable = null;
         private SBExpressionData m_fileElementReference = null;
 
         public StepBroListener(ErrorCollector errorCollector)

@@ -72,7 +72,7 @@ namespace StepBroCoreTest.Execution
                 log.ExpectNext("3 - Normal - 4 delay - 100ms");
                 log.ExpectNext("3 - Normal - 5 Log - Ending");
                 log.ExpectNext("3 - Post");
-                log.ExpectNext("2 - Post - Script execution ended. Succes.");
+                log.ExpectNext("2 - Post - Script execution ended. Success.");
                 log.ExpectEnd();
             }
             finally

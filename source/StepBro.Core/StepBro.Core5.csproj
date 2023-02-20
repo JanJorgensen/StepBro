@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <!-- Template generated code from Antlr4BuildTasks.Template v 8.10 -->
   <PropertyGroup>
-    <OutputType>Library</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>StepBro.Core</RootNamespace>
     <AssemblyName>StepBro.Core</AssemblyName>
     <OutputPath>..\bin</OutputPath>
@@ -10,7 +9,6 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Authors>Jan Jorgensen</Authors>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <Platforms>AnyCPU</Platforms>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
@@ -63,7 +61,6 @@
     <PackageReference Include="Antlr4BuildTasks" Version="8.17.0" PrivateAssets="all" />
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="System.IO.Ports" Version="6.0.0" />
     <PackageReference Include="System.Resources.Extensions" Version="6.0.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
   </ItemGroup>

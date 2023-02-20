@@ -6,11 +6,58 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 
 namespace StepBro.Core.Api
 {
     internal class AddonManager : ServiceBase<IAddonManager, AddonManager>, IAddonManager
     {
+        /// <summary>
+        /// Helper class made from the guide here: https://learn.microsoft.com/en-us/dotnet/core/tutorials/creating-app-with-plugin-support
+        /// </summary>
+        class PluginLoadContext : AssemblyLoadContext
+        {
+            private AssemblyDependencyResolver _resolver;
+            static Dictionary<string, Assembly> _assemblyCache = new Dictionary<string, Assembly>();
+
+            public PluginLoadContext(string pluginPath)
+            {
+                _resolver = new AssemblyDependencyResolver(pluginPath);
+            }
+
+            protected override Assembly Load(AssemblyName assemblyName)
+            {
+                string assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
+                if (assemblyPath != null)
+                {
+                    var assembly = LoadFromAssemblyPath(assemblyPath);
+                    if (!_assemblyCache.ContainsKey(assemblyName.Name))
+                    {
+                        _assemblyCache[assemblyName.Name] = assembly;
+                    }
+                    return assembly;
+                }
+
+                if (_assemblyCache.ContainsKey(assemblyName.Name))
+                {
+                    return _assemblyCache[assemblyName.Name];
+                }
+
+                return null;
+            }
+
+            protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
+            {
+                string libraryPath = _resolver.ResolveUnmanagedDllToPath(unmanagedDllName);
+                if (libraryPath != null)
+                {
+                    return LoadUnmanagedDllFromPath(libraryPath);
+                }
+
+                return IntPtr.Zero;
+            }
+        }
+
         private bool m_hostIsWPF = false;
         private readonly Action<IAddonManager> m_basicModulesLoader;
         private List<Assembly> m_assemblies = new List<Assembly>();
@@ -56,7 +103,18 @@ namespace StepBro.Core.Api
             Exception loadException = null;
             try
             {
-                var fileAssembly = Assembly.LoadFrom(path);
+                var loadContext = new PluginLoadContext(path);
+                var fileAssembly = loadContext.LoadFromAssemblyName(AssemblyName.GetAssemblyName(path));
+                //if (fileAssembly.GetName().Name == "StepBro.Streams")
+                //{
+                //    var portType = fileAssembly.ExportedTypes.Where(t => t.Name == "SerialPort").FirstOrDefault();
+                //    if (portType != null)
+                //    {
+                //        object obj = Activator.CreateInstance(portType, new object[] { null });
+                //        PropertyInfo prop = portType.GetProperty("BaudRate");
+                //        prop.SetValue(obj, 115200L, null);
+                //    }
+                //}
                 if (!IsUIModuleAttribute.HasAttribute(fileAssembly) || m_hostIsWPF)
                 {
                     this.AddAssembly(fileAssembly, loadOnlyTypesWithPublicAttribute);
@@ -327,8 +385,11 @@ namespace StepBro.Core.Api
                 m_typeLookup.Add(fullName, type);
                 m_lookup.Add(fullName, new IdentifierInfo(fullName, fullName, IdentifierType.DotNetType, new TypeReference(type), null));
 
-                NamespaceList nsList = this.GetOrCreateNamespaceList(type.Namespace);
-                nsList.AddType(type);
+                if (!String.IsNullOrEmpty(type.Namespace))
+                {
+                    NamespaceList nsList = this.GetOrCreateNamespaceList(type.Namespace);
+                    nsList.AddType(type);
+                }
 
                 m_types.Add(new Tuple<string, Type>(fullName, type));
             }

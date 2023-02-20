@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <OutputPath>..\..\bin\Modules</OutputPath>
     <AssemblyName>StepBro.TestInterface</AssemblyName>
     <RootNamespace>StepBro.TestInterface</RootNamespace>
@@ -9,18 +9,9 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <Platforms>AnyCPU</Platforms>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -45,9 +36,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\StepBro.Core\StepBro.Core5.csproj">
       <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
     <ProjectReference Include="..\StepBro.Streams\StepBro.Streams.csproj">
       <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
   </ItemGroup>
 

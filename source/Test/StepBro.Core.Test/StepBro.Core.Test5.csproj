@@ -9,15 +9,6 @@
     <RootNamespace>StepBro.Core.Test</RootNamespace>
     <AssemblyName>StepBro.Core.Test</AssemblyName>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <Platforms>AnyCPU</Platforms>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
