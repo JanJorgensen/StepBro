@@ -24,7 +24,7 @@ namespace StepBro.Core.Data
         public ErrorID ErrorID { get { return m_errorID; } }
         public int SubResultCount { get { return m_subResults.Count; } }
 
-        public ProcedureResult(string reference, Verdict verdict, int stepIndex, string description, ErrorID error, List<ProcedureResult> subResults)
+        internal ProcedureResult(string reference, Verdict verdict, int stepIndex, string description, ErrorID error, List<ProcedureResult> subResults)
         {
             m_reference = reference;
             m_verdict = verdict;

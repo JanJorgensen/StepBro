@@ -155,9 +155,49 @@ namespace StepBro.Cmd
                                             {
                                                 var result = StepBroMain.ExecuteProcedure(procedure, arguments.ToArray());
 
-                                                if (m_commandLineOptions.Verbose)
+                                                if (result != null)
                                                 {
-                                                    if (result != null)
+                                                    if (m_commandLineOptions.ReturnValueFromSubVerdict)
+                                                    {
+                                                        var verdict = Verdict.Unset;
+                                                        foreach (var sr in result.ProcedureResult.ListSubResults())
+                                                        {
+                                                            if (sr.Verdict > verdict) verdict = sr.Verdict;
+                                                        }
+                                                         switch (verdict)
+                                                        {
+                                                            case Verdict.Unset:
+                                                            case Verdict.Pass:
+                                                                break;
+                                                            case Verdict.Inconclusive:
+                                                            case Verdict.Fail:
+                                                            case Verdict.Abandoned:
+                                                                retval = 1;
+                                                                break;
+                                                            case Verdict.Error:
+                                                                retval = -1;
+                                                                break;
+                                                        }
+                                                    }
+                                                    else if (m_commandLineOptions.ReturnValueFromVerdict)
+                                                    {
+                                                        switch (result.ProcedureResult.Verdict)
+                                                        {
+                                                            case Verdict.Unset:
+                                                            case Verdict.Pass:
+                                                                break;
+                                                            case Verdict.Inconclusive:
+                                                            case Verdict.Fail:
+                                                            case Verdict.Abandoned:
+                                                                retval = 1;
+                                                                break;
+                                                            case Verdict.Error:
+                                                                retval = -1;
+                                                                break;
+                                                        }
+                                                    }
+
+                                                    if (m_commandLineOptions.Verbose)
                                                     {
                                                         ConsoleWriteLine("Procedure execution ended. " + result.ResultText());
                                                     }
@@ -284,7 +324,7 @@ namespace StepBro.Cmd
                 }
                 Console.ReadKey();
             }
-            return retval;
+             return retval;
         }
 
         private static void ConsoleWriteLine(string value, params object[] args)
