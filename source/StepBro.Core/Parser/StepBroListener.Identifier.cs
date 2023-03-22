@@ -216,7 +216,7 @@ namespace StepBro.Core.Parser
                 int c = parts.Length;
 
                 SBExpressionData result = this.ResolveSingleIdentifier(parts[0], inFunctionScope, reportUnresolved, token);
-                if (result != null)
+                if (result != null && !result.IsError())
                 {
                     for (int i = 1; i < c; i++)
                     {

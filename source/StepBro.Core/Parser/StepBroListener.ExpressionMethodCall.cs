@@ -113,6 +113,15 @@ namespace StepBro.Core.Parser
             SBExpressionData assignmentTarget,
             PropertyBlock propertyBlock)
         {
+            if (left.IsError())
+            {
+                if (!isCallStatement) 
+                {
+                    m_expressionData.Push(left);
+                }
+                return;
+            }
+
             var leftType = left.DataType?.Type;
             List<SBExpressionData> arguments = new List<SBExpressionData>();
             if (argumentStack.Count > 0)
@@ -136,8 +145,11 @@ namespace StepBro.Core.Parser
                 case SBExpressionType.Namespace:
                 case SBExpressionType.Constant:
                 case SBExpressionType.GlobalVariableReference:
-                case SBExpressionType.TypeReference:
                     m_errors.SymanticError(context.Start.Line, -1, false, $"\"{left.ToString()}\" is not a method, procedure or delegate.");
+                    return;
+
+                case SBExpressionType.TypeReference:
+                    m_errors.SymanticError(context.Start.Line, -1, false, $"\"{left.ToString()}\" should access a ctor or Create-function, but is not implemented.");
                     return;
 
                 case SBExpressionType.Identifier:
@@ -159,7 +171,7 @@ namespace StepBro.Core.Parser
                             System.Diagnostics.Debug.Assert(m != null);
                             methods = new MethodInfo[] { m };
                             callType = isCallStatement ? ParansExpressionType.ProcedureCall : ParansExpressionType.FunctionCall;
-                            if (left.DataType.HaveProcedureReference)
+                            if (left.DataType.HasProcedureReference)
                             {
                                 var proc = left.DataType.DynamicType as FileProcedure;
                                 firstParIsThis = proc.IsFirstParameterThisReference;

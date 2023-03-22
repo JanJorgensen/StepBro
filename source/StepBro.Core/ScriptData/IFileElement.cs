@@ -1,13 +1,9 @@
-﻿using StepBro.Core.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using StepBro.Core.Data;
 
 namespace StepBro.Core.ScriptData
 {
-    public interface IFileElement : StepBro.Core.Data.IIdentifierInfo
+    public interface IFileElement : IIdentifierInfo, IInheritable
     {
         IScriptFile ParentFile { get; }
         int Line { get; }

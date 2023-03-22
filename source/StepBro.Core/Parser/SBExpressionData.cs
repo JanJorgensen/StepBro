@@ -268,6 +268,7 @@ namespace StepBro.Core.Parser
                     case SBExpressionType.ProcedureReference:
                     case SBExpressionType.TestListReference:
                     case SBExpressionType.DatatableReference:
+                    case SBExpressionType.OperationError:
                         return false;
 
                     case SBExpressionType.Constant:

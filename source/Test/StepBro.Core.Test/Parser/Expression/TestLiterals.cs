@@ -32,7 +32,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestLiteralIntegerWithPostfix()
         {
-            var result = FileBuilder.ParseLiteral("4k");
+            var result = FileBuilder.ParseLiteral("4K");
             Assert.IsTrue(result.IsConstant);
             Assert.IsTrue(result.Value is long);
             Assert.AreEqual(4000L, (long)result.Value);
@@ -57,7 +57,7 @@ namespace StepBroCoreTest.Parser
             Assert.IsTrue(result.Value is long);
             Assert.AreEqual(8000000000000000L, (long)result.Value);
 
-            result = FileBuilder.ParseLiteral("2.6k");
+            result = FileBuilder.ParseLiteral("2.6K");
             Assert.IsTrue(result.IsConstant);
             Assert.IsTrue(result.Value is long);
             Assert.AreEqual(2600L, (long)result.Value);

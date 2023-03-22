@@ -164,7 +164,7 @@ namespace StepBro.Core.Parser
         {
             var exp = this.ResolveForGetOperation(m_expressionData.Pop());
             var type = m_typeStack.Pop();
-            if (type.HaveProcedureReference)
+            if (type.HasProcedureReference)
             {
                 var call = Expression.Call(
                     s_ProcedureReferenceIs,
@@ -445,7 +445,7 @@ namespace StepBro.Core.Parser
 
                 switch (last)
                 {
-                    case 'k': break;
+                    case 'K': break;
                     case 'M': value *= 1000L; break;
                     case 'G': value *= 1000000L; break;
                     case 'T': value *= 1000000000L; break;

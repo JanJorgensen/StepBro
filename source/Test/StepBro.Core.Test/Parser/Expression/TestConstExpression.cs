@@ -21,7 +21,7 @@ namespace StepBroCoreTest.Parser
         public void TestExpressionConstantMult()
         {
             this.AssertConstantExpression(16L * 200L, "16 * 200");
-            this.AssertConstantExpression(5000L * 1234L, "5k * 1234");
+            this.AssertConstantExpression(5000L * 1234L, "5K * 1234");
             this.AssertConstantExpression(12.54 * 0.83, "12.54 * 0.83");
             this.AssertConstantExpression(50.0, "5.0 * 10");
             this.AssertConstantExpression(11.0 * 2.4, "11 * 2.4");
@@ -37,7 +37,7 @@ namespace StepBroCoreTest.Parser
         public void TestExpressionConstantDiv()
         {
             this.AssertConstantExpression(64L / 8L, "64 / 8");
-            this.AssertConstantExpression(5000L / 25L, "5k / 25");
+            this.AssertConstantExpression(5000L / 25L, "5K / 25");
             this.AssertConstantExpression(12.54 / 4.2, "12.54 / 4.2");
             this.AssertConstantExpression(50.0 / 4.0, "50.0 / 4");
             this.AssertConstantExpression(72.0 / 2.4, "72 / 2.4");
@@ -58,7 +58,7 @@ namespace StepBroCoreTest.Parser
         public void TestExpressionConstantAdd()
         {
             this.AssertConstantExpression(216L, "16 + 200");
-            this.AssertConstantExpression(6234L, "5k + 1234");
+            this.AssertConstantExpression(6234L, "5K + 1234");
             this.AssertConstantExpression(13.37, "12.54 + 0.83");
             this.AssertConstantExpression(15.0, "5.0 + 10");
             this.AssertConstantExpression(13.4, "11 + 2.4");
@@ -70,7 +70,7 @@ namespace StepBroCoreTest.Parser
         public void TestExpressionConstantSub()
         {
             this.AssertConstantExpression(32L - 43L, "32 - 43");
-            this.AssertConstantExpression(5000L - 1234L, "5k - 1234");
+            this.AssertConstantExpression(5000L - 1234L, "5K - 1234");
             this.AssertConstantExpression(12.54 - 0.83, "12.54 - 0.83");
             this.AssertConstantExpression(-5.0, "5.0 - 10");
             this.AssertConstantExpression(11.0 - 2.4, "11 - 2.4");

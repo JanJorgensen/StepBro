@@ -19,5 +19,6 @@ namespace StepBro.Core.Execution
         void AddPartResult(IProcedureReference procedure, ProcedureResult result);
         ProcedureResult Result { get; }
         ProcedureResult LastCallResult { get; }
+        bool SetResult(Verdict verdict, string description);
     }
 }

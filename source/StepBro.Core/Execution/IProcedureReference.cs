@@ -11,7 +11,7 @@ namespace StepBro.Core.Execution
     /// <summary>
     /// Generic interface for a procedure reference object.
     /// </summary>
-    public interface IProcedureReference
+    public interface IProcedureReference : IInheritable
     {
         /// <summary>
         ///  Reference to the base type of the procedure.

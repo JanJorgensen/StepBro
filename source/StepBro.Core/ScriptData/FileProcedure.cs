@@ -117,6 +117,8 @@ namespace StepBro.Core.ScriptData
             public string Name { get { return m_reference.Name; } }
 
             public string FullName { get { return m_reference.FullName; } }
+
+            IInheritable IInheritable.Base { get { return this.BaseProcedure; } }
         }
         private class Reference<T> : ReferenceBase, IProcedureReference<T> where T : class
         {

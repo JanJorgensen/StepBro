@@ -18,6 +18,10 @@ namespace StepBro.Core.ScriptData
         /// <summary>
         /// The element is an 'overrider' for another file element, and therefore will not be directly accessible itself during execution.
         /// </summary>
-        Override
+        Override,
+        /// <summary>
+        /// A 'type definition' that defines a named type from another data type.
+        /// </summary>
+        TypeDef
     }
 }

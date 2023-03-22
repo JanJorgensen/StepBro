@@ -3,6 +3,7 @@ using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using StepBroCoreTest;
+using StepBroCoreTest.Parser;
 using System;
 using System.Linq;
 using System.Text;
@@ -73,6 +74,42 @@ namespace StepBro.Core.Test.Parser
             Assert.IsNotNull(element);
             element = files[1].ListElements().First(p => p.Name == "varPrivate") as IFileElement;
             Assert.IsNotNull(element);
+        }
+
+        [TestMethod]
+        public void FileParsing_UnresolvedVariable()
+        {
+            var file = new StringBuilder();
+            file.AppendLine("procedure void Proc()");
+            file.AppendLine("{");
+            file.AppendLine("    myTool.Action(27);");
+            file.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("test.sbs", file.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);
+            Assert.IsTrue(files[0].Errors[0].Message.Contains("unresolved identifier", StringComparison.InvariantCultureIgnoreCase));
+        }
+
+
+        [TestMethod]
+        public void FileParsing_UnresolvedVariableInFlowStatements()
+        {
+            var file = new StringBuilder();
+            file.AppendLine("procedure void Proc()");
+            file.AppendLine("{");
+            file.AppendLine("    if ( myTool.Action(27) )");
+            file.AppendLine("    {");
+            file.AppendLine("        log (\"plup\");");
+            file.AppendLine("    }");
+            file.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("test.sbs", file.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);
+            Assert.IsTrue(files[0].Errors[0].Message.Contains("unresolved identifier", StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

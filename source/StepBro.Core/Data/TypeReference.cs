@@ -5,7 +5,7 @@ using StepBro.Core.ScriptData;
 namespace StepBro.Core.Data
 {
     /// <summary>
-    /// A "higher level" version of System.Type, with a reference to dynamic type object.
+    /// A "higher level" version of System.Type, with a reference to dynamic (high level) type object.
     /// </summary>
     public class TypeReference
     {
@@ -23,9 +23,14 @@ namespace StepBro.Core.Data
             //{
             //    throw new Exception();
             //}
-            var tn = type.Name;
             m_type = type;
             m_dynamicType = reference;
+        }
+
+        internal TypeReference(TypeDef type)
+        {
+            m_type = type.Type.Type;    // Base type of the type definition.
+            m_dynamicType = type;
         }
 
         public Type Type { get { return m_type; } }
@@ -37,7 +42,7 @@ namespace StepBro.Core.Data
             else return "TR-" + this.Type.ToString();
         }
 
-        public bool HaveProcedureReference { get { return (m_dynamicType != null && m_dynamicType is IFileProcedure); } }
+        public bool HasProcedureReference { get { return (m_dynamicType != null && m_dynamicType is IFileProcedure); } }
 
         public override bool Equals(object obj)
         {
@@ -54,6 +59,34 @@ namespace StepBro.Core.Data
                 return (this.Type == (obj as Type) && this.DynamicType == null);
             }
             return false;
+        }
+
+        public bool IsAssignableFrom(TypeReference other)
+        {
+            if (this.IsTypedef())
+            {
+                if (!other.IsTypedef() || !Object.ReferenceEquals(m_type, other.m_type)) return false;
+                if (object.ReferenceEquals(m_dynamicType, other.m_dynamicType)) return true;
+                return this.IsAssignableFrom((other.m_dynamicType as TypeDef).Type);
+            }
+            else if (m_dynamicType != null)
+            {
+                if (other.m_dynamicType == null) return false;
+                if (!Object.ReferenceEquals(m_type, other.m_type)) return false;
+                var inheritance = other.m_dynamicType as IInheritable; 
+                while (inheritance != null)
+                {
+                    if (Object.ReferenceEquals(m_dynamicType, inheritance)) return true;    // Check if other inherits from the same dynamicType as this;
+                    inheritance = inheritance.Base;                                         // Try next level.
+                }
+                return false;
+            }
+            return m_type.IsAssignableFrom(other.m_type);
+        }
+
+        public bool IsTypedef()
+        {
+            return (m_dynamicType != null) && (m_dynamicType is TypeDef);
         }
 
         public override int GetHashCode()

@@ -593,6 +593,20 @@ namespace StepBro.Core.Execution
 
         ProcedureResult IProcedureThis.LastCallResult { get { return m_lastCallResult; } }
 
+        bool IProcedureThis.SetResult(Verdict verdict, string description)
+        {
+            if (m_verdict <= Verdict.Pass && verdict > m_verdict) 
+            {
+                m_verdict = verdict;
+                m_failureDescription = description;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public TaskManager TaskManager { get { return m_taskManager; } }
     }
 }

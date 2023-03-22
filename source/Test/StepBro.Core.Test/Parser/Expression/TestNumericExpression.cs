@@ -43,7 +43,7 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(14L, ParseAndRun<long>("varIntA"));
             Assert.AreEqual(-29L, ParseAndRun<long>("varIntB"));
 
-            Assert.AreEqual(2014L, ParseAndRun<long>("varIntA + 2k"));
+            Assert.AreEqual(2014L, ParseAndRun<long>("varIntA + 2K"));
             Assert.AreEqual(8L, ParseAndRun<long>("varIntA - 6"));
             Assert.AreEqual(-30L, ParseAndRun<long>("varIntA + varIntA + varIntB + varIntB"));
             Assert.AreEqual(43L, ParseAndRun<long>("varIntA - varIntB"));

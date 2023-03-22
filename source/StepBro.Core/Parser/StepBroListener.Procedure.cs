@@ -364,6 +364,11 @@ namespace StepBro.Core.Parser
 
             condition = this.ResolveForGetOperation(condition);
 
+            if (condition.IsError()) 
+            {
+                return;
+            }
+
             Expression trueStatement;
             if (subStatements[0].Type == ProcedureParsingScope.ScopeType.Block)
             {

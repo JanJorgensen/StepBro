@@ -9,6 +9,8 @@ namespace StepBro.Core.ScriptData
 {
     internal class FileElementOverride : FileElement
     {
+        private TypeReference m_datatype = null;
+
         public FileElementOverride(IScriptFile file, int line, IFileElement parentElement, string @namespace, string name) 
             : base(file, line, parentElement, @namespace, name, AccessModifier.None, FileElementType.Override)
         {
@@ -17,7 +19,8 @@ namespace StepBro.Core.ScriptData
 
         protected override TypeReference GetDataType()
         {
-            return new TypeReference(typeof(IFileElement), this);
+            if (m_datatype == null) m_datatype = new TypeReference(typeof(IFileElement), this);
+            return m_datatype;
         }
     }
 }

@@ -157,6 +157,8 @@ namespace StepBro.Core.ScriptData
             internal set { m_line = value; }
         }
 
+        IInheritable IInheritable.Base { get { return this.BaseElement as IInheritable; } }
+
         internal virtual int ParseSignature(StepBroListener listener, bool reportErrors)
         {
             return 0;

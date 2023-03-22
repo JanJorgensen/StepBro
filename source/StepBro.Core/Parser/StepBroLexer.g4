@@ -77,6 +77,7 @@ IN : 'in' ;
 IS : 'is' ;
 LOG : 'log' ;
 NAMESPACE : 'namespace' ;
+NEW : 'new' ;
 NOT : 'not' ;
 NULL : 'null' ;
 OBJECT : 'object' ;
@@ -103,6 +104,7 @@ TIMEOUT : 'timeout' ;
 TIMESPAN : 'timespan' ;
 THROW : 'throw' ;
 TRUE : 'true' ;
+TYPEDEF : 'typedef' ;
 TYPEOF : 'typeof' ;
 UNSET : 'unset' ;
 USING : 'using' ;
@@ -137,15 +139,15 @@ HexLiteral : ('0x' HexDigit+)
 //OctalLiteral : '0' ('0'..'7')+;
 
 IntegerWithSIPrefixLiteral 
-    :	INT ('P'|'T'|'G'|'M'|'k') 
-    |	INT '.' [0-9] ('P'|'T'|'G'|'M'|'k') 
-    |	INT '.' [0-9] [0-9] ('P'|'T'|'G'|'M'|'k') 
-    |	INT '.' [0-9] [0-9] [0-9] ('P'|'T'|'G'|'M'|'k') 
+    :	INT ('P'|'T'|'G'|'M'|'K') 
+    |	INT '.' [0-9] ('P'|'T'|'G'|'M'|'K') 
+    |	INT '.' [0-9] [0-9] ('P'|'T'|'G'|'M'|'K') 
+    |	INT '.' [0-9] [0-9] [0-9] ('P'|'T'|'G'|'M'|'K') 
     ;
 
 FloatingPointLiteral
     :   INT '.' [0-9]+ Exponent?
-    |   INT '.' [0-9]+ ('P'|'T'|'G'|'M'|'k'|'m'|'u'|'n'|'p')
+    |   INT '.' [0-9]+ ('P'|'T'|'G'|'M'|'K'|'m'|'u'|'n'|'p')
     |   INT ('m'|'u'|'n'|'p')
     |   INT Exponent
     ;
