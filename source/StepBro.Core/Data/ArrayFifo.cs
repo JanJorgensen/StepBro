@@ -1,5 +1,6 @@
 ﻿using StepBro.Core.Logging;
 using System;
+using System.Linq;
 using System.Threading;
 
 namespace StepBro.Core.Data
@@ -11,16 +12,25 @@ namespace StepBro.Core.Data
             public enum Action { Add, Get, Index, AwaitImmediate, AwaitEvent, AwaitTimeout, Eat }
             private readonly Action m_action;
             private readonly int m_head, m_tail, m_count;
-            public MyDebugLogEntry(Action action, int head, int tail, int count) : base()
+            private readonly string m_data;
+            public MyDebugLogEntry(Action action, int head, int tail, int count, string data = null) : base()
             {
                 m_action = action;
                 m_head = head;
                 m_tail = tail;
                 m_count = count;
+                m_data = data;
             }
             public override string ToString()
             {
-                return $"{m_action}: {m_head}, {m_tail}, {m_count}";
+                if (m_data == null)
+                {
+                    return $"{m_action}: {m_head}, {m_tail}, {m_count}";
+                }
+                else
+                {
+                    return $"{m_action}: {m_head}, {m_tail}, {m_count}, '{m_data}'";
+                }
             }
         }
 
@@ -55,8 +65,8 @@ namespace StepBro.Core.Data
             lock (m_lock)
             {
                 MakeSpace(length);
-                Array.Copy(m_buffer, start, m_buffer, m_head, length);
-                DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.Add, m_head, m_tail, length));
+                Array.Copy(block, start, m_buffer, m_head, length);
+                DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.Add, m_head, m_tail, length, DataToString(block, start, length)));
                 m_head += length;
                 if (m_waitingForData)
                 {
@@ -66,13 +76,18 @@ namespace StepBro.Core.Data
             }
         }
 
+        public virtual string DataToString(T[] block, int start, int length)
+        {
+            return String.Join(", ", block.Skip(start).Take(length).Select(e => e.ToString()));
+        }
+
         public void Add(Func<T[], int, int, int> getter, int length)
         {
             lock (m_lock)
             {
                 MakeSpace(length);
                 var count = getter(m_buffer, m_head, length);
-                DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.Add, m_head, m_tail, count));
+                DebugLogEntry.Register(new MyDebugLogEntry(MyDebugLogEntry.Action.Add, m_head, m_tail, count, DataToString(m_buffer, m_head, length)));
                 m_head += count;
                 if (m_waitingForData)
                 {
