@@ -448,6 +448,11 @@ namespace StepBro.Core.Parser
             m_lastElementPropertyBlock = null;
 
             condition = this.ResolveForGetOperation(condition);
+            if (condition.IsError())
+            {
+                return;
+            }
+
             var conditionExpression = condition.ExpressionCode;
 
             if (condition.IsValueType && condition.DataType.Type != typeof(bool))
@@ -872,6 +877,11 @@ namespace StepBro.Core.Parser
             }
             var exp = stack.Pop();
             exp = this.ResolveIfIdentifier(exp, m_inFunctionScope);
+            if (exp.IsError())
+            {
+                return;
+            }
+
             var code = exp.IsError() ? Expression.Constant("<EXPRESSION ERROR>") : exp.ExpressionCode;
 
             if (code != null)
@@ -981,6 +991,11 @@ namespace StepBro.Core.Parser
             var stack = m_expressionData.PopStackLevel();
             var expression = stack.Pop();
             expression = this.ResolveForGetOperation(expression);
+            if (expression.IsError())
+            {
+                return;
+            }
+
             string expressionText = context.GetChild(context.ChildCount - 2).GetChild(1).GetText();
             string title = String.Empty;
             if (context.ChildCount > 3)
@@ -1083,6 +1098,10 @@ namespace StepBro.Core.Parser
                 }
                 foreach (var variable in m_variables)
                 {
+                    if (variable.Value.IsError())
+                    {
+                        return;
+                    }
                     if (!type.Type.IsAssignableFrom(variable.Value.DataType.Type))
                     {
                         throw new NotImplementedException("Variables assignment of incompatible type.");
