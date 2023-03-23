@@ -60,6 +60,7 @@ namespace StepBro.Cmd
             try
             {
                 StepBroMain.Initialize(m_hostService);
+                StepBroMain.Logger.IsDebugging = m_commandLineOptions.Debugging;
 
                 if (m_commandLineOptions.Verbose)
                 {
@@ -311,6 +312,11 @@ namespace StepBro.Cmd
                     System.Threading.Thread.Sleep(50);
                 }
                 FlushBufferedConsoleOutput();
+                if (m_commandLineOptions.Debugging)
+                {
+                    DebugLogUtils.DumpToFile();
+                    ConsoleWriteLine($"Internal Debug Log saved in {DebugLogUtils.DumpFilePath}");
+                }
 
                 StepBroMain.Deinitialize();
             }

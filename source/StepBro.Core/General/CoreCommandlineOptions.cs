@@ -13,6 +13,9 @@ namespace StepBro.Core.General
         [Value(0, MetaName = "file", HelpText = "Script file to load.")]
         public string InputFile { get; set; }
 
+        [Option('d', "debug", HelpText = "Sets StepBro in debugging mode.")]
+        public bool Debugging { get; set; }
+
         [Option('e', "execute", HelpText = "File element (procedure or test suite) to execute.")]
         public string TargetElement { get; set; }
 

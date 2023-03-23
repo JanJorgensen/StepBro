@@ -58,6 +58,15 @@ namespace StepBro.Core.Logging
     public static class DebugLogUtils
     {
         private static object sync = new object();
+
+        public static string DumpFilePath
+        {
+            get
+            {
+                return System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\StepBro DebugLog.txt";
+            }
+        }
+
         public static void DumpToFile(DebugLogEntry start = null)
         {
             var first = (start == null) ? DebugLogEntry.First : start;
@@ -65,7 +74,7 @@ namespace StepBro.Core.Logging
             lock(sync)
             {
                 using (System.IO.FileStream dump = new System.IO.FileStream(
-                    System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\StepBro DebugLog.txt",
+                    DumpFilePath,
                     System.IO.FileMode.Create, System.IO.FileAccess.Write,
                     System.IO.FileShare.None))
                 {
