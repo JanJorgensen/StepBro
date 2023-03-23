@@ -103,7 +103,7 @@ namespace StepBroCoreTest
         [TestMethod]
         public void StaticPropertyGetAndSet()
         {
-            var exp = Expression.Property(null, typeof(System.AppDomain).GetProperty("CurrentDomain"));
+            var exp = Expression.Property(null, typeof(System.AppDomain).GetProperty("MonitoringIsEnabled"));
 
             var result = Expression.Lambda<Func<bool>>(exp).Compile()();
             Assert.AreEqual(false, result);
