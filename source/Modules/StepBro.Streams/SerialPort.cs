@@ -3,8 +3,10 @@ using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using System;
+using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace StepBro.Streams
 {
@@ -88,6 +90,22 @@ namespace StepBro.Streams
         OnePointFive = 3
     }
 
+    class ArrayFifoChar : ArrayFifo<char>
+    {
+        public ArrayFifoChar(int size = 16384) : base(size) { }
+
+        public override string DataToString(char[] block, int start, int length)
+        {
+            return (new String(block.Skip(start).Take(length).ToArray())).Replace('\r', '^').Replace('\n', '^');
+        }
+
+        public override string ValueString(char value)
+        {
+            if (value < 32) value = '^';
+            return value.ToString();
+        }
+    }
+
     [Public]
     public class SerialPort : Stream, INameable
     {
@@ -98,7 +116,7 @@ namespace StepBro.Streams
         private System.IO.Ports.SerialPort m_port;
         private long m_dataReceivedCounter = 0L;
         private ArrayFifo<byte> m_binaryFifo = null;
-        private ArrayFifo<char> m_textualFifo = null;
+        private ArrayFifoChar m_textualFifo = null;
         private ILogger m_asyncLogger = null;
         private bool m_reportOverrun = false;
 
@@ -184,7 +202,7 @@ namespace StepBro.Streams
 
         protected override IReadBuffer<char> CreateTextualReadBuffer(int size)
         {
-            m_textualFifo = new ArrayFifo<char>(size);
+            m_textualFifo = new ArrayFifoChar(size);
             return m_textualFifo;
         }
 

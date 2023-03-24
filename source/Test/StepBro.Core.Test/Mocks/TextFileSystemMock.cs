@@ -13,7 +13,7 @@ namespace StepBro.Core.Test.Mocks
 {
     internal class TextFileSystemMock : ServiceBase<ITextFileSystem, TextFileSystemMock>, ITextFileSystem
     {
-        private string m_basePath;
+        private string m_basePath = "";
         private List<NamedData<Tuple<string,DateTime>>> m_files = new List<NamedData<Tuple<string, DateTime>>>();
 
         public TextFileSystemMock(out IService serviceAccess) :
