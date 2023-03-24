@@ -233,13 +233,14 @@ namespace StepBro.Core.Data
                 if (length > ((m_head - m_tail) + index) || length < 0) throw new ArgumentOutOfRangeException("length");
                 if (total > (m_head - m_tail) || total < (length + index) || total <= 0) throw new ArgumentOutOfRangeException("total");
                 Array.Copy(m_buffer, m_tail + index, targetbuffer, targetindex, length);
+                var datastring = DataToString(m_buffer, m_tail + index, length);
+                DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Get, m_head, m_tail, length, datastring));
                 m_tail += total;
                 if (m_tail == m_head)
                 {
                     m_tail = 0;
                     m_head = 0;
                 }
-                DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Get, m_head, m_tail, length, DataToString(m_buffer, m_tail + index, length)));
                 OnDataPulled();
             }
         }
