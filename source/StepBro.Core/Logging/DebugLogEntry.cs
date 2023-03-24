@@ -5,23 +5,28 @@ namespace StepBro.Core.Logging
 {
     public abstract class DebugLogEntry
     {
+        private const long MAX_COUNT = 1000000;
+        private static DebugLogEntry m_first;
         private static DebugLogEntry m_last;
         private static readonly object m_sync = new object();
+        private static long m_count = 0;
 
         static DebugLogEntry()
         {
-            First = m_last = new DebugLogEntryString("DebugLog Created");
+            m_first = m_last = new DebugLogEntryString("DebugLog Created");
         }
         public static void Register(DebugLogEntry entry)
         {
             lock (m_sync)
             {
+                m_count++;
                 m_last.m_next = entry;
                 m_last = entry;
+                if (m_count > MAX_COUNT) m_first = m_first.m_next;
             }
         }
 
-        public static DebugLogEntry First { get; private set; }
+        public static DebugLogEntry First { get { return m_first; } }
 
         private DebugLogEntry m_next;
         protected DateTime m_timestamp;
