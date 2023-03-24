@@ -239,7 +239,7 @@ namespace StepBro.Core.Data
                     m_tail = 0;
                     m_head = 0;
                 }
-                DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Get, m_head, m_tail, length));
+                DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Get, m_head, m_tail, length, DataToString(m_buffer, m_tail + index, length)));
                 OnDataPulled();
             }
         }

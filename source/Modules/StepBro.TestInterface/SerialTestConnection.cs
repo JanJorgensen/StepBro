@@ -836,6 +836,7 @@ namespace StepBro.TestInterface
                             var s = new string(line, 1, line.Length - 1);
                             if (line[0] == EventLineChar)
                             {
+                                DebugLogEntry.Register(new DebugLogEntryString("Event line received: " + s));
                                 lock (m_sync)
                                 {
                                     AddToLog(LogType.ReceivedAsync, 0, new string(line));
@@ -850,11 +851,15 @@ namespace StepBro.TestInterface
                             {
                                 if (line[0] == ResponseMultiLineChar)
                                 {
+                                    DebugLogEntry.Register(new DebugLogEntryString("Multi response line received: " + s));
                                     lock (m_sync)
                                     {
                                         AddToLog(LogType.ReceivedPartial, 0, new string(line));
                                     }
-                                    m_responseLines.Enqueue(s);
+                                    if (m_currentExecutingCommand != null)
+                                    {
+                                        m_responseLines.Enqueue(s);
+                                    }
                                 }
                                 else if (line[0] == ResponseEndLineChar)
                                 {
@@ -865,6 +870,7 @@ namespace StepBro.TestInterface
                                     }
                                     if (m_currentExecutingCommand != null)
                                     {
+                                        DebugLogEntry.Register(new DebugLogEntryString("Response line received: " + s));
                                         try
                                         {
                                             m_currentExecutingCommand.SetResult(new string(line), m_responseLines.ToArray());
@@ -872,8 +878,12 @@ namespace StepBro.TestInterface
                                         finally
                                         {
                                         }
+                                        OnEndCommand();
                                     }
-                                    OnEndCommand();
+                                    else
+                                    {
+                                        DebugLogEntry.Register(new DebugLogEntryString("Response line received (no command active): " + s));
+                                    }
                                 }
                             }
                         }
@@ -928,9 +938,11 @@ namespace StepBro.TestInterface
             m_currentExecutingCommand = command;
             DoSendDirect(commandstring);
         }
+        
         private void DoSendDirect(string text)
         {
             AddToLog(LogType.Sent, 0, text);
+            DebugLogEntry.Register(new DebugLogEntryString("Send: " + text));
             m_stream.Write(null, text + m_stream.NewLine);
         }
 
