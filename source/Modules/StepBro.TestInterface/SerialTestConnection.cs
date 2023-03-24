@@ -921,11 +921,11 @@ namespace StepBro.TestInterface
 
         private void DoSendCommand(CommandData command)
         {
-            m_currentExecutingCommand = command;
             var commandstring = command.GetAndMarkActive();
             m_loopbackAnswers?.TryGetValue(commandstring, out commandstring);
             if (m_nextResponse != null) commandstring = m_nextResponse;
             if (command.Context != null && command.Context.LoggingEnabled) command.Context.Logger.LogDetail("Send: " + commandstring);
+            m_currentExecutingCommand = command;
             DoSendDirect(commandstring);
         }
         private void DoSendDirect(string text)

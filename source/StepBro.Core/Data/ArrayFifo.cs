@@ -118,6 +118,7 @@ namespace StepBro.Core.Data
                 }
                 m_waitingForData = true;
             }
+            DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Await, m_head, m_tail, -1, timeout.ToString()));
             if (m_newDataEvent.WaitOne(timeout))
             {
                 DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.AwaitEvent, m_head, m_tail, -1));
