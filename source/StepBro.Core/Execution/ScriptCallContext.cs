@@ -539,28 +539,40 @@ namespace StepBro.Core.Execution
         public bool SetResultFromSub(IScriptCallContext sub)
         {
             m_lastCallResult = sub.Result;
-            if ((this.Self.Flags & ProcedureFlags.NoSubResultInheritance) == ProcedureFlags.None)
+            bool setVerdict = false;
+            if ((this.Self.Flags & ProcedureFlags.NoSubResultInheritance) == ProcedureFlags.NoSubResultInheritance)
+            {
+                if (m_verdict <= Verdict.Pass && sub.Result.SubResultCount > 0)
+                {
+                    m_subResults.AddRange(sub.Result.ListSubResults());
+                }
+                if (sub.Result.Verdict > Verdict.Fail)
+                {
+                    setVerdict = true;
+                }
+            }
+            else
             {
                 if (sub.Result.Verdict > m_verdict)
                 {
-                    m_verdict = sub.Result.Verdict;
-                    if (sub.Result.Verdict >= Verdict.Fail)
-                    {
-                        m_failureLine = m_currentStatementLine;
-                        m_failureID = sub.Result.ErrorID;
-                        m_failureDescription = $"Failure in called procedure \"{sub.Self.FullName}\".";
-                        m_subResults.Clear();   // When procedure has its own verdict, the sub-results are not useful.
-
-                        if (m_verdict == Verdict.Error) return true;
-                        else if (m_verdict == Verdict.Fail)
-                        {
-                            return (m_procedure.Flags & ProcedureFlags.ContinueOnFail) == ProcedureFlags.None;
-                        }
-                    }
+                    setVerdict = true;
                 }
-                else if (m_verdict <= Verdict.Pass && sub.Result.SubResultCount > 0)
+            }
+            if (setVerdict)
+            {
+                m_verdict = sub.Result.Verdict;
+                if (sub.Result.Verdict >= Verdict.Fail)
                 {
-                    m_subResults.AddRange(sub.Result.ListSubResults());
+                    m_failureLine = m_currentStatementLine;
+                    m_failureID = sub.Result.ErrorID;
+                    m_failureDescription = $"Failure in called procedure \"{sub.Self.FullName}\".";
+                    m_subResults.Clear();   // When procedure has its own verdict, the sub-results are not useful.
+
+                    if (m_verdict == Verdict.Error) return true;
+                    else if (m_verdict == Verdict.Fail)
+                    {
+                        return (m_procedure.Flags & ProcedureFlags.ContinueOnFail) == ProcedureFlags.None;
+                    }
                 }
             }
             return false;

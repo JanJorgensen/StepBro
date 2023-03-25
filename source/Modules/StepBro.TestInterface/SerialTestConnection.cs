@@ -409,6 +409,7 @@ namespace StepBro.TestInterface
             if (m_receiverTask != null && !m_receiverTask.IsCompleted)
             {
                 m_stopReceiver = true;
+                m_receiverTask.Wait();      // Important, to avoid having two running tasks if connecting again soon. 
             }
             m_receiverTask = null;
             return true;
@@ -797,7 +798,7 @@ namespace StepBro.TestInterface
         private void ReceiverTask()
         {
             int knownCount = 0;
-            int i = 0;
+            int index = 0;
             while (!m_stopReceiver)
             {
                 var nextWaitTime = 2000;
@@ -818,25 +819,36 @@ namespace StepBro.TestInterface
                 if (m_inputBuffer.AwaitNewData(knownCount, nextWaitTime))
                 {
                     knownCount = m_inputBuffer.Count;
-                    while (i < knownCount)
+                    //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Handling data; " + index.ToString() + ", " + knownCount.ToString()));
+                    //if ( index > knownCount || index != j)
+                    //{
+                    //    DebugLogEntry.Register(new DebugLogEntryString(m_name + " INDEX WRONG!!"));
+                    //}
+                    while (index < knownCount)
                     {
-                        char ch = m_inputBuffer[i];
-                        if (ch == '\n' || ch == '\r')
+                        char ch = m_inputBuffer[index];
+                        if (ch != '\n' && ch != '\r')
                         {
-                            if (i == 0)
+                            index++;
+                        }
+                        else
+                        {
+                            //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Line end"));
+                            if (index == 0)
                             {
                                 m_inputBuffer.Eat(1);
-                                knownCount = m_inputBuffer.Count; // Update knownCount as we have now deleted one of the elements in the input buffer
+                                knownCount--;
                                 continue;
                             }
-                            var line = m_inputBuffer.Get(0, i, i + 1);
-                            i = 0;
-                            knownCount = m_inputBuffer.Count;
+                            var line = m_inputBuffer.Get(0, index, index + 1);
+                            knownCount -= (index + 1);
+                            index = 0;
+                            //DebugLogEntry.Register(new DebugLogEntryString(m_name + " After Get: " + index.ToString() + ", " + knownCount.ToString()));
 
                             var s = new string(line, 1, line.Length - 1);
                             if (line[0] == EventLineChar)
                             {
-                                DebugLogEntry.Register(new DebugLogEntryString("Event line received: " + s));
+                                //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Event line received: " + s));
                                 lock (m_sync)
                                 {
                                     AddToLog(LogType.ReceivedAsync, 0, new string(line));
@@ -851,7 +863,7 @@ namespace StepBro.TestInterface
                             {
                                 if (line[0] == ResponseMultiLineChar)
                                 {
-                                    DebugLogEntry.Register(new DebugLogEntryString("Multi response line received: " + s));
+                                    //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Multi response line received: " + s));
                                     lock (m_sync)
                                     {
                                         AddToLog(LogType.ReceivedPartial, 0, new string(line));
@@ -870,7 +882,7 @@ namespace StepBro.TestInterface
                                     }
                                     if (m_currentExecutingCommand != null)
                                     {
-                                        DebugLogEntry.Register(new DebugLogEntryString("Response line received: " + s));
+                                        //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Response line received: " + s));
                                         try
                                         {
                                             m_currentExecutingCommand.SetResult(new string(line), m_responseLines.ToArray());
@@ -882,12 +894,11 @@ namespace StepBro.TestInterface
                                     }
                                     else
                                     {
-                                        DebugLogEntry.Register(new DebugLogEntryString("Response line received (no command active): " + s));
+                                        //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Response line received (no command active): " + s));
                                     }
                                 }
                             }
                         }
-                        else i++;
                     }
                 }
                 //else

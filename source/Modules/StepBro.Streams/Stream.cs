@@ -131,7 +131,7 @@ namespace StepBro.Streams
                 {
                     if (context != null)
                     {
-                        context.ReportError($"Could not open stream; {ex.Message}", exception: ex);
+                        context.ReportError($"Could not open stream; {ex.Message}");
                     }
                     return false;
                 }

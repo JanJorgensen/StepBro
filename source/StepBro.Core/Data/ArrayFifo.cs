@@ -71,7 +71,7 @@ namespace StepBro.Core.Data
             {
                 MakeSpace(length);
                 Array.Copy(block, start, m_buffer, m_head, length);
-                DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Add, m_head, m_tail, length, DataToString(block, start, length)));
+                //DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Add, m_head, m_tail, length, DataToString(block, start, length)));
                 m_head += length;
                 if (m_waitingForData)
                 {
@@ -97,7 +97,7 @@ namespace StepBro.Core.Data
             {
                 MakeSpace(length);
                 var count = getter(m_buffer, m_head, length);
-                DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Add, m_head, m_tail, count, DataToString(m_buffer, m_head, length)));
+                //DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Add, m_head, m_tail, count, DataToString(m_buffer, m_head, length)));
                 m_head += count;
                 if (m_waitingForData)
                 {
@@ -113,20 +113,20 @@ namespace StepBro.Core.Data
             {
                 if (Count > knownCount)
                 {
-                    DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.AwaitImmediate, m_head, m_tail, -1));
+                    //DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.AwaitImmediate, m_head, m_tail, -1));
                     return true;
                 }
                 m_waitingForData = true;
             }
-            DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Await, m_head, m_tail, -1, timeout.ToString()));
+            //DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Await, m_head, m_tail, -1, timeout.ToString()));
             if (m_newDataEvent.WaitOne(timeout))
             {
-                DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.AwaitEvent, m_head, m_tail, -1));
+                //DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.AwaitEvent, m_head, m_tail, -1));
                 return true;
             }
             else
             {
-                DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.AwaitTimeout, m_head, m_tail, -1));
+                //DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.AwaitTimeout, m_head, m_tail, -1));
                 return false;
             }
         }
@@ -137,7 +137,7 @@ namespace StepBro.Core.Data
             {
                 if (Count > knownCount)
                 {
-                    DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.AwaitImmediate, m_head, m_tail, -1));
+                    //DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.AwaitImmediate, m_head, m_tail, -1));
                     return true;
                 }
                 m_waitingForData = true;
@@ -145,12 +145,12 @@ namespace StepBro.Core.Data
             DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Await, m_head, m_tail, -1, timeout.ToString()));
             if (m_newDataEvent.WaitOne(timeout))
             {
-                DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.AwaitEvent, m_head, m_tail, -1));
+                //DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.AwaitEvent, m_head, m_tail, -1));
                 return true;
             }
             else
             {
-                DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.AwaitTimeout, m_head, m_tail, -1));
+                //DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.AwaitTimeout, m_head, m_tail, -1));
                 return false;
             }
         }
@@ -184,13 +184,13 @@ namespace StepBro.Core.Data
                             throw new ArgumentOutOfRangeException("index");
                         }
                         var value = m_buffer[m_tail + index];
-                        DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Index, m_head, m_tail, index, ValueString(value)));
+                        //DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Index, m_head, m_tail, index, ValueString(value)));
                         return value;
                     }
                     catch (Exception)
                     {
-                        DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.IndexError, m_head, m_tail, index));
-                        DebugLogUtils.DumpToFile();
+                        //DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.IndexError, m_head, m_tail, index));
+                        //DebugLogUtils.DumpToFile();
                         throw;
                     }
                 }
@@ -220,7 +220,7 @@ namespace StepBro.Core.Data
                         m_head = 0;
                     }
                 }
-                DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Eat, m_head, m_tail, length));
+                //DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Eat, m_head, m_tail, length));
                 OnDataPulled();
             }
         }
@@ -234,7 +234,7 @@ namespace StepBro.Core.Data
                 if (total > (m_head - m_tail) || total < (length + index) || total <= 0) throw new ArgumentOutOfRangeException("total");
                 Array.Copy(m_buffer, m_tail + index, targetbuffer, targetindex, length);
                 var datastring = DataToString(m_buffer, m_tail + index, length);
-                DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Get, m_head, m_tail, length, datastring));
+                //DebugLogEntry.Register(new MyDebugLogEntry(m_instanceName, MyDebugLogEntry.Action.Get, m_head, m_tail, length, datastring));
                 m_tail += total;
                 if (m_tail == m_head)
                 {
