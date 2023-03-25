@@ -219,19 +219,14 @@ namespace StepBro.Streams
                 {
                     s_OpenPortFailureExplorer(context, ex);
                 }
-                //if (context != null && context.LoggingEnabled)
-                //{
-                //    using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\cimv2",
-                //        "SELECT * FROM Win32_PnPEntity WHERE ClassGuid=\"{4d36e978-e325-11ce-bfc1-08002be10318}\""))
-                //    {
-
-                //        // Add all available (COM)-ports to the combobox
-                //        foreach (ManagementObject queryObj in searcher.Get())
-                //        {
-                //            context.Logger.Log("SerialPort.Open", "Available port: " + (queryObj["Caption"] as string));
-                //        }
-                //    }
-                //}
+                if (context != null && context.LoggingEnabled)
+                {
+                    var available = System.IO.Ports.SerialPort.GetPortNames();
+                    if (available != null && available.Length > 0)
+                    {
+                        context.Logger.Log("Available port(s): " + String.Join(", ", available.Select(s => "'" + s + "'")));
+                    }
+                }
                 throw;
             }
             try
