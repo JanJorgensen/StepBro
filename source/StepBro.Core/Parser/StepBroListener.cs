@@ -27,6 +27,7 @@ namespace StepBro.Core.Parser
         private Stack<ElementType> m_currentElementType = new Stack<ElementType>();
         protected AccessModifier m_fileElementModifier = AccessModifier.None;
         protected IToken m_elementStart = null;
+        protected string m_name = null;
         protected string m_currentNamespace = null;
         protected FileTestList m_currentTestList = null;
         protected Stack<SBExpressionData> m_testListEntryArguments = null;
@@ -141,6 +142,41 @@ namespace StepBro.Core.Parser
             else if (modifier == "private") m_fileElementModifier = AccessModifier.Private;
             else if (modifier == "protected") m_fileElementModifier = AccessModifier.Protected;
             else throw new NotImplementedException();
+        }
+
+        public override void EnterTypedef([NotNull] SBP.TypedefContext context)
+        {
+            //var fileElement = new FileElementTypeDef(m_file, context.Start.Line, )
+            m_currentFileElement = new FileElementTypeDef(m_file, context.Start.Line, m_currentNamespace, "");
+            m_name = null;
+        }
+
+        public override void ExitTypedef([NotNull] SBP.TypedefContext context)
+        {
+            m_currentFileElement.SetName(m_currentNamespace, m_name);
+        }
+
+        public override void ExitTypedefName([NotNull] SBP.TypedefNameContext context)
+        {
+            m_name = context.GetText();
+        }
+
+        public override void EnterTypedefType([NotNull] SBP.TypedefTypeContext context)
+        {
+            m_expressionData.PushStackLevel("TypeDefOuterType");
+        }
+
+        public override void ExitTypedefType([NotNull] SBP.TypedefTypeContext context)
+        {
+            m_expressionData.PopStackLevel();
+            var type = m_typeStack.Pop();
+
+            // TODO: Set the type in the FileElementTypedef
+        }
+
+        public override void ExitTypeOverride([NotNull] SBP.TypeOverrideContext context)
+        {
+            // TODO: set the override type for the current file element (variable). Use m_name.
         }
 
         public override void EnterFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)

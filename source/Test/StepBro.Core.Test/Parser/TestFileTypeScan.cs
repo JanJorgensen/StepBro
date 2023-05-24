@@ -242,5 +242,25 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(0, result.TopElement.Childs[0].Parameters.Count);
             Assert.AreEqual("void", result.TopElement.Childs[0].ReturnType);
         }
+
+        [TestMethod]
+        public void TestFileScanTypedefs()
+        {
+            var result = FileBuilder.TypeScanFile("typedef StringList List<string>; typedef MyType TheBaseType;");
+            Assert.AreEqual(FET.Namespace, result.TopElement.Type);
+            Assert.AreEqual("Angus", result.TopElement.Name);
+
+            var top = result.TopElement;
+            Assert.AreEqual(2, top.Childs.Count);
+
+            Assert.AreEqual(FET.TypeDef, top.Childs[0].Type);
+            Assert.AreEqual("StringList", top.Childs[0].Name);
+            Assert.AreEqual("List", top.Childs[0].DataType.GetGenericType().Item1);
+            Assert.AreEqual(1, top.Childs[0].DataType.ParameterCount);
+            Assert.AreEqual("string", top.Childs[0].DataType.GetParameter(0).GetGenericType().Item1);
+            
+            Assert.AreEqual("MyType", top.Childs[1].Name);
+            Assert.AreEqual("TheBaseType", top.Childs[1].DataType.GetGenericType().Item1);
+        }
     }
 }

@@ -35,6 +35,7 @@ fileElement
         |	testlist
         |	datatable
         |   fileElementOverride
+        |   typedef
         ) 
     ;
 
@@ -76,7 +77,17 @@ elementModifier
 
 fileElementReference : identifierOrQualified ;
 
-fileElementOverride : OVERRIDE fileElementReference elementPropertyblock ;
+fileElementOverride : OVERRIDE fileElementReference typeOverride? elementPropertyblock? ;
+
+typeOverride : AS typedefName ;
+
+typedefName : IDENTIFIER ;
+
+typedef 
+    : TYPEDEF typedefName typedefType SEMICOLON       // NOT LIKE A TYPEDEF IN C/C++; NAME FIRST HERE!!
+    ;
+
+typedefType : typeSimpleOrGeneric ;
 
 fileVariable
     :   elementModifier? variableType variableDeclaratorId elementPropertyblock         #FileVariableWithPropertyBlock
@@ -86,14 +97,6 @@ fileVariable
 //modifiers
     //:   modifier*
     //;
-
-//typeParameters
-//    :   '<' typeParameter (',' typeParameter)* '>'
-//    ;
-
-//typeParameter
-//    :   Identifier ('extends' typeBound)?
-//    ;
 
 // ENUM DECLARATION
 
@@ -260,6 +263,14 @@ primitiveType
 
 typeReference : TYPEOF OPEN_PARENS type CLOSE_PARENS ;
 
+typeSimpleOrGeneric
+    : type typeParameters       # TypeGeneric
+    | type                      # TypeSimple
+    ;
+
+typeParameters : LT typeParameter (COMMA typeParameter)* GT ;
+
+typeParameter : typeSimpleOrGeneric ;
 
 //qualifiedNameList
 //    :   identifierOrQualified (COMMA identifierOrQualified)*
@@ -646,7 +657,8 @@ expression
     |   ( op=TILDE | op=BANG | op=NOT ) expression						# ExpUnaryRight
     |   OPEN_PARENS type CLOSE_PARENS expression						# ExpCast
     |   AWAIT expression                                                # ExpAwait
-    //|   'new' creator
+
+    //|   NEW creator
 
     |	expression 
         (op1=OP_LE|op1=OP_LT_APPROX|op1=LT) 
