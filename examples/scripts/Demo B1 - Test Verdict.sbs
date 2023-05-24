@@ -1,0 +1,14 @@
+// Demonstration of the parsing error view.
+// Open the 'Error List' view from the View menu and parse he file by pressing F6.
+// Notice the errors listed in the view. Double click the error entry in the list will
+// open the file with that error and place the cursor on the line with the error.
+
+procedure void Proc1()
+{
+    int x = y;  // Unknown 'y'
+}
+
+procedure void Proc2()
+{
+    Proc101();  // Undefined procedure
+}

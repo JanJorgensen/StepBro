@@ -230,5 +230,15 @@ namespace StepBroCoreTest.Parser
             m_resetCounts++;
             return true;
         }
+
+        public void DoSomething()
+        {
+            this.IntA += 1000;
+        }
+
+        public void DoSomethingElse()
+        {
+            this.IntA /= 4;
+        }
     }
 }

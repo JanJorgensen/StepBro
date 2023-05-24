@@ -1,0 +1,33 @@
+﻿procedure void Procedure1()
+{
+    // A simple 'if' statement.
+    if (56 < 82)
+    {
+        log("Yes, that's right.");
+    }
+}
+
+procedure void Procedure2()
+{
+    // An 'if' statement followed by some 'else if' statements
+    if (4 > 30)
+    {
+        log("That can't be right...");
+    }
+    else if (4 > 7)
+    {
+        log("Still not right.");
+    }
+    else if (4 > 3)
+    {
+        log("That's right.");
+    }
+    else if (4 > 1)
+    {
+        log("This is also true."); // ... but this will not be called because the previous 'if' was true.
+    }
+    else
+    {
+        log("Only here if none of the above were true.");
+    }
+}

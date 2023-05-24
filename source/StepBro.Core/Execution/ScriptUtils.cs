@@ -300,6 +300,33 @@ namespace StepBro.Core.Execution
         }
 
         #endregion
+
+        #region Data Object Reading and Writing
+
+        [Public]
+        public static IDataNode ReadJsonFile(string file)
+        {
+            return null;
+        }
+
+        [Public]
+        public static IDataNode ReadJsonString(string data)
+        {
+            return null;
+        }
+
+        [Public]
+        public static IDataNode ReadPropertyBlockFile(string file)
+        {
+            return null;
+        }
+
+        [Public]
+        public static IDataNode ReadPropertyBlockString(string data)
+        {
+            return null;
+        }
+        #endregion
     }
 
     //[Public]

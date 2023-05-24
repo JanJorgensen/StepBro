@@ -1,0 +1,77 @@
+﻿
+
+namespace Examples;     // All file elements defined in this file will 'belong' to this namespace.
+                        // If no namespace is defined in a script file, the namespace will automatically be set to the name of the file, without the extension name.
+
+// EXAMPLE 1 - A SIMPLE PROCEDURE
+
+// The procedure below will write "Hello World!" in the execution log.
+// When executing the command line below, notice that the hello-line is not the only line in the execution log.
+// The execution flow is automatically added, so the 'log' statements are only used to add some extra information to the execution log.
+// Notice that the namespace for this file ("Examples") is prefixed to the procedure name in the execution log.
+// Command line: stepbro -t -e HelloStepBro "Demo A1 - Procedure.sbs"
+procedure void HelloStepBro()
+{
+    log("Hello World!");  // See the execution log (the Output view). The line in the log from this statement starts with the number of this line.
+}
+
+
+
+// EXAMPLE 2 - PROCEDURES CAN CALL OTHER PROCEDURES
+
+// This procedure calls another procedure named 'LogTheName', which writes to the execution log.
+// Command line: stepbro -t -e CallOtherProcedure "Demo A1 - Procedure.sbs"
+procedure void CallOtherProcedure()
+{
+    LogTheName();
+}
+
+// Notice the 'void' keyword. It indicates that the procedure does not return any data (result).
+// Also notice that the procedure 'CallOtherProcedure' can "see" and call this procedure, even when this is defined later in the file.
+function void LogTheName()
+{
+    log("The name is: Peter");
+}
+
+
+
+// EXAMPLE 3 - A PROCEDURE CAN BE A SPECIAL TYPE NAMED FUNCTION.
+
+// This procedure calls the procedure named 'GetName', to get a name. Notice that the 'GetName' procedure has the 'function' type instead of 'procedure'.
+// Command line: stepbro -t -e CallFunction "Demo A1 - Procedure.sbs"
+procedure void CallFunction()
+{
+    log("The name is: " + GetName());
+}
+
+// This procedure is a 'function', which is a simple procedure, where the call to it and the internal execution is not logged.
+// A 'function' is typically used to do some calculations and return the result.
+// In this case the function has no parameters, and just returns a name back to the caller.
+function string GetName()
+{
+    log ("This line will NOT be added to the execution log.");
+    return "Peter Parker";
+}
+
+
+
+// EXAMPLE 4 - PROCEDURES CAN HAVE PARAMETERS
+
+// This procedure calls another procedure, and passes two arguments to it. 
+// An 'argument' is the value for a parameter. In the procedure call inside the procedure below, the first argument is the string "Jeff", and the second argument is the numeric value 54.
+// The parameters for 'LogTheSpecifiedName' can be seen in that procedure's definition.
+// The second parameter is 
+// Command line: stepbro -t -e CallProcedureWithParameters "Demo A1 - Procedure.sbs"
+procedure void CallProcedureWithParameters()
+{
+    LogTheSpecifiedName("Jeff", 54);
+}
+
+// This procedure has two parameters.
+// The data type of the first parameter is 'string' and the name is 'name'.
+// The data type of the second parameter is 'integer' and the name is 'age'.
+// You can have a look at the example file "Demo A2 - Data and Types.sbs", to learn about the different data types in StepBro.
+procedure void LogTheSpecifiedName(string name, integer age)
+{
+    log("The name is " + name + ", and he/she is " + age + " years old.");  // Use the two parameters, to build a text line showing the passed name and age.
+}

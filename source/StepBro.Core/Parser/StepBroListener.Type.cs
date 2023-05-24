@@ -11,6 +11,8 @@ namespace StepBro.Core.Parser
     internal partial class StepBroListener
     {
         private Stack<TypeReference> m_typeStack = new Stack<TypeReference>();
+        protected Stack<Tuple<TypeReference, List<TypeReference>>> m_typedefTypeStack = null;     // In Tuple: Generic type + list of generic parameters.
+
         public TypeReference LastParsedType { get { return m_typeStack.Peek(); } }
 
         /// <summary>
@@ -160,5 +162,36 @@ namespace StepBro.Core.Parser
             var type = ParseTypeString(typename, false, true, (context.GetChild(2).Payload as Antlr4.Runtime.CommonToken));
             m_expressionData.Push(SBExpressionData.Constant(TypeReference.TypeType, type));
         }
+
+        public override void EnterTypeGeneric([NotNull] SBP.TypeGenericContext context)
+        {
+            m_typedefTypeStack = new Stack<Tuple<TypeReference, List<TypeReference>>>();
+            m_typedefTypeStack.Push(new Tuple<TypeReference, List<TypeReference>>(null, new List<TypeReference>()));
+        }
+
+        public override void ExitTypeGeneric([NotNull] SBP.TypeGenericContext context)
+        {
+            var type = m_typedefTypeStack.Peek().Item1;
+            var parameters = m_typedefTypeStack.Peek().Item2;
+        }
+
+        public override void EnterTypeParameter([NotNull] SBP.TypeParameterContext context)
+        {
+            m_expressionData.PushStackLevel("TypeParameter");
+        }
+
+        public override void ExitTypeParameter([NotNull] SBP.TypeParameterContext context)
+        {
+            m_expressionData.PopStackLevel();
+            var type = m_typeStack.Pop();
+
+            m_typedefTypeStack.Peek().Item2.Add(type);
+
+            //var type = PopType("typeparameter");
+            //var par = m_typedefStack.Pop();
+            //par.SetTypeName(type.Item1, type.Item2);
+            //m_typedefStack.Peek().AddParameter(par);
+        }
+
     }
 }

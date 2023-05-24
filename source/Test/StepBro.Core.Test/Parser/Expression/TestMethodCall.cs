@@ -289,5 +289,15 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(70L + 928L, ParseAndRun<long>("varDummyA.MethodWithCallContextB(\"Upsan\")", varDummyClass: true));
             Assert.AreEqual(70L + 726L, ParseAndRun<long>("varDummyB.MethodWithCallContextB(\"Upsan\")", varDummyClass: true));
         }
+
+        [TestMethod]
+        public void TestSystemRandom()
+        {
+            Assert.AreEqual(25L, ParseAndRun<long>(
+                "value",
+                "var rnd = new Random(); " +
+                "var value = rnd.Next(0, 100);",
+                false));
+        }
     }
 }

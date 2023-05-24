@@ -350,3 +350,4 @@ MigrationBackup/
 .ionide/
 source/bin5/
 source/stepbro/Properties/launchSettings.json
+*.exe

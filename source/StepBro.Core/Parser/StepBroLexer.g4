@@ -40,6 +40,7 @@ SHARP:						'#'						-> mode(DIRECTIVE_MODE);
 
 // Keywords
 
+AS : 'as' ;
 ALT : 'alt' ;
 ASSERT : 'assert' ;
 AWAIT : 'await' ;

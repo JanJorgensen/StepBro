@@ -318,6 +318,7 @@ namespace StepBro.Core.Parser
                 addonManager.AddAssembly(typeof(Enumerable).Assembly, false);
             }
             addonManager.AddAssembly(AddonManager.StepBroCoreAssembly, true);   // Add StepBro.Core always.
+            addonManager.AddAssembly(typeof(System.Array).Assembly, false);
             if (usingType != null)
             {
                 addonManager.AddAssembly(usingType.Assembly, false);

@@ -1,0 +1,37 @@
+﻿// StepBro defines some basic data types. The types are:
+//     * bool
+//     * int / integer      - 64 bit signed integer value.
+//     * double             - Floating point value with 64 bit resulution.
+//     * string
+//     * verdict            - Enum with the basic result of a test: Unset, Pass, Fail, Error, Inconclusive or Abandoned.
+//     * datetime           - The .net DateTime type, for an instant in time. Documentation: https://learn.microsoft.com/en-us/dotnet/api/system.datetime?view=net-7.0
+//     * timespan           - The .net TimeSpan type, representing a time interval. Documentation: https://learn.microsoft.com/en-us/dotnet/api/system.timespan?view=net-7.0
+//     * void               - 
+// Besides that, StepBro can use virtually any .net enum, struct or class.
+//
+
+int fileVariable = 40;              // Variable accessible only from this file.
+public int somePublicVariable = 20; // Variable accessible from this file and from files using this file.
+
+procedure void ProcedureWithSomVariables()
+{
+    bool v1 = true;
+    bool v2 = false;
+    bool v3 = v1 && (10 < 72);
+    
+    int v4 = 40;
+    int v5 = -60;
+    int v6 = 23.6M;                 // Using postfix (SI prefix) 'M' for 'millions'. Allowed postfix for integer values are 'P', 'T', 'G', 'M' and 'K'.
+    int v7 = -5.9G;                 // -5,900,000,000.
+    int v8 = v6 * 23;
+    integer v9 = 4000 + fileVariable;
+    
+    double v10 = 1.001;
+    double v11 = -58.2e-20;
+    double v12 = 14.2m;             // Using postfix (SI prefix) 'm' for 'milli'. Allowed postfix for floating point values are 'P', 'T', 'G', 'M', 'K', 'm', 'u', 'n' and 'p', 
+    double v13 = v10 * v4 + 23.5;
+}
+
+procedure void Procedure2()
+{
+}

@@ -7,6 +7,9 @@ using System.Linq;
 using StepBro.Core.Data;
 //using StepBro.Core.ScriptData;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
+using StepBro.Core.ScriptData;
+using System.Xml.Linq;
+using System.ComponentModel;
 
 namespace StepBro.Core.Parser
 {
@@ -22,6 +25,44 @@ namespace StepBro.Core.Parser
                 this.Line = line;
                 this.Type = type;
                 this.Name = name;
+            }
+        }
+
+        public class ScannedTypeDescriptor
+        {
+            private string m_typeName = null;
+            private IToken m_typeNameToken = null;
+            private List<ScannedTypeDescriptor> m_typeParameters = null;
+
+            public Tuple<string, IToken> GetGenericType()
+            {
+                return new Tuple<string, IToken>(m_typeName, m_typeNameToken);
+            }
+
+            public int ParameterCount {  get { return m_typeParameters.Count; } }
+
+            public ScannedTypeDescriptor GetParameter(int index) { return m_typeParameters[index]; }
+
+            public void SetTypeName(string name, IToken token)
+            {
+                m_typeName = name;
+                m_typeNameToken = token;
+            }
+
+            public void AddParameter(ScannedTypeDescriptor parameter)
+            {
+                if (m_typeParameters == null) m_typeParameters = new List<ScannedTypeDescriptor>();
+                m_typeParameters.Add(parameter);
+            }
+
+            public override string ToString()
+            {
+                var s = m_typeName;
+                if (m_typeParameters != null && m_typeParameters.Count > 0)
+                {
+                    s = s + "<" +  String.Join(", ", m_typeParameters) + ">";
+                }
+                return s;
             }
         }
 
@@ -44,6 +85,7 @@ namespace StepBro.Core.Parser
             public List<string> PropertyFlags { get; set; } = null;
             public bool IsFunction { get; set; } = false;
             public bool HasBody { get; set; } = true;
+            public ScannedTypeDescriptor DataType { get; set; } = null;
             public FileElement(FileElement parent, int line, ScriptData.FileElementType type, string name)
             {
                 this.Parent = parent;
@@ -103,6 +145,7 @@ namespace StepBro.Core.Parser
         private List<string> m_elementPropFlags = null;
         private bool m_acceptElementPropFlags = true;
         private Stack<Tuple<string, IToken>> m_typeStack = new Stack<Tuple<string, IToken>>();
+        private Stack<ScannedTypeDescriptor> m_typedefStack = new Stack<ScannedTypeDescriptor>();
         private bool m_isFunction = false;
         private string[] m_parameterModifiers = null;
 
@@ -176,6 +219,43 @@ namespace StepBro.Core.Parser
             m_elementStack.Clear();
             m_elementStack.Push(element);
         }
+
+        #region TypeDef
+
+        public override void EnterTypedef([NotNull] SBP.TypedefContext context)
+        {
+            m_typedefStack.Clear();
+            m_typedefStack.Push(new ScannedTypeDescriptor());
+        }
+
+        public override void ExitTypedefName([NotNull] SBP.TypedefNameContext context)
+        {
+            m_name = context.GetText();
+        }
+
+        public override void ExitTypedef([NotNull] SBP.TypedefContext context)
+        {
+            var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.TypeDef, m_name);
+            element.Modifiers = m_modifiers;
+            //TODO: set scanned type
+            element.DataType = m_typedefStack.Pop().GetParameter(0);
+            this.TopElement.Childs.Add(element);
+        }
+
+        public override void EnterTypeParameter([NotNull] SBP.TypeParameterContext context)
+        {
+            m_typedefStack.Push(new ScannedTypeDescriptor());
+        }
+
+        public override void ExitTypeParameter([NotNull] SBP.TypeParameterContext context)
+        {
+            var type = PopType("typeparameter");
+            var par = m_typedefStack.Pop();
+            par.SetTypeName(type.Item1, type.Item2);
+            m_typedefStack.Peek().AddParameter(par);
+        }
+
+        #endregion
 
         public override void EnterFileElement([NotNull] SBP.FileElementContext context)
         {
