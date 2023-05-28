@@ -497,6 +497,19 @@ namespace StepBro.Core.Parser
                         }
                         break;
 
+                    case FileElementType.TypeDef:
+                        {
+                            var typedef = element as FileElementTypeDef;
+
+                            result = new SBExpressionData(
+                                HomeType.Immediate,
+                                SBExpressionType.TypeReference,
+                                typedef.DataType,
+                                null,
+                                typedef);
+                        }
+                        break;
+
                     default:
                         throw new NotImplementedException();
                 }

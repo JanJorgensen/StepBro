@@ -535,6 +535,11 @@ namespace StepBro.Core.ScriptData
             m_elements.Add(overrider);
         }
 
+        internal void AddTypedef(FileElementTypeDef def)
+        {
+            m_elements.Add(def);
+        }
+
         public IEnumerable<IFileElement> ListElements()
         {
             foreach (var e in m_fileScopeVariables)

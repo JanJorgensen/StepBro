@@ -1,4 +1,6 @@
-﻿using Antlr4.Runtime;
+﻿#define PRINT_TREE
+
+using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using System;
@@ -32,6 +34,7 @@ namespace StepBro.Core.Parser
         {
             private string m_typeName = null;
             private IToken m_typeNameToken = null;
+            private TypeReference m_resolvedType = null;
             private List<ScannedTypeDescriptor> m_typeParameters = null;
 
             public Tuple<string, IToken> GetGenericType()
@@ -39,9 +42,15 @@ namespace StepBro.Core.Parser
                 return new Tuple<string, IToken>(m_typeName, m_typeNameToken);
             }
 
-            public int ParameterCount {  get { return m_typeParameters.Count; } }
+            public int ParameterCount { get { return (m_typeParameters != null) ? m_typeParameters.Count : 0; } }
 
             public ScannedTypeDescriptor GetParameter(int index) { return m_typeParameters[index]; }
+
+            public string TypeName { get { return m_typeName; } }
+
+            public IToken Token { get { return m_typeNameToken; } }
+
+            public TypeReference ResolvedType { get { return m_resolvedType; } set { m_resolvedType = value; } }
 
             public void SetTypeName(string name, IToken token)
             {
@@ -60,7 +69,7 @@ namespace StepBro.Core.Parser
                 var s = m_typeName;
                 if (m_typeParameters != null && m_typeParameters.Count > 0)
                 {
-                    s = s + "<" +  String.Join(", ", m_typeParameters) + ">";
+                    s = s + "<" + String.Join(", ", m_typeParameters) + ">";
                 }
                 return s;
             }
@@ -233,12 +242,17 @@ namespace StepBro.Core.Parser
             m_name = context.GetText();
         }
 
+        public override void ExitTypeSimple([NotNull] SBP.TypeSimpleContext context)
+        {
+            var type = this.PopType("ExitTypeSimple");
+            m_typedefStack.Peek().SetTypeName(type.Item1, type.Item2);
+        }
+
         public override void ExitTypedef([NotNull] SBP.TypedefContext context)
         {
             var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.TypeDef, m_name);
             element.Modifiers = m_modifiers;
-            //TODO: set scanned type
-            element.DataType = m_typedefStack.Pop().GetParameter(0);
+            element.DataType = m_typedefStack.Pop();
             this.TopElement.Childs.Add(element);
         }
 
@@ -249,10 +263,15 @@ namespace StepBro.Core.Parser
 
         public override void ExitTypeParameter([NotNull] SBP.TypeParameterContext context)
         {
-            var type = PopType("typeparameter");
             var par = m_typedefStack.Pop();
-            par.SetTypeName(type.Item1, type.Item2);
             m_typedefStack.Peek().AddParameter(par);
+        }
+
+        public override void ExitTypeGeneric([NotNull] SBP.TypeGenericContext context)
+        {
+            var genericType = PopType("generictype");
+            var type = m_typedefStack.Peek();
+            type.SetTypeName(genericType.Item1, genericType.Item2);
         }
 
         #endregion
@@ -262,6 +281,10 @@ namespace StepBro.Core.Parser
             m_modifiers = null;
             m_elementPropFlags = null;
             m_acceptElementPropFlags = true;
+
+#if (PRINT_TREE)
+            m_indent = m_indent.Substring(0, m_indent.Length - 4) + "|   ";
+#endif
         }
 
         public override void ExitFileElement([NotNull] SBP.FileElementContext context)
@@ -472,21 +495,53 @@ namespace StepBro.Core.Parser
             this.PushType("ExitTypeClassOrInterface", context.GetText(), context.Start);
         }
 
+
+#if (PRINT_TREE)
+        private string m_indent = "";
+
         public override void EnterEveryRule([NotNull] ParserRuleContext context)
         {
-            base.EnterEveryRule(context);
-            //System.Diagnostics.Debug.WriteLine("TypeScan Enter " + context.GetType().Name);
+            System.Diagnostics.Debug.WriteLine(m_indent + "Enter" + this.ContextName(context) + ":             " + this.ShortContextText(context));
+            m_indent += "    ";
         }
 
         public override void ExitEveryRule([NotNull] ParserRuleContext context)
         {
-            //System.Diagnostics.Debug.WriteLine("TypeScan Exit " + context.GetType().Name);
-            base.ExitEveryRule(context);
+            m_indent = m_indent.Substring(0, m_indent.Length - 4);
+            //Console.WriteLine(m_indent + "EXIT  - " + this.ContextName(context) + ":             " + this.ShortContextText(context));
         }
+
+        private string ShortContextText(ParserRuleContext context)
+        {
+            string text = context.GetText();
+            if (text.Length > 80)
+            {
+                text = text.Substring(0, 75) + " ... " + text.Substring(text.Length - 10);
+            }
+            return text;
+        }
+
+        private string ContextName(ParserRuleContext context)
+        {
+            string name = context.GetType().Name;
+            return name.Substring(0, name.Length - "Context".Length);
+        }
+#endif
 
         public override void VisitErrorNode([NotNull] IErrorNode node)
         {
-            System.Diagnostics.Debug.WriteLine("TypeScan ERROR " + node.GetText());
+#if (PRINT_TREE)
+            System.Diagnostics.Debug.WriteLine(m_indent + "TypeScan ERROR - " + node.GetText());
+#endif
+            //var t = node.Payload as CommonToken;
+            //if (t != null)
+            //{
+            //    m_errors.SyntaxError(null, null, t.Type, t.Line, t.Column, node.GetText(), null);
+            //}
+            //else
+            //{
+            //    m_errors.SyntaxError(null, null, -1, -1, -1, node.GetText(), null);
+            //}
             base.VisitErrorNode(node);
         }
     }

@@ -11,7 +11,7 @@ namespace StepBro.Core.Parser
     internal partial class StepBroListener
     {
         private Stack<TypeReference> m_typeStack = new Stack<TypeReference>();
-        protected Stack<Tuple<TypeReference, List<TypeReference>>> m_typedefTypeStack = null;     // In Tuple: Generic type + list of generic parameters.
+        //protected Stack<Tuple<TypeReference, List<TypeReference>>> m_typedefTypeStack = null;     // In Tuple: Generic type + list of generic parameters.
 
         public TypeReference LastParsedType { get { return m_typeStack.Peek(); } }
 
@@ -156,6 +156,52 @@ namespace StepBro.Core.Parser
             return this.ResolveQualifiedType(identifier, reportErrors, token)?.DataType;
         }
 
+        public int ParseTypedef(
+            StepBroTypeScanListener.ScannedTypeDescriptor declaration,
+            bool reportErrors = false,
+            Antlr4.Runtime.IToken token = null)
+        {
+            if (declaration.ParameterCount > 0)
+            {
+                int unresolved = 0;
+                for (int i = 0; i < declaration.ParameterCount; i++)
+                {
+                    var p = declaration.GetParameter(i);
+                    if (p.ResolvedType == null)
+                    {
+                        var parameterUnresolved = ParseTypedef(p, reportErrors, p.Token);
+                        if (parameterUnresolved > 0)
+                        {
+                            unresolved += parameterUnresolved;
+                        }
+                    }
+                }
+                if (unresolved > 0)
+                {
+                    return unresolved + 1;
+                }
+                else
+                {
+                    // RESOLVE THIS GENERIC TYPE
+                    throw new NotImplementedException();
+                }
+            }
+            else
+            {
+                if (declaration.ResolvedType == null)
+                {
+                    var type = ParseTypeString(declaration.TypeName, reportErrors: reportErrors, token: declaration.Token);
+                    if (type != null)
+                    {
+                        declaration.ResolvedType = type;
+                        return 0;
+                    }
+                    else { return 1; }
+                }
+            }
+            return (declaration.ResolvedType != null) ? 0 : 1;
+        }
+
         public override void ExitTypeReference([NotNull] SBP.TypeReferenceContext context)
         {
             var typename = context.GetChild(2).GetText();
@@ -163,35 +209,35 @@ namespace StepBro.Core.Parser
             m_expressionData.Push(SBExpressionData.Constant(TypeReference.TypeType, type));
         }
 
-        public override void EnterTypeGeneric([NotNull] SBP.TypeGenericContext context)
-        {
-            m_typedefTypeStack = new Stack<Tuple<TypeReference, List<TypeReference>>>();
-            m_typedefTypeStack.Push(new Tuple<TypeReference, List<TypeReference>>(null, new List<TypeReference>()));
-        }
+        //public override void EnterTypeGeneric([NotNull] SBP.TypeGenericContext context)
+        //{
+        //    m_typedefTypeStack = new Stack<Tuple<TypeReference, List<TypeReference>>>();
+        //    m_typedefTypeStack.Push(new Tuple<TypeReference, List<TypeReference>>(null, new List<TypeReference>()));
+        //}
 
-        public override void ExitTypeGeneric([NotNull] SBP.TypeGenericContext context)
-        {
-            var type = m_typedefTypeStack.Peek().Item1;
-            var parameters = m_typedefTypeStack.Peek().Item2;
-        }
+        //public override void ExitTypeGeneric([NotNull] SBP.TypeGenericContext context)
+        //{
+        //    var type = m_typedefTypeStack.Peek().Item1;
+        //    var parameters = m_typedefTypeStack.Peek().Item2;
+        //}
 
-        public override void EnterTypeParameter([NotNull] SBP.TypeParameterContext context)
-        {
-            m_expressionData.PushStackLevel("TypeParameter");
-        }
+        //public override void EnterTypeParameter([NotNull] SBP.TypeParameterContext context)
+        //{
+        //    m_expressionData.PushStackLevel("TypeParameter");
+        //}
 
-        public override void ExitTypeParameter([NotNull] SBP.TypeParameterContext context)
-        {
-            m_expressionData.PopStackLevel();
-            var type = m_typeStack.Pop();
+        //public override void ExitTypeParameter([NotNull] SBP.TypeParameterContext context)
+        //{
+        //    m_expressionData.PopStackLevel();
+        //    var type = m_typeStack.Pop();
 
-            m_typedefTypeStack.Peek().Item2.Add(type);
+        //    m_typedefTypeStack.Peek().Item2.Add(type);
 
-            //var type = PopType("typeparameter");
-            //var par = m_typedefStack.Pop();
-            //par.SetTypeName(type.Item1, type.Item2);
-            //m_typedefStack.Peek().AddParameter(par);
-        }
+        //    //var type = PopType("typeparameter");
+        //    //var par = m_typedefStack.Pop();
+        //    //par.SetTypeName(type.Item1, type.Item2);
+        //    //m_typedefStack.Peek().AddParameter(par);
+        //}
 
     }
 }
