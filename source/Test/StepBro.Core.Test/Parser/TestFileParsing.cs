@@ -321,7 +321,7 @@ namespace StepBroCoreTest.Parser
             var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
 
             var result = taskContext.CallProcedure(proc);
-            Assert.AreEqual("Bente", result);
+            Assert.AreEqual("Bent", result);
         }
     }
 }

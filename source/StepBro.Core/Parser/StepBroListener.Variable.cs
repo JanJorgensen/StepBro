@@ -69,7 +69,9 @@ namespace StepBro.Core.Parser
                 }
                 else if (m_variableType.Type.IsClass)
                 {
-                    throw new NotImplementedException();
+                    var defaultConstructor = m_variableType.Type.GetConstructor(new Type[0]);
+                    var newExpression = Expression.New(defaultConstructor);
+                    m_variableInitializer = new SBExpressionData(newExpression);
                 }
             }
         }

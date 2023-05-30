@@ -5,6 +5,7 @@ using System.Linq;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace StepBro.Core.Parser
 {
@@ -164,6 +165,7 @@ namespace StepBro.Core.Parser
             if (declaration.ParameterCount > 0)
             {
                 int unresolved = 0;
+                var parameters = new List<Type>();
                 for (int i = 0; i < declaration.ParameterCount; i++)
                 {
                     var p = declaration.GetParameter(i);
@@ -175,6 +177,10 @@ namespace StepBro.Core.Parser
                             unresolved += parameterUnresolved;
                         }
                     }
+                    if (p.ResolvedType != null)
+                    {
+                        parameters.Add(p.ResolvedType.Type);
+                    }
                 }
                 if (unresolved > 0)
                 {
@@ -182,8 +188,40 @@ namespace StepBro.Core.Parser
                 }
                 else
                 {
-                    // RESOLVE THIS GENERIC TYPE
-                    throw new NotImplementedException();
+                    var types = this.ResolveQualifiedType(declaration.TypeName, reportErrors, token);
+                    if (types != null && types.ReferencedType == SBExpressionType.GenericTypeDefinition)
+                    {
+                        var foundTypes = (List<Type>)types.Value;
+                        System.Diagnostics.Debug.Assert(foundTypes != null);
+
+                        var matchingTypes = foundTypes.Where(t => t.GetGenericArguments().Length == declaration.ParameterCount).ToList();
+                        if (matchingTypes.Count == 1)
+                        {
+                            var genericType = matchingTypes[0].MakeGenericType(parameters.ToArray());
+                            declaration.ResolvedType = new TypeReference(genericType);
+                            return 0;
+                        }
+                        else
+                        {
+                            if (reportErrors)
+                            {
+                                string error = $"The number of type parameters for {declaration.TypeName} is wrong.";
+                                if (token != null)
+                                {
+                                    m_errors.SymanticError(token.Line, token.Column, false, error);
+                                }
+                                else
+                                {
+                                    m_errors.SymanticError(-1, -1, false, error);
+                                }
+                            }
+                            return 1;
+                        }
+                    }
+                    else
+                    {
+                        return 1;
+                    }
                 }
             }
             else
