@@ -41,6 +41,7 @@ namespace StepBro.Cmd
             {
                 if (!String.IsNullOrWhiteSpace(line)) ConsoleWriteLine(line);
             }
+            if (m_commandLineOptions.ReturnValueFromSubVerdict) m_commandLineOptions.ReturnValueFromVerdict = true;
             if (m_commandLineOptions.Verbose || args.Length == 0)
             {
                 ConsoleWriteLine("StepBro console application. Type 'stepbro --help' to show the help text.");
@@ -156,12 +157,12 @@ namespace StepBro.Cmd
                                                 {
                                                     if (m_commandLineOptions.ReturnValueFromSubVerdict)
                                                     {
-                                                        var verdict = Verdict.Unset;
-                                                        foreach (var sr in result.ProcedureResult.ListSubResults())
+                                                        var verdict = result.ProcedureResult.Verdict;                   // Include verdict from the partner procedure result.
+                                                        foreach (var sr in result.ProcedureResult.ListSubResults())     // Check verdict from each sub result.
                                                         {
                                                             if (sr.Verdict > verdict) verdict = sr.Verdict;
                                                         }
-                                                         switch (verdict)
+                                                        switch (verdict)
                                                         {
                                                             case Verdict.Unset:
                                                             case Verdict.Pass:
@@ -235,6 +236,24 @@ namespace StepBro.Cmd
                                                     else
                                                     {
                                                         ConsoleWriteLine("Procedure execution ended.");
+                                                    }
+                                                }
+
+                                                if (m_commandLineOptions.ReturnValueFromVerdict)
+                                                {
+                                                    switch (result.ProcedureResult.Verdict)
+                                                    {
+                                                        case Verdict.Unset:
+                                                        case Verdict.Pass:
+                                                            break;
+                                                        case Verdict.Inconclusive:
+                                                        case Verdict.Fail:
+                                                        case Verdict.Abandoned:
+                                                            retval = 1;
+                                                            break;
+                                                        case Verdict.Error:
+                                                            retval = -1;
+                                                            break;
                                                     }
                                                 }
                                             }

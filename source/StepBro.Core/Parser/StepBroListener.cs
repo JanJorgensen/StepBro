@@ -1,4 +1,6 @@
-﻿using Antlr4.Runtime;
+﻿//#define PRINT_TREE
+
+using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using Newtonsoft.Json.Serialization;
@@ -27,6 +29,7 @@ namespace StepBro.Core.Parser
         private Stack<ElementType> m_currentElementType = new Stack<ElementType>();
         protected AccessModifier m_fileElementModifier = AccessModifier.None;
         protected IToken m_elementStart = null;
+        protected string m_name = null;
         protected string m_currentNamespace = null;
         protected FileTestList m_currentTestList = null;
         protected Stack<SBExpressionData> m_testListEntryArguments = null;
@@ -132,6 +135,10 @@ namespace StepBro.Core.Parser
             m_lastElementPropertyBlock = null;
             m_fileElementModifier = AccessModifier.Private;    // Default is 'private'.
             m_currentFileElement = null;
+
+#if (PRINT_TREE)
+            m_indent = m_indent.Substring(0, m_indent.Length - 4) + "|   ";
+#endif
         }
 
         public override void EnterElementModifier([NotNull] SBP.ElementModifierContext context)
@@ -141,6 +148,41 @@ namespace StepBro.Core.Parser
             else if (modifier == "private") m_fileElementModifier = AccessModifier.Private;
             else if (modifier == "protected") m_fileElementModifier = AccessModifier.Protected;
             else throw new NotImplementedException();
+        }
+
+        public override void EnterTypedef([NotNull] SBP.TypedefContext context)
+        {
+            //var fileElement = new FileElementTypeDef(m_file, context.Start.Line, )
+            m_currentFileElement = new FileElementTypeDef(m_file, context.Start.Line, m_currentNamespace, "");
+            m_name = null;
+        }
+
+        public override void ExitTypedef([NotNull] SBP.TypedefContext context)
+        {
+            m_currentFileElement.SetName(m_currentNamespace, m_name);
+        }
+
+        public override void ExitTypedefName([NotNull] SBP.TypedefNameContext context)
+        {
+            m_name = context.GetText();
+        }
+
+        public override void EnterTypedefType([NotNull] SBP.TypedefTypeContext context)
+        {
+            m_expressionData.PushStackLevel("TypeDefOuterType");
+        }
+
+        public override void ExitTypedefType([NotNull] SBP.TypedefTypeContext context)
+        {
+            m_expressionData.PopStackLevel();
+            var type = m_typeStack.Pop();
+
+            // TODO: Set the type in the FileElementTypedef
+        }
+
+        public override void ExitTypeOverride([NotNull] SBP.TypeOverrideContext context)
+        {
+            // TODO: set the override type for the current file element (variable). Use m_name.
         }
 
         public override void EnterFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)
@@ -221,7 +263,7 @@ namespace StepBro.Core.Parser
                     }
                 }
                 #endregion
-                
+
                 #region Reset Action
                 var resettable = type.Type.GetInterface(nameof(IResettable));
                 if (resettable != null)
@@ -651,25 +693,43 @@ namespace StepBro.Core.Parser
             }
         }
 
+#if (PRINT_TREE)
+        private string m_indent = "";
+
         public override void EnterEveryRule([NotNull] ParserRuleContext context)
         {
-            base.EnterEveryRule(context);
-            //var txt = context.GetText();
-            //var lf = txt.IndexOf('\r');
-            //if (lf > 0) txt = txt.Substring(0, lf);
-            //else if (txt.Length > 40) txt = txt.Substring(0, 40);
-            //System.Diagnostics.Debug.WriteLine("ENTER " + context.GetType().Name + "  : " + txt);
+            System.Diagnostics.Debug.WriteLine(m_indent + "Enter" + this.ContextName(context) + ":             " + this.ShortContextText(context));
+            m_indent += "    ";
         }
 
         public override void ExitEveryRule([NotNull] ParserRuleContext context)
         {
-            //System.Diagnostics.Debug.WriteLine("EXIT " + context.GetType().Name);
-            base.ExitEveryRule(context);
+            m_indent = m_indent.Substring(0, m_indent.Length - 4);
+            //Console.WriteLine(m_indent + "EXIT  - " + this.ContextName(context) + ":             " + this.ShortContextText(context));
         }
+
+        private string ShortContextText(ParserRuleContext context)
+        {
+            string text = context.GetText();
+            if (text.Length > 80)
+            {
+                text = text.Substring(0, 75) + " ... " + text.Substring(text.Length - 10);
+            }
+            return text;
+        }
+
+        private string ContextName(ParserRuleContext context)
+        {
+            string name = context.GetType().Name;
+            return name.Substring(0, name.Length - "Context".Length);
+        }
+#endif
 
         public override void VisitErrorNode([NotNull] IErrorNode node)
         {
-            //System.Diagnostics.Debug.WriteLine(node.Payload.GetType().Name);
+#if (PRINT_TREE)
+            System.Diagnostics.Debug.WriteLine(m_indent + "ERROR - " + node.GetText());
+#endif
             //var t = node.Payload as CommonToken;
             //if (t != null)
             //{
