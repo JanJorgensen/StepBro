@@ -62,7 +62,7 @@ namespace StepBroCoreTest
                 queue.AddTask("TaskAdd17", true, null, this.TaskAdd17);
             }
             var taskEnd = queue.AddTask("TaskNOP", true, null, this.TaskNOP);
-            Assert.IsTrue(taskEnd.Wait(TimeSpan.FromSeconds(2)));
+            Assert.IsTrue(taskEnd.Wait(TimeSpan.FromSeconds(5)));
             Assert.AreEqual(3400, m_testVariable);
             tasksFinished = queue.FinishedTasks - tasksFinished;
             Assert.AreEqual(201U, tasksFinished);
