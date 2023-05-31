@@ -81,7 +81,7 @@ namespace StepBro.Cmd
                 }
                 if (m_logDumpAddon.FormatterType != OutputType.Console)
                 {
-                    m_logDumpAddon = StepBroMain.GetService<Core.Api.IAddonManager>().TryGetAddon<IOutputFormatterTypeAddon>(OutputConsoleWithColorsAddon.Name);
+                    m_logDumpAddon = StepBroMain.GetService<Core.Api.IAddonManager>().TryGetAddon<IOutputFormatterTypeAddon>(selectedLogDumpAddon);
                 }
                 m_logDumpFormatter = m_logDumpAddon.Create();
                 //m_logDumpFormatter = new OutputConsoleWithColorsAddon.TextToConsoleFormatter(m_logDumpAddon);
