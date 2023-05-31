@@ -18,7 +18,7 @@ namespace StepBro.Core.Addons
 
         public IOutputFormatter Create()
         {
-            throw new NotImplementedException();
+            return new Outputter();
         }
 
         public IOutputFormatter Create(ITextWriter writer)
@@ -26,13 +26,20 @@ namespace StepBro.Core.Addons
             return new Outputter(writer);
         }
 
-        private class Outputter : IOutputFormatter
+        private class Outputter : IOutputFormatter, ITextWriter
         {
             readonly ITextWriter m_writer;
+
             public Outputter(ITextWriter writer)
             {
                 m_writer = writer;
             }
+            
+            public Outputter()
+            {
+                m_writer = this;
+            }
+
             public void LogEntry(LogEntry entry, DateTime zero)
             {
                 var txt = entry.ToClearText(zero, false);
@@ -57,6 +64,16 @@ namespace StepBro.Core.Addons
                     }
                     m_writer.WriteLine(prefix + txt);
                 }
+            }
+
+            void ITextWriter.Write(string text)
+            {
+                System.Console.Write(text);
+            }
+
+            void ITextWriter.WriteLine(string text)
+            {
+                System.Console.WriteLine(text);
             }
         }
     }
