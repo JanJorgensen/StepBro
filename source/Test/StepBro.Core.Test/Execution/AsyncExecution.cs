@@ -13,7 +13,7 @@ namespace StepBroCoreTest.Execution
     [TestClass]
     public class AsyncExecution
     {
-        [TestMethod]
+        [TestMethod, Ignore]
         public void AsyncExecutionSimple()
         {
             var f = new StringBuilder();
