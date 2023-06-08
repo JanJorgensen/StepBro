@@ -1,6 +1,8 @@
-﻿using StepBro.Core;
+﻿using Microsoft.VisualBasic;
+using StepBro.Core;
 using StepBro.Core.Addons;
 using StepBro.Core.Data;
+using StepBro.Core.File;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using System;
@@ -103,14 +105,19 @@ namespace StepBro.Cmd
                 {
                     if (m_commandLineOptions.Verbose) ConsoleWriteLine("Filename: {0}", m_commandLineOptions.InputFile);
                     IScriptFile file = null;
+                    var filepath = System.IO.Path.GetFullPath(m_commandLineOptions.InputFile);
                     try
                     {
-                        file = StepBroMain.LoadScriptFile(consoleResourceUserObject, m_commandLineOptions.InputFile);
+                        file = StepBroMain.LoadScriptFile(consoleResourceUserObject, filepath);
                         if (file == null)
                         {
                             retval = -1;
-                            ConsoleWriteLine("Error: Loading script file failed ( " + m_commandLineOptions.InputFile + " )");
+                            ConsoleWriteLine("Error: Loading script file failed ( " + filepath + " )");
                         }
+                        var shortcuts = ServiceManager.Global.Get<IFolderManager>();
+                        var projectShortcuts = new FolderCollection(FolderShortcutOrigin.Project);
+                        projectShortcuts.AddShortcut(StepBro.Core.Api.Constants.TOP_FILE_FOLDER_SHORTCUT, System.IO.Path.GetDirectoryName(file.FilePath));
+                        shortcuts.AddSource(projectShortcuts);
                     }
                     catch (Exception ex)
                     {
@@ -345,7 +352,7 @@ namespace StepBro.Cmd
                 }
                 Console.ReadKey();
             }
-             return retval;
+            return retval;
         }
 
         private static void ConsoleWriteLine(string value, params object[] args)

@@ -163,9 +163,9 @@ namespace StepBro.Core.Execution
         {
         }
 
-        public IEnumerable<IFolderShortcut> GetFolders()
+        public IEnumerable<IFolderShortcut> ListShortcuts()
         {
-            return m_context.GetFolders();
+            return m_context.ListShortcuts();
         }
 
         public void InternalDispose()

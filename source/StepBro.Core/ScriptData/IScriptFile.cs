@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StepBro.Core.File;
 using StepBro.Core.General;
 using StepBro.Core.Parser;
 
@@ -25,5 +26,6 @@ namespace StepBro.Core.ScriptData
         string Namespace { get; }
         IEnumerable<IFileElement> ListElements();
         IErrorCollector Errors { get; }
+        IFolderShortcutsSource FolderShortcuts { get; }
     }
 }
