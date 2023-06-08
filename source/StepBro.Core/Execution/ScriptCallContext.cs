@@ -46,6 +46,7 @@ namespace StepBro.Core.Execution
         private DataReport m_currentReport = null;
         private ProcedureResult m_lastCallResult = null;
         private string m_nextCallHighLevelType = null;
+        private IFolderShortcutsSource m_folderShortcuts = null;
 
         internal ScriptCallContext(
             ScriptTaskContext task,
@@ -85,6 +86,11 @@ namespace StepBro.Core.Execution
             m_statusUpdaterOnEntry = parent.StatusUpdater;
             m_loggingEnabled = parent.LoggingEnabled;
             m_errorListener = parent.m_errorListener;
+
+            if (Object.ReferenceEquals(procedure, parent.m_procedure))
+            {
+                m_folderShortcuts = parent.m_folderShortcuts;
+            }
 
             m_procedure = procedure;
             m_isDynamicCall = isDynamicCall;
@@ -315,9 +321,14 @@ namespace StepBro.Core.Execution
             return this.EnterNewScriptContext(procedure.ProcedureData, callerLoggingOption, isDynamicCall, arguments);
         }
 
-        public IEnumerable<IFolderShortcut> GetFolders()
+        public IEnumerable<IFolderShortcut> ListShortcuts()
         {
-            throw new NotImplementedException();
+            if (m_folderShortcuts == null)
+            {
+                var commonShortcuts = ServiceManager.Global.Get<IFolderManager>();
+                m_folderShortcuts = new FolderCollection(FolderShortcutOrigin.ScriptFile, commonShortcuts, m_procedure.ParentFile.FolderShortcuts);
+            }
+            return m_folderShortcuts.ListShortcuts();
         }
 
         public string ShortLocationDescription()

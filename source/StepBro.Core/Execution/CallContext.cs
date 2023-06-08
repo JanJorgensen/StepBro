@@ -140,9 +140,9 @@ namespace StepBro.Core.Execution
             m_childContext = null;
         }
 
-        public IEnumerable<IFolderShortcut> GetFolders()
+        public IEnumerable<IFolderShortcut> ListShortcuts()
         {
-            return m_parentScriptContext.GetFolders();
+            return m_parentScriptContext.ListShortcuts();
         }
 
         public bool ReportParsingError(ErrorID error = null, string description = "", Exception exception = null)

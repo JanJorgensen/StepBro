@@ -1,5 +1,6 @@
 ﻿using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.File;
 using StepBro.Core.General;
 using StepBro.Core.Logging;
 using StepBro.Core.Parser;
@@ -63,6 +64,8 @@ namespace StepBroCoreTest
         public string Namespace => throw new NotImplementedException();
 
         public IErrorCollector Errors => throw new NotImplementedException();
+
+        public IFolderShortcutsSource FolderShortcuts => throw new NotImplementedException();
 
         public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
         public event EventHandler ObjectContainerListChanged { add { } remove { } }
