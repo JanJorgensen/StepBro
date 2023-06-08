@@ -1,0 +1,19 @@
+using StepBro.Process;
+using StepBro.Core.Tasks;
+
+public procedure void StartNotepad()
+{
+    var process = Process.Start(@"[windir]\notepad.exe", "", false, 10s);
+    while (process.CurrentState != TaskExecutionState.Ended)
+    {
+        delay(500ms);
+    }
+}
+
+public procedure void StartCmdDir()
+{
+    var process = Process.Start(@"cmd.exe", "/C dir");
+	process.WaitForExit();
+	process.OutputLines.DebugDump();
+	expect (process.ExitCode == 0);
+}

@@ -9,16 +9,29 @@ using StepBro.Core.Data;
 using StepBro.Core.Tasks;
 using StepBro.Core.Logging;
 using StepBro.Core.Api;
+using static System.Net.Mime.MediaTypeNames;
+using System.Diagnostics;
+using StepBro.Core.File;
 
 namespace StepBro.Process
 {
-    public sealed class Process : ITaskControl
+    public sealed class Process : ITaskControl, INameable, IDisposable
     {
+        private class OSProcess : System.Diagnostics.Process
+        {
+            public StepBro.Process.Process m_parent = null;
+        }
+
         private System.Diagnostics.Process m_process;
         private ILogger m_logger;
         private TaskExecutionState m_state;
         private DateTime m_lastRefresh = DateTime.MinValue;
         private object m_sync = new object();
+        private LogLineLineReader m_processOutputReader = null;
+        private object m_processOutputLogSync = new object();
+        private LogLineData m_firstProcessOutputLine = null;
+        private LogLineData m_lastProcessOutputLine = null;
+        private bool m_hasErrorOutput = false;
 
         public event EventHandler CurrentStateChanged;
 
@@ -26,10 +39,22 @@ namespace StepBro.Process
         {
             m_process = process;
             m_logger = logger;
-            m_state = TaskExecutionState.Started;
-            process.Exited += Process_Exited;
-            //process.ErrorDataReceived += Process_ErrorDataReceived;
-            //process.OutputDataReceived += Process_OutputDataReceived;
+            m_state = TaskExecutionState.StartRequested;
+            m_process.Exited += Process_Exited;
+            m_process.StartInfo.UseShellExecute = false;
+            m_process.StartInfo.RedirectStandardOutput = true;
+            m_process.OutputDataReceived += OsProcess_OutputDataReceived;
+            m_process.StartInfo.RedirectStandardError = true;
+            m_process.ErrorDataReceived += OsProcess_ErrorDataReceived;
+        }
+
+        public void Dispose()
+        {
+            if (m_process != null)
+            {
+                m_process.Dispose();
+            }
+            m_logger = null;
         }
 
         private void SetState(TaskExecutionState state)
@@ -46,21 +71,141 @@ namespace StepBro.Process
 
         public System.Diagnostics.Process DotNetProcess { get { return m_process; } }
 
-        private void Process_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        public ILineReader OutputLines
         {
+            get
+            {
+                if (m_processOutputReader == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("Process.OutputLines is null !!");
+                }
+                return m_processOutputReader;
+            }
         }
 
-        private void Process_ErrorDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        public bool HasErrorOutput {  get { return m_hasErrorOutput; } }
+
+        //public static Process Start(ILogger logger = null, string filename = "", string arguments = "")
+        //{
+        //    var osProcess = new OSProcess();
+        //    osProcess.StartInfo.FileName = filename;
+        //    if (!String.IsNullOrEmpty(arguments))
+        //    {
+        //        osProcess.StartInfo.Arguments = arguments;
+        //    }
+        //    return ObjectMonitorManager.Register(
+        //        new Process(logger, System.Diagnostics.Process.Start(filename, arguments)));
+        //}
+
+        public static Process Start(
+            [Implicit] StepBro.Core.Execution.ICallContext context,
+            string filename,
+            string arguments = "",
+            bool useShell = false,
+            TimeSpan startTimeout = new TimeSpan(),
+            TimeSpan exitTimeout = new TimeSpan()
+            // bool moveWindow = false
+            )
         {
+            if (context != null)
+            {
+                filename = FileReferenceUtils.ResolveShortcutPath(context.ListShortcuts(), filename);
+            }
+
+            var osProcess = new OSProcess();
+            osProcess.StartInfo.FileName = filename;
+            if (!String.IsNullOrEmpty(arguments))
+            {
+                osProcess.StartInfo.Arguments = arguments;
+            }
+            osProcess.StartInfo.UseShellExecute = useShell;
+
+            if (context != null && context.LoggingEnabled)
+            {
+                if (String.IsNullOrEmpty(arguments))
+                {
+                    context.Logger.Log($"Starting process: {filename}");
+                }
+                else
+                {
+                    context.Logger.Log($"Starting process: {filename} {arguments}");
+                }
+            }
+
+            ObjectMonitorManager.Register(osProcess);
+            var process = new Process(context.Logger, osProcess);
+            osProcess.m_parent = process;
+
+            process.SetState(TaskExecutionState.StartRequested);
+            try
+            {
+                osProcess.Start();
+                osProcess.BeginErrorReadLine();
+                osProcess.BeginOutputReadLine();
+                if (startTimeout > TimeSpan.Zero)
+                {
+                    if (!process.AwaitStart(context, startTimeout))
+                    {
+                        //context.RegisterResult()
+                        return process;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (context != null)
+                {
+                    context.ReportError("Error starting process.", exception: ex);
+                }
+                process.SetState(TaskExecutionState.ErrorStarting);
+            }
+
+            return process;
+        }
+
+        private static void OsProcess_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            var line = e.Data;
+            if (line != null)
+            {
+                var process = (sender as OSProcess).m_parent;
+                process.LogProcessOutput(false, line);
+            }
+        }
+
+        private static void OsProcess_ErrorDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            var process = (sender as OSProcess).m_parent;
+            process.m_hasErrorOutput = true;
+            var line = e.Data;
+            if (line != null)
+            {
+                process.LogProcessOutput(true, line);
+            }
+        }
+
+        private void LogProcessOutput(bool error, string line)
+        {
+            lock (m_processOutputLogSync)
+            {
+                m_lastProcessOutputLine = new LogLineData(m_lastProcessOutputLine, error ? LogLineData.LogType.Error : LogLineData.LogType.Neutral, 0, line);
+                if (m_processOutputReader == null)
+                {
+                    m_firstProcessOutputLine = m_lastProcessOutputLine;
+                    m_processOutputReader = new LogLineLineReader(this, m_firstProcessOutputLine, m_processOutputLogSync);
+                }
+                m_processOutputReader.NotifyNew(m_lastProcessOutputLine);
+            }
         }
 
         private void Process_Exited(object sender, EventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine("Process Exited");
             m_process.Exited -= Process_Exited;
             this.SetState(TaskExecutionState.Ended);
-            //m_process.ErrorDataReceived -= Process_ErrorDataReceived;
-            //m_process.OutputDataReceived -= Process_OutputDataReceived;
         }
+
+        public int ExitCode {  get { return m_process.ExitCode; } }
 
         private void ForceRefresh()
         {
@@ -82,26 +227,10 @@ namespace StepBro.Process
                     m_process.Refresh();
                     switch (m_state)
                     {
+                        case TaskExecutionState.Created:
+                        case TaskExecutionState.StartRequested:
                         case TaskExecutionState.AwaitingStartCondition:
-                            if (m_process.HasExited)
-                            {
-                                this.SetState(TaskExecutionState.Ended);
-                            }
-                            else if (m_process.Responding)
-                            {
-                                this.SetState(TaskExecutionState.Running);
-                            }
-                            break;
                         case TaskExecutionState.Running:
-                            if (m_process.HasExited)
-                            {
-                                this.SetState(TaskExecutionState.Ended);
-                            }
-                            else if (!m_process.Responding)
-                            {
-                                this.SetState(TaskExecutionState.RunningNotResponding);
-                            }
-                            break;
                         case TaskExecutionState.RunningNotResponding:
                             if (m_process.HasExited)
                             {
@@ -110,6 +239,10 @@ namespace StepBro.Process
                             else if (m_process.Responding)
                             {
                                 this.SetState(TaskExecutionState.Running);
+                            }
+                            else
+                            {
+                                this.SetState(TaskExecutionState.RunningNotResponding);
                             }
                             break;
                         case TaskExecutionState.PauseRequested:
@@ -159,7 +292,7 @@ namespace StepBro.Process
                 {
 
                     this.RefreshIfNecessary();
-                    return TaskExecutionState.Running;
+                    return m_state;
                 }
             }
         }
@@ -172,49 +305,109 @@ namespace StepBro.Process
             }
         }
 
-        public bool AwaitStart(ILogger logger = null, TimeSpan timeout = default(TimeSpan))
+        public string Name
         {
-            if (m_state == TaskExecutionState.Started)
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+
+        public bool AwaitStart([Implicit] StepBro.Core.Execution.ICallContext context, TimeSpan timeout = default(TimeSpan))
+        {
+            if (m_state <= TaskExecutionState.AwaitingStartCondition)
             {
                 DateTime entryTime = DateTime.UtcNow;
 
-                this.SetState(TaskExecutionState.AwaitingStartCondition);
-
+                if (context != null && context.LoggingEnabled)
+                {
+                    context.Logger.Log("Waiting for started process to enter idle state.");
+                }
                 if (m_process.WaitForInputIdle((int)timeout.TotalMilliseconds))
                 {
-                    this.SetState(TaskExecutionState.Running);
+                    if (context != null && context.LoggingEnabled)
+                    {
+                        context.Logger.Log("Process Idle.");
+                    }
                 }
                 else
                 {
-                    this.SetState(TaskExecutionState.Started);
+                    if (context != null && context.LoggingEnabled)
+                    {
+                        context.Logger.Log("Process did not enter idle state.");
+                    }
                     return false;
                 }
 
-
-
-                this.ForceRefresh();
-
+                if (context != null && context.LoggingEnabled)
+                {
+                    context.Logger.Log("Waiting for started process to open a main window.");
+                }
                 while (m_process.MainWindowHandle == IntPtr.Zero)
                 {
-                    //context.Log("Waiting for started process to open a main window.");
-
                     TimeSpan time = DateTime.UtcNow - entryTime;
                     if (time > timeout)
                     {
                         //context.ReportFailureOrError(new TimeoutWaitingForInputIdleError(), String.Format("Process did not open a main window in {0} seconds.", timeout));
-                        break;
+                        return false;
                     }
                     System.Threading.Thread.Sleep(100);
                     m_process.Refresh();
                 }
-
-
+                if (context != null && context.LoggingEnabled)
+                {
+                    context.Logger.Log("Process main window opened.");
+                }
+                this.SetState(TaskExecutionState.Running);
+                return true;
             }
             else
             {
-                throw new Exception("Process is not in the right state (" + m_state.ToString() + ") for an 'AwaitStart' operation.");
+                switch (m_state)
+                {
+                    case TaskExecutionState.Created:
+                    case TaskExecutionState.StartRequested:
+                    case TaskExecutionState.AwaitingStartCondition:
+                        if (context != null && context.LoggingEnabled)
+                        {
+                            context.Logger.Log("Process not running as expected.");
+                        }
+                        return false;
+                    case TaskExecutionState.ErrorStarting:
+                        return false;
+                    case TaskExecutionState.Running:
+                    case TaskExecutionState.RunningNotResponding:
+                    case TaskExecutionState.PauseRequested:
+                    case TaskExecutionState.Paused:
+                    case TaskExecutionState.StopRequested:
+                    case TaskExecutionState.KillRequested:
+                    case TaskExecutionState.Terminating:
+                        if (context != null && context.LoggingEnabled)
+                        {
+                            context.Logger.Log("Process is started.");
+                        }
+                        break;
+                    case TaskExecutionState.Ended:
+                    case TaskExecutionState.EndedByException:
+                        if (context != null && context.LoggingEnabled)
+                        {
+                            context.Logger.Log("Process ended.");
+                        }
+                        break;
+                }
+                return true;
             }
-            return false;
+        }
+
+        public bool WaitForExit(TimeSpan timeout = new TimeSpan())
+        {
+            if (timeout == TimeSpan.Zero)
+            {
+                m_process.WaitForExit();
+                return true;
+            }
+            else
+            {
+                return m_process.WaitForExit((int)(timeout.Ticks / TimeSpan.TicksPerMillisecond));
+            }
         }
 
         public bool RequestPause()
@@ -231,7 +424,7 @@ namespace StepBro.Process
         {
             switch (m_state)
             {
-                case TaskExecutionState.Started:
+                case TaskExecutionState.StartRequested:
                 case TaskExecutionState.AwaitingStartCondition:
                 case TaskExecutionState.Running:
                 case TaskExecutionState.RunningNotResponding:
@@ -261,7 +454,7 @@ namespace StepBro.Process
         {
             switch (m_state)
             {
-                case TaskExecutionState.Started:
+                case TaskExecutionState.StartRequested:
                 case TaskExecutionState.AwaitingStartCondition:
                 case TaskExecutionState.Running:
                 case TaskExecutionState.RunningNotResponding:
@@ -278,36 +471,6 @@ namespace StepBro.Process
                     break;
             }
             return false;
-        }
-
-        public static Process Start(ILogger logger = null, string filename = "", string arguments = "")
-        {
-            return ObjectMonitorManager.Register(
-                new Process(logger, System.Diagnostics.Process.Start(filename, arguments)));
-        }
-
-        public static Process Start(
-            [Implicit] StepBro.Core.Execution.ICallContext context,
-            string filename,
-            string arguments = "",
-            TimeSpan startTimeout = new TimeSpan(),
-            TimeSpan exitTimeout = new TimeSpan()
-            // bool moveWindow = false
-            )
-        {
-            var process = ObjectMonitorManager.Register(
-                new Process((ILogger)context, System.Diagnostics.Process.Start(filename, arguments)));
-
-            if (startTimeout > TimeSpan.Zero)
-            {
-                if (!process.AwaitStart(context.Logger, startTimeout))
-                {
-                    //context.RegisterResult()
-                    return process;
-                }
-            }
-
-            return process;
         }
     }
 }

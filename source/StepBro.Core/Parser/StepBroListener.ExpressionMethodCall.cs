@@ -768,6 +768,10 @@ namespace StepBro.Core.Parser
                                 {
                                     prefix = instanceName + "." + prefix;
                                 }
+                                else if (method.DeclaringType != typeof(ScriptUtils))
+                                {
+                                    prefix = method.DeclaringType.Name + "." + prefix;
+                                }
                                 var contextCreator = Expression.Call(
                                     s_CreateMethodCallContext,
                                     contextReference,
