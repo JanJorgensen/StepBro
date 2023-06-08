@@ -1,0 +1,24 @@
+using StepBro.Process;
+using StepBro.Core.Tasks;
+
+public using @"..\Scripts\TestFramework.sbs";
+
+
+procedure void ScriptExecution(string file, string element, string model = "", int expectedReturn = 0) : TestCase
+{
+	log ("file: " + file);
+	log ("element: " + element);
+	log ("model: " + model);
+	log ("expectedReturn: " + expectedReturn);
+}
+
+public testlist AllTests
+{
+	* ScriptExecution(file: "Peter", element: "Madsen", expectedReturn: -4)
+	* ScriptExecution(file: "Knud", element: "Jensen")
+}
+
+public procedure void SayHello()
+{
+	log("Hello!!");
+}

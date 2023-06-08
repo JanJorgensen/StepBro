@@ -31,6 +31,14 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
+        public void TestProcedureParametersWithDefaultValue()
+        {
+            var proc = FileBuilder.ParseProcedure("void Func(int a = 30){}");
+            Assert.AreEqual(typeof(void), proc.ReturnType.Type);
+            Assert.AreEqual(1, proc.Parameters.Length);
+        }
+
+        [TestMethod]
         public void TestProcedureParametersInterfaceReference()
         {
             var proc = FileBuilder.ParseProcedure(

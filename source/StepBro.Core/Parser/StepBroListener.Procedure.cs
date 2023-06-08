@@ -154,6 +154,10 @@ namespace StepBro.Core.Parser
         }
         public override void ExitFormalParameterDecl([NotNull] SBP.FormalParameterDeclContext context)
         {
+        }
+
+        public override void ExitFormalParameterDeclStart([NotNull] SBP.FormalParameterDeclStartContext context)
+        {
             string name = context.GetChild(context.ChildCount - 1).GetText();
             TypeReference type = m_typeStack.Pop();
             var modifiers = (m_modifiers != null) ? m_modifiers.Split(' ') : new string[] { };
@@ -161,6 +165,21 @@ namespace StepBro.Core.Parser
             var typeToken = ((ParserRuleContext)context.children[context.ChildCount - 2]).Start;
             m_parameters.Add(new ParameterData(modifiers, name, type.Type.Name, type, typeToken));
             m_expressionData.PopStackLevel();
+        }
+
+        public override void EnterFormalParameterAssignment([NotNull] SBP.FormalParameterAssignmentContext context)
+        {
+            m_expressionData.PushStackLevel("FormalParameterAssignment @" + context.Start.Line.ToString() + ", " + context.Start.Column.ToString());
+        }
+
+        public override void ExitFormalParameterAssignment([NotNull] SBP.FormalParameterAssignmentContext context)
+        {
+            var stack = m_expressionData.PopStackLevel();
+            var parInitializer = this.ResolveForGetOperation(stack.Pop());
+            //if (m_variableInitializer.IsError())
+            //{
+            //    m_errors.UnresolvedIdentifier(m_variableInitializer.Token.Line, m_variableInitializer.Token.Column, m_variableInitializer.Value as string);
+            //}
         }
 
         public override void ExitProcedureParameters([NotNull] SBP.ProcedureParametersContext context)

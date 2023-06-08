@@ -11,6 +11,9 @@ namespace StepBro.Core.Parser
         private readonly string m_typeName;
         private TypeReference m_type;
         private readonly IToken m_typeToken;
+        private object m_defaultValue = null;
+        private object m_defaultValueToken = null;
+
         public ParameterData(string[] modifiers, string name, string typeName, TypeReference type = null, IToken typeToken = null)
         {
             m_modifiers = modifiers ?? new string[] { };
