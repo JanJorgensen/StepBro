@@ -50,7 +50,7 @@ namespace StepBro.Core.Data
             throw new NotImplementedException();
         }
 
-        public IEnumerable<IFolderShortcut> GetFolders()
+        public IEnumerable<IFolderShortcut> ListShortcuts()
         {
             throw new NotImplementedException();
         }

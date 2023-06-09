@@ -2,6 +2,7 @@
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.File;
 using StepBro.Core.General;
 using StepBro.Core.Logging;
 using StepBro.Core.Parser;
@@ -34,6 +35,7 @@ namespace StepBro.Core.ScriptData
         private DateTime m_lastFileChange = DateTime.MinValue;
         private readonly DateTime m_lastTypeScan = DateTime.MinValue;
         private readonly DateTime m_lastParsing = DateTime.MinValue;
+        private FolderCollection m_folderShortcuts = null;
 
         /// <summary>
         /// Reachable script elements and namespaces with this files current usings.
@@ -51,6 +53,16 @@ namespace StepBro.Core.ScriptData
             m_errors = new ErrorCollector(this, false);
             m_lastFileChange = DateTime.Now;   // TODO: take this from file timestamp.
             m_parserFileStream = filestream;
+            m_folderShortcuts = new FolderCollection(FolderShortcutOrigin.ScriptFile);
+            if (!String.IsNullOrEmpty(filepath))
+            {
+                var folder = this.FilePath;
+                if (this.FilePath == this.FileName) // In case there's no path
+                {
+                    folder = System.IO.Path.GetDirectoryName(this.GetFullPath());
+                }
+                m_folderShortcuts.AddShortcut(Constants.CURRENT_FILE_FOLDER_SHORTCUT, folder);
+            }
         }
 
         protected override void DoDispose()
@@ -97,6 +109,8 @@ namespace StepBro.Core.ScriptData
 
         public IErrorCollector Errors { get { return m_errors; } }
         public ErrorCollector ErrorsInternal { get { return m_errors; } }
+
+        public IFolderShortcutsSource FolderShortcuts { get { return m_folderShortcuts; } }
 
         public bool HasFileChanged()
         {
@@ -592,7 +606,7 @@ namespace StepBro.Core.ScriptData
                     }
                     else
                     {
-                        m_errors.UnresolvedUsing(m_fileUsings[i].Line, -1, m_fileUsings[i].Identifier.Name);
+                        m_errors.UnresolvedUsing(m_namespaceUsings[i].Line, -1, m_namespaceUsings[i].Identifier.Name);
                     }
                 }
             }

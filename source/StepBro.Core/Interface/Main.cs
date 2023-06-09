@@ -1,6 +1,7 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.File;
 using StepBro.Core.General;
 using StepBro.Core.Host;
 using StepBro.Core.Logging;
@@ -34,6 +35,7 @@ namespace StepBro.Core
         private static ScriptExecutionManager m_scriptExecutionManager = null;
         private static DynamicObjectManager m_dynamicObjectManager = null;
         private static UICalculator m_uiCalculator = null;
+        private static FolderManager m_folderShortcuts = null;
         //private static readonly object m_mainObject = new object();
         //private static readonly bool m_isInDebugMode = true;
         //private static Queue<Task> m_runningTasks = new Queue<Task>();
@@ -118,6 +120,9 @@ namespace StepBro.Core
             m_uiCalculator = new UICalculator(out service);
             m_serviceManagerAdmin.Manager.Register(service);
 
+            m_folderShortcuts = new FolderManager(out service);
+            m_serviceManagerAdmin.Manager.Register(service);
+
             if (hostServices != null)
             {
                 foreach (var hs in hostServices)
@@ -169,6 +174,7 @@ namespace StepBro.Core
                 m_scriptExecutionManager = null;
                 m_dynamicObjectManager = null;
                 m_uiCalculator = null;
+                m_folderShortcuts = null;
 
                 m_serviceManagerAdmin = ServiceManager.Create();
             }
