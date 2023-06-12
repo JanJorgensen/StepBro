@@ -886,9 +886,15 @@ namespace StepBro.Core.Parser
                     {
                         if (p.HasDefaultValue)
                         {
+                            object defaultValue = p.DefaultValue;
+                            if (defaultValue == null && p.ParameterType.IsValueType)
+                            {
+                                // Structs just have null as default value in ParameterInfo, so create a usable default value.
+                                defaultValue = Activator.CreateInstance(p.ParameterType);
+                            } 
                             suggestedAssignmentsOut.Add(
                                 new SBExpressionData(
-                                    Expression.Constant(p.DefaultValue, p.ParameterType)));
+                                    Expression.Constant(defaultValue, p.ParameterType)));
                             continue;
                         }
                         else

@@ -4,6 +4,8 @@ using StepBro.Core.Tasks;
 public procedure void StartNotepad()
 {
     var process = Process.Start(@"[windir]\notepad.exe", "", false, 10s);
+	delay(2000ms);
+	process.RequestStop();
     while (process.CurrentState != TaskExecutionState.Ended)
     {
         delay(500ms);
@@ -16,4 +18,25 @@ public procedure void StartCmdDir()
 	process.WaitForExit();
 	process.OutputLines.DebugDump();
 	expect (process.ExitCode == 0);
+}
+
+public procedure void StartStepBroHelp()
+{
+    var process = Process.Start(@"stepbro.exe", "--help", logOutput: true);
+	process.WaitForExit(expectReturnCodeZero: true);
+	process.OutputLines.DebugDump();
+}
+
+public procedure void StartStepBroProcedure()
+{
+    var process = Process.Start(@"stepbro.exe", "\"" + this.FileName + "\" -t -e SomeProcedure -a 4", logOutput: true, workingDirectory: this.FileDirectory);
+	process.WaitForExit(expectReturnCodeZero: true);
+	process.OutputLines.DebugDump();
+}
+
+
+public procedure int SomeProcedure(int returnValue)
+{
+    log("Hello folks!");
+    return returnValue;
 }

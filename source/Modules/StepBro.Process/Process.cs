@@ -24,6 +24,7 @@ namespace StepBro.Process
 
         private System.Diagnostics.Process m_process;
         private ILogger m_logger;
+        private bool m_logProcessOutput = false;
         private TaskExecutionState m_state;
         private DateTime m_lastRefresh = DateTime.MinValue;
         private object m_sync = new object();
@@ -32,6 +33,7 @@ namespace StepBro.Process
         private LogLineData m_firstProcessOutputLine = null;
         private LogLineData m_lastProcessOutputLine = null;
         private bool m_hasErrorOutput = false;
+        StepBro.Core.Execution.ICallContext m_outputLogger = null;
 
         public event EventHandler CurrentStateChanged;
 
@@ -53,6 +55,9 @@ namespace StepBro.Process
             if (m_process != null)
             {
                 m_process.Dispose();
+                m_process = null;
+                m_processOutputReader = null;
+                m_processOutputLogSync = null;
             }
             m_logger = null;
         }
@@ -83,7 +88,7 @@ namespace StepBro.Process
             }
         }
 
-        public bool HasErrorOutput {  get { return m_hasErrorOutput; } }
+        public bool HasErrorOutput { get { return m_hasErrorOutput; } }
 
         //public static Process Start(ILogger logger = null, string filename = "", string arguments = "")
         //{
@@ -103,7 +108,9 @@ namespace StepBro.Process
             string arguments = "",
             bool useShell = false,
             TimeSpan startTimeout = new TimeSpan(),
-            TimeSpan exitTimeout = new TimeSpan()
+            TimeSpan exitTimeout = new TimeSpan(),
+            bool logOutput = false,
+            string workingDirectory = null
             // bool moveWindow = false
             )
         {
@@ -131,10 +138,15 @@ namespace StepBro.Process
                     context.Logger.Log($"Starting process: {filename} {arguments}");
                 }
             }
+            if (!String.IsNullOrEmpty(workingDirectory))
+            {
+                osProcess.StartInfo.WorkingDirectory = workingDirectory;
+            }
 
             ObjectMonitorManager.Register(osProcess);
             var process = new Process(context.Logger, osProcess);
             osProcess.m_parent = process;
+            process.m_logProcessOutput = (context != null && context.LoggingEnabled && logOutput);
 
             process.SetState(TaskExecutionState.StartRequested);
             try
@@ -175,17 +187,29 @@ namespace StepBro.Process
 
         private static void OsProcess_ErrorDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
         {
-            var process = (sender as OSProcess).m_parent;
-            process.m_hasErrorOutput = true;
             var line = e.Data;
             if (line != null)
             {
+                var process = (sender as OSProcess).m_parent;
+                process.m_hasErrorOutput = true;
                 process.LogProcessOutput(true, line);
             }
         }
 
         private void LogProcessOutput(bool error, string line)
         {
+            if (m_logProcessOutput)
+            {
+                if (error)
+                {
+                    m_logger.LogError("Out: " + line);
+                }
+                else
+                {
+                    m_logger.Log("Out: " + line);
+                }
+            }
+
             lock (m_processOutputLogSync)
             {
                 m_lastProcessOutputLine = new LogLineData(m_lastProcessOutputLine, error ? LogLineData.LogType.Error : LogLineData.LogType.Neutral, 0, line);
@@ -205,7 +229,7 @@ namespace StepBro.Process
             this.SetState(TaskExecutionState.Ended);
         }
 
-        public int ExitCode {  get { return m_process.ExitCode; } }
+        public int ExitCode { get { return m_process.ExitCode; } }
 
         private void ForceRefresh()
         {
@@ -311,7 +335,7 @@ namespace StepBro.Process
             set => throw new NotImplementedException();
         }
 
-        public bool AwaitStart([Implicit] StepBro.Core.Execution.ICallContext context, TimeSpan timeout = default(TimeSpan))
+        public bool AwaitStart([Implicit] StepBro.Core.Execution.ICallContext context, TimeSpan timeout = default)
         {
             if (m_state <= TaskExecutionState.AwaitingStartCondition)
             {
@@ -397,17 +421,34 @@ namespace StepBro.Process
             }
         }
 
-        public bool WaitForExit(TimeSpan timeout = new TimeSpan())
+        public bool WaitForExit(
+            [Implicit] StepBro.Core.Execution.ICallContext context,
+            TimeSpan timeout = default,
+            bool expectNoErrors = true,
+            bool expectReturnCodeZero = false)
         {
+            bool exitedBeforeTimeout = true;
             if (timeout == TimeSpan.Zero)
             {
                 m_process.WaitForExit();
-                return true;
             }
             else
             {
-                return m_process.WaitForExit((int)(timeout.Ticks / TimeSpan.TicksPerMillisecond));
+                exitedBeforeTimeout = m_process.WaitForExit((int)(timeout.Ticks / TimeSpan.TicksPerMillisecond));
             }
+
+            if (exitedBeforeTimeout)
+            {
+                if (expectNoErrors && m_hasErrorOutput)
+                {
+                    context.ReportError("Process reported error(s).");
+                }
+                else if (expectReturnCodeZero && m_process.ExitCode != 0)
+                {
+                    context.ReportError($"Process exit code is {m_process.ExitCode}.");
+                }
+            }
+            return exitedBeforeTimeout;
         }
 
         public bool RequestPause()
