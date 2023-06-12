@@ -6,16 +6,44 @@ namespace StepBro.Core.Data
     {
         public enum LogType
         {
+            /// <summary>
+            /// A line without any known category.
+            /// </summary>
             Neutral,
+            /// <summary>
+            /// A line with error information.
+            /// </summary>
+            Error,
+            /// <summary>
+            /// A line that is sent from the current unit.
+            /// </summary>
             Sent,
+            /// <summary>
+            /// A received line without any further categorization. 
+            /// </summary>
+            Received,
+            /// <summary>
+            /// A received line that marks the end of a block. 
+            /// </summary>
             ReceivedEnd,
+            /// <summary>
+            /// A received line that is part of a larger block, and which is not the last one.
+            /// </summary>
             ReceivedPartial,
+            /// <summary>
+            /// A received line that is part of an error message.
+            /// </summary>
             ReceivedError,
+            /// <summary>
+            /// A received line that didn't come as a result of a direct request.
+            /// </summary>
             ReceivedAsync,
+            /// <summary>
+            /// A received line that is a part of a remote execution trace.
+            /// </summary>
             ReceivedTrace,
         }
 
-        public LogLineData Previous { get; private set; }
         public LogLineData Next { get; private set; }
         public LogType Type { get; private set; }
         public uint ID { get; private set; }
@@ -31,7 +59,6 @@ namespace StepBro.Core.Data
 
         public LogLineData(LogLineData previous, LogType type, uint id, string text)
         {
-            this.Previous = previous;
             this.Type = type;
             this.ID = id;
             this.Timestamp = DateTime.Now;

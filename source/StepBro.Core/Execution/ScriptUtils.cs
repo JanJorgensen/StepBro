@@ -5,6 +5,7 @@ using System.Threading;
 using StepBro.Core;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
+using StepBro.Core.File;
 using static StepBro.Core.Data.StringUtils;
 
 namespace StepBro.Core.Execution
@@ -114,6 +115,12 @@ namespace StepBro.Core.Execution
                 context?.ReportError($"Could not parse string \"{text}\" to an integer value.");
                 return 0;
             }
+        }
+
+        [Public]
+        public static string GetFullPath(this string filepath, [Implicit] ICallContext context)
+        {
+            return FileReferenceUtils.GetFullPath(context.ListShortcuts(), filepath);
         }
 
         [Public]
