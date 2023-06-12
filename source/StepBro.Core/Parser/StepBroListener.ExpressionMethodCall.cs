@@ -768,6 +768,10 @@ namespace StepBro.Core.Parser
                                 {
                                     prefix = instanceName + "." + prefix;
                                 }
+                                else if (method.DeclaringType != typeof(ScriptUtils))
+                                {
+                                    prefix = method.DeclaringType.Name + "." + prefix;
+                                }
                                 var contextCreator = Expression.Call(
                                     s_CreateMethodCallContext,
                                     contextReference,
@@ -882,9 +886,15 @@ namespace StepBro.Core.Parser
                     {
                         if (p.HasDefaultValue)
                         {
+                            object defaultValue = p.DefaultValue;
+                            if (defaultValue == null && p.ParameterType.IsValueType)
+                            {
+                                // Structs just have null as default value in ParameterInfo, so create a usable default value.
+                                defaultValue = Activator.CreateInstance(p.ParameterType);
+                            } 
                             suggestedAssignmentsOut.Add(
                                 new SBExpressionData(
-                                    Expression.Constant(p.DefaultValue, p.ParameterType)));
+                                    Expression.Constant(defaultValue, p.ParameterType)));
                             continue;
                         }
                         else

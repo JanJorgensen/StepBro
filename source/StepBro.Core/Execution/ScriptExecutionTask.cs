@@ -68,7 +68,7 @@ namespace StepBro.Core.Execution
         {
             if (m_currentState != TaskExecutionState.Created) throw new InvalidOperationException("Execution has already been started.");
 
-            this.SetState(TaskExecutionState.Started);
+            this.SetState(TaskExecutionState.StartRequested);
 
             this.ProcedureExecutionTask();
         }
@@ -80,7 +80,7 @@ namespace StepBro.Core.Execution
                 if (m_currentState != TaskExecutionState.Created) throw new InvalidOperationException("Execution has already been started.");
                 m_task = new Task(this.AsyncExecutionHandler);
                 m_task.Start();
-                this.SetState(TaskExecutionState.Started);
+                this.SetState(TaskExecutionState.StartRequested);
             }
         }
 

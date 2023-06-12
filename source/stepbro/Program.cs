@@ -1,6 +1,8 @@
-﻿using StepBro.Core;
+﻿using Microsoft.VisualBasic;
+using StepBro.Core;
 using StepBro.Core.Addons;
 using StepBro.Core.Data;
+using StepBro.Core.File;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using System;
@@ -22,7 +24,7 @@ namespace StepBro.Cmd
         private static bool m_dumpingExecutionLog = false;
         private static IOutputFormatterTypeAddon m_logDumpAddon = null;
         private static IOutputFormatter m_logDumpFormatter = null;
-        private static List<string> m_bufferedOutput = new List<string>();
+        private static List<Tuple<bool, string>> m_bufferedOutput = new List<Tuple<bool, string>>();
 
         private static int Main(string[] args)
         {
@@ -41,7 +43,6 @@ namespace StepBro.Cmd
             {
                 if (!String.IsNullOrWhiteSpace(line)) ConsoleWriteLine(line);
             }
-            if (m_commandLineOptions.ReturnValueFromSubVerdict) m_commandLineOptions.ReturnValueFromVerdict = true;
             if (m_commandLineOptions.Verbose || args.Length == 0)
             {
                 ConsoleWriteLine("StepBro console application. Type 'stepbro --help' to show the help text.");
@@ -76,7 +77,7 @@ namespace StepBro.Cmd
                 m_logDumpAddon = StepBroMain.GetService<Core.Api.IAddonManager>().TryGetAddon<IOutputFormatterTypeAddon>(selectedLogDumpAddon);
                 if (m_logDumpAddon == null)
                 {
-                    ConsoleWriteLine("Error: Log dump format (addon) \'" + selectedLogDumpAddon + "\' was found.");
+                    ConsoleWriteErrorLine("Error: Log dump format (addon) \'" + selectedLogDumpAddon + "\' was found.");
                     retval = -1;
                     throw new ExitException();
                 }
@@ -103,19 +104,24 @@ namespace StepBro.Cmd
                 {
                     if (m_commandLineOptions.Verbose) ConsoleWriteLine("Filename: {0}", m_commandLineOptions.InputFile);
                     IScriptFile file = null;
+                    var filepath = System.IO.Path.GetFullPath(m_commandLineOptions.InputFile);
                     try
                     {
-                        file = StepBroMain.LoadScriptFile(consoleResourceUserObject, m_commandLineOptions.InputFile);
+                        file = StepBroMain.LoadScriptFile(consoleResourceUserObject, filepath);
                         if (file == null)
                         {
                             retval = -1;
-                            ConsoleWriteLine("Error: Loading script file failed ( " + m_commandLineOptions.InputFile + " )");
+                            ConsoleWriteErrorLine("Error: Loading script file failed ( " + filepath + " )");
                         }
+                        var shortcuts = ServiceManager.Global.Get<IFolderManager>();
+                        var projectShortcuts = new FolderCollection(FolderShortcutOrigin.Project);
+                        projectShortcuts.AddShortcut(StepBro.Core.Api.Constants.TOP_FILE_FOLDER_SHORTCUT, System.IO.Path.GetDirectoryName(file.FilePath));
+                        shortcuts.AddSource(projectShortcuts);
                     }
                     catch (Exception ex)
                     {
                         retval = -1;
-                        ConsoleWriteLine("Error: Loading script file failed: " + ex.GetType().Name + ", " + ex.Message);
+                        ConsoleWriteErrorLine("Error: Loading script file failed: " + ex.GetType().Name + ", " + ex.Message);
                     }
 
                     if (file != null)
@@ -155,7 +161,7 @@ namespace StepBro.Cmd
 
                                                 if (result != null)
                                                 {
-                                                    if (m_commandLineOptions.ReturnValueFromSubVerdict)
+                                                    if (m_commandLineOptions.ExitCode == ExitValueOption.SubVerdict)
                                                     {
                                                         var verdict = result.ProcedureResult.Verdict;                   // Include verdict from the partner procedure result.
                                                         foreach (var sr in result.ProcedureResult.ListSubResults())     // Check verdict from each sub result.
@@ -177,7 +183,7 @@ namespace StepBro.Cmd
                                                                 break;
                                                         }
                                                     }
-                                                    else if (m_commandLineOptions.ReturnValueFromVerdict)
+                                                    else if (m_commandLineOptions.ExitCode == ExitValueOption.Verdict)
                                                     {
                                                         switch (result.ProcedureResult.Verdict)
                                                         {
@@ -194,6 +200,13 @@ namespace StepBro.Cmd
                                                                 break;
                                                         }
                                                     }
+                                                    else if (m_commandLineOptions.ExitCode == ExitValueOption.ReturnValue)
+                                                    {
+                                                        if (procedure.ReturnType == TypeReference.TypeInt64) 
+                                                        {
+                                                            retval = (Int32)(Int64)result.ReturnValue;
+                                                        }
+                                                    }
 
                                                     if (m_commandLineOptions.Verbose)
                                                     {
@@ -208,14 +221,14 @@ namespace StepBro.Cmd
                                             catch (TargetParameterCountException)
                                             {
                                                 retval = -1;
-                                                ConsoleWriteLine("Error: The number of arguments does not match the target procedure.");
+                                                ConsoleWriteErrorLine("Error: The number of arguments does not match the target procedure.");
                                             }
 
                                         }
                                         else
                                         {
                                             retval = -1;
-                                            ConsoleWriteLine($"Error: The specified file element does not have a model named \"{m_commandLineOptions.Model}\".");
+                                            ConsoleWriteErrorLine($"Error: The specified file element does not have a model named \"{m_commandLineOptions.Model}\".");
                                         }
                                     }
                                     else
@@ -238,8 +251,15 @@ namespace StepBro.Cmd
                                                         ConsoleWriteLine("Procedure execution ended.");
                                                     }
                                                 }
+                                                else if (m_commandLineOptions.ExitCode == ExitValueOption.ReturnValue)
+                                                {
+                                                    if (procedure.ReturnType == TypeReference.TypeInt64)
+                                                    {
+                                                        retval = (Int32)(Int64)result.ReturnValue;
+                                                    }
+                                                }
 
-                                                if (m_commandLineOptions.ReturnValueFromVerdict)
+                                                if (m_commandLineOptions.ExitCode == ExitValueOption.Verdict)
                                                 {
                                                     switch (result.ProcedureResult.Verdict)
                                                     {
@@ -260,20 +280,20 @@ namespace StepBro.Cmd
                                             catch (TargetParameterCountException)
                                             {
                                                 retval = -1;
-                                                ConsoleWriteLine("Error: The number of arguments does not match the target procedure.");
+                                                ConsoleWriteErrorLine("Error: The number of arguments does not match the target procedure.");
                                             }
                                         }
                                         else
                                         {
                                             retval = -1;
-                                            ConsoleWriteLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
+                                            ConsoleWriteErrorLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
                                         }
                                     }
                                 }
                                 else
                                 {
                                     retval = -1;
-                                    ConsoleWriteLine($"Error: File element named '{m_commandLineOptions.TargetElement} was not found.");
+                                    ConsoleWriteErrorLine($"Error: File element named '{m_commandLineOptions.TargetElement} was not found.");
                                 }
                             }
                             else
@@ -281,7 +301,7 @@ namespace StepBro.Cmd
                                 if (!String.IsNullOrEmpty(m_commandLineOptions.Model))
                                 {
                                     retval = -1;
-                                    ConsoleWriteLine("Error: Model has been specified, but not a target element.");
+                                    ConsoleWriteErrorLine("Error: Model has been specified, but not a target element.");
                                 }
                                 else
                                 {
@@ -291,14 +311,14 @@ namespace StepBro.Cmd
                         }
                         else
                         {
-                            ConsoleWriteLine("Parsing errors!");
+                            ConsoleWriteErrorLine("Parsing errors!");
                             foreach (var openedFile in StepBroMain.GetLoadedFilesManager().ListFiles<IScriptFile>())
                             {
                                 foreach (var err in openedFile.Errors.GetList())
                                 {
                                     if (!err.JustWarning)
                                     {
-                                        ConsoleWriteLine($"   {openedFile.FileName} line {err.Line}: {err.Message}");
+                                        ConsoleWriteErrorLine($"   {openedFile.FileName} line {err.Line}: {err.Message}");
                                     }
                                 }
                             }
@@ -310,13 +330,13 @@ namespace StepBro.Cmd
                 {
                     // If no file should be opened, what then?
                     retval = -1;
-                    ConsoleWriteLine("Error: File could not be opened.");
+                    ConsoleWriteErrorLine("Error: File could not be opened.");
                 }
             }
             catch (ExitException) { }
             catch (Exception ex)
             {
-                ConsoleWriteLine($"Error: {ex.GetType().Name}, {ex.Message}");
+                ConsoleWriteErrorLine($"Error: {ex.GetType().Name}, {ex.Message}");
                 retval = -1;
             }
             finally
@@ -345,14 +365,14 @@ namespace StepBro.Cmd
                 }
                 Console.ReadKey();
             }
-             return retval;
+            return retval;
         }
 
         private static void ConsoleWriteLine(string value, params object[] args)
         {
             if (m_executionRunning)
             {
-                m_bufferedOutput.Add(String.Format(value, args));
+                m_bufferedOutput.Add(new Tuple<bool, string>(false, String.Format(value, args)));
             }
             else
             {
@@ -361,11 +381,25 @@ namespace StepBro.Cmd
             }
         }
 
+        private static void ConsoleWriteErrorLine(string value, params object[] args)
+        {
+            if (m_executionRunning)
+            {
+                m_bufferedOutput.Add(new Tuple<bool, string>(true, String.Format(value, args)));
+            }
+            else
+            {
+                FlushBufferedConsoleOutput();
+                Console.Error.WriteLine(value, args);
+            }
+        }
+
         private static void FlushBufferedConsoleOutput()
         {
             foreach (var s in m_bufferedOutput)
             {
-                Console.WriteLine(s);
+                if (s.Item1 == false) Console.WriteLine(s.Item2);
+                else Console.Error.WriteLine(s.Item2);
             }
             m_bufferedOutput.Clear();
         }
