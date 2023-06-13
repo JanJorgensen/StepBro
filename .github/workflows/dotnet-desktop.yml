@@ -90,7 +90,7 @@ jobs:
     #     Configuration: ${{ matrix.configuration }}
       
     - name: Build StepBro
-      run: msbuild source/StepBro5.sln -r -t:Clean`;Rebuild -warnAsMessage:CS0067`;CS0649; cd bin; .\stepbro.exe --version; .\stepbro.exe ConsoleTest.sbs -v -e HelloStepBro --exitcode Verdict
+      run: msbuild source/StepBro5.sln -r -t:Clean`;Rebuild -warnAsMessage:CS0067`;CS0649; ls; cd bin; .\stepbro.exe --version; .\stepbro.exe ConsoleTest.sbs -v -e HelloStepBro --exitcode Verdict
         
     # - name: Run StepBro Version Check
     #   run: cd bin; .\stepbro.exe --version
