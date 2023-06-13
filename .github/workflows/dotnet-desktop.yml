@@ -83,17 +83,12 @@ jobs:
     - name: Execute unit tests
       run: dotnet test source\Test\StepBro.Core.Test\StepBro.Core.Test5.csproj
 
-    # Restore the application to populate the obj folder with RuntimeIdentifiers
-    # - name: Restore the application
-    #   run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-    #   env:
-    #     Configuration: ${{ matrix.configuration }}
-      
+    # Build StepBro so we can use it to test StepBro scripts
     - name: Build StepBro
-      run: msbuild source/StepBro5.sln -r -t:Clean`;Rebuild -warnAsMessage:CS0067`;CS0649; ls; cd bin; .\stepbro.exe --version; .\stepbro.exe ConsoleTest.sbs -v -e HelloStepBro --exitcode Verdict
+      run: msbuild source/StepBro5.sln -r -t:Clean`;Rebuild -warnAsMessage:CS0067`;CS0649;
         
-    # - name: Run StepBro Version Check
-    #   run: cd bin; .\stepbro.exe --version
+    - name: Run StepBro Version Check
+      run: cd source/bin; .\stepbro.exe --version
         
-    # - name: Run StepBro Smoketest
-    #   run: cd bin; .\stepbro.exe ConsoleTest.sbs -v -e HelloStepBro --exitcode Verdict
+    - name: Run StepBro Smoketest
+      run: cd source/bin; .\stepbro.exe ConsoleTest.sbs -v -e HelloStepBro --exitcode Verdict
