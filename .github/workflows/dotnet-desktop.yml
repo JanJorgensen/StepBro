@@ -86,6 +86,9 @@ jobs:
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
+      
+    - name: Build StepBro
+      run: msbuild source/StepBro5.sln -r -t:Clean`;Rebuild -warnAsMessage:CS0067`;CS0649
         
     - name: Run StepBro Version Check
       run: bin\stepbro.exe --version
