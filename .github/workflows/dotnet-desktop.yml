@@ -46,7 +46,7 @@ on:
 
 jobs:
 
-  build:
+  build_and_test:
 
     strategy:
       matrix:
@@ -60,6 +60,8 @@ jobs:
       Test_Project_Path: source\Test\StepBro.Core.Test\StepBro.Core.Test5.csproj
       Wap_Project_Directory: your-wap-project-directory-name    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
       Wap_Project_Path: your-wap-project-path                   # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
+
+
 
     steps:
     - name: Checkout
@@ -82,16 +84,16 @@ jobs:
       run: dotnet test source\Test\StepBro.Core.Test\StepBro.Core.Test5.csproj
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
-    - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
+    # - name: Restore the application
+    #   run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
+    #   env:
+    #     Configuration: ${{ matrix.configuration }}
       
     - name: Build StepBro
       run: msbuild source/StepBro5.sln -r -t:Clean`;Rebuild -warnAsMessage:CS0067`;CS0649
         
     - name: Run StepBro Version Check
-      run: bin\stepbro.exe --version
+      run: cd bin; .\stepbro.exe --version
         
     - name: Run StepBro Smoketest
-      run: bin\stepbro.exe ConsoleTest.sbs -v -e HelloStepBro --exitcode Verdict
+      run: cd bin; .\stepbro.exe ConsoleTest.sbs -v -e HelloStepBro --exitcode Verdict
