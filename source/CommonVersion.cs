@@ -1,6 +1,6 @@
 using System.Reflection;
 
-[assembly: AssemblyCompany("JanJorgensen")]
+[assembly: AssemblyCompany("SchmutStein")]
 [assembly: AssemblyProduct("StepBro")]
 [assembly: AssemblyVersion("0.2.5.109")]
 
