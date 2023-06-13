@@ -84,9 +84,7 @@ jobs:
         
     # TODO: Out-commented because stepbro --version has exit code -1 for some reason, when it is fixed this can be re-added
     # - name: Run StepBro Version Check
-    #   working-directory: .\source\bin
-    #   run: .\stepbro.exe --version
+    #   run: .\source\bin\stepbro.exe --version
         
     - name: Run StepBro Smoketest
-      working-directory: .\source\bin
-      run: .\stepbro.exe ConsoleTest.sbs -v -e HelloStepBro --exitcode Verdict
+      run: .\source\bin\stepbro.exe ".\test files\smoketest\ConsoleTest.sbs" -v -e HelloStepBro --exitcode Verdict
