@@ -87,5 +87,8 @@ jobs:
       env:
         Configuration: ${{ matrix.configuration }}
         
+    - name: Run StepBro Version Check
+      run: bin\stepbro.exe --version
+        
     - name: Run StepBro Smoketest
-      run: test files\smoketest\ConsoleTest.cmd
+      run: bin\stepbro.exe ConsoleTest.sbs -v -e HelloStepBro --exitcode Verdict
