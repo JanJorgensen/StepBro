@@ -599,21 +599,28 @@ namespace StepBro.Core.Parser
                 throw new NotImplementedException();
             }
             entryTarget = this.ResolveIfIdentifier(entryTarget, false);
-            var args = m_testListEntryArguments;
+            ITestListEntry entry = null;
             if (entryTarget.IsProcedureReference)
             {
                 System.Diagnostics.Debug.Assert(entryTarget.Value != null && entryTarget.Value is IProcedureReference);
                 var proc = entryTarget.Value as IProcedureReference;
-                m_currentTestList.AddTestCase(referenceName, proc);
+                entry = m_currentTestList.AddTestCase(referenceName, proc, null);
             }
             else if (entryTarget.IsTestList)
             {
                 var list = entryTarget.Value as FileTestList;
-                m_currentTestList.AddTestList(referenceName, list);
+                entry = m_currentTestList.AddTestList(referenceName, list);
             }
             else
             {
                 m_currentTestList.AddTestEntry((string)entryTarget.Value);
+            }
+            if (entry != null && m_testListEntryArguments != null)
+            {
+                foreach (var a in m_testListEntryArguments)
+                {
+                    entry.Arguments.Add(a.ParameterName, a.Value);
+                }
             }
         }
 

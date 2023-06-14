@@ -44,7 +44,7 @@ namespace StepBroCoreTest
             Assert.AreEqual(2, methodInfo.GetParameters().Length);
             Assert.AreEqual("callcontext", methodInfo.GetParameters()[0].Name);
             Assert.AreEqual(typeof(ICallContext), methodInfo.GetParameters()[0].ParameterType);
-            Assert.AreEqual("p1", methodInfo.GetParameters()[1].Name);
+            Assert.AreEqual("firstParameter", methodInfo.GetParameters()[1].Name);
             Assert.AreEqual(typeof(bool).MakeByRefType(), methodInfo.GetParameters()[1].ParameterType);
         }
     }

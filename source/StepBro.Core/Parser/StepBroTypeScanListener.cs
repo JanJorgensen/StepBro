@@ -1,4 +1,4 @@
-﻿#define PRINT_TREE
+﻿//#define PRINT_TREE
 
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
@@ -320,6 +320,10 @@ namespace StepBro.Core.Parser
         }
 
         public override void ExitFormalParameterDecl([NotNull] SBP.FormalParameterDeclContext context)
+        {
+        }
+
+        public override void ExitFormalParameterDeclStart([NotNull] SBP.FormalParameterDeclStartContext context)
         {
             var type = this.PopType("ExitFormalParameterDecl");
             var name = context.GetChild(context.children.Count - 1).GetText();
