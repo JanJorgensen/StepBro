@@ -11,6 +11,9 @@ namespace StepBro.Core.Parser
         private readonly string m_typeName;
         private TypeReference m_type;
         private readonly IToken m_typeToken;
+        private object m_defaultValue = null;
+        private IToken m_defaultValueToken = null;
+
         public ParameterData(string[] modifiers, string name, string typeName, TypeReference type = null, IToken typeToken = null)
         {
             m_modifiers = modifiers ?? new string[] { };
@@ -20,10 +23,17 @@ namespace StepBro.Core.Parser
             m_typeToken = typeToken;
         }
 
-        public void SetType(TypeReference type)
+        internal void SetType(TypeReference type)
         {
             if (m_type != null) throw new InvalidOperationException("The type has already been set.");
             m_type = type;
+        }
+
+        internal void SetDefaultValue(object value, IToken token)
+        {
+            if (token == null) throw new ArgumentNullException("token");
+            m_defaultValue = value;
+            m_defaultValueToken = token;
         }
 
         public string[] Modifiers { get { return m_modifiers; } }
@@ -31,5 +41,8 @@ namespace StepBro.Core.Parser
         public string TypeName { get { return m_typeName; } }
         public TypeReference Type { get { return m_type; } }
         public IToken TypeToken { get { return m_typeToken; } }
+        public object DefaultValue { get { return m_defaultValue; } }
+        public IToken DefaultValueToken { get { return m_defaultValueToken; } }
+        public bool HasDefaultValue {  get { return m_defaultValueToken != null; } }
     }
 }

@@ -206,6 +206,11 @@ namespace StepBro.Core.ScriptData
             return m_parametersInternal;
         }
 
+        public List<ParameterData> GetFormalParameters()
+        {
+            return new List<ParameterData>(m_formalParameters);
+        }
+
         public ParameterExpression ContextReference
         {
             get

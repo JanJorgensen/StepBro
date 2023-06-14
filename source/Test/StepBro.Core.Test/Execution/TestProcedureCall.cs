@@ -225,5 +225,55 @@ namespace StepBroCoreTest
             Assert.AreEqual(procedureName, procedure.Name);
             return procedure;
         }
+
+        [TestMethod]
+        public void ProcedureCallWithDefaultArguments()
+        {
+            var taskContext = ExecutionHelper.ExeContext();
+
+            var f = new StringBuilder();
+            f.AppendLine("namespace MyFile;");
+            f.AppendLine("procedure void Bent(int a, string b = \"Wow\", bool c = true, int d = 126)");
+            f.AppendLine("{");
+            f.AppendLine("   log (\"a: \" + a + \", b: \" + b + \", c: \" + c + \", d: \" + d);");
+            f.AppendLine("}");
+            f.AppendLine("procedure void Anders()");
+            f.AppendLine("{");
+            f.AppendLine("   Bent(5, \"Ups\", false, 230);");
+            f.AppendLine("   Bent(28);");
+            f.AppendLine("   Bent(94, c: false);");
+            f.AppendLine("   Bent(113, b: \"Musk\");");
+            f.AppendLine("}");
+
+            var file = FileBuilder.ParseFile(null, f.ToString());
+            Assert.AreEqual(2, file.ListElements().Count());
+            var procedure = file.ListElements().First(p => p.Name == "Anders") as IFileProcedure;
+            Assert.IsNotNull(procedure);
+            taskContext.CallProcedure(procedure);
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - MyFile.Anders - <no arguments>");
+
+            log.ExpectNext("2 - Pre - MyFile.Bent - <no arguments>");
+            log.ExpectNext("3 - Normal - 4 Log - a: 5, b: Ups, c: False, d: 230");
+            log.ExpectNext("3 - Post");
+            
+            log.ExpectNext("2 - Pre - MyFile.Bent - <no arguments>");
+            log.ExpectNext("3 - Normal - 4 Log - a: 28, b: Wow, c: True, d: 126");
+            log.ExpectNext("3 - Post");
+
+            log.ExpectNext("2 - Pre - MyFile.Bent - <no arguments>");
+            log.ExpectNext("3 - Normal - 4 Log - a: 94, b: Wow, c: False, d: 126");
+            log.ExpectNext("3 - Post");
+
+            log.ExpectNext("2 - Pre - MyFile.Bent - <no arguments>");
+            log.ExpectNext("3 - Normal - 4 Log - a: 113, b: Musk, c: True, d: 126");
+            log.ExpectNext("3 - Post");
+
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
     }
 }

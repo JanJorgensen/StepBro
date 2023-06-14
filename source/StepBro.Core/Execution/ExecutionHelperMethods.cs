@@ -403,22 +403,56 @@ namespace StepBro.Core.Execution
 
                 var methodInfo = ((FileProcedure)procedure.ProcedureData).DelegateType.GetMethod("Invoke");
                 var arguments = new List<object>();
-                int i = 0;
-                foreach (var p in methodInfo.GetParameters())
+                arguments.Add(subContext);
+
+                var formalParameters = (procedure.ProcedureData as FileProcedure).GetFormalParameters();
+                ArgumentList args = null;
+                if (sequencialFirstArguments != null && sequencialFirstArguments.Length == 1 && sequencialFirstArguments[0].GetType() == typeof(ArgumentList))
                 {
-                    if (i == 0)
-                    {
-                        arguments.Add(subContext);
-                    }
-                    i++;
+                    args = sequencialFirstArguments[0] as ArgumentList;
                 }
+                foreach (var p in methodInfo.GetParameters().Skip(1))
+                {
+                    bool handled = false;
+
+                    if (args != null)       // If arguments were given
+                    {
+                        var arg = args.FirstOrDefault(a => a.Name == p.Name);
+                        if (arg != null)    // If argument with same name as parameter was found
+                        {
+                            arguments.Add(arg.Value);
+                            handled = true;
+                        }
+                    }
+
+                    if (!handled)
+                    {
+                        var parameter = formalParameters.FirstOrDefault(fp => fp.Name == p.Name);
+                        if (parameter != null && parameter.HasDefaultValue)  // If parameter found in formal parameters (should never fail...) and there is a default value/argument
+                        {
+                            // Use the default value from the formal parameters.
+                            var value = parameter.DefaultValue;
+                            if (value == null && p.ParameterType.IsValueType)
+                            {
+                                value = Activator.CreateInstance(p.ParameterType);
+                            }
+                            arguments.Add(value);
+                            handled = true;
+                        }
+                    }
+                    if (!handled)
+                    {
+                        // Check the default arguments
+                    }
+                }
+
                 Delegate runtimeProcedure = ((FileProcedure)procedure.ProcedureData).RuntimeProcedure;
-                object value = runtimeProcedure.DynamicInvoke(arguments.ToArray());
+                object returnValue = runtimeProcedure.DynamicInvoke(arguments.ToArray());
                 if (PostProcedureCallResultHandling(context, subContext))
                 {
                     throw new RequestEarlyExitException();
                 }
-                return value;
+                return returnValue;
             }
             catch (RequestEarlyExitException)
             {
