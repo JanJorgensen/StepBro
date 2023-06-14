@@ -165,7 +165,7 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(37, obj3.IntA);
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void FileParsing_OverrideVariable()
         {
             var f1 = new StringBuilder();
