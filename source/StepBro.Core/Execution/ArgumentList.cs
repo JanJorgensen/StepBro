@@ -18,6 +18,18 @@ namespace StepBro.Core.Execution
         }
         public string Name { get { return m_name; } }
         public object Value { get { return m_value; } }
+
+        public override string ToString()
+        {
+            if (string.IsNullOrEmpty(m_name))
+            {
+                return $"<unnamed>: {StringUtils.ObjectToString(m_value)}";
+            }
+            else
+            {
+                return $"{m_name}: {StringUtils.ObjectToString(m_value)}";
+            }
+        }
     }
 
     [Public]
@@ -29,16 +41,6 @@ namespace StepBro.Core.Execution
         public ArgumentList(ArgumentList parent)
         {
             m_parent = parent;
-        }
-
-        public ArgumentList Clone(params NamedArgument[] arguments)
-        {
-            var list = new ArgumentList(this);
-            foreach (var a in arguments)
-            {
-                list.Add(a.Name, a.Value);
-            }
-            return list;
         }
 
         public void Add(string name, object value)

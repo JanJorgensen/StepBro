@@ -28,7 +28,13 @@ namespace StepBro.Core.ScriptData
 
             public TestListEntryType Type { get { return m_type; } }
 
-            public ArgumentList Arguments { get { return m_arguments; } }
+            public ArgumentList Arguments
+            {
+                get
+                {
+                    return m_arguments;
+                }
+            }
         }
 
         private class EntryTestCase : EntryBase, ITestListEntryTestCase
@@ -87,9 +93,11 @@ namespace StepBro.Core.ScriptData
             return new TypeReference(typeof(ITestList), this);
         }
 
-        public void AddTestCase(string name, IProcedureReference procedure)
+        public ITestListEntry AddTestCase(string name, IProcedureReference procedure, ArgumentList arguments)
         {
-            m_entries.Add(new EntryTestCase(this, name, procedure));
+            var entry = new EntryTestCase(this, name, procedure);
+            m_entries.Add(entry);
+            return entry;
         }
 
         public void AddTestEntry(string target)
@@ -97,9 +105,11 @@ namespace StepBro.Core.ScriptData
             m_entries.Add(new EntryBase(this, TestListEntryType.Unresolved, target));
         }
 
-        public void AddTestList(string name, ITestList list)
+        public ITestListEntry AddTestList(string name, ITestList list)
         {
-            m_entries.Add(new EntryTestList(this, name, list));
+            var entry = new EntryTestList(this, name, list);
+            m_entries.Add(entry);
+            return entry;
         }
 
         public ITestListIterator GetProcedureIterator(/*bool loop = false, Predicate<IProcedureReference> filter = null*/)

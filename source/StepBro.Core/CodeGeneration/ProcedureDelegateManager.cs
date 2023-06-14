@@ -53,8 +53,11 @@ namespace StepBro.Core.CodeGeneration
                 foreach (var p in parameters)
                 {
                     typestring.Append("_PAR_");
-                    //typestring.Append(p.Name);
-                    //typestring.Append("_");
+                    if (!String.IsNullOrEmpty(p.Name))
+                    {
+                        typestring.Append(p.Name);
+                        typestring.Append("_");
+                    }
                     typestring.Append(p.Value.Type.FullName.Replace('.', '_'));
                 }
             }
@@ -148,7 +151,7 @@ namespace StepBro.Core.CodeGeneration
             for (int i = 0; i < parameters.Length; i++)
             {
                 var parameter = parameters[i];
-                var par = invokeMethod.DefineParameter(i + 2, ParameterAttributes.None, $"p{i + 1}");
+                var par = invokeMethod.DefineParameter(i + 2, ParameterAttributes.None, parameter.Name);
             }
 
             return typeBuilder.CreateType();

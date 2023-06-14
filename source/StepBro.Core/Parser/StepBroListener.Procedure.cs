@@ -176,6 +176,7 @@ namespace StepBro.Core.Parser
         {
             var stack = m_expressionData.PopStackLevel();
             var parInitializer = this.ResolveForGetOperation(stack.Pop());
+            m_parameters[m_parameters.Count - 1].SetDefaultValue(parInitializer.Value, ((ParserRuleContext)context.children[0]).Start);
             //if (m_variableInitializer.IsError())
             //{
             //    m_errors.UnresolvedIdentifier(m_variableInitializer.Token.Line, m_variableInitializer.Token.Column, m_variableInitializer.Value as string);

@@ -136,6 +136,7 @@ namespace StepBro.Core.Parser
             var callType = ParansExpressionType.MethodCall;
             var firstParIsThis = false; // Whether the first parameter of procedure (or method?) is a 'this' reference.
             TypeReference returnType = null;
+            FileProcedure procedure = null;
 
             #region Identify call type and list methods with matching name
 
@@ -201,7 +202,7 @@ namespace StepBro.Core.Parser
                     {
                         callType = isCallStatement ? ParansExpressionType.ProcedureCall : ParansExpressionType.FunctionCall;
                         // Note: never anonymous procedure here.
-                        var procedure = (left.Value as IProcedureReference).ProcedureData;
+                        procedure = (left.Value as IProcedureReference).ProcedureData as FileProcedure;
                         if (!isCallStatement && (procedure.Flags & ProcedureFlags.IsFunction) == ProcedureFlags.None)
                         {
                             m_errors.SymanticError(context.Start.Line, -1, false, "Only procedures marked as 'function' can be called from expressions.");
@@ -375,6 +376,7 @@ namespace StepBro.Core.Parser
                     ref constructedMethod,
                     callType == ParansExpressionType.ProcedureCall || callType == ParansExpressionType.FunctionCall,
                     firstParIsThis,
+                    procedure?.GetFormalParameters(),
                     instance, 
                     instanceName,
                     m_currentProcedure?.ContextReferenceInternal,
@@ -491,7 +493,7 @@ namespace StepBro.Core.Parser
                     case SBExpressionType.ProcedureReference:
                         {
                             var procRef = left.Value as IProcedureReference;
-                            var procedure = procRef.ProcedureData as FileProcedure;
+                            procedure = procRef.ProcedureData as FileProcedure;
                             returnType = procedure.ReturnType;
                             delegateType = procedure.DelegateType;
                             procedureReferenceType = procedure.ProcedureReferenceType;
@@ -706,6 +708,7 @@ namespace StepBro.Core.Parser
         internal int CheckMethodArguments(
             ref MethodInfo method,
             bool isProcedure, bool firstParIsThis,
+            List<ParameterData> procedureParameters,
             Expression instance, string instanceName,
             Expression contextReference,
             Expression extensionInstance,
@@ -897,6 +900,22 @@ namespace StepBro.Core.Parser
                                     Expression.Constant(defaultValue, p.ParameterType)));
                             continue;
                         }
+                        else if (procedureParameters != null)
+                        {
+                            var fp = procedureParameters.Find(a => a.Name == p.Name);
+                            if (fp != null)
+                            {
+                                object c = fp.DefaultValue;
+                                if (c == null && p.ParameterType.IsValueType)
+                                {
+                                    c = Activator.CreateInstance(p.ParameterType);
+                                }
+                                suggestedAssignmentsOut.Add(
+                                    new SBExpressionData(
+                                        Expression.Constant(c, p.ParameterType)));
+                                continue;
+                            }
+                        }
                         else
                         {
                             // TODO: Report argument not found, maybe
@@ -965,6 +984,22 @@ namespace StepBro.Core.Parser
                                 new SBExpressionData(
                                     Expression.Constant(c, p.ParameterType)));
                             continue;
+                        }
+                        else if (procedureParameters != null)
+                        {
+                            var fp = procedureParameters.Find(a => a.Name == p.Name);
+                            if (fp != null)
+                            {
+                                object c = fp.DefaultValue;
+                                if (c == null && p.ParameterType.IsValueType)
+                                {
+                                    c = Activator.CreateInstance(p.ParameterType);
+                                }
+                                suggestedAssignmentsOut.Add(
+                                    new SBExpressionData(
+                                        Expression.Constant(c, p.ParameterType)));
+                                continue;
+                            }
                         }
                         else
                         {
