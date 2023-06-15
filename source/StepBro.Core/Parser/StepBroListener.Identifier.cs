@@ -497,6 +497,19 @@ namespace StepBro.Core.Parser
                         }
                         break;
 
+                    case FileElementType.TypeDef:
+                        {
+                            var typedef = element as FileElementTypeDef;
+
+                            result = new SBExpressionData(
+                                HomeType.Immediate,
+                                SBExpressionType.TypeReference,
+                                typedef.DataType,
+                                null,
+                                typedef);
+                        }
+                        break;
+
                     default:
                         throw new NotImplementedException();
                 }
@@ -588,8 +601,16 @@ namespace StepBro.Core.Parser
                 }
                 else
                 {
-                    //throw new Exception("Sub-namespace was not found (" + right + ").");
-                    return null;
+                    var gtName = rightString + "`";
+                    var genericTypedefs = left.NamespaceList.ListTypes(false).Where(ti => ti.Name.StartsWith(gtName)).ToList();
+                    if (genericTypedefs.Count > 0)
+                    {
+                        return new SBExpressionData(HomeType.Immediate, SBExpressionType.GenericTypeDefinition, (TypeReference)null, value: genericTypedefs, token: right.Token);
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
         }

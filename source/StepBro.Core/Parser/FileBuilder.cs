@@ -762,8 +762,15 @@ namespace StepBro.Core.Parser
                                     file.AddOverrider(overrider);
                                 }
                                 break;
-                            default:
+                            case FileElementType.TypeDef:
+                                {
+                                    var typedef = new FileElementTypeDef(file, element.Line, file.Namespace, element.Name);
+                                    typedef.SetDeclaration(element.DataType);
+                                    file.AddTypedef(typedef);
+                                }
                                 break;
+                            default:
+                                throw new NotImplementedException();
                         }
                     }
                     file.LastTypeScan = DateTime.Now;
@@ -771,9 +778,9 @@ namespace StepBro.Core.Parser
             }
             #endregion
 
-            //=================================================//
-            #region STEP 3: PARSE ALL THE PROCEDURE SIGNATURES //
-            //=================================================//
+            //====================================================//
+            #region STEP 3: PARSE ALL SIGNATURES AND DECLARATIONS //
+            //====================================================//
             var signaturesToParseNow = new List<Tuple<FileElement, StepBroListener>>();
             // Collect file elements to parse from _all_ files
             foreach (var file in filesToParse)
@@ -792,27 +799,29 @@ namespace StepBro.Core.Parser
                 file.UpdateRootIdentifiers();
             }
 
-            var numberToParse = signaturesToParseNow.Count;
-            var numberParsedLast = int.MaxValue;
+            var numberItemsToParse = (signaturesToParseNow.Count > 0 ) ? int.MaxValue - 1 : 0;
+            var numberUnparsedItemsBefore = int.MaxValue;
             var signaturesToParseAgain = new List<Tuple<FileElement, StepBroListener>>();
             // Continue parsing signatures until no more elements can be resolved
-            while (numberToParse > 0 && numberToParse < numberParsedLast)
+            while (numberItemsToParse > 0 && numberItemsToParse < numberUnparsedItemsBefore)
             {
+                numberUnparsedItemsBefore = numberItemsToParse;
+                numberItemsToParse = 0;
                 foreach (var d in signaturesToParseNow)
                 {
                     d.Item1.ParseBaseElement();
-                    if (d.Item1.ParseSignature(d.Item2, false) > 0)
+                    var unparsedItemsInElement = d.Item1.ParseSignature(d.Item2, false);
+                    if (unparsedItemsInElement > 0)
                     {
+                        numberItemsToParse += unparsedItemsInElement;
                         signaturesToParseAgain.Add(d);
                     }
                 }
-                numberParsedLast = signaturesToParseNow.Count;
                 signaturesToParseNow = signaturesToParseAgain;
-                numberToParse = signaturesToParseNow.Count;
                 signaturesToParseAgain = new List<Tuple<FileElement, StepBroListener>>();
             }
 
-            if (numberToParse > 0)
+            if (numberItemsToParse > 0)
             {
                 foreach (var d in signaturesToParseNow)
                 {

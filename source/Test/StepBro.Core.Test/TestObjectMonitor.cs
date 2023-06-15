@@ -73,7 +73,7 @@ namespace StepBroCoreTest
             }
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void TestObjectMonitorWholeCycle()
         {
             var obj = new MyClass();

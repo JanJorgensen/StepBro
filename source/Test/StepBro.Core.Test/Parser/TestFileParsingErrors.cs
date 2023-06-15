@@ -111,5 +111,36 @@ namespace StepBro.Core.Test.Parser
             Assert.AreEqual(1, files[0].Errors.ErrorCount);
             Assert.IsTrue(files[0].Errors[0].Message.Contains("unresolved identifier", StringComparison.InvariantCultureIgnoreCase));
         }
+
+        [TestMethod]
+        public void FileParsing_UnresolvedProcedure()
+        {
+            var file = new StringBuilder();
+            file.AppendLine("procedure void Proc()");
+            file.AppendLine("{");
+            file.AppendLine("    bool b = false;");
+            file.AppendLine("    b = BadProc(27);");
+            file.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("test.sbs", file.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);
+            Assert.IsTrue(files[0].Errors[0].Message.Contains("unresolved identifier", StringComparison.InvariantCultureIgnoreCase));
+
+
+            file = new StringBuilder();
+            file.AppendLine("procedure void Proc()");
+            file.AppendLine("{");
+            file.AppendLine("    bool b = false;");
+            file.AppendLine("    !BadProc(27);");
+            file.AppendLine("}");
+
+            files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("test.sbs", file.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);
+            Assert.IsTrue(files[0].Errors[0].Message.Contains("unresolved identifier", StringComparison.InvariantCultureIgnoreCase));
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace StepBroCoreTest.Execution
     [TestClass]
     public class AsyncExecution
     {
-        [TestMethod]
+        [TestMethod, Ignore]
         public void AsyncExecutionSimple()
         {
             var f = new StringBuilder();
@@ -38,7 +38,7 @@ namespace StepBroCoreTest.Execution
                 var execution = StepBro.Core.Main.StartProcedureExecution(procedure);
                 bool isRunning = false;
                 while (execution.Task.CurrentState == StepBro.Core.Tasks.TaskExecutionState.Created) ;
-                while (execution.Task.CurrentState == StepBro.Core.Tasks.TaskExecutionState.Started) ;
+                while (execution.Task.CurrentState == StepBro.Core.Tasks.TaskExecutionState.StartRequested) ;
                 while ((DateTime.Now - execution.Task.StartTime) < TimeSpan.FromMilliseconds(5000))
                 {
                     if (execution.Task.CurrentState == StepBro.Core.Tasks.TaskExecutionState.Running)

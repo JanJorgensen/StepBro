@@ -46,6 +46,7 @@ namespace StepBro.Core.Execution
         private DataReport m_currentReport = null;
         private ProcedureResult m_lastCallResult = null;
         private string m_nextCallHighLevelType = null;
+        private IFolderShortcutsSource m_folderShortcuts = null;
 
         internal ScriptCallContext(
             ScriptTaskContext task,
@@ -70,9 +71,9 @@ namespace StepBro.Core.Execution
 
         internal ScriptCallContext(
             ScriptCallContext parent,
-            IFileProcedure procedure, 
-            ContextLogOption callLoggingOption, 
-            bool isDynamicCall, 
+            IFileProcedure procedure,
+            ContextLogOption callLoggingOption,
+            bool isDynamicCall,
             object[] arguments)
         {
             m_task = parent.m_task;
@@ -85,6 +86,11 @@ namespace StepBro.Core.Execution
             m_statusUpdaterOnEntry = parent.StatusUpdater;
             m_loggingEnabled = parent.LoggingEnabled;
             m_errorListener = parent.m_errorListener;
+
+            if (Object.ReferenceEquals(procedure, parent.m_procedure))
+            {
+                m_folderShortcuts = parent.m_folderShortcuts;
+            }
 
             m_procedure = procedure;
             m_isDynamicCall = isDynamicCall;
@@ -136,7 +142,7 @@ namespace StepBro.Core.Execution
                 m_loggerInsideScope = m_loggerOnEntry.LogEntering(
                     (m_parentContext?.m_nextCallHighLevelType != null),
                     (m_isDynamicCall ? "<DYNAMIC CALL> " : "") + m_procedure.FullName,
-                    textPrefix + argText.ToString(), 
+                    textPrefix + argText.ToString(),
                     new LoggerDynamicLocationSource(this.GetDynamicLogLocation));
                 m_loggerInside = m_loggerInsideScope;
             }
@@ -315,9 +321,14 @@ namespace StepBro.Core.Execution
             return this.EnterNewScriptContext(procedure.ProcedureData, callerLoggingOption, isDynamicCall, arguments);
         }
 
-        public IEnumerable<IFolderShortcut> GetFolders()
+        public IEnumerable<IFolderShortcut> ListShortcuts()
         {
-            throw new NotImplementedException();
+            if (m_folderShortcuts == null)
+            {
+                var commonShortcuts = ServiceManager.Global.Get<IFolderManager>();
+                m_folderShortcuts = new FolderCollection(FolderShortcutOrigin.ScriptFile, commonShortcuts, m_procedure.ParentFile.FolderShortcuts);
+            }
+            return m_folderShortcuts.ListShortcuts();
         }
 
         public string ShortLocationDescription()
@@ -607,7 +618,7 @@ namespace StepBro.Core.Execution
 
         bool IProcedureThis.SetResult(Verdict verdict, string description)
         {
-            if (m_verdict <= Verdict.Pass && verdict > m_verdict) 
+            if (m_verdict <= Verdict.Pass && verdict > m_verdict)
             {
                 m_verdict = verdict;
                 m_failureDescription = description;
@@ -618,6 +629,22 @@ namespace StepBro.Core.Execution
                 return false;
             }
         }
+
+        string IProcedureThis.FileName
+        {
+            get
+            {
+                return m_procedure.ParentFile.FileName;
+            }
+        }
+        string IProcedureThis.FileDirectory
+        {
+            get
+            {
+                return System.IO.Path.GetDirectoryName(m_procedure.ParentFile.FilePath);
+            }
+        }
+
 
         public TaskManager TaskManager { get { return m_taskManager; } }
     }

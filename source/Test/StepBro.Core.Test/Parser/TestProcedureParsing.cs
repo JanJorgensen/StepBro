@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StepBro.Core.Parser;
+using StepBro.Core.ScriptData;
+using System.Linq;
 
 namespace StepBroCoreTest.Parser
 {
@@ -28,6 +30,20 @@ namespace StepBroCoreTest.Parser
             var proc = FileBuilder.ParseProcedure("void Func(int a){}");
             Assert.AreEqual(typeof(void), proc.ReturnType.Type);
             Assert.AreEqual(1, proc.Parameters.Length);
+        }
+
+        [TestMethod]
+        public void TestProcedureParametersWithDefaultValue()
+        {
+            var proc = FileBuilder.ParseProcedure("void Func(int a = 30){}") as FileProcedure;
+            Assert.AreEqual(typeof(void), proc.ReturnType.Type);
+            Assert.AreEqual(1, proc.GetFormalParameters().Count);
+            Assert.AreEqual(30, (long)proc.GetFormalParameters()[0].DefaultValue);
+
+            proc = FileBuilder.ParseProcedure("void Func(string b = \"Nix!\"){}") as FileProcedure;
+            Assert.AreEqual(typeof(void), proc.ReturnType.Type);
+            Assert.AreEqual(1, proc.GetFormalParameters().Count);
+            Assert.AreEqual("Nix!", (string)proc.GetFormalParameters()[0].DefaultValue);
         }
 
         [TestMethod]

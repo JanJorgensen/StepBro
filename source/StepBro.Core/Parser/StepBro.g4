@@ -285,7 +285,11 @@ formalParameterDecls
     ;
 
 formalParameterDecl
-    :   formalParameterModifiers? formalParameterType IDENTIFIER (ASSIGNMENT formalParameterAssignment)?
+    :   formalParameterDeclStart (ASSIGNMENT formalParameterAssignment)?
+    ;
+
+formalParameterDeclStart
+    :   formalParameterModifiers? formalParameterType IDENTIFIER
     ;
 
 formalParameterType : type ;

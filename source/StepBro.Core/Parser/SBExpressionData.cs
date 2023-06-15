@@ -21,6 +21,7 @@ namespace StepBro.Core.Parser
         LocalVariableReference,
         Indexing,
         TypeReference,
+        GenericTypeDefinition,
         PropertyReference,
         MethodReference,
         ScriptNamespace,

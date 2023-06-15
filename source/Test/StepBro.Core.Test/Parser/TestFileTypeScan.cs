@@ -246,21 +246,35 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestFileScanTypedefs()
         {
-            var result = FileBuilder.TypeScanFile("typedef StringList List<string>; typedef MyType TheBaseType;");
+            // Typedef for .net generic type.
+            var result = FileBuilder.TypeScanFile("typedef MyType TheBaseType;");
             Assert.AreEqual(FET.Namespace, result.TopElement.Type);
             Assert.AreEqual("Angus", result.TopElement.Name);
 
             var top = result.TopElement;
-            Assert.AreEqual(2, top.Childs.Count);
+            Assert.AreEqual(1, top.Childs.Count);
 
-            Assert.AreEqual(FET.TypeDef, top.Childs[0].Type);
-            Assert.AreEqual("StringList", top.Childs[0].Name);
-            Assert.AreEqual("List", top.Childs[0].DataType.GetGenericType().Item1);
-            Assert.AreEqual(1, top.Childs[0].DataType.ParameterCount);
-            Assert.AreEqual("string", top.Childs[0].DataType.GetParameter(0).GetGenericType().Item1);
-            
-            Assert.AreEqual("MyType", top.Childs[1].Name);
-            Assert.AreEqual("TheBaseType", top.Childs[1].DataType.GetGenericType().Item1);
+            var child = top.Childs[0];
+            Assert.AreEqual("MyType", child.Name);
+            Assert.AreEqual("TheBaseType", child.DataType.GetGenericType().Item1);
+
+
+            // Typedef for .net generic type.
+            result = FileBuilder.TypeScanFile("typedef StringList List<string>;");
+            Assert.AreEqual(FET.Namespace, result.TopElement.Type);
+            Assert.AreEqual("Angus", result.TopElement.Name);
+
+            top = result.TopElement;
+            Assert.AreEqual(1, top.Childs.Count);
+
+            child = top.Childs[0];
+            Assert.AreEqual(FET.TypeDef, child.Type);
+            Assert.AreEqual("StringList", child.Name);
+            Assert.AreEqual("List", child.DataType.GetGenericType().Item1);
+            Assert.AreEqual(1, child.DataType.ParameterCount);
+            Assert.AreEqual("string", child.DataType.GetParameter(0).GetGenericType().Item1);
+
+
         }
     }
 }

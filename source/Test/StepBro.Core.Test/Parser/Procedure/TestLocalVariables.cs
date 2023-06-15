@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StepBro.Core.Data;
 using StepBro.Core.Parser;
+using StepBroCoreTest.Data;
 using static StepBroCoreTest.Parser.ExpressionParser;
 
 namespace StepBroCoreTest.Parser
@@ -59,6 +60,14 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual("Snappy", ParseAndRun<string>("myVar", "var myVar = \"\"; myVar = \"Snappy\";", false));
             Assert.AreEqual(13.45, ParseAndRun<double>("myVar", "var myVar = 0.0; myVar = 13.45;", false));
             Assert.AreEqual(Verdict.Error, ParseAndRun<Verdict>("myVar", "var myVar = unset; myVar = error;", false));
+        }
+
+
+        [TestMethod]
+        public void TestClassTypeVariables()
+        {
+            Assert.AreEqual(8822L, ParseAndRun<long>("obj.PropInt", "DummyClass obj; obj.PropInt = 8822;", false, true));
+            //Assert.AreEqual(8822L, ParseAndRun<long>("obj.PropInt", "var obj = DummyClass(); obj.PropInt = 8822;", false, true));     // TODO !!
         }
     }
 }

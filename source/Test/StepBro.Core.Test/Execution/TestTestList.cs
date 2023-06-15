@@ -6,6 +6,7 @@ using StepBroCoreTest.Utils;
 using System;
 using System.Linq;
 using System.Text;
+using static StepBro.Core.ScriptData.FileDatatable;
 
 namespace StepBroCoreTest.Execution
 {
@@ -13,7 +14,7 @@ namespace StepBroCoreTest.Execution
     public class TestTestList
     {
         [TestMethod]
-        public void TestFileWithSingleSimpleTestList()
+        public void TestSingleSimpleTestList()
         {
             var f = new StringBuilder();
             f.AppendLine("namespace MyFile;");
@@ -72,6 +73,59 @@ namespace StepBroCoreTest.Execution
 
         }
 
+        [TestMethod]
+        public void TestSingleSimpleTestListWithParameters()
+        {
+            var f = new StringBuilder();
+            f.AppendLine("namespace MyFile;");
+            f.AppendLine("procedure void TestCaseWithParameters(int a = 20, string b = \"noffin\", verdict c = pass, timespan d = 5s)");
+            f.AppendLine("{");
+            f.AppendLine("}");
+            f.AppendLine("testlist AllTests");
+            f.AppendLine("{");
+            f.AppendLine("   * TestCaseWithParameters(b: \"Brian\")");
+            f.AppendLine("   * TestCaseWithParameters");
+            f.AppendLine("   * TestCaseWithParameters");
+            f.AppendLine("}");
+            f.AppendLine("procedure void ExecuteAllTests()");
+            f.AppendLine("{");
+            f.AppendLine("   var iterator = AllTests.GetProcedureIterator();");
+            f.AppendLine("   while (iterator.GetNext())");
+            f.AppendLine("   {");
+            f.AppendLine("      iterator.Procedure( iterator.Arguments );");
+            f.AppendLine("   }");
+            f.AppendLine("}");
+
+            var file = FileBuilder.ParseFile(null, f.ToString());
+            Assert.AreEqual(1, file.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
+            var list = file["AllTests"] as ITestList;
+            Assert.AreEqual("AllTests", list.Name);
+            Assert.AreEqual(3, list.EntryCount);
+            Assert.AreSame(file["TestCaseWithParameters"], list[0].Reference);
+            Assert.AreSame(file["TestCaseWithParameters"], list[1].Reference);
+            Assert.AreSame(file["TestCaseWithParameters"], list[2].Reference);
+            Assert.AreSame(list, list[0].Home);
+            Assert.AreSame(list, list[1].Home);
+            Assert.AreSame(list, list[2].Home);
+
+            var procedure = file.ListElements().First(p => p.Name == "ExecuteAllTests") as IFileProcedure;
+
+            var taskContext = ExecutionHelper.ExeContext();
+            taskContext.CallProcedure(procedure);
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - MyFile.ExecuteAllTests - <no arguments>");
+            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (b: \"Brian\") )");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (<empty>) )");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (<empty>) )");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
         [TestMethod]
         public void TestlistUseWithOppositeOrder()
         {

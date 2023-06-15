@@ -337,10 +337,16 @@ namespace StepBro.Core.Parser
         private void ExitExpUnary(int type, bool opOnLeft)
         {
             var input = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            // TODO: Check if operator is returned
-            var op = UnaryOperators.UnaryOperatorBase.GetOperator(type);
-            var result = op.Resolve(this, input, opOnLeft);
-            m_expressionData.Push(result);
+            if (input.IsError())
+            {
+                m_expressionData.Push(input);
+            }
+            else
+            {
+                var op = UnaryOperators.UnaryOperatorBase.GetOperator(type);
+                var result = op.Resolve(this, input, opOnLeft);
+                m_expressionData.Push(result);
+            }
         }
 
         public override void ExitExpAssignment([NotNull] SBP.ExpAssignmentContext context)
