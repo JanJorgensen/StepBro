@@ -115,7 +115,7 @@ namespace StepBro.Core.Parser
         {
             if (left.IsError())
             {
-                if (!isCallStatement) 
+                if (!isCallStatement)
                 {
                     m_expressionData.Push(left);
                 }
@@ -217,6 +217,8 @@ namespace StepBro.Core.Parser
                         {
                             m_errors.SymanticError(context.Start.Line, -1, false, "Unresolved signature for procedure.");
                         }
+                        instance = left.InstanceCode;
+                        instanceName = left.Instance;
                     }
                     break;
 
@@ -370,14 +372,14 @@ namespace StepBro.Core.Parser
             foreach (MethodInfo m in methods)
             {
                 var constructedMethod = m;
-                var extensionInstance = m.IsExtension() ? instance : null;
+                var extensionInstance = (m.IsExtension() || (callType == ParansExpressionType.ProcedureCall || callType == ParansExpressionType.FunctionCall)) ? instance : null;
                 List<SBExpressionData> suggestedAssignments = new List<SBExpressionData>();
                 int score = this.CheckMethodArguments(
                     ref constructedMethod,
                     callType == ParansExpressionType.ProcedureCall || callType == ParansExpressionType.FunctionCall,
                     firstParIsThis,
                     procedure?.GetFormalParameters(),
-                    instance, 
+                    instance,
                     instanceName,
                     m_currentProcedure?.ContextReferenceInternal,
                     extensionInstance,
@@ -751,7 +753,8 @@ namespace StepBro.Core.Parser
                 else if (state == ArgumentInsertState.ProcedureContext)
                 {
                     suggestedAssignmentsOut.Add(new SBExpressionData(contextReference));
-                    state = ArgumentInsertState.Initial;
+                    if (extensionInstance != null) state = ArgumentInsertState.ExtensionInstance;
+                    else state = ArgumentInsertState.Initial;
                     continue;
                 }
                 else if (state == ArgumentInsertState.Initial)
@@ -894,7 +897,7 @@ namespace StepBro.Core.Parser
                             {
                                 // Structs just have null as default value in ParameterInfo, so create a usable default value.
                                 defaultValue = Activator.CreateInstance(p.ParameterType);
-                            } 
+                            }
                             suggestedAssignmentsOut.Add(
                                 new SBExpressionData(
                                     Expression.Constant(defaultValue, p.ParameterType)));

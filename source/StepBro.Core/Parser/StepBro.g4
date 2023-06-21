@@ -75,9 +75,9 @@ elementModifier
 
 //fileVariableNameReference : variableDeclaratorQualifiedId ;
 
-fileElementReference : identifierOrQualified ;
+overrideReference : identifierOrQualified ;
 
-fileElementOverride : OVERRIDE fileElementReference typeOverride? elementPropertyblock? ;
+fileElementOverride : OVERRIDE overrideReference typeOverride? elementPropertyblock? ;
 
 typeOverride : AS typedefName ;
 

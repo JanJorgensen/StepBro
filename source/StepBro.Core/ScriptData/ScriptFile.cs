@@ -312,7 +312,8 @@ namespace StepBro.Core.ScriptData
             PropertyBlock customSetupData = null)
         {
             var existing = m_fileScopeVariablesBefore.FirstOrDefault(
-                v => (String.Equals(v.VariableOwnerAccess.Container.Name, name, StringComparison.InvariantCulture) &&
+                v => (v.VariableOwnerAccess != null &&
+                        String.Equals(v.VariableOwnerAccess.Container.Name, name, StringComparison.InvariantCulture) &&
                         v.VariableOwnerAccess.Container.DataType.Type == datatype.Type));
             if (existing != null)
             {
@@ -640,12 +641,20 @@ namespace StepBro.Core.ScriptData
             }
         }
 
+        internal void ClearRootIdentifiers()
+        {
+            m_rootIdentifiers.Clear();
+        }
+
         internal void UpdateRootIdentifiers()
         {
-            if (m_rootIdentifiers == null) m_rootIdentifiers = new Dictionary<string, List<IIdentifierInfo>>();
-            else m_rootIdentifiers.Clear();
+            if (m_rootIdentifiers == null)
+            {
+                m_rootIdentifiers = new Dictionary<string, List<IIdentifierInfo>>();
+            }
+            m_rootIdentifiers.Clear();
 
-            foreach (var element in this.ListElements().Where(e => e.ElementType != FileElementType.Override))
+            foreach (var element in this.ListElements())
             {
                 this.AddRootIdentifier(element.Name, element);
             }
@@ -728,16 +737,24 @@ namespace StepBro.Core.ScriptData
             }
         }
 
-        public List<IIdentifierInfo> LookupIdentifier(string identifier, bool includeLocal = true, bool includeExternal = true)
+        public List<IIdentifierInfo> LookupIdentifier(string identifier, Func<IIdentifierInfo, bool> predicate = null)
         {
             List<IIdentifierInfo> result = null;
             if (m_rootIdentifiers != null)
             {
                 m_rootIdentifiers.TryGetValue(identifier, out result);
+                if (result != null)
+                {
+                    if (predicate != null)
+                    {
+                        result = result.Where(predicate).ToList();
+                    }
+                    if (result.Count == 0) return null;
+                }
             }
             else
             {
-                result = this.ListElements().Where(e => e.Name.Equals(identifier, StringComparison.InvariantCulture)).Cast<IIdentifierInfo>().ToList();
+                result = this.ListElements().Where(e => e.Name.Equals(identifier, StringComparison.InvariantCulture) && (predicate == null || predicate(e))).Cast<IIdentifierInfo>().ToList();
                 if (result.Count == 0) return null;
             }
             return result;

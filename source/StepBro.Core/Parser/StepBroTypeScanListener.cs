@@ -87,6 +87,7 @@ namespace StepBro.Core.Parser
             }
             public string Name { get; private set; }
             public Tuple<string, IToken> ReturnTypeData { get; set; } = null;
+            public Tuple<string, IToken> AsType { get; set; } = null;
             public string ReturnType { get { return this.ReturnTypeData.Item1; } }
             public List<ParameterData> Parameters { get; set; } = null;
             public List<NamedString> Values { get; set; } = null;   // For enum values.
@@ -148,6 +149,7 @@ namespace StepBro.Core.Parser
         private Stack<FileElement> m_elementStack = new Stack<FileElement>();
         private string m_name = null;
         private string m_type = null;
+        private Tuple<string, IToken> m_typedefName = null;
         private Tuple<string, IToken> m_returnType = null;
         private List<ParameterData> m_procedureParameters = null;
         private List<string> m_modifiers = null;
@@ -235,11 +237,12 @@ namespace StepBro.Core.Parser
         {
             m_typedefStack.Clear();
             m_typedefStack.Push(new ScannedTypeDescriptor());
+            m_typedefName = null;
         }
 
         public override void ExitTypedefName([NotNull] SBP.TypedefNameContext context)
         {
-            m_name = context.GetText();
+            m_typedefName = new Tuple<string, IToken>(context.GetText(), context.Start);
         }
 
         public override void ExitTypeSimple([NotNull] SBP.TypeSimpleContext context)
@@ -250,7 +253,7 @@ namespace StepBro.Core.Parser
 
         public override void ExitTypedef([NotNull] SBP.TypedefContext context)
         {
-            var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.TypeDef, m_name);
+            var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.TypeDef, m_typedefName.Item1);
             element.Modifiers = m_modifiers;
             element.DataType = m_typedefStack.Pop();
             this.TopElement.Childs.Add(element);
@@ -421,13 +424,20 @@ namespace StepBro.Core.Parser
             this.TopElement.Childs.Add(element);
         }
 
+        public override void EnterFileElementOverride([NotNull] SBP.FileElementOverrideContext context)
+        {
+            m_name = null;
+            m_typedefName = null;
+        }
+
         public override void ExitFileElementOverride([NotNull] SBP.FileElementOverrideContext context)
         {
             var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.Override, m_name);
+            element.AsType = m_typedefName;
             this.TopElement.Childs.Add(element);
         }
 
-        public override void EnterFileElementReference([NotNull] SBP.FileElementReferenceContext context)
+        public override void EnterOverrideReference([NotNull] SBP.OverrideReferenceContext context)
         {
             m_name = context.GetText();
         }

@@ -133,7 +133,7 @@ namespace StepBro.Core.Parser
         public override void EnterFileElement([NotNull] SBP.FileElementContext context)
         {
             m_lastElementPropertyBlock = null;
-            m_fileElementModifier = AccessModifier.Private;    // Default is 'private'.
+            m_fileElementModifier = AccessModifier.Public;    // Default is 'public'.
             m_currentFileElement = null;
 
 #if (PRINT_TREE)
@@ -631,18 +631,21 @@ namespace StepBro.Core.Parser
 
         #endregion
 
-        public override void EnterFileElementReference([NotNull] SBP.FileElementReferenceContext context)
+        public override void EnterOverrideReference([NotNull] SBP.OverrideReferenceContext context)
         {
             m_expressionData.PushStackLevel("ReferenceName");
         }
 
-        public override void ExitFileElementReference([NotNull] SBP.FileElementReferenceContext context)
+        public override void ExitOverrideReference([NotNull] SBP.OverrideReferenceContext context)
         {
             m_fileElementReference = m_expressionData.Peek().Pop();
             m_expressionData.PopStackLevel();
 
             m_currentFileElement.SetName(m_currentNamespace, m_fileElementReference.Value as string);
-            var parent = this.ResolveIfIdentifier(m_fileElementReference, false);
+            var parent = this.ResolveIfIdentifier(
+                m_fileElementReference, 
+                false, 
+                predicate: (IIdentifierInfo id) => (id.Type != IdentifierType.FileElement || !Object.ReferenceEquals(((FileElement)id).ParentFile, m_file)));
             if (!parent.IsResolved)
             {
                 return;
@@ -670,8 +673,9 @@ namespace StepBro.Core.Parser
             {
                 m_file.AddOverrider(m_currentFileElement as FileElementOverride);
             }
+            
             m_currentFileElement.BaseElementName = m_currentFileElement.Name;
-
+            m_currentFileElement.ParseBaseElement();
             if (m_currentFileElement.BaseElement == null) return;
 
             if (m_currentFileElement.BaseElement.ElementType == FileElementType.FileVariable)

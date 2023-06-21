@@ -93,12 +93,16 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public SBExpressionData ResolveIfIdentifier(SBExpressionData input, bool inFunctionScope, TypeReference targetType = null)
+        public SBExpressionData ResolveIfIdentifier(
+            SBExpressionData input, 
+            bool inFunctionScope, 
+            TypeReference targetType = null,
+            Func<IIdentifierInfo, bool> predicate = null)
         {
             if (input.IsUnresolvedIdentifier)
             {
                 string identifier = (string)input.Value;
-                SBExpressionData result = this.ResolveQualifiedIdentifier(identifier, inFunctionScope, true, input.Token);
+                SBExpressionData result = this.ResolveQualifiedIdentifier(identifier, inFunctionScope, true, input.Token, predicate);
                 if (result != null)
                 {
                     // Preserve some of the extra data from input.
@@ -206,7 +210,12 @@ namespace StepBro.Core.Parser
             return procedure;
         }
 
-        private SBExpressionData ResolveQualifiedIdentifier(string identifier, bool inFunctionScope, bool reportUnresolved = false, IToken token = null)
+        private SBExpressionData ResolveQualifiedIdentifier(
+            string identifier, 
+            bool inFunctionScope, 
+            bool reportUnresolved = false, 
+            IToken token = null,
+            Func<IIdentifierInfo, bool> predicate = null)
         {
             if (String.IsNullOrWhiteSpace(identifier)) throw new ArgumentException("Empty identifier string.");
 
@@ -231,11 +240,16 @@ namespace StepBro.Core.Parser
             }
             else
             {
-                return this.ResolveSingleIdentifier(identifier, inFunctionScope, reportUnresolved, token);
+                return this.ResolveSingleIdentifier(identifier, inFunctionScope, reportUnresolved, token, predicate);
             }
         }
 
-        private SBExpressionData ResolveSingleIdentifier(string identifier, bool inFunctionScope, bool reportUnresolved = false, IToken token = null)
+        private SBExpressionData ResolveSingleIdentifier(
+            string identifier, 
+            bool inFunctionScope, 
+            bool reportUnresolved = false, 
+            IToken token = null,
+            Func<IIdentifierInfo, bool> predicate = null)
         {
             IIdentifierInfo foundIdentifier = null;
             if (inFunctionScope)
@@ -261,14 +275,25 @@ namespace StepBro.Core.Parser
             }
             if (m_file != null)
             {
-                var identifiers = m_file.LookupIdentifier(identifier);
+                var identifiers = m_file.LookupIdentifier(identifier, predicate);
                 if (identifiers != null)
                 {
-                    if (identifiers.Count > 1)
+                    //if (identifiers.Count > 1)
+                    //{
+                    //    var selection = SelectOneIdentifier(identifiers);
+                    //    if (selection >= 0)
+                    //    {
+                    //        foundIdentifier = identifiers[selection];
+                    //    }
+                    //    else
+                    //    {
+                    //        throw new ParsingErrorException((token != null) ? token.Line : -1, identifier, "More than one alternative. ");
+                    //    }
+                    //}
+                    //else
                     {
-                        throw new ParsingErrorException((token != null) ? token.Line : -1, identifier, "More than one alternative. ");
+                        foundIdentifier = identifiers[0];       // NOTE: This might not always be the best solution.
                     }
-                    foundIdentifier = identifiers[0];
                 }
                 if (foundIdentifier == null)
                 {
@@ -326,6 +351,21 @@ namespace StepBro.Core.Parser
 
             return null;
         }
+
+        //int SelectOneIdentifier(List<IIdentifierInfo> identifiers)
+        //{
+        //    if (identifiers.All(id => id.Type == IdentifierType.FileElement))
+        //    {
+        //        var fileelements = identifiers.Cast<FileElement>().ToList();
+
+        //        if (fileelements.SkipLast(1).All(fe => fe.ElementType == FileElementType.Override) &&
+        //            fileelements.Last().ElementType == FileElementType.FileVariable)
+        //        {
+        //            return 0;
+        //        }
+        //    }
+        //    return -1;  // No solution yet for the given list.
+        //}
 
         private SBExpressionData ResolveSingleIdentifierType(string identifier, bool reportUnresolved = false, IToken token = null)
         {
@@ -455,8 +495,8 @@ namespace StepBro.Core.Parser
                                     getGlobalVariableTyped,
                                     context,
                                     Expression.Constant((container as IValueContainer).UniqueID)),
-                                identifier);
-                            result.Instance = identifier.Name;
+                                fileVariable,                                                         // Make access to the file element, and thereby the declared type.
+                                instanceName: identifier.Name);
                         }
                         break;
 
@@ -486,11 +526,11 @@ namespace StepBro.Core.Parser
 
                     case FileElementType.Override:
                         {
-                            var overrider = element as IFileElement;
+                            var overrider = element;
 
                             result = new SBExpressionData(
                                 HomeType.Immediate,
-                                SBExpressionType.TestListReference,
+                                SBExpressionType.FileElementOverride,
                                 new TypeReference(typeof(IFileElement), overrider),
                                 null,
                                 overrider);
@@ -570,6 +610,13 @@ namespace StepBro.Core.Parser
                 case SBExpressionType.TestListReference:
                     result = this.ResolveDotIdentifierInstanceReference(left, right, true);
                     break;
+                case SBExpressionType.FileElementOverride:
+                    {
+                        var overrider = left.Value as FileElement;
+                        var rootElement = IdentifierToExpressionData(overrider.GetRootBaseElement(), left.Token);
+                        result = this.ResolveDotIdentifier(rootElement, right);
+                    }
+                    break;
                 case SBExpressionType.TypeReference:
                     result = this.ResolveDotIdentifierTypeReference(left, right);
                     break;
@@ -621,15 +668,15 @@ namespace StepBro.Core.Parser
 
         private SBExpressionData ResolveDotIdentifierGlobalVariableReference(SBExpressionData left, SBExpressionData right)
         {
-            var datatype = left.DataType.Type.GenericTypeArguments[0];
+            var variableDataType = (left.Value as FileVariable).DataType;
             var getValue = Expression.Call(
-                left.ExpressionCode,
+                left.ExpressionCode,        // Code for getting the variable reference
                 left.DataType.Type.GetMethod("GetTypedValue"),
                 Expression.Constant(null, typeof(StepBro.Core.Logging.ILogger)));
             var instance = new SBExpressionData(
                 HomeType.Immediate,
                 SBExpressionType.Expression,
-                (TypeReference)datatype,
+                variableDataType,
                 getValue,
                 left.Value);
             instance.Instance = left.Instance;  // Preserve the instance reference, if it's there.
@@ -739,12 +786,22 @@ namespace StepBro.Core.Parser
                         SBExpressionType.Expression,
                         partnerProcedure.DataType,
                         getPartnerProc,
-                        instance: left.ExpressionCode);     // Reference to the procedure reference
+                        instanceCode: left.ExpressionCode);     // Reference to the procedure reference
                 }
+            }
+
+            var fileIdentifiers = m_file.LookupIdentifier(right.Value as string)?.Where(fe => fe is FileProcedure && CanUseTypeAsInstance(fe as FileProcedure, left.DataType)).ToList();
+            if (fileIdentifiers != null && fileIdentifiers.Count > 0)
+            {
+                var procedureCallReference = ResolveIfIdentifier(right, true);
+                procedureCallReference.InstanceCode = left.ExpressionCode;
+                procedureCallReference.Instance = left.Instance;
+                return procedureCallReference;
             }
 
             foreach (var type in left.DataType.Type.SelfBasesAndInterfaces(includeBaseAndInterfaces, includeBaseAndInterfaces))
             {
+
                 var methods = type.GetMethods().Where(mi => mi.Name == rightString).ToList();
                 methods.AddRange(m_addonManager.ListExtensionMethods(left.DataType.Type, mi => mi.Name == rightString));
                 var properties = type.GetProperties().Where(pi => pi.Name == rightString).ToList();
@@ -824,7 +881,7 @@ namespace StepBro.Core.Parser
                     HomeType.Immediate,
                     SBExpressionType.DynamicObjectMember,
                     value: rightString,                 // Name of method
-                    instance: left.ExpressionCode,      // Instance reference
+                    instanceCode: left.ExpressionCode,      // Instance reference
                     token: right.Token);
             }
             if (typeof(IDynamicAsyncStepBroObject).IsAssignableFrom(left.DataType.Type))
@@ -833,10 +890,16 @@ namespace StepBro.Core.Parser
                     HomeType.Immediate,
                     SBExpressionType.DynamicAsyncObjectMember,
                     value: rightString,                 // Name of method
-                    instance: left.ExpressionCode,      // Instance reference
+                    instanceCode: left.ExpressionCode,      // Instance reference
                     token: right.Token);
             }
             return null;
+        }
+
+        static bool CanUseTypeAsInstance(FileProcedure procedure, TypeReference type)
+        {
+            var parameters = procedure.GetFormalParameters();   // Note: The parameters returned from GetFormalParameters() do not include the context parameter.
+            return procedure.IsFirstParameterThisReference && parameters.Count >= 1 && parameters[0].Type.IsAssignableFrom(type);
         }
     }
 }

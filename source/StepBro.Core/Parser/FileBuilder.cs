@@ -744,6 +744,9 @@ namespace StepBro.Core.Parser
                                 }
                                 break;
                             case FileElementType.FileVariable:
+                                // TODO: Add a temporary file element here, to make all file elements available after the pre-scan (to be able to remove "redundant" UpdateRootIdentifiers calls).
+                                // Add file variable with temporary type and data.
+                                //file.CreateOrGetFileVariable(file.Namespace, accessModifier, element.Name, (TypeReference)default(Type), false, element.Line, 0, 0);
                                 break;
                             case FileElementType.TestList:
                                 {
@@ -759,6 +762,7 @@ namespace StepBro.Core.Parser
                             case FileElementType.Override:
                                 {
                                     var overrider = new FileElementOverride(file, element.Line, null, file.Namespace, element.Name);
+                                    overrider.SetAsType(element.AsType);
                                     file.AddOverrider(overrider);
                                 }
                                 break;
@@ -850,8 +854,10 @@ namespace StepBro.Core.Parser
 
                             try
                             {
+                                file.UpdateRootIdentifiers();
                                 var walker = new ParseTreeWalker();
                                 walker.Walk(listener, context);
+                                file.UpdateRootIdentifiers();
                             }
                             finally { }
                         }
@@ -860,6 +866,7 @@ namespace StepBro.Core.Parser
                             throw new NotImplementedException();
                         }
                     }
+
                     totalErrors += file.Errors.ErrorCount;
                     if (file.Errors.ErrorCount == 0)
                     {

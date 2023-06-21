@@ -109,6 +109,7 @@ namespace StepBro.Core.Data
 
         private readonly string m_namespace;
         private readonly string m_name;
+        private readonly TypeReference m_declaredType;
         private T m_value;
         private readonly bool m_readonly;
         private AccessModifier m_access = AccessModifier.None;
@@ -119,18 +120,19 @@ namespace StepBro.Core.Data
         public event EventHandler ValueChanged;
         public event EventHandler ObjectReplaced;
 
-        public VariableContainer(string @namespace, string name, T value, bool readOnly)
+        public VariableContainer(string @namespace, string name, TypeReference declaredType, T value, bool readOnly)
         {
             m_namespace = @namespace;
             m_name = name;
+            m_declaredType = declaredType;
             m_value = value;
             m_readonly = readOnly;
             m_uniqueID = VariableContainer.GetIdentifier();
         }
 
-        public static IValueContainerOwnerAccess Create(string @namespace, string name, T value, bool readOnly)
+        public static IValueContainerOwnerAccess Create(string @namespace, string name, TypeReference declaredType, T value, bool readOnly)
         {
-            var container = new VariableContainer<T>(@namespace, name, value, readOnly);
+            var container = new VariableContainer<T>(@namespace, name, declaredType, value, readOnly);
             return new OwnerAccessor(container);
         }
 
@@ -150,7 +152,7 @@ namespace StepBro.Core.Data
         {
             get
             {
-                return new TypeReference(typeof(T));
+                return m_declaredType;
             }
         }
 
@@ -309,18 +311,18 @@ namespace StepBro.Core.Data
 
         private static IValueContainerOwnerAccess CreateContainer(string @namespace, string name, TypeReference type, object defaultValue, bool readOnly)
         {
-            if (type.Equals(typeof(bool))) return VariableContainer<Boolean>.Create(@namespace, name, (bool)defaultValue, readOnly);
-            else if (type.Equals(typeof(long))) return VariableContainer<Int64>.Create(@namespace, name, (long)defaultValue, readOnly);
-            else if (type.Equals(typeof(int))) return VariableContainer<Int32>.Create(@namespace, name, (int)defaultValue, readOnly);
-            else if (type.Equals(typeof(double))) return VariableContainer<Double>.Create(@namespace, name, (double)defaultValue, readOnly);
-            else if (type.Equals(typeof(string))) return VariableContainer<String>.Create(@namespace, name, (string)defaultValue, readOnly);
-            else if (type.Equals(typeof(DateTime))) return VariableContainer<DateTime>.Create(@namespace, name, (DateTime)defaultValue, readOnly);
-            else if (type.Equals(typeof(TimeSpan))) return VariableContainer<TimeSpan>.Create(@namespace, name, (TimeSpan)defaultValue, readOnly);
+            if (type.Equals(typeof(bool))) return VariableContainer<Boolean>.Create(@namespace, name, TypeReference.TypeBool, (bool)defaultValue, readOnly);
+            else if (type.Equals(typeof(long))) return VariableContainer<Int64>.Create(@namespace, name, TypeReference.TypeInt64, (long)defaultValue, readOnly);
+            else if (type.Equals(typeof(int))) return VariableContainer<Int32>.Create(@namespace, name, TypeReference.TypeInt32, (int)defaultValue, readOnly);
+            else if (type.Equals(typeof(double))) return VariableContainer<Double>.Create(@namespace, name, TypeReference.TypeDouble, (double)defaultValue, readOnly);
+            else if (type.Equals(typeof(string))) return VariableContainer<String>.Create(@namespace, name, TypeReference.TypeString, (string)defaultValue, readOnly);
+            else if (type.Equals(typeof(DateTime))) return VariableContainer<DateTime>.Create(@namespace, name, TypeReference.TypeDateTime, (DateTime)defaultValue, readOnly);
+            else if (type.Equals(typeof(TimeSpan))) return VariableContainer<TimeSpan>.Create(@namespace, name, TypeReference.TypeTimeSpan, (TimeSpan)defaultValue, readOnly);
             else
             {
                 Type containertype = typeof(VariableContainer<>).MakeGenericType(type.Type);
                 var method = containertype.GetMethod("Create");
-                var result = method.Invoke(null, new object[] { @namespace, name, defaultValue, readOnly }) as IValueContainerOwnerAccess;
+                var result = method.Invoke(null, new object[] { @namespace, name, type, defaultValue, readOnly }) as IValueContainerOwnerAccess;
                 if (result == null) throw new NullReferenceException("Created Container");
                 return result;
             }
