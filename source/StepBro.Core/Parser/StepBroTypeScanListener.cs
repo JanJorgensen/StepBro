@@ -1,4 +1,4 @@
-﻿//#define PRINT_TREE
+﻿#define PRINT_TREE
 
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
@@ -231,13 +231,36 @@ namespace StepBro.Core.Parser
             m_elementStack.Push(element);
         }
 
-        #region TypeDef
+        #region TypeDef and Alias
 
         public override void EnterTypedef([NotNull] SBP.TypedefContext context)
         {
             m_typedefStack.Clear();
             m_typedefStack.Push(new ScannedTypeDescriptor());
             m_typedefName = null;
+        }
+
+        public override void ExitTypedef([NotNull] SBP.TypedefContext context)
+        {
+            var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.TypeDef, m_typedefName.Item1);
+            element.Modifiers = m_modifiers;
+            element.DataType = m_typedefStack.Pop();
+            this.TopElement.Childs.Add(element);
+        }
+
+        public override void EnterTypeAlias([NotNull] SBP.TypeAliasContext context)
+        {
+            m_typedefStack.Clear();
+            m_typedefStack.Push(new ScannedTypeDescriptor());
+            m_typedefName = null;
+        }
+
+        public override void ExitTypeAlias([NotNull] SBP.TypeAliasContext context)
+        {
+            var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.UsingAlias, m_typedefName.Item1);
+            element.Modifiers = m_modifiers;
+            element.DataType = m_typedefStack.Pop();
+            this.TopElement.Childs.Add(element);
         }
 
         public override void ExitTypedefName([NotNull] SBP.TypedefNameContext context)
@@ -249,14 +272,6 @@ namespace StepBro.Core.Parser
         {
             var type = this.PopType("ExitTypeSimple");
             m_typedefStack.Peek().SetTypeName(type.Item1, type.Item2);
-        }
-
-        public override void ExitTypedef([NotNull] SBP.TypedefContext context)
-        {
-            var element = new FileElement(this.TopElement, m_elementStartLine, ScriptData.FileElementType.TypeDef, m_typedefName.Item1);
-            element.Modifiers = m_modifiers;
-            element.DataType = m_typedefStack.Pop();
-            this.TopElement.Childs.Add(element);
         }
 
         public override void EnterTypeParameter([NotNull] SBP.TypeParameterContext context)

@@ -79,7 +79,7 @@ namespace StepBro.Core.Parser
             {
                 if (!m_file.TypeScanIncluded)
                 {
-                    m_file.AddProcedure(m_currentProcedure);
+                    m_file.AddElement(m_currentProcedure);
                 }
                 m_currentProcedure.Compile();   // TODO: Maybe not called here ( and runtime code needs to be added).
             }
@@ -1099,17 +1099,17 @@ namespace StepBro.Core.Parser
             {
                 if (type.Type == typeof(VarSpecifiedType))
                 {
-                    if (m_variables[0].Value.IsError())
+                    if (m_variables[0].Initializer.IsError())
                     {
                         return;     // Just leave; no point in spending more time on this variable.
                     }
-                    else if (m_variables[0].Value.DataType != null)
+                    else if (m_variables[0].Initializer.DataType != null)
                     {
-                        type = m_variables[0].Value.DataType;
+                        type = m_variables[0].Initializer.DataType;
                     }
-                    else if (m_variables[0].Value.ExpressionCode != null)
+                    else if (m_variables[0].Initializer.ExpressionCode != null)
                     {
-                        type = new TypeReference(m_variables[0].Value.ExpressionCode.Type);
+                        type = new TypeReference(m_variables[0].Initializer.ExpressionCode.Type);
                     }
                     else
                     {
@@ -1118,23 +1118,24 @@ namespace StepBro.Core.Parser
                 }
                 foreach (var variable in m_variables)
                 {
-                    if (variable.Value.IsError())
+                    if (variable.Initializer.IsError())
                     {
                         return;
                     }
-                    if (!type.Type.IsAssignableFrom(variable.Value.DataType.Type))
+                    if (!type.IsAssignableFrom(variable.Initializer.DataType))
                     {
-                        throw new NotImplementedException("Variables assignment of incompatible type.");
+                        m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Variable assignment of incompatible type.");
+                        return;
                     }
                     if (m_scopeStack.Peek().StatementCount > 0)
                     {
                         var scope = m_scopeStack.Peek();
                         var v = scope.AddVariable(variable.Name, type, null, EntryModifiers.Private);
-                        scope.AddStatementCode(Expression.Assign(v.VariableExpression, variable.Value.ExpressionCode));
+                        scope.AddStatementCode(Expression.Assign(v.VariableExpression, variable.Initializer.ExpressionCode));
                     }
                     else
                     {
-                        m_scopeStack.Peek().AddVariable(variable.Name, type, variable.Value, EntryModifiers.Private);
+                        m_scopeStack.Peek().AddVariable(variable.Name, type, variable.Initializer, EntryModifiers.Private);
                     }
                 }
             }

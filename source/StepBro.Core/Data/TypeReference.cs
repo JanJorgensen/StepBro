@@ -33,6 +33,12 @@ namespace StepBro.Core.Data
             m_dynamicType = type;
         }
 
+        internal TypeReference(UsingAlias type)
+        {
+            m_type = type.Type.Type;    // Base type of the type definition.
+            m_dynamicType = type;
+        }
+
         public Type Type { get { return m_type; } }
         public object DynamicType { get { return m_dynamicType; } }
 
@@ -69,6 +75,10 @@ namespace StepBro.Core.Data
                 if (object.ReferenceEquals(m_dynamicType, other.m_dynamicType)) return true;
                 return this.IsAssignableFrom((other.m_dynamicType as TypeDef).Type);
             }
+            else if (this.IsUsingAlias())
+            {
+                return m_type.IsAssignableFrom(other.m_type);   // TODO: Is this too simple?
+            }
             else if (m_dynamicType != null)
             {
                 if (other.m_dynamicType == null) return false;
@@ -87,6 +97,11 @@ namespace StepBro.Core.Data
         public bool IsTypedef()
         {
             return (m_dynamicType != null) && (m_dynamicType is TypeDef);
+        }
+
+        public bool IsUsingAlias()
+        {
+            return (m_dynamicType != null) && (m_dynamicType is UsingAlias);
         }
 
         public override int GetHashCode()

@@ -247,7 +247,7 @@ namespace StepBroCoreTest.Parser
         public void TestFileScanTypedefs()
         {
             // Typedef for .net generic type.
-            var result = FileBuilder.TypeScanFile("typedef MyType TheBaseType;");
+            var result = FileBuilder.TypeScanFile("type MyType : TheBaseType;");
             Assert.AreEqual(FET.Namespace, result.TopElement.Type);
             Assert.AreEqual("Angus", result.TopElement.Name);
 
@@ -260,7 +260,7 @@ namespace StepBroCoreTest.Parser
 
 
             // Typedef for .net generic type.
-            result = FileBuilder.TypeScanFile("typedef StringList List<string>;");
+            result = FileBuilder.TypeScanFile("type StringList : List<string>;");
             Assert.AreEqual(FET.Namespace, result.TopElement.Type);
             Assert.AreEqual("Angus", result.TopElement.Name);
 

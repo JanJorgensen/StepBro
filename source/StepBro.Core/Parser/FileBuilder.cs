@@ -397,7 +397,7 @@ namespace StepBro.Core.Parser
             var walker = new ParseTreeWalker();
             walker.Walk(listener, context);
 
-            if (file.Errors.ErrorCount > 0) throw new Exception("PARSING ERRORS: " + file.Errors[0].ToString());
+            if (file.Errors.ErrorCount > 0) throw new ParsingErrorException(file.Errors[0].Line, "PARSING ERROR", file.Errors[0].Message);
 
             //file?.InitializeFileVariables();
             return file;
@@ -739,7 +739,7 @@ namespace StepBro.Core.Parser
                                         HasBody = element.HasBody,
                                         BaseElementName = firstPropFlag,
                                     };
-                                    file.AddProcedure(procedure);
+                                    file.AddElement(procedure);
                                     procedure.CheckForPrototypeChange(element.Parameters, element.ReturnTypeData);
                                 }
                                 break;
@@ -754,7 +754,7 @@ namespace StepBro.Core.Parser
                                     {
                                         BaseElementName = firstPropFlag,
                                     };
-                                    file.AddTestList(testlist);
+                                    file.AddElement(testlist);
                                 }
                                 break;
                             case FileElementType.Datatable:
@@ -763,14 +763,21 @@ namespace StepBro.Core.Parser
                                 {
                                     var overrider = new FileElementOverride(file, element.Line, null, file.Namespace, element.Name);
                                     overrider.SetAsType(element.AsType);
-                                    file.AddOverrider(overrider);
+                                    file.AddElement(overrider);
                                 }
                                 break;
                             case FileElementType.TypeDef:
                                 {
                                     var typedef = new FileElementTypeDef(file, element.Line, file.Namespace, element.Name);
                                     typedef.SetDeclaration(element.DataType);
-                                    file.AddTypedef(typedef);
+                                    file.AddElement(typedef);
+                                }
+                                break;
+                            case FileElementType.UsingAlias:
+                                {
+                                    var typedef = new FileElementUsingAlias(file, element.Line, file.Namespace, element.Name);
+                                    typedef.SetDeclaration(element.DataType);
+                                    file.AddElement(typedef);
                                 }
                                 break;
                             default:

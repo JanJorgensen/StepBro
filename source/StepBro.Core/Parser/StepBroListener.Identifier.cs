@@ -550,6 +550,19 @@ namespace StepBro.Core.Parser
                         }
                         break;
 
+                    case FileElementType.UsingAlias:
+                        {
+                            var aliasType = element as FileElementUsingAlias;
+
+                            result = new SBExpressionData(
+                                HomeType.Immediate,
+                                SBExpressionType.TypeReference,
+                                aliasType.DataType,
+                                null,
+                                aliasType);
+                        }
+                        break;
+
                     default:
                         throw new NotImplementedException();
                 }

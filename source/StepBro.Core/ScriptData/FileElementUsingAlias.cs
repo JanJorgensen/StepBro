@@ -1,16 +1,20 @@
 ﻿using StepBro.Core.Data;
 using StepBro.Core.Parser;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace StepBro.Core.ScriptData
 {
-    internal class FileElementTypeDef : FileElement
+    internal class FileElementUsingAlias : FileElement
     {
         private StepBroTypeScanListener.ScannedTypeDescriptor m_declaration = null;
         private TypeReference m_typeReference = null;
 
-        public FileElementTypeDef(IScriptFile file, int line, string @namespace, string name)
-            : base(file, line, null, @namespace, name, AccessModifier.None, FileElementType.TypeDef)
+        public FileElementUsingAlias(IScriptFile file, int line, string @namespace, string name)
+            : base(file, line, null, @namespace, name, AccessModifier.None, FileElementType.UsingAlias)
         {
         }
 
@@ -18,6 +22,7 @@ namespace StepBro.Core.ScriptData
         {
             m_declaration = declaration;
         }
+
 
         protected override TypeReference GetDataType()
         {
@@ -31,7 +36,7 @@ namespace StepBro.Core.ScriptData
                 var numUnresolved = listener.ParseTypedef(m_declaration, reportErrors: reportErrors, token: m_declaration.Token);
                 if (numUnresolved == 0 && m_declaration.ResolvedType != null)
                 {
-                    m_typeReference = new TypeReference(new TypeDef(this.Name, m_declaration.ResolvedType));
+                    m_typeReference = new TypeReference(new UsingAlias(this.Name, m_declaration.ResolvedType));
                 }
                 return numUnresolved;
             }

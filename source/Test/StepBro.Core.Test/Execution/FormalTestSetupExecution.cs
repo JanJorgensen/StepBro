@@ -90,7 +90,7 @@ namespace StepBroCoreTest.Execution
             f.AppendLine("   while (iterator.GetNext())");
             f.AppendLine("   {");
             f.AppendLine("      log (\"Starting Test: \" + iterator.Procedure.Name);");
-            f.AppendLine("      TestCase testcase = iterator.Procedure;");
+            f.AppendLine("      TestCase testcase = iterator.Procedure as TestCase;");
             f.AppendLine("      testcase.Setup();");
             f.AppendLine("      iterator.Procedure( iterator.Arguments );");
             f.AppendLine("      testcase.Cleanup();");
@@ -281,7 +281,7 @@ namespace StepBroCoreTest.Execution
             f.AppendLine("   while (iterator.GetNext())");
             f.AppendLine("   {");
             f.AppendLine("      log (\"Starting Test: \" + iterator.Procedure.Name);");
-            f.AppendLine("      TestCaseBase testcase = iterator.Procedure;");
+            f.AppendLine("      TestCaseBase testcase = iterator.Procedure as TestCaseBase;");
             f.AppendLine("      testcase.Setup();");
             f.AppendLine("      iterator.Procedure( iterator.Arguments );");
             f.AppendLine("      this.AddPartResult(iterator.Procedure, this.LastCallResult);");
@@ -769,7 +769,7 @@ namespace StepBroCoreTest.Execution
             f.AppendLine("       while (iterator.GetNext())");
             f.AppendLine("       {");
             f.AppendLine("           log (\"Starting Test: \" + iterator.Procedure.Name);");
-            f.AppendLine("           TestCase testcase = iterator.Procedure;");
+            f.AppendLine("           TestCase testcase = iterator.Procedure as TestCase;");
             f.AppendLine("           testcase.Setup();");
             f.AppendLine("           iterator.Procedure( iterator.Arguments );");
             f.AppendLine("           testcase.Cleanup();");

@@ -530,29 +530,9 @@ namespace StepBro.Core.ScriptData
             m_fileScopeVariablesBefore = null;
         }
 
-        internal void AddProcedure(FileProcedure function)
+        internal void AddElement(FileElement function)
         {
             m_elements.Add(function);
-        }
-
-        internal void AddTestList(FileTestList list)
-        {
-            m_elements.Add(list);
-        }
-
-        internal void AddDatatable(FileDatatable table)
-        {
-            m_elements.Add(table);
-        }
-
-        internal void AddOverrider(FileElementOverride overrider)
-        {
-            m_elements.Add(overrider);
-        }
-
-        internal void AddTypedef(FileElementTypeDef def)
-        {
-            m_elements.Add(def);
         }
 
         public IEnumerable<IFileElement> ListElements()

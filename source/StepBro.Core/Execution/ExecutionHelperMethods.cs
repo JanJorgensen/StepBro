@@ -696,12 +696,40 @@ namespace StepBro.Core.Execution
             }
         }
 
-        public static bool ProcedureReferenceIs(IScriptCallContext context, IProcedureReference procedure, int fileID, int procedureID, bool isNot)
+        public static TProcedure ProcedureReferenceAs<TProcedure>(
+            IScriptCallContext context, 
+            IProcedureReference procedure, 
+            int targetFileID, 
+            int targetProcedureID) where TProcedure : class, IProcedureReference
+        {
+            var type = GetProcedure(context, targetFileID, targetProcedureID);
+            if (type != null)
+            {
+                var targetType = type.ProcedureData.DataType;
+                if (((FileProcedure)procedure.ProcedureData).IsA(type.ProcedureData))
+                {
+                    return (TProcedure)procedure;
+                }
+            }
+            else
+            {
+                context.ReportError("Target procedure type was not found.");
+            }
+            return null;
+        }
+
+        public static bool ProcedureReferenceIs(
+            IScriptCallContext context, 
+            IProcedureReference procedure, 
+            int fileID, 
+            int procedureID, 
+            bool isNot)
         {
             var type = GetProcedure(context, fileID, procedureID);
             if (Object.ReferenceEquals(procedure, type)) return !isNot;
             return false;
         }
+
 
         public static bool ObjectIsType(Type type, object obj, bool isNot)
         {

@@ -116,6 +116,13 @@ namespace StepBro.Core.ScriptData
             return (FileElement)((m_baseElement != null) ? m_baseElement : this);
         }
 
+        public bool IsA(IFileElement elementType)
+        {
+            if (Object.ReferenceEquals(this, elementType)) return true;
+            if (m_baseElement == null) return false;
+            return ((FileElement)m_baseElement).IsA(elementType);
+        }
+
         public IFileElement ParentElement
         {
             get
