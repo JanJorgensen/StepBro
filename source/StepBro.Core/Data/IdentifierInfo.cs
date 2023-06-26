@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StepBro.Core.ScriptData;
+using System;
 
 namespace StepBro.Core.Data
 {
@@ -82,6 +83,19 @@ namespace StepBro.Core.Data
         public override string ToString()
         {
             return this.Type.ToString() + " " + this.DataType.ToString();
+        }
+    }
+
+    public static class IdentifierInfoHelpers
+    {
+        public static bool IsFileElement(this IIdentifierInfo identifier)
+        {
+            return (identifier.Type == IdentifierType.FileElement);
+        }
+        public static bool IsLocalFileElement(this IIdentifierInfo identifier, IScriptFile file)
+        {
+            if (!(identifier is FileElement)) throw new ArgumentException("The identifier is not a file element.");
+            return Object.ReferenceEquals((identifier as FileElement).ParentFile, file);
         }
     }
 }

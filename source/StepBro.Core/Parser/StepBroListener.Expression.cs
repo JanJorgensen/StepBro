@@ -17,6 +17,7 @@ namespace StepBro.Core.Parser
         private static MethodInfo s_AwaitAsyncToTyped = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.AwaitAsyncToTyped));
         private static MethodInfo s_AwaitObjectToTyped = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.AwaitObjectToTyped));
         private static MethodInfo s_ProcedureReferenceIs = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ProcedureReferenceIs));
+        private static MethodInfo s_ProcedureReferenceAs = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ProcedureReferenceAs));
         private static MethodInfo s_ObjectIsType = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ObjectIsType));
 
         private ExpressionStack m_expressionData = new ExpressionStack();
@@ -160,6 +161,47 @@ namespace StepBro.Core.Parser
             //}
         }
 
+        public override void ExitExpCastAs([NotNull] SBP.ExpCastAsContext context)
+        {
+            var exp = this.ResolveForGetOperation(m_expressionData.Pop());
+            var type = m_typeStack.Pop();
+            if (type.HasProcedureReference)
+            {
+                var caster = s_ProcedureReferenceAs.MakeGenericMethod(type.Type);
+
+                var call = Expression.Call(
+                    caster,
+                    m_currentProcedure?.ContextReferenceInternal,
+                    Expression.Convert(exp.ExpressionCode, typeof(IProcedureReference)),
+                    Expression.Constant((type.DynamicType as IFileProcedure).ParentFile.UniqueID),
+                    Expression.Constant((type.DynamicType as IFileProcedure).UniqueID));
+                m_expressionData.Push(
+                    new SBExpressionData(
+                        HomeType.Immediate,
+                        SBExpressionType.Expression,
+                        type,
+                        call));
+            }
+            else if (type.DynamicType != null)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                var call = Expression.Call(
+                    s_ObjectIsType,
+                    Expression.Constant(type.Type, typeof(Type)),
+                    Expression.Convert(exp.ExpressionCode, typeof(object)),
+                    Expression.Constant(context.ChildCount == 4));
+                m_expressionData.Push(
+                    new SBExpressionData(
+                        HomeType.Immediate,
+                        SBExpressionType.Expression,
+                        TypeReference.TypeBool,
+                        call));
+            }
+        }
+
         public override void ExitExpIsType([NotNull] SBP.ExpIsTypeContext context)
         {
             var exp = this.ResolveForGetOperation(m_expressionData.Pop());
@@ -283,7 +325,11 @@ namespace StepBro.Core.Parser
                 var isContainer = typeof(IValueContainer).IsAssignableFrom(expression.Type);
                 if (isContainer && (targetType == null || !targetType.Type.IsAssignableFrom(typeof(IValueContainer))))
                 {
-                    var datatype = expression.Type.GenericTypeArguments[0];
+                    var datatype = (TypeReference)expression.Type.GenericTypeArguments[0];
+                    if (result.Value != null && result.Value is FileVariable)
+                    {
+                        datatype = ((FileVariable)result.Value).DataType;    // Get the declared type of the variable.
+                    }
                     var getValue = Expression.Call(
                         expression,
                         expression.Type.GetMethod("GetTypedValue"),
@@ -291,8 +337,9 @@ namespace StepBro.Core.Parser
                     result = new SBExpressionData(
                         HomeType.Immediate,
                         SBExpressionType.Expression,
-                        (TypeReference)datatype,
-                        getValue);
+                        datatype,
+                        getValue);//,
+                        //result.Value /* E.g. the variable reference */ );
                 }
                 return result;
             }

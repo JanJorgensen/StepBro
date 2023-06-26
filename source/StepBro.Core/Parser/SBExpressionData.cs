@@ -30,6 +30,7 @@ namespace StepBro.Core.Parser
         ProcedurePropertyReference,
         ProcedureCustomPropertyReference,
         TestListReference,
+        FileElementOverride,
         DatatableReference,
         AwaitExpression,
         DynamicObjectMember,
@@ -64,60 +65,62 @@ namespace StepBro.Core.Parser
             object value = null,
             string argument = null,
             string parameterName = null,
-            Expression instance = null,
+            string instanceName = null,
+            Expression instanceCode = null,
             bool automaticTypeConvert = false,
             Antlr4.Runtime.IToken token = null)
         {
             System.Diagnostics.Debug.Assert(type == null || !type.Type.IsGenericTypeDefinition);
             System.Diagnostics.Debug.Assert(type == null || !type.Type.IsGenericParameter);
             System.Diagnostics.Debug.Assert(value == null || !(value is IFileProcedure));
-            Home = home;
-            ReferencedType = referencedtype;
-            DataType = type ?? (code != null ? (TypeReference)(code.Type) : null);
-            ExpressionCode = code;
-            m_value = value;
-            Argument = argument;
-            ParameterName = parameterName;
-            InstanceCode = instance;
-            SuggestsAutomaticTypeConversion = automaticTypeConvert;
-            Token = token;
+            this.Home = home;
+            this.ReferencedType = referencedtype;
+            this.DataType = type ?? (code != null ? (TypeReference)(code.Type) : null);
+            this.ExpressionCode = code;
+            this.m_value = value;
+            this.Argument = argument;
+            this.ParameterName = parameterName;
+            this.Instance = instanceName;
+            this.InstanceCode = instanceCode;
+            this.SuggestsAutomaticTypeConversion = automaticTypeConvert;
+            this.Token = token;
         }
 
         public SBExpressionData(SBExpressionType type, string message, string value, Antlr4.Runtime.IToken token = null)
         {
-            Home = HomeType.Immediate;
-            ReferencedType = type;
-            DataType = null;
-            ExpressionCode = null;
-            m_value = value;
-            Argument = message;
-            ParameterName = null;
-            Token = token;
+            this.Home = HomeType.Immediate;
+            this.ReferencedType = type;
+            this.DataType = null;
+            this.ExpressionCode = null;
+            this.m_value = value;
+            this.Argument = message;
+            this.ParameterName = null;
+            this.Token = token;
         }
 
         public SBExpressionData(object value, Antlr4.Runtime.IToken token = null)
         {
             if (value == null) throw new ArgumentNullException();
-            Home = HomeType.Immediate;
-            ReferencedType = SBExpressionType.Constant;
-            DataType = (TypeReference)(value.GetType());
-            ExpressionCode = Expression.Constant(value);
-            m_value = value;
-            Argument = null;
-            ParameterName = null;
-            Token = token;
+            this.Home = HomeType.Immediate;
+            this.ReferencedType = SBExpressionType.Constant;
+            this.DataType = (TypeReference)(value.GetType());
+            this.ExpressionCode = Expression.Constant(value);
+            this.m_value = value;
+            this.Argument = null;
+            this.ParameterName = null;
+            this.Token = token;
         }
 
         public SBExpressionData(TypeReference type, object value, Antlr4.Runtime.IToken token = null)
         {
-            Home = HomeType.Immediate;
-            ReferencedType = SBExpressionType.Constant;
-            DataType = type;
-            ExpressionCode = Expression.Constant(value, type.Type);
-            m_value = value;
-            Argument = null;
-            ParameterName = null;
-            Token = token;
+            this.Home = HomeType.Immediate;
+            this.ReferencedType = SBExpressionType.Constant;
+            this.DataType = type;
+            this.ExpressionCode = Expression.Constant(value, type.Type);
+            this.m_value = value;
+            this.Argument = null;
+            this.ParameterName = null;
+            this.Token = token;
         }
         public static SBExpressionData Constant(TypeReference type, object value, Antlr4.Runtime.IToken token = null)
         {
@@ -140,40 +143,40 @@ namespace StepBro.Core.Parser
         public SBExpressionData(Expression expression, SBExpressionType type)
         {
             if (expression == null) throw new ArgumentNullException();
-            Home = HomeType.Immediate;
-            ReferencedType = type;
-            DataType = (TypeReference)expression.Type;
-            ExpressionCode = expression;
-            m_value = null;
-            Argument = null;
-            ParameterName = null;
+            this.Home = HomeType.Immediate;
+            this.ReferencedType = type;
+            this.DataType = (TypeReference)expression.Type;
+            this.ExpressionCode = expression;
+            this.m_value = null;
+            this.Argument = null;
+            this.ParameterName = null;
         }
 
         public SBExpressionData(SBExpressionType type)
         {
-            Home = HomeType.Immediate;
-            ReferencedType = type;
-            DataType = null;
-            ExpressionCode = null;
-            m_value = null;
-            Argument = null;
-            ParameterName = null;
+            this.Home = HomeType.Immediate;
+            this.ReferencedType = type;
+            this.DataType = null;
+            this.ExpressionCode = null;
+            this.m_value = null;
+            this.Argument = null;
+            this.ParameterName = null;
         }
 
         public SBExpressionData(Expression instance, List<MethodInfo> methods)
         {
             //System.Diagnostics.Debug.Assert(type == null || !type.IsGenericTypeDefinition);
             //System.Diagnostics.Debug.Assert(type == null || !type.IsGenericParameter);
-            Home = HomeType.Immediate;
-            ReferencedType = SBExpressionType.MethodReference;
+            this.Home = HomeType.Immediate;
+            this.ReferencedType = SBExpressionType.MethodReference;
             if (methods.Count == 1 && !methods[0].IsGenericMethodDefinition)
             {
-                DataType = null;
+                this.DataType = null;
             }
-            ExpressionCode = instance;
-            m_value = methods;
-            Argument = null;
-            ParameterName = null;
+            this.ExpressionCode = instance;
+            this.m_value = methods;
+            this.Argument = null;
+            this.ParameterName = null;
         }
 
         public SBExpressionData NewExpressionCode(Expression exp)
@@ -191,6 +194,7 @@ namespace StepBro.Core.Parser
                 value,
                 Argument,
                 ParameterName,
+                null,
                 InstanceCode,
                 SuggestsAutomaticTypeConversion,
                 Token)
@@ -202,7 +206,7 @@ namespace StepBro.Core.Parser
             get { return m_value; }
             set
             {
-                m_value = value;
+                this.m_value = value;
             }
         }
 
@@ -268,6 +272,7 @@ namespace StepBro.Core.Parser
                     case SBExpressionType.MethodReference:
                     case SBExpressionType.ProcedureReference:
                     case SBExpressionType.TestListReference:
+                    case SBExpressionType.FileElementOverride:
                     case SBExpressionType.DatatableReference:
                     case SBExpressionType.OperationError:
                         return false;
@@ -328,13 +333,13 @@ namespace StepBro.Core.Parser
                 case SBExpressionType.Namespace:
                     break;
                 case SBExpressionType.Constant:
-                    m_value = NarrowTypeByCasting(Value);
+                    this.m_value = NarrowTypeByCasting(Value);
                     if (m_value != null)
                     {
                         t = (TypeReference)m_value.GetType();
                     }
-                    DataType = t;
-                    ExpressionCode = Expression.Constant(m_value, t.Type);
+                    this.DataType = t;
+                    this.ExpressionCode = Expression.Constant(m_value, t.Type);
                     break;
 
                 case SBExpressionType.Identifier:
@@ -343,10 +348,10 @@ namespace StepBro.Core.Parser
                 case SBExpressionType.LocalVariableReference:
                 case SBExpressionType.PropertyReference:
                 case SBExpressionType.Indexing:
-                    ExpressionCode = NarrowGetValueTypeByConverting(ExpressionCode, t.Type);
+                    this.ExpressionCode = NarrowGetValueTypeByConverting(ExpressionCode, t.Type);
                     if (ExpressionCode != null)
                     {
-                        DataType = new TypeReference(ExpressionCode.Type);
+                        this.DataType = new TypeReference(ExpressionCode.Type);
                     }
                     break;
                 case SBExpressionType.GlobalVariableReference:
@@ -415,17 +420,17 @@ namespace StepBro.Core.Parser
                 case SBExpressionType.Namespace:
                     break;
                 case SBExpressionType.Constant:
-                    m_value = System.Convert.ToInt64(Value);
-                    ExpressionCode = Expression.Constant((Int64)Value);
-                    DataType = (TypeReference)typeof(Int64);
+                    this.m_value = System.Convert.ToInt64(Value);
+                    this.ExpressionCode = Expression.Constant((Int64)Value);
+                    this.DataType = (TypeReference)typeof(Int64);
                     break;
                 case SBExpressionType.Identifier:
                     break;
                 case SBExpressionType.Expression:
                 case SBExpressionType.LocalVariableReference:
                 case SBExpressionType.PropertyReference:
-                    ExpressionCode = Expression.Convert(ExpressionCode, typeof(Int64));
-                    DataType = (TypeReference)typeof(Int64);
+                    this.ExpressionCode = Expression.Convert(ExpressionCode, typeof(Int64));
+                    this.DataType = (TypeReference)typeof(Int64);
                     break;
                 case SBExpressionType.GlobalVariableReference:
                     break;
@@ -450,18 +455,18 @@ namespace StepBro.Core.Parser
                 case SBExpressionType.Namespace:
                     break;
                 case SBExpressionType.Constant:
-                    m_value = System.Convert.ToDouble(Value);
-                    ExpressionCode = Expression.Constant((Double)m_value);
-                    DataType = (TypeReference)typeof(Double);
+                    this.m_value = System.Convert.ToDouble(Value);
+                    this.ExpressionCode = Expression.Constant((Double)m_value);
+                    this.DataType = (TypeReference)typeof(Double);
                     break;
                 case SBExpressionType.Identifier:
                     break;
                 case SBExpressionType.Expression:
                 case SBExpressionType.LocalVariableReference:
                 case SBExpressionType.PropertyReference:
-                    ExpressionCode = Expression.Convert(ExpressionCode, typeof(double));
+                    this.ExpressionCode = Expression.Convert(ExpressionCode, typeof(double));
                     //this.ExpressionCode = Expression.Call(typeof(System.Convert).GetMethod("ToDouble", new Type[] { this.DataType }), this.ExpressionCode);
-                    DataType = (TypeReference)typeof(Double);
+                    this.DataType = (TypeReference)typeof(Double);
                     break;
                 case SBExpressionType.GlobalVariableReference:
                     break;

@@ -9,15 +9,28 @@ namespace StepBro.Core.Parser
 {
     internal partial class StepBroListener
     {
+        private struct VariableData
+        {
+            public string Name;
+            public TypeReference Type;
+            public SBExpressionData Initializer;
+
+            public VariableData(string name, TypeReference type, SBExpressionData initializer)
+            {
+                this.Name = name;
+                this.Type = type;
+                this.Initializer = initializer;
+            }
+        }
         private VariableModifier m_variableModifier = VariableModifier.None;
         private TypeReference m_variableType;
         private string m_variableName = "";
         private SBExpressionData m_variableInitializer = null;
-        private List<NamedData<SBExpressionData>> m_variables;
+        private List<VariableData> m_variables;
 
         public void CreateVariablesList()
         {
-            m_variables = new List<NamedData<SBExpressionData>>();
+            m_variables = new List<VariableData>();
         }
 
         public override void EnterVariableModifier([NotNull] SBP.VariableModifierContext context)
@@ -143,8 +156,9 @@ namespace StepBro.Core.Parser
                     }
                 }
                 m_variables.Add(
-                    new NamedData<SBExpressionData>(
+                    new VariableData(
                         m_variableName,
+                        m_variableType,
                         m_variableInitializer));
                 m_variableName = null;
                 m_variableInitializer = null;

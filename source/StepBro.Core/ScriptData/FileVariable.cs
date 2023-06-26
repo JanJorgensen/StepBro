@@ -8,6 +8,8 @@ namespace StepBro.Core.ScriptData
     {
         private readonly IValueContainerOwnerAccess m_variableAccess;
         private readonly int m_id;
+        private TypeReference m_declaredType = null;
+
         public FileVariable(
             IScriptFile file,
             AccessModifier access,
@@ -15,9 +17,11 @@ namespace StepBro.Core.ScriptData
             IFileElement parentElement,
             string @namespace,
             string name,
+            TypeReference type,
             IValueContainerOwnerAccess variableAccess, int id) :
                 base(file, line, parentElement, @namespace, name, access, FileElementType.FileVariable)
         {
+            m_declaredType = type;
             m_variableAccess = variableAccess;
             m_id = id;
         }
@@ -32,30 +36,34 @@ namespace StepBro.Core.ScriptData
             VariableContainerAction creator,
             VariableContainerAction initializer)
         {
-            var vcOwnerAccess = VariableContainer.Create(@namespace, name, type, readOnly);
-            System.Diagnostics.Debug.WriteLine($"Creating variable \"{name}\" (in {file.FileName}), with ID {vcOwnerAccess.Container.UniqueID}");
-            vcOwnerAccess.FileLine = line;
-            vcOwnerAccess.FileColumn = column;
-            vcOwnerAccess.CodeHash = codeHash;
-            vcOwnerAccess.Tags = new Dictionary<string, Object>();
-            if (resetter != null)
+            IValueContainerOwnerAccess vcOwnerAccess = null;
+            if (type.Type != null)
             {
-                vcOwnerAccess.DataResetter = resetter;
+                vcOwnerAccess = VariableContainer.Create(@namespace, name, type, readOnly);
+                System.Diagnostics.Debug.WriteLine($"Creating variable \"{name}\" (in {file.FileName}), with ID {vcOwnerAccess.Container.UniqueID}");
+                vcOwnerAccess.FileLine = line;
+                vcOwnerAccess.FileColumn = column;
+                vcOwnerAccess.CodeHash = codeHash;
+                vcOwnerAccess.Tags = new Dictionary<string, Object>();
+                if (resetter != null)
+                {
+                    vcOwnerAccess.DataResetter = resetter;
+                }
+                if (creator != null)
+                {
+                    vcOwnerAccess.DataCreator = creator;
+                }
+                if (initializer != null)
+                {
+                    vcOwnerAccess.DataInitializer = initializer;
+                }
             }
-            if (creator != null)
-            {
-                vcOwnerAccess.DataCreator = creator;
-            }
-            if (initializer != null)
-            {
-                vcOwnerAccess.DataInitializer = initializer;
-            }
-            return new FileVariable(file, access, line, null, @namespace, name, vcOwnerAccess, vcOwnerAccess.Container.UniqueID);
+            return new FileVariable(file, access, line, null, @namespace, name, type, vcOwnerAccess, (vcOwnerAccess != null) ? vcOwnerAccess.Container.UniqueID : 0);
         }
 
         protected override TypeReference GetDataType()
         {
-            throw new System.NotImplementedException();
+            return m_declaredType;
         }
     }
 }

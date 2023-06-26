@@ -33,7 +33,6 @@ namespace StepBro.Process
         private LogLineData m_firstProcessOutputLine = null;
         private LogLineData m_lastProcessOutputLine = null;
         private bool m_hasErrorOutput = false;
-        StepBro.Core.Execution.ICallContext m_outputLogger = null;
 
         public event EventHandler CurrentStateChanged;
 

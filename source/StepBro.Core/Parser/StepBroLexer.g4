@@ -105,7 +105,7 @@ TIMEOUT : 'timeout' ;
 TIMESPAN : 'timespan' ;
 THROW : 'throw' ;
 TRUE : 'true' ;
-TYPEDEF : 'typedef' ;
+TYPEDEF : 'type' ;
 TYPEOF : 'typeof' ;
 UNSET : 'unset' ;
 USING : 'using' ;

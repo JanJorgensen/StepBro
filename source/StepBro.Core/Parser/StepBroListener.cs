@@ -1,4 +1,4 @@
-﻿//#define PRINT_TREE
+﻿#define PRINT_TREE
 
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
@@ -83,12 +83,12 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public override void EnterUsingDeclarationWithIdentifierAlias([NotNull] SBP.UsingDeclarationWithIdentifierAliasContext context)
+        public override void EnterTypeAlias([NotNull] SBP.TypeAliasContext context)
         {
             m_expressionData.PushStackLevel("Using identifier alias");
         }
 
-        public override void ExitUsingDeclarationWithIdentifierAlias([NotNull] SBP.UsingDeclarationWithIdentifierAliasContext context)
+        public override void ExitTypeAlias([NotNull] SBP.TypeAliasContext context)
         {
             var stack = m_expressionData.PopStackLevel();
             if (!m_file.TypeScanIncluded)
@@ -133,7 +133,7 @@ namespace StepBro.Core.Parser
         public override void EnterFileElement([NotNull] SBP.FileElementContext context)
         {
             m_lastElementPropertyBlock = null;
-            m_fileElementModifier = AccessModifier.Private;    // Default is 'private'.
+            m_fileElementModifier = AccessModifier.Public;    // Default is 'public'.
             m_currentFileElement = null;
 
 #if (PRINT_TREE)
@@ -203,17 +203,17 @@ namespace StepBro.Core.Parser
             var variable = m_variables[0];
             if (type == (TypeReference)typeof(VarSpecifiedType))
             {
-                type = variable.Value.DataType;
+                type = variable.Type;
             }
-            if (!type.Type.IsAssignableFrom(variable.Value.DataType.Type))
+            if (!type.Type.IsAssignableFrom(variable.Initializer.DataType.Type))
             {
-                throw new NotImplementedException("Variables assignment of incompatible type.");
+                throw new NotImplementedException("Variable assignment of incompatible type.");
             }
             var codeHash = context.GetText().GetHashCode();
             var id = m_file.CreateOrGetFileVariable(
                 m_currentNamespace, m_fileElementModifier, variable.Name, type, false,
                 context.Start.Line, context.Start.Column, codeHash,
-                CreateVariableContainerValueAssignAction(variable.Value.ExpressionCode));
+                CreateVariableContainerValueAssignAction(variable.Initializer.ExpressionCode));
             m_file.SetFileVariableModifier(id, m_fileElementModifier);
         }
 
@@ -569,7 +569,7 @@ namespace StepBro.Core.Parser
             }
             else
             {
-                m_file.AddTestList(m_currentTestList);
+                m_file.AddElement(m_currentTestList);
             }
             m_currentFileElement = m_currentTestList;
         }
@@ -631,18 +631,21 @@ namespace StepBro.Core.Parser
 
         #endregion
 
-        public override void EnterFileElementReference([NotNull] SBP.FileElementReferenceContext context)
+        public override void EnterOverrideReference([NotNull] SBP.OverrideReferenceContext context)
         {
             m_expressionData.PushStackLevel("ReferenceName");
         }
 
-        public override void ExitFileElementReference([NotNull] SBP.FileElementReferenceContext context)
+        public override void ExitOverrideReference([NotNull] SBP.OverrideReferenceContext context)
         {
             m_fileElementReference = m_expressionData.Peek().Pop();
             m_expressionData.PopStackLevel();
 
             m_currentFileElement.SetName(m_currentNamespace, m_fileElementReference.Value as string);
-            var parent = this.ResolveIfIdentifier(m_fileElementReference, false);
+            var parent = this.ResolveIfIdentifier(
+                m_fileElementReference, 
+                false, 
+                predicate: (IIdentifierInfo id) => (id.Type != IdentifierType.FileElement || !Object.ReferenceEquals(((FileElement)id).ParentFile, m_file)));
             if (!parent.IsResolved)
             {
                 return;
@@ -668,10 +671,11 @@ namespace StepBro.Core.Parser
             }
             else
             {
-                m_file.AddOverrider(m_currentFileElement as FileElementOverride);
+                m_file.AddElement(m_currentFileElement as FileElementOverride);
             }
+            
             m_currentFileElement.BaseElementName = m_currentFileElement.Name;
-
+            m_currentFileElement.ParseBaseElement();
             if (m_currentFileElement.BaseElement == null) return;
 
             if (m_currentFileElement.BaseElement.ElementType == FileElementType.FileVariable)

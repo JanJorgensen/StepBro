@@ -22,6 +22,10 @@ namespace StepBro.Core.ScriptData
         /// <summary>
         /// A 'type definition' that defines a named type from another data type.
         /// </summary>
-        TypeDef
+        TypeDef,
+        /// <summary>
+        /// An alias definition that defines an alias for a data type.
+        /// </summary>
+        UsingAlias
     }
 }

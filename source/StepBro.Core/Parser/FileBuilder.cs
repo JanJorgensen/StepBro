@@ -397,7 +397,7 @@ namespace StepBro.Core.Parser
             var walker = new ParseTreeWalker();
             walker.Walk(listener, context);
 
-            if (file.Errors.ErrorCount > 0) throw new Exception("PARSING ERRORS: " + file.Errors[0].ToString());
+            if (file.Errors.ErrorCount > 0) throw new ParsingErrorException(file.Errors[0].Line, "PARSING ERROR", file.Errors[0].Message);
 
             //file?.InitializeFileVariables();
             return file;
@@ -739,11 +739,14 @@ namespace StepBro.Core.Parser
                                         HasBody = element.HasBody,
                                         BaseElementName = firstPropFlag,
                                     };
-                                    file.AddProcedure(procedure);
+                                    file.AddElement(procedure);
                                     procedure.CheckForPrototypeChange(element.Parameters, element.ReturnTypeData);
                                 }
                                 break;
                             case FileElementType.FileVariable:
+                                // TODO: Add a temporary file element here, to make all file elements available after the pre-scan (to be able to remove "redundant" UpdateRootIdentifiers calls).
+                                // Add file variable with temporary type and data.
+                                //file.CreateOrGetFileVariable(file.Namespace, accessModifier, element.Name, (TypeReference)default(Type), false, element.Line, 0, 0);
                                 break;
                             case FileElementType.TestList:
                                 {
@@ -751,7 +754,7 @@ namespace StepBro.Core.Parser
                                     {
                                         BaseElementName = firstPropFlag,
                                     };
-                                    file.AddTestList(testlist);
+                                    file.AddElement(testlist);
                                 }
                                 break;
                             case FileElementType.Datatable:
@@ -759,14 +762,22 @@ namespace StepBro.Core.Parser
                             case FileElementType.Override:
                                 {
                                     var overrider = new FileElementOverride(file, element.Line, null, file.Namespace, element.Name);
-                                    file.AddOverrider(overrider);
+                                    overrider.SetAsType(element.AsType);
+                                    file.AddElement(overrider);
                                 }
                                 break;
                             case FileElementType.TypeDef:
                                 {
                                     var typedef = new FileElementTypeDef(file, element.Line, file.Namespace, element.Name);
                                     typedef.SetDeclaration(element.DataType);
-                                    file.AddTypedef(typedef);
+                                    file.AddElement(typedef);
+                                }
+                                break;
+                            case FileElementType.UsingAlias:
+                                {
+                                    var typedef = new FileElementUsingAlias(file, element.Line, file.Namespace, element.Name);
+                                    typedef.SetDeclaration(element.DataType);
+                                    file.AddElement(typedef);
                                 }
                                 break;
                             default:
@@ -850,8 +861,10 @@ namespace StepBro.Core.Parser
 
                             try
                             {
+                                file.UpdateRootIdentifiers();
                                 var walker = new ParseTreeWalker();
                                 walker.Walk(listener, context);
+                                file.UpdateRootIdentifiers();
                             }
                             finally { }
                         }
@@ -860,6 +873,7 @@ namespace StepBro.Core.Parser
                             throw new NotImplementedException();
                         }
                     }
+
                     totalErrors += file.Errors.ErrorCount;
                     if (file.Errors.ErrorCount == 0)
                     {

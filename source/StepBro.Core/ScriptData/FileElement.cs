@@ -73,7 +73,17 @@ namespace StepBro.Core.ScriptData
 
         public string FullName { get { return m_elementFullName; } }
 
-        public AccessModifier AccessLevel { get { return m_accessModifier; } internal set { m_accessModifier = value; } }
+        public AccessModifier AccessLevel
+        {
+            get
+            {
+                return m_accessModifier;
+            }
+            internal set
+            {
+                m_accessModifier = value;
+            }
+        }
 
         internal string BaseElementName
         {
@@ -87,7 +97,30 @@ namespace StepBro.Core.ScriptData
             {
                 return m_baseElement;
             }
-            internal set { m_baseElement = value; }
+            internal set
+            {
+                // Assume not the same element.
+                System.Diagnostics.Debug.Assert(value != null && !object.ReferenceEquals(value, this));
+                // Assume not both override elements or elements are from different files.
+                System.Diagnostics.Debug.Assert(this.ElementType != FileElementType.Override || value.ElementType != FileElementType.Override || !Object.ReferenceEquals(m_parentFile, value.ParentFile));
+                m_baseElement = value;
+            }
+        }
+
+        public FileElement GetRootBaseElement()
+        {
+            if (m_baseElement != null && m_elementType == FileElementType.Override)
+            {
+                return ((FileElement)m_baseElement).GetRootBaseElement();
+            }
+            return (FileElement)((m_baseElement != null) ? m_baseElement : this);
+        }
+
+        public bool IsA(IFileElement elementType)
+        {
+            if (Object.ReferenceEquals(this, elementType)) return true;
+            if (m_baseElement == null) return false;
+            return ((FileElement)m_baseElement).IsA(elementType);
         }
 
         public IFileElement ParentElement
@@ -191,9 +224,34 @@ namespace StepBro.Core.ScriptData
             if (!String.IsNullOrEmpty(baseName) && m_parentFile != null)
             {
                 var file = m_parentFile as ScriptFile;
-                var found = file.LookupIdentifier(baseName);
+
+                bool allowOverrideElements = false;
+                switch (this.ElementType)
+                {
+                    case FileElementType.Override:
+                        allowOverrideElements = true;
+                        break;
+                    case FileElementType.Using:
+                    case FileElementType.Namespace:
+                    case FileElementType.EnumDeclaration:
+                    case FileElementType.ProcedureDeclaration:
+                    case FileElementType.FileVariable:
+                    case FileElementType.TestList:
+                    case FileElementType.Datatable:
+                    case FileElementType.TypeDef:
+                        break;
+                    default:
+                        break;
+                }
+
+                var found = file.LookupIdentifier(
+                    baseName,
+                    predicate: (IIdentifierInfo id) => (
+                        id.Type == IdentifierType.FileElement &&
+                        !Object.ReferenceEquals(id, this) &&
+                        (allowOverrideElements || ((FileElement)id).ElementType != FileElementType.Override)));
                 var element = (found != null) ? (found[0] as IFileElement) : null;
-                if (element != null && element.ElementType == this.ElementType)
+                if (element != null)
                 {
                     this.BaseElement = element;
                     return true;
@@ -294,9 +352,10 @@ namespace StepBro.Core.ScriptData
                     {
                         if (this.ElementType == FileElementType.Override)
                         {
-                            if (this.BaseElement != null)
+                            var baseElement = this.GetRootBaseElement();
+                            if (baseElement != null)
                             {
-                                var existing = ((FileElement)this.BaseElement).m_partners.Where(p => p.Name.Equals(name)).FirstOrDefault() as FileElementPartner;
+                                var existing = baseElement.m_partners.Where(p => p.Name.Equals(name)).FirstOrDefault() as FileElementPartner;
                                 if (existing != null)
                                 {
                                     existing.ProcedureName = referenceName;
@@ -304,7 +363,7 @@ namespace StepBro.Core.ScriptData
                                 }
                                 else
                                 {
-                                    ((FileElement)this.BaseElement).m_partners.Add(new FileElementPartner(this, name, referenceName, referenceElement as IFileProcedure));
+                                    baseElement.m_partners.Add(new FileElementPartner(this, name, referenceName, referenceElement as IFileProcedure));
                                 }
                             }
                         }

@@ -200,7 +200,7 @@ namespace StepBroCoreTest.Execution
             var f2 = new StringBuilder();
             f2.AppendLine("testlist TestSuiteBase :");
             f2.AppendLine("    partner Park : ParkProcEmpty;");
-            f2.AppendLine("procedure void ParkProcEmpty()");
+            f2.AppendLine("private procedure void ParkProcEmpty()");
             f2.AppendLine("{");
             f2.AppendLine("}");
 

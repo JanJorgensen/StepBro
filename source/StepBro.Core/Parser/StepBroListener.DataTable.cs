@@ -39,7 +39,7 @@ namespace StepBro.Core.Parser
             m_lastDatatable = m_currentDatatable;
             if (m_file != null)
             {
-                m_file.AddDatatable(m_currentDatatable);
+                m_file.AddElement(m_currentDatatable);
             }
             m_currentDatatable = null;
         }

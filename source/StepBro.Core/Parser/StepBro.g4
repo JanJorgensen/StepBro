@@ -16,9 +16,9 @@ fileProperties : elementPropertyblock ;
 usingDeclarations : usingDeclaration* ;
 
 usingDeclaration 
-    :   PUBLIC? USING identifierOrQualified SEMICOLON		                    # UsingDeclarationWithIdentifier
-    |   PUBLIC? USING IDENTIFIER ASSIGNMENT identifierOrQualified SEMICOLON		# UsingDeclarationWithIdentifierAlias
-    |   PUBLIC? USING (REGULAR_STRING | VERBATIUM_STRING) SEMICOLON		        # UsingDeclarationWithPath
+    :   PUBLIC? USING identifierOrQualified SEMICOLON                   # UsingDeclarationWithIdentifier
+    |   PUBLIC? USING typedefName ASSIGNMENT typedefType SEMICOLON      # TypeAlias
+    |   PUBLIC? USING (REGULAR_STRING | VERBATIUM_STRING) SEMICOLON     # UsingDeclarationWithPath
     ;
 
 namespace : identifierOrQualified ;
@@ -75,17 +75,17 @@ elementModifier
 
 //fileVariableNameReference : variableDeclaratorQualifiedId ;
 
-fileElementReference : identifierOrQualified ;
+overrideReference : identifierOrQualified ;
 
-fileElementOverride : OVERRIDE fileElementReference typeOverride? elementPropertyblock? ;
+fileElementOverride : OVERRIDE overrideReference typeOverride? elementPropertyblock? ;
 
 typeOverride : AS typedefName ;
 
-typedefName : IDENTIFIER ;
-
 typedef 
-    : TYPEDEF typedefName typedefType SEMICOLON       // NOT LIKE A TYPEDEF IN C/C++; NAME FIRST HERE!!
+    : TYPEDEF typedefName COLON typedefType SEMICOLON       // NOT LIKE A TYPEDEF IN C/C++; NAME FIRST HERE!!
     ;
+
+typedefName : IDENTIFIER ;
 
 typedefType : typeSimpleOrGeneric ;
 
@@ -661,6 +661,7 @@ expression
     |   ( op=TILDE | op=BANG | op=NOT ) expression						# ExpUnaryRight
     |   OPEN_PARENS type CLOSE_PARENS expression						# ExpCast
     |   AWAIT expression                                                # ExpAwait
+    |   expression AS type                                              # ExpCastAs
 
     //|   NEW creator
 
