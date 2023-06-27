@@ -1,1 +1,1 @@
-..\..\source\bin\stepbro.exe smoketest.sbs -v -e AllTests -m FormalTest
+..\..\source\bin\stepbro.exe smoketest.sbs -v -e AllTests -m FormalTest --exitcode SubVerdict

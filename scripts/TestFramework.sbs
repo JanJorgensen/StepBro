@@ -63,18 +63,20 @@ public procedure void TestCaseFormalTest( this TestCase testcase )
 
 // Procedure to be used for the 'TestUntilFail' partner of a test case.
 public procedure void TestCaseTestUntilFail( this TestCase testcase ) :
-	NoSubResultInheritance  // The result of this procedure will not be directly affected by the results of sub procedures.
+    NoSubResultInheritance  // The result of this procedure will not be directly affected by the results of sub procedures.
 {
-	int loopIndex = 1;
+    int loopIndex = 1;
+    var result = pass;
     bool preconditionsOkay = false;
     NextProcedureIsHighLevel("PreTest");
     preconditionsOkay = testcase.PreTest();
     if (preconditionsOkay)
     {
-        while ( true )
+        while (result < fail)
         {
             NextProcedureIsHighLevel("Iteration #" + loopIndex);
             testcase();
+            result = this.LastCallResult.Verdict;
             loopIndex++;
         }
     }
@@ -82,31 +84,34 @@ public procedure void TestCaseTestUntilFail( this TestCase testcase ) :
 
 // Procedure to be used for the 'TestFormalUntilFail' partner of a test case.
 public procedure void TestCaseFormalTestUntilFail( this TestCase testcase ) : 
-	NoSubResultInheritance
+    NoSubResultInheritance
 {
-	int loopIndex = 1;
+    int loopIndex = 1;
+    var result = pass;
     NextProcedureIsHighLevel("PreTest");
     testcase.PreTest();
-	while (true)
-	{
+    while (result < fail)
+    {
 
         NextProcedureIsHighLevel("Setup #" + loopIndex);
-		testcase.Setup();
+        testcase.Setup();
 
         NextProcedureIsHighLevel("Test #" + loopIndex);
-		testcase();
+        testcase();
+        result = this.LastCallResult.Verdict;
 
         NextProcedureIsHighLevel("Cleanup #" + loopIndex);
-		testcase.Cleanup();
+        testcase.Cleanup();
 
-		loopIndex++;
-	}
+        loopIndex++;
+    }
 }
 
 public testlist TestSuite :
-    partner FormalTest : TestSuiteFormalTestExecution,
-    partner DirectTest : TestSuiteDirectTestExecution,
-    partner PreTest    : TestSuiteEmptyPreTest;         // Setup and precondition check for the test suite.
+    partner InfiniteTest : TestSuiteInfiniteTestExecution,
+    partner FormalTest   : TestSuiteFormalTestExecution,
+    partner DirectTest   : TestSuiteDirectTestExecution,
+    partner PreTest      : TestSuiteEmptyPreTest;         // Setup and precondition check for the test suite.
 
 
 procedure bool TestSuiteEmptyPreTest(this TestSuite suite)
@@ -114,9 +119,32 @@ procedure bool TestSuiteEmptyPreTest(this TestSuite suite)
     return true;
 }
 
+///
+public procedure void TestSuiteInfiniteTestExecution(this TestSuite suite) :
+    NoSubResultInheritance
+{
+    bool passedPreTest = true;
+    NextProcedureIsHighLevel("PRETEST");
+    passedPreTest = suite.PreTest();
+    var iterator = suite.GetProcedureIterator();
+    while (passedPreTest)
+    {
+        passedPreTest = suite.PreTest();
+        iterator.Reset();
+        while (iterator.GetNext())
+        {
+            log ("Starting Test: " + iterator.Procedure.Name);
+            TestCase testcase = iterator.Procedure as TestCase;
+            NextProcedureIsHighLevel("TEST");
+            iterator.Procedure( iterator.Arguments );
+            this.AddPartResult(iterator.Procedure, this.LastCallResult);
+        }
+    }
+}
+
 /// 
 public procedure void TestSuiteDirectTestExecution(this TestSuite suite) :
-	NoSubResultInheritance
+    NoSubResultInheritance
 {
     bool passedPreTest = true;
     NextProcedureIsHighLevel("PRETEST");
@@ -130,6 +158,7 @@ public procedure void TestSuiteDirectTestExecution(this TestSuite suite) :
             TestCase testcase = iterator.Procedure as TestCase;
             NextProcedureIsHighLevel("TEST");
             iterator.Procedure( iterator.Arguments );
+            this.AddPartResult(iterator.Procedure, this.LastCallResult);
         }
     }
 }
@@ -172,7 +201,7 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
                 // TODO: Save test summary in report
             }
             testReport.DumpToLog();
-			
+            
             // TODO: Save report in selected format in the selected location (file or URL). Selection taken from configuration file.
         }
     }
