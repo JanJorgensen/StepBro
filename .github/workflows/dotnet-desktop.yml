@@ -86,5 +86,8 @@ jobs:
     # - name: Run StepBro Version Check
     #   run: .\source\bin\stepbro.exe --version
         
-    - name: Run StepBro Smoketest
+    - name: Run StepBro Consoletest
       run: .\source\bin\stepbro.exe ".\test files\smoketest\ConsoleTest.sbs" -v -e HelloStepBro --exitcode Verdict
+
+    - name: Run StepBro Smoketest
+      run: .\source\bin\stepbro.exe ".\test files\smoketest\smoketest.sbs" -v -e AllTests -m FormalTest --exitcode SubVerdict
