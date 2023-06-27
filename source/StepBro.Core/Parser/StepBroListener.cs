@@ -223,9 +223,7 @@ namespace StepBro.Core.Parser
             {
                 return;
             }
-            var t = context.children[4].GetType();
-            bool hasArguments = context.children.Any(child => child is SBP.CtorArgumentsContext);
-            var args = hasArguments ? m_arguments.Pop() : null;
+            var args = (context.children.Any(child => child is SBP.CtorArgumentsContext)) ? m_arguments.Pop() : null;
             var props = m_lastElementPropertyBlock;
             VariableContainerAction createAction = null;
             VariableContainerAction initAction = null;
@@ -241,7 +239,7 @@ namespace StepBro.Core.Parser
             {
                 #region Creator Action
 
-                //if (hasArguments)
+                //if (args != null && args.Count > 0)
                 //{
                 //}
                 //else
