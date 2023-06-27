@@ -127,7 +127,7 @@ public procedure void TestSuiteDirectTestExecution(this TestSuite suite) :
         while (iterator.GetNext())
         {
             log ("Starting Test: " + iterator.Procedure.Name);
-            TestCase testcase = iterator.Procedure;
+            TestCase testcase = iterator.Procedure as TestCase;
             NextProcedureIsHighLevel("TEST");
             iterator.Procedure( iterator.Arguments );
         }
@@ -154,7 +154,7 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
                 // TODO: Start new group in report
                 // TODO: Save test case data in report
                 log ("Starting Test: " + iterator.Procedure.Name);
-                TestCase testcase = iterator.Procedure;
+                TestCase testcase = iterator.Procedure as TestCase;
 
                 // TODO: Start Setup group
                 NextProcedureIsHighLevel("SETUP");

@@ -1,49 +1,16 @@
 ﻿using @"..\..\scripts\TestFramework.sbs";
 
 
-public procedure TestCase() :
-    TestCaseBase,
-    FreeParameters,
-    override partner Setup:     TestCaseSetup,
-    override partner Cleanup:   TestCaseCleanup;
-
-public procedure void TestCaseSetup( this TestCase testcase )
-{
-    log ("Doing default setup for " + testcase.Name);
-}
-
-public procedure void TestCaseCleanup( this TestCase testcase )
-{
-    log ("Doing default cleanup for " + testcase.Name);
-}
-
-public procedure void TestCaseSpecialSetup( this TestCase testcase )
-{
-    log ("Doing special setup for " + testcase.Name);
-}
-
-public procedure void TestCaseSpecialCleanup( this TestCase testcase )
-{
-    log ("Doing special cleanup for " + testcase.Name);
-}
-
-public testlist TestSuite : TestSuiteBase;
-
 //########################################################################
-
-public procedure void RunTests()    // TODO: Put this up before the testlist, to test that the procedure can be placed before the refefenced testlist.
-{
-    AllTests.DirectTest();
-}
 
 testlist AllTests : TestSuite
 {
-    * TestExpressions
+    * TestIntegerExpressions
 }
 
 //########################################################################
 
-public procedure void TestExpressions() : TestCase
+public procedure void TestIntegerExpressions() : TestCase
 {
     // Assignments
     int i1 = -2111222333444;

@@ -1,4 +1,4 @@
-﻿#define PRINT_TREE
+﻿//#define PRINT_TREE
 
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;

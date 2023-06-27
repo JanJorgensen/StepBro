@@ -1,4 +1,4 @@
-﻿#define PRINT_TREE
+﻿//#define PRINT_TREE
 
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
@@ -7,11 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using StepBro.Core.Data;
-//using StepBro.Core.ScriptData;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
-using StepBro.Core.ScriptData;
-using System.Xml.Linq;
-using System.ComponentModel;
 
 namespace StepBro.Core.Parser
 {
