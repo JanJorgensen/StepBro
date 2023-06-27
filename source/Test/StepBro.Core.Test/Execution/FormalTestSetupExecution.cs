@@ -577,7 +577,7 @@ namespace StepBroCoreTest.Execution
             f.AppendLine("using StepBroCoreTest.Data;");
             f.AppendLine("using SomeTool;");
 
-            f.AppendLine("DummyClass anders { PropInt = 20 }");
+            f.AppendLine("DummyClass anders = DummyClass{ PropInt = 20 }");
 
             f.AppendLine("procedure void TestCaseLocalSetup(this TestCase testcase)");
             f.AppendLine("{ log (this.Name + \" \" + testcase.Name); }");
@@ -616,7 +616,7 @@ namespace StepBroCoreTest.Execution
 
             var tf = new StringBuilder();
             tf.AppendLine("using StepBroCoreTest.Data;");
-            tf.AppendLine("public DummyClass bent { PropInt = 1986 }");
+            tf.AppendLine("public DummyClass bent = DummyClass{ PropInt = 1986 }");
             tf.AppendLine("public function int DummyFunc(){ return 729; }");
 
             var files = FileBuilder.ParseFiles((ILogger)null, typeof(DummyClass).Assembly,

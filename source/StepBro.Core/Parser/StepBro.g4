@@ -90,9 +90,13 @@ typedefName : IDENTIFIER ;
 typedefType : typeSimpleOrGeneric ;
 
 fileVariable
-    :   elementModifier? variableType variableDeclaratorId elementPropertyblock         #FileVariableWithPropertyBlock
-    |   elementModifier? variableType variableDeclarator SEMICOLON                      #FileVariableSimple
+    :   elementModifier? variableType variableDeclaratorId ASSIGNMENT ctorClassType ctorArguments? elementPropertyblock     #FileVariableWithPropertyBlock
+    |   elementModifier? variableType variableDeclarator SEMICOLON                                                          #FileVariableSimple
     ;
+
+ctorClassType : type ;
+
+ctorArguments : arguments ;
  
 //modifiers
     //:   modifier*

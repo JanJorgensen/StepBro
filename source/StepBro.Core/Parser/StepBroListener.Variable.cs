@@ -24,6 +24,7 @@ namespace StepBro.Core.Parser
         }
         private VariableModifier m_variableModifier = VariableModifier.None;
         private TypeReference m_variableType;
+        private TypeReference m_creatorType;
         private string m_variableName = "";
         private SBExpressionData m_variableInitializer = null;
         private List<VariableData> m_variables;
@@ -56,6 +57,18 @@ namespace StepBro.Core.Parser
         {
             m_expressionData.PopStackLevel();
             m_variableType = m_typeStack.Pop();
+        }
+
+        public override void EnterCtorClassType([NotNull] SBP.CtorClassTypeContext context)
+        {
+            m_creatorType = null;
+            m_expressionData.PushStackLevel("CTORType");
+        }
+
+        public override void ExitCtorClassType([NotNull] SBP.CtorClassTypeContext context)
+        {
+            m_expressionData.PopStackLevel();
+            m_creatorType = m_typeStack.Pop();
         }
 
         public override void EnterVariableDeclaratorId([NotNull] SBP.VariableDeclaratorIdContext context)

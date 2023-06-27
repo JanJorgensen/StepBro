@@ -107,7 +107,7 @@ namespace StepBroCoreTest.Parser
             var f = new StringBuilder();
             f.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
             f.AppendLine("namespace ObjectUsing;");
-            f.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool");
+            f.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool = " + typeof(DummyInstrumentClass).Name);
             f.AppendLine("{");
             f.AppendLine("   BoolA: true,");
             f.AppendLine("   IntA:  19");
@@ -146,7 +146,7 @@ namespace StepBroCoreTest.Parser
             f = new StringBuilder();
             f.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");
             f.AppendLine("namespace ObjectUsing;");
-            f.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool");
+            f.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool = " + typeof(DummyInstrumentClass).Name);
             f.AppendLine("{");
             f.AppendLine("   BoolA: true,");
             f.AppendLine("   IntA:  37");
@@ -171,7 +171,7 @@ namespace StepBroCoreTest.Parser
         {
             var f1 = new StringBuilder();
             f1.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
-            f1.AppendLine(typeof(DummyInstrumentClass).Name + " myTool");
+            f1.AppendLine(typeof(DummyInstrumentClass).Name + " myTool = " + typeof(DummyInstrumentClass).Name);
             f1.AppendLine("{");
             f1.AppendLine("   IntA: 783");
             f1.AppendLine("}");
@@ -210,7 +210,7 @@ namespace StepBroCoreTest.Parser
             var f2 = new StringBuilder();
             f2.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");
             f2.AppendLine("namespace ObjectOverride;");
-            f2.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool");
+            f2.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool = " + typeof(DummyInstrumentClass).Name);
             f2.AppendLine("{");
             f2.AppendLine("   BoolA: true,");
             f2.AppendLine("   IntA:  36");
@@ -246,7 +246,7 @@ namespace StepBroCoreTest.Parser
             var f1 = new StringBuilder();
             f1.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
             f1.AppendLine("type MyToolType : " + typeof(DummyInstrumentClass).Name + ";");
-            f1.AppendLine("MyToolType myTool");
+            f1.AppendLine("MyToolType myTool = MyToolType");
             f1.AppendLine("{");
             f1.AppendLine("   IntA: 72");
             f1.AppendLine("}");
@@ -369,7 +369,7 @@ namespace StepBroCoreTest.Parser
             var f1 = new StringBuilder();
             f1.AppendLine("using \"lib3file.sbs\";");
             f1.AppendLine("namespace TypedefTest;");
-            f1.AppendLine("MyThirdToolType myTool");
+            f1.AppendLine("MyThirdToolType myTool = MyThirdToolType");
             f1.AppendLine("{");
             f1.AppendLine("    IntA: 91");
             f1.AppendLine("}");
@@ -449,7 +449,7 @@ namespace StepBroCoreTest.Parser
             var f2 = new StringBuilder();
             f2.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
             f2.AppendLine("namespace ObjectOverride;");
-            f2.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool");
+            f2.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool = " + typeof(DummyInstrumentClass).Name);
             f2.AppendLine("{");
             f2.AppendLine("   BoolA: true,");
             f2.AppendLine("   IntA:  36");
