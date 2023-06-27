@@ -13,6 +13,7 @@ namespace StepBro.Core.Api
 
         static public bool IsObjectName(System.Reflection.ParameterInfo parameter)
         {
+            if (parameter.ParameterType != typeof(string)) return false;
             var attrib = parameter.CustomAttributes.Where(a => a.AttributeType == typeof(ObjectNameAttribute)).FirstOrDefault();
             if (attrib != null)
             {

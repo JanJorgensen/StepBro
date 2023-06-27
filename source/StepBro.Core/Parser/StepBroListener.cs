@@ -219,11 +219,11 @@ namespace StepBro.Core.Parser
 
         public override void ExitFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)
         {
-            TypeReference type = m_variableType;
-            if (type == null)
+            if (m_variableType == null || m_creatorType == null)
             {
                 return;
             }
+            var args = (context.children.Any(child => child is SBP.CtorArgumentsContext)) ? m_arguments.Pop() : null;
             var props = m_lastElementPropertyBlock;
             VariableContainerAction createAction = null;
             VariableContainerAction initAction = null;
@@ -231,41 +231,49 @@ namespace StepBro.Core.Parser
 
             if (m_variableType.Type.IsValueType || m_variableType.Type == typeof(string))
             {
-                var code = Expression.Constant(Activator.CreateInstance(type.Type), type.Type);
+                var code = Expression.Constant(Activator.CreateInstance(m_creatorType.Type), m_creatorType.Type);
                 createAction = CreateVariableContainerValueAssignAction(code);
                 resetAction = createAction;
             }
             else
             {
                 #region Creator Action
-                // First check if there's a ctor with object name as parameter.
-                var ctor = type.Type.GetConstructor(new Type[] { typeof(string) });
-                if (ctor != null && ObjectNameAttribute.IsObjectName(ctor.GetParameters()[0]))
+
+                //if (args != null && args.Count > 0)
+                //{
+                //}
+                //else
                 {
-                    var code = Expression.New(ctor, Expression.Constant(m_variableName));
-                    createAction = CreateVariableContainerValueAssignAction(code);
-                }
-                else
-                {
-                    // else, try using the default ctor.
-                    ctor = type.Type.GetConstructor(new Type[] { });
-                    if (ctor != null)
+                    // First check if there's a ctor with object name as parameter.
+                    var ctor = m_creatorType.Type.GetConstructor(new Type[] { typeof(string) });
+                    if (ctor != null && ObjectNameAttribute.IsObjectName(ctor.GetParameters()[0]))
                     {
-                        var code = Expression.New(ctor);
+                        var code = Expression.New(ctor, Expression.Constant(m_variableName));
                         createAction = CreateVariableContainerValueAssignAction(code);
                     }
                     else
                     {
-                        var createMethods =
-                            type.Type.GetMethods().Where(
-                                m => String.Equals(m.Name, "Create", StringComparison.InvariantCulture) && m.IsStatic).ToArray();
-                        throw new NotImplementedException();
+                        // else, try using the default ctor.
+                        ctor = m_creatorType.Type.GetConstructor(new Type[] { });
+                        if (ctor != null)
+                        {
+                            var code = Expression.New(ctor);
+                            createAction = CreateVariableContainerValueAssignAction(code);
+                        }
+                        else
+                        {
+                            var createMethods =
+                                m_creatorType.Type.GetMethods().Where(
+                                    m => String.Equals(m.Name, "Create", StringComparison.InvariantCulture) && m.IsStatic).ToArray();
+                            throw new NotImplementedException();
+                        }
                     }
                 }
+
                 #endregion
 
                 #region Reset Action
-                var resettable = type.Type.GetInterface(nameof(IResettable));
+                var resettable = m_creatorType.Type.GetInterface(nameof(IResettable));
                 if (resettable != null)
                 {
                     LabelTarget returnLabel = Expression.Label(typeof(bool));
@@ -295,7 +303,7 @@ namespace StepBro.Core.Parser
             PropertyBlock customProperties = null;
             if (props != null && props.Count > 0)
             {
-                initAction = this.CreateVariableContainerObjectInitAction(type.Type, props, m_errors, context.Start);
+                initAction = this.CreateVariableContainerObjectInitAction(m_creatorType.Type, props, m_errors, context.Start);
                 if (props.Count(e => e.Tag == null) > 0)
                 {
                     customProperties = new PropertyBlock(context.Start.Line);
@@ -305,7 +313,7 @@ namespace StepBro.Core.Parser
 
             var codeHash = context.GetText().GetHashCode();
             var id = m_file.CreateOrGetFileVariable(
-                m_currentNamespace, m_fileElementModifier, m_variableName, type, true,
+                m_currentNamespace, m_fileElementModifier, m_variableName, m_variableType, true,
                 context.Start.Line, context.Start.Column, codeHash,
                 resetter: resetAction,
                 creator: createAction,

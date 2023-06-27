@@ -102,7 +102,7 @@ namespace StepBroCoreTest.Parser
         {
             var f = new StringBuilder();
             f.AppendLine("using " + typeof(DummyClass).Namespace + ";");
-            f.AppendLine("public " + nameof(DummyClass) + " myObject {}");
+            f.AppendLine("public " + nameof(DummyClass) + " myObject = " + nameof(DummyClass) + "{}");
             f.AppendLine("procedure void Func(bool state)");
             f.AppendLine("{");
             f.AppendLine("   if (state) await myObject." + nameof(DummyClass.MethodAsyncObject) + "(\"Anders\");");

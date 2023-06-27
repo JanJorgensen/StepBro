@@ -17,24 +17,12 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void ParseSimpleFileVariables()
         {
-            var var = FileBuilder.ParseFileVariable<long>(null, null, "protected int myVariable = 10;");
+            var var = FileBuilder.ParseFileVariable<long>(null, null, "protected int myVariable = 10 * 3;");
             Assert.IsNotNull(var);
             Assert.AreEqual("myVariable", var.Name);
             Assert.ReferenceEquals(var.DataType, TypeReference.TypeInt64);
             Assert.IsFalse(var.IsReadonly);
             Assert.AreEqual(AccessModifier.Protected, var.AccessProtection);
-            //Assert.AreEqual(0, proc.Parameters.Length);
-        }
-
-        [TestMethod]
-        public void ParseSimpleFileVariablesWithPropertyBlock()
-        {
-            var var = FileBuilder.ParseFileVariable<long>(null, null, "public int myVariable { }");
-            Assert.IsNotNull(var);
-            Assert.AreEqual("myVariable", var.Name);
-            Assert.ReferenceEquals(var.DataType, TypeReference.TypeInt64);
-            Assert.IsTrue(var.IsReadonly);
-            Assert.AreEqual(AccessModifier.Public, var.AccessProtection);
         }
 
         /// <summary>
@@ -52,11 +40,24 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        public void ParseFileVariableWithEmptyPropertyBlock()
+        public void ParseFileVariableWithEmptyPropertyBlockNoArgs()
         {
             var var = FileBuilder.ParseFileVariable<DummyInstrumentClass>(
                 null, new Type[] { typeof(DummyInstrumentClass) },
-                "private DummyInstrumentClass myVariable { }");
+                "private DummyInstrumentClass myVariable = DummyInstrumentClass{ }");
+            Assert.IsNotNull(var);
+            Assert.AreEqual("myVariable", var.Name);
+            Assert.ReferenceEquals(var.DataType, (TypeReference)typeof(DummyInstrumentClass));
+            Assert.IsTrue(var.IsReadonly);
+            Assert.AreEqual(AccessModifier.Private, var.AccessProtection);
+        }
+
+        [TestMethod]
+        public void ParseFileVariableWithEmptyPropertyBlockEmptyArgs()
+        {
+            var var = FileBuilder.ParseFileVariable<DummyInstrumentClass>(
+                null, new Type[] { typeof(DummyInstrumentClass) },
+                "private DummyInstrumentClass myVariable = DummyInstrumentClass(){ }");
             Assert.IsNotNull(var);
             Assert.AreEqual("myVariable", var.Name);
             Assert.ReferenceEquals(var.DataType, (TypeReference)typeof(DummyInstrumentClass));
@@ -70,7 +71,7 @@ namespace StepBroCoreTest.Parser
             var f = new StringBuilder();
             f.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");
             f.AppendLine("namespace ObjectUsing;");
-            f.AppendLine("public DummyInstrumentClass myTool {}");
+            f.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool = " + typeof(DummyInstrumentClass).Name + "{}");
             f.AppendLine("procedure int Test1()");
             f.AppendLine("{");
             f.AppendLine("   myTool.BoolA = true;");
@@ -107,13 +108,54 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(77L, result);
         }
 
+        [TestMethod, Ignore]
+        public void TestFileVariableWithArgsAndEmptyPropertyBlock()
+        {
+            var f = new StringBuilder();
+            f.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");
+            f.AppendLine("namespace ObjectUsing;");
+            f.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool = " + typeof(DummyInstrumentClass).Name + "(400){}");
+            f.AppendLine("procedure int Test1()");
+            f.AppendLine("{");
+            f.AppendLine("   myTool.BoolA = true;");
+            f.AppendLine("   return myTool.Fcn(\"Janse\", false);");
+            f.AppendLine("}");
+            f.AppendLine("procedure int Test2()");
+            f.AppendLine("{");
+            f.AppendLine("   myTool.BoolA = true;");
+            f.AppendLine("   return myTool.Fcn(\"Janse\", true);");
+            f.AppendLine("}");
+            var file = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f.ToString()))[0];
+
+            Assert.AreEqual("ObjectUsing", file.Namespace);
+
+            var variable = file.ListElements().First(p => p.Name == "myTool") as FileVariable;
+            Assert.IsNotNull(variable);
+            var variableObject = variable.VariableOwnerAccess.Container.GetValue() as INameable;
+            Assert.IsNotNull(variableObject);
+            Assert.AreEqual("myTool", variableObject.Name);
+
+            var procedure = file.ListElements().First(p => p.Name == "Test1") as IFileProcedure;
+            Assert.AreEqual("Test1", procedure.Name);
+            var taskContext = ExecutionHelper.ExeContext();
+            var result = taskContext.CallProcedure(procedure);
+            Assert.AreEqual(44L, result);
+
+            procedure = file.ListElements().First(p => p.Name == "Test2") as IFileProcedure;
+            Assert.AreEqual("Test2", procedure.Name);
+            taskContext = ExecutionHelper.ExeContext();
+            result = taskContext.CallProcedure(procedure);
+            Assert.AreEqual(77L, result);
+        }
+
         [TestMethod]
         public void TestSpecialFileVariableWithPropblockConfig()
         {
             var f = new StringBuilder();
             f.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");
             f.AppendLine("namespace ObjectUsing;");
-            f.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool");
+            f.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool = " + typeof(DummyInstrumentClass).Name);
             f.AppendLine("{");
             f.AppendLine("   BoolA: true,");
             f.AppendLine("   IntA:  19");
@@ -192,14 +234,22 @@ namespace StepBroCoreTest.Parser
 
         public DummyInstrumentClass([ObjectName] string objectName = "<no name>")
         {
-            m_objectName = objectName;
             m_id = m_nextInstanceID++;
+            m_objectName = objectName;
         }
 
         public DummyInstrumentClass(string[] names, [ObjectName] string objectName = "<no name>") : this()
         {
+            m_id = m_nextInstanceID++;
             m_objectName = objectName;
             m_names = names.ToList();
+        }
+
+        public DummyInstrumentClass(long valueA, [ObjectName] string objectName = "<no name>") : this()
+        {
+            m_id = m_nextInstanceID++;
+            m_objectName = objectName;
+            this.IntA = valueA;
         }
 
         public long ID { get { return m_id; } }
