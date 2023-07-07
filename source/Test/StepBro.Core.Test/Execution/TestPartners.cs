@@ -229,5 +229,91 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
         }
+
+        [TestMethod]
+        public void TestProcedureOverridePartnerInBase02()
+        {
+            var f1 = new StringBuilder();
+            f1.AppendLine("using @\"basefile.sbs\";");
+            f1.AppendLine("override TestCaseBase");
+            f1.AppendLine("{");
+            f1.AppendLine("    partner override Park : ParkProc");
+            f1.AppendLine("}");
+            f1.AppendLine("procedure void ParkProc(this TestCaseBase caseBase)");
+            f1.AppendLine("{");
+            f1.AppendLine("   log(\"Park\");");
+            f1.AppendLine("}");
+            f1.AppendLine("public procedure void Run()");
+            f1.AppendLine("{");
+            f1.AppendLine("   CallParkOnTestCaseBase();");
+            f1.AppendLine("}");
+
+            var f2 = new StringBuilder();
+            f2.AppendLine("procedure void TestCaseBase() :");
+            f2.AppendLine("    partner Park : ParkProcEmpty;");
+            f2.AppendLine("procedure void ParkProcEmpty(this TestCaseBase caseBase)");
+            f2.AppendLine("{");
+            f2.AppendLine("}");
+            f2.AppendLine("public procedure void CallParkOnTestCaseBase()");
+            f2.AppendLine("{");
+            f2.AppendLine("   TestCaseBase.Park();");
+            f2.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null,
+                new Tuple<string, string>("topfile.sbs", f1.ToString()),
+                new Tuple<string, string>("basefile.sbs", f2.ToString()));
+
+            Assert.AreEqual(2, files.Length);
+            var file1 = files[0];
+            var file2 = files[1];
+            Assert.AreEqual(0, file1.Errors.ErrorCount);
+            Assert.AreEqual(0, file2.Errors.ErrorCount);
+            Assert.AreEqual(2, file1.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
+            Assert.AreEqual(3, file2.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
+
+            var procTestCaseBase = file2.ListElements().First(p => p.Name == "TestCaseBase") as IFileProcedure;
+            Assert.IsNotNull(procTestCaseBase);
+
+            var procTestCaseBaseOverride = file1.ListElements().First(p => p.Name == "TestCaseBase") as IFileElement;
+            Assert.IsNotNull(procTestCaseBaseOverride);
+            Assert.IsTrue(procTestCaseBaseOverride.ElementType == FileElementType.Override);
+            Assert.AreSame(procTestCaseBase, procTestCaseBaseOverride.BaseElement);
+
+            var procParkProc = file1.ListElements().First(p => p.Name == "ParkProc") as IFileProcedure;
+            Assert.IsNotNull(procParkProc);
+            var procParkProcEmpty = file2.ListElements().First(p => p.Name == "ParkProcEmpty") as IFileProcedure;
+            Assert.IsNotNull(procParkProcEmpty);
+
+            var partnerOverridden = procTestCaseBase.ListPartners().First();
+            Assert.IsNotNull(partnerOverridden);
+            Assert.AreSame(procParkProc, partnerOverridden.ProcedureReference);
+
+            var procRun = file1.ListElements().First(p => p.Name == "Run") as IFileProcedure;
+            Assert.IsNotNull(procRun);
+
+            Exception exeException = null;
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+            try
+            {
+                taskContext.CallProcedure(procRun);
+            }
+            catch (Exception ex)
+            {
+                exeException = ex;
+            }
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+            if (exeException != null) throw exeException;
+
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - topfile.Run - <no arguments>");
+            log.ExpectNext("2 - Pre - basefile.CallParkOnTestCaseBase - <no arguments>");
+            log.ExpectNext("3 - Pre - topfile.ParkProc - <no arguments>");
+            log.ExpectNext("4 - Normal - 8 Log - Park");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
     }
 }
