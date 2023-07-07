@@ -352,28 +352,14 @@ namespace StepBro.Core.Parser
             return null;
         }
 
-        //int SelectOneIdentifier(List<IIdentifierInfo> identifiers)
-        //{
-        //    if (identifiers.All(id => id.Type == IdentifierType.FileElement))
-        //    {
-        //        var fileelements = identifiers.Cast<FileElement>().ToList();
-
-        //        if (fileelements.SkipLast(1).All(fe => fe.ElementType == FileElementType.Override) &&
-        //            fileelements.Last().ElementType == FileElementType.FileVariable)
-        //        {
-        //            return 0;
-        //        }
-        //    }
-        //    return -1;  // No solution yet for the given list.
-        //}
-
         private SBExpressionData ResolveSingleIdentifierType(string identifier, bool reportUnresolved = false, IToken token = null)
         {
             IIdentifierInfo foundIdentifier = null;
 
             if (m_file != null)
             {
-                var identifiers = m_file.LookupIdentifier(identifier);
+                // Search files, and skip override elements.
+                var identifiers = m_file.LookupIdentifier(identifier, i => i.Type != IdentifierType.FileElement || ((FileElement)i).ElementType != FileElementType.Override);
                 if (identifiers != null)
                 {
                     if (identifiers.Count > 1)
