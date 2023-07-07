@@ -336,7 +336,23 @@ namespace StepBro.Cmd
             catch (ExitException) { }
             catch (Core.Parser.ParsingErrorException ex)
             {
-                ConsoleWriteErrorLine($"{ex.Message} File: {ex.FileName}, Line: {ex.Line}, Identifier: {ex.Name}");
+                StringBuilder extraErrorMessage = new StringBuilder();
+                if (ex.FileName != "")
+                {
+                    extraErrorMessage.Append(" File: ");
+                    extraErrorMessage.Append(ex.FileName);
+                }
+                if (ex.Line != -1)
+                {
+                    extraErrorMessage.Append(" Line: ");
+                    extraErrorMessage.Append(ex.Line);
+                }
+                if (ex.Name != "")
+                {
+                    extraErrorMessage.Append(" Name: ");
+                    extraErrorMessage.Append(ex.Name);
+                }
+                ConsoleWriteErrorLine($"{ex.Message}{extraErrorMessage}");
             }
             catch (Exception ex)
             {
