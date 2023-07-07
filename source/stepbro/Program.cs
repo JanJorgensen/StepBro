@@ -334,6 +334,10 @@ namespace StepBro.Cmd
                 }
             }
             catch (ExitException) { }
+            catch (Core.Parser.ParsingErrorException ex)
+            {
+                ConsoleWriteErrorLine($"{ex.Message} File: {ex.FileName}, Line: {ex.Line}, Identifier: {ex.Name}");
+            }
             catch (Exception ex)
             {
                 ConsoleWriteErrorLine($"Error: {ex.GetType().Name}, {ex.Message}");

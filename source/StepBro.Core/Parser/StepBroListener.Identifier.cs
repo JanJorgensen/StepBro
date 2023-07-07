@@ -366,7 +366,7 @@ namespace StepBro.Core.Parser
                     {
                         string fileName = (m_file.FileName != null ? m_file.FileName : "");
                         int lineNumber = (token != null ? token.Line : -1);
-                        throw new ParsingErrorException((token != null) ? token.Line : -1, identifier, $"More than one alternative. File: {fileName}, Line: {lineNumber}, Identifier: {identifier}");
+                        throw new ParsingErrorException(lineNumber, identifier, fileName, $"More than one alternative.");
                     }
                     return this.IdentifierToExpressionData(identifiers[0], token);
                 }
