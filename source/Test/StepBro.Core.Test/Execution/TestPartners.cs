@@ -263,10 +263,9 @@ namespace StepBroCoreTest.Execution
                 new Tuple<string, string>("topfile.sbs", f1.ToString()),
                 new Tuple<string, string>("basefile.sbs", f2.ToString()));
 
-            Assert.AreEqual(3, files.Length);
+            Assert.AreEqual(2, files.Length);
             var file1 = files[0];
             var file2 = files[1];
-            Assert.AreEqual("", file1.Errors[0]);
             Assert.AreEqual(0, file1.Errors.ErrorCount);
             Assert.AreEqual(0, file2.Errors.ErrorCount);
             Assert.AreEqual(2, file1.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
