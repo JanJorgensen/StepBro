@@ -25,6 +25,11 @@ namespace StepBro.Core.Parser.BinaryOperators
         private static LessThanOrApproxOperator g_LessThanOrApproxOp = new LessThanOrApproxOperator();
         private static LogicalAndOperator g_LogicalAndOp = new LogicalAndOperator();
         private static LogicalOrOperator g_LogicalOrOp = new LogicalOrOperator();
+        private static BitwiseAndOperator g_BitwiseAndOp = new BitwiseAndOperator();
+        private static BitwiseOrOperator g_BitwiseOrOp = new BitwiseOrOperator();
+        private static BitwiseXorOperator g_BitwiseXorOp = new BitwiseXorOperator();
+        private static ShiftRightOperator g_ShiftRightOp = new ShiftRightOperator();
+        private static ShiftLeftOperator g_ShiftLeftOp = new ShiftLeftOperator();
 
         public abstract SBExpressionData Resolve(StepBroListener listener, SBExpressionData first, SBExpressionData last);
 
@@ -46,6 +51,11 @@ namespace StepBro.Core.Parser.BinaryOperators
             if (op == SBP.OP_LT_APPROX) return g_LessThanOrApproxOp;
             if (op == SBP.OP_AND) return g_LogicalAndOp;
             if (op == SBP.OP_OR) return g_LogicalOrOp;
+            if (op == SBP.AMP) return g_BitwiseAndOp;
+            if (op == SBP.BITWISE_OR) return g_BitwiseOrOp;
+            if (op == SBP.CARET) return g_BitwiseXorOp;
+            if (op == SBP.OP_RIGHT_SHIFT) return g_ShiftRightOp;
+            if (op == SBP.OP_LEFT_SHIFT) return g_ShiftLeftOp;
             else
             {
                 throw new NotImplementedException();

@@ -79,5 +79,16 @@ namespace StepBroCoreTest.Parser
 
             Assert.AreEqual(0x00000000FFFFFFFFL, ParseAndRun<long>("~varIntA", "varIntA = 0xFFFFFFFF00000000;"));
         }
+
+        [TestMethod]
+        public void TestIntegerBitwiseOperations()
+        {
+            Assert.AreEqual(2L, ParseAndRun<long>("2 & 6"));
+            Assert.AreEqual(6L, ParseAndRun<long>("2 | 4"));
+            Assert.AreEqual(2L, ParseAndRun<long>("6 ^ 4"));
+            Assert.AreEqual(16L, ParseAndRun<long>("2 << 3"));
+            Assert.AreEqual(2L, ParseAndRun<long>("16 >> 3"));
+            Assert.AreEqual(2L, ParseAndRun<long>("~varIntA", "varIntA = 0xFFFFFFFFFFFFFFFD;"));
+        }
     }
 }
