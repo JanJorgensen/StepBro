@@ -83,7 +83,7 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(5L, result);
         }
 
-        [TestMethod, Ignore]    // public using is not working yet.
+        [TestMethod]    // public using is not working yet.
         public void FileParsing_AccessProcedureInUsedFilesPublicUsingFile()
         {
             var files = FileBuilder.ParseFiles((ILogger)null,
@@ -99,6 +99,11 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(0, files[2].Errors.ErrorCount);
             var procedureA = files[0].ListElements().First(p => p.Name == "Absalon") as IFileProcedure;
             Assert.IsNotNull(procedureA);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            var result = taskContext.CallProcedure(procedureA);
+            Assert.AreEqual(82L, result);
         }
 
         [TestMethod, Description("Testing the behaviour of generated code when parsing, and then re-parsing the code.")]

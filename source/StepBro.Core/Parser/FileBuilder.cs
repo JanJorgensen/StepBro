@@ -547,16 +547,16 @@ namespace StepBro.Core.Parser
                     var line = @using.Line;
                     var type = @using.Type;
                     var name = @using.Name;
-                    if (type == "i" || type == "I")
+                    if (type == "i")
                     {
                         if (!file.AddNamespaceUsing(line, name))
                         {
                             throw new Exception($"Namespace using already added ({name}).");
                         }
                     }
-                    else if (type == "p" || type == "P")
+                    else if (type == "p")
                     {
-                        if (!file.AddFileUsing(line, name))
+                        if (!file.AddFileUsing(line, @using.IsPublic, name))
                         {
                             throw new Exception($"File using already added ({name}).");
                         }

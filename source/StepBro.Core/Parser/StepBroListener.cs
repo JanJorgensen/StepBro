@@ -112,10 +112,10 @@ namespace StepBro.Core.Parser
         {
             if (!m_file.TypeScanIncluded)
             {
-                var path = context.GetChild(1).GetText();
+                var path = context.GetChild(context.ChildCount - 2).GetText();
                 path = ParseStringLiteral(path, context);
                 // TODO: check the path
-                m_file.AddFileUsing(context.Start.Line, path);
+                m_file.AddFileUsing(context.Start.Line, false, path);
             }
         }
 

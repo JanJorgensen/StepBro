@@ -260,7 +260,7 @@ namespace StepBro.Core.ScriptData
             {
                 return false;
             }
-            m_namespaceUsings.Add(new UsingData(line, alias, new IdentifierInfo(namespaceOrType, namespaceOrType, IdentifierType.UnresolvedType, null, null)));
+            m_namespaceUsings.Add(new UsingData(line, false, alias, new IdentifierInfo(namespaceOrType, namespaceOrType, IdentifierType.UnresolvedType, null, null)));
             return true;
         }
 
@@ -270,17 +270,17 @@ namespace StepBro.Core.ScriptData
             {
                 return false;
             }
-            m_namespaceUsings.Add(new UsingData(line, alias, identifier));
+            m_namespaceUsings.Add(new UsingData(line, false, alias, identifier)); ;
             return true;
         }
 
-        internal bool AddFileUsing(int line, string file)
+        internal bool AddFileUsing(int line, bool isPublic, string file)
         {
             if (m_fileUsings.Select(u => u.Identifier.Name).FirstOrDefault(u => String.Equals(u, file, StringComparison.InvariantCultureIgnoreCase)) != null)
             {
                 return false;
             }
-            m_fileUsings.Add(new UsingData(line, file, IdentifierType.FileByName));
+            m_fileUsings.Add(new UsingData(line, isPublic, file, IdentifierType.FileByName));
             return true;
         }
 
@@ -583,7 +583,7 @@ namespace StepBro.Core.ScriptData
                     var resolved = resolver(m_namespaceUsings[i].Identifier.Name);
                     if (resolved != null)
                     {
-                        m_namespaceUsings[i] = new UsingData(m_namespaceUsings[i].Line, resolved);
+                        m_namespaceUsings[i] = new UsingData(m_namespaceUsings[i].Line, m_namespaceUsings[i].IsPublic, resolved);
                     }
                     else
                     {
@@ -605,7 +605,7 @@ namespace StepBro.Core.ScriptData
                         var resolved = resolver(m_fileUsings[i].Identifier.Name);
                         if (resolved != null)
                         {
-                            m_fileUsings[i] = new UsingData(m_fileUsings[i].Line, m_fileUsings[i].Identifier.Name, IdentifierType.FileByName, resolved);
+                            m_fileUsings[i] = new UsingData(m_fileUsings[i].Line, m_fileUsings[i].IsPublic, m_fileUsings[i].Identifier.Name, IdentifierType.FileByName, resolved);
                             resolved.RegisterDependant(this);
                         }
                         else
@@ -750,11 +750,19 @@ namespace StepBro.Core.ScriptData
                 Select(nu => new Tuple<string, IIdentifierInfo>(nu.Alias, nu.Identifier));
         }
 
-        internal IEnumerable<ScriptFile> ListResolvedFileUsings()
+        internal IEnumerable<ScriptFile> ListResolvedFileUsings(bool publicOnly = false)
         {
             foreach (var u in m_fileUsings)
             {
-                if (u.Identifier.Reference != null && u.Identifier.Type == IdentifierType.FileByName) yield return u.Identifier.Reference as ScriptFile;
+                if ((!publicOnly || u.IsPublic) && u.Identifier.Reference != null && u.Identifier.Type == IdentifierType.FileByName)
+                {
+                    var file = u.Identifier.Reference as ScriptFile;
+                    yield return file;
+                    foreach (var childUsing in file.ListResolvedFileUsings(true))
+                    {
+                        yield return childUsing;
+                    }
+                }
             }
         }
 

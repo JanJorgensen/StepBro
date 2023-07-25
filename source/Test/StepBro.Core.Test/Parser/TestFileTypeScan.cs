@@ -228,12 +228,16 @@ namespace StepBroCoreTest.Parser
 
             Assert.AreEqual(4, result.ListUsings().Count());
             Assert.AreEqual("i", result.ListUsings().ElementAt(0).Type);
+            Assert.AreEqual(false, result.ListUsings().ElementAt(0).IsPublic);
             Assert.AreEqual("Andrea", result.ListUsings().ElementAt(0).Name);
             Assert.AreEqual("i", result.ListUsings().ElementAt(1).Type);
+            Assert.AreEqual(false, result.ListUsings().ElementAt(1).IsPublic);
             Assert.AreEqual("Betty.Chrissy", result.ListUsings().ElementAt(1).Name);
             Assert.AreEqual("p", result.ListUsings().ElementAt(2).Type);
+            Assert.AreEqual(false, result.ListUsings().ElementAt(2).IsPublic);
             Assert.AreEqual("Denise.sbs", result.ListUsings().ElementAt(2).Name);
-            Assert.AreEqual("I", result.ListUsings().ElementAt(3).Type);
+            Assert.AreEqual("i", result.ListUsings().ElementAt(3).Type);
+            Assert.AreEqual(true, result.ListUsings().ElementAt(3).IsPublic);
             Assert.AreEqual("Erica", result.ListUsings().ElementAt(3).Name);
 
             Assert.AreEqual(1, result.TopElement.Childs.Count);

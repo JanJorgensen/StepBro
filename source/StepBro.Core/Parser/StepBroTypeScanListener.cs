@@ -16,11 +16,13 @@ namespace StepBro.Core.Parser
         public class UsingData
         {
             public int Line = -1;
+            public bool IsPublic = false;
             public string Type = null;
             public string Name = null;
-            public UsingData(int line, string type, string name)
+            public UsingData(int line, bool isPublic, string type, string name)
             {
                 this.Line = line;
+                this.IsPublic = isPublic;
                 this.Type = type;
                 this.Name = name;
             }
@@ -187,26 +189,14 @@ namespace StepBro.Core.Parser
 
         public override void ExitUsingDeclarationWithIdentifier([NotNull] SBP.UsingDeclarationWithIdentifierContext context)
         {
-            if (context.ChildCount == 3)
-            {
-                m_usings.Add(new UsingData(context.Start.Line, "i", context.GetChild(1).GetText()));
-            }
-            else if (context.ChildCount == 4)
-            {
-                m_usings.Add(new UsingData(context.Start.Line, "I", context.GetChild(2).GetText()));
-            }
+            bool @public = (context.ChildCount == 3) ? false : (context.GetChild(0) as Antlr4.Runtime.Tree.TerminalNodeImpl).Payload.Type == SBP.PUBLIC;
+            m_usings.Add(new UsingData(context.Start.Line, @public, "i", context.GetChild(context.ChildCount - 2).GetText()));
         }
 
         public override void ExitUsingDeclarationWithPath([NotNull] SBP.UsingDeclarationWithPathContext context)
         {
-            if (context.ChildCount == 3)
-            {
-                m_usings.Add(new UsingData(context.Start.Line, "p", StepBroListener.ParseStringLiteral(context.GetChild(1).GetText(), context)));
-            }
-            else if (context.ChildCount == 4)
-            {
-                m_usings.Add(new UsingData(context.Start.Line, "P", StepBroListener.ParseStringLiteral(context.GetChild(2).GetText(), context)));
-            }
+            bool @public = (context.ChildCount == 3) ? false : (context.GetChild(0) as Antlr4.Runtime.Tree.TerminalNodeImpl).Payload.Type == SBP.PUBLIC;
+            m_usings.Add(new UsingData(context.Start.Line, @public, "p", StepBroListener.ParseStringLiteral(context.GetChild(context.ChildCount - 2).GetText(), context)));
         }
 
         public override void ExitNamespace([NotNull] SBP.NamespaceContext context)
