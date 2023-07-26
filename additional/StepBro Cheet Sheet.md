@@ -2,12 +2,19 @@
 
 Most of the StepBro scripting language syntax is identical to C# syntax.
 
-All (almost) .net types can be used in StepBro, though some cannot be defined in StepBro and therefore have to be defined in plugin code modules (.net assemblies).
+All .net types (almost) can be used in StepBro, though some cannot be defined in StepBro and therefore have to be defined in plugin code modules (.net assemblies).
+
 ## Hello World example
 
-```
+```C
+/*
+This is a
+multi-line
+comment.
+*/
 procedure void main()
 {
+    // Send the greeting. (single-line comment)
     log ("Hello World!");
 }
 ```
@@ -16,15 +23,15 @@ procedure void main()
 
 Build-in data types:
 
-**Type** | **Description** | **Example** | **.net type**
--------- | --------------- | ----------- | -------------
-bool | Boolean value. | true, false | System.Bool
-int, integer | 64-bit signed integer value. | 2332, -10K | System.Int64
-decimal, double | Floating point decimal value. | 3.1416, 24m, 5.2E9 | System.Double
-string | Text, as a sequence of UTF-16 characters. | "Birdie again!", "c:\\temp" | System.String
-verdict | Enumeration of test verdict values. | pass, fail | StepBro.Core.Data.Verdict
-datetime | Represents an instant in time, expressed as a date and time of day.| @2016-11-23 | System.DateTime
-timespan | Represents a time interval. | 10s, @0:02.400 | System.TimeSpan
+| **Type** | **Description** | **Examples** | **.net type** |
+| -------- | --------------- | ----------- | ------------- |
+| bool | Boolean value. | true<br>false | System.Bool |
+| int, integer | 64-bit signed integer value. | 2332<br>-10K | System.Int64 |
+| decimal, double | Floating point decimal value. | 3.1416<br>24m<br>5.2e9 | System.Double |
+| string | Text, as a sequence of UTF-16 characters. | "Birdie!"<br>"c:\\temp" | System.String |
+| verdict | Enumeration of test verdict values. | pass<br>fail | StepBro.Core.Data.Verdict |
+| datetime | Represents an instant in time, expressed as a date and time of day.| @2016-11-23 | System.DateTime |
+| timespan | Represents a time interval. | 10s<br>@0:02.400 | System.TimeSpan |
 
 ## Using .net types
 
@@ -65,12 +72,21 @@ Supported timespan value formats are supported:
 
 **Format** | **Description** | **Example**
 ---------- | --------------- | -----------
-ns | Integer or decimal number of seconds | 14.4s
-nPs | Integer or decimal number of SI-prefixed seconds | 4ms, 22.8ns
+xs | Integer or decimal number of seconds | 14.4s
+xps | Integer or decimal number of SI-prefixed seconds. <br>x: numeric value <br>p: SI prefix <br>s: 's' for 'seconds'. | 4ms<br>22.8ns
 @m:ss | Minutes and seconds | @8:30
 @m:ss.f | Minutes, seconds and fraction-of-a-second | @0:03.218
 @h:mm:ss | Hours, minutes and seconds | @2:15:00
 @h:mm:ss.f | Hours, minutes, seconds and fraction-of-a-second | @7:24:56.62
+
+# Usings
+
+```
+using "CalendarTests.sbs";
+using @"..\..\library\Algorithms.sbs";
+using StepBro.Streams;
+using StringList = System.Collections.Generics.List<string>;
+```
 
 # Variables
 
@@ -87,7 +103,45 @@ var b = "Stanley";
 var c = false;
 ```
 
+Object properties can be set at variable creation like this:
+
+```
+SerialPort port = SerialPort()
+{
+    Port: "Com4",
+    Baudrate: 115200
+}
+```
+
 # Procedures
+
+```
+procedure int CountStuff( bool includeHiddenElements ) { ... }
+void SendMessage( string receiver, string title, string message ) { ... }       // Also a 'procedure'.
+function decimal CalculateSomething( decimal height, decimal speed ) { ... }    // Has no logging or verdict.
+public void ProcA() { ... }                                                     // Explicitely statint that it is public.
+private void ProcB() { ... }                                                    // Private; not visible from other files.
+void SomeTest() : TestBaseProcedure { ... }                                     // Inheriting stuff from another procedure.
+void Send( this SerialPort port, string text ) { ... }                          // Extension procedure for SerialPort objects.
+```
+
+## Logging
+
+```
+log ("Some extra log information.");
+log error ("Something is very wrong!");
+log warning ("Operation took longer time than expected.");
+```
+
+## Sub steps
+
+```
+step:
+step 14:
+step "Warming up":
+step 6, "Inspecting received data":
+```
+
 
 # Test Lists
 
@@ -98,5 +152,41 @@ testlist allTests
     * CalendarTest
     * CalculatorTest
     * CommunicationTest( repetitions: 100, timeout: 20s )
+}
+```
+
+# Partners
+
+```
+void DoSomehing() : BaseProcedure
+    partner OperationA: ProcedureAX,
+    partner override OperationB: ProcedureB3
+{
+}
+```
+
+# Test Framework
+The file *scripts\TestFramework.sbs* contains a general framework for test setups. Most important elements are:
+* **TestCase**, a base procedure for all test cases / test procedures.
+* **TestSuite**, a base test list for test suites.
+
+```
+using "TestFramework.sbs";
+
+testlist AllTests : TestSuite
+{
+    * TestIntegerExpressions
+    * TestBooleanExpressions
+}
+
+public procedure void TestIntegerExpressions() : TestCase
+{
+    -
+    -
+}
+public procedure void TestBooleanExpressions() : TestCase
+{
+    -
+    -
 }
 ```
