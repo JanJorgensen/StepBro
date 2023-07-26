@@ -52,6 +52,7 @@
     <Compile Include="..\CommonVersion.cs" Link="CommonVersion.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\additional\StepBro Cheet Sheet.md" Link="StepBro Cheet Sheet.md" />
     <None Include="..\..\README.md" Link="README.md" />
   </ItemGroup>
   
