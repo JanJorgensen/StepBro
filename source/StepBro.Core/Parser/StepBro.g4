@@ -71,13 +71,9 @@ elementModifier
     |	PROTECTED		// Shared within the namespace
     ;
 
-//elementOverride : OVERRIDE ;
-
-//fileVariableNameReference : variableDeclaratorQualifiedId ;
-
 overrideReference : identifierOrQualified ;
 
-fileElementOverride : OVERRIDE overrideReference typeOverride? elementPropertyblock? ;
+fileElementOverride : OVERRIDE overrideReference typeOverride? (elementPropertyblock | SEMICOLON) ;
 
 typeOverride : AS typedefName ;
 

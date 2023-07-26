@@ -35,6 +35,8 @@ namespace StepBro.Core.ScriptData
             m_asTypeData = type;
         }
 
+        public bool HasTypeOverride { get {  return m_asTypeData != null; } }
+
         internal override int ParseSignature(StepBroListener listener, bool reportErrors)
         {
             base.ParseSignature(listener, reportErrors);
