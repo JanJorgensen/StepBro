@@ -686,7 +686,7 @@ namespace StepBro.Core.Parser
             m_currentFileElement.ParseBaseElement();
             if (m_currentFileElement.BaseElement == null) return;
 
-            if (m_currentFileElement.BaseElement.ElementType == FileElementType.FileVariable)
+            if (m_currentFileElement.BaseElement.ElementType == FileElementType.FileVariable && m_lastElementPropertyBlock != null)
             {
                 FileVariable fileVariable = m_currentFileElement.BaseElement as FileVariable;
                 var parentProperties = ScriptFile.GetFileVariableAllData(fileVariable);

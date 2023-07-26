@@ -613,8 +613,12 @@ namespace StepBro.Core.Parser
                     break;
                 case SBExpressionType.FileElementOverride:
                     {
-                        var overrider = left.Value as FileElement;
+                        var overrider = (FileElementOverride)(left.Value);
                         var rootElement = IdentifierToExpressionData(overrider.GetRootBaseElement(), left.Token);
+                        if (overrider.HasTypeOverride)
+                        {
+                            rootElement.Value = left.Value;
+                        }
                         result = this.ResolveDotIdentifier(rootElement, right);
                     }
                     break;
@@ -669,7 +673,7 @@ namespace StepBro.Core.Parser
 
         private SBExpressionData ResolveDotIdentifierGlobalVariableReference(SBExpressionData left, SBExpressionData right)
         {
-            var variableDataType = (left.Value as FileVariable).DataType;
+            var variableDataType = (left.Value as FileElement).DataType;
             var getValue = Expression.Call(
                 left.ExpressionCode,        // Code for getting the variable reference
                 left.DataType.Type.GetMethod("GetTypedValue"),

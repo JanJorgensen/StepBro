@@ -543,7 +543,7 @@ namespace StepBro.Core.Parser
                     case 'T': factor = 1000000000000.0; break;
                     case 'G': factor = 1000000000.0; break;
                     case 'M': factor = 1000000.0; break;
-                    case 'k': factor = 1000.0; break;
+                    case 'K': factor = 1000.0; break;
                     case 'm': factor = 0.001; break;
                     case 'u': factor = 0.000001; break;
                     case 'n': factor = 0.000000001; break;

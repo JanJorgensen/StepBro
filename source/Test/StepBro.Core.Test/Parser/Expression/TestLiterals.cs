@@ -74,6 +74,55 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
+        public void TestLiteralDecimal()
+        {
+            var result = FileBuilder.ParseLiteral("12.3");
+            Assert.IsTrue(result.IsConstant);
+            Assert.IsTrue(result.Value is double);
+            Assert.AreEqual(12.3, (double)result.Value);
+
+            result = FileBuilder.ParseLiteral("-0.1");
+            Assert.IsTrue(result.IsConstant);
+            Assert.IsTrue(result.Value is double);
+            Assert.AreEqual(-0.1, (double)result.Value);
+
+            result = FileBuilder.ParseLiteral("182m");
+            Assert.IsTrue(result.IsConstant);
+            Assert.IsTrue(result.Value is double);
+            Assert.AreEqual(0.182, (double)result.Value);
+
+            result = FileBuilder.ParseLiteral("182.7m");
+            Assert.IsTrue(result.IsConstant);
+            Assert.IsTrue(result.Value is double);
+            Assert.AreEqual(0.1827, (double)result.Value);
+
+            result = FileBuilder.ParseLiteral("32u");
+            Assert.IsTrue(result.IsConstant);
+            Assert.IsTrue(result.Value is double);
+            Assert.AreEqual(0.000032, (double)result.Value);
+
+            result = FileBuilder.ParseLiteral("32.6u");
+            Assert.IsTrue(result.IsConstant);
+            Assert.IsTrue(result.Value is double);
+            Assert.AreEqual(0.0000326, (double)result.Value);
+
+            result = FileBuilder.ParseLiteral("73n");
+            Assert.IsTrue(result.IsConstant);
+            Assert.IsTrue(result.Value is double);
+            Assert.AreEqual(0.000000073, (double)result.Value);
+
+            result = FileBuilder.ParseLiteral("73.5n");
+            Assert.IsTrue(result.IsConstant);
+            Assert.IsTrue(result.Value is double);
+            Assert.AreEqual(0.0000000735, (double)result.Value);
+
+            result = FileBuilder.ParseLiteral("2.468123K");
+            Assert.IsTrue(result.IsConstant);
+            Assert.IsTrue(result.Value is double);
+            Assert.AreEqual(2468.123, (double)result.Value);
+        }
+
+        [TestMethod]
         public void TestLiteralBoolean()
         {
             var result = FileBuilder.ParseLiteral("true");
