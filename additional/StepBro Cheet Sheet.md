@@ -177,6 +177,34 @@ step "Warming up";
 step 6, "Inspecting received data";
 ```
 
+## Control flow statements
+
+```
+if ( x > 5 )
+{
+}
+else
+{
+}
+
+while ( i < 10 )
+{
+    if (x > 6000) break;
+}
+```
+
+### While loop attributes
+```
+while ( i < 10K ) :
+    Title: "Awaiting the thing to happen"       // Added to the log and shown in UI while looping.
+    Timeout: 30s,                               // Looping breaks after time has elapsed.
+    Break: "I saw it!",                         // User option for manually breaking loop.
+    Break: "Error",                             // Another break option.
+    CountVar: i                                 // Variable thta counts the loop iterations.
+{
+}
+```
+
 
 # Test Lists
 
