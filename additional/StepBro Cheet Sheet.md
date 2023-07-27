@@ -2,7 +2,7 @@
 
 Most of the StepBro scripting language syntax is identical to C# syntax.
 
-All .net types (almost) can be used in StepBro, though some cannot be defined in StepBro and therefore have to be defined in plugin code modules (.net assemblies).
+All .net types (almost) can be used in StepBro. New .net types cannot be defined directly in StepBro script files.
 
 ## Hello World example
 
@@ -21,7 +21,7 @@ procedure void main()
 
 # Data Types
 
-Build-in data types:
+Built-in data types:
 
 | **Type** | **Description** | **Examples** | **.net type** |
 | -------- | --------------- | ----------- | ------------- |
@@ -30,7 +30,7 @@ Build-in data types:
 | decimal, double | Floating point decimal value. | 3.1416<br>24m<br>5.2e9 | System.Double |
 | string | Text, as a sequence of UTF-16 characters. | "Birdie!"<br>"c:\\temp" | System.String |
 | verdict | Enumeration of test verdict values. | pass<br>fail | StepBro.Core.Data.Verdict |
-| datetime | Represents an instant in time, expressed as a date and time of day.| @2016-11-23 | System.DateTime |
+| datetime | Represents an instant in time, expressed as a date and time of day.| @2023-07-27 09:25:00 UTC | System.DateTime |
 | timespan | Represents a time interval. | 10s<br>@0:02.400 | System.TimeSpan |
 
 ## Using .net types
@@ -45,7 +45,7 @@ Example: ```System.Globalization.CultureInfo```
 --------- | ---------------
 unset / Verdict.Unset | The execution has no verdict.
 pass / Verdict.Pass | All test expectations were fulfilled.
-inconclusive / Verdict.Inconclusive| A pass/fail test result could be determined.
+inconclusive / Verdict.Inconclusive| A pass/fail test result could not be determined.
 fail / Verdict.Fail | One or more expectations in the test was not fulfilled.
 Verdict.Abandoned | Indicates that the user chose to abandon/break a running test.
 error / Verdict.Error | A fatal error in the script execution.
@@ -60,7 +60,7 @@ The supported SI prefixes, used for numeric values, are:
 
 | P | T | G | M | K | m | u | n | p |
 |
-| Penta | Tera | Giga  | Mega | Kilo | milli | micro | nano | pico |
+| Peta | Tera | Giga  | Mega | Kilo | milli | micro | nano | pico |
 | 1e15 | 1e12 | 1e9 | 1e6 | 1e3 | 1e-3 | 1e-6 | 1e-9 | 1e-12 |
 
 Examples:
@@ -79,6 +79,47 @@ xps | Integer or decimal number of SI-prefixed seconds. <br>x: numeric value <br
 @h:mm:ss | Hours, minutes and seconds | @2:15:00
 @h:mm:ss.f | Hours, minutes, seconds and fraction-of-a-second | @7:24:56.62
 
+## Type Definition
+
+```
+type MySpecialConnection : SerialTestConnection;        // Create a new type that is based directly on another type.
+```
+
+# Aritmetic operators
+
+**Operator** | **Examples** | **Description**
+------------ | ------------ | ---------------
+| + | a + b<br>"Number: " + value | Addition |
+| - | a - b | Subtraction, multiplication, division  |
+| * | a * b<br>"Go" * 16 | multiplication |
+| / | a / b | division |
+| % | a % b | modulus |
+
+# Comparison operators
+
+**Operator** | **Examples** | **Description**
+------------ | ------------ | ---------------
+| == | a == b | Equal to |
+| != | a != b | Equal to |
+
+# Logical operators
+
+**Operator** | **Examples** | **Description**
+------------ | ------------ | ---------------
+| && | a && b | Logical AND |
+| \|\| | a \|\| b | Logical OR |
+| ! | !a | Logical NOT |
+
+# Binary operators
+
+**Operator** | **Examples** | **Description**
+------------ | ------------ | ---------------
+| & | a + b | Binary AND |
+| \| | a \| b | Binary OR |
+| ! | !a | Binary NOT |
+| << | a << b | Shift a left b bits |
+| >> | a >> b | Shift a right b bits |
+
 # Usings
 
 ```
@@ -96,21 +137,15 @@ double myDecimal = 582.3;
 bool myBoolean = true;
 string myString = "I didn't do it!";
 
-SerialPort port = SerialPort("COM4, "115200); 
+SerialPort port = SerialPort("COM4", 115200)
+{
+    Handshake: Handshake.None,
+    StopBits: StopBits.One
+}
 
 var a = 15;
 var b = "Stanley";
 var c = false;
-```
-
-Object properties can be set at variable creation like this:
-
-```
-SerialPort port = SerialPort()
-{
-    Port: "Com4",
-    Baudrate: 115200
-}
 ```
 
 # Procedures
@@ -136,10 +171,10 @@ log warning ("Operation took longer time than expected.");
 ## Sub steps
 
 ```
-step:
-step 14:
-step "Warming up":
-step 6, "Inspecting received data":
+step;
+step 14;
+step "Warming up";
+step 6, "Inspecting received data";
 ```
 
 
@@ -158,11 +193,21 @@ testlist allTests
 # Partners
 
 ```
-void DoSomehing() : BaseProcedure
-    partner OperationA: ProcedureAX,
-    partner override OperationB: ProcedureB3
+void DoSomehing() : BaseProcedure,
+    partner OperationA: ProcedureAX,            // Define new partner procedure.
+    partner override OperationB: ProcedureB3    // Redirect inherited partner to another procedure.
 {
 }
+```
+
+# File Element Override
+
+```
+override connection                         // Override data for a script variable.
+{
+    BaudRate: 460800
+}
+override connection as TargetConnection;    // Override type for a script variable.
 ```
 
 # Test Framework
