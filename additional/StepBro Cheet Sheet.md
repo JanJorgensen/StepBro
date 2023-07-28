@@ -100,7 +100,18 @@ type MySpecialConnection : SerialTestConnection;        // Create a new type tha
 **Operator** | **Examples** | **Description**
 ------------ | ------------ | ---------------
 | == | a == b | Equal to |
-| != | a != b | Equal to |
+| != | a != b | Not equal to |
+| > | a > b | Greater than |
+| < | a < b | Less than |
+| >= | a >= b | Greater than or equal to |
+| \<= | a \<= b | Less than or equal to |
+| ~= | a ~= b | Approximately equal to |
+| ± | a == b ± c | Equal to within tolerance |
+| ~=, ± | a ~= b ± c | Approximately equal to within tolerance |
+| | a \< b \< c | Is within range, limits not included |
+| | a \<= b \<= c | Is within range, limits included |
+| | a \<~ b \<~ c | Is within range, approximate limits included |
+
 
 # Logical operators
 
@@ -177,6 +188,14 @@ step "Warming up";
 step 6, "Inspecting received data";
 ```
 
+## Testing and reporting
+
+```
+expect ( value < 60.0 );                            // Verdict 'pass' if fulfilled, otherwise 'fail'.
+expect "Temperature Low Limit" ( temp > 4.5 );      // Added name/tag for the test.
+assert ( value < 400.0 );                           // Verdict 'error' if not fulfilled.
+```
+
 ## Control flow statements
 
 ```
@@ -189,7 +208,8 @@ else
 
 while ( i < 10 )
 {
-    if (x > 6000) break;
+    if (x < 0) continue;
+    if (y > 6000) break;
 }
 ```
 
@@ -209,7 +229,7 @@ while ( i < 10K ) :
 # Test Lists
 
 ```
-testlist allTests
+testlist allTests : BaseTestList, timeout: 10s, user: "Anders"
 {
     * SmokeTest
     * CalendarTest
