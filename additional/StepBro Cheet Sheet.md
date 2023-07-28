@@ -59,7 +59,7 @@ error / Verdict.Error | A fatal error in the script execution.
 The supported SI prefixes, used for numeric values, are:
 
 | P | T | G | M | K | m | u | n | p |
-|
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Peta | Tera | Giga  | Mega | Kilo | milli | micro | nano | pico |
 | 1e15 | 1e12 | 1e9 | 1e6 | 1e3 | 1e-3 | 1e-6 | 1e-9 | 1e-12 |
 
