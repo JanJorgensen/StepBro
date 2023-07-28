@@ -39,6 +39,8 @@ StepBro can use all .net data types, by using their full type name.
 
 Example: ```System.Globalization.CultureInfo```
 
+Generic types can be used by creating an alias like: ```using StringList = System.Collections.Generics.List<string>;```
+
 ## Verdict values
 
 **Value** | **Description**
