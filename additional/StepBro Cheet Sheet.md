@@ -2,7 +2,7 @@
 
 Most of the StepBro scripting language syntax is identical to C# syntax.
 
-All .net types (almost) can be used in StepBro. New .net types cannot be defined directly in StepBro script files.
+All .NET types (almost) can be used in StepBro. New .NET types cannot be defined directly in StepBro script files.
 
 ## Hello World example
 
@@ -23,7 +23,7 @@ procedure void main()
 
 Built-in data types:
 
-| **Type** | **Description** | **Examples** | **.net type** |
+| **Type** | **Description** | **Examples** | **.NET type** |
 | -------- | --------------- | ----------- | ------------- |
 | bool | Boolean value. | true<br>false | System.Bool |
 | int, integer | 64-bit signed integer value. | 2332<br>-10K | System.Int64 |
@@ -33,9 +33,9 @@ Built-in data types:
 | datetime | Represents an instant in time, expressed as a date and time of day.| @2023-07-27 09:25:00 UTC | System.DateTime |
 | timespan | Represents a time interval. | 10s<br>@0:02.400 | System.TimeSpan |
 
-## Using .net types
+## Using .NET types
 
-StepBro can use all .net data types, by using their full type name.
+StepBro can use all .NET data types, by using their full type name.
 
 Example: ```System.Globalization.CultureInfo```
 
@@ -222,7 +222,7 @@ while ( i < 10K ) :
     Timeout: 30s,                               // Looping breaks after time has elapsed.
     Break: "I saw it!",                         // User option for manually breaking loop.
     Break: "Error",                             // Another break option.
-    CountVar: i                                 // Variable thta counts the loop iterations.
+    CountVar: i                                 // Variable that counts the loop iterations.
 {
 }
 ```
@@ -243,7 +243,7 @@ testlist allTests : BaseTestList, timeout: 10s, user: "Anders"
 # Partners
 
 ```
-void DoSomehing() : BaseProcedure,
+void DoSomething() : BaseProcedure,
     partner OperationA: ProcedureAX,            // Define new partner procedure.
     partner override OperationB: ProcedureB3    // Redirect inherited partner to another procedure.
 {
