@@ -67,6 +67,13 @@ namespace StepBroCoreTest.Parser
             Assert.IsNull(ret);
         }
 
+        [TestMethod]
+        public void TestProcedureUnknownIdentifierWithAsyncMethodCall()
+        {
+            var proc = FileBuilder.ParseProcedure("void Func(){ int b = 5; if (b == 5) await harness.SendDirect(\"hi\"); }");
+            Assert.AreEqual(1, FileBuilder.LastInstance.Errors.ErrorCount);
+        }
+
 
         public interface ISomeInterface
         {
