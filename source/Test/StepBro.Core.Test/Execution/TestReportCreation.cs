@@ -11,7 +11,7 @@ namespace StepBroCoreTest.Execution
         [TestMethod]
         public void CreateReportInProcedure()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "DataReport Func(){ var data = StartReport(\"daID\", \"daTitle\"); return data; }");
 
             Assert.AreEqual(typeof(DataReport), proc.ReturnType.Type);
@@ -28,7 +28,7 @@ namespace StepBroCoreTest.Execution
         [TestMethod]
         public void CreateReportWithData()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "DataReport Func(){ step 1, \"Setup\"; var data = StartReport(\"daID\", \"Test#6\"); expect (5 > 4); return data; }");
 
             Assert.AreEqual(typeof(DataReport), proc.ReturnType.Type);
@@ -47,7 +47,7 @@ namespace StepBroCoreTest.Execution
         [TestMethod]
         public void CreateReportWithinUsing()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "DataReport Func(){ DataReport result = null; using ( var r = StartReport(\"daID\", \"Test#9\")) { expect (5 > 4); result = r; } return result; }");
 
             Assert.AreEqual(typeof(DataReport), proc.ReturnType.Type);

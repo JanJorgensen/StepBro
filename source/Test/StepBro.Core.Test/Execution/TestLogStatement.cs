@@ -17,7 +17,7 @@ namespace StepBroCoreTest.Execution
         [TestMethod]
         public void LogConstantString()
         {
-            var procedure = FileBuilder.ParseProcedure(
+            var procedure = FileBuilder.ParseProcedureExpectNoErrors(
                 "procedure void Anders() {",
                 "   log (\"Ello!\");",
                 "}");
@@ -35,7 +35,7 @@ namespace StepBroCoreTest.Execution
         [TestMethod]
         public void LogSimpleNonStringTypes()
         {
-            var procedure = FileBuilder.ParseProcedure(
+            var procedure = FileBuilder.ParseProcedureExpectNoErrors(
                 "procedure void Anders() {",
                 "   log (true);",
                 "   log (36);",

@@ -19,7 +19,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestProcedureSimpleIfStatement()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "int Func(bool input){ var result = 0; if (input) result = 715; return result; }");
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
             Assert.AreEqual(1, proc.Parameters.Length);
@@ -38,7 +38,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestProcedureSimpleIfStatementWithBlock()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "int Func(bool input){ var result = 0; if (input) { result = 223; } return result; }");
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
             Assert.AreEqual(1, proc.Parameters.Length);
@@ -57,7 +57,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestProcedureSimpleIfElseStatement()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "int Func(bool input){ var result = 0; if (input) result = 175; else result = 126; return result; }");
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
             Assert.AreEqual(1, proc.Parameters.Length);
@@ -76,7 +76,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestProcedureSimpleIfElseStatementWithBlock()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "int Func(bool input)",
                 "{  var result = 0;",
                 "   if (input) { result = 626; }",
@@ -124,6 +124,32 @@ namespace StepBroCoreTest.Parser
             log.ExpectNext("2 - Normal - 5 myObject.MethodAsyncObject - Yup: Anders");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
+        }
+
+        [TestMethod]
+        public void TestProcedureIfWithErrorInCondition()
+        {
+            // With block in if and else.
+            var proc = FileBuilder.ParseProcedure(
+                "int Func()",
+                "{  var result = 22;",
+                "   if (undefinedVariable == 42) { result = 626; }",
+                "   else { result = 262; }",
+                "   return result; ",
+                "}");
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(1, FileBuilder.LastInstance.Errors.ErrorCount);
+
+            // With single statement in if and else.
+            proc = FileBuilder.ParseProcedure(
+                "int Func()",
+                "{  var result = 22;",
+                "   if (undefinedVariable == 42) log(\"true\");",
+                "   else log(\"false\");",
+                "   return result; ",
+                "}");
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(1, FileBuilder.LastInstance.Errors.ErrorCount);
         }
     }
 }

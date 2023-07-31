@@ -232,7 +232,7 @@ namespace StepBro.Core.Parser
 
         public override void ExitBlock([NotNull] SBP.BlockContext context)
         {
-            m_expressionData.PopStackLevel();   // Just remove the level; it 
+            m_expressionData.PopStackLevel();   // Just remove the level.
 
             var block = m_scopeStack.Pop();
             if (block.Type != ProcedureParsingScope.ScopeType.Procedure)
@@ -250,8 +250,6 @@ namespace StepBro.Core.Parser
             {
                 // End of procedure body. Handled in ExitProcedureBody().
             }
-            //    var sub = m_scopeStack.Pop();
-            //    m_scopeStack.Peek().AddStatementCode(sub.GetBlockCode());
         }
 
         public override void EnterSubStatement([NotNull] SBP.SubStatementContext context)
@@ -275,7 +273,7 @@ namespace StepBro.Core.Parser
             else if (sub.StatementCount == 0)   // Must be a block statement then.
             {
                 // Add the block scope saved as a sub-expression in the sub-statement scope.
-                m_scopeStack.Peek().AddSubStatement(sub.GetSubExpressions()[0]);
+                m_scopeStack.Peek().AddSubStatement(sub.GetSubStatements()[0]);
             }
         }
 
@@ -379,13 +377,14 @@ namespace StepBro.Core.Parser
         {
             var stack = m_expressionData.PopStackLevel();
             var condition = stack.Pop();
-            var subStatements = m_scopeStack.Peek().GetSubExpressions();
+            var subStatements = m_scopeStack.Peek().GetSubStatements();
             var attributes = m_scopeStack.Peek().GetAttributes();
 
             condition = this.ResolveForGetOperation(condition);
 
-            if (condition.IsError()) 
+            if (!CheckExpressionsForErrors(context, condition))
             {
+                m_scopeStack.Peek().AddStatementCode(Expression.Empty());
                 return;
             }
 
@@ -457,7 +456,7 @@ namespace StepBro.Core.Parser
         {
             var stack = m_expressionData.PopStackLevel();
             var condition = stack.Pop();
-            var subStatements = m_scopeStack.Peek().GetSubExpressions();
+            var subStatements = m_scopeStack.Peek().GetSubStatements();
             var attributes = m_scopeStack.Peek().GetAttributes();
             ProcedureVariable varLoopIndex = null;
             ProcedureVariable varEntryTime = null;
@@ -650,7 +649,7 @@ namespace StepBro.Core.Parser
 
         public override void ExitUsingStatement([NotNull] SBP.UsingStatementContext context)
         {
-            var subStatements = m_scopeStack.Peek().GetSubExpressions();
+            var subStatements = m_scopeStack.Peek().GetSubStatements();
 
             Expression scopeCode = null;
             if (subStatements[0].Type == ProcedureParsingScope.ScopeType.Block)
@@ -1156,14 +1155,14 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpressionStatement([NotNull] SBP.ExpressionStatementContext context)
         {
-            var statement = m_expressionData.PopStackLevel().Pop();
-            if (statement.IsError())
+            var expression = m_expressionData.PopStackLevel().Pop();
+            if (expression.IsError())
             {
-                // TODO: Has error been reported???
+                m_scopeStack.Peek().AddStatementCode(Expression.Empty());   // Add ampty statement, to make the rest of the error handling easier.
             }
             else
             {
-                var expressionStatement = statement.ExpressionCode;
+                var expressionStatement = expression.ExpressionCode;
 
                 var conditionalReturn = Expression.Condition(
                     Expression.Call(s_PostExpressionStatement, m_currentProcedure.ContextReferenceInternal),

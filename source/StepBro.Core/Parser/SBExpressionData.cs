@@ -36,10 +36,10 @@ namespace StepBro.Core.Parser
         DynamicObjectMember,
         DynamicAsyncObjectMember,
         // Errors:
-        OperationError,
+        ExpressionError,
+        //OperationError,
         UnknownIdentifier,
         UnsupportedOperation,
-        ExpressionError
     };
 
     public class SBExpressionData
@@ -212,7 +212,7 @@ namespace StepBro.Core.Parser
 
         public bool IsError()
         {
-            return (this.ReferencedType >= SBExpressionType.OperationError);
+            return (this.ReferencedType >= SBExpressionType.ExpressionError);
         }
 
         public bool IsResolved
@@ -224,7 +224,7 @@ namespace StepBro.Core.Parser
                     case SBExpressionType.Identifier:
                     case SBExpressionType.UnknownIdentifier:
                     case SBExpressionType.UnsupportedOperation:
-                    case SBExpressionType.OperationError:
+                    //case SBExpressionType.OperationError:
                         return false;
                     default:
                         return true;
@@ -274,7 +274,7 @@ namespace StepBro.Core.Parser
                     case SBExpressionType.TestListReference:
                     case SBExpressionType.FileElementOverride:
                     case SBExpressionType.DatatableReference:
-                    case SBExpressionType.OperationError:
+                    //case SBExpressionType.OperationError:
                         return false;
 
                     case SBExpressionType.Constant:
