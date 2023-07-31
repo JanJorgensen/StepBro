@@ -67,29 +67,32 @@ namespace StepBro.Core.Parser
         {
             var left = m_expressionData.Pop();
             left = this.ResolveIfIdentifier(left, true);
-            if (left.IsUnresolvedIdentifier || left.IsError())
+            if (CheckExpressionsForErrors(context, left))
             {
-                m_expressionData.Push(new SBExpressionData(
-                    SBExpressionType.OperationError, "Error parsing 'dot' operation.", context.GetText(), new TokenOrSection(context.Start, context.Stop, context.GetText())));
-            }
-            else
-            {
-                var child = context.GetChild(2) as TerminalNodeImpl;
-                var identifier = SBExpressionData.CreateIdentifier(child.GetText(), token: child.Payload as CommonToken);
-                var result = this.ResolveDotIdentifier(left, identifier);
-                if (result == null)
+                if (left.IsUnresolvedIdentifier || left.IsError())
                 {
-                    var payload = context.GetChild(2).Payload as CommonToken;
-                    m_errors.SymanticError(payload.Line, payload.StartIndex, false, $"Unknown identifier: '{identifier.Value as string}'.");
-                    result = new SBExpressionData(
-                        SBExpressionType.OperationError, "Error parsing 'dot' operation.", context.GetText(), new TokenOrSection(context.Start, context.Stop, context.GetText()));
+                    m_expressionData.Push(new SBExpressionData(
+                        SBExpressionType.ExpressionError, "Error parsing 'dot' operation.", context.GetText(), new TokenOrSection(context.Start, context.Stop, context.GetText())));
                 }
-                else if (result.IsError())
+                else
                 {
-                    var payload = context.GetChild(2).Payload as CommonToken;
-                    m_errors.SymanticError(payload.Line, payload.StartIndex, false, result.Argument);
+                    var child = context.GetChild(2) as TerminalNodeImpl;
+                    var identifier = SBExpressionData.CreateIdentifier(child.GetText(), token: child.Payload as CommonToken);
+                    var result = this.ResolveDotIdentifier(left, identifier);
+                    if (result == null)
+                    {
+                        var payload = context.GetChild(2).Payload as CommonToken;
+                        m_errors.SymanticError(payload.Line, payload.StartIndex, false, $"Unknown identifier: '{identifier.Value as string}'.");
+                        result = new SBExpressionData(
+                            SBExpressionType.ExpressionError, "Error parsing 'dot' operation.", context.GetText(), new TokenOrSection(context.Start, context.Stop, context.GetText()));
+                    }
+                    else if (result.IsError())
+                    {
+                        var payload = context.GetChild(2).Payload as CommonToken;
+                        m_errors.SymanticError(payload.Line, payload.StartIndex, false, result.Argument);
+                    }
+                    m_expressionData.Push(result);
                 }
-                m_expressionData.Push(result);
             }
         }
 

@@ -115,7 +115,11 @@ namespace StepBro.Core.Parser
         {
             if (left.IsError())
             {
-                if (!isCallStatement)
+                if (isCallStatement)
+                {
+                    m_scopeStack.Peek().AddStatementCode(Expression.Empty());   // Add ampty statement, to make the rest of the error handling easier.
+                }
+                else
                 {
                     m_expressionData.Push(left);
                 }
@@ -290,7 +294,7 @@ namespace StepBro.Core.Parser
                         return;     // All done for now.
                     }
 
-                case SBExpressionType.OperationError:
+                case SBExpressionType.ExpressionError:
                 case SBExpressionType.UnsupportedOperation:
                 case SBExpressionType.UnknownIdentifier:
                     return;

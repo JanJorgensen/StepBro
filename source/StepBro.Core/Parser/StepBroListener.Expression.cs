@@ -1,8 +1,12 @@
-﻿using Antlr4.Runtime.Misc;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
+using Newtonsoft.Json.Linq;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.ScriptData;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Range = StepBro.Core.Data.Range;
@@ -141,8 +145,9 @@ namespace StepBro.Core.Parser
             }
             catch
             {
-                m_expressionData.Push(new SBExpressionData(
-                    SBExpressionType.OperationError, "Error parsing 'await' operation.", null, context.Start));
+                throw new NotImplementedException();
+                //m_expressionData.Push(new SBExpressionData(
+                //    SBExpressionType.OperationError, "Error parsing 'await' operation.", null, context.Start));
             }
 
             //var awaiter = this.MakeAwaitOperation(exp.ExpressionCode, context, true);
@@ -339,7 +344,7 @@ namespace StepBro.Core.Parser
                         SBExpressionType.Expression,
                         datatype,
                         getValue);//,
-                        //result.Value /* E.g. the variable reference */ );
+                                  //result.Value /* E.g. the variable reference */ );
                 }
                 return result;
             }
@@ -352,43 +357,31 @@ namespace StepBro.Core.Parser
         public override void ExitExpBinary([NotNull] SBP.ExpBinaryContext context)
         {
             var ctxt = context.GetText();
-            var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            if (first.IsResolved && last.IsResolved)
+            var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            if (CheckExpressionsForErrors(context, first, last))
             {
                 var op = BinaryOperators.BinaryOperatorBase.GetOperator(context.op.Type);
                 // TODO: Check if operator is returned
                 var result = op.Resolve(this, first, last);
                 m_expressionData.Push(result);
             }
-            else
-            {
-                m_expressionData.Push(new SBExpressionData(
-                    SBExpressionType.OperationError, 
-                    "Error parsing binary operation.", 
-                    context.GetText(), 
-                    new TokenOrSection(context.Start, context.Stop, context.GetText())));
-            }
         }
 
         public override void ExitExpUnaryRight([NotNull] SBP.ExpUnaryRightContext context)
         {
-            this.ExitExpUnary(context.op.Type, false);
+            this.ExitExpUnary(context, context.op.Type, false);
         }
 
         public override void ExitExpUnaryLeft([NotNull] SBP.ExpUnaryLeftContext context)
         {
-            this.ExitExpUnary(context.op.Type, true);
+            this.ExitExpUnary(context, context.op.Type, true);
         }
 
-        private void ExitExpUnary(int type, bool opOnLeft)
+        private void ExitExpUnary(ParserRuleContext context, int type, bool opOnLeft)
         {
-            var input = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            if (input.IsError())
-            {
-                m_expressionData.Push(input);
-            }
-            else
+            var input = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            if (CheckExpressionsForErrors(context, input))
             {
                 var op = UnaryOperators.UnaryOperatorBase.GetOperator(type);
                 var result = op.Resolve(this, input, opOnLeft);
@@ -400,33 +393,23 @@ namespace StepBro.Core.Parser
         {
             var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true);
             var first = this.ResolveIfIdentifier(m_expressionData.Peek().Pop(), true);
-            if (last.IsError())
+            if (CheckExpressionsForErrors(context, first, last))
             {
-                m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError));
-            }
-            else
-            {
-                if (first.IsError())
+                last.NarrowGetValueType();
+                var op = AssignmentOperators.AssignmentOperatorBase.GetOperator(context.op.Type);
+                if (op != null)
                 {
-                    m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError));
+                    // TODO: Check if operator is returned
+                    last = this.CastProcedureAssignmentArgumentIfNeeded(first.DataType, last);
+                    if (CheckExpressionsForErrors(context, first, last))
+                    {
+                        var result = op.Resolve(this, first, last);
+                        m_expressionData.Push(result);
+                    }
                 }
                 else
                 {
-                    last.NarrowGetValueType();
-                    var op = AssignmentOperators.AssignmentOperatorBase.GetOperator(context.op.Type);
-                    if (op != null)
-                    {
-                        // TODO: Check if operator is returned
-                        last = this.CastProcedureAssignmentArgumentIfNeeded(first.DataType, last);
-
-                        if (first.IsError()) m_expressionData.Push(first);
-                        else if (last.IsError()) m_expressionData.Push(last);
-                        else
-                        {
-                            var result = op.Resolve(this, first, last);
-                            m_expressionData.Push(result);
-                        }
-                    }
+                    throw new NotImplementedException();
                 }
             }
         }
@@ -436,11 +419,14 @@ namespace StepBro.Core.Parser
             var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
             var middle = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
             var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            var op1 = context.op1.Type;
-            var op2 = context.op2.Type;
-            // TODO: Check if operator is returned
-            var result = SpecialOperators.BetweenOperator.Resolve(this, first, op1, middle, op2, last);
-            m_expressionData.Push(result);
+            if (CheckExpressionsForErrors(context, first, middle, last))
+            {
+                var op1 = context.op1.Type;
+                var op2 = context.op2.Type;
+                // TODO: Check if operator is returned
+                var result = SpecialOperators.BetweenOperator.Resolve(this, first, op1, middle, op2, last);
+                m_expressionData.Push(result);
+            }
         }
 
         public override void ExitExpEqualsWithTolerance([NotNull] SBP.ExpEqualsWithToleranceContext context)
@@ -448,18 +434,24 @@ namespace StepBro.Core.Parser
             var tolerance = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
             var expected = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
             var value = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            var op = context.op.Type;
-            // TODO: Check if operator is returned
-            var result = SpecialOperators.EqualsWithToleranceOperator.Resolve(this, value, op, expected, tolerance);
-            m_expressionData.Push(result);
+            if (CheckExpressionsForErrors(context, value, expected, tolerance))
+            {
+                var op = context.op.Type;
+                // TODO: Check if operator is returned
+                var result = SpecialOperators.EqualsWithToleranceOperator.Resolve(this, value, op, expected, tolerance);
+                m_expressionData.Push(result);
+            }
         }
 
         public override void ExitExpCoalescing([NotNull] SBP.ExpCoalescingContext context)
         {
             var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
             var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            var result = SpecialOperators.CoalescingOperator.Resolve(this, first, last);
-            m_expressionData.Push(result);
+            if (CheckExpressionsForErrors(context, first, last))
+            {
+                var result = SpecialOperators.CoalescingOperator.Resolve(this, first, last);
+                m_expressionData.Push(result);
+            }
         }
 
         #region Literals
@@ -683,6 +675,39 @@ namespace StepBro.Core.Parser
             else
             {
                 return expression;
+            }
+        }
+
+        private bool CheckExpressionsForErrors(ParserRuleContext context, params SBExpressionData[] expressions)
+        {
+            if (expressions.All(e => e.IsResolved && !e.IsError()))
+            {
+                return true;
+            }
+            else
+            {
+                foreach (var e in expressions.Where(exp => exp.IsResolved == false && !exp.IsError()))
+                {
+                    if (e.ReferencedType != SBExpressionType.ExpressionError)
+                    {
+                        if (e.ReferencedType == SBExpressionType.UnknownIdentifier)
+                        {
+                            m_errors.SymanticError(e.Token.Line, e.Token.Column, false, "Unknown identifier: " + (e.Value as string));
+                        }
+                        else
+                        {
+                            throw new NotImplementedException();
+                            //m_errors.SymanticError(e.Token.Line, e.Token.Column, false, "");
+                        }
+                    }
+                }
+
+                m_expressionData.Push(new SBExpressionData(
+                    SBExpressionType.ExpressionError,
+                    "Expression error.",
+                    context.GetText(),
+                    new TokenOrSection(context.Start, context.Stop, context.GetText())));
+                return false;
             }
         }
 

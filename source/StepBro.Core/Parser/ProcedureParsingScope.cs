@@ -80,7 +80,7 @@ namespace StepBro.Core.Parser
             m_subStatements.Add(statementCode);
         }
 
-        public List<ProcedureParsingScope> GetSubExpressions()
+        public List<ProcedureParsingScope> GetSubStatements()
         {
             var subs = m_subStatements;
             m_subStatements = new List<ProcedureParsingScope>();

@@ -24,6 +24,7 @@ namespace StepBro.Core.Parser
         private readonly StepBroListener m_listener = null;
         private readonly ScriptFile m_file = null;
         public static readonly AccessModifier DefaultAccess = AccessModifier.Public;
+        private static FileBuilder m_lastInstance = null;
 
         internal FileBuilder(AntlrInputStream code, IAddonManager addons = null, ScriptFile file = null)
         {
@@ -41,9 +42,11 @@ namespace StepBro.Core.Parser
 #endif
             m_parser.BuildParseTree = true;
             m_listener = new StepBroListener(m_errors, addons, file);
+            m_lastInstance = this;
         }
 
         public static ServiceManager.IServiceManagerAdministration LastServiceManager { get; internal set; }
+        public static FileBuilder LastInstance { get { return m_lastInstance; } }
 
         internal static FileBuilder Create(string content, Type typeUsing = null, Type[] typeNamespaces = null)
         {
@@ -293,10 +296,16 @@ namespace StepBro.Core.Parser
             return builder.File.ListFileVariables().FirstOrDefault() as IValueContainer<T>;
         }
 
-        internal static IFileProcedure ParseProcedure(params string[] content)
+        internal static IFileProcedure ParseProcedureExpectNoErrors(params string[] content)
         {
             var builder = ParseProcedure(null, new string[] { }, null, content);
             System.Diagnostics.Debug.Assert(builder.Errors.ErrorCount == 0);
+            return builder.Listener.LastParsedProcedure;
+        }
+
+        internal static IFileProcedure ParseProcedure(params string[] content)
+        {
+            var builder = ParseProcedure(null, new string[] { }, null, content);
             return builder.Listener.LastParsedProcedure;
         }
 
