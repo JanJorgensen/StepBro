@@ -290,7 +290,7 @@ namespace StepBro.Core.Parser
                         return;     // All done for now.
                     }
 
-                case SBExpressionType.OperationError:
+                case SBExpressionType.ExpressionError:
                 case SBExpressionType.UnsupportedOperation:
                 case SBExpressionType.UnknownIdentifier:
                     return;

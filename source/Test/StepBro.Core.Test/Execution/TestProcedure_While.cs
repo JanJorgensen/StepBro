@@ -15,7 +15,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestProcedureWhileStatementWithExpression()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "int Func(){ var output = 0; while ( output < 100) output += 12; return output; }");
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
             Assert.AreEqual(0, proc.Parameters.Length);
@@ -28,7 +28,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestProcedureWhileStatementWithBlock()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "int Func(){ var output = 0; var n = 0; while (n < 10) { output += 13; n++; } return output; }");
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
             Assert.AreEqual(0, proc.Parameters.Length);
@@ -41,7 +41,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestProcedureWhileStatementWithBlockAndBreak()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "int Func(){ var output = 3; var n = 0; while (n < 1000) { output += 13; break; } return output; }");
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
             Assert.AreEqual(0, proc.Parameters.Length);
@@ -54,7 +54,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestProcedureWhileStatementWithBlockAndConditionalBreak()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "int Func(){ var output = 5; var n = 0; while (n < 1000) { output += 13; n++; if (n >= 4) break; } return output; }");
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
             Assert.AreEqual(0, proc.Parameters.Length);
@@ -67,7 +67,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestProcedureWhileStatementWithTimeout()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "int Func(){ var n = 0; " +
                 "while (true) :" +
                 "    Timeout: 20ms" +
@@ -86,10 +86,10 @@ namespace StepBroCoreTest.Parser
         // "[Title: \"Looping for a while\"] [Timeout: 2s] [Break: \"Found\", Break: \"Error\", CountVar: c]" +
 
         [TestMethod]
-        [Ignore]    // Interactive interface not implemented
+        [Ignore("Interactive interface not implemented")]
         public void TestProcedureWhileStatementWithSpecifiedIterationVariable()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "int Func(){ var n = 9; var m = 0; var c = 0;" +
                 "while (true) : index: c" +
                 "{ n++; if (n >= 16) break; m = c; }" +
@@ -104,10 +104,10 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        [Ignore]    // Interactive interface not implemented
+        [Ignore("Interactive interface not implemented")]
         public void TestProcedureWhileStatementWithInteractiveBreak()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "int Func(){ var n = 0;" +
                 "[Break: \"Stop\"]" +
                 "while (true) : Break: \"Stop\"" +

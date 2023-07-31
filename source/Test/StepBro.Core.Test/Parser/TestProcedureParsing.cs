@@ -11,7 +11,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestProcedureParametersNone()
         {
-            var proc = FileBuilder.ParseProcedure("void Func(){}");
+            var proc = FileBuilder.ParseProcedureExpectNoErrors("void Func(){}");
             Assert.AreEqual(typeof(void), proc.ReturnType.Type);
             Assert.AreEqual(0, proc.Parameters.Length);
         }
@@ -19,7 +19,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestProcedureParametersOnlyReturn()
         {
-            var proc = FileBuilder.ParseProcedure("int Func(){}");
+            var proc = FileBuilder.ParseProcedureExpectNoErrors("int Func(){}");
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
             Assert.AreEqual(0, proc.Parameters.Length);
         }
@@ -27,7 +27,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestProcedureParametersSingleInput()
         {
-            var proc = FileBuilder.ParseProcedure("void Func(int a){}");
+            var proc = FileBuilder.ParseProcedureExpectNoErrors("void Func(int a){}");
             Assert.AreEqual(typeof(void), proc.ReturnType.Type);
             Assert.AreEqual(1, proc.Parameters.Length);
         }
@@ -35,12 +35,12 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestProcedureParametersWithDefaultValue()
         {
-            var proc = FileBuilder.ParseProcedure("void Func(int a = 30){}") as FileProcedure;
+            var proc = FileBuilder.ParseProcedureExpectNoErrors("void Func(int a = 30){}") as FileProcedure;
             Assert.AreEqual(typeof(void), proc.ReturnType.Type);
             Assert.AreEqual(1, proc.GetFormalParameters().Count);
             Assert.AreEqual(30, (long)proc.GetFormalParameters()[0].DefaultValue);
 
-            proc = FileBuilder.ParseProcedure("void Func(string b = \"Nix!\"){}") as FileProcedure;
+            proc = FileBuilder.ParseProcedureExpectNoErrors("void Func(string b = \"Nix!\"){}") as FileProcedure;
             Assert.AreEqual(typeof(void), proc.ReturnType.Type);
             Assert.AreEqual(1, proc.GetFormalParameters().Count);
             Assert.AreEqual("Nix!", (string)proc.GetFormalParameters()[0].DefaultValue);
@@ -60,7 +60,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestSimpleVoidProcedureExecution()
         {
-            var proc = FileBuilder.ParseProcedure("void Func(){}");
+            var proc = FileBuilder.ParseProcedureExpectNoErrors("void Func(){}");
             Assert.AreEqual(0, proc.Parameters.Length);
 
             var ret = proc.Call();

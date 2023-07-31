@@ -384,7 +384,7 @@ namespace StepBro.Core.Parser
 
             condition = this.ResolveForGetOperation(condition);
 
-            if (condition.IsError()) 
+            if (!CheckExpressionsForErrors(context, condition))
             {
                 return;
             }

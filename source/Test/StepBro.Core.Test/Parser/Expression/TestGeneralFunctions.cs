@@ -19,7 +19,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void ExecuteDelay2()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "void Func(){ delay(200ms); }");
 
             Assert.AreEqual(typeof(void), proc.ReturnType.Type);
@@ -32,7 +32,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void StringParseToInteger()
         {
-            var proc = FileBuilder.ParseProcedure("int Func(){ var v = \"726\".ToInt(); return v; }");
+            var proc = FileBuilder.ParseProcedureExpectNoErrors("int Func(){ var v = \"726\".ToInt(); return v; }");
 
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
             Assert.AreEqual(0, proc.Parameters.Length);
@@ -42,7 +42,7 @@ namespace StepBroCoreTest.Parser
             Assert.IsTrue(result.GetType() == typeof(long));
             Assert.AreEqual(726L, (long)result);
 
-            proc = FileBuilder.ParseProcedure("int Func(){ var v = \"*d7\".ToInt(); return v; }");
+            proc = FileBuilder.ParseProcedureExpectNoErrors("int Func(){ var v = \"*d7\".ToInt(); return v; }");
 
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
             Assert.AreEqual(0, proc.Parameters.Length);
@@ -56,7 +56,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestContainsMatch()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "bool Func(){ var strings = [\"Anders\", \"Benny\", \"Chris\", \"Dennis\"]; bool b = strings.ContainsMatch(\"Be*\"); return b; }");
             Assert.AreEqual(typeof(bool), proc.ReturnType.Type);
             Assert.AreEqual(0, proc.Parameters.Length);
@@ -65,7 +65,7 @@ namespace StepBroCoreTest.Parser
             Assert.IsTrue((bool)result);
 
 
-            proc = FileBuilder.ParseProcedure(
+            proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "bool Func(){ var strings = [\"Anders\", \"Benny\", \"Chris\", \"Dennis\"]; bool b = strings.ContainsMatch(\"Bes*\"); return b; }");
             Assert.AreEqual(typeof(bool), proc.ReturnType.Type);
             Assert.AreEqual(0, proc.Parameters.Length);
@@ -77,7 +77,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestFindMatch()
         {
-            var proc = FileBuilder.ParseProcedure(
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "string Func(){ var strings = [\"Anders\", \"Benny\", \"Chris\", \"Dennis\"]; string r = strings.FindMatch(\"Be*\"); return r; }");
             Assert.AreEqual(typeof(string), proc.ReturnType.Type);
             Assert.AreEqual(0, proc.Parameters.Length);
@@ -86,7 +86,7 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual("Benny", (string)result);
 
 
-            proc = FileBuilder.ParseProcedure(
+            proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "string Func(){ var strings = [\"Anders\", \"Benny\", \"Chris\", \"Dennis\"]; string r = strings.FindMatch(\"Bes*\"); return r; }");
             Assert.AreEqual(typeof(string), proc.ReturnType.Type);
             Assert.AreEqual(0, proc.Parameters.Length);
