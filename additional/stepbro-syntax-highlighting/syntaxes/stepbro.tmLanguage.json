@@ -141,7 +141,7 @@
 			[
 				{
 					"name": "support.type.built-in.object-name.stepbro",
-					"match": "(?<=(public|private)) (?!procedure).* "
+					"match": "(?<=(public|private)) (?!procedure)[a-zA-Z][a-zA-Z0-9]*"
 				}
 			]
 		},
