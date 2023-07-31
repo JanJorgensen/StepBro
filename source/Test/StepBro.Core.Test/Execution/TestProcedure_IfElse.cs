@@ -129,11 +129,23 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestProcedureIfWithErrorInCondition()
         {
+            // With block in if and else.
             var proc = FileBuilder.ParseProcedure(
                 "int Func()",
                 "{  var result = 22;",
                 "   if (undefinedVariable == 42) { result = 626; }",
                 "   else { result = 262; }",
+                "   return result; ",
+                "}");
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(1, FileBuilder.LastInstance.Errors.ErrorCount);
+
+            // With single statement in if and else.
+            proc = FileBuilder.ParseProcedure(
+                "int Func()",
+                "{  var result = 22;",
+                "   if (undefinedVariable == 42) log(\"true\");",
+                "   else log(\"false\");",
                 "   return result; ",
                 "}");
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
