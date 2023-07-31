@@ -1,69 +1,69 @@
 {
-	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-	"name": "StepBro",
-	"patterns": [
-		{
-			"include": "#keywords"
-		},
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "StepBro",
+    "patterns": [
+        {
+            "include": "#keywords"
+        },
         {
             "include": "#constants"
         },
-		{
-			"include": "#strings"
-		},
-		{
-			"include": "#procedures"
-		},
-		{
-			"include": "#usings"
-		},
-		{
-			"include": "#objects"
-		},
-		{
-			"include": "#double-slash-comments"
-		},
-		{
-			"include": "#multi-line-comments"
-		},
+        {
+            "include": "#strings"
+        },
+        {
+            "include": "#procedures"
+        },
+        {
+            "include": "#usings"
+        },
+        {
+            "include": "#objects"
+        },
+        {
+            "include": "#double-slash-comments"
+        },
+        {
+            "include": "#multi-line-comments"
+        },
         {
             "include": "#type-overrides"
         },
         {
             "include": "#test-list"
         }
-	],
-	"repository": {
-		"keywords": 
-		{
-			"patterns":
-			[
-				{
-					"name": "keyword.control.stepbro",
-					"match": "\\b(if|while|for|return)\\b"
-				},
-				{
-					"name": "keyword.other.types.stepbro",
-					"match": "\\b(bool|void|testlist|int|string|type|namespace)\\b"
-				},
-				{
-					"name": "keyword.other.step.stepbro",
-					"match": "step"
-				},
-				{
-					"name": "keyword.other.using.stepbro",
-					"match": "using"
-				},
-				{
-					"name": "keyword.other.stepbro",
-					"match": "\\b(true|false|override|this)\\b"
-				},
-				{
-					"name": "keyword.control.partner.stepbro",
-					"match": "partner"
-				}
-			]
-		},
+    ],
+    "repository": {
+        "keywords": 
+        {
+            "patterns":
+            [
+                {
+                    "name": "keyword.control.stepbro",
+                    "match": "\\b(if|while|for|return)\\b"
+                },
+                {
+                    "name": "keyword.other.types.stepbro",
+                    "match": "\\b(bool|void|testlist|int|string|type|namespace)\\b"
+                },
+                {
+                    "name": "keyword.other.step.stepbro",
+                    "match": "step"
+                },
+                {
+                    "name": "keyword.other.using.stepbro",
+                    "match": "using"
+                },
+                {
+                    "name": "keyword.other.stepbro",
+                    "match": "\\b(true|false|override|this)\\b"
+                },
+                {
+                    "name": "keyword.control.partner.stepbro",
+                    "match": "partner"
+                }
+            ]
+        },
         "constants":
         {
             "patterns":
@@ -78,22 +78,22 @@
                 }
             ]
         },
-		"procedures":
-		{
-			"patterns":
-			[
-				{
-					"name": "entity.name.function.stepbro",
-					"match": "procedure"
-				},
-				{
-					"name": "keyword.other.protection.stepbro",
-					"match": "\\b(public|private)\\b"
-				},
-				{
-					"name": "entity.name.function.stepbro",
-					"match": "([a-zA-Z][a-zA-Z0-9]* *\\()"
-				},
+        "procedures":
+        {
+            "patterns":
+            [
+                {
+                    "name": "entity.name.function.stepbro",
+                    "match": "procedure"
+                },
+                {
+                    "name": "keyword.other.protection.stepbro",
+                    "match": "\\b(public|private)\\b"
+                },
+                {
+                    "name": "entity.name.function.stepbro",
+                    "match": "([a-zA-Z][a-zA-Z0-9]* *\\()"
+                },
                 {
                     "name": "entity.name.function.inherited.stepbro",
                     "match": "(?<=procedure .*:[ ]*)[a-zA-Z][a-zA-Z0-9]*"
@@ -114,43 +114,43 @@
                     "name": "entity.name.function.override.stepbro",
                     "match": "(?<=partner .*:[ ]*)[a-zA-Z][a-zA-Z0-9]*"
                 }
-			]
-		},
-		"strings": 
-		{
-			"name": "string.quoted.double.stepbro",
-			"begin": "\"",
-			"end": "\"",
-			"patterns": 
-			[
-				{
-					"name": "constant.character.escape.stepbro",
-					"match": "\\\\."
-				}
-			]
-		},
-		"usings":
-		{
-			"patterns":
-			[
-				{
-					"name": "constant.character.escape.using-at.stepbro",
-					"match": "(?<=using) @\".*\""
-				},
-				{
-					"name": "entity.name.function.using-normal.stepbro",
-					"match": "(?<=using) \\b(?!\\@\".*\").*\\b"
-				}
-			]
-		},
-		"objects":
-		{
-			"patterns":
-			[
-				{
-					"name": "support.type.built-in.object-name.stepbro",
-					"match": "(?<=(public|private)) (?!procedure)[a-zA-Z][a-zA-Z0-9]*"
-				},
+            ]
+        },
+        "strings": 
+        {
+            "name": "string.quoted.double.stepbro",
+            "begin": "\"",
+            "end": "\"",
+            "patterns": 
+            [
+                {
+                    "name": "constant.character.escape.stepbro",
+                    "match": "\\\\."
+                }
+            ]
+        },
+        "usings":
+        {
+            "patterns":
+            [
+                {
+                    "name": "constant.character.escape.using-at.stepbro",
+                    "match": "(?<=using) @\".*\""
+                },
+                {
+                    "name": "entity.name.function.using-normal.stepbro",
+                    "match": "(?<=using) \\b(?!\\@\".*\").*\\b"
+                }
+            ]
+        },
+        "objects":
+        {
+            "patterns":
+            [
+                {
+                    "name": "support.type.built-in.object-name.stepbro",
+                    "match": "(?<=(public|private)) (?!procedure)[a-zA-Z][a-zA-Z0-9]*"
+                },
                 {
                     "name": "support.type.argument.stepbro",
                     "match": "(?<=(\\([ ]*(this)*[ ]*))[a-zA-Z][a-zA-Z0-9]*[ ]+(?![^a-zA-Z])"
@@ -159,31 +159,31 @@
                     "name": "support.type.argument.stepbro",
                     "match": "(?<=(\\(.*,[ ]*(this)*[ ]*))[a-zA-Z][a-zA-Z0-9]*[ ]+(?![^a-zA-Z])"
                 }
-			]
-		},
-		"double-slash-comments":
-		{
-			"patterns":
-			[
-				{
-					"name": "comment.line.double-slash.stepbro",
-					"match": "\/\/.*"
-				}
-			]
-		},
-		"multi-line-comments":
-		{
-			"name": "comment.block.stepbro",
-			"begin": "\/\\*",
-			"end": "\\*\/",
-			"patterns":
-			[
-				{
-					"name": "comment.block.stepbro",
-					"match": "."
-				}
-			]
-		},
+            ]
+        },
+        "double-slash-comments":
+        {
+            "patterns":
+            [
+                {
+                    "name": "comment.line.double-slash.stepbro",
+                    "match": "\/\/.*"
+                }
+            ]
+        },
+        "multi-line-comments":
+        {
+            "name": "comment.block.stepbro",
+            "begin": "\/\\*",
+            "end": "\\*\/",
+            "patterns":
+            [
+                {
+                    "name": "comment.block.stepbro",
+                    "match": "."
+                }
+            ]
+        },
         "type-overrides":
         {
             "name": "override.type.stepbro",
@@ -217,6 +217,6 @@
                 }
             ]
         }
-	},
-	"scopeName": "source.sbs"
+    },
+    "scopeName": "source.sbs"
 }
