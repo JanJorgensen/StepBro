@@ -5,6 +5,9 @@
 		{
 			"include": "#keywords"
 		},
+        {
+            "include": "#constants"
+        },
 		{
 			"include": "#strings"
 		},
@@ -22,7 +25,13 @@
 		},
 		{
 			"include": "#multi-line-comments"
-		}
+		},
+        {
+            "include": "#type-overrides"
+        },
+        {
+            "include": "#test-list"
+        }
 	],
 	"repository": {
 		"keywords": 
@@ -35,7 +44,7 @@
 				},
 				{
 					"name": "keyword.other.types.stepbro",
-					"match": "\\b(bool|void|testlist|int|string)\\b"
+					"match": "\\b(bool|void|testlist|int|string|type)\\b"
 				},
 				{
 					"name": "keyword.other.step.stepbro",
@@ -55,6 +64,20 @@
 				}
 			]
 		},
+        "constants":
+        {
+            "patterns":
+            [
+                {
+                    "name": "constant.numeric.timespan.stepbro",
+                    "match": "([0-9]+[.]*[0-9]*(m|u|n|p)?s)|(@[0-9]+:[0-9]+((:|.)[0-9]+)?(.[0-9]+)?)"
+                },
+                {
+                    "name": "constant.numeric.stepbro",
+                    "match": "[0-9]+[.]*[0-9]*(P|T|G|M|K|m|u|n|p)?"
+                }
+            ]
+        },
 		"procedures":
 		{
 			"patterns":
@@ -69,8 +92,20 @@
 				},
 				{
 					"name": "entity.name.function.stepbro",
-					"match": "([[a-zA-Z][A-Z0-9].]*[a-zA-Z][a-zA-Z0-9]* *\\()"
-				}
+					"match": "([a-zA-Z][a-zA-Z0-9]* *\\()"
+				},
+                {
+                    "name": "entity.name.function.inherited.stepbro",
+                    "match": "(?<=procedure .*:[ ]*)[a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                    "name": "entity.name.function.override.stepbro",
+                    "match": "(?<=partner override )[a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                    "name": "entity.name.function.override.stepbro",
+                    "match": "(?<=partner override .*:[ ]*)[a-zA-Z][a-zA-Z0-9]*"
+                }
 			]
 		},
 		"strings": 
@@ -96,7 +131,7 @@
 				},
 				{
 					"name": "entity.name.function.using-normal.stepbro",
-					"match": "(?<=using) (?!\\@\".*\").*"
+					"match": "(?<=using) \\b(?!\\@\".*\").*\\b"
 				}
 			]
 		},
@@ -132,7 +167,40 @@
 					"match": "."
 				}
 			]
-		}
+		},
+        "type-overrides":
+        {
+            "name": "override.type.stepbro",
+            "patterns":
+            [
+                {
+                    "name": "support.type.built-in.object-name.stepbro",
+                    "match": "(?<=(type)) [a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                    "name": "support.type.built-in.object-name.stepbro",
+                    "match": "(?<=(type [a-zA-Z][a-zA-Z0-9]*[ ]*:))[ ]*[a-zA-Z][a-zA-Z0-9]*"
+                }
+            ]
+        },
+        "test-list":
+        {
+            "patterns":
+            [
+                {
+                    "name": "support.type.built-in.object-name.test-list.stepbro",
+                    "match": "(?<=(testlist)) [a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                    "name": "support.type.built-in.object-name.test-list.stepbro",
+                    "match": "(?<=(testlist [a-zA-Z][a-zA-Z0-9]*[ ]*:[ ]*))[a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                    "name": "entity.name.function.test-list.case.stepbro",
+                    "match": "(?<=\\*[ ]*)[a-zA-Z][a-zA-Z0-9]*"
+                }
+            ]
+        }
 	},
 	"scopeName": "source.sbs"
 }
