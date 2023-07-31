@@ -56,7 +56,7 @@
 				},
 				{
 					"name": "keyword.other.stepbro",
-					"match": "\\b(true|false|override)\\b"
+					"match": "\\b(true|false|override|this)\\b"
 				},
 				{
 					"name": "keyword.control.partner.stepbro",
@@ -105,6 +105,14 @@
                 {
                     "name": "entity.name.function.override.stepbro",
                     "match": "(?<=partner override .*:[ ]*)[a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                    "name": "entity.name.function.override.stepbro",
+                    "match": "(?<=partner )[a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                    "name": "entity.name.function.override.stepbro",
+                    "match": "(?<=partner .*:[ ]*)[a-zA-Z][a-zA-Z0-9]*"
                 }
 			]
 		},
@@ -142,7 +150,15 @@
 				{
 					"name": "support.type.built-in.object-name.stepbro",
 					"match": "(?<=(public|private)) (?!procedure)[a-zA-Z][a-zA-Z0-9]*"
-				}
+				},
+                {
+                    "name": "support.type.argument.stepbro",
+                    "match": "(?<=(\\([ ]*(this)*[ ]*))[a-zA-Z][a-zA-Z0-9]*[ ]+(?![^a-zA-Z])"
+                },
+                {
+                    "name": "support.type.argument.stepbro",
+                    "match": "(?<=(\\(.*,[ ]*(this)*[ ]*))[a-zA-Z][a-zA-Z0-9]*[ ]+(?![^a-zA-Z])"
+                }
 			]
 		},
 		"double-slash-comments":
