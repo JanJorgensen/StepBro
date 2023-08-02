@@ -70,11 +70,11 @@
             [
                 {
                     "name": "constant.numeric.timespan.stepbro",
-                    "match": "([0-9]+[.]*[0-9]*(m|u|n|p)?s)|(@[0-9]+:[0-9]+((:|.)[0-9]+)?(.[0-9]+)?)"
+                    "match": "\\b([0-9]+[.]*[0-9]*(m|u|n|p)?s)|(@[0-9]+:[0-9]+((:|.)[0-9]+)?(.[0-9]+)?)\\b"
                 },
                 {
                     "name": "constant.numeric.stepbro",
-                    "match": "[0-9]+[.]*[0-9]*(P|T|G|M|K|m|u|n|p)?"
+                    "match": "\\b([0-9]+[.]*[0-9]*(P|T|G|M|K|m|u|n|p)?)\\b"
                 }
             ]
         },
