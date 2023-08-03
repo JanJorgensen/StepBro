@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
@@ -328,7 +329,21 @@ namespace StepBro.Core.Parser
             var propertyBlock = m_lastElementPropertyBlock;
             left = this.ResolveIfIdentifier(left, true);        // Now done in EnterMethodArguments() above.
 
-            this.HandleParensExpression(context, true, left, argumentStack, null, propertyBlock);
+            try
+            {
+                this.HandleParensExpression(context, true, left, argumentStack, null, propertyBlock);
+            }
+            catch (NotImplementedException e)
+            {
+                StringBuilder exceptionMessage = new StringBuilder();
+                exceptionMessage.Append("Line: ").Append(left.Token.Line).Append('.');
+                if (e.Message != null)
+                {
+                    exceptionMessage.Append(' ').Append(e.Message);
+                }
+                e.GetType().GetField("_message", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(e, exceptionMessage.ToString());
+                throw; // Re-throw the exception, preserving all data
+            }
         }
 
         public override void ExitCallAssignment([NotNull] SBP.CallAssignmentContext context)

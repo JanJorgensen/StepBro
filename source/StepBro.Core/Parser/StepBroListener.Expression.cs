@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 using Range = StepBro.Core.Data.Range;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
@@ -363,7 +364,22 @@ namespace StepBro.Core.Parser
             {
                 var op = BinaryOperators.BinaryOperatorBase.GetOperator(context.op.Type);
                 // TODO: Check if operator is returned
-                var result = op.Resolve(this, first, last);
+                SBExpressionData result;
+                try
+                {
+                    result = op.Resolve(this, first, last);
+                }
+                catch (NotImplementedException e)
+                {
+                    StringBuilder exceptionMessage = new StringBuilder();
+                    exceptionMessage.Append("Line: ").Append(first.Token.Line).Append('.');
+                    if (e.Message != null)
+                    {
+                        exceptionMessage.Append(' ').Append(e.Message);
+                    }
+                    e.GetType().GetField("_message", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(e, exceptionMessage.ToString());
+                    throw; // Re-throw the exception, preserving all data
+                }
                 m_expressionData.Push(result);
             }
         }
