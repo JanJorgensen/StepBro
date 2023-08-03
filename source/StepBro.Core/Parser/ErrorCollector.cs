@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using StepBro.Core.ScriptData;
 using System.IO;
 using System.Collections.Specialized;
+using System.Text;
 
 namespace StepBro.Core.Parser
 {
@@ -145,7 +146,13 @@ namespace StepBro.Core.Parser
             m_errors.Add(err);
             this.NotifyAdd(err);
 #if (DEBUG)
-            throw new Exception("INTERNAL ERROR. " + description);
+            StringBuilder exceptionMessage = new StringBuilder("INTERNAL ERROR.");
+            if (line != -1)
+            {
+                exceptionMessage.Append(" Line: ").Append(line).Append(".");
+            }
+            exceptionMessage.Append(' ').Append(description);
+            throw new Exception(exceptionMessage.ToString());
 #endif
         }
 
