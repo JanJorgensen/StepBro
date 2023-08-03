@@ -875,7 +875,7 @@ namespace StepBro.Core.Parser
                                 walker.Walk(listener, context);
                                 file.UpdateRootIdentifiers();
                             }
-                            catch (NotImplementedException e)
+                            catch (Exception e)
                             {
                                 StringBuilder exceptionMessage = new StringBuilder();
                                 exceptionMessage.Append("File: ").Append(file.FileName).Append('.');
@@ -884,7 +884,7 @@ namespace StepBro.Core.Parser
                                     exceptionMessage.Append(' ').Append(e.Message);
                                 }
                                 e.GetType().GetField("_message", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(e, exceptionMessage.ToString());
-                                throw; // Re-throw the exception, preserving all data
+                                file.ErrorsInternal.InternalError(-1, -1, e.Message);
                             }
                             finally { }
                         }

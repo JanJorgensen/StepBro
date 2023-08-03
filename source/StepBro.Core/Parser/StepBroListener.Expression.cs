@@ -363,24 +363,21 @@ namespace StepBro.Core.Parser
             if (CheckExpressionsForErrors(context, first, last))
             {
                 var op = BinaryOperators.BinaryOperatorBase.GetOperator(context.op.Type);
-                // TODO: Check if operator is returned
-                SBExpressionData result;
+                
+                SBExpressionData result = null;
                 try
                 {
                     result = op.Resolve(this, first, last);
                 }
-                catch (NotImplementedException e)
+                catch (Exception e)
                 {
-                    StringBuilder exceptionMessage = new StringBuilder();
-                    exceptionMessage.Append("Line: ").Append(first.Token.Line).Append('.');
-                    if (e.Message != null)
-                    {
-                        exceptionMessage.Append(' ').Append(e.Message);
-                    }
-                    e.GetType().GetField("_message", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(e, exceptionMessage.ToString());
-                    throw; // Re-throw the exception, preserving all data
+                    m_errors.InternalError(first.Token.Line, first.Token.Column, e.Message);
                 }
-                m_expressionData.Push(result);
+
+                if (result != null)
+                {
+                    m_expressionData.Push(result);
+                }
             }
         }
 

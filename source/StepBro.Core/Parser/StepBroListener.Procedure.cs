@@ -333,16 +333,9 @@ namespace StepBro.Core.Parser
             {
                 this.HandleParensExpression(context, true, left, argumentStack, null, propertyBlock);
             }
-            catch (NotImplementedException e)
+            catch (Exception e)
             {
-                StringBuilder exceptionMessage = new StringBuilder();
-                exceptionMessage.Append("Line: ").Append(left.Token.Line).Append('.');
-                if (e.Message != null)
-                {
-                    exceptionMessage.Append(' ').Append(e.Message);
-                }
-                e.GetType().GetField("_message", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(e, exceptionMessage.ToString());
-                throw; // Re-throw the exception, preserving all data
+                m_errors.InternalError(left.Token.Line, left.Token.Column, e.Message);
             }
         }
 
