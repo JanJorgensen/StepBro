@@ -15,8 +15,8 @@ jobs:
     runs-on: windows-latest
     
     env:
-      Solution_Name: source\StepBro5.sln
-      Test_Project_Path: source\Test\StepBro.Core.Test\StepBro.Core.Test5.csproj
+      Solution_Name: source\StepBro.sln
+      Test_Project_Path: source\Test\StepBro.Core.Test\StepBro.Core.Test.csproj
       Wap_Project_Directory: your-wap-project-directory-name    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
       Wap_Project_Path: your-wap-project-path                   # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
   
@@ -32,7 +32,7 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 7.0.x
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
@@ -40,7 +40,7 @@ jobs:
 
     # Execute all unit tests in the solution
     - name: Execute unit tests
-      run: dotnet test source\Test\StepBro.Core.Test\StepBro.Core.Test5.csproj
+      run: dotnet test source\Test\StepBro.Core.Test\StepBro.Core.Test.csproj
   
   
   
@@ -55,8 +55,8 @@ jobs:
     runs-on: windows-latest
 
     env:
-      Solution_Name: source\StepBro5.sln
-      Test_Project_Path: source\Test\StepBro.Core.Test\StepBro.Core.Test5.csproj
+      Solution_Name: source\StepBro.sln
+      Test_Project_Path: source\Test\StepBro.Core.Test\StepBro.Core.Test.csproj
       Wap_Project_Directory: your-wap-project-directory-name    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
       Wap_Project_Path: your-wap-project-path                   # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
 
@@ -72,7 +72,7 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 7.0.x
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
@@ -80,7 +80,7 @@ jobs:
 
     # Build StepBro so we can use it to test StepBro scripts
     - name: Build StepBro
-      run: msbuild source/StepBro5.sln -r -t:Clean`;Rebuild
+      run: msbuild source/StepBro.sln -r -t:Clean`;Rebuild
         
     # TODO: Out-commented because stepbro --version has exit code -1 for some reason, when it is fixed this can be re-added
     # - name: Run StepBro Version Check
