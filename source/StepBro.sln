@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.Core5", "StepBro.Core\StepBro.Core5.csproj", "{F56B9BC1-0F9A-4BEB-A1EF-434F5E58C806}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.Core", "StepBro.Core\StepBro.Core.csproj", "{F56B9BC1-0F9A-4BEB-A1EF-434F5E58C806}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.Core.Test5", "Test\StepBro.Core.Test\StepBro.Core.Test5.csproj", "{D7723EF6-788F-4BD3-B513-7B7A9135FADA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.Core.Test", "Test\StepBro.Core.Test\StepBro.Core.Test.csproj", "{D7723EF6-788F-4BD3-B513-7B7A9135FADA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{9F79D088-ED45-49F3-A994-D6C8ECF0FE88}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestModule5", "Modules\TestModule\TestModule5.csproj", "{F7954DB2-7E18-483E-9B5E-0D1C73F9DE87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestModule", "Modules\TestModule\TestModule.csproj", "{F7954DB2-7E18-483E-9B5E-0D1C73F9DE87}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.TestInterface5", "Modules\StepBro.TestInterface\StepBro.TestInterface5.csproj", "{FB23502D-0078-451C-A8F9-2721DAE7B7B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.TestInterface", "Modules\StepBro.TestInterface\StepBro.TestInterface.csproj", "{FB23502D-0078-451C-A8F9-2721DAE7B7B3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.Streams", "Modules\StepBro.Streams\StepBro.Streams.csproj", "{150ED092-9E6F-45A0-B22C-04D2F019BB9A}"
 EndProject
@@ -20,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.Console", "stepbro\
 		{150ED092-9E6F-45A0-B22C-04D2F019BB9A} = {150ED092-9E6F-45A0-B22C-04D2F019BB9A}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.CAN5", "Modules\StepBro.CAN\StepBro.CAN5.csproj", "{5AE32C08-84A1-4349-849F-B830269E8B0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.CAN", "Modules\StepBro.CAN\StepBro.CAN.csproj", "{5AE32C08-84A1-4349-849F-B830269E8B0B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.IronPython", "Modules\StepBro.Python\StepBro.IronPython.csproj", "{EA16E99F-D8DD-4243-A3CC-420F01D91866}"
 EndProject

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <AssemblyName>StepBro.Process</AssemblyName>
     <RootNamespace>StepBro.Process</RootNamespace>
     <OutputPath>..\..\bin\Modules</OutputPath>
@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\StepBro.Core\StepBro.Core5.csproj">
+    <ProjectReference Include="..\..\StepBro.Core\StepBro.Core.csproj">
       <Private>false</Private>
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>

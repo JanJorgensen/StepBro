@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyName>StepBro.TestInterface.UI</AssemblyName>
     <RootNamespace>StepBro.TestInterface.UI</RootNamespace>
@@ -32,10 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\StepBro.Core\StepBro.Core5.csproj">
+    <ProjectReference Include="..\..\StepBro.Core\StepBro.Core.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\StepBro.TestInterface\StepBro.TestInterface5.csproj">
+    <ProjectReference Include="..\StepBro.TestInterface\StepBro.TestInterface.csproj">
       <Private>false</Private>
     </ProjectReference>
   </ItemGroup>
