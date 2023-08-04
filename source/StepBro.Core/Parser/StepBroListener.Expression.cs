@@ -362,21 +362,20 @@ namespace StepBro.Core.Parser
             var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
             if (CheckExpressionsForErrors(context, first, last))
             {
-                var op = BinaryOperators.BinaryOperatorBase.GetOperator(context.op.Type);
-                
-                SBExpressionData result = null;
                 try
                 {
-                    result = op.Resolve(this, first, last);
+                    var op = BinaryOperators.BinaryOperatorBase.GetOperator(context.op.Type);
+                
+                    var result = op.Resolve(this, first, last);
+
+                    if (result != null)
+                    {
+                        m_expressionData.Push(result);
+                    }
                 }
                 catch (Exception e)
                 {
                     m_errors.InternalError(first.Token.Line, first.Token.Column, e.Message);
-                }
-
-                if (result != null)
-                {
-                    m_expressionData.Push(result);
                 }
             }
         }

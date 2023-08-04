@@ -147,6 +147,7 @@ namespace StepBro.Core.Parser
             this.NotifyAdd(err);
 #if (DEBUG)
             StringBuilder exceptionMessage = new StringBuilder("INTERNAL ERROR.");
+            exceptionMessage.Append(" File: ").Append(File.FileName).Append('.');
             if (line != -1)
             {
                 exceptionMessage.Append(" Line: ").Append(line).Append(".");

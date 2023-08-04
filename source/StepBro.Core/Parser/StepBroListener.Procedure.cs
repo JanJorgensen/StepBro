@@ -329,14 +329,7 @@ namespace StepBro.Core.Parser
             var propertyBlock = m_lastElementPropertyBlock;
             left = this.ResolveIfIdentifier(left, true);        // Now done in EnterMethodArguments() above.
 
-            try
-            {
-                this.HandleParensExpression(context, true, left, argumentStack, null, propertyBlock);
-            }
-            catch (Exception e)
-            {
-                m_errors.InternalError(left.Token.Line, left.Token.Column, e.Message);
-            }
+            this.HandleParensExpression(context, true, left, argumentStack, null, propertyBlock);
         }
 
         public override void ExitCallAssignment([NotNull] SBP.CallAssignmentContext context)

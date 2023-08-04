@@ -877,13 +877,6 @@ namespace StepBro.Core.Parser
                             }
                             catch (Exception e)
                             {
-                                StringBuilder exceptionMessage = new StringBuilder();
-                                exceptionMessage.Append("File: ").Append(file.FileName).Append('.');
-                                if (e.Message != null)
-                                {
-                                    exceptionMessage.Append(' ').Append(e.Message);
-                                }
-                                e.GetType().GetField("_message", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(e, exceptionMessage.ToString());
                                 file.ErrorsInternal.InternalError(-1, -1, e.Message);
                             }
                             finally { }
