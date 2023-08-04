@@ -875,6 +875,10 @@ namespace StepBro.Core.Parser
                                 walker.Walk(listener, context);
                                 file.UpdateRootIdentifiers();
                             }
+                            catch (Exception e)
+                            {
+                                file.ErrorsInternal.InternalError(-1, -1, e.Message);
+                            }
                             finally { }
                         }
                         else
