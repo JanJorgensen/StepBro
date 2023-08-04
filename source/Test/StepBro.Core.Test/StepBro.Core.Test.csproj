@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\StepBro.Core\StepBro.Core5.csproj">
+    <ProjectReference Include="..\..\StepBro.Core\StepBro.Core.csproj">
       <Private>false</Private>
       <CopyLocal>False</CopyLocal>
       <CopyLocalSatelliteAssemblies>False</CopyLocalSatelliteAssemblies>
