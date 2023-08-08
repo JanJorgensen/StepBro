@@ -21,7 +21,7 @@ procedure void main()
 
 # Data Types
 
-Built-in data types:
+Basic data types:
 
 | **Type** | **Description** | **Examples** | **.NET type** |
 | -------- | --------------- | ----------- | ------------- |
@@ -52,11 +52,7 @@ fail / Verdict.Fail | One or more expectations in the test was not fulfilled.
 Verdict.Abandoned | Indicates that the user chose to abandon/break a running test.
 error / Verdict.Error | A fatal error in the script execution.
 
-## Numeric value format
-
-
-
-### SI Prefixes
+## SI Prefixes
 
 The supported SI prefixes, used for numeric values, are:
 
@@ -70,7 +66,7 @@ Examples:
 
 ## Timespan value format
 
-Supported timespan value formats are supported:
+Supported timespan value formats are:
 
 **Format** | **Description** | **Example**
 ---------- | --------------- | -----------
@@ -108,8 +104,8 @@ type MySpecialConnection : SerialTestConnection;        // Create a new type tha
 | >= | a >= b | Greater than or equal to |
 | \<= | a \<= b | Less than or equal to |
 | ~= | a ~= b | Approximately equal to |
-| ± | a == b ± c | Equal to within tolerance |
-| ~=, ± | a ~= b ± c | Approximately equal to within tolerance |
+| Â± | a == b Â± c | Equal to within tolerance |
+| ~=, Â± | a ~= b Â± c | Approximately equal to within tolerance |
 | | a \< b \< c | Is within range, limits not included |
 | | a \<= b \<= c | Is within range, limits included |
 | | a \<~ b \<~ c | Is within range, approximate limits included |
