@@ -83,6 +83,26 @@ namespace StepBroCoreTest.Parser
             Assert.IsTrue((long)result > 1000);         // Just to check that the loop iterated several times
         }
 
+        [TestMethod]
+        public void TestProcedureWhileStatementWithTimeoutFromVariable()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                "int Func(){ var n = 0; " +
+                "var t = 20ms; " +
+                "while (true) :" +
+                "    Timeout: t" +
+                "{ n++; if (n > 5000000) break; }" +        // ENSURE THIS TAKES MORE THAN 20ms !!
+                "return n; }");
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.IsTrue((long)result < 5000000);
+            Assert.IsTrue((long)result > 1000);         // Just to check that the loop iterated several times
+        }
+
         // "[Title: \"Looping for a while\"] [Timeout: 2s] [Break: \"Found\", Break: \"Error\", CountVar: c]" +
 
         [TestMethod]

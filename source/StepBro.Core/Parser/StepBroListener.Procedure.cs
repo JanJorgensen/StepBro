@@ -470,6 +470,7 @@ namespace StepBro.Core.Parser
             condition = this.ResolveForGetOperation(condition);
             if (condition.IsError())
             {
+                m_scopeStack.Peek().AddStatementCode(Expression.Empty());
                 return;
             }
 
@@ -516,45 +517,69 @@ namespace StepBro.Core.Parser
                         {
                             timeout = Expression.Constant((TimeSpan)toValue);
                         }
+                        else if (((PropertyBlockValue)property).IsStringOrIdentifier)
+                        {
+                            var s = ((PropertyBlockValue)property).ValueAsString();
+                            if (s.IsIdentifier())
+                            {
+                                var timeoutExpression = ResolveIdentifierForGetOperation(s, true, TypeReference.TypeTimeSpan);
+                                if (timeoutExpression.IsError())
+                                {
+                                    m_scopeStack.Peek().AddStatementCode(Expression.Empty());
+                                    return;
+                                }
+                                timeout = timeoutExpression.ExpressionCode;
+                            }
+                            else
+                            {
+
+                            }
+                        }
                         else
                         {
                             throw new NotImplementedException("Timeout data type or expression not implemented or supported.");
                         }
 
-                        varEntryTime = m_scopeStack.Peek().AddVariable(
-                            CreateStatementVariableName(context, "whileLoop_EntryTime"),
-                            TypeReference.TypeDateTime,
-                            new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
-                            EntryModifiers.Private);
                         varTimeoutTime = m_scopeStack.Peek().AddVariable(
                             CreateStatementVariableName(context, "whileLoop_TimeoutTime"),
                             TypeReference.TypeDateTime,
                             new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
                             EntryModifiers.Private);
-                        //loopExpressions.Add(Expression.Assign(varTimeoutTime.VariableExpression,
-                        //    Expression.IfThen(
-                        //        Expression.Not(conditionExpression),
-                        //        Expression.Block(
-                        //            Expression.Break(breakLabel))));
-                        //new TSExpressionData(Expression.Property(null, typeof(DateTime).GetProperty("Now"))),
                     }
                 }
             }
             #endregion
 
-            if (varEntryTime != null)
-            {
-                m_scopeStack.Peek().AddStatementCode(
-                    Expression.Assign(varEntryTime.VariableExpression,
-                    Expression.Property(null, typeof(DateTime).GetProperty("Now"))));
-            }
+
+            varEntryTime = m_scopeStack.Peek().AddVariable(
+                            CreateStatementVariableName(context, "whileLoop_EntryTime"),
+                            TypeReference.TypeDateTime,
+                            new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
+                            EntryModifiers.Private);
+
+
+            varEntryTime = m_scopeStack.Peek().AddVariable(
+                CreateStatementVariableName(context, "whileLoop_EntryTime"),
+                TypeReference.TypeDateTime,
+                new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
+                EntryModifiers.Private);
+
+            var loggingEnabled = Expression.Property(
+                    Expression.Convert(m_currentProcedure.ContextReferenceInternal, typeof(ICallContext)),
+                    typeof(ICallContext).GetProperty("LoggingEnabled"));
+
+            var timeoutLoggingCall = Expression.Call(
+                m_currentProcedure.ContextReferenceInternal,
+                typeof(IScriptCallContext).GetMethod("Log", new Type[] { typeof(string) }),
+                Expression.Constant("Loop timeout!"));
+
+            m_scopeStack.Peek().AddStatementCode(
+                Expression.Assign(varEntryTime.VariableExpression, Expression.Property(null, typeof(DateTime).GetProperty("Now"))));
+
             if (varTimeoutTime != null)
             {
                 m_scopeStack.Peek().AddStatementCode(
-                    Expression.Assign(varTimeoutTime.VariableExpression,
-                    Expression.Add(
-                        varEntryTime.VariableExpression,
-                        timeout)));
+                    Expression.Assign(varTimeoutTime.VariableExpression, Expression.Add(varEntryTime.VariableExpression, timeout)));
                 loopExpressions.Add(
                     Expression.IfThen(
                         Expression.Not(conditionExpression),
@@ -565,9 +590,8 @@ namespace StepBro.Core.Parser
                             Expression.Property(null, typeof(DateTime).GetProperty("Now")),
                             varTimeoutTime.VariableExpression),
                         Expression.Block(
-                            // TODO: log timeout
+                            Expression.IfThen(loggingEnabled, timeoutLoggingCall),
                             Expression.Break(breakLabel))));
-                //new TSExpressionData(Expression.Property(null, typeof(DateTime).GetProperty("Now"))),
             }
 
             if (isBlockSub)

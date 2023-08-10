@@ -141,6 +141,12 @@ namespace StepBro.Core.Data
             return Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture);
         }
 
+        public static bool IsIdentifier(this string value)
+        {
+            if (String.IsNullOrEmpty(value)) return false;
+            if (!Char.IsLetter(value[0]) || value[0] == '_') return false;      // First char must be letter or underscore.
+            return value.All(c => c == '_' || Char.IsLetterOrDigit(c) || c == '.');
+        }
 
         public static string ListToString(System.Collections.IEnumerable list)
         {
