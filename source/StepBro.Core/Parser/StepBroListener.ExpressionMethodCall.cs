@@ -758,6 +758,7 @@ namespace StepBro.Core.Parser
                 if (state == ArgumentInsertState.ExtensionInstance)
                 {
                     suggestedAssignmentsOut.Add(new SBExpressionData(extensionInstance));
+                    thisParameterHandled = true;
                     state = ArgumentInsertState.Initial;
                     continue;
                 }

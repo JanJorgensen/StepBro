@@ -92,7 +92,7 @@ namespace StepBro.Core.Parser
         public override void ExitParExpression([NotNull] SBP.ParExpressionContext context)
         {
             var expressionScope = m_expressionData.PopStackLevel();
-            System.Diagnostics.Debug.Assert(expressionScope.Count == 1);    // Until anything else has been seen...
+            System.Diagnostics.Debug.Assert(expressionScope.Count == 1, "Parameter error in: " + context.GetText());    // Until anything else has been seen...
             var data = expressionScope.Pop();
             m_expressionData.Push(data);
         }

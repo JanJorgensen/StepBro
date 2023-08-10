@@ -315,5 +315,67 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
         }
+
+
+        [TestMethod]
+        public void TestProcedurePartnerWithParameters()
+        {
+            var f1 = new StringBuilder();
+            f1.AppendLine("procedure void Proc() :");
+            f1.AppendLine("    partner Park : ParkProc");
+            f1.AppendLine("{");
+            f1.AppendLine("    log (\"Proc Was Called\");");
+            f1.AppendLine("}");
+            f1.AppendLine("procedure void ParkProc(this Proc baseProc, int x, timespan t)");
+            f1.AppendLine("{");
+            f1.AppendLine("    log (\"Args: \" + x + \", \" + t);");
+            f1.AppendLine("    baseProc();");
+            f1.AppendLine("}");
+            f1.AppendLine("public procedure void Run()");
+            f1.AppendLine("{");
+            f1.AppendLine("   Proc.Park(30, 50ms);");
+            f1.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("topfile.sbs", f1.ToString()));
+
+            Assert.AreEqual(1, files.Length);
+            var file1 = files[0];
+            Assert.AreEqual(0, file1.Errors.ErrorCount);
+            Assert.AreEqual(3, file1.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
+
+            var proc = file1.ListElements().First(p => p.Name == "Proc") as IFileProcedure;
+            Assert.IsNotNull(proc);
+
+            var procParkProc = file1.ListElements().First(p => p.Name == "ParkProc") as IFileProcedure;
+            Assert.IsNotNull(procParkProc);
+
+            var procRun = file1.ListElements().First(p => p.Name == "Run") as IFileProcedure;
+            Assert.IsNotNull(procRun);
+
+            Exception exeException = null;
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+            try
+            {
+                taskContext.CallProcedure(procRun);
+            }
+            catch (Exception ex)
+            {
+                exeException = ex;
+            }
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+            if (exeException != null) throw exeException;
+
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - topfile.Run - <no arguments>");
+            log.ExpectNext("2 - Pre - topfile.ParkProc - <no arguments>");
+            log.ExpectNext("3 - Normal - 8 Log - Args: 30, 00:00:00.0500000");
+            log.ExpectNext("3 - Pre - topfile.Proc - <no arguments>");
+            log.ExpectNext("4 - Normal - 4 Log - Proc Was Called");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
     }
 }
