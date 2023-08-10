@@ -22,13 +22,13 @@ public procedure TestCase() :
     // cleanup procedure to be executed after the test case.
     partner Cleanup:                TestCaseEmptyCleanup,
     // Setup and precondition check for the test case.
-    // This will not be used when test case is executed from a test suite (test list).
+    // This will NOT be used when test case is executed from a test suite (test list).
     partner PreTest:                TestCaseEmptyPreTest,
-    // Partner that keeps executing the test case until there is a fail or error.
+    // Model partner that keeps executing the test case until there is a fail or error.
     partner TestUntilFail:          TestCaseTestUntilFail,
-    // Partner that first calls the Setup partner, then the test case and last the Cleanup partner.
+    // Model partner that first calls the Setup partner, then the test case and last the Cleanup partner.
     partner TestFormal:             TestCaseFormalTest,
-    // Partner that keeps executing the test case until there is a fail or error.
+    // Model partner that keeps executing the test case until there is a fail or error.
     // For each loop the Setup partner, the test case and the Cleanup partner are all called.
     partner TestFormalUntilFail:    TestCaseFormalTestUntilFail;
 
@@ -108,14 +108,18 @@ public procedure void TestCaseFormalTestUntilFail( this TestCase testcase ) :
 }
 
 public testlist TestSuite :
-    partner InfiniteTest : TestSuiteInfiniteTestExecution,
-    partner FormalTest   : TestSuiteFormalTestExecution,
-    partner DirectTest   : TestSuiteDirectTestExecution,
-    partner PreTest      : TestSuiteEmptyPreTest;         // Setup and precondition check for the test suite.
+    partner InfiniteTest : TestSuiteInfiniteTestExecution,  // Model partner for executing the TestSuite infinitely, or until the user stops the execution.
+    partner FormalTest   : TestSuiteFormalTestExecution,    // Model partner for executing the TestSuite in a 'formal' way, with 'PreTest', test report and more.
+    partner DirectTest   : TestSuiteDirectTestExecution,    // Model partner for executing the TestSuite simple and direct and without test report.
+    partner PreTest      : TestSuiteEmptyPreTest;           // Partner for setup and precondition check for the TestSuite.
+// NOTE: Override the PreTest partner in your setup, to actually do some setup and to check any preconditions for the test.
 
 
+// TestSuiteEmptyPreTest
+// Default procedure for the 'PreTest' partner on TestSuite.
 procedure bool TestSuiteEmptyPreTest(this TestSuite suite)
 {
+    // Do nothing. Just return "everything is fine".
     return true;
 }
 
@@ -211,7 +215,9 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
 
 public procedure void Action() :
     partner PreSetup: ActionEmptyPreSetup,
-    partner WithPreSetup : RunActionWithPreSetup;
+    partner WithPreSetup : RunActionWithPreSetup,
+    partner Loop : RunActionInLoop,
+    partner LoopWithPreSetup : RunActionInLoopWithPreSetup;
     
 public procedure bool ActionEmptyPreSetup() { return true; }
 
@@ -224,5 +230,28 @@ public procedure void RunActionWithPreSetup(this Action action)
     {
         NextProcedureIsHighLevel("Action");
         action();
+    }
+}
+
+public procedure void RunActionInLoop(this Action action, timespan time = @1:00:00)
+{
+    while (true) : Timeout: time
+    {
+        action();
+    }
+}
+
+public procedure void RunActionInLoopWithPreSetup(this Action action, timespan time = @1:00:00)
+{
+    bool passedPreSetup = true;
+    NextProcedureIsHighLevel("PreSetup");
+    passedPreSetup = action.PreSetup();
+    if (passedPreSetup)
+    {
+        while (true) : Timeout: time
+        {
+            NextProcedureIsHighLevel("Action");
+            action();
+        }
     }
 }
