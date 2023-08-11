@@ -35,6 +35,7 @@
     <ProjectReference Include="..\..\StepBro.Core\StepBro.Core.csproj">
       <Private>false</Private>
     </ProjectReference>
+    <ProjectReference Include="..\..\StepBro.UI\StepBro.UI.csproj" />
     <ProjectReference Include="..\StepBro.TestInterface\StepBro.TestInterface.csproj">
       <Private>false</Private>
     </ProjectReference>

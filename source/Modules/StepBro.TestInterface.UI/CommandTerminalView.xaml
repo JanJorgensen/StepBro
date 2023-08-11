@@ -8,7 +8,6 @@
     xmlns:syntaxeditor="http://schemas.actiprosoftware.com/winfx/xaml/syntaxeditor" 
     xmlns:ribbon="http://schemas.actiprosoftware.com/winfx/xaml/ribbon" 
     xmlns:shared="http://schemas.actiprosoftware.com/winfx/xaml/shared"
-    xmlns:Controls="clr-namespace:StepBro.Core.Controls;assembly=StepBro.UI"
     x:Class="StepBro.TestInterface.Controls.CommandTerminalView"
     mc:Ignorable="d">
 

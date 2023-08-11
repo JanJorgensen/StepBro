@@ -1135,7 +1135,7 @@ namespace StepBro.Workbench
                 case TaskExecutionState.Created:
                     Invoke(OnScriptExecutionStarted);
                     break;
-                case TaskExecutionState.Started:
+                case TaskExecutionState.StartRequested:
                 case TaskExecutionState.AwaitingStartCondition:
                     break;
                 case TaskExecutionState.Running:
