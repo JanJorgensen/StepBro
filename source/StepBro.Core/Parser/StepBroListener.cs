@@ -501,9 +501,22 @@ namespace StepBro.Core.Parser
                     }
                     else
                     {
-                        throw new NotImplementedException();
+                        errors.InternalError(startToken.Line, startToken.Column, $"Element type is not expected (entry \"{entry.Name}\").");
                     }
                 }
+                //else if (entry.BlockEntryType == PropertyBlockEntryType.Block)
+                //{
+                //    var blockEntry = entry as PropertyBlock;
+                //    var objectProperty = contract.Properties.FirstOrDefault(p => String.Equals(entry.Name, p.PropertyName, StringComparison.InvariantCultureIgnoreCase) && p.GetType() == typeof(PropertyBlock));
+                //    if (objectProperty != null)
+                //    {
+                //        HVOR SKAL DENNE BLOCK GEMMES, SÅ DEN KAN GIVES TIL OBJEKTET EFTER INSTANTIERING ????
+                //    }
+                //    else 
+                //    {
+                //        errors.SymanticError(startToken.Line, startToken.Column, false, $"The object has no property named \"{entry.Name}\".");
+                //    }
+                //}
                 else
                 {
                     // Not handled yet; just let it fall through.
@@ -651,8 +664,8 @@ namespace StepBro.Core.Parser
 
             m_currentFileElement.SetName(m_currentNamespace, m_fileElementReference.Value as string);
             var parent = this.ResolveIfIdentifier(
-                m_fileElementReference, 
-                false, 
+                m_fileElementReference,
+                false,
                 predicate: (IIdentifierInfo id) => (id.Type != IdentifierType.FileElement || !Object.ReferenceEquals(((FileElement)id).ParentFile, m_file)));
             if (!parent.IsResolved)
             {
@@ -681,7 +694,7 @@ namespace StepBro.Core.Parser
             {
                 m_file.AddElement(m_currentFileElement as FileElementOverride);
             }
-            
+
             m_currentFileElement.BaseElementName = m_currentFileElement.Name;
             m_currentFileElement.ParseBaseElement();
             if (m_currentFileElement.BaseElement == null) return;

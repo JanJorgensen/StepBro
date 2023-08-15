@@ -54,6 +54,7 @@
   <ItemGroup>
     <None Include="..\..\additional\StepBro Cheet Sheet.md" Link="StepBro Cheet Sheet.md" />
     <None Include="..\..\README.md" Link="README.md" />
+    <None Include="..\..\scripts\TestFramework.sbs" Link="Scripts\TestFramework.sbs" />
   </ItemGroup>
   
 

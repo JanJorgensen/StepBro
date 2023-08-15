@@ -514,8 +514,9 @@ namespace StepBro.Core.ScriptData
                         }
                         logger.Log("Variable " + v.VariableOwnerAccess.Container.Name + " init: " + text);
                     }
-                    v.VariableOwnerAccess.DataResetter?.Invoke(v.VariableOwnerAccess, logger);
-                    v.VariableOwnerAccess.DataInitializer?.Invoke(v.VariableOwnerAccess, logger);
+                    var logWrapper = new VariableSetupLoggerWrapper(v, logger);
+                    v.VariableOwnerAccess.DataResetter?.Invoke(v.VariableOwnerAccess, logWrapper);
+                    v.VariableOwnerAccess.DataInitializer?.Invoke(v.VariableOwnerAccess, logWrapper);
                 }
             }
         }
@@ -807,5 +808,66 @@ namespace StepBro.Core.ScriptData
                 }
             }
         }
+
+
+
+        private class VariableSetupLoggerWrapper : ILogger
+        {
+            FileVariable m_variable;
+            ILogger m_logger;
+
+            public VariableSetupLoggerWrapper(FileVariable variable, ILogger logger)
+            {
+                m_variable = variable;
+                m_logger = logger;
+            }
+
+            public bool IsDebugging => m_logger.IsDebugging;
+
+            public string Location => m_logger.Location;
+
+            public ILoggerScope CreateSubLocation(string name)
+            {
+                return m_logger.CreateSubLocation(name);
+            }
+
+            public void Log(string text)
+            {
+                m_logger.Log(text);
+            }
+
+            public void LogAsync(string text)
+            {
+                m_logger.LogAsync(text);
+            }
+
+            public void LogDetail(string text)
+            {
+                m_logger.LogDetail(text);
+            }
+
+            public ILoggerScope LogEntering(string location, string text)
+            {
+                return m_logger.LogEntering(location, text);
+            }
+
+            public void LogError(string text)
+            {
+                (m_variable.ParentFile as ScriptFile).ErrorsInternal.SymanticError(m_variable.Line, 1, false, $"Error initializing variable \"{m_variable.Name}\": {text}");
+                m_logger.LogError(text);
+            }
+
+            public void LogSystem(string text)
+            {
+                m_logger.LogSystem(text);
+            }
+
+            public void LogUserAction(string text)
+            {
+                m_logger.LogUserAction(text);
+            }
+        }
+
+
     }
 }
