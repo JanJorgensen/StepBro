@@ -749,7 +749,7 @@ namespace StepBro.Core.Parser
                     }
                     else if (m_variableType != m_variableInitializer.DataType && !m_variableType.Type.IsAssignableFrom(m_variableInitializer.DataType.Type))
                     {
-                        throw new NotImplementedException("Convertion of variable initializer is not implemented.");
+                        m_errors.InternalError(context.Start.Line, context.Start.Column, "Conversion of variable initializer is not implemented.");
                     }
                 }
                 if (m_variableType.Type == typeof(VarSpecifiedType))
