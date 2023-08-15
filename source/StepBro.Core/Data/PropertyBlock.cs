@@ -38,6 +38,14 @@ namespace StepBro.Core.Data
             return m_children.FirstOrDefault(e => String.Equals(name, e.Name, StringComparison.InvariantCultureIgnoreCase));
         }
 
+        public PropertyBlockEntry this[string name]
+        {
+            get
+            {
+                return TryGetElement(name);
+            }
+        }
+
         public override void GetTestString(StringBuilder text)
         {
             if (IsArrayEntry || String.IsNullOrEmpty(this.Name))
