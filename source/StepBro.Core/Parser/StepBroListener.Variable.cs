@@ -161,8 +161,7 @@ namespace StepBro.Core.Parser
                                 m_variableInitializer.NarrowGetValueType();
                                 if (m_variableInitializer.DataType.Type != m_variableType.Type)
                                 {
-                                    //m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "");
-                                    throw new ParsingErrorException(context.Start.Line, "Data Type", "Convertion of variable initializer is not implemented.");
+                                    m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Conversion of variable initializer is not implemented.");
                                 }
                             }
                         }
