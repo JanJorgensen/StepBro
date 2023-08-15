@@ -879,28 +879,29 @@ namespace StepBro.Core.Parser
                             {
                                 file.ErrorsInternal.InternalError(-1, -1, e.Message);
                             }
-                            finally { }
                         }
                         else
                         {
                             throw new NotImplementedException();
                         }
                     }
-
-                    totalErrors += file.Errors.ErrorCount;
-                    if (file.Errors.ErrorCount == 0)
-                    {
-                        file.LastParsing = DateTime.Now;
-                    }
                 }
+                // Run through the files once more, to initialize variables and to check the error count.
                 foreach (var file in filesToParse)
                 {
                     if (file.Errors.ErrorCount == 0)
                     {
                         // Initialize file variables after ALL files have been parsed,
                         // because parsing a file can change data in other files.
+                        // Note: errors can occur during this, thus this has to be done before checking the error status.
                         file.InitializeFileVariables(logger);
                         file.DisposeUnusedFileVariables(logger);
+                    }
+
+                    totalErrors += file.Errors.ErrorCount;
+                    if (file.Errors.ErrorCount == 0)
+                    {
+                        file.LastParsing = DateTime.Now;
                     }
                 }
             }

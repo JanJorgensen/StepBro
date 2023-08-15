@@ -52,12 +52,15 @@ namespace StepBroCoreTest
             return taskContext.CallProcedure(procedure, args);
         }
 
-        public static ScriptTaskContext ExeContext(bool debugging = true, ServiceManager services = null)
+        public static ScriptTaskContext ExeContext(bool debugging = true, ServiceManager services = null, Logger logger = null)
         {
             ScriptTaskContext taskContext = new ScriptTaskContext();
             RuntimeErrors = new RuntimeErrorCollector();
             taskContext.SetErrorListener(RuntimeErrors.ReportError);
-            var logger = new Logger("", false, "TestRun", "Starting");
+            if (logger == null)
+            {
+                logger = new Logger("", false, "TestRun", "Starting");
+            }
             if (debugging)
             {
                 logger.IsDebugging = true;

@@ -588,14 +588,7 @@ propertyblockArrayEntry
     |	primaryOrQualified		# propertyblockArrayEntryPrimary
     ;
 
-//propertyblockStatementValue 
-//	:	propertyblockStatementValueArrayIndexed
-//	|	propertyblockStatementValueNormal
-//	;
-
 propertyblockStatementValueNormal : primaryOrQualified ;
-
-//propertyblockStatementValueArrayIndexed : Identifier OPEN_BRACKET IntegerLiteral CLOSE_BRACKET ASSIGNMENT primaryOrQualified ;
 
 propertyblockStatementValueIdentifierOnly : IDENTIFIER ;
 

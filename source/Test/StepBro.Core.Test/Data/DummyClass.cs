@@ -38,8 +38,6 @@ namespace StepBroCoreTest.Data
         static public TimeSpan StaticPropTimespan { get; set; }
         static public bool StaticPropBool { get; set; } = true;
 
-        //private static DummyClass g_oneInstance = new DummyClass(928L);
-        //static public DummyClass OneInstance { get { return g_oneInstance; } }
         static public DummyClass OneInstance { get { return new DummyClass(928L); } }
         static public IDummyClass OneInstanceInterface { get { return (IDummyClass)(new DummyClass(726L)); } }
 
@@ -85,6 +83,7 @@ namespace StepBroCoreTest.Data
             get { m_propAccessCounter++; return m_propBool; }
             set { m_propAccessCounter++; m_propBool = value; }
         }
+
         public TimeSpan GetTimespan() { return TimeSpan.FromTicks(TimeSpan.TicksPerMillisecond * 514L); }
 
         public bool IsDisposed { get { return m_disposed; } }
