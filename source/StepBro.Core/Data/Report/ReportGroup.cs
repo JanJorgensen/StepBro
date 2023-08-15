@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StepBro.Core.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,13 +12,16 @@ namespace StepBro.Core.Data.Report
         private string m_name;
         private string m_description;
         private readonly DateTime m_starttime;
+        private readonly LogEntry m_logStart;
+        private readonly LogEntry m_logEnd = null;
         private readonly List<ReportData> m_data = new List<ReportData>();
 
-        public ReportGroup(string name, string description)
+        public ReportGroup(string name, string description, LogEntry logStart)
         {
             m_name = name;
             m_description = description;
             m_starttime = DateTime.Now;
+            m_logStart = logStart;
         }
 
         public string Name { get { return m_name; } }

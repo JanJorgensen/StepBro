@@ -8,7 +8,7 @@ namespace StepBro.Core.Data.Report
 {
     public enum ReportDataType
     {
-        Header,
+        Section,
         TextLine,
         ExpectResult,
         DataTable

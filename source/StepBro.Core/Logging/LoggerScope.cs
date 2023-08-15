@@ -144,7 +144,7 @@ namespace StepBro.Core.Logging
             this.Log(LogEntry.Type.System, text);
         }
 
-        private LogEntry Log(LogEntry.Type type, string text)
+        internal LogEntry Log(LogEntry.Type type, string text)
         {
             return m_logger.Log(m_scopeStartEntry, type, DateTime.Now, m_threadID, (type != LogEntry.Type.Post) ? m_dynamicLocation() : null, text);
         }

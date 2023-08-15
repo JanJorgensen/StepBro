@@ -398,7 +398,7 @@ namespace StepBro.Core.Execution
         {
             if (m_currentReport != null)
             {
-                m_currentReport.AddData(data);
+                m_currentReport.AddData(this, data);
             }
         }
 

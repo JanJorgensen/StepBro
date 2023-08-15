@@ -4,6 +4,7 @@ using StepBro.Core.Api;
 using StepBro.Core.Data.Report;
 using StepBro.Core.Execution;
 using StepBro.Core.General;
+using StepBro.Core.Logging;
 
 namespace StepBro.Core
 {
@@ -34,7 +35,7 @@ namespace StepBro.Core
 
         public long GroupCount { get { return (long)m_groups.Count; } }
 
-        public void AddData(ReportData data)
+        public void AddData([Implicit] ICallContext context, ReportData data)
         {
             if (m_isClosed)
             {
@@ -42,15 +43,25 @@ namespace StepBro.Core
             }
             if (m_currentGroup == null)
             {
-                this.StartGroup("default");
+                this.StartGroup(context, "default");
             }
             m_currentGroup.AddData(data);
         }
 
-        public void StartGroup(string name, string description = null)
+        public void StartGroup([Implicit] ICallContext context, string name, string description = null)
         {
-            m_currentGroup = new ReportGroup(name, description);
+            LogEntry logStart = null;
+            if (context != null && context.Logger is LoggerScope)
+            {
+                logStart = ((LoggerScope)(context.Logger)).Log(LogEntry.Type.Normal, $"Starting report group \"{name}\". {description}");
+            }
+            m_currentGroup = new ReportGroup(name, description, logStart);
             m_groups.Add(m_currentGroup);
+        }
+
+        public void AddSection([Implicit] ICallContext context, string header, string subheader = "")
+        {
+            this.AddData(context, new ReportGroupSection(header, subheader));
         }
 
         public void DumpToLog([Implicit] ICallContext context)
