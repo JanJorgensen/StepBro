@@ -1,8 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Logging;
 using StepBro.Core.Data;
 using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
+using StepBroCoreTest.Utils;
 using System;
 using System.Linq;
 using System.Text;
@@ -199,6 +201,47 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(783L, result);
         }
 
+
+        [TestMethod]
+        public void FileParsing_CustomObjectData()
+        {
+            var source = new StringBuilder();
+            source.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");
+            source.AppendLine("namespace ObjectOverride;");
+            source.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool1 = " + typeof(DummyInstrumentClass).Name);
+            source.AppendLine("{");
+            source.AppendLine("   BoolA: true,");
+            source.AppendLine("   IntA:  36,");
+            source.AppendLine("   ExtraData:  { a: 8227, b: \"Bee\" }");    // Accepted extra data
+            source.AppendLine("}");
+            source.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool2 = " + typeof(DummyInstrumentClass).Name);
+            source.AppendLine("{");
+            source.AppendLine("   BoolA: true,");
+            source.AppendLine("   IntA:  36,");
+            source.AppendLine("   Mogens:  { m1: true, m2: Jepper }");      // Unknown extra data
+            source.AppendLine("}");
+
+            var logger = new StepBro.Core.Logging.Logger("", false, "TestRun", "Starting");
+            var taskContext = ExecutionHelper.ExeContext(logger: logger);
+
+            var files = FileBuilder.ParseFiles(taskContext.Logger, this.GetType().Assembly,
+                new Tuple<string, string>("script.sbs", source.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual("script.sbs", files[0].FileName);
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);
+
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Normal - TestRun - Variable myTool1 - Create data");
+            log.ExpectNext("1 - Normal - TestRun - Variable myTool1 init: Reset and initialize, data: { BoolA=True, IntA=36, ExtraData = { a=8227, b=Bee } }");
+            log.ExpectNext("1 - Normal - TestRun - Entry: Value: a=8227");
+            log.ExpectNext("1 - Normal - TestRun - Entry: Value: b=Bee");
+            log.ExpectNext("1 - Normal - TestRun - Variable myTool2 - Create data");
+            log.ExpectNext("1 - Normal - TestRun - Variable myTool2 init: Reset and initialize, data: { BoolA=True, IntA=36, Mogens = { m1=True, m2=Jepper } }");
+            log.ExpectNext("1 - Error - TestRun - Unknown data field: \"Mogens\", line 13");
+            log.ExpectEnd();
+        }
 
         [TestMethod]
         public void FileParsing_OverrideVariable()

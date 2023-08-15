@@ -223,7 +223,7 @@ namespace StepBroCoreTest.Parser
 
     }
 
-    public class DummyInstrumentClass : IDisposable, IResettable, INameable
+    public class DummyInstrumentClass : IDisposable, IResettable, INameable, ISettableFromPropertyBlock
     {
         public static long m_nextInstanceID = 10;
 
@@ -250,6 +250,30 @@ namespace StepBroCoreTest.Parser
             m_id = m_nextInstanceID++;
             m_objectName = objectName;
             this.IntA = valueA;
+        }
+
+        public void Setup(ILogger logger, PropertyBlock data)
+        {
+            bool errors = false;
+            foreach (var f in data)
+            {
+                if (f.BlockEntryType != PropertyBlockEntryType.Block || f.Name != "ExtraData")
+                {
+                    logger.LogError($"Unknown data field: \"{f.Name}\", line {f.Line}");
+                    errors = true;
+                }
+            }
+            if ( !errors )
+            {
+                var extra = data["ExtraData"] as PropertyBlock;
+                if (extra != null)
+                {
+                    foreach (var e in extra)
+                    {
+                        logger?.Log("Entry: " + e.ToString());
+                    }
+                }
+            }
         }
 
         public long ID { get { return m_id; } }

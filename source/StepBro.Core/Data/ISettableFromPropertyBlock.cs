@@ -4,6 +4,6 @@ namespace StepBro.Core.Data
 {
     public interface ISettableFromPropertyBlock
     {
-        void Setup(ILogger logger, PropertyBlock properties);
+        void Setup(ILogger logger, PropertyBlock data);
     }
 }
