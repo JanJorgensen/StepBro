@@ -257,7 +257,14 @@ namespace StepBro.Core.Parser
         {
             if (m_enteredLoopStatement)
             {
-                m_scopeStack.Peek().SetupForLoop();
+                try
+                {
+                    m_scopeStack.Peek().SetupForLoop();
+                }
+                catch (Exception e)
+                {
+                    m_errors.InternalError(context.Start.Line, context.Start.Column, e.Message);
+                }
                 m_enteredLoopStatement = false;
             }
             m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "sub", ProcedureParsingScope.ScopeType.SubStatement));
