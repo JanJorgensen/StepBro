@@ -257,7 +257,14 @@ namespace StepBro.Core.Parser
         {
             if (m_enteredLoopStatement)
             {
-                m_scopeStack.Peek().SetupForLoop();
+                try
+                {
+                    m_scopeStack.Peek().SetupForLoop();
+                }
+                catch (Exception e)
+                {
+                    m_errors.InternalError(context.Start.Line, context.Start.Column, e.Message);
+                }
                 m_enteredLoopStatement = false;
             }
             m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "sub", ProcedureParsingScope.ScopeType.SubStatement));
@@ -451,14 +458,16 @@ namespace StepBro.Core.Parser
             //m_lastPropertyBlock = null;
             m_expressionData.PushStackLevel("WhileStatement");
             m_enteredLoopStatement = true;
+            m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "while", ProcedureParsingScope.ScopeType.Block));
         }
 
         public override void ExitWhileStatement([NotNull] SBP.WhileStatementContext context)
         {
+            var whileScope = m_scopeStack.Pop();
             var stack = m_expressionData.PopStackLevel();
             var condition = stack.Pop();
-            var subStatements = m_scopeStack.Peek().GetSubStatements();
-            var attributes = m_scopeStack.Peek().GetAttributes();
+            var subStatements = whileScope.GetSubStatements();
+            var attributes = whileScope.GetAttributes();
             ProcedureVariable varLoopIndex = null;
             ProcedureVariable varEntryTime = null;
             ProcedureVariable varTimeoutTime = null;
@@ -486,7 +495,7 @@ namespace StepBro.Core.Parser
             var isBlockSub = (subStatements[0].Type == ProcedureParsingScope.ScopeType.Block);
             if (isBlockSub)
             {
-                breakLabel = m_scopeStack.Peek().BreakLabel;
+                breakLabel = whileScope.BreakLabel;
             }
 
             var statementExpressions = new List<Expression>();
