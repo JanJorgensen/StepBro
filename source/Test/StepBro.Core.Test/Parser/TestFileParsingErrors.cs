@@ -142,5 +142,26 @@ namespace StepBro.Core.Test.Parser
             Assert.AreEqual(1, files[0].Errors.ErrorCount);
             Assert.IsTrue(files[0].Errors[0].Message.Contains("unresolved identifier", StringComparison.InvariantCultureIgnoreCase));
         }
+
+        [TestMethod]
+        public void FileParsing_MissingSemicolon()
+        {
+            var file = new StringBuilder();
+            file.AppendLine("procedure void Proc()");
+            file.AppendLine("{");
+            file.AppendLine("    int i = 0;");
+            file.AppendLine("    while(i < 20)");
+            file.AppendLine("    {");
+            file.AppendLine("        log(\"Hello\");");
+            file.AppendLine("        i++");                 // Missing semicolon here.
+            file.AppendLine("    }");
+            file.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("test.sbs", file.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);
+            Assert.IsTrue(files[0].Errors[0].Message.Contains("missing ';'", StringComparison.InvariantCultureIgnoreCase), "Found: " + files[0].Errors[0].Message);
+        }
     }
 }

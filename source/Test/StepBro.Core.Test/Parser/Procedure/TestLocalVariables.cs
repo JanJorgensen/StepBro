@@ -55,11 +55,11 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestSimpleVarAssignment()
         {
-            //Assert.AreEqual(727L, ParseAndRun<long>("myVar", "var myVar = 0; myVar = 727;", false));
-            //Assert.AreEqual(true, ParseAndRun<bool>("myVar", "var myVar = false; myVar = true;", false));
+            Assert.AreEqual(727L, ParseAndRun<long>("myVar", "var myVar = 0; myVar = 727;", false));
+            Assert.AreEqual(true, ParseAndRun<bool>("myVar", "var myVar = false; myVar = true;", false));
             Assert.AreEqual("Snappy", ParseAndRun<string>("myVar", "var myVar = \"\"; myVar = \"Snappy\";", false));
-            //Assert.AreEqual(13.45, ParseAndRun<double>("myVar", "var myVar = 0.0; myVar = 13.45;", false));
-            //Assert.AreEqual(Verdict.Error, ParseAndRun<Verdict>("myVar", "var myVar = unset; myVar = error;", false));
+            Assert.AreEqual(13.45, ParseAndRun<double>("myVar", "var myVar = 0.0; myVar = 13.45;", false));
+            Assert.AreEqual(Verdict.Error, ParseAndRun<Verdict>("myVar", "var myVar = unset; myVar = error;", false));
         }
 
 

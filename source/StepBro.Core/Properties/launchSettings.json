@@ -1,9 +1,8 @@
 {
   "profiles": {
-    "StepBro.Core5 S3B Test": {
+    "Profile 1": {
       "commandName": "Project",
-      "commandLineArgs": "S3BTest.sbs -t --lf AzureLog --execute S3BTests --model DirectTest",
-      "workingDirectory": "C:\\SW_development\\Platform\\esw-platform-picked\\test\\systest\\S3B"
+      "workingDirectory": "C:\\SW_development\\StepBro\\test files\\parsertests"
     }
   }
 }
