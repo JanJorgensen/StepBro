@@ -467,7 +467,7 @@ namespace StepBro.Core.Parser
             var stack = m_expressionData.PopStackLevel();
             var condition = stack.Pop();
             var subStatements = whileScope.GetSubStatements();
-            var attributes = m_scopeStack.Peek().GetAttributes();
+            var attributes = whileScope.GetAttributes();
             ProcedureVariable varLoopIndex = null;
             ProcedureVariable varEntryTime = null;
             ProcedureVariable varTimeoutTime = null;
