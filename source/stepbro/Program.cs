@@ -401,6 +401,19 @@ namespace StepBro.Cmd
             }
         }
 
+        private static void ConsoleWriteErrorLine(string value)
+        {
+            if (m_executionRunning)
+            {
+                m_bufferedOutput.Add(new Tuple<bool, string>(true, value));
+            }
+            else
+            {
+                FlushBufferedConsoleOutput();
+                Console.Error.WriteLine(value);
+            }
+        }
+
         private static void ConsoleWriteErrorLine(string value, params object[] args)
         {
             if (m_executionRunning)
