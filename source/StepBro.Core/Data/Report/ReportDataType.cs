@@ -11,6 +11,7 @@ namespace StepBro.Core.Data.Report
         Section,
         TextLine,
         ExpectResult,
-        DataTable
+        DataTable,
+        TestSummary
     }
 }

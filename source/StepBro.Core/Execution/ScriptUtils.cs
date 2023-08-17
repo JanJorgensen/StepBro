@@ -131,10 +131,10 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static DataReport StartReport([Implicit] ICallContext context, string ID, string title)
+        public static DataReport StartReport([Implicit] ICallContext context, string type, string title)
         {
             var internalContext = ToScriptContext(context);
-            var report = new DataReport(ID);
+            var report = new DataReport(type, title);
             try
             {
                 internalContext.AddReport(report);

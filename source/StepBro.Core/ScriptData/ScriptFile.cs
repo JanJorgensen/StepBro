@@ -831,9 +831,9 @@ namespace StepBro.Core.ScriptData
                 return m_logger.CreateSubLocation(name);
             }
 
-            public void Log(string text)
+            public ILogEntry Log(string text)
             {
-                m_logger.Log(text);
+                return m_logger.Log(text);
             }
 
             public void LogAsync(string text)

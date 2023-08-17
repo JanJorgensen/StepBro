@@ -15,6 +15,8 @@ namespace StepBro.Core.Data
         private string m_description;
         private ErrorID m_errorID;
         private int m_stepIndex;
+        private DateTime m_startTime;
+        private DateTime m_endTime;
         private List<ProcedureResult> m_subResults;
 
         public string Reference { get { return m_reference; } }
@@ -24,13 +26,15 @@ namespace StepBro.Core.Data
         public ErrorID ErrorID { get { return m_errorID; } }
         public int SubResultCount { get { return m_subResults.Count; } }
 
-        internal ProcedureResult(string reference, Verdict verdict, int stepIndex, string description, ErrorID error, List<ProcedureResult> subResults)
+        internal ProcedureResult(string reference, Verdict verdict, int stepIndex, string description, ErrorID error, DateTime start, DateTime end, List<ProcedureResult> subResults)
         {
             m_reference = reference;
             m_verdict = verdict;
             m_stepIndex = stepIndex;
             m_description = description;
             m_errorID = error;
+            m_startTime = start;
+            m_endTime = end;
             m_subResults = new List<ProcedureResult>(subResults);
         }
 
@@ -46,6 +50,29 @@ namespace StepBro.Core.Data
         public int CountSubErrors()
         {
             return m_subResults.Count(r => r.Verdict == Verdict.Error);
+        }
+
+        public ProcedureResult SelectIfWorse(ProcedureResult otherResult)
+        {
+            if (this.Verdict >= otherResult.Verdict) return this;
+            return otherResult;
+        }
+
+        public override string ToString()
+        {
+            List<string> parts = new List<string>();
+            if (!String.IsNullOrEmpty(m_reference)) parts.Add(m_reference);
+            if (m_stepIndex > 0) parts.Add("step " + m_stepIndex.ToString());
+            parts.Add(m_verdict.ToString());
+            if (!String.IsNullOrEmpty(m_description)) parts.Add("\"" + m_description + "\"");
+            if (m_subResults != null && m_subResults.Count > 0)
+            {
+                parts.Add("Subresults: " + m_subResults.Count.ToString());
+                if (this.CountSubErrors() > 0) { parts.Add("errors: " + this.CountSubErrors().ToString()); }
+                else if (this.CountSubFails() > 0) { parts.Add("fails: " + this.CountSubFails().ToString()); }
+            }
+
+            return String.Join(", ", parts);
         }
     }
 }

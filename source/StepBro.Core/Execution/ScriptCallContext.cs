@@ -21,6 +21,8 @@ namespace StepBro.Core.Execution
         private IFileProcedure m_procedure;
         private readonly bool m_isDynamicCall;
         private TaskManager m_taskManager;
+        private DateTime m_startTime;
+        private DateTime m_endTime = DateTime.MaxValue;
         private int m_fileLine = -1;
         private ILoggerScope m_loggerOnEntry;
         private ILogger m_loggerInside;
@@ -145,10 +147,12 @@ namespace StepBro.Core.Execution
                     textPrefix + argText.ToString(),
                     new LoggerDynamicLocationSource(this.GetDynamicLogLocation));
                 m_loggerInside = m_loggerInsideScope;
+                m_startTime = m_loggerInsideScope.FirstLogEntryInScope.Timestamp;   // Same timestamp as the loggeg entry.
             }
             else
             {
                 m_loggerInsideScope = null;
+                m_startTime = DateTime.Now;
             }
         }
 
@@ -158,6 +162,7 @@ namespace StepBro.Core.Execution
             m_loggerInsideScope?.Dispose();
             m_loggerInside = null;
             m_loggerInsideScope = null;
+            m_endTime = DateTime.Now;
             //m_createdlogger.Dispose();
             //if (m_firstCreatedStatusUpdater != null)
             //{
@@ -425,17 +430,14 @@ namespace StepBro.Core.Execution
 
             if (verdict == Verdict.Error)
             {
-                //m_loggerInside.LogError(m_currentStatementLine.ToString(), resultDescription);
                 this.ReportError(resultDescription, null, null);
             }
             else if (verdict >= Verdict.Fail)
             {
-                //m_loggerInside.LogError(m_currentStatementLine.ToString(), resultDescription);
                 this.ReportFailure(resultDescription);
             }
             else
             {
-                //m_loggerInside.Log(m_currentStatementLine.ToString(), resultDescription);
                 m_loggerInside.Log(resultDescription);
                 this.SetPassVerdict();  // To indicate that the procedure actually has a verdict set now.
             }
@@ -593,7 +595,7 @@ namespace StepBro.Core.Execution
         {
             get
             {
-                return new ProcedureResult(m_procedure.FullName, m_verdict, m_failureLine, m_failureDescription, m_failureID, m_subResults);
+                return new ProcedureResult(m_procedure.FullName, m_verdict, m_failureLine, m_failureDescription, m_failureID, m_startTime, m_endTime, m_subResults);
             }
         }
 

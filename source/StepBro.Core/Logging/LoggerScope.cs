@@ -114,9 +114,9 @@ namespace StepBro.Core.Logging
             }
         }
 
-        public void Log(string text)
+        public ILogEntry Log(string text)
         {
-            this.Log(LogEntry.Type.Normal, text);
+            return this.Log(LogEntry.Type.Normal, text);
         }
 
         public void LogDetail(string text)
@@ -163,7 +163,7 @@ namespace StepBro.Core.Logging
             return (IProtectedLogger)this;
         }
 
-        public object FirstLogEntryInScope
+        public ILogEntry FirstLogEntryInScope
         {
             get { return m_scopeStartEntry; }
         }
