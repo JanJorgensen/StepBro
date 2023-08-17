@@ -92,7 +92,6 @@ public procedure void TestCaseFormalTestUntilFail( this TestCase testcase ) :
     testcase.PreTest();
     while (result < fail)
     {
-
         NextProcedureIsHighLevel("Setup #" + loopIndex);
         testcase.Setup();
 
@@ -173,7 +172,7 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
 {
     bool passedPreTest = true;
     NextProcedureIsHighLevel("PRETEST");
-    passedPreTest = suite.PreTest();
+    passedPreTest = suite.PreTest();        // Keep this in separate line, to make sure this is a high-level procedure call.
     if (passedPreTest)
     {
         var iterator = suite.GetProcedureIterator();
@@ -182,27 +181,36 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
         {
             // TODO: Save setup data in report
             // TODO: Save test suite data in report
+
+            var summary = testReport.CreateTestSummary();
+
             while (iterator.GetNext())
             {
-                // TODO: Start new group in report
-                // TODO: Save test case data in report
-                log ("Starting Test: " + iterator.Procedure.Name);
                 TestCase testcase = iterator.Procedure as TestCase;
+                testReport.StartGroup("Testcase " + testcase.Name, "<description of testcase>");
+                // TODO: Save test case data in report
+                log ("Starting Test: " + testcase.Name);
 
-                // TODO: Start Setup group
+                testReport.AddSection("Setup", "");
                 NextProcedureIsHighLevel("SETUP");
                 testcase.Setup();
+                var result = this.LastCallResult;
 
-                // TODO: Start main group, armed for documenting the next procedure call.
-                NextProcedureIsHighLevel("TEST");
-                iterator.Procedure( iterator.Arguments );
-                this.AddPartResult(iterator.Procedure, this.LastCallResult);
+                if (result.Verdict < fail)  // Only run the test if the setup succeeded.
+                {
+                    testReport.AddSection("Test", "");
+                    NextProcedureIsHighLevel("TEST");
+                    testcase( iterator.Arguments );
+                    result = result.SelectIfWorse(this.LastCallResult);
+                }
 
-                // TODO: Start Cleanup group
+                testReport.AddSection("Cleanup", "");
                 NextProcedureIsHighLevel("CLEANUP");
                 testcase.Cleanup();
-                
-                // TODO: Save test summary in report
+                result = result.SelectIfWorse(this.LastCallResult);
+
+                this.AddPartResult(testcase, result);
+                summary.AddResult(testcase.Name, result);
             }
             testReport.DumpToLog();
             
