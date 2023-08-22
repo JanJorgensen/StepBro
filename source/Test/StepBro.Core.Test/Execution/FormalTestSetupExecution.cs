@@ -278,16 +278,17 @@ namespace StepBroCoreTest.Execution
             f.AppendLine("procedure void TestSuiteFormalTestExecution(this TestSuiteBase suite) : NoSubResultInheritance");
             f.AppendLine("{");
             f.AppendLine("   var iterator = suite.GetProcedureIterator();");
+            f.AppendLine("   var summary = CreateTestSummary();");
             f.AppendLine("   while (iterator.GetNext())");
             f.AppendLine("   {");
             f.AppendLine("      log (\"Starting Test: \" + iterator.Procedure.Name);");
             f.AppendLine("      TestCaseBase testcase = iterator.Procedure as TestCaseBase;");
             f.AppendLine("      testcase.Setup();");
             f.AppendLine("      iterator.Procedure( iterator.Arguments );");
-            f.AppendLine("      this.AddPartResult(iterator.Procedure, this.LastCallResult);");
+            f.AppendLine("      summary.AddResult(testcase.Name, this.LastCallResult);");
             f.AppendLine("      testcase.Cleanup();");
             f.AppendLine("   }");
-            f.AppendLine("   log (\"Fails: \" + this.Result.CountSubFails());");
+            f.AppendLine("   log (\"Fails: \" + summary.CountSubFails());");
             f.AppendLine("}");
 
             f.AppendLine("procedure void ExecuteAllTests()");
@@ -323,7 +324,7 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - myfile.ExecuteAllTests - <no arguments>");
             log.ExpectNext("2 - Pre - myfile.TestSuiteFormalTestExecution - <no arguments>");
-            log.ExpectNext("3 - Normal - 26 Log - Starting Test: FirstTestCase");
+            log.ExpectNext("3 - Normal - 27 Log - Starting Test: FirstTestCase");
             log.ExpectNext("3 - Pre - myfile.TestCaseBaseSetup - <no arguments>");
             log.ExpectNext("4 - Normal - 7 Log - Doing setup for FirstTestCase");
             log.ExpectNext("4 - Post");
@@ -333,7 +334,7 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("3 - Pre - myfile.TestCaseBaseCleanup - <no arguments>");
             log.ExpectNext("4 - Normal - 8 Log - Doing cleanup for FirstTestCase");
             log.ExpectNext("4 - Post");
-            log.ExpectNext("3 - Normal - 26 Log - Starting Test: SecondTestCase");
+            log.ExpectNext("3 - Normal - 27 Log - Starting Test: SecondTestCase");
             log.ExpectNext("3 - Pre - myfile.TestCaseBaseSetup - <no arguments>");
             log.ExpectNext("4 - Normal - 7 Log - Doing setup for SecondTestCase");
             log.ExpectNext("4 - Post");
@@ -343,7 +344,7 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("3 - Pre - myfile.TestCaseBaseCleanup - <no arguments>");
             log.ExpectNext("4 - Normal - 8 Log - Doing cleanup for SecondTestCase");
             log.ExpectNext("4 - Post");
-            log.ExpectNext("3 - Normal - 26 Log - Starting Test: ThirdTestCase");
+            log.ExpectNext("3 - Normal - 27 Log - Starting Test: ThirdTestCase");
             log.ExpectNext("3 - Pre - myfile.SpecialSetup - <no arguments>");
             log.ExpectNext("4 - Normal - 9 Log - Doing special setup for ThirdTestCase");
             log.ExpectNext("4 - Post");
@@ -353,7 +354,7 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("3 - Pre - myfile.TestCaseBaseCleanup - <no arguments>");
             log.ExpectNext("4 - Normal - 8 Log - Doing cleanup for ThirdTestCase");
             log.ExpectNext("4 - Post");
-            log.ExpectNext("3 - Normal - 33 Log - Fails: 1");
+            log.ExpectNext("3 - Normal - 34 Log - Fails: 1");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();

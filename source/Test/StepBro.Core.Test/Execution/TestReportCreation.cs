@@ -43,7 +43,7 @@ namespace StepBroCoreTest.Execution
             Assert.AreEqual("Test#6", report.Title);
             Assert.AreEqual(1, report.ListData().Count());
             var entry = report.ListData().ElementAt(0);
-            Assert.AreEqual(StepBro.Core.Data.Report.ReportDataType.ExpectResult, entry.Type);
+            Assert.AreEqual(ReportDataType.ExpectResult, entry.Type);
         }
 
         [TestMethod]
@@ -63,7 +63,7 @@ namespace StepBroCoreTest.Execution
             Assert.AreEqual("Test#9", report.Title);
             Assert.AreEqual(1, report.ListData().Count());
             var entry = report.ListData().ElementAt(0);
-            Assert.AreEqual(StepBro.Core.Data.Report.ReportDataType.ExpectResult, entry.Type);
+            Assert.AreEqual(ReportDataType.ExpectResult, entry.Type);
         }
     }
 }

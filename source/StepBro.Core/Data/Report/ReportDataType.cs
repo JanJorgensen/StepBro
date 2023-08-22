@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using StepBro.Core.Api;
 
-namespace StepBro.Core.Data.Report
+namespace StepBro.Core
 {
+    [Public]
     public enum ReportDataType
     {
         Section,
         TextLine,
         ExpectResult,
+        SimpleMeasurement,
         DataTable,
         TestSummary
     }

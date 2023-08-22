@@ -5,6 +5,7 @@ using System.Threading;
 using StepBro.Core;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
+using StepBro.Core.Data.Report;
 using StepBro.Core.File;
 using static StepBro.Core.Data.StringUtils;
 
@@ -130,7 +131,6 @@ namespace StepBro.Core.Execution
             internalContext.SetNextProcedureAsHighLevel(type);
         }
 
-        [Public]
         public static DataReport StartReport([Implicit] ICallContext context, string type, string title)
         {
             var internalContext = ToScriptContext(context);
@@ -147,15 +147,37 @@ namespace StepBro.Core.Execution
             }
         }
 
-        [Public]
         public static DataReport GetReport([Implicit] ICallContext context)
         {
             var internalContext = context as ScriptCallContext;
             var report = internalContext.TryGetReport();
+            if (report == null)
             {
                 context.ReportError("No has been registered.");
             }
             return report;
+        }
+
+        public static ReportTestSummary CreateTestSummary([Implicit] ICallContext context)
+        {
+            var internalContext = (context is ScriptCallContext) ? context as ScriptCallContext : (context as CallContext).ParentContext as ScriptCallContext;
+            var report = internalContext.TryGetReport();
+            if (report != null)
+            {
+                return report.CreateTestSummary();
+            }
+            else
+            {
+                return new ReportTestSummary(DateTime.Now);
+            }
+        }
+
+        public static void ReportMeasurement([Implicit] ICallContext context, string id, string instance, string unit, object value)
+        {
+            var internalContext = (context is ScriptCallContext) ? context as ScriptCallContext : (context as CallContext).ParentContext as ScriptCallContext;
+            var report = internalContext.TryGetReport();
+
+            DataReport.AddMeasurement(context, report, id, instance, unit, value);
         }
 
         [Public]

@@ -187,21 +187,7 @@ namespace StepBro.Core.Data
                     }
                     else
                     {
-                        if (result.SubResultCount > 0)
-                        {
-                            if (result.CountSubFails() > 0)
-                            {
-                                return $"Result: Failed {result.CountSubFails()} out of {result.SubResultCount} tests.";
-                            }
-                            else
-                            {
-                                return $"Result: Passed all {result.SubResultCount} tests.";
-                            }
-                        }
-                        else
-                        {
-                            return "Success.";
-                        }
+                        return "Success.";
                     }
                 }
 

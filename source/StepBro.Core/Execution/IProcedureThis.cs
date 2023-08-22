@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StepBro.Core.Data;
+using StepBro.Core.Data.Report;
 
 namespace StepBro.Core.Execution
 {
@@ -16,7 +17,6 @@ namespace StepBro.Core.Execution
         string Name { get; }
         void ReportFailure(string failureDescription, ErrorID id = null);
         void ReportError(string errorDescription, ErrorID id = null);
-        void AddPartResult(IProcedureReference procedure, ProcedureResult result);
         ProcedureResult Result { get; }
         ProcedureResult LastCallResult { get; }
         bool SetResult(Verdict verdict, string description); 
