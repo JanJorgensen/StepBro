@@ -15,37 +15,46 @@ namespace StepBro.Core.Data
         private string m_description;
         private ErrorID m_errorID;
         private int m_stepIndex;
-        private List<ProcedureResult> m_subResults;
+        private DateTime m_startTime;
+        private DateTime m_endTime;
 
         public string Reference { get { return m_reference; } }
         public Verdict Verdict { get { return m_verdict; } }
         public int StepIndex { get { return m_stepIndex; } }
         public string Description { get { return m_description; } }
         public ErrorID ErrorID { get { return m_errorID; } }
-        public int SubResultCount { get { return m_subResults.Count; } }
 
-        internal ProcedureResult(string reference, Verdict verdict, int stepIndex, string description, ErrorID error, List<ProcedureResult> subResults)
+        internal ProcedureResult(string reference, Verdict verdict, int stepIndex, string description, ErrorID error, DateTime start, DateTime end)
         {
             m_reference = reference;
             m_verdict = verdict;
             m_stepIndex = stepIndex;
             m_description = description;
             m_errorID = error;
-            m_subResults = new List<ProcedureResult>(subResults);
+            m_startTime = start;
+            m_endTime = end;
         }
 
-        public IEnumerable<ProcedureResult> ListSubResults()
+        public ProcedureResult SelectIfWorse(ProcedureResult otherResult)
         {
-            foreach (var r in m_subResults) yield return r;
+            if (this.Verdict >= otherResult.Verdict) return this;
+            return otherResult;
         }
 
-        public int CountSubFails()
+        public string ToString(bool includeReference)
         {
-            return m_subResults.Count(r => r.Verdict == Verdict.Fail);
+            List<string> parts = new List<string>();
+            if (includeReference && !String.IsNullOrEmpty(m_reference)) parts.Add(m_reference);
+            if (m_stepIndex > 0) parts.Add("step " + m_stepIndex.ToString());
+            parts.Add(m_verdict.ToString());
+            if (!String.IsNullOrEmpty(m_description)) parts.Add("\"" + m_description + "\"");
+
+            return String.Join(", ", parts);
         }
-        public int CountSubErrors()
+
+        public override string ToString()
         {
-            return m_subResults.Count(r => r.Verdict == Verdict.Error);
+            return this.ToString(true);
         }
     }
 }

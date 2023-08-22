@@ -187,21 +187,7 @@ namespace StepBro.Core.Data
                     }
                     else
                     {
-                        if (result.SubResultCount > 0)
-                        {
-                            if (result.CountSubFails() > 0)
-                            {
-                                return $"Result: Failed {result.CountSubFails()} out of {result.SubResultCount} tests.";
-                            }
-                            else
-                            {
-                                return $"Result: Passed all {result.SubResultCount} tests.";
-                            }
-                        }
-                        else
-                        {
-                            return "Success.";
-                        }
+                        return "Success.";
                     }
                 }
 
@@ -213,7 +199,7 @@ namespace StepBro.Core.Data
             return result.ProcedureResult.ResultText(result.ReturnValue);
         }
 
-        public static string ToClearText(this LogEntry entry, DateTime zero, bool forceShow = false)
+        public static string ToClearText(this LogEntry entry, DateTime zero, bool forceShow = false, bool showErrorAndFailType = true)
         {
             var timestamp = entry.Timestamp.ToSecondsTimestamp(zero);
             var timestampIndent = new string(' ', Math.Max(0, 8 - timestamp.Length));
@@ -223,10 +209,10 @@ namespace StepBro.Core.Data
             text.Append(timestamp);
             text.Append(new string(' ', 1 + entry.IndentLevel * 3));
             string type = entry.EntryType switch {
-                    LogEntry.Type.Async => "<A> ",//type = "Async - ";
+                    LogEntry.Type.Async => "<A> ",
                     LogEntry.Type.TaskEntry => "TaskEntry - ",
-                    LogEntry.Type.Error => "Error - ",
-                    LogEntry.Type.Failure => "Fail - ",
+                    LogEntry.Type.Error => showErrorAndFailType ? "Error - " : "",
+                    LogEntry.Type.Failure => showErrorAndFailType ? "Fail - " : "",
                     LogEntry.Type.UserAction => "UserAction - ",
                     _ => ""
             };

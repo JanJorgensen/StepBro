@@ -163,12 +163,7 @@ namespace StepBro.Cmd
                                                 {
                                                     if (m_commandLineOptions.ExitCode == ExitValueOption.SubVerdict)
                                                     {
-                                                        var verdict = result.ProcedureResult.Verdict;                   // Include verdict from the partner procedure result.
-                                                        foreach (var sr in result.ProcedureResult.ListSubResults())     // Check verdict from each sub result.
-                                                        {
-                                                            if (sr.Verdict > verdict) verdict = sr.Verdict;
-                                                        }
-                                                        switch (verdict)
+                                                        switch (result.ProcedureResult.Verdict)
                                                         {
                                                             case Verdict.Unset:
                                                             case Verdict.Pass:

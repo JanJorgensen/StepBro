@@ -1,33 +1,52 @@
-﻿// Demo project using the MyProjectBase and through that also the TestFramework.
+﻿// This file contains procedures and testlists that can be used to test the behaviour of StepBro itself.
 
-using "MyProjectBase.sbs";
+using @"..\Scripts\TestFramework.sbs";
 
 testlist AllTests : TestSuite
 {
     * FirstTestCase
     * SecondTestCase
     * ThirdTestCase
+    * FourthTestCase
+    * FifthTestCase
 }
 
-procedure void FirstTestCase() : TestCase,
-    override partner Setup:     TestCaseSpecialSetup
+testlist AllPassing : TestSuite
 {
-    log ("Inside FirstTestCase");
+    * FirstTestCase
+    * SecondTestCase
+    * ThirdTestCase
 }
 
-procedure void SecondTestCase() : TestCase,
-    override partner Cleanup:   TestCaseSpecialCleanup
+testlist OneFailing : TestSuite
 {
-    log ("Inside SecondTestCase");
+    * FirstTestCase
+    * SecondTestCase
+    * ThirdTestCase
+    * FourthTestCase
+}
+
+procedure void FirstTestCase() : TestCase
+{
+}
+
+procedure void SecondTestCase() : TestCase
+{
+    ReportMeasurement("Temperature", "#1", "degC", 982.5);
 }
 
 procedure void ThirdTestCase() : TestCase
 {
-    log ("Inside ThirdTestCase");
+    expect (5 > 2);
 }
 
-
-procedure void ExecuteTest()
+procedure void FourthTestCase() : TestCase
 {
-    AllTests.FormalTest();
+    expect (20 > 11);
+    expect ( 5 > 11);
+    expect (14 > 11);
+}
+
+procedure void FifthTestCase() : TestCase
+{
 }

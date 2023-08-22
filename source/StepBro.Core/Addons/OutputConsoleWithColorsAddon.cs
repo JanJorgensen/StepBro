@@ -36,7 +36,7 @@ namespace StepBro.Core.Addons
 
             public void LogEntry(LogEntry entry, DateTime zero)
             {
-                var txt = entry.ToClearText(zero, false);
+                var txt = entry.ToClearText(zero, false, false);
                 if (txt != null)
                 {
                     switch (entry.EntryType)
