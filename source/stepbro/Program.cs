@@ -58,7 +58,11 @@ namespace StepBro.Cmd
             m_hostAccess = new HostAccess(out m_hostService);
             var selectedLogDumpAddon = OutputConsoleWithColorsAddon.Name;
 
-            Console.CursorVisible = false;
+            try
+            {
+                Console.CursorVisible = false;      // On the Azure CI, this fail.
+            }
+            catch { }
 
             object consoleResourceUserObject = new object();
             int retval = 0;
