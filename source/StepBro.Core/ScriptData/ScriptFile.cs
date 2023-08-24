@@ -112,11 +112,11 @@ namespace StepBro.Core.ScriptData
 
         public IFolderShortcutsSource FolderShortcuts { get { return m_folderShortcuts; } }
 
-        public bool HasFileChanged()
+        public bool HasFileChanged(bool alsoIfFileNotFound = false)
         {
             var path = this.GetFullPath();
             var exist = System.IO.File.Exists(path);
-            if (!exist) return false;
+            if (!exist) return alsoIfFileNotFound ? true : false;
             //if (m_parserFileStream == null) return true;
             var lastWrite = System.IO.File.GetLastWriteTime(path);
             return (lastWrite != m_lastFileChange);
@@ -200,6 +200,7 @@ namespace StepBro.Core.ScriptData
         public DateTime LastFileChange { get; internal set; }
         public DateTime LastTypeScan { get; internal set; }
         public DateTime LastParsing { get; internal set; }
+        public DateTime LastSuccessfulParsing { get; internal set; }
 
         public void MarkForTypeScanning()
         {

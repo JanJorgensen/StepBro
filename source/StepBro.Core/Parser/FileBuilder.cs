@@ -899,9 +899,10 @@ namespace StepBro.Core.Parser
                     }
 
                     totalErrors += file.Errors.ErrorCount;
+                    file.LastParsing = DateTime.Now;
                     if (file.Errors.ErrorCount == 0)
                     {
-                        file.LastParsing = DateTime.Now;
+                        file.LastSuccessfulParsing = file.LastParsing;
                     }
                 }
             }

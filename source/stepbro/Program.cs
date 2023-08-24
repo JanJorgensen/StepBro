@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using Newtonsoft.Json.Linq;
 using StepBro.Core;
 using StepBro.Core.Addons;
 using StepBro.Core.Data;
@@ -7,30 +8,57 @@ using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using static StepBro.Core.Data.ObjectMonitor;
 using StepBroMain = StepBro.Core.Main;
 
 namespace StepBro.Cmd
 {
     internal class Program
     {
+        private enum Mode
+        {
+            /// <summary>
+            /// After checking command line parameters, just exit.
+            /// </summary>
+            RunThrough,
+            ExecuteScript,
+            RepeatedParsing
+        }
+        private enum State
+        {
+            LoadMainFile,
+            ParseFiles,
+            ExecuteScript,
+            AwaitFileChange,
+            CloseAndDisposeAllFiles,
+            Exit
+        }
+
         private class ExitException : Exception { }
         private static HostAccess m_hostAccess;
         private static CommandLineOptions m_commandLineOptions = null;
-        private static bool m_executionRunning = false;
+        private static bool m_activitiesRunning = false;
         private static bool m_dumpingExecutionLog = false;
+        private static bool m_dumpBufferedConsoleOutput = false;
         private static IOutputFormatterTypeAddon m_logDumpAddon = null;
         private static IOutputFormatter m_logDumpFormatter = null;
         private static List<Tuple<bool, string>> m_bufferedOutput = new List<Tuple<bool, string>>();
+        //Queue<Tuple<Action<object>, object>> m_commandQueue = new Queue<Tuple<Action<object>, object>>();
+        private static Mode m_mode = Mode.RunThrough;
+        private static State m_state = State.Exit;
 
         private static int Main(string[] args)
         {
             IService m_hostService = null;
             m_hostAccess = new HostAccess(out m_hostService);
             var selectedLogDumpAddon = OutputConsoleWithColorsAddon.Name;
+
+            Console.CursorVisible = false;
 
             object consoleResourceUserObject = new object();
             int retval = 0;
@@ -99,45 +127,139 @@ namespace StepBro.Cmd
                     }
                 }
 
-
                 if (!String.IsNullOrEmpty(m_commandLineOptions.InputFile))
                 {
                     if (m_commandLineOptions.Verbose) ConsoleWriteLine("Filename: {0}", m_commandLineOptions.InputFile);
-                    IScriptFile file = null;
-                    var filepath = System.IO.Path.GetFullPath(m_commandLineOptions.InputFile);
-                    try
+
+                    m_state = State.LoadMainFile;
+
+                    if (!String.IsNullOrEmpty(m_commandLineOptions.TargetElement) && m_commandLineOptions.RepeatedParsing)
                     {
-                        file = StepBroMain.LoadScriptFile(consoleResourceUserObject, filepath);
-                        if (file == null)
-                        {
-                            retval = -1;
-                            ConsoleWriteErrorLine("Error: Loading script file failed ( " + filepath + " )");
-                        }
-                        var shortcuts = ServiceManager.Global.Get<IFolderManager>();
-                        var projectShortcuts = new FolderCollection(FolderShortcutOrigin.Project);
-                        projectShortcuts.AddShortcut(StepBro.Core.Api.Constants.TOP_FILE_FOLDER_SHORTCUT, System.IO.Path.GetDirectoryName(file.FilePath));
-                        shortcuts.AddSource(projectShortcuts);
+                        ConsoleWriteErrorLine("Options 'execute' and 'repeated parsing' cannot be used at the same time.");
+                        retval = -1;
+                        m_state = State.Exit;
                     }
-                    catch (Exception ex)
+
+                    if (m_commandLineOptions.RepeatedParsing)
+                    {
+                        m_mode = Mode.RepeatedParsing;
+                        ConsoleWriteLine("Starting 'repeated parsing'. To exit, press 'x'. To clear view, press 'c'.");
+                    }
+                    else
+                    {
+                        if (!String.IsNullOrEmpty(m_commandLineOptions.TargetElement))
+                        {
+                            m_mode = Mode.ExecuteScript;
+                        }
+                    }
+                }
+                else
+                {
+                    if (!String.IsNullOrEmpty(m_commandLineOptions.Model))
                     {
                         retval = -1;
-                        ConsoleWriteErrorLine("Error: Loading script file failed: " + ex.GetType().Name + ", " + ex.Message);
+                        ConsoleWriteErrorLine("Error: Model has been specified, but not a target element.");
                     }
+                    //else
+                    //{
+                    //    ConsoleWriteLine("No target element specified; no execution started.");
+                    //}
+                }
 
-                    if (file != null)
+                m_activitiesRunning = true;
+
+                IScriptFile file = null;
+
+                while (m_state != State.Exit)
+                {
+                    switch (m_state)
                     {
-                        m_executionRunning = true;
-                        if (m_commandLineOptions.TraceToConsole)
-                        {
-                            m_dumpingExecutionLog = true;
-                            var logTask = new Task(() => LogDumpTask());
-                            logTask.Start();
-                        }
+                        case State.LoadMainFile:
+                            var filepath = System.IO.Path.GetFullPath(m_commandLineOptions.InputFile);
+                            try
+                            {
+                                file = StepBroMain.LoadScriptFile(consoleResourceUserObject, filepath);
+                                if (file == null)
+                                {
+                                    m_state = State.Exit;
+                                    retval = -1;
+                                    ConsoleWriteErrorLine("Error: Loading script file failed ( " + filepath + " )");
+                                }
+                                var shortcuts = ServiceManager.Global.Get<IFolderManager>();
+                                var projectShortcuts = new FolderCollection(FolderShortcutOrigin.Project);
+                                projectShortcuts.AddShortcut(StepBro.Core.Api.Constants.TOP_FILE_FOLDER_SHORTCUT, System.IO.Path.GetDirectoryName(file.FilePath));
+                                shortcuts.AddSource(projectShortcuts);
 
-                        var parsingSuccess = StepBroMain.ParseFiles(true);
-                        if (parsingSuccess)
-                        {
-                            if (!String.IsNullOrEmpty(m_commandLineOptions.TargetElement))
+                                switch (m_mode)
+                                {
+                                    case Mode.RunThrough:
+                                        break;
+                                    case Mode.ExecuteScript:
+                                    case Mode.RepeatedParsing:
+                                        m_state = State.ParseFiles;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                m_state = State.Exit;
+                                retval = -1;
+                                ConsoleWriteErrorLine("Error: Loading script file failed: " + ex.GetType().Name + ", " + ex.Message);
+                            }
+                            break;
+
+                        case State.ParseFiles:
+                            var parsingSuccess = StepBroMain.ParseFiles(true);
+                            if (parsingSuccess)
+                            {
+                                switch (m_mode)
+                                {
+                                    case Mode.RunThrough:
+                                        m_state = State.Exit;
+                                        break;
+                                    case Mode.ExecuteScript:
+                                        m_state = State.ExecuteScript;
+                                        break;
+                                    case Mode.RepeatedParsing:
+                                        ConsoleWriteLine("No parsing errors.");
+                                        m_state = State.AwaitFileChange;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                int num = StepBroMain.GetLoadedFilesManager().ListFiles<IScriptFile>().Sum(f => f.Errors.GetList().Where(e => !e.JustWarning).Count());
+                                ConsoleWriteErrorLine($"{num} parsing error(s)!");
+                                foreach (var openedFile in StepBroMain.GetLoadedFilesManager().ListFiles<IScriptFile>())
+                                {
+                                    foreach (var err in openedFile.Errors.GetList())
+                                    {
+                                        if (!err.JustWarning)
+                                        {
+                                            ConsoleWriteErrorLine($"   {openedFile.FileName} line {err.Line}: {err.Message}");
+                                        }
+                                    }
+                                }
+
+                                switch (m_mode)
+                                {
+                                    case Mode.RepeatedParsing:
+                                        m_dumpBufferedConsoleOutput = true;
+                                        m_state = State.AwaitFileChange;
+                                        break;
+                                    default:
+                                        retval = -1;
+                                        m_state = State.Exit;
+                                        break;
+                                }
+                            }
+                            break;
+
+                        case State.ExecuteScript:
                             {
                                 IFileElement element = StepBroMain.TryFindFileElement(m_commandLineOptions.TargetElement);
                                 if (element != null)
@@ -157,6 +279,15 @@ namespace StepBro.Cmd
                                             }
                                             try
                                             {
+                                                // Start logging now.
+                                                if (m_commandLineOptions.TraceToConsole)
+                                                {
+                                                    m_dumpingExecutionLog = true;
+                                                    var logTask = new Task(() => LogDumpTask());
+                                                    logTask.Start();
+                                                }
+
+
                                                 var result = StepBroMain.ExecuteProcedure(procedure, arguments.ToArray());
 
                                                 if (result != null)
@@ -197,7 +328,7 @@ namespace StepBro.Cmd
                                                     }
                                                     else if (m_commandLineOptions.ExitCode == ExitValueOption.ReturnValue)
                                                     {
-                                                        if (procedure.ReturnType == TypeReference.TypeInt64) 
+                                                        if (procedure.ReturnType == TypeReference.TypeInt64)
                                                         {
                                                             retval = (Int32)(Int64)result.ReturnValue;
                                                         }
@@ -290,42 +421,62 @@ namespace StepBro.Cmd
                                     retval = -1;
                                     ConsoleWriteErrorLine($"Error: File element named '{m_commandLineOptions.TargetElement} was not found.");
                                 }
+
+                                m_state = State.Exit;   // For now, always exit after execution (or attempt).
                             }
-                            else
+                            break;
+
+                        case State.AwaitFileChange:
+
+                            // Collect all relevant files
+
+                            while (true)
                             {
-                                if (!String.IsNullOrEmpty(m_commandLineOptions.Model))
+                                if (StepBroMain.CheckIfFileParsingNeeded(true))
                                 {
-                                    retval = -1;
-                                    ConsoleWriteErrorLine("Error: Model has been specified, but not a target element.");
+                                    m_state = State.CloseAndDisposeAllFiles;
+                                    System.Threading.Thread.Sleep(200);         // Give editor a chance to save all files before the sparsing starts.
+                                    break;
                                 }
-                                else
+                                else if (Console.KeyAvailable)
                                 {
-                                    ConsoleWriteLine("No target element specified; no execution started.");
-                                }
-                            }
-                        }
-                        else
-                        {
-                            ConsoleWriteErrorLine("Parsing errors!");
-                            foreach (var openedFile in StepBroMain.GetLoadedFilesManager().ListFiles<IScriptFile>())
-                            {
-                                foreach (var err in openedFile.Errors.GetList())
-                                {
-                                    if (!err.JustWarning)
+                                    var keyInfo = Console.ReadKey(true);
+                                    if ((uint)keyInfo.Modifiers == 0)
                                     {
-                                        ConsoleWriteErrorLine($"   {openedFile.FileName} line {err.Line}: {err.Message}");
+                                        if (keyInfo.Key == ConsoleKey.C)
+                                        {
+                                            Console.Clear();
+                                        }
+                                        else if (keyInfo.Key == ConsoleKey.X)
+                                        {
+                                            m_state = State.Exit;
+                                        }
                                     }
+                                    break;
                                 }
+                                System.Threading.Thread.Sleep(200);
                             }
-                            retval = -1;
-                        }
+                            break;
+
+                        case State.CloseAndDisposeAllFiles:
+
+                            StepBroMain.UnregisterFileUsage(consoleResourceUserObject, file);
+                            switch (m_mode)
+                            {
+                                case Mode.RepeatedParsing:
+                                    ConsoleWriteLine("");
+                                    ConsoleWriteLine($"{DateTime.Now.ToString("HH:mm:ss")} - Starting parsing");
+                                    m_state = State.LoadMainFile;   // Load the file again and all its dependencies.
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            break;
+
+                        case State.Exit:
+                            break;
                     }
-                }
-                else
-                {
-                    // If no file should be opened, what then?
-                    retval = -1;
-                    ConsoleWriteErrorLine("Error: File could not be opened.");
                 }
             }
             catch (ExitException) { }
@@ -356,7 +507,7 @@ namespace StepBro.Cmd
             }
             finally
             {
-                m_executionRunning = false;
+                m_activitiesRunning = false;
                 while (m_dumpingExecutionLog)
                 {
                     System.Threading.Thread.Sleep(50);
@@ -378,14 +529,14 @@ namespace StepBro.Cmd
                 {
                     System.Threading.Thread.Sleep(25);
                 }
-                Console.ReadKey();
+                Console.ReadKey(true);
             }
             return retval;
         }
 
         private static void ConsoleWriteLine(string value, params object[] args)
         {
-            if (m_executionRunning)
+            if (m_activitiesRunning && m_dumpingExecutionLog)
             {
                 m_bufferedOutput.Add(new Tuple<bool, string>(false, String.Format(value, args)));
             }
@@ -398,27 +549,17 @@ namespace StepBro.Cmd
 
         private static void ConsoleWriteErrorLine(string value)
         {
-            if (m_executionRunning)
+            if (m_activitiesRunning && m_dumpingExecutionLog)
             {
                 m_bufferedOutput.Add(new Tuple<bool, string>(true, value));
             }
             else
             {
                 FlushBufferedConsoleOutput();
+                var color = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.Error.WriteLine(value);
-            }
-        }
-
-        private static void ConsoleWriteErrorLine(string value, params object[] args)
-        {
-            if (m_executionRunning)
-            {
-                m_bufferedOutput.Add(new Tuple<bool, string>(true, String.Format(value, args)));
-            }
-            else
-            {
-                FlushBufferedConsoleOutput();
-                Console.Error.WriteLine(value, args);
+                Console.ForegroundColor = color;
             }
         }
 
@@ -427,7 +568,13 @@ namespace StepBro.Cmd
             foreach (var s in m_bufferedOutput)
             {
                 if (s.Item1 == false) Console.WriteLine(s.Item2);
-                else Console.Error.WriteLine(s.Item2);
+                else
+                {
+                    var color = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Error.WriteLine(s.Item2);
+                    Console.ForegroundColor = color;
+                }
             }
             m_bufferedOutput.Clear();
         }
@@ -436,14 +583,19 @@ namespace StepBro.Cmd
         {
             var logEntry = StepBroMain.Logger.GetOldestEntry();
             var zero = logEntry.Timestamp;
-            while (logEntry != null || m_executionRunning)
+            while (logEntry != null || m_activitiesRunning)
             {
                 m_logDumpFormatter.LogEntry(logEntry, zero);
 
                 // Wait until log is empty and there is no running execution.
-                while (logEntry.Next == null && m_executionRunning == true)
+                while (logEntry.Next == null && m_activitiesRunning == true)
                 {
                     System.Threading.Thread.Sleep(50);
+                    if (m_dumpBufferedConsoleOutput)
+                    {
+                        FlushBufferedConsoleOutput();
+                        m_dumpBufferedConsoleOutput = false;
+                    }
                 }
                 logEntry = logEntry.Next;
             }
