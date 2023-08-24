@@ -300,11 +300,14 @@ namespace StepBro.Core.ScriptData
                     if (i == 0)
                     {
                         m_baseElementName = entry.Name;
-                        if (!this.ParseBaseElement())
+                        if (this.ParseBaseElement())
                         {
-                            throw new ParsingErrorException(entry.Line, m_baseElementName, "Base element unknown.");
+                            entry.IsUsedOrApproved = true;
                         }
-                        entry.IsUsedOrApproved = true;
+                        else
+                        {
+                            (this.ParentFile as ScriptFile).ErrorsInternal.SymanticError(entry.Line, 1, false, "Unknown flag or file element: '" + entry.Name + "'.");
+                        }
                     }
                     continue;
                 }

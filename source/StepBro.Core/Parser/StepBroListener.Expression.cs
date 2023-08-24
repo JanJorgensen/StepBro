@@ -365,17 +365,41 @@ namespace StepBro.Core.Parser
                 try
                 {
                     var op = BinaryOperators.BinaryOperatorBase.GetOperator(context.op.Type);
-                
-                    var result = op.Resolve(this, first, last);
 
-                    if (result != null)
+                    try
                     {
+                        var result = op.Resolve(this, first, last);
+                        System.Diagnostics.Debug.Assert(result != null);
                         m_expressionData.Push(result);
                     }
+                    catch (NotImplementedException)
+                    {
+                        var description = $"Operation '{context.GetChild(1).GetText()}' not implemented for the specified types.";
+                        m_errors.SymanticError(context.op.Line, context.op.Column, false, description);
+                        m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError, description, context.GetText(), new TokenOrSection(context.Start, context.Stop, context.GetText())));
+                    }
+                    catch (ParsingErrorException ex)
+                    {
+                        var description = (String.IsNullOrEmpty(ex.Message)) ? $"Operation '{context.GetChild(1).GetText()}' not supported for the specified types." : ex.Message;
+                        m_errors.SymanticError(context.op.Line, context.op.Column, false, description);
+                        m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError, description, context.GetText(), new TokenOrSection(context.Start, context.Stop, context.GetText())));
+                    }
+                    catch (Exception)
+                    {
+                        var description = $"Unhandled exception in operation '{context.GetChild(1).GetText()}'.";
+                        m_errors.InternalError(context.op.Line, context.op.Column, "");
+                        m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError, description, context.GetText(), new TokenOrSection(context.Start, context.Stop, context.GetText())));
+                    }
                 }
-                catch (Exception e)
+                catch (NotImplementedException)
                 {
-                    m_errors.InternalError(first.Token.Line, first.Token.Column, e.Message);
+                    var description = $"Operation '{context.GetChild(1).GetText()}' is not implemented.";
+                    m_errors.InternalError(context.op.Line, context.op.Column, description);
+                }
+                catch (Exception)
+                {
+                    var description = $"Unhandled exception in operation '{context.GetChild(1).GetText()}'.";
+                    m_errors.InternalError(context.op.Line, context.op.Column, description);
                 }
             }
         }

@@ -23,7 +23,7 @@ namespace StepBro.Core.Parser.BinaryOperators
                 }
                 else
                 {
-                    throw new NotImplementedException("Only integers are allowed when using the bitwise AND operator.");
+                    throw new ParsingErrorException("Only integers are allowed when using the bitwise AND operator.");
                 }
                 #endregion
             }
