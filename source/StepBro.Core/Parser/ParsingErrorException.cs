@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Linq;
 
 namespace StepBro.Core.Parser
 {
@@ -19,6 +20,13 @@ namespace StepBro.Core.Parser
             m_fileName = "";
             m_line = line;
             m_elementName = name;
+        }
+
+        public ParsingErrorException(string message = "") : base(message)
+        {
+            m_fileName = "";
+            m_line = -1;
+            m_elementName = "";
         }
 
         public string FileName { get { return m_fileName; } }

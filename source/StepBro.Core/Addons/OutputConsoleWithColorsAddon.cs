@@ -42,6 +42,7 @@ namespace StepBro.Core.Addons
                     switch (entry.EntryType)
                     {
                         case Logging.LogEntry.Type.Pre:
+                        case Logging.LogEntry.Type.PreHighLevel:
                         case Logging.LogEntry.Type.TaskEntry:
                             Console.ForegroundColor = ConsoleColor.Cyan;
                             break;
@@ -66,9 +67,11 @@ namespace StepBro.Core.Addons
                             Console.ForegroundColor = ConsoleColor.Blue;
                             break;
                         default:
+                            Console.ForegroundColor = ConsoleColor.White;
                             break;
                     }
                     Console.WriteLine(txt);
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
 
