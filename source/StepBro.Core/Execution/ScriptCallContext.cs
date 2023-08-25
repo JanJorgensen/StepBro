@@ -21,6 +21,8 @@ namespace StepBro.Core.Execution
         private IFileProcedure m_procedure;
         private readonly bool m_isDynamicCall;
         private TaskManager m_taskManager;
+        private DateTime m_startTime;
+        private DateTime m_endTime = DateTime.MaxValue;
         private int m_fileLine = -1;
         private ILoggerScope m_loggerOnEntry;
         private ILogger m_loggerInside;
@@ -39,7 +41,6 @@ namespace StepBro.Core.Execution
         private string m_failureDescription = null;
         private ErrorID m_failureID = null;
         private Exception m_errorException = null;
-        private List<ProcedureResult> m_subResults = new List<ProcedureResult>();
         private int m_failCount = 0;
         private int m_errorCount = 0;
         private RuntimeErrorListener m_errorListener = null;
@@ -145,10 +146,12 @@ namespace StepBro.Core.Execution
                     textPrefix + argText.ToString(),
                     new LoggerDynamicLocationSource(this.GetDynamicLogLocation));
                 m_loggerInside = m_loggerInsideScope;
+                m_startTime = m_loggerInsideScope.FirstLogEntryInScope.Timestamp;   // Same timestamp as the loggeg entry.
             }
             else
             {
                 m_loggerInsideScope = null;
+                m_startTime = DateTime.Now;
             }
         }
 
@@ -158,6 +161,7 @@ namespace StepBro.Core.Execution
             m_loggerInsideScope?.Dispose();
             m_loggerInside = null;
             m_loggerInsideScope = null;
+            m_endTime = DateTime.Now;
             //m_createdlogger.Dispose();
             //if (m_firstCreatedStatusUpdater != null)
             //{
@@ -398,7 +402,7 @@ namespace StepBro.Core.Execution
         {
             if (m_currentReport != null)
             {
-                m_currentReport.AddData(data);
+                m_currentReport.AddData(this, data);
             }
         }
 
@@ -425,17 +429,14 @@ namespace StepBro.Core.Execution
 
             if (verdict == Verdict.Error)
             {
-                //m_loggerInside.LogError(m_currentStatementLine.ToString(), resultDescription);
                 this.ReportError(resultDescription, null, null);
             }
             else if (verdict >= Verdict.Fail)
             {
-                //m_loggerInside.LogError(m_currentStatementLine.ToString(), resultDescription);
                 this.ReportFailure(resultDescription);
             }
             else
             {
-                //m_loggerInside.Log(m_currentStatementLine.ToString(), resultDescription);
                 m_loggerInside.Log(resultDescription);
                 this.SetPassVerdict();  // To indicate that the procedure actually has a verdict set now.
             }
@@ -541,11 +542,6 @@ namespace StepBro.Core.Execution
                 this.LogError(errorDescription);
             }
         }
-        public void AddPartResult(IProcedureReference procedure, ProcedureResult result)
-        {
-            m_subResults.Add(result);
-        }
-
 
         public bool SetResultFromSub(IScriptCallContext sub)
         {
@@ -553,10 +549,6 @@ namespace StepBro.Core.Execution
             bool setVerdict = false;
             if ((this.Self.Flags & ProcedureFlags.NoSubResultInheritance) == ProcedureFlags.NoSubResultInheritance)
             {
-                if (m_verdict <= Verdict.Pass && sub.Result.SubResultCount > 0)
-                {
-                    m_subResults.AddRange(sub.Result.ListSubResults());
-                }
                 if (sub.Result.Verdict > Verdict.Fail)
                 {
                     setVerdict = true;
@@ -577,7 +569,6 @@ namespace StepBro.Core.Execution
                     m_failureLine = m_currentStatementLine;
                     m_failureID = sub.Result.ErrorID;
                     m_failureDescription = $"Failure in called procedure \"{sub.Self.FullName}\".";
-                    m_subResults.Clear();   // When procedure has its own verdict, the sub-results are not useful.
 
                     if (m_verdict == Verdict.Error) return true;
                     else if (m_verdict == Verdict.Fail)
@@ -593,7 +584,7 @@ namespace StepBro.Core.Execution
         {
             get
             {
-                return new ProcedureResult(m_procedure.FullName, m_verdict, m_failureLine, m_failureDescription, m_failureID, m_subResults);
+                return new ProcedureResult(m_procedure.FullName, m_verdict, m_failureLine, m_failureDescription, m_failureID, m_startTime, m_endTime);
             }
         }
 
@@ -644,7 +635,6 @@ namespace StepBro.Core.Execution
                 return System.IO.Path.GetDirectoryName(m_procedure.ParentFile.FilePath);
             }
         }
-
 
         public TaskManager TaskManager { get { return m_taskManager; } }
     }

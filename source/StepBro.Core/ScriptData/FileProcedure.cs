@@ -20,7 +20,6 @@ namespace StepBro.Core.ScriptData
         private TypeReference m_returnType = null;
         private List<IdentifierInfo> m_parametersInternal = new List<IdentifierInfo>();
         private List<ParameterData> m_formalParameters = new List<ParameterData>();
-        private bool m_freeParameters = false;
         private readonly ParameterExpression m_callContextParameter;
         private LabelTarget m_returnLabel;
         private Expression m_bodyCode = null;
@@ -167,7 +166,7 @@ namespace StepBro.Core.ScriptData
 
         public bool HasBody { get; internal set; } = false;
 
-        public bool DictatesParameters { get { return !m_freeParameters; } }
+        public bool DictatesParameters { get { return this.Flags.HasFlag(ProcedureFlags.FreeParameters) == false; } }
 
         public TypeReference ReturnType
         {
@@ -361,7 +360,7 @@ namespace StepBro.Core.ScriptData
         {
             if (name.Equals("FreeParameters"))
             {
-                m_freeParameters = true;
+                this.Flags |= ProcedureFlags.FreeParameters;
                 return true;
             }
             if (name.Equals("ContinueOnFail"))  // Default is 'SkipRestOnFail' (exit procedure)

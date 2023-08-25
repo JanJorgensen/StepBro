@@ -30,6 +30,9 @@ namespace StepBro.Cmd
         [Option("report_result", Default = false, HelpText = "Dumps the execution result.")]
         public bool ReportResult { get; set; } = false;
 
+        [Option("repeat_parsing", Default = false, HelpText = "Repeatedly parsing top file and the dependancy files whenever a file changes.")]
+        public bool RepeatedParsing { get; set; } = false;
+
         [Option("exitcode", Default = ExitValueOption.Normal, HelpText = "Application exit code option (ReturnValue, Verdict or SubVerdict).")]
         public ExitValueOption ExitCode { get; set; } = ExitValueOption.Normal;
 

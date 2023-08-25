@@ -308,11 +308,11 @@ namespace StepBro.Core
             }
         }
 
-        private static bool CheckIfFileParsingNeeded()
+        public static bool CheckIfFileParsingNeeded(bool alsoIfFileNotFound = false)
         {
             foreach (var f in m_loadedFilesManager.ListFiles<ScriptFile>())
             {
-                if (f.LastParsing == DateTime.MinValue || f.LastParsing < f.LastFileChange || f.HasFileChanged())
+                if (f.LastParsing == DateTime.MinValue || f.LastParsing < f.LastFileChange || f.HasFileChanged(alsoIfFileNotFound))
                 {
                     return true;
                 }

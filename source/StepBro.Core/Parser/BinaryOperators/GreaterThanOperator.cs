@@ -46,7 +46,7 @@ namespace StepBro.Core.Parser.BinaryOperators
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    throw new ParsingErrorException();
                 }
                 #endregion
             }
@@ -83,15 +83,10 @@ namespace StepBro.Core.Parser.BinaryOperators
                     {
                         return new SBExpressionData(Expression.GreaterThan(first.ConvertToInt64().ExpressionCode, last.ConvertToInt64().ExpressionCode));
                     }
-                    else
-                    {
-                        throw new NotImplementedException();
-                    }
                 }
-                else
-                {
-                    throw new NotImplementedException();
-                }
+
+                // If unhandled:
+                throw new ParsingErrorException(0, "", "");
                 #endregion
             }
 

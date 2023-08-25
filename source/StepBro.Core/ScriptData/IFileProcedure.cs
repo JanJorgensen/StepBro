@@ -23,6 +23,7 @@ namespace StepBro.Core.ScriptData
         /// The result from called sub-procedures will not affect procedure result directly.
         /// </summary>
         NoSubResultInheritance = 0x20,
+        FreeParameters = 0x40
     }
     public interface IFileProcedure : IFileElement
     {

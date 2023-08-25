@@ -112,11 +112,11 @@ namespace StepBro.Core.ScriptData
 
         public IFolderShortcutsSource FolderShortcuts { get { return m_folderShortcuts; } }
 
-        public bool HasFileChanged()
+        public bool HasFileChanged(bool alsoIfFileNotFound = false)
         {
             var path = this.GetFullPath();
             var exist = System.IO.File.Exists(path);
-            if (!exist) return false;
+            if (!exist) return alsoIfFileNotFound ? true : false;
             //if (m_parserFileStream == null) return true;
             var lastWrite = System.IO.File.GetLastWriteTime(path);
             return (lastWrite != m_lastFileChange);
@@ -200,6 +200,7 @@ namespace StepBro.Core.ScriptData
         public DateTime LastFileChange { get; internal set; }
         public DateTime LastTypeScan { get; internal set; }
         public DateTime LastParsing { get; internal set; }
+        public DateTime LastSuccessfulParsing { get; internal set; }
 
         public void MarkForTypeScanning()
         {
@@ -705,7 +706,7 @@ namespace StepBro.Core.ScriptData
 
         private void AddRootIdentifier(string name, IIdentifierInfo info)
         {
-            System.Diagnostics.Debug.WriteLine($"AddRootIdentifier {this.FileName}: {name}");
+            //System.Diagnostics.Debug.WriteLine($"AddRootIdentifier {this.FileName}: {name}");
             if (!m_rootIdentifiers.ContainsKey(name))
             {
                 var list = new List<IIdentifierInfo>();
@@ -831,9 +832,9 @@ namespace StepBro.Core.ScriptData
                 return m_logger.CreateSubLocation(name);
             }
 
-            public void Log(string text)
+            public ILogEntry Log(string text)
             {
-                m_logger.Log(text);
+                return m_logger.Log(text);
             }
 
             public void LogAsync(string text)

@@ -1,5 +1,6 @@
 ﻿using StepBro.Core.Execution;
 using StepBro.Core.Logging;
+using StepBro.Core.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,6 +51,168 @@ namespace StepBro.Core.Data
         public static string ToFileName(this DateTime time)
         {
             return time.ToString("yyyyMMdd_HHmmss");
+        }
+
+        public static bool TryParseLiteral(this string value, out object literal)
+        {
+            if (String.IsNullOrEmpty(value))
+            {
+                literal = null;
+                return false;
+            }
+            if (Char.IsDigit(value[0]))
+            {
+                long i;
+                double d;
+                if (value.StartsWith("0x") && Int64.TryParse(value[2..], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out i))
+                {
+                    literal = i;
+                    return true;
+                }
+                else if (value.TryParseInt64(out i))
+                {
+                    literal = i;
+                    return true;
+                }
+                else if (value.TryParseFloat(out d))
+                {
+                    literal = d;
+                    return true;
+                }
+                else
+                {
+                    literal = null;
+                    return false;
+                }
+            }
+            else if (Char.IsLetter(value[0]))
+            {
+                bool b;
+                if (value.TryParse(out b))
+                {
+                    literal = b;
+                    return true;
+                }
+                literal = value;
+                return true;
+            }
+            else if (value[0] == '\"')
+            {
+                if (value[value.Length - 1] == '\"')
+                {
+                    try
+                    {
+                        string s = value[1..^1].DecodeLiteral();
+                        literal = s;
+                        return true;
+                    }
+                    catch
+                    {
+                        literal = null;
+                        return false;
+                    }
+                }
+                else
+                {
+                    literal = null;
+                    return false;
+                }
+            }
+            else
+            {
+                literal = null;
+                return false;
+            }
+            literal = null;
+            return false;
+        }
+
+        public static bool TryParseInt64(this string text, out long result)
+        {
+            char last = text[text.Length - 1];
+            if (Char.IsLetter(last))
+            {
+                int dotIndex = text.IndexOf('.');
+                long value;
+                long valueFromDecimals = 0;
+
+                long factor = 0;
+                int maxDecimals = 0;
+                switch (last)
+                {
+                    case 'K': factor = 1000L; maxDecimals = 3; break;
+                    case 'M': factor = 1000000L; maxDecimals = 6; break;
+                    case 'G': factor = 1000000000L; maxDecimals = 9; break;
+                    case 'T': factor = 1000000000000L; maxDecimals = 12; break;
+                    case 'P': factor = 1000000000000000L; maxDecimals = 15; break;
+                    default:
+                        result = 0L;
+                        return false;
+                }
+
+                if (dotIndex > 0)
+                {
+                    value = Int64.Parse(text.Substring(0, dotIndex));
+                    string decimals = text.Substring(dotIndex + 1, text.Length - (dotIndex + 2));
+                    if (decimals.Length < 1 || decimals.Length > maxDecimals)
+                    {
+                        result = 0L;
+                        return false;
+                    }
+                    valueFromDecimals = Int64.Parse(decimals);
+                    long decimalfactor = factor;
+                    for (int i = 0; i < decimals.Length; i++) decimalfactor /= 10;
+                    value = value * factor + valueFromDecimals * decimalfactor;
+                }
+                else
+                {
+                    value = Int64.Parse(text.Substring(0, text.Length - 1)) * factor;
+                }
+
+                result = value;
+                return true;
+            }
+            else
+            {
+                return Int64.TryParse(text, out result);
+            }
+
+        }
+
+        public static bool TryParseFloat(this string text, out double result)
+        {
+            var strVal = text;
+            char last = text[text.Length - 1];
+            var factor = 1.0;
+            if (Char.IsLetter(last))
+            {
+                switch (last)
+                {
+                    case 'P': factor = 1000000000000000.0; break;
+                    case 'T': factor = 1000000000000.0; break;
+                    case 'G': factor = 1000000000.0; break;
+                    case 'M': factor = 1000000.0; break;
+                    case 'K': factor = 1000.0; break;
+                    case 'm': factor = 0.001; break;
+                    case 'u': factor = 0.000001; break;
+                    case 'n': factor = 0.000000001; break;
+                    case 'p': factor = 0.000000000001; break;
+                    default:
+                        break;
+                }
+                strVal = text.Substring(0, text.Length - 1);
+            }
+            double value = 0.0;
+            if (Double.TryParse(strVal, System.Globalization.CultureInfo.InvariantCulture, out value))
+            {
+                result = value * factor;
+                return true;
+            }
+            else
+            {
+                result = 0.0;
+                return true;
+            }
         }
 
         public static string DecodeLiteral(this string s)
@@ -187,21 +350,7 @@ namespace StepBro.Core.Data
                     }
                     else
                     {
-                        if (result.SubResultCount > 0)
-                        {
-                            if (result.CountSubFails() > 0)
-                            {
-                                return $"Result: Failed {result.CountSubFails()} out of {result.SubResultCount} tests.";
-                            }
-                            else
-                            {
-                                return $"Result: Passed all {result.SubResultCount} tests.";
-                            }
-                        }
-                        else
-                        {
-                            return "Success.";
-                        }
+                        return "Success.";
                     }
                 }
 
@@ -213,7 +362,7 @@ namespace StepBro.Core.Data
             return result.ProcedureResult.ResultText(result.ReturnValue);
         }
 
-        public static string ToClearText(this LogEntry entry, DateTime zero, bool forceShow = false)
+        public static string ToClearText(this LogEntry entry, DateTime zero, bool forceShow = false, bool showErrorAndFailType = true)
         {
             var timestamp = entry.Timestamp.ToSecondsTimestamp(zero);
             var timestampIndent = new string(' ', Math.Max(0, 8 - timestamp.Length));
@@ -222,13 +371,14 @@ namespace StepBro.Core.Data
             text.Append(timestampIndent);
             text.Append(timestamp);
             text.Append(new string(' ', 1 + entry.IndentLevel * 3));
-            string type = entry.EntryType switch {
-                    LogEntry.Type.Async => "<A> ",//type = "Async - ";
-                    LogEntry.Type.TaskEntry => "TaskEntry - ",
-                    LogEntry.Type.Error => "Error - ",
-                    LogEntry.Type.Failure => "Fail - ",
-                    LogEntry.Type.UserAction => "UserAction - ",
-                    _ => ""
+            string type = entry.EntryType switch
+            {
+                LogEntry.Type.Async => "<A> ",
+                LogEntry.Type.TaskEntry => "TaskEntry - ",
+                LogEntry.Type.Error => showErrorAndFailType ? "Error - " : "",
+                LogEntry.Type.Failure => showErrorAndFailType ? "Fail - " : "",
+                LogEntry.Type.UserAction => "UserAction - ",
+                _ => ""
             };
             text.Append(type);
 

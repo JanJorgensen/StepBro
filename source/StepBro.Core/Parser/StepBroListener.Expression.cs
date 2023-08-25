@@ -365,17 +365,41 @@ namespace StepBro.Core.Parser
                 try
                 {
                     var op = BinaryOperators.BinaryOperatorBase.GetOperator(context.op.Type);
-                
-                    var result = op.Resolve(this, first, last);
 
-                    if (result != null)
+                    try
                     {
+                        var result = op.Resolve(this, first, last);
+                        System.Diagnostics.Debug.Assert(result != null);
                         m_expressionData.Push(result);
                     }
+                    catch (NotImplementedException)
+                    {
+                        var description = $"Operation '{context.GetChild(1).GetText()}' not implemented for the specified types.";
+                        m_errors.SymanticError(context.op.Line, context.op.Column, false, description);
+                        m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError, description, context.GetText(), new TokenOrSection(context.Start, context.Stop, context.GetText())));
+                    }
+                    catch (ParsingErrorException ex)
+                    {
+                        var description = (String.IsNullOrEmpty(ex.Message)) ? $"Operation '{context.GetChild(1).GetText()}' not supported for the specified types." : ex.Message;
+                        m_errors.SymanticError(context.op.Line, context.op.Column, false, description);
+                        m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError, description, context.GetText(), new TokenOrSection(context.Start, context.Stop, context.GetText())));
+                    }
+                    catch (Exception)
+                    {
+                        var description = $"Unhandled exception in operation '{context.GetChild(1).GetText()}'.";
+                        m_errors.InternalError(context.op.Line, context.op.Column, "");
+                        m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError, description, context.GetText(), new TokenOrSection(context.Start, context.Stop, context.GetText())));
+                    }
                 }
-                catch (Exception e)
+                catch (NotImplementedException)
                 {
-                    m_errors.InternalError(first.Token.Line, first.Token.Column, e.Message);
+                    var description = $"Operation '{context.GetChild(1).GetText()}' is not implemented.";
+                    m_errors.InternalError(context.op.Line, context.op.Column, description);
+                }
+                catch (Exception)
+                {
+                    var description = $"Unhandled exception in operation '{context.GetChild(1).GetText()}'.";
+                    m_errors.InternalError(context.op.Line, context.op.Column, description);
                 }
             }
         }
@@ -471,50 +495,20 @@ namespace StepBro.Core.Parser
         public override void ExitLiteralInteger([NotNull] SBP.LiteralIntegerContext context)
         {
             var str = context.GetText();
-            char last = str[str.Length - 1];
-            if (Char.IsLetter(last))
-            {
-                int dotIndex = str.IndexOf('.');
-                long value;
-                long valueFromDecimals = 0;
-                if (dotIndex > 0)
-                {
-                    value = Int64.Parse(str.Substring(0, dotIndex));
-                    string decimals = str.Substring(dotIndex + 1, str.Length - (dotIndex + 2));
-                    valueFromDecimals = Int64.Parse(decimals);
-                    switch (decimals.Length)
-                    {
-                        case 1:
-                            valueFromDecimals *= 100L;
-                            break;
-                        case 2:
-                            valueFromDecimals *= 10L;
-                            break;
-                        default:
-                            break;
-                    }
-                    value = value * 1000L + valueFromDecimals;
-                }
-                else
-                {
-                    value = Int64.Parse(str.Substring(0, str.Length - 1)) * 1000L;
-                }
 
-                switch (last)
-                {
-                    case 'K': break;
-                    case 'M': value *= 1000L; break;
-                    case 'G': value *= 1000000L; break;
-                    case 'T': value *= 1000000000L; break;
-                    case 'P': value *= 1000000000000L; break;
-                    default:
-                        throw new NotImplementedException("Postfix not implemented: " + last.ToString());
-                }
-                m_expressionData.Push(new SBExpressionData(value));
+            long value = 0L;
+            if (str.TryParseInt64(out value))
+            {
+                m_expressionData.Push(new SBExpressionData(value, context.Start));
             }
             else
             {
-                m_expressionData.Push(new SBExpressionData(Int64.Parse(context.GetText()), context.Start));
+                m_errors.InternalError(context.Start.Line, context.Start.Column, "Format error in: " + str);
+                m_expressionData.Push(new SBExpressionData(
+                    SBExpressionType.ExpressionError,
+                    "Expression error.",
+                    context.GetText(),
+                    new TokenOrSection(context.Start, context.Stop, context.GetText())));
             }
         }
 
@@ -536,30 +530,20 @@ namespace StepBro.Core.Parser
         public override void ExitLiteralFloat([NotNull] SBP.LiteralFloatContext context)
         {
             var str = context.GetText();
-            var strVal = str;
-            char last = str[str.Length - 1];
-            var factor = 1.0;
-            if (Char.IsLetter(last))
+            double v;
+            if (str.TryParseFloat(out v))
             {
-                switch (last)
-                {
-                    case 'P': factor = 1000000000000000.0; break;
-                    case 'T': factor = 1000000000000.0; break;
-                    case 'G': factor = 1000000000.0; break;
-                    case 'M': factor = 1000000.0; break;
-                    case 'K': factor = 1000.0; break;
-                    case 'm': factor = 0.001; break;
-                    case 'u': factor = 0.000001; break;
-                    case 'n': factor = 0.000000001; break;
-                    case 'p': factor = 0.000000000001; break;
-                    default:
-                        break;
-                }
-                strVal = str.Substring(0, str.Length - 1);
+                m_expressionData.Push(new SBExpressionData(v, context.Start));
             }
-            double v = Double.Parse(strVal, System.Globalization.CultureInfo.InvariantCulture);
-
-            m_expressionData.Push(new SBExpressionData(v * factor, context.Start));
+            else
+            {
+                m_errors.InternalError(context.Start.Line, context.Start.Column, "Format error in: " + str);
+                m_expressionData.Push(new SBExpressionData(
+                    SBExpressionType.ExpressionError,
+                    "Expression error.",
+                    context.GetText(),
+                    new TokenOrSection(context.Start, context.Stop, context.GetText())));
+            }
         }
 
         public override void ExitLiteralBool([NotNull] SBP.LiteralBoolContext context)
