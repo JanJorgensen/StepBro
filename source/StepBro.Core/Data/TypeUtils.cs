@@ -9,7 +9,7 @@ namespace StepBro.Core.Data
 {
     public static class TypeUtils
     {
-        public static bool TryParse(string s, out bool result)
+        public static bool TryParse(this string s, out bool result)
         {
             if (Boolean.TryParse(s, out result)) return true;
             switch (s.ToLower())
