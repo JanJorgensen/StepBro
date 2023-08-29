@@ -37,7 +37,6 @@ namespace StepBro.Core.Parser
         DynamicAsyncObjectMember,
         // Errors:
         ExpressionError,
-        //OperationError,
         UnknownIdentifier,
         UnsupportedOperation,
     };
@@ -324,6 +323,7 @@ namespace StepBro.Core.Parser
         public bool IsTestList { get { return ReferencedType == SBExpressionType.TestListReference; } }
 
         public bool IsAwaitExpression { get { return ReferencedType == SBExpressionType.AwaitExpression; } }
+        public bool IsDynamicObjectMember { get { return ReferencedType == SBExpressionType.DynamicObjectMember; } }
 
         public SBExpressionData NarrowGetValueType(TypeReference type = null)
         {

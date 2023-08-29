@@ -522,7 +522,10 @@ namespace StepBro.Core.Parser
                     // Not handled yet; just let it fall through.
                 }
             }
-            if (dataSetters.Count > 0)
+
+            bool isSettableFromPropertyBlock = objectType.GetInterface(nameof(ISettableFromPropertyBlock)) != null;
+
+            if (dataSetters.Count > 0 || isSettableFromPropertyBlock)
             {
                 try
                 {
@@ -542,7 +545,7 @@ namespace StepBro.Core.Parser
                     var expressions = new List<Expression>(dataSetters);
                     expressions.Insert(0, objectReferenceAssignment);
 
-                    if (objectType.GetInterface(nameof(ISettableFromPropertyBlock)) != null)
+                    if (isSettableFromPropertyBlock)
                     {
                         var setterHelper = typeof(ExecutionHelperMethods).GetMethod(
                             nameof(ExecutionHelperMethods.SetupObjectWithPropertyBlock));

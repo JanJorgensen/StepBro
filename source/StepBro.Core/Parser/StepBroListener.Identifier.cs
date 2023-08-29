@@ -632,6 +632,14 @@ namespace StepBro.Core.Parser
                 case SBExpressionType.ProcedureReference:
                     result = this.ResolveDotIdentifierInstanceReference(left, right, true);
                     break;
+                case SBExpressionType.DynamicObjectMember:
+                    result = new SBExpressionData(
+                        HomeType.Immediate,
+                        SBExpressionType.DynamicObjectMember,
+                        value: ((string)left.Value) + "." + (string)right.Value,        // Just concatenate the name of the member
+                        instanceCode: left.InstanceCode,                                // Same instance reference
+                        token: left.Token);
+                    break;
                 default:
                     throw new Exception("Illegal left side of dot-operator; " + left.ToString());
             }
@@ -738,7 +746,7 @@ namespace StepBro.Core.Parser
                     return new SBExpressionData(
                         HomeType.Immediate,
                         SBExpressionType.PropertyReference,         // Expression type
-                        (TypeReference)properties[0].PropertyType,                 // Data type
+                        (TypeReference)properties[0].PropertyType,  // Data type
                         Expression.Property(null, properties[0]),   // The property access expression
                         properties[0],                              // Reference to the property info
                         token: right.Token);
