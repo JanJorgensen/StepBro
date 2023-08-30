@@ -9,7 +9,7 @@
     <OutputPath>..\bin</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <InvariantGlobalization>true</InvariantGlobalization>
+    <!--<InvariantGlobalization>true</InvariantGlobalization>-->
     <Platforms>AnyCPU</Platforms>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
