@@ -1,0 +1,40 @@
+﻿// This file contains procedures and testlists that can be used to test the behaviour of StepBro itself.
+
+using StepBro.PanelCreator;
+
+Panel panel = Panel()
+{
+    HorizontalSplit Main:
+    {
+        MinimumHeight: 400, MinimumWidth: 600,
+        VerticalSplit Top: 
+        {
+            FlowTopDownWrap Left: 
+            {
+                Name: Commands,
+                Controls:
+                {
+                    ProcedureActivationButton Start: { procedure: StartSomeShit },
+                    ProcedureActivationButton Stop: { Text: "Stop All Shit !!", Procedure: StopAllShit },
+                    ProcedureActivationButton SendReset: { Text: "Reset", Procedure: SendTargetCommand, Arguments: "reset" }
+                }
+            },
+            SerialTestConnectionTerminal Right: { Instance: target }
+        },
+        ExecutionLogViewer Bottom: { Title: "Execution Log", MinimumHeight: 200, MinimumWidth: 300 }
+    }
+}
+
+procedure void DoIt()
+{
+    panel.DumpPanelElements();
+    panel.Start.Enabled = false;
+    string value = panel.Top.Left.Stop.Text;
+    log("panel.Top.Left.Stop.Text: " + value);
+    value = panel.Commands.SendReset.Procedure;
+    log("panel.Commands.SendReset.Procedure: " + value);
+    int n = panel.Bottom.MinimumHeight;
+    log("panel.bottom.MinimumHeight: " + n);
+
+    log("Done!");
+}

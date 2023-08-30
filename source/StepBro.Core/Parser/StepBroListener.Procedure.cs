@@ -23,7 +23,7 @@ namespace StepBro.Core.Parser
         private bool m_procedureIsFunction = false;
         private List<ParameterData> m_parameters = null;
         private Stack<FileProcedure> m_procedureStack = new Stack<FileProcedure>();
-        private FileProcedure m_currentProcedure = null;    // The procedure currently being parsed.
+        internal FileProcedure m_currentProcedure = null;   // The procedure currently being parsed.
         private bool m_inFunctionScope = false;
         private FileProcedure m_lastProcedure = null;       // The last procedure the parser ended parsing.
         private ProcedureParsingScope m_procedureBaseScope = null;

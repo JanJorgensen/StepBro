@@ -511,7 +511,15 @@ namespace StepBro.Core.ScriptData
                         var props = GetFileVariableAllData(v);
                         if (props != null)
                         {
-                            text = $"{text}, data: {props.GetTestString()}";
+                            var datastring = props.GetTestString();
+                            if (datastring.Length < 100)
+                            {
+                                text = String.Concat(text, ", data: ", datastring);
+                            }
+                            else
+                            {
+                                text = String.Concat(text, ", data: ", datastring.Substring(0, 100), "...");
+                            }
                         }
                         logger.Log("Variable " + v.VariableOwnerAccess.Container.Name + " init: " + text);
                     }

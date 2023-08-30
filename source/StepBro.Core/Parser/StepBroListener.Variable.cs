@@ -1,8 +1,12 @@
 ﻿using Antlr4.Runtime.Misc;
+using StepBro.Core.Api;
 using StepBro.Core.Data;
+using StepBro.Core.Execution;
+using StepBro.Core.ScriptData;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
@@ -190,7 +194,7 @@ namespace StepBro.Core.Parser
         public override void ExitVariableInitializerExpression([NotNull] SBP.VariableInitializerExpressionContext context)
         {
             var stack = m_expressionData.PopStackLevel();
-            m_variableInitializer = this.ResolveForGetOperation(stack.Pop());
+            m_variableInitializer = this.ResolveForGetOperation(stack.Pop(), targetType: m_variableType);
             if (m_variableInitializer.IsError())
             {
                 m_errors.UnresolvedIdentifier(m_variableInitializer.Token.Line, m_variableInitializer.Token.Column, m_variableInitializer.Value as string);

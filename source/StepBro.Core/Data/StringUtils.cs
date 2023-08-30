@@ -123,8 +123,6 @@ namespace StepBro.Core.Data
                 literal = null;
                 return false;
             }
-            literal = null;
-            return false;
         }
 
         public static bool TryParseInt64(this string text, out long result)

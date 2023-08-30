@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Newtonsoft.Json.Linq;
+using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.ScriptData;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using Range = StepBro.Core.Data.Range;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
@@ -24,6 +26,9 @@ namespace StepBro.Core.Parser
         private static MethodInfo s_ProcedureReferenceIs = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ProcedureReferenceIs));
         private static MethodInfo s_ProcedureReferenceAs = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ProcedureReferenceAs));
         private static MethodInfo s_ObjectIsType = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ObjectIsType));
+        private static MethodInfo s_DynamicObjectGetProperty = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.DynamicObjectGetProperty));
+        private static MethodInfo s_DynamicObjectSetProperty = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.DynamicObjectSetProperty));
+
 
         private ExpressionStack m_expressionData = new ExpressionStack();
 
@@ -315,6 +320,18 @@ namespace StepBro.Core.Parser
                     }
                 }
             }
+            else if (input.IsDynamicObjectMember)
+            {
+                var getter = s_DynamicObjectGetProperty.MakeGenericMethod((targetType != null) ? targetType.Type : typeof(Object));
+
+                var call = Expression.Call(
+                    getter,
+                    m_currentProcedure?.ContextReferenceInternal,
+                    Expression.Convert(input.InstanceCode, typeof(IDynamicStepBroObject)),
+                    Expression.Constant((string)input.Value));
+
+                output = new SBExpressionData(call);
+            }
             return output;
         }
 
@@ -427,8 +444,9 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpAssignment([NotNull] SBP.ExpAssignmentContext context)
         {
-            var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true);
+            var last = m_expressionData.Peek().Pop();
             var first = this.ResolveIfIdentifier(m_expressionData.Peek().Pop(), true);
+            last = this.ResolveForGetOperation(last, reportIfUnresolved: true, targetType: first.DataType);
             if (CheckExpressionsForErrors(context, first, last))
             {
                 last.NarrowGetValueType();
@@ -651,8 +669,9 @@ namespace StepBro.Core.Parser
 
         public SBExpressionData CastProcedureAssignmentArgumentIfNeeded(TypeReference type, SBExpressionData expression)
         {
-            var t = type.Type;
-            if (!expression.IsError() &&
+            var t = type?.Type;
+            if (t != null &&
+                !expression.IsError() &&
                 expression.DataType.Type != t &&
                 expression.DataType.Type == typeof(IProcedureReference) &&
                 t.IsConstructedGenericType &&

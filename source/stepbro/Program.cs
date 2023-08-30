@@ -291,7 +291,6 @@ namespace StepBro.Cmd
                                                     logTask.Start();
                                                 }
 
-
                                                 var result = StepBroMain.ExecuteProcedure(procedure, arguments.ToArray());
 
                                                 if (result != null)
@@ -368,6 +367,14 @@ namespace StepBro.Cmd
                                             var procedure = element as IFileProcedure;
                                             try
                                             {
+                                                // Start logging now.
+                                                if (m_commandLineOptions.TraceToConsole)
+                                                {
+                                                    m_dumpingExecutionLog = true;
+                                                    var logTask = new Task(() => LogDumpTask());
+                                                    logTask.Start();
+                                                }
+
                                                 var result = StepBroMain.ExecuteProcedure(procedure, arguments.ToArray());
 
                                                 if (m_commandLineOptions.Verbose)
