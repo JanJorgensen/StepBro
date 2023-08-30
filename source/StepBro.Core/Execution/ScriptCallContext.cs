@@ -305,7 +305,8 @@ namespace StepBro.Core.Execution
 
         public ICallContext EnterNewContext(string shortDescription, bool separateStateLevel)
         {
-            throw new NotImplementedException();
+            var newContext = new CallContext(this, CallEntry.Subsequent, false, this.GetDynamicLogLocation() + " " + shortDescription);
+            return newContext;
         }
 
         public virtual IScriptCallContext EnterNewScriptContext(IFileProcedure procedure, ContextLogOption callerLoggingOption, bool isDynamicCall, object[] arguments)

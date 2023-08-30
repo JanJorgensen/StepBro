@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Data;
+using StepBro.Core.Execution;
 using System;
 
 namespace StepBro.Core.Api
@@ -29,9 +30,9 @@ namespace StepBro.Core.Api
     public interface IDynamicStepBroObject
     {
         DynamicSupport HasProperty(string name, out Type type, out bool isReadOnly);
-        object TryGetProperty(string name);
-        object TrySetProperty(string name, object value);
+        object GetProperty([Implicit] ICallContext context, string name);
+        void SetProperty([Implicit] ICallContext context, string name, object value);
         DynamicSupport HasMethod(string name, out NamedData<Type>[] parameters, out Type returnType);
-        object TryInvokeMethod(string name, object[] args);
+        object InvokeMethod([Implicit] ICallContext context, string name, object[] args);
     }
 }
