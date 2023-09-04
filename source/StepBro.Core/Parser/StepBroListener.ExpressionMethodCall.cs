@@ -228,17 +228,6 @@ namespace StepBro.Core.Parser
                         }
                         break;
 
-                    //case SBExpressionType.DynamicObjectProperty:
-                    //case SBExpressionType.DynamicObjectPropertyReadonly:
-                    //    m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Left side is a dynamic property, not a dynamic procedure.");
-                    //    return;
-
-                    //case SBExpressionType.DynamicObjectProcedure:
-                    //    {
-                    //        callType = ParansExpressionType.DynamicObjectMethodCall;
-                    //    }
-                    //    break;
-
                     case SBExpressionType.DynamicObjectMember:
                     case SBExpressionType.DynamicAsyncObjectMember:
                         {

@@ -507,8 +507,8 @@ namespace StepBro.Core.Execution
                 var partner = e.ListPartners().FirstOrDefault(p => p.Name.Equals(partnerName, StringComparison.InvariantCulture));
                 if (partner != null)
                 {
-                    System.Diagnostics.Debug.WriteLine("Expected type: " + typeof(T).FullName);
-                    System.Diagnostics.Debug.WriteLine("Found type:    " + partner.ProcedureReference.ProcedureReference.GetType().GetGenericArguments()[0].FullName);
+                    //System.Diagnostics.Debug.WriteLine("Expected type: " + typeof(T).FullName);
+                    //System.Diagnostics.Debug.WriteLine("Found type:    " + partner.ProcedureReference.ProcedureReference.GetType().GetGenericArguments()[0].FullName);
                     if (partner.ProcedureReference.ProcedureReference is IProcedureReference<T>)
                     {
                         return partner.ProcedureReference.ProcedureReference as IProcedureReference<T>;
@@ -613,6 +613,8 @@ namespace StepBro.Core.Execution
             return default(T);
         }
 
+        #region Dynamic Object Access
+
         public static object ExecuteDynamicObjectMethod(
             IScriptCallContext context,
             IDynamicStepBroObject instance,
@@ -621,11 +623,11 @@ namespace StepBro.Core.Execution
         {
             try
             {
-                if (context != null && context.LoggingEnabled)
+                if (context != null && context.LoggingEnabled && context.Logger.IsDebugging)
                 {
-                    context.Log($"Calling dynamic method \"{name}\".");
+                    context.Log($"Calling dynamic method '{name}' on object of type '{instance.GetType().Name}'.");
                 }
-                return instance.TryInvokeMethod(name, arguments);
+                return instance.InvokeMethod(context.EnterNewContext(instance.GetType().Name, false), name, arguments);
             }
             catch (DynamicMethodNotFoundException)
             {
@@ -658,18 +660,15 @@ namespace StepBro.Core.Execution
             try
             {
                 var result = instance.TryInvokeMethod(name, arguments);
-                if (result != null)
+                if (context != null && context.LoggingEnabled && context.Logger.IsDebugging)
                 {
-                    if (context != null && context.LoggingEnabled)
+                    if (result != null)
                     {
-                        context.Log($"Called method \"{name}\" on object of type '{instance.GetType().Name}'.");
+                        context.Log($"Called method '{name}' on object of type '{instance.GetType().Name}'.");
                     }
-                }
-                else
-                {
-                    if (context != null && context.LoggingEnabled)
+                    else
                     {
-                        context.Log($"Null value returned from method \"{name}\" on object of type '{instance.GetType().Name}'.");
+                        context.Log($"Null value returned from method '{name}' on object of type '{instance.GetType().Name}'.");
                     }
                 }
                 return result;
@@ -695,6 +694,79 @@ namespace StepBro.Core.Execution
                 throw;
             }
         }
+
+        public static TExpected DynamicObjectGetProperty<TExpected>(
+            IScriptCallContext context,
+            IDynamicStepBroObject instance,
+            string name)
+        {
+            try
+            {
+                if (context != null && context.LoggingEnabled && context.Logger.IsDebugging)
+                {
+                    context.Log($"Getting dynamic property '{name}' on object of type '{instance.GetType().Name}'.");
+                }
+                var value = instance.GetProperty(context.EnterNewContext(instance.GetType().Name, false), name);
+                return (TExpected)System.Convert.ChangeType(value, typeof(TExpected));
+            }
+            catch (DynamicPropertyNotFoundException)
+            {
+                if (context != null)
+                {
+                    context.ReportError(
+                        $"Property named '{name}' was not found on the object of type '{instance.GetType().Name}'.",
+                        new DynamicPropertyNotFoundError());
+                }
+            }
+            catch (Exception ex)
+            {
+                if (context != null)
+                {
+                    context.ReportError(
+                        $"Exception getting property '{name}' on the object of type '{instance.GetType().Name}'.",
+                        exception: ex);
+                }
+            }
+            return default(TExpected);
+        }
+
+        public static void DynamicObjectSetProperty(
+            IScriptCallContext context,
+            IDynamicStepBroObject instance,
+            string name,
+            object value)
+        {
+            try
+            {
+                if (context != null && context.LoggingEnabled && context.Logger.IsDebugging)
+                {
+                    context.Log($"Setting dynamic property '{name}' on object of type '{instance.GetType().Name}'.");
+                }
+                instance.SetProperty(context.EnterNewContext(instance.GetType().Name, false), name, value);
+            }
+            catch (DynamicPropertyNotFoundException)
+            {
+                if (context != null)
+                {
+                    context.ReportError(
+                        $"Property named '{name}' was not found on the object of type '{instance.GetType().Name}'.",
+                        new DynamicPropertyNotFoundError());
+                }
+                throw;
+            }
+            catch (Exception ex)
+            {
+                if (context != null)
+                {
+                    context.ReportError(
+                        $"Exception setting property '{name}' on the object of type '{instance.GetType().Name}'.",
+                        exception: ex);
+                }
+                throw;
+            }
+        }
+
+        #endregion
 
         public static TProcedure ProcedureReferenceAs<TProcedure>(
             IScriptCallContext context, 

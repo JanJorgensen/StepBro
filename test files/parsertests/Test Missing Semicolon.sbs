@@ -1,0 +1,9 @@
+procedure void Proc()
+{
+    int i = 0;
+    while(i < 20)
+    {
+        log("Hello");
+        i++
+    }
+}

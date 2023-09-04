@@ -1,5 +1,6 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
+using StepBro.Core.Execution;
 using StepBro.Core.General;
 using System;
 
@@ -8,11 +9,27 @@ namespace StepBroCoreTest.Data
     public class DummyDynamicObject : StepBro.Core.Api.DynamicStepBroObject
     {
         private bool m_initialized = false;
+        private string m_lastValue = "";
+
+        public string LastValue { get { return m_lastValue; } }
 
         public override DynamicSupport HasProperty(string name, out Type type, out bool isReadOnly)
         {
             if (m_initialized)
             {
+                if (name == "Anna")
+                {
+                    type = typeof(long);
+                    isReadOnly = false;
+                    return DynamicSupport.Yes;
+                }
+                else if (name == "Berit")
+                {
+                    type = typeof(bool);
+                    isReadOnly = false;
+                    return DynamicSupport.Yes;
+                }
+
                 type = null;
                 isReadOnly = false;
                 return DynamicSupport.No;
@@ -41,13 +58,69 @@ namespace StepBroCoreTest.Data
             m_initialized = true;
         }
 
-        public override object TryGetProperty(string name)
+        public override object GetProperty([Implicit] ICallContext context, string name)
         {
-            return base.TryGetProperty(name);
+            var nameparts = name.Split('.');
+            if (nameparts.Length == 1)
+            {
+                if (name == "Anna")
+                {
+                    return 9927L;
+                }
+                else if (name == "Berit")
+                {
+                    return true;
+                }
+                else
+                {
+                    throw new DynamicPropertyNotFoundException(name);
+                }
+            }
+            else
+            {
+                if (name == "Aee.Bee.Cee.Dee.Anna")
+                {
+                    return 663L;
+                }
+                else
+                {
+                    throw new DynamicPropertyNotFoundException(name);
+                }
+            }
         }
-        public override object TrySetProperty(string name, object value)
+
+        public override void SetProperty([Implicit] ICallContext context, string name, object value)
         {
-            return base.TrySetProperty(name, value);
+            var nameparts = name.Split('.');
+            if (nameparts.Length == 1)
+            {
+                if (name == "Anna")
+                {
+                    var v = (long)value;
+                    m_lastValue = v.ToString();
+                }
+                else if (name == "Berit")
+                {
+                    var v = (bool)value;
+                    m_lastValue = v.ToString();
+                }
+                else
+                {
+                    throw new DynamicPropertyNotFoundException(name);
+                }
+            }
+            else
+            {
+                if (name == "Aee.Bee.Cee.Dee.Anna")
+                {
+                    var v = (long)value;
+                    m_lastValue = v.ToString();
+                }
+                else
+                {
+                    throw new DynamicPropertyNotFoundException(name);
+                }
+            }
         }
 
         public override DynamicSupport HasMethod(string name, out NamedData<Type>[] parameters, out Type returnType)
@@ -104,7 +177,7 @@ namespace StepBroCoreTest.Data
             }
         }
 
-        public override object TryInvokeMethod(string name, object[] args)
+        public override object InvokeMethod([Implicit] ICallContext context, string name, object[] args)
         {
             if (!m_initialized) throw new InvalidOperationException("Object has really not been initialized yet !!");
             if (name == "Anderson")

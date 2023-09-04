@@ -92,7 +92,6 @@ public procedure void TestCaseFormalTestUntilFail( this TestCase testcase ) :
     testcase.PreTest();
     while (result < fail)
     {
-
         NextProcedureIsHighLevel("Setup #" + loopIndex);
         testcase.Setup();
 
@@ -141,7 +140,6 @@ public procedure void TestSuiteInfiniteTestExecution(this TestSuite suite) :
             TestCase testcase = iterator.Procedure as TestCase;
             NextProcedureIsHighLevel("TEST");
             iterator.Procedure( iterator.Arguments );
-            this.AddPartResult(iterator.Procedure, this.LastCallResult);
         }
     }
 }
@@ -155,6 +153,7 @@ public procedure void TestSuiteDirectTestExecution(this TestSuite suite) :
     passedPreTest = suite.PreTest();
     if (passedPreTest)
     {
+        var summary = CreateTestSummary();
         var iterator = suite.GetProcedureIterator();
         while (iterator.GetNext())
         {
@@ -162,8 +161,13 @@ public procedure void TestSuiteDirectTestExecution(this TestSuite suite) :
             TestCase testcase = iterator.Procedure as TestCase;
             NextProcedureIsHighLevel("TEST");
             iterator.Procedure( iterator.Arguments );
-            this.AddPartResult(iterator.Procedure, this.LastCallResult);
+            summary.AddResult(testcase.Name, this.LastCallResult);
         }
+        this.SetResult(summary.GetResultVerdict(), summary.GetResultDescription());
+    }
+    else
+    {
+        this.SetResult(error, "Failed the PreTest");
     }
 }
 
@@ -172,41 +176,52 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
     NoSubResultInheritance
 {
     bool passedPreTest = true;
+    var testReport = StartReport("TestReport", suite.Name);
+    testReport.StartGroup("Test Setup", "The test configuration and preconditions.");
     NextProcedureIsHighLevel("PRETEST");
-    passedPreTest = suite.PreTest();
+    passedPreTest = suite.PreTest();        // Keep this in separate line, to make sure this is a high-level procedure call.
     if (passedPreTest)
     {
         var iterator = suite.GetProcedureIterator();
-        var testReport = StartReport("TestReport", suite.Name);
         using (testReport)
         {
             // TODO: Save setup data in report
             // TODO: Save test suite data in report
+
+            var summary = testReport.CreateTestSummary();
+
             while (iterator.GetNext())
             {
-                // TODO: Start new group in report
-                // TODO: Save test case data in report
-                log ("Starting Test: " + iterator.Procedure.Name);
                 TestCase testcase = iterator.Procedure as TestCase;
+                testReport.StartGroup("Testcase " + testcase.Name, "<description of testcase>");
+                // TODO: Save test case data in report
+                log ("Starting Test: " + testcase.Name);
 
-                // TODO: Start Setup group
+                testReport.AddSection("Setup", "");
                 NextProcedureIsHighLevel("SETUP");
                 testcase.Setup();
+                var result = this.LastCallResult;
 
-                // TODO: Start main group, armed for documenting the next procedure call.
-                NextProcedureIsHighLevel("TEST");
-                iterator.Procedure( iterator.Arguments );
-                this.AddPartResult(iterator.Procedure, this.LastCallResult);
+                if (result.Verdict < fail)  // Only run the test if the setup succeeded.
+                {
+                    testReport.AddSection("Test", "");
+                    NextProcedureIsHighLevel("TEST");
+                    iterator.Procedure( iterator.Arguments );
+                    result = result.SelectIfWorse(this.LastCallResult);
+                }
 
-                // TODO: Start Cleanup group
+                testReport.AddSection("Cleanup", "");
                 NextProcedureIsHighLevel("CLEANUP");
                 testcase.Cleanup();
-                
-                // TODO: Save test summary in report
+                result = result.SelectIfWorse(this.LastCallResult);
+
+                summary.AddResult(testcase.Name, result);
             }
+            testReport.Close();
             testReport.DumpToLog();
-            
             // TODO: Save report in selected format in the selected location (file or URL). Selection taken from configuration file.
+
+            this.SetResult(summary.GetResultVerdict(), summary.GetResultDescription());     // Keep this as the last statement; if there were any failed tests, the procedure will exit after this statement.
         }
     }
 }

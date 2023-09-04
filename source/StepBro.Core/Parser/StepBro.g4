@@ -413,16 +413,16 @@ statement
     |   INTERLEAVE interleaveBlock													# interleaveStatement
     |   RETURN expression? SEMICOLON												# returnStatement
     |   THROW expression SEMICOLON													# throwStatement
-    |	STEP ((stepIndex COMMA stepTitle) | stepIndex | stepTitle)? SEMICOLON		# stepStatement
-    |	LOG logModifier? parExpression SEMICOLON									# logStatement
-    |	REPORT parExpression SEMICOLON												# reportStatement
+    |   STEP ((stepIndex COMMA stepTitle) | stepIndex | stepTitle)? SEMICOLON		# stepStatement
+    |   LOG logModifier? parExpression SEMICOLON									# logStatement
+    //|   REPORT parExpression SEMICOLON                                              # reportStatement
     |   BREAK SEMICOLON																# breakStatement
     |   CONTINUE SEMICOLON															# continueStatement
     |   GOTO IDENTIFIER SEMICOLON													# gotoStatement
-    |	SEMICOLON																	# emptyStatement
-    |	localVariableDeclaration SEMICOLON 											# localVariableDeclarationStatement
-    |	keywordProcedureCall SEMICOLON												# keywordProcedureCallStatement
-    |	callAssignment? 
+    |   SEMICOLON																	# emptyStatement
+    |   localVariableDeclaration SEMICOLON 											# localVariableDeclarationStatement
+    |   keywordProcedureCall SEMICOLON												# keywordProcedureCallStatement
+    |   callAssignment? 
             callReference 
             statementarguments 
             (( COLON elementPropertyblock ) | SEMICOLON)                            # callStatement
@@ -468,7 +468,7 @@ keywordType : CONFIG | OBJECT | OVERRIDE | PRIVATE | PUBLIC | VERDICT ;
 keyword
     : BREAK | CONTINUE | DO | ELSE | ERROR | EXECUTION | EXPECT | FAIL
     | FOR | FUNCTION | IF | IGNORE | IN | INTERLEAVE | IS | LOG | NOT | ON | OUT
-    | PASS | PROCEDURE | REF | REPORT | RETURN 
+    | PASS | PROCEDURE | REF | RETURN // | REPORT 
     | SESSION | STEP | THIS | TIMEOUT | THROW | WARNING //| WITH
     ;
 

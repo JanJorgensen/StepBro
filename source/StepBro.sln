@@ -24,7 +24,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.CAN", "Modules\Step
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.IronPython", "Modules\StepBro.Python\StepBro.IronPython.csproj", "{EA16E99F-D8DD-4243-A3CC-420F01D91866}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.Process", "Modules\StepBro.Process\StepBro.Process.csproj", "{80383165-3832-4F9F-885A-72828B6C72C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.Process", "Modules\StepBro.Process\StepBro.Process.csproj", "{80383165-3832-4F9F-885A-72828B6C72C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.PanelCreator", "Modules\StepBro.PanelCreator\StepBro.PanelCreator.csproj", "{C64206E6-77F4-43E4-9BCC-1FAFCEAA6AB1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +68,10 @@ Global
 		{80383165-3832-4F9F-885A-72828B6C72C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80383165-3832-4F9F-885A-72828B6C72C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80383165-3832-4F9F-885A-72828B6C72C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C64206E6-77F4-43E4-9BCC-1FAFCEAA6AB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C64206E6-77F4-43E4-9BCC-1FAFCEAA6AB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C64206E6-77F4-43E4-9BCC-1FAFCEAA6AB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C64206E6-77F4-43E4-9BCC-1FAFCEAA6AB1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -77,6 +83,7 @@ Global
 		{5AE32C08-84A1-4349-849F-B830269E8B0B} = {9F79D088-ED45-49F3-A994-D6C8ECF0FE88}
 		{EA16E99F-D8DD-4243-A3CC-420F01D91866} = {9F79D088-ED45-49F3-A994-D6C8ECF0FE88}
 		{80383165-3832-4F9F-885A-72828B6C72C2} = {9F79D088-ED45-49F3-A994-D6C8ECF0FE88}
+		{C64206E6-77F4-43E4-9BCC-1FAFCEAA6AB1} = {9F79D088-ED45-49F3-A994-D6C8ECF0FE88}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2684A99E-8352-4250-AFE9-C724A535A6A8}

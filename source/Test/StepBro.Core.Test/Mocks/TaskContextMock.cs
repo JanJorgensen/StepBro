@@ -64,7 +64,7 @@ namespace StepBroCoreTest.Mocks
         }
 
         #region ILoggerScope
-        object ILoggerScope.FirstLogEntryInScope => throw new NotImplementedException();
+        ILogEntry ILoggerScope.FirstLogEntryInScope => throw new NotImplementedException();
 
         bool ILogger.IsDebugging => throw new NotImplementedException();
 
@@ -75,7 +75,7 @@ namespace StepBroCoreTest.Mocks
             throw new NotImplementedException();
         }
 
-        void ILogger.Log(string text)
+        ILogEntry ILogger.Log(string text)
         {
             throw new NotImplementedException();
         }

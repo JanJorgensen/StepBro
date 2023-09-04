@@ -114,9 +114,9 @@ namespace StepBro.Core.Logging
             }
         }
 
-        public void Log(string text)
+        public ILogEntry Log(string text)
         {
-            this.Log(LogEntry.Type.Normal, text);
+            return this.Log(LogEntry.Type.Normal, text);
         }
 
         public void LogDetail(string text)
@@ -144,7 +144,7 @@ namespace StepBro.Core.Logging
             this.Log(LogEntry.Type.System, text);
         }
 
-        private LogEntry Log(LogEntry.Type type, string text)
+        internal LogEntry Log(LogEntry.Type type, string text)
         {
             return m_logger.Log(m_scopeStartEntry, type, DateTime.Now, m_threadID, (type != LogEntry.Type.Post) ? m_dynamicLocation() : null, text);
         }
@@ -163,7 +163,7 @@ namespace StepBro.Core.Logging
             return (IProtectedLogger)this;
         }
 
-        public object FirstLogEntryInScope
+        public ILogEntry FirstLogEntryInScope
         {
             get { return m_scopeStartEntry; }
         }

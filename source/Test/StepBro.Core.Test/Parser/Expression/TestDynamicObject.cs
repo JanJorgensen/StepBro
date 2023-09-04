@@ -11,6 +11,58 @@ namespace StepBroCoreTest.Parser
     public class TestDynamicObject
     {
         [TestMethod]
+        public void GetDynamicProperty()
+        {
+            Assert.AreEqual(9927L, ParseAndRun<long>(
+                "obj.Anna",
+                nameof(DummyDynamicObject) + " obj = " + nameof(DummyDynamicObject) + ".NewInitialized();",
+                varDummyClass: true));
+            Assert.AreEqual(0, ExecutionHelper.RuntimeErrors.Errors.Count);
+
+            Assert.AreEqual(9927L, ParseAndRun<long>(
+                "temp",
+                "var temp = 0; " + nameof(DummyDynamicObject) + " obj = " + nameof(DummyDynamicObject) + ".NewInitialized(); temp = obj.Anna;",
+                varDummyClass: true));
+            Assert.AreEqual(0, ExecutionHelper.RuntimeErrors.Errors.Count);
+        }
+
+        [TestMethod]
+        public void GetDynamicPropertyDeep()
+        {
+            Assert.AreEqual(663L, ParseAndRun<long>(
+                "obj.Aee.Bee.Cee.Dee.Anna",
+                nameof(DummyDynamicObject) + " obj = " + nameof(DummyDynamicObject) + ".NewInitialized();",
+                varDummyClass: true));
+            Assert.AreEqual(0, ExecutionHelper.RuntimeErrors.Errors.Count);
+
+            Assert.AreEqual(663L, ParseAndRun<long>(
+                "temp",
+                "var temp = 0; " + nameof(DummyDynamicObject) + " obj = " + nameof(DummyDynamicObject) + ".NewInitialized(); temp = obj.Aee.Bee.Cee.Dee.Anna;",
+                varDummyClass: true));
+            Assert.AreEqual(0, ExecutionHelper.RuntimeErrors.Errors.Count);
+        }
+
+        [TestMethod]
+        public void SetDynamicProperty()
+        {
+            Assert.AreEqual("9821", ParseAndRun<string>(
+                "obj.LastValue",
+                nameof(DummyDynamicObject) + " obj = " + nameof(DummyDynamicObject) + ".NewInitialized(); obj.Anna = 9821;",
+                varDummyClass: true));
+            Assert.AreEqual(0, ExecutionHelper.RuntimeErrors.Errors.Count);
+        }
+
+        [TestMethod]
+        public void SetDynamicPropertyDeep()
+        {
+            Assert.AreEqual("2272", ParseAndRun<string>(
+                "obj.LastValue",
+                nameof(DummyDynamicObject) + " obj = " + nameof(DummyDynamicObject) + ".NewInitialized(); obj.Aee.Bee.Cee.Dee.Anna = 2272;",
+                varDummyClass: true));
+            Assert.AreEqual(0, ExecutionHelper.RuntimeErrors.Errors.Count);
+        }
+
+        [TestMethod]
         public void CallUnknownDynamicMethod()
         {
             Assert.AreEqual(0L, ParseAndRun<long>(

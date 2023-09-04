@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Data;
+using StepBro.Core.Execution;
 using StepBro.Core.Tasks;
 using System;
 
@@ -13,14 +14,13 @@ namespace StepBro.Core.Api
             return DynamicSupport.KnownAtRuntimeOnly;
         }
 
-        public virtual object TryGetProperty(string name)
+        public virtual object GetProperty([Implicit] ICallContext context, string name)
         {
             throw new NotSupportedException();
         }
 
-        public virtual object TrySetProperty(string name, object value)
+        public virtual void SetProperty([Implicit] ICallContext context, string name, object value)
         {
-            return null;
         }
 
         public virtual DynamicSupport HasMethod(string name, out NamedData<Type>[] parameters, out Type returnType)
@@ -30,7 +30,7 @@ namespace StepBro.Core.Api
             return DynamicSupport.KnownAtRuntimeOnly;
         }
 
-        public virtual object TryInvokeMethod(string name, object[] args)
+        public virtual object InvokeMethod([Implicit] ICallContext context, string name, object[] args)
         {
             throw new NotSupportedException();
         }
