@@ -38,7 +38,7 @@ namespace StepBro.Core.Parser
         private bool m_callAssignmentAwait = false;
         private Stack<Stack<SBExpressionData>> m_arguments = new Stack<Stack<SBExpressionData>>();
         private Stack<Stack<SBExpressionData>> m_statementExpressions = new Stack<Stack<SBExpressionData>>();
-        private SBExpressionData m_forCondition = null;
+        private Stack<SBExpressionData> m_forCondition = new Stack<SBExpressionData>();
         //private Stack<TSExpressionData> m_keywordArguments = null;
 
         public Stack<SBExpressionData> GetArguments()
@@ -456,14 +456,15 @@ namespace StepBro.Core.Parser
             // As for-loops can have multiple expressions within them, we ensure we choose the right expression
             // by popping when we exit the "ForCondition" part of the for-loop, meaning the second part of the
             // three-part initialization of the for-loop.
-            m_forCondition = m_expressionData.Peek().Pop();
+            // We use a stack as multiple for loops can be within each other.
+            m_forCondition.Push(m_expressionData.Peek().Pop());
         }
 
         public override void ExitForStatement([NotNull] SBP.ForStatementContext context)
         {
             var forScope = m_scopeStack.Pop();
             var stack = m_expressionData.PopStackLevel();
-            var condition = m_forCondition;
+            var condition = m_forCondition.Pop();
             var subStatements = forScope.GetSubStatements();
             var attributes = forScope.GetAttributes();
             ProcedureVariable varLoopIndex = null;
