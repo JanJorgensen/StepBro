@@ -503,10 +503,12 @@ keywordWide : keywordType | keyword ;
 //    ;
 
 forControl
-    :   forInit? SEMICOLON expression? SEMICOLON forUpdate?
+    :   forInit? SEMICOLON forCondition? SEMICOLON forUpdate?
     ;
 
-forInit : ((variableType variableDeclarators) | expression) (COMMA (variableType variableDeclarators) | expression)* ;
+forInit : (localVariableDeclaration | expression) (COMMA localVariableDeclaration | expression)* ;
+
+forCondition : expression ;
 
 forUpdate : expressionList ;
 
