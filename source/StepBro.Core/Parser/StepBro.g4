@@ -506,7 +506,9 @@ forControl
     :   forInit? SEMICOLON forCondition? SEMICOLON forUpdate?
     ;
 
-forInit : (localVariableDeclaration | expression) (COMMA localVariableDeclaration | expression)* ;
+forVariableDeclaration : variableType variableDeclarators ;
+
+forInit : (forVariableDeclaration | expression) (COMMA forVariableDeclaration | expression)* ;
 
 forCondition : expression ;
 

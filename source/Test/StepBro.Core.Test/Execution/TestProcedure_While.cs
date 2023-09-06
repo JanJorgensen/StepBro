@@ -197,5 +197,30 @@ namespace StepBroCoreTest.Parser
             Assert.IsInstanceOfType(result, typeof(long));
             Assert.AreEqual(1500, (long)result);
         }
+
+        [TestMethod]
+        public void TestProcedureWhileStatementVariableInLoop01()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    int i = 0;
+                    while (i < 1000)
+                    {
+                        int a = 5;
+
+                        i += a;
+                    }
+                    return i;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(1000, (long)result);
+        }
     }
 }

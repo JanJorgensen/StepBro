@@ -450,6 +450,40 @@ namespace StepBro.Core.Parser
             m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for", ProcedureParsingScope.ScopeType.Block));
         }
 
+        public override void ExitForVariableDeclaration([NotNull] SBP.ForVariableDeclarationContext context)
+        {
+            base.ExitForVariableDeclaration(context);
+
+            foreach (var variable in m_variables)
+            {
+                TypeReference type = m_variableType;
+                if (type.Type == typeof(VarSpecifiedType))
+                {
+                    if (variable.Initializer.IsError())
+                    {
+                        return;     // Just leave; no point in spending more time on this variable.
+                    }
+                    else if (variable.Initializer.DataType != null)
+                    {
+                        type = variable.Initializer.DataType;
+                    }
+                    else if (variable.Initializer.ExpressionCode != null)
+                    {
+                        type = new TypeReference(variable.Initializer.ExpressionCode.Type);
+                    }
+                    else
+                    {
+                        m_errors.SymanticError(variable.Initializer.Token.Line, variable.Initializer.Token.Column, false, "Unknown value type for assignment to variable with type 'var'.");
+                        break;
+                    }
+                }
+
+                var scope = m_scopeStack.Peek();
+                var v = scope.AddVariable(variable.Name, type, null, EntryModifiers.Private);
+                scope.AddStatementCode(Expression.Assign(v.VariableExpression, variable.Initializer.ExpressionCode));
+            }
+        }
+
         public override void ExitForCondition([NotNull] SBP.ForConditionContext context)
         {
             base.ExitForCondition(context);
@@ -458,6 +492,13 @@ namespace StepBro.Core.Parser
             // three-part initialization of the for-loop.
             // We use a stack as multiple for loops can be within each other.
             m_forCondition.Push(m_expressionData.Peek().Pop());
+        }
+
+        public override void ExitForUpdate([NotNull] SBP.ForUpdateContext context)
+        {
+            base.ExitForUpdate(context);
+
+            Console.WriteLine("Exiting For-loop Update");
         }
 
         public override void ExitForStatement([NotNull] SBP.ForStatementContext context)
