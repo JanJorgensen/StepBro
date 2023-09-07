@@ -507,10 +507,16 @@ namespace StepBro.Core.Parser
         {
             var forLoopScope = m_scopeStack.Pop();
             var forOuterScope = m_scopeStack.Pop();
-            var stack = m_expressionData.PopStackLevel();
+
+            // Contains the expressions in the for-update part of the for-loop
+            var forUpdateExpressions = m_expressionData.PopStackLevel();
+
+            // Contains the part of the for-loop that contains the condition
             var condition = m_forCondition.Pop();
+
             var subStatements = forLoopScope.GetSubStatements();
             var attributes = forLoopScope.GetAttributes();
+
             ProcedureVariable varLoopIndex = null;
             ProcedureVariable varEntryTime = null;
             ProcedureVariable varTimeoutTime = null;
@@ -638,6 +644,11 @@ namespace StepBro.Core.Parser
                             Expression.IfThen(loggingEnabled, timeoutLoggingCall),
                             Expression.Break(breakLabel))));
             }
+            
+            if (forOuterScope.GetBlockCode() != null)
+            {
+                statementExpressions.Add(forOuterScope.GetBlockCode());
+            }
 
             if (isBlockSub)
             {
@@ -656,7 +667,10 @@ namespace StepBro.Core.Parser
                         breakLabel));
             }
 
-            m_scopeStack.Peek().AddStatementCode(statementExpressions.ToArray());
+            List<Expression> forLoopExpression = new List<Expression>();
+            forLoopExpression.Add(Expression.Block(statementExpressions.ToArray()));
+
+            m_scopeStack.Peek().AddStatementCode(forLoopExpression.ToArray());
         }
 
         public override void EnterWhileStatement([NotNull] SBP.WhileStatementContext context)
