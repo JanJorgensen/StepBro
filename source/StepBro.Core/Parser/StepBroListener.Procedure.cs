@@ -447,7 +447,7 @@ namespace StepBro.Core.Parser
             //m_lastPropertyBlock = null;
             m_expressionData.PushStackLevel("ForStatement");
             m_enteredLoopStatement = true;
-            m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for", ProcedureParsingScope.ScopeType.Block));
+            m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-init", ProcedureParsingScope.ScopeType.Block));
         }
 
         public override void ExitForVariableDeclaration([NotNull] SBP.ForVariableDeclarationContext context)
@@ -492,6 +492,8 @@ namespace StepBro.Core.Parser
             // three-part initialization of the for-loop.
             // We use a stack as multiple for loops can be within each other.
             m_forCondition.Push(m_expressionData.Peek().Pop());
+
+            m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-loop", ProcedureParsingScope.ScopeType.Block));
         }
 
         public override void ExitForUpdate([NotNull] SBP.ForUpdateContext context)
@@ -503,11 +505,12 @@ namespace StepBro.Core.Parser
 
         public override void ExitForStatement([NotNull] SBP.ForStatementContext context)
         {
-            var forScope = m_scopeStack.Pop();
+            var forLoopScope = m_scopeStack.Pop();
+            var forOuterScope = m_scopeStack.Pop();
             var stack = m_expressionData.PopStackLevel();
             var condition = m_forCondition.Pop();
-            var subStatements = forScope.GetSubStatements();
-            var attributes = forScope.GetAttributes();
+            var subStatements = forLoopScope.GetSubStatements();
+            var attributes = forLoopScope.GetAttributes();
             ProcedureVariable varLoopIndex = null;
             ProcedureVariable varEntryTime = null;
             ProcedureVariable varTimeoutTime = null;
@@ -535,7 +538,7 @@ namespace StepBro.Core.Parser
             var isBlockSub = (subStatements[0].Type == ProcedureParsingScope.ScopeType.Block);
             if (isBlockSub)
             {
-                breakLabel = forScope.BreakLabel;
+                breakLabel = forLoopScope.BreakLabel;
             }
 
             var statementExpressions = new List<Expression>();
@@ -546,7 +549,7 @@ namespace StepBro.Core.Parser
                     Expression.Break(breakLabel)));
 
             varLoopIndex = m_scopeStack.Peek().AddVariable(
-                CreateStatementVariableName(context, "whileLoop_index"),
+                CreateStatementVariableName(context, "forLoop_index"),
                 TypeReference.TypeInt64,
                 new SBExpressionData(Expression.Constant(0L)),
                 EntryModifiers.Private);

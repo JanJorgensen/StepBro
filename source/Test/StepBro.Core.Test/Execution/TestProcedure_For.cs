@@ -42,7 +42,7 @@ namespace StepBroCoreTest.Parser
                 int Func()
                 {
                     var output = 0;
-                    for (var i = 0; i < 100; i += 12;)
+                    for (var i = 0; i < 100; i += 12)
                     {
                         output += 12;
                     }
@@ -65,9 +65,56 @@ namespace StepBroCoreTest.Parser
                 int Func()
                 {
                     var output = 0;
-                    for (var i = 0, var j = 0; i < 100; i += 12;)
+                    for (var i = 0, var j = 0; i < 100; i += 12)
                     {
                         output += 12;
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(108L, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithExpression04()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 0;
+                    var i = 0;
+                    for (; i < 100; i += 12)
+                    {
+                        output += 12;
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(108L, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithEmptyBody01()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 0;
+                    var i = 0;
+                    for (; i < 100; i += 12, output += 12)
+                    {
                     }
                     return output;
                 }
