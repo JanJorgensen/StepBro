@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net7.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-    <AssemblyName>StepBro.TestInterface.UI</AssemblyName>
-    <RootNamespace>StepBro.TestInterface.UI</RootNamespace>
+    <AssemblyName>StepBro.PanelCreator.UI</AssemblyName>
+    <RootNamespace>StepBro.PanelCreator.UI</RootNamespace>
     <OutputPath>..\..\bin\Modules</OutputPath>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -15,32 +15,15 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Include="..\..\CommonVersion.cs" Link="CommonVersion.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="ActiproSoftware.Controls.WPF.SyntaxEditor" Version="21.1.3" ExcludeAssets="runtime"/>
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\StepBro.Core\StepBro.Core.csproj">
       <Private>false</Private>
-      <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
     <ProjectReference Include="..\..\StepBro.UI\StepBro.UI.csproj">
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\StepBro.TestInterface\StepBro.TestInterface.csproj">
-      <Private>false</Private>
+    <ProjectReference Include="..\StepBro.PanelCreator\StepBro.PanelCreator.csproj">
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
 

@@ -10,7 +10,7 @@
         <local:LogViewerViewModel/>
     </UserControl.DataContext>
     <Grid>
-        <ListView x:Name="LogEntryList" ItemsSource="{Binding LogEntries}" ScrollViewer.VerticalScrollBarVisibility="Visible">
+        <local:LoggingListView x:Name="LogEntryList" ItemsSource="{Binding LogEntries}" ScrollViewer.VerticalScrollBarVisibility="Visible">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Timestamp" Width="70" DisplayMemberBinding="{Binding Timestamp}"></GridViewColumn>
@@ -31,6 +31,6 @@
                     <MenuItem x:Name="saveAsHtml" Header="Save as HTML file" Click="saveAsHtml_Click" />
                 </ContextMenu>
             </ListView.ContextMenu>
-        </ListView>
+        </local:LoggingListView>
     </Grid>
 </UserControl>

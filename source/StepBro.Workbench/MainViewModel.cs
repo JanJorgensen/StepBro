@@ -5,6 +5,7 @@ using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.General;
 using StepBro.Core.Host;
+using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
@@ -80,8 +81,12 @@ namespace StepBro.Workbench
 
             IService panelManagerService;
             m_panelManager = new CustomPanelManager(out panelManagerService);
+
+            IService hostService;
+            var hostAccess = new HostAccess(out hostService);
+
             // Initialize before the views start asking for the different services.
-            StepBroMain.Initialize(new IService[] { panelManagerService });
+            StepBroMain.Initialize(new IService[] { panelManagerService, hostService });
 
             m_propertiesViewModel = new PropertiesViewModel();
             m_propertiesViewModel.IsOpen = true;
@@ -106,6 +111,30 @@ namespace StepBro.Workbench
 
             this.UpdateCustomPanelsMenu();
         }
+
+        #region Host Access
+
+        public class HostAccess : StepBro.Core.Host.HostAccessBase<HostAccess>
+        {
+            public HostAccess(out IService serviceAccess) : base("StepBro.Workbench", out serviceAccess, typeof(ILogger))
+            {
+            }
+
+            public override bool IsWPFApplication { get { return true; } }
+
+            public override IEnumerable<NamedData<object>> ListHostCodeModuleInstances()
+            {
+                //yield return new NamedData<object>("Host.Console", m_app);
+                yield break;
+            }
+
+            public override IEnumerable<Type> ListHostCodeModuleTypes()
+            {
+                yield break;
+            }
+        }
+
+        #endregion
 
         public void LogUserAction(string text)
         {
@@ -657,7 +686,7 @@ namespace StepBro.Workbench
 
         public TextDocumentItemViewModel OpenDocumentWindow(string filepath, bool activate)
         {
-            System.Diagnostics.Debug.WriteLine($"MainViewModel.OpenUserDocument({filepath})");
+            System.Diagnostics.Debug.WriteLine($"MainViewModel.OpenDocumentWindow({filepath})");
             var alreadyOpenedDoc = m_userDocumentItems.FirstOrDefault(ud => string.Equals(ud.FileName, filepath));
             if (alreadyOpenedDoc != null)
             {
@@ -1081,13 +1110,12 @@ namespace StepBro.Workbench
                                 var editModel = active as TextDocumentItemViewModel;
                                 var file = active.LoadedFile as IScriptFile;
                                 IFileElement element = null;
-                                var selectionLine = editModel.CaretPosition.Item1;    // Make line number 1-based
+                                var selectionLine = editModel.CaretPosition.Item1 + 1;    // Make line number 1-based
                                 foreach (var fe in file.ListElements())
                                 {
                                     if (fe.Line <= selectionLine && (element == null || element.Line < fe.Line))
                                     {
                                         element = fe;
-                                        break;
                                     }
                                 }
                                 if (element != null)
@@ -1198,7 +1226,7 @@ namespace StepBro.Workbench
             {
                 this.OpenCustomPanel(param);
             });
-            var dynamicObjects = StepBroMain.GetService<IDynamicObjectManager>().ListKnownObjects().ToList();
+            var dynamicObjects = StepBroMain.GetService<IDynamicObjectManager>().GetObjectCollection();
             m_creatableCustomPanels.BeginUpdate();
             m_creatableCustomPanels.Clear();
             foreach (var pt in m_panelManager.ListPanelTypes())
@@ -1220,12 +1248,14 @@ namespace StepBro.Workbench
                         if (pt.IsObjectPanel && pt.IsCompatibleWithType(vc.Object.GetType())) // TODO: Check if more of this type can be created.
                         {
                             var menuItem = new CreateCustomPanelMenuItemViewModel(pt, vc, command, pt.Name);
+                            menuItem.ToolTip = "Create " + pt.Name + ". " + pt.Description;
                             objectMenu.AddSubItem(menuItem);
                         }
                     }
                 }
                 if (objectMenu.SubItems != null)
                 {
+                    objectMenu.ToolTip = "Panels for the variable '" + vc.FullName + "' (type '" + vc.Object.GetType().Name + "')";
                     m_creatableCustomPanels.Add(objectMenu);
                 }
             }

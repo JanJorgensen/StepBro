@@ -244,6 +244,7 @@
                                 <Setter Property="Header" Value="{Binding Path=Header}"/>
                                 <Setter Property="Command" Value="{Binding Path=Command}"/>
                                 <Setter Property="CommandParameter" Value="{Binding Path=Self}"/>
+                                <Setter Property="ToolTip" Value="{Binding Path=ToolTip}"/>
                             </Style>
                             <HierarchicalDataTemplate DataType="{x:Type local:CreateCustomPanelMenuItemViewModel}" ItemsSource="{Binding SubItems}"></HierarchicalDataTemplate>
                         </MenuItem.Resources>

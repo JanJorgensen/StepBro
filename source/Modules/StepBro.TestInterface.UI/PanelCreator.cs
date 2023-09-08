@@ -1,4 +1,5 @@
-﻿using StepBro.Core.Data;
+﻿using StepBro.Core.Api;
+using StepBro.Core.Data;
 using StepBro.TestInterface;
 using StepBro.TestInterface.Controls;
 using StepBro.UI.Panels;
@@ -24,6 +25,11 @@ namespace StepBro.TestInterface.UI
                 (control.DataContext as CommandTerminalViewModel).Connection = @object;
                 return true;
             }
+        }
+
+        public PanelCreator()
+        {
+            System.Diagnostics.Debug.WriteLine("PanelCreator CTOR");
         }
 
         protected override IEnumerable<CustomPanelType> CreatePanelList()

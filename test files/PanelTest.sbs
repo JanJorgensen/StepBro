@@ -1,27 +1,48 @@
-﻿// This file contains procedures and testlists that can be used to test the behaviour of StepBro itself.
-
+using StepBro.Streams;
+using StepBro.TestInterface;
 using StepBro.PanelCreator;
+
+SerialPort portGRT = SerialPor6t()
+{
+	PortName = "COM8",
+    BaudRate = 460800,
+    StopBits = One
+}
+
+SerialTestConnection grt = SerialTestConnection()
+{ 
+    Stream = portGRT, 
+    CommandResponseTimeout = 5s,
+    commands : [ 
+        {"Help|Get Help": "help"},
+        {"Help|About": "about"},
+        {"List|Commands": "list commands"},
+        {"List|Objects": "list objects"},
+        {"LED": "led 2"}
+    ]
+}
 
 Panel panel = Panel()
 {
     HorizontalSplit Main:
     {
-        MinimumHeight: 400, MinimumWidth: 600,
+        MinHeight: 400, MinWidth: 600,
         VerticalSplit Top: 
         {
             FlowTopDownWrap Left: 
             {
                 Name: Commands,
+                MaxWidth: 120,
                 Controls:
                 {
-                    ProcedureActivationButton Start: { procedure: StartSomeShit },
+                    ProcedureActivationButton Start: { Procedure: StartSomeShit, Model: WithSetup },
                     ProcedureActivationButton Stop: { Text: "Stop All Shit !!", Procedure: StopAllShit },
                     ProcedureActivationButton SendReset: { Text: "Reset", Procedure: SendTargetCommand, Arguments: "reset" }
                 }
             },
             SerialTestConnectionTerminal Right: { Instance: target }
         },
-        ExecutionLogViewer Bottom: { Title: "Execution Log", MinimumHeight: 200, MinimumWidth: 300 }
+        ExecutionLogViewer Bottom: { Title: "Execution Log", MinHeight: 200, Minidth: 300 }
     }
 }
 
@@ -34,7 +55,7 @@ procedure void DoIt()
     value = panel.Commands.SendReset.Procedure;
     log("panel.Commands.SendReset.Procedure: " + value);
     int n = panel.Bottom.MinimumHeight;
-    log("panel.bottom.MinimumHeight: " + n);
+    log("panel.Bottom.MinimumHeight: " + n);
 
     log("Done!");
 }

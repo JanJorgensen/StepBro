@@ -50,6 +50,7 @@ namespace StepBro.Workbench
         public CreateCustomPanelMenuItemViewModel Self { get { return this; } }
         public CustomPanelType PanelType { get; private set; } = null;
         public string Header { get; private set; }
+        public string ToolTip { get; set; } = null;
         public IObjectContainer Variable { get; private set; } = null;
         public ICommand Command { get; private set; } = null;
         public DeferrableObservableCollection<CreateCustomPanelMenuItemViewModel> SubItems { get; set; } = null;
