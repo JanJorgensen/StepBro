@@ -665,19 +665,25 @@ namespace StepBro.Core.Parser
                 statementExpressions.Add(expression.ExpressionCode);
             }
 
-            if (isBlockSub)
+            if (isBlockSub) // 0-N statements with {} around
             {
+                var subStatementBlockCode = subStatements[0].GetBlockCode();
+                if (subStatementBlockCode != null)
+                {
+                    loopExpressions.Add(subStatementBlockCode);
+                }
+                
                 foreach (var expression in forUpdateExpressions)
                 {
                     loopExpressions.Add(expression.ExpressionCode);
                 }
                 statementExpressions.Add(
                     Expression.Loop(
-                        subStatements[0].GetBlockCode(loopExpressions, null),
+                        Expression.Block(loopExpressions),
                         breakLabel,
                         subStatements[0].ContinueLabel));
             }
-            else
+            else // Only a single statement without {} around
             {
                 loopExpressions.Add(subStatements[0].GetOnlyStatementCode());
                 foreach (var expression in forUpdateExpressions)
