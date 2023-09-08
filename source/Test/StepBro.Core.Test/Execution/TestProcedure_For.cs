@@ -366,7 +366,7 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        [Ignore("When the only statement in a for loop is another for loop, it breaks.")]
+        [Ignore("When the only statement in a for loop is another for loop, it breaks. The substatement does not get created.")]
         public void TestProcedureForStatementWithinForStatement02()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
@@ -387,7 +387,7 @@ namespace StepBroCoreTest.Parser
             object result = proc.Call();
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(long));
-            Assert.AreEqual(400L, (long)result);
+            Assert.AreEqual(450L, (long)result);
         }
 
         [TestMethod]
@@ -413,7 +413,7 @@ namespace StepBroCoreTest.Parser
             object result = proc.Call();
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(long));
-            Assert.AreEqual(400L, (long)result);
+            Assert.AreEqual(450L, (long)result);
         }
     }
 }

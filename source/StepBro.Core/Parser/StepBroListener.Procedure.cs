@@ -446,7 +446,6 @@ namespace StepBro.Core.Parser
         {
             this.AddEnterStatement(context);
             //m_lastPropertyBlock = null;
-            m_expressionData.PushStackLevel("ForStatement");
             m_enteredLoopStatement = true;
             m_expressionData.PushStackLevel("for-init");
             m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-init", ProcedureParsingScope.ScopeType.Block));

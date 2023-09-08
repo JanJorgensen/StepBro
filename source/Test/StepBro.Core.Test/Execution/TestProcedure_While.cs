@@ -256,7 +256,7 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        [Ignore("When the only statement in a loop is another loop, it breaks unless it has {}.")]
+        [Ignore("When the only statement in a loop is another loop, it breaks unless it has {}. The substatement does not get created.")]
         public void TestProcedureWhileStatementSingleStatementInWhileLoop01()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
