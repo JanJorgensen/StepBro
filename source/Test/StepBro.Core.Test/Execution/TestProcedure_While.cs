@@ -224,7 +224,6 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        [Ignore("Continue not implemented yet.")]
         public void TestProcedureWhileStatementContinue01()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
