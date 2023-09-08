@@ -65,9 +65,9 @@ namespace StepBroCoreTest.Parser
                 int Func()
                 {
                     var output = 0;
-                    for (var i = 0, var j = 0; i < 100; i += 12)
+                    for (var i = 0, var j = 12; i < 100; i += 12)
                     {
-                        output += 12;
+                        output += j;
                     }
                     return output;
                 }
