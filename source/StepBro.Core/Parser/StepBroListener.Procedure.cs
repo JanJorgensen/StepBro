@@ -667,6 +667,10 @@ namespace StepBro.Core.Parser
 
             if (isBlockSub)
             {
+                foreach (var expression in forUpdateExpressions)
+                {
+                    loopExpressions.Add(expression.ExpressionCode);
+                }
                 statementExpressions.Add(
                     Expression.Loop(
                         subStatements[0].GetBlockCode(loopExpressions, null),
@@ -676,6 +680,10 @@ namespace StepBro.Core.Parser
             else
             {
                 loopExpressions.Add(subStatements[0].GetOnlyStatementCode());
+                foreach (var expression in forUpdateExpressions)
+                {
+                    loopExpressions.Add(expression.ExpressionCode);
+                }
                 statementExpressions.Add(
                     Expression.Loop(
                         Expression.Block(loopExpressions),

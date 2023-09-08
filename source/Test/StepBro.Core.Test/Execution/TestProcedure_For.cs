@@ -130,6 +130,80 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
+        public void TestProcedureForStatementWithExpression06()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 0;
+                    for (var i = 0; i < 100; i += 35)
+                    {
+                        output += 12;
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(36L, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithExpression07()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 0;
+                    for (var i = 0; i < 100; i += 35)
+                    {
+                        if (i == 35)
+                        {
+                            i = 105;
+                        }
+                        else
+                        {
+                            output += 12;
+                        }
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(12L, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithExpression08()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 0;
+                    for (var i = 0; i < 100; i += 35)
+                        output += i;
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(105L, (long)result);
+        }
+
+        [TestMethod]
         public void TestProcedureForStatementWithEmptyBody01()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
@@ -228,6 +302,39 @@ namespace StepBroCoreTest.Parser
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(long));
             Assert.AreEqual(108L, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithContinue01()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 0;
+                    
+                    for (var i = 0; i < 100; i += 35)
+                    {
+                        output += 12;
+
+                        if (output == 12)
+                        {
+                            output++;
+                            continue;
+                        }
+
+                        output += 5;
+                    }
+
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(47L, (long)result);
         }
 
         [TestMethod]
