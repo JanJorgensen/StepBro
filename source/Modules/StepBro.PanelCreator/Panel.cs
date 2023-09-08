@@ -10,6 +10,7 @@ using System.Xml.Linq;
 
 namespace StepBro.PanelCreator
 {
+    [Public]
     public class Panel : StepBro.Core.Api.DynamicStepBroObject, INameable, ISettableFromPropertyBlock
     {
         public const string MainElementName = "panel";
