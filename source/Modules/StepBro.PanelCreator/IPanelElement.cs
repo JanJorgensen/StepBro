@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.PanelCreator
 {
+    [Public]
     public interface IPanelElement
     {
         /// <summary>
