@@ -38,7 +38,7 @@ namespace StepBro.Core.Parser
         private bool m_callAssignmentAwait = false;
         private Stack<Stack<SBExpressionData>> m_arguments = new Stack<Stack<SBExpressionData>>();
         private Stack<Stack<SBExpressionData>> m_statementExpressions = new Stack<Stack<SBExpressionData>>();
-        private List<Expression> m_forInitVariables = new List<Expression>();
+        private Stack<List<Expression>> m_forInitVariables = new Stack<List<Expression>>();
         private Stack<SBExpressionData> m_forCondition = new Stack<SBExpressionData>();
         //private Stack<TSExpressionData> m_keywordArguments = null;
 
@@ -450,6 +450,7 @@ namespace StepBro.Core.Parser
             m_enteredLoopStatement = true;
             m_expressionData.PushStackLevel("for-init");
             m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-init", ProcedureParsingScope.ScopeType.Block));
+            m_forInitVariables.Push(new List<Expression>());
         }
 
         public override void ExitForVariableDeclaration([NotNull] SBP.ForVariableDeclarationContext context)
@@ -482,7 +483,8 @@ namespace StepBro.Core.Parser
 
                 var scope = m_scopeStack.Peek();
                 var v = scope.AddVariable(variable.Name, type, null, EntryModifiers.Private);
-                m_forInitVariables.Add(Expression.Assign(v.VariableExpression, variable.Initializer.ExpressionCode));
+                // Needs to be a stack for each scope so we don't initialize variables in incorrect scopes
+                m_forInitVariables.Peek().Add(Expression.Assign(v.VariableExpression, variable.Initializer.ExpressionCode));
             }
         }
 
@@ -516,6 +518,8 @@ namespace StepBro.Core.Parser
         {
             var forLoopScope = m_scopeStack.Pop();
             var forOuterScope = m_scopeStack.Pop();
+
+            var forInitVariables = m_forInitVariables.Pop();
 
             // Contains the expressions in the for-update part of the for-loop
             var forUpdateExpressions = m_expressionData.PopStackLevel();
@@ -657,7 +661,7 @@ namespace StepBro.Core.Parser
 
             if (forOuterScope.GetBlockCode() != null)
             {
-                statementExpressions.AddRange(m_forInitVariables);
+                statementExpressions.AddRange(forInitVariables);
             }
 
             foreach (var expression in forInitExpressions)

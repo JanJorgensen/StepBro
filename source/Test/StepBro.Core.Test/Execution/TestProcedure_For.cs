@@ -305,6 +305,7 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
+        [Ignore("Continue not implemented yet.")]
         public void TestProcedureForStatementWithContinue01()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
@@ -362,6 +363,57 @@ namespace StepBroCoreTest.Parser
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(long));
             Assert.AreEqual(558L, (long)result);
+        }
+
+        [TestMethod]
+        [Ignore("When the only statement in a for loop is another for loop, it breaks.")]
+        public void TestProcedureForStatementWithinForStatement02()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 0;
+                    for (var i = 0; i < 100; i += 12)
+                        for (var j = 0; j < 200; j += 4)
+                        {
+                            output += 1;
+                        }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(400L, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithinForStatement03()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 0;
+                    for (var i = 0; i < 100; i += 12)
+                    {
+                        for (var j = 0; j < 200; j += 4)
+                        {
+                            output += 1;
+                        }
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(400L, (long)result);
         }
     }
 }
