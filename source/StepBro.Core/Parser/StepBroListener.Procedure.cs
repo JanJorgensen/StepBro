@@ -506,13 +506,6 @@ namespace StepBro.Core.Parser
             m_expressionData.PushStackLevel("for-update");
         }
 
-        public override void ExitForUpdate([NotNull] SBP.ForUpdateContext context)
-        {
-            base.ExitForUpdate(context);
-
-            Console.WriteLine("Exiting For-loop Update");
-        }
-
         public override void ExitForStatement([NotNull] SBP.ForStatementContext context)
         {
             var forLoopScope = m_scopeStack.Pop();
