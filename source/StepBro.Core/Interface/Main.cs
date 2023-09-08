@@ -526,7 +526,7 @@ namespace StepBro.Core
         public static void DumpCurrentObjectsToLog()
         {
             var logger = m_mainLogger.RootLogger;
-            foreach (var oc in m_dynamicObjectManager.ListKnownObjects())
+            foreach (var oc in m_dynamicObjectManager.GetObjectCollection())
             {
                 logger.Log("Dynamic object: " + oc.FullName);
             }

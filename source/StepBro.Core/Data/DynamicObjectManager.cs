@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace StepBro.Core.Data
@@ -7,6 +8,7 @@ namespace StepBro.Core.Data
     internal class DynamicObjectManager : ServiceBase<IDynamicObjectManager, DynamicObjectManager>, IDynamicObjectManager
     {
         private List<IObjectHost> m_hosts = new List<IObjectHost>();
+        ObservableCollection<IObjectContainer> m_containers = new ObservableCollection<IObjectContainer>();
 
         public DynamicObjectManager(out IService serviceAccess) :
             base("DynamicObjectManager", out serviceAccess)
@@ -36,22 +38,25 @@ namespace StepBro.Core.Data
 
         private void Host_ObjectContainerListChanged(object sender, EventArgs e)
         {
-            this.ObjectListChanged?.Invoke(this, e);
-        }
-
-        public IEnumerable<IObjectContainer> ListKnownObjects()
-        {
+            m_containers.Clear();
             foreach (var host in m_hosts)
             {
                 foreach (var c in host.ListObjectContainers())
                 {
-                    yield return c;
+                    m_containers.Add(c);
                 }
             }
+            this.ObjectListChanged?.Invoke(this, e);
         }
+
+        public ReadOnlyObservableCollection<IObjectContainer> GetObjectCollection()
+        {
+            return new ReadOnlyObservableCollection<IObjectContainer>(m_containers);
+        }
+
         public IObjectContainer TryFindObject(string id)
         {
-            return this.ListKnownObjects().FirstOrDefault(
+            return m_containers.FirstOrDefault(
                 oc => string.Equals(oc.FullName, id, System.StringComparison.InvariantCulture));
         }
     }
