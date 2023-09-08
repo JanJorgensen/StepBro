@@ -38,6 +38,7 @@ namespace StepBro.Core.Parser
         private bool m_callAssignmentAwait = false;
         private Stack<Stack<SBExpressionData>> m_arguments = new Stack<Stack<SBExpressionData>>();
         private Stack<Stack<SBExpressionData>> m_statementExpressions = new Stack<Stack<SBExpressionData>>();
+        private List<Expression> m_forInitVariables = new List<Expression>();
         private Stack<SBExpressionData> m_forCondition = new Stack<SBExpressionData>();
         //private Stack<TSExpressionData> m_keywordArguments = null;
 
@@ -447,6 +448,7 @@ namespace StepBro.Core.Parser
             //m_lastPropertyBlock = null;
             m_expressionData.PushStackLevel("ForStatement");
             m_enteredLoopStatement = true;
+            m_expressionData.PushStackLevel("for-init");
             m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-init", ProcedureParsingScope.ScopeType.Block));
         }
 
@@ -480,7 +482,7 @@ namespace StepBro.Core.Parser
 
                 var scope = m_scopeStack.Peek();
                 var v = scope.AddVariable(variable.Name, type, null, EntryModifiers.Private);
-                scope.AddStatementCode(Expression.Assign(v.VariableExpression, variable.Initializer.ExpressionCode));
+                m_forInitVariables.Add(Expression.Assign(v.VariableExpression, variable.Initializer.ExpressionCode));
             }
         }
 
@@ -494,6 +496,13 @@ namespace StepBro.Core.Parser
             m_forCondition.Push(m_expressionData.Peek().Pop());
 
             m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-loop", ProcedureParsingScope.ScopeType.Block));
+        }
+
+        public override void EnterForUpdate([NotNull] SBP.ForUpdateContext context)
+        {
+            base.EnterForUpdate(context);
+
+            m_expressionData.PushStackLevel("for-update");
         }
 
         public override void ExitForUpdate([NotNull] SBP.ForUpdateContext context)
@@ -510,6 +519,7 @@ namespace StepBro.Core.Parser
 
             // Contains the expressions in the for-update part of the for-loop
             var forUpdateExpressions = m_expressionData.PopStackLevel();
+            var forInitExpressions = m_expressionData.PopStackLevel();
 
             // Contains the part of the for-loop that contains the condition
             var condition = m_forCondition.Pop();
@@ -644,10 +654,15 @@ namespace StepBro.Core.Parser
                             Expression.IfThen(loggingEnabled, timeoutLoggingCall),
                             Expression.Break(breakLabel))));
             }
-            
+
             if (forOuterScope.GetBlockCode() != null)
             {
-                statementExpressions.Add(forOuterScope.GetBlockCode());
+                statementExpressions.AddRange(m_forInitVariables);
+            }
+
+            foreach (var expression in forInitExpressions)
+            {
+                statementExpressions.Add(expression.ExpressionCode);
             }
 
             if (isBlockSub)
@@ -667,8 +682,9 @@ namespace StepBro.Core.Parser
                         breakLabel));
             }
 
+            List<ProcedureVariable> forVariables = forOuterScope.GetVariables();
             List<Expression> forLoopExpression = new List<Expression>();
-            forLoopExpression.Add(Expression.Block(statementExpressions.ToArray()));
+            forLoopExpression.Add(Expression.Block(forVariables.Select(v => ((ParameterExpression)v.VariableExpression)), statementExpressions.ToArray()));
 
             m_scopeStack.Peek().AddStatementCode(forLoopExpression.ToArray());
         }

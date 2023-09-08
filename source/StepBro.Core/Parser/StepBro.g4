@@ -508,7 +508,9 @@ forControl
 
 forVariableDeclaration : variableType variableDeclarators ;
 
-forInit : (forVariableDeclaration | expression) (COMMA forVariableDeclaration | expression)* ;
+forInitExpression : expression ;
+
+forInit : (forVariableDeclaration | forInitExpression) (COMMA forVariableDeclaration | forInitExpression)* ;
 
 forCondition : expression ;
 

@@ -80,6 +80,11 @@ namespace StepBro.Core.Parser
             m_subStatements.Add(statementCode);
         }
 
+        public List<ProcedureVariable> GetVariables()
+        {
+            return m_localVariables;
+        }
+
         public List<ProcedureParsingScope> GetSubStatements()
         {
             var subs = m_subStatements;
