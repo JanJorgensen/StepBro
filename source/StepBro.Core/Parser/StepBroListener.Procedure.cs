@@ -38,6 +38,8 @@ namespace StepBro.Core.Parser
         private bool m_callAssignmentAwait = false;
         private Stack<Stack<SBExpressionData>> m_arguments = new Stack<Stack<SBExpressionData>>();
         private Stack<Stack<SBExpressionData>> m_statementExpressions = new Stack<Stack<SBExpressionData>>();
+        private Stack<List<Expression>> m_forInitVariables = new Stack<List<Expression>>();
+        private Stack<SBExpressionData> m_forCondition = new Stack<SBExpressionData>();
         //private Stack<TSExpressionData> m_keywordArguments = null;
 
         public Stack<SBExpressionData> GetArguments()
@@ -444,12 +446,253 @@ namespace StepBro.Core.Parser
         {
             this.AddEnterStatement(context);
             //m_lastPropertyBlock = null;
-            m_expressionData.PushStackLevel("ForStatement");
             m_enteredLoopStatement = true;
+            m_expressionData.PushStackLevel("for-init");
+            m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-init", ProcedureParsingScope.ScopeType.Block));
+            m_forInitVariables.Push(new List<Expression>());
+        }
+
+        public override void ExitForVariableDeclaration([NotNull] SBP.ForVariableDeclarationContext context)
+        {
+            foreach (var variable in m_variables)
+            {
+                TypeReference type = m_variableType;
+                if (type.Type == typeof(VarSpecifiedType))
+                {
+                    if (variable.Initializer.IsError())
+                    {
+                        return;     // Just leave; no point in spending more time on this variable.
+                    }
+                    else if (variable.Initializer.DataType != null)
+                    {
+                        type = variable.Initializer.DataType;
+                    }
+                    else if (variable.Initializer.ExpressionCode != null)
+                    {
+                        type = new TypeReference(variable.Initializer.ExpressionCode.Type);
+                    }
+                    else
+                    {
+                        m_errors.SymanticError(variable.Initializer.Token.Line, variable.Initializer.Token.Column, false, "Unknown value type for assignment to variable with type 'var'.");
+                        break;
+                    }
+                }
+
+                var scope = m_scopeStack.Peek();
+                var v = scope.AddVariable(variable.Name, type, null, EntryModifiers.Private);
+                // Needs to be a stack for each scope so we don't initialize variables in incorrect scopes
+                m_forInitVariables.Peek().Add(Expression.Assign(v.VariableExpression, variable.Initializer.ExpressionCode));
+            }
+        }
+
+        public override void ExitForCondition([NotNull] SBP.ForConditionContext context)
+        {
+            // As for-loops can have multiple expressions within them, we ensure we choose the right expression
+            // by popping when we exit the "ForCondition" part of the for-loop, meaning the second part of the
+            // three-part initialization of the for-loop.
+            // We use a stack as multiple for loops can be within each other.
+            m_forCondition.Push(m_expressionData.Peek().Pop());
+
+            m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-loop", ProcedureParsingScope.ScopeType.Block));
+        }
+
+        public override void EnterForUpdate([NotNull] SBP.ForUpdateContext context)
+        {
+            m_expressionData.PushStackLevel("for-update");
         }
 
         public override void ExitForStatement([NotNull] SBP.ForStatementContext context)
         {
+            var forLoopScope = m_scopeStack.Pop();
+            var forOuterScope = m_scopeStack.Pop();
+
+            var forInitVariables = m_forInitVariables.Pop();
+
+            // Contains the expressions in the for-update part of the for-loop
+            var forUpdateExpressions = m_expressionData.PopStackLevel();
+            var forInitExpressions = m_expressionData.PopStackLevel();
+
+            // Contains the part of the for-loop that contains the condition
+            var condition = m_forCondition.Pop();
+
+            var subStatements = forLoopScope.GetSubStatements();
+            var attributes = forLoopScope.GetAttributes();
+
+            ProcedureVariable varLoopIndex = null;
+            ProcedureVariable varEntryTime = null;
+            ProcedureVariable varTimeoutTime = null;
+            Expression timeout = null;
+
+            var props = m_lastElementPropertyBlock;
+            m_lastElementPropertyBlock = null;
+
+            condition = this.ResolveForGetOperation(condition);
+            if (condition.IsError())
+            {
+                m_scopeStack.Peek().AddStatementCode(Expression.Empty());
+                return;
+            }
+
+            var conditionExpression = condition.ExpressionCode;
+
+            if (condition.IsValueType && condition.DataType.Type != typeof(bool))
+            {
+                m_errors.SymanticError(condition.Token.Line, condition.Token.Column, false, "Something wrong with the condition expression.");
+                return;
+            }
+
+            var breakLabel = Expression.Label();
+
+            var isBlockSub = (subStatements[0].Type == ProcedureParsingScope.ScopeType.Block);
+            if (isBlockSub)
+            {
+                breakLabel = forLoopScope.BreakLabel;
+            }
+
+            var statementExpressions = new List<Expression>();
+            var loopExpressions = new List<Expression>();
+            loopExpressions.Add(
+                Expression.IfThen(
+                    Expression.Not(conditionExpression),
+                    Expression.Break(breakLabel)));
+
+            varLoopIndex = m_scopeStack.Peek().AddVariable(
+                CreateStatementVariableName(context, "forLoop_index"),
+                TypeReference.TypeInt64,
+                new SBExpressionData(Expression.Constant(0L)),
+                EntryModifiers.Private);
+            loopExpressions.Add(Expression.Increment(varLoopIndex.VariableExpression));     // index++; therefore index = 1 inside and after first iteration.
+
+            // TODO: Add some logging, interactive break check, timeout and other stuff
+            #region Attribute Handling
+
+            if ((m_currentProcedure.Flags & ProcedureFlags.IsFunction) == ProcedureFlags.None && props != null)
+            {
+                foreach (var property in props)
+                {
+                    if (property.Is("Timeout", PropertyBlockEntryType.Value))
+                    {
+                        object toValue = (((PropertyBlockValue)property).Value);
+                        if (toValue is TimeSpan)
+                        {
+                            timeout = Expression.Constant((TimeSpan)toValue);
+                        }
+                        else if (((PropertyBlockValue)property).IsStringOrIdentifier)
+                        {
+                            var s = ((PropertyBlockValue)property).ValueAsString();
+                            if (s.IsIdentifier())
+                            {
+                                var timeoutExpression = ResolveIdentifierForGetOperation(s, true, TypeReference.TypeTimeSpan);
+                                if (timeoutExpression.IsError())
+                                {
+                                    m_scopeStack.Peek().AddStatementCode(Expression.Empty());
+                                    return;
+                                }
+                                timeout = timeoutExpression.ExpressionCode;
+                            }
+                            else
+                            {
+
+                            }
+                        }
+                        else
+                        {
+                            throw new NotImplementedException("Timeout data type or expression not implemented or supported.");
+                        }
+
+                        varTimeoutTime = m_scopeStack.Peek().AddVariable(
+                            CreateStatementVariableName(context, "whileLoop_TimeoutTime"),
+                            TypeReference.TypeDateTime,
+                            new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
+                            EntryModifiers.Private);
+                    }
+                }
+            }
+            #endregion
+
+
+            varEntryTime = m_scopeStack.Peek().AddVariable(
+                            CreateStatementVariableName(context, "forLoop_EntryTime"),
+                            TypeReference.TypeDateTime,
+                            new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
+                            EntryModifiers.Private);
+
+            var loggingEnabled = Expression.Property(
+                    Expression.Convert(m_currentProcedure.ContextReferenceInternal, typeof(ICallContext)),
+                    typeof(ICallContext).GetProperty("LoggingEnabled"));
+
+            var timeoutLoggingCall = Expression.Call(
+                m_currentProcedure.ContextReferenceInternal,
+                typeof(IScriptCallContext).GetMethod("Log", new Type[] { typeof(string) }),
+                Expression.Constant("Loop timeout!"));
+
+            m_scopeStack.Peek().AddStatementCode(
+                Expression.Assign(varEntryTime.VariableExpression, Expression.Property(null, typeof(DateTime).GetProperty("Now"))));
+
+            if (varTimeoutTime != null)
+            {
+                m_scopeStack.Peek().AddStatementCode(
+                    Expression.Assign(varTimeoutTime.VariableExpression, Expression.Add(varEntryTime.VariableExpression, timeout)));
+                loopExpressions.Add(
+                    Expression.IfThen(
+                        Expression.Not(conditionExpression),
+                        Expression.Break(breakLabel)));
+                loopExpressions.Add(
+                    Expression.IfThen(
+                        Expression.GreaterThan(
+                            Expression.Property(null, typeof(DateTime).GetProperty("Now")),
+                            varTimeoutTime.VariableExpression),
+                        Expression.Block(
+                            Expression.IfThen(loggingEnabled, timeoutLoggingCall),
+                            Expression.Break(breakLabel))));
+            }
+
+            if (forOuterScope.GetBlockCode() != null)
+            {
+                statementExpressions.AddRange(forInitVariables);
+            }
+
+            foreach (var expression in forInitExpressions)
+            {
+                statementExpressions.Add(expression.ExpressionCode);
+            }
+
+            if (isBlockSub) // 0-N statements with {} around
+            {
+                var subStatementBlockCode = subStatements[0].GetBlockCode();
+                if (subStatementBlockCode != null)
+                {
+                    loopExpressions.Add(subStatementBlockCode);
+                }
+                
+                foreach (var expression in forUpdateExpressions)
+                {
+                    loopExpressions.Add(expression.ExpressionCode);
+                }
+                statementExpressions.Add(
+                    Expression.Loop(
+                        Expression.Block(loopExpressions),
+                        breakLabel,
+                        subStatements[0].ContinueLabel));
+            }
+            else // Only a single statement without {} around
+            {
+                loopExpressions.Add(subStatements[0].GetOnlyStatementCode());
+                foreach (var expression in forUpdateExpressions)
+                {
+                    loopExpressions.Add(expression.ExpressionCode);
+                }
+                statementExpressions.Add(
+                    Expression.Loop(
+                        Expression.Block(loopExpressions),
+                        breakLabel));
+            }
+
+            List<ProcedureVariable> forVariables = forOuterScope.GetVariables();
+            List<Expression> forLoopExpression = new List<Expression>();
+            forLoopExpression.Add(Expression.Block(forVariables.Select(v => ((ParameterExpression)v.VariableExpression)), statementExpressions.ToArray()));
+
+            m_scopeStack.Peek().AddStatementCode(forLoopExpression.ToArray());
         }
 
         public override void EnterWhileStatement([NotNull] SBP.WhileStatementContext context)
@@ -487,7 +730,8 @@ namespace StepBro.Core.Parser
 
             if (condition.IsValueType && condition.DataType.Type != typeof(bool))
             {
-                throw new NotImplementedException("Something wrong with the condition expression.");
+                m_errors.SymanticError(condition.Token.Line, condition.Token.Column, false, "Something wrong with the condition expression.");
+                return;
             }
 
             var breakLabel = Expression.Label();
@@ -565,13 +809,6 @@ namespace StepBro.Core.Parser
                             TypeReference.TypeDateTime,
                             new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
                             EntryModifiers.Private);
-
-
-            varEntryTime = m_scopeStack.Peek().AddVariable(
-                CreateStatementVariableName(context, "whileLoop_EntryTime"),
-                TypeReference.TypeDateTime,
-                new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
-                EntryModifiers.Private);
 
             var loggingEnabled = Expression.Property(
                     Expression.Convert(m_currentProcedure.ContextReferenceInternal, typeof(ICallContext)),

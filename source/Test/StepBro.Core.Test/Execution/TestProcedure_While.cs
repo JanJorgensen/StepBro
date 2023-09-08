@@ -197,5 +197,126 @@ namespace StepBroCoreTest.Parser
             Assert.IsInstanceOfType(result, typeof(long));
             Assert.AreEqual(1500, (long)result);
         }
+
+        [TestMethod]
+        public void TestProcedureWhileStatementVariableInLoop01()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    int i = 0;
+                    while (i < 1000)
+                    {
+                        int a = 5;
+
+                        i += a;
+                    }
+                    return i;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(1000, (long)result);
+        }
+
+        [TestMethod]
+        [Ignore("Continue not implemented yet.")]
+        public void TestProcedureWhileStatementContinue01()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    int i = 0;
+                    while (i < 1000)
+                    {
+                        int a = 5;
+
+                        if (i == 200)
+                        {
+                            i += 15;
+                            continue;
+                        }
+
+                        i += a;
+                    }
+                    return i;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(990, (long)result);
+        }
+
+        [TestMethod]
+        [Ignore("When the only statement in a loop is another loop, it breaks unless it has {}. The substatement does not get created.")]
+        public void TestProcedureWhileStatementSingleStatementInWhileLoop01()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    int i = 0;
+                    int j = 0;
+                    int output = 0;
+
+                    while (i < 250)
+                        while (j < 500)
+                        {
+                            output += 2;
+                            i++;
+                            j++;
+                        }
+                        
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(1000, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureWhileStatementSingleStatementInWhileLoop02()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    int i = 0;
+                    int j = 0;
+                    int output = 0;
+
+                    while (i < 1000)
+                    {
+                        while (j < 500)
+                        {
+                            output += 2;
+                            i++;
+                            j++;
+                        }
+                        j = 0;
+                    }
+                        
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(2000, (long)result);
+        }
     }
 }
