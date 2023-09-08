@@ -209,9 +209,14 @@ while ( i < 10 )
     if (x < 0) continue;
     if (y > 6000) break;
 }
+
+for ( int i = 0 ; i < 40 ; i++ )
+{
+    if (x > 100) y += 2;
+}
 ```
 
-### While loop attributes
+### While & For loop attributes
 ```
 while ( i < 10K ) :
     Title: "Awaiting the thing to happen"       // Added to the log and shown in UI while looping.
