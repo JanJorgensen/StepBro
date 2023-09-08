@@ -454,8 +454,6 @@ namespace StepBro.Core.Parser
 
         public override void ExitForVariableDeclaration([NotNull] SBP.ForVariableDeclarationContext context)
         {
-            base.ExitForVariableDeclaration(context);
-
             foreach (var variable in m_variables)
             {
                 TypeReference type = m_variableType;
@@ -489,7 +487,6 @@ namespace StepBro.Core.Parser
 
         public override void ExitForCondition([NotNull] SBP.ForConditionContext context)
         {
-            base.ExitForCondition(context);
             // As for-loops can have multiple expressions within them, we ensure we choose the right expression
             // by popping when we exit the "ForCondition" part of the for-loop, meaning the second part of the
             // three-part initialization of the for-loop.
@@ -501,8 +498,6 @@ namespace StepBro.Core.Parser
 
         public override void EnterForUpdate([NotNull] SBP.ForUpdateContext context)
         {
-            base.EnterForUpdate(context);
-
             m_expressionData.PushStackLevel("for-update");
         }
 
@@ -542,7 +537,8 @@ namespace StepBro.Core.Parser
 
             if (condition.IsValueType && condition.DataType.Type != typeof(bool))
             {
-                throw new NotImplementedException("Something wrong with the condition expression.");
+                m_errors.SymanticError(condition.Token.Line, condition.Token.Column, false, "Something wrong with the condition expression.");
+                return;
             }
 
             var breakLabel = Expression.Label();
@@ -734,7 +730,8 @@ namespace StepBro.Core.Parser
 
             if (condition.IsValueType && condition.DataType.Type != typeof(bool))
             {
-                throw new NotImplementedException("Something wrong with the condition expression.");
+                m_errors.SymanticError(condition.Token.Line, condition.Token.Column, false, "Something wrong with the condition expression.");
+                return;
             }
 
             var breakLabel = Expression.Label();
