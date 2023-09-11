@@ -558,7 +558,7 @@ namespace StepBro.Core.Parser
                     Expression.Not(conditionExpression),
                     Expression.Break(breakLabel)));
 
-            varLoopIndex = m_scopeStack.Peek().AddVariable(
+            varLoopIndex = forOuterScope.AddVariable(
                 CreateStatementVariableName(context, "forLoop_index"),
                 TypeReference.TypeInt64,
                 new SBExpressionData(Expression.Constant(0L)),
@@ -613,7 +613,7 @@ namespace StepBro.Core.Parser
             #endregion
 
 
-            varEntryTime = m_scopeStack.Peek().AddVariable(
+            varEntryTime = forOuterScope.AddVariable(
                             CreateStatementVariableName(context, "forLoop_EntryTime"),
                             TypeReference.TypeDateTime,
                             new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
@@ -628,12 +628,13 @@ namespace StepBro.Core.Parser
                 typeof(IScriptCallContext).GetMethod("Log", new Type[] { typeof(string) }),
                 Expression.Constant("Loop timeout!"));
 
-            m_scopeStack.Peek().AddStatementCode(
+            List<Expression> timeAssignments = new List<Expression>();
+            timeAssignments.Add(
                 Expression.Assign(varEntryTime.VariableExpression, Expression.Property(null, typeof(DateTime).GetProperty("Now"))));
 
             if (varTimeoutTime != null)
             {
-                m_scopeStack.Peek().AddStatementCode(
+                timeAssignments.Add(
                     Expression.Assign(varTimeoutTime.VariableExpression, Expression.Add(varEntryTime.VariableExpression, timeout)));
                 loopExpressions.Add(
                     Expression.IfThen(
@@ -649,14 +650,16 @@ namespace StepBro.Core.Parser
                             Expression.Break(breakLabel))));
             }
 
-            if (forOuterScope.GetBlockCode() != null)
-            {
-                statementExpressions.AddRange(forInitVariables);
-            }
+            statementExpressions.AddRange(forInitVariables);
 
             foreach (var expression in forInitExpressions)
             {
                 statementExpressions.Add(expression.ExpressionCode);
+            }
+
+            foreach (var assignment in timeAssignments)
+            {
+                statementExpressions.Add(assignment);
             }
 
             if (isBlockSub) // 0-N statements with {} around
@@ -748,7 +751,7 @@ namespace StepBro.Core.Parser
                     Expression.Not(conditionExpression),
                     Expression.Break(breakLabel)));
 
-            varLoopIndex = m_scopeStack.Peek().AddVariable(
+            varLoopIndex = whileScope.AddVariable(
                 CreateStatementVariableName(context, "whileLoop_index"),
                 TypeReference.TypeInt64,
                 new SBExpressionData(Expression.Constant(0L)),
@@ -803,7 +806,7 @@ namespace StepBro.Core.Parser
             #endregion
 
 
-            varEntryTime = m_scopeStack.Peek().AddVariable(
+            varEntryTime = whileScope.AddVariable(
                             CreateStatementVariableName(context, "whileLoop_EntryTime"),
                             TypeReference.TypeDateTime,
                             new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
@@ -818,12 +821,13 @@ namespace StepBro.Core.Parser
                 typeof(IScriptCallContext).GetMethod("Log", new Type[] { typeof(string) }),
                 Expression.Constant("Loop timeout!"));
 
-            m_scopeStack.Peek().AddStatementCode(
+            List<Expression> timeAssignments = new List<Expression>();
+            timeAssignments.Add(
                 Expression.Assign(varEntryTime.VariableExpression, Expression.Property(null, typeof(DateTime).GetProperty("Now"))));
 
             if (varTimeoutTime != null)
             {
-                m_scopeStack.Peek().AddStatementCode(
+                timeAssignments.Add(
                     Expression.Assign(varTimeoutTime.VariableExpression, Expression.Add(varEntryTime.VariableExpression, timeout)));
                 loopExpressions.Add(
                     Expression.IfThen(
@@ -837,6 +841,11 @@ namespace StepBro.Core.Parser
                         Expression.Block(
                             Expression.IfThen(loggingEnabled, timeoutLoggingCall),
                             Expression.Break(breakLabel))));
+            }
+
+            foreach (var assignment in timeAssignments)
+            {
+                statementExpressions.Add(assignment);
             }
 
             if (isBlockSub)
@@ -857,7 +866,11 @@ namespace StepBro.Core.Parser
                         continueLabel));
             }
 
-            m_scopeStack.Peek().AddStatementCode(statementExpressions.ToArray());
+            List<ProcedureVariable> whileVariables = whileScope.GetVariables(); // Contains the entry time and timeout variables
+            List<Expression> whileLoopExpression = new List<Expression>();
+            whileLoopExpression.Add(Expression.Block(whileVariables.Select(v => ((ParameterExpression)v.VariableExpression)), statementExpressions.ToArray()));
+
+            m_scopeStack.Peek().AddStatementCode(whileLoopExpression.ToArray());
         }
 
         public override void EnterDoWhileStatement([NotNull] SBP.DoWhileStatementContext context)
