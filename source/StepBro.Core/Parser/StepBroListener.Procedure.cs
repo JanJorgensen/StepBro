@@ -40,6 +40,7 @@ namespace StepBro.Core.Parser
         private Stack<Stack<SBExpressionData>> m_statementExpressions = new Stack<Stack<SBExpressionData>>();
         private Stack<List<Expression>> m_forInitVariables = new Stack<List<Expression>>();
         private Stack<SBExpressionData> m_forCondition = new Stack<SBExpressionData>();
+        private Stack<Stack<SBExpressionData>> m_forUpdateExpressions = new Stack<Stack<SBExpressionData>>();
         //private Stack<TSExpressionData> m_keywordArguments = null;
 
         public Stack<SBExpressionData> GetArguments()
@@ -501,6 +502,11 @@ namespace StepBro.Core.Parser
             m_expressionData.PushStackLevel("for-update");
         }
 
+        public override void ExitForUpdate([NotNull] SBP.ForUpdateContext context)
+        {
+            m_forUpdateExpressions.Push(m_expressionData.PopStackLevel());
+        }
+
         public override void ExitForStatement([NotNull] SBP.ForStatementContext context)
         {
             var forLoopScope = m_scopeStack.Pop();
@@ -509,7 +515,11 @@ namespace StepBro.Core.Parser
             var forInitVariables = m_forInitVariables.Pop();
 
             // Contains the expressions in the for-update part of the for-loop
-            var forUpdateExpressions = m_expressionData.PopStackLevel();
+            var forUpdateExpressions = new Stack<SBExpressionData>();
+            if (m_forUpdateExpressions.Count != 0)
+            {
+                forUpdateExpressions = m_forUpdateExpressions.Pop();
+            }
             var forInitExpressions = m_expressionData.PopStackLevel();
 
             // Contains the part of the for-loop that contains the condition
@@ -666,7 +676,11 @@ namespace StepBro.Core.Parser
                 {
                     loopExpressions.Add(subStatementBlockCode);
                 }
-                
+
+                // Add the continue label we jump to in case of a "continue" statement
+                // right before the for update expressions, so the for loop still updates
+                // when we write continue;
+                loopExpressions.Add(Expression.Label(continueLabel));
                 foreach (var expression in forUpdateExpressions)
                 {
                     loopExpressions.Add(expression.ExpressionCode);
@@ -674,12 +688,16 @@ namespace StepBro.Core.Parser
                 statementExpressions.Add(
                     Expression.Loop(
                         Expression.Block(loopExpressions),
-                        breakLabel,
-                        continueLabel));
+                        breakLabel));
             }
             else // Only a single statement without {} around
             {
                 loopExpressions.Add(subStatements[0].GetOnlyStatementCode());
+
+                // Add the continue label we jump to in case of a "continue" statement
+                // right before the for update expressions, so the for loop still updates
+                // when we write continue;
+                loopExpressions.Add(Expression.Label(continueLabel));
                 foreach (var expression in forUpdateExpressions)
                 {
                     loopExpressions.Add(expression.ExpressionCode);
@@ -687,8 +705,7 @@ namespace StepBro.Core.Parser
                 statementExpressions.Add(
                     Expression.Loop(
                         Expression.Block(loopExpressions),
-                        breakLabel,
-                        continueLabel));
+                        breakLabel));
             }
 
             List<ProcedureVariable> forVariables = forOuterScope.GetVariables();
