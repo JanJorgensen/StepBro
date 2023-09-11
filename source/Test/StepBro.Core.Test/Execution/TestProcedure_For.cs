@@ -431,7 +431,6 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        [Ignore("When the only statement in a for loop is another for loop, it breaks. The substatement does not get created.")]
         public void TestProcedureForStatementWithinForStatement02()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
@@ -479,6 +478,57 @@ namespace StepBroCoreTest.Parser
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(long));
             Assert.AreEqual(450L, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithTimeout01()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 0;
+                    for (var i = 0; i < 5000000; i += 1) : 
+                        Timeout: 20ms
+                    {
+                        output++;
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.IsTrue((long)result < 5000000);
+            Assert.IsTrue((long)result > 1000);         // Just to check that the loop iterated several times
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithTimeout02()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 0;
+                    var t = 20ms;
+                    for (var i = 0; i < 5000000; i += 1) : 
+                        Timeout: t
+                    {
+                        output++;
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.IsTrue((long)result < 5000000);
+            Assert.IsTrue((long)result > 1000);         // Just to check that the loop iterated several times
         }
     }
 }

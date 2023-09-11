@@ -396,13 +396,13 @@ blockStatementAttributes : attributes ;
 subStatement : block | statement ;
 
 statement
-    :   (ASSERT | EXPECT) (REGULAR_STRING COLON)? parExpression SEMICOLON			# expectStatement
-    |   IF parExpression subStatement (ELSE subStatement)?							# ifStatement
-    |   FOR OPEN_PARENS forControl CLOSE_PARENS subStatement						# forStatement
-    |   FOREACH OPEN_PARENS foreachControl CLOSE_PARENS subStatement				# foreachStatement
-    |   WHILE parExpression ( COLON elementPropertyList )? subStatement	            # whileStatement
-    |   DO subStatement WHILE parExpression SEMICOLON								# doWhileStatement
-    |	USING OPEN_PARENS usingExpression CLOSE_PARENS subStatement					# usingStatement
+    :   (ASSERT | EXPECT) (REGULAR_STRING COLON)? parExpression SEMICOLON			        # expectStatement
+    |   IF parExpression subStatement (ELSE subStatement)?							        # ifStatement
+    |   FOR OPEN_PARENS forControl CLOSE_PARENS ( COLON elementPropertyList )? subStatement	# forStatement
+    |   FOREACH OPEN_PARENS foreachControl CLOSE_PARENS subStatement				        # foreachStatement
+    |   WHILE parExpression ( COLON elementPropertyList )? subStatement	                    # whileStatement
+    |   DO subStatement WHILE parExpression SEMICOLON								        # doWhileStatement
+    |	USING OPEN_PARENS usingExpression CLOSE_PARENS subStatement					        # usingStatement
     //|   'try' block
     //    ( catches 'finally' block
     //    | catches
