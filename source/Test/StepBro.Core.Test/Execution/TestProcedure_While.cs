@@ -224,7 +224,6 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        [Ignore("Continue not implemented yet.")]
         public void TestProcedureWhileStatementContinue01()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
@@ -232,19 +231,22 @@ namespace StepBroCoreTest.Parser
                 int Func()
                 {
                     int i = 0;
+                    int output = 0;
                     while (i < 1000)
                     {
                         int a = 5;
 
                         if (i == 200)
                         {
+                            output += 5;
                             i += 15;
                             continue;
                         }
 
+                        output += a;
                         i += a;
                     }
-                    return i;
+                    return output;
                 }
                 """);
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);

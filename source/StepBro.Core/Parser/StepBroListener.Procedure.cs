@@ -542,11 +542,13 @@ namespace StepBro.Core.Parser
             }
 
             var breakLabel = Expression.Label();
+            var continueLabel = Expression.Label();
 
             var isBlockSub = (subStatements[0].Type == ProcedureParsingScope.ScopeType.Block);
             if (isBlockSub)
             {
                 breakLabel = forLoopScope.BreakLabel;
+                continueLabel = forLoopScope.ContinueLabel;
             }
 
             var statementExpressions = new List<Expression>();
@@ -664,29 +666,24 @@ namespace StepBro.Core.Parser
                 {
                     loopExpressions.Add(subStatementBlockCode);
                 }
-                
-                foreach (var expression in forUpdateExpressions)
-                {
-                    loopExpressions.Add(expression.ExpressionCode);
-                }
-                statementExpressions.Add(
-                    Expression.Loop(
-                        Expression.Block(loopExpressions),
-                        breakLabel,
-                        subStatements[0].ContinueLabel));
             }
             else // Only a single statement without {} around
             {
                 loopExpressions.Add(subStatements[0].GetOnlyStatementCode());
-                foreach (var expression in forUpdateExpressions)
-                {
-                    loopExpressions.Add(expression.ExpressionCode);
-                }
-                statementExpressions.Add(
-                    Expression.Loop(
-                        Expression.Block(loopExpressions),
-                        breakLabel));
             }
+
+            // Add the continue label we jump to in case of a "continue" statement
+            // right before the for update expressions, so the for loop still updates
+            // when we write continue;
+            loopExpressions.Add(Expression.Label(continueLabel));
+            foreach (var expression in forUpdateExpressions)
+            {
+                loopExpressions.Add(expression.ExpressionCode);
+            }
+            statementExpressions.Add(
+                Expression.Loop(
+                    Expression.Block(loopExpressions),
+                    breakLabel));
 
             List<ProcedureVariable> forVariables = forOuterScope.GetVariables();
             List<Expression> forLoopExpression = new List<Expression>();
@@ -735,11 +732,13 @@ namespace StepBro.Core.Parser
             }
 
             var breakLabel = Expression.Label();
+            var continueLabel = Expression.Label();
 
             var isBlockSub = (subStatements[0].Type == ProcedureParsingScope.ScopeType.Block);
             if (isBlockSub)
             {
                 breakLabel = whileScope.BreakLabel;
+                continueLabel = whileScope.ContinueLabel;
             }
 
             var statementExpressions = new List<Expression>();
@@ -846,7 +845,7 @@ namespace StepBro.Core.Parser
                     Expression.Loop(
                         subStatements[0].GetBlockCode(loopExpressions, null),
                         breakLabel,
-                        subStatements[0].ContinueLabel));
+                        continueLabel));
             }
             else
             {
@@ -854,7 +853,8 @@ namespace StepBro.Core.Parser
                 statementExpressions.Add(
                     Expression.Loop(
                         Expression.Block(loopExpressions),
-                        breakLabel));
+                        breakLabel,
+                        continueLabel));
             }
 
             m_scopeStack.Peek().AddStatementCode(statementExpressions.ToArray());
