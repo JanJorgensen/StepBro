@@ -542,11 +542,13 @@ namespace StepBro.Core.Parser
             }
 
             var breakLabel = Expression.Label();
+            var continueLabel = Expression.Label();
 
             var isBlockSub = (subStatements[0].Type == ProcedureParsingScope.ScopeType.Block);
             if (isBlockSub)
             {
                 breakLabel = forLoopScope.BreakLabel;
+                continueLabel = forLoopScope.ContinueLabel;
             }
 
             var statementExpressions = new List<Expression>();
@@ -673,7 +675,7 @@ namespace StepBro.Core.Parser
                     Expression.Loop(
                         Expression.Block(loopExpressions),
                         breakLabel,
-                        subStatements[0].ContinueLabel));
+                        continueLabel));
             }
             else // Only a single statement without {} around
             {
@@ -685,7 +687,8 @@ namespace StepBro.Core.Parser
                 statementExpressions.Add(
                     Expression.Loop(
                         Expression.Block(loopExpressions),
-                        breakLabel));
+                        breakLabel,
+                        continueLabel));
             }
 
             List<ProcedureVariable> forVariables = forOuterScope.GetVariables();
@@ -735,11 +738,13 @@ namespace StepBro.Core.Parser
             }
 
             var breakLabel = Expression.Label();
+            var continueLabel = Expression.Label();
 
             var isBlockSub = (subStatements[0].Type == ProcedureParsingScope.ScopeType.Block);
             if (isBlockSub)
             {
                 breakLabel = whileScope.BreakLabel;
+                continueLabel = whileScope.ContinueLabel;
             }
 
             var statementExpressions = new List<Expression>();
@@ -846,7 +851,7 @@ namespace StepBro.Core.Parser
                     Expression.Loop(
                         subStatements[0].GetBlockCode(loopExpressions, null),
                         breakLabel,
-                        subStatements[0].ContinueLabel));
+                        continueLabel));
             }
             else
             {
@@ -854,7 +859,8 @@ namespace StepBro.Core.Parser
                 statementExpressions.Add(
                     Expression.Loop(
                         Expression.Block(loopExpressions),
-                        breakLabel));
+                        breakLabel,
+                        continueLabel));
             }
 
             m_scopeStack.Peek().AddStatementCode(statementExpressions.ToArray());

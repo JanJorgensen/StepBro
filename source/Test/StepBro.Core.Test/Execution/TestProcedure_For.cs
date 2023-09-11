@@ -338,6 +338,39 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
+        public void TestProcedureForStatementWithBreak01()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 0;
+                    
+                    for (var i = 0; i < 100; i += 35)
+                    {
+                        output += 12;
+
+                        if (output == 12)
+                        {
+                            output++;
+                            break;
+                        }
+
+                        output += 5;
+                    }
+
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(13L, (long)result);
+        }
+
+        [TestMethod]
         public void TestProcedureForStatementWithinForStatement01()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
