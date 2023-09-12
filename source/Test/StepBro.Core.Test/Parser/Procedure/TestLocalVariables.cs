@@ -69,5 +69,132 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(8822L, ParseAndRun<long>("obj.PropInt", "DummyClass obj; obj.PropInt = 8822;", false, true));
             //Assert.AreEqual(8822L, ParseAndRun<long>("obj.PropInt", "var obj = DummyClass(); obj.PropInt = 8822;", false, true));     // TODO !!
         }
+
+        [TestMethod]
+        public void TestVarReAssignmentError01()
+        {
+            var result = Parse<long>("0", "int per = 0;\r\n bool per = true;", varGeneration: false);
+            Assert.AreEqual(1, result.Errors.ErrorCount);
+            Assert.AreEqual(3, result.Errors[0].Line);
+        }
+
+        [TestMethod]
+        public void TestVarReAssignmentError02()
+        {
+            var result = Parse<long>("0", "int per = 0;\r\n bool per = true;\r\n string per = \"test\";", varGeneration: false);
+            Assert.AreEqual(2, result.Errors.ErrorCount);
+            Assert.AreEqual(3, result.Errors[0].Line);
+            Assert.AreEqual(4, result.Errors[1].Line);
+        }
+
+        [TestMethod]
+        public void TestVarReAssignmentError03()
+        {
+            var proc = FileBuilder.ParseProcedure(
+                """
+                int Func()
+                {
+                    int per = 0;
+                    bool per = true;
+                    return 0;
+                }
+                """);
+
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            Assert.AreEqual(1, FileBuilder.LastInstance.Errors.ErrorCount);
+            Assert.AreEqual(4, FileBuilder.LastInstance.Errors[0].Line);
+        }
+
+        [TestMethod]
+        public void TestVarReDeclarationError01()
+        {
+            var proc = FileBuilder.ParseProcedure(
+                """
+                int Func()
+                {
+                    int per = 0;
+                    bool per;
+                    return 0;
+                }
+                """);
+
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            Assert.AreEqual(1, FileBuilder.LastInstance.Errors.ErrorCount);
+            Assert.AreEqual(4, FileBuilder.LastInstance.Errors[0].Line);
+        }
+
+        [TestMethod]
+        public void TestVarReDeclarationNoError01()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    int a = 5;
+                    if (a == 5)
+                    {
+                        int per = 7;
+                        a = per;
+                    }
+                    else
+                    {
+                        bool per = true;
+                        if (per == true)
+                        {
+                            a = 2;
+                        }
+                        else
+                        {
+                            a = 0;
+                        }
+                    }
+                    return a;
+                }
+                """);
+
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsTrue(result.GetType() == typeof(long));
+            Assert.AreEqual(7, (long)result);
+        }
+
+        [TestMethod]
+        public void TestVarReDeclarationNoError02()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    int a = 4;
+                    if (a == 5)
+                    {
+                        int per = 7;
+                        a = per;
+                    }
+                    else
+                    {
+                        bool per = true;
+                        if (per == true)
+                        {
+                            a = 2;
+                        }
+                        else
+                        {
+                            a = 0;
+                        }
+                    }
+                    return a;
+                }
+                """);
+
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsTrue(result.GetType() == typeof(long));
+            Assert.AreEqual(2, (long)result);
+        }
     }
 }

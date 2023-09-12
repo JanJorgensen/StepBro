@@ -1,12 +1,8 @@
 ﻿using Antlr4.Runtime.Misc;
-using StepBro.Core.Api;
 using StepBro.Core.Data;
-using StepBro.Core.Execution;
-using StepBro.Core.ScriptData;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
@@ -171,11 +167,23 @@ namespace StepBro.Core.Parser
                         }
                     }
                 }
-                m_variables.Add(
-                    new VariableData(
-                        m_variableName,
-                        m_variableType,
-                        m_variableInitializer));
+
+                if (ResolveQualifiedIdentifier(m_variableName, true).IsUnknownIdentifier)
+                {
+                    m_variables.Add(
+                        new VariableData(
+                            m_variableName,
+                            m_variableType,
+                            m_variableInitializer));
+                }
+                else
+                {
+                    m_errors.SymanticError(
+                        context.Start.Line, 
+                        context.Start.Column, 
+                        false,
+                        "Illegal to declare variable with same name as another variable or other type of element in the same scope.");
+                }
                 m_variableName = null;
                 m_variableInitializer = null;
             }
