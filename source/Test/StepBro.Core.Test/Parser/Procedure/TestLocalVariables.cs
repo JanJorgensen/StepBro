@@ -162,7 +162,7 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        public void TestVarReDeclarationNoError03()
+        public void TestVarReDeclarationNoError02()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 """
