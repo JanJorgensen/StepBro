@@ -181,8 +181,8 @@ namespace StepBro.Core.Parser
                     m_errors.SymanticError(
                         context.Start.Line, 
                         context.Start.Column, 
-                        false, 
-                        "Illegal to declare variable with same name as another variable in the same scope.");
+                        false,
+                        "Illegal to declare variable with same name as another variable or other type of element in the same scope.");
                 }
                 m_variableName = null;
                 m_variableInitializer = null;
