@@ -265,15 +265,8 @@ namespace StepBro.Core.Execution
             //bool sleep = false;
             do
             {
-                var result = reader.Find(null, comparer, true);
-                if (result != null)
-                {
-                    if (removeFound)
-                    {
-                        reader.Next();
-                    }
-                    return result;
-                }
+                // If there isn't anything in the reader right now
+                // we wait 50ms to see if anything shows up
                 lock (reader.Sync)
                 {
                     if (reader.Current == null)
@@ -281,8 +274,33 @@ namespace StepBro.Core.Execution
                         Monitor.Wait(reader.Sync, 50);
                     }
                 }
-                //sleep = true;
-            } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero);
+
+                // We look for the string we want to find
+                var result = reader.Find(null, comparer, true);
+
+                // If the string was found
+                if (result != null)
+                {
+
+                    // We take the timestamp of the found string
+                    DateTime foundTimeStamp = reader.Current.Timestamp;
+
+                    if (removeFound)
+                    {
+                        reader.Next();
+                    }
+
+                    // We check if the time stamp is within the allowed time
+                    if (foundTimeStamp <= to)
+                    {
+                        return result;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
 
             if (context != null)
             {
