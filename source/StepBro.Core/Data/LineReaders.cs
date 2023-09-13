@@ -20,7 +20,6 @@ namespace StepBro.Core.Data
         private readonly List<string> m_list;
         private int m_index;
         private EntryWrapper m_current;
-        private EntryWrapper m_previous;
 
         public StringListLineReader(List<string> list, INameable source = null)
         {
@@ -43,7 +42,6 @@ namespace StepBro.Core.Data
                 return m_current;
             }
         }
-
         public bool LinesHaveTimestamp { get { return false; } }
 
         public bool HasMore { get { return (m_index < (m_list.Count - 1)); } }
