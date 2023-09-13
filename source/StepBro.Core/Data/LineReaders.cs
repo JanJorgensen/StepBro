@@ -20,11 +20,13 @@ namespace StepBro.Core.Data
         private readonly List<string> m_list;
         private int m_index;
         private EntryWrapper m_current;
+        private bool m_first = true;
 
         public StringListLineReader(List<string> list, INameable source = null)
         {
             m_list = list;
             m_index = (m_list.Count > 0) ? 0 : -1;
+            m_first = true;
             this.Source = source;
         }
 
@@ -80,7 +82,11 @@ namespace StepBro.Core.Data
 
         public bool NextUnlessNewEntry()
         {
-            return Next(); // Next works the same as NextUnlessNewEntry for this line reader
+            if (!m_first)
+                return Next(); // Next works the same as NextUnlessNewEntry for this line reader - Except for the very first
+            else
+                m_first = false;
+            return false;
         }
 
         public IEnumerable<ILineReaderEntry> Peak()
