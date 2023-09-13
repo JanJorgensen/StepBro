@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using StepBro.Core;
+using StepBro.Core.Addons;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Data.Report;
@@ -181,15 +182,26 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static void SaveAsPlainText(this DataReport report, string filepath)
+        public static void Save(this DataReport report, string format, string filepath)
         {
-            throw new NotImplementedException();
-        }
-
-        [Public]
-        public static void SaveAsHtml(this DataReport report, string filepath)
-        {
-            throw new NotImplementedException();
+            var addon = StepBro.Core.Main.GetService<Core.Api.IAddonManager>().TryGetAddon<IOutputFormatterTypeAddon>(format);
+            if (addon != null)
+            {
+                if (addon.FormatterType == OutputType.Text)
+                {
+                    //var formatter = addon.Create(false, writer);
+                }
+                throw new NotImplementedException();
+            }
+            else
+            {
+                throw new NotImplementedException();
+                //ConsoleWriteErrorLine("Error: Output format \'" + selectedOutputAddon + "\' was not found.");
+                //var available = String.Join(", ", StepBroMain.GetService<Core.Api.IAddonManager>().Addons.Where(a => a is IOutputFormatterTypeAddon).Select(a => a.ShortName));
+                //ConsoleWriteErrorLine("    Available options: " + available);
+                //retval = -1;
+                //throw new ExitException();
+            }
         }
 
         #region LineReader

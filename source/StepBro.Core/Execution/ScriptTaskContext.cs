@@ -18,6 +18,7 @@ namespace StepBro.Core.Execution
         private RuntimeErrorListener m_errorListener = null;
         private Exception m_executionException = null;
         private ProcedureResult m_result = null;
+        private DataReport m_dataReport = null;
 
         public void Setup(
             ILoggerScope logger, 
@@ -59,6 +60,7 @@ namespace StepBro.Core.Execution
                 invokeArguments[0] = context;
                 m_value = runtimeProcedure.DynamicInvoke(invokeArguments);
                 m_result = context.Result;
+                m_dataReport = context.TryGetReport();
                 return m_value;
             }
             catch (Exception)
@@ -104,5 +106,7 @@ namespace StepBro.Core.Execution
         public Exception ExecutionExeception { get { return m_executionException; } }
 
         public ILoadedFilesManager LoadedFilesManager { get { return m_loadedFilesManager; } }
+
+        public DataReport Report { get { return m_dataReport; } }
     }
 }

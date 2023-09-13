@@ -18,7 +18,7 @@ namespace StepBro.Core.Data.Report
             m_procedureResults.Add(new Tuple<string, ProcedureResult>(reference, result));
         }
 
-        public IEnumerable<Tuple<string, ProcedureResult>> GetResults()
+        public IEnumerable<Tuple<string, ProcedureResult>> ListResults()
         {
             foreach (var r in m_procedureResults) 
             { 

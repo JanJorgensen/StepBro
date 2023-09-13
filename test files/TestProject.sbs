@@ -32,6 +32,10 @@ procedure void FirstTestCase() : TestCase
 
 procedure void SecondTestCase() : TestCase
 {
+    step "Init";
+    log("Some initialization");
+
+    step "Test";
     ReportMeasurement("Temperature", "#1", "degC", 982.5);
 }
 

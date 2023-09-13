@@ -29,7 +29,7 @@ namespace StepBro.Core.Execution
             m_taskManager = manager.Get<TaskManager>();
         }
 
-        public IExecutionResult ExecuteFileElement(
+        public IScriptExecution ExecuteFileElement(
             IFileElement element,
             IPartner partner,
             params object[] arguments)
@@ -39,7 +39,7 @@ namespace StepBro.Core.Execution
             var exeTask = (ScriptExecutionTask)CreateFileElementExecution(element, partner, arguments);
             exeTask.ExecuteSynchronous();
 
-            return exeTask.Result;
+            return exeTask;
         }
 
         public IScriptExecution CreateFileElementExecution(

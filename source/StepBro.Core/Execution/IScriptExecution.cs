@@ -14,5 +14,6 @@ namespace StepBro.Core.Execution
         void StartExecution();
         ITaskControl Task { get; }
         IExecutionResult Result { get; }
+        DataReport Report { get; }
     }
 }

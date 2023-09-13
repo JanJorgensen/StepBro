@@ -19,8 +19,7 @@ namespace StepBro.Core.Addons
     public interface IOutputFormatterTypeAddon : IAddon
     {
         OutputType FormatterType { get; }
-        IOutputFormatter Create();
-        IOutputFormatter Create(ITextWriter writer);
+        IOutputFormatter Create(bool createHighLevelLogSections, ITextWriter writer = null);
     }
 
     public interface IOutputFormatter
@@ -30,6 +29,13 @@ namespace StepBro.Core.Addons
         /// </summary>
         /// <param name="entry">The log entry to create a textual representation for.</param>
         /// <param name="zero">The start time for the returned relatime time stamp.</param>
-        void LogEntry(LogEntry entry, DateTime zero);
+        /// <returns>Whether the entry was actually printed.</returns>
+        bool WriteLogEntry(LogEntry entry, DateTime zero);
+
+        /// <summary>
+        /// Create a complete textual report.
+        /// </summary>
+        /// <param name="report">The report data.</param>
+        void WriteReport(DataReport report);
     }
 }
