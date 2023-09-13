@@ -16,6 +16,7 @@ namespace StepBro.Core
     [Public]
     public class DataReport : IScriptDisposable
     {
+        private static List<DataReport> m_savedReports = new List<DataReport>();
         private bool m_isDisposed = false;
         private bool m_isOpen = true;
         private readonly string m_type;
@@ -34,6 +35,14 @@ namespace StepBro.Core
 
         public string Type { get { return m_type; } }
         public string Title { get { return m_title; } }
+
+        public IEnumerable<ReportGroup> ListGroups()
+        {
+            foreach (var g in m_groups)
+            {
+                yield return g;
+            }
+        }
 
         public IEnumerable<ReportData> ListData()
         {
@@ -82,6 +91,7 @@ namespace StepBro.Core
             ILogEntry logStart = null;
             if (context != null && context.Logger is LoggerScope)
             {
+                if (description == null) description = "";
                 logStart = context.Logger.Log($"Starting report group \"{name}\". {description}");
             }
             m_currentGroup = new ReportGroup(name, description, (LogEntry)logStart);
@@ -124,7 +134,7 @@ namespace StepBro.Core
                 sb.Append("'");
                 if (!String.IsNullOrEmpty(instance))
                 {
-                    sb.Append(", ");
+                    sb.Append(" - ");
                     sb.Append(instance);
                 }
                 sb.Append(": ");
@@ -167,10 +177,10 @@ namespace StepBro.Core
                     }
                 }
 
-                if (m_summary != null && m_summary.GetResults().Any())
+                if (m_summary != null && m_summary.ListResults().Any())
                 {
                     logger.Log("Summary");
-                    foreach (var r in m_summary.GetResults())
+                    foreach (var r in m_summary.ListResults())
                     {
                         logger.Log("        " +  r.Item1 + " - " + r.Item2.ToString(r.Item2.Verdict > Verdict.Pass));
                     }

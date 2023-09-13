@@ -8,7 +8,7 @@ namespace StepBro.Core.Addons
     [Public]
     public class OutputSimpleCleartextAddon : IOutputFormatterTypeAddon
     {
-        static public string Name {  get { return "SimpleCleartext"; } } 
+        static public string Name { get { return "SimpleCleartext"; } }
 
         public string ShortName { get { return Name; } }
 
@@ -23,9 +23,16 @@ namespace StepBro.Core.Addons
             throw new NotImplementedException();
         }
 
-        public IOutputFormatter Create(ITextWriter writer)
+        public IOutputFormatter Create(bool createHighLevelLogSections, ITextWriter writer = null)
         {
-            return new Outputter(writer);
+            if (writer != null)
+            {
+                return new Outputter(writer);
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
         }
 
         private class Outputter : IOutputFormatter
@@ -35,9 +42,20 @@ namespace StepBro.Core.Addons
             {
                 m_writer = writer;
             }
-            public void LogEntry(LogEntry entry, DateTime zero)
+            public bool WriteLogEntry(LogEntry entry, DateTime zero)
             {
-                m_writer.WriteLine(entry.ToClearText(zero, false));
+                var line = entry.ToClearText(zero, false);
+                if (line != null)
+                {
+                    m_writer.WriteLine(line);
+                    return true;
+                }
+                return false;
+            }
+
+            public void WriteReport(DataReport report)
+            {
+                throw new NotImplementedException();
             }
         }
     }

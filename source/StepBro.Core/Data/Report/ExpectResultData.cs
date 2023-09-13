@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace StepBro.Core.Data.Report
 {
@@ -25,5 +26,31 @@ namespace StepBro.Core.Data.Report
         public string Expected { get { return m_expected; } }
         public string Actual { get { return m_actual; } }
         public Verdict Verdict { get { return m_verdict; } }
+
+        public override string ToString()
+        {
+            return String.Format("Expect " + this.FormatString());
+        }
+
+        public string FormatString()
+        {
+            StringBuilder sb = new StringBuilder();
+            if (!String.IsNullOrEmpty(m_id))
+            {
+                sb.Append(m_id);
+                sb.Append(" at ");
+            }
+            sb.Append(m_location);
+            sb.Append(": ");
+            sb.Append(m_verdict);
+            sb.Append(", ");
+            sb.Append(m_expected);
+            if (!String.IsNullOrEmpty(m_actual))
+            {
+                sb.Append(", ");
+                sb.Append(m_actual);
+            }
+            return sb.ToString();
+        }
     }
 }

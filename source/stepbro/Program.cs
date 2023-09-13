@@ -45,8 +45,8 @@ namespace StepBro.Cmd
         private static bool m_activitiesRunning = false;
         private static bool m_dumpingExecutionLog = false;
         private static bool m_dumpBufferedConsoleOutput = false;
-        private static IOutputFormatterTypeAddon m_logDumpAddon = null;
-        private static IOutputFormatter m_logDumpFormatter = null;
+        private static IOutputFormatterTypeAddon m_outputAddon = null;
+        private static IOutputFormatter m_outputFormatter = null;
         private static List<Tuple<bool, string>> m_bufferedOutput = new List<Tuple<bool, string>>();
         //Queue<Tuple<Action<object>, object>> m_commandQueue = new Queue<Tuple<Action<object>, object>>();
         private static Mode m_mode = Mode.RunThrough;
@@ -56,7 +56,8 @@ namespace StepBro.Cmd
         {
             IService m_hostService = null;
             m_hostAccess = new HostAccess(out m_hostService);
-            var selectedLogDumpAddon = OutputConsoleWithColorsAddon.Name;
+            var selectedOutputAddon = OutputConsoleWithColorsAddon.Name;
+            DataReport createdReport = null;
 
             try
             {
@@ -100,21 +101,31 @@ namespace StepBro.Cmd
                 {
                     m_commandLineOptions.TraceToConsole = true;
                 }
+
+                // In case the obsolete option is used.
                 if (!String.IsNullOrEmpty(m_commandLineOptions.LogFormat))
                 {
-                    selectedLogDumpAddon = m_commandLineOptions.LogFormat;
-                    m_commandLineOptions.TraceToConsole = true;
+                    m_commandLineOptions.OutputFormat = m_commandLineOptions.LogFormat;
+                }
+                if (!String.IsNullOrEmpty(m_commandLineOptions.OutputFormat))
+                {
+                    selectedOutputAddon = m_commandLineOptions.OutputFormat;
+                    if (!m_commandLineOptions.PrintReport)
+                    {
+                        m_commandLineOptions.TraceToConsole = true;     // If report output is not enabled, the idea MUST be to output the execution log.
+                    }
                 }
 
-                m_logDumpAddon = StepBroMain.GetService<Core.Api.IAddonManager>().TryGetAddon<IOutputFormatterTypeAddon>(selectedLogDumpAddon);
-                if (m_logDumpAddon == null)
+                m_outputAddon = StepBroMain.GetService<Core.Api.IAddonManager>().TryGetAddon<IOutputFormatterTypeAddon>(selectedOutputAddon);
+                if (m_outputAddon == null)
                 {
-                    ConsoleWriteErrorLine("Error: Log dump format (addon) \'" + selectedLogDumpAddon + "\' was found.");
+                    ConsoleWriteErrorLine("Error: Output format \'" + selectedOutputAddon + "\' was not found.");
+                    var available = String.Join(", ", StepBroMain.GetService<Core.Api.IAddonManager>().Addons.Where(a => a is IOutputFormatterTypeAddon).Select(a => a.ShortName));
+                    ConsoleWriteErrorLine("    Available options: " + available);
                     retval = -1;
                     throw new ExitException();
                 }
-                m_logDumpFormatter = m_logDumpAddon.Create();
-                //m_logDumpFormatter = new OutputConsoleWithColorsAddon.TextToConsoleFormatter(m_logDumpAddon);
+                m_outputFormatter = m_outputAddon.Create(createHighLevelLogSections: true);
 
                 if (m_commandLineOptions.Verbose)
                 {
@@ -271,88 +282,18 @@ namespace StepBro.Cmd
                                     List<object> arguments = m_commandLineOptions?.Arguments.Select(
                                         (a) => StepBroMain.ParseExpression(element?.ParentFile, a)).ToList();
 
+                                    IFileProcedure procedure = null;
+
                                     if (!String.IsNullOrEmpty(m_commandLineOptions.Model))
                                     {
                                         var partner = element.ListPartners().First(p => String.Equals(m_commandLineOptions.Model, p.Name, StringComparison.InvariantCultureIgnoreCase));
                                         if (partner != null)
                                         {
-                                            var procedure = partner.ProcedureReference;
+                                            procedure = partner.ProcedureReference;
                                             if (procedure.IsFirstParameterThisReference)
                                             {
-                                                arguments.Insert(0, element);
+                                                arguments.Insert(0, element);   // TODO: Parser should check whether the 'this' parameter is the correct type.
                                             }
-                                            try
-                                            {
-                                                // Start logging now.
-                                                if (m_commandLineOptions.TraceToConsole)
-                                                {
-                                                    m_dumpingExecutionLog = true;
-                                                    var logTask = new Task(() => LogDumpTask());
-                                                    logTask.Start();
-                                                }
-
-                                                var result = StepBroMain.ExecuteProcedure(procedure, arguments.ToArray());
-
-                                                if (result != null)
-                                                {
-                                                    if (m_commandLineOptions.ExitCode == ExitValueOption.SubVerdict)
-                                                    {
-                                                        switch (result.ProcedureResult.Verdict)
-                                                        {
-                                                            case Verdict.Unset:
-                                                            case Verdict.Pass:
-                                                                break;
-                                                            case Verdict.Inconclusive:
-                                                            case Verdict.Fail:
-                                                            case Verdict.Abandoned:
-                                                                retval = 1;
-                                                                break;
-                                                            case Verdict.Error:
-                                                                retval = -1;
-                                                                break;
-                                                        }
-                                                    }
-                                                    else if (m_commandLineOptions.ExitCode == ExitValueOption.Verdict)
-                                                    {
-                                                        switch (result.ProcedureResult.Verdict)
-                                                        {
-                                                            case Verdict.Unset:
-                                                            case Verdict.Pass:
-                                                                break;
-                                                            case Verdict.Inconclusive:
-                                                            case Verdict.Fail:
-                                                            case Verdict.Abandoned:
-                                                                retval = 1;
-                                                                break;
-                                                            case Verdict.Error:
-                                                                retval = -1;
-                                                                break;
-                                                        }
-                                                    }
-                                                    else if (m_commandLineOptions.ExitCode == ExitValueOption.ReturnValue)
-                                                    {
-                                                        if (procedure.ReturnType == TypeReference.TypeInt64)
-                                                        {
-                                                            retval = (Int32)(Int64)result.ReturnValue;
-                                                        }
-                                                    }
-
-                                                    if (m_commandLineOptions.Verbose)
-                                                    {
-                                                        ConsoleWriteLine("Procedure execution ended. " + result.ResultText());
-                                                    }
-                                                    else
-                                                    {
-                                                        ConsoleWriteLine("Procedure execution ended.");
-                                                    }
-                                                }
-                                            }
-                                            catch (TargetParameterCountException)
-                                            {
-                                                retval = -1;
-                                                ConsoleWriteErrorLine("Error: The number of arguments does not match the target procedure.");
-                                            }
-
                                         }
                                         else
                                         {
@@ -364,39 +305,34 @@ namespace StepBro.Cmd
                                     {
                                         if (element is IFileProcedure)
                                         {
-                                            var procedure = element as IFileProcedure;
-                                            try
+                                            procedure = element as IFileProcedure;
+                                        }
+                                        else
+                                        {
+                                            retval = -1;
+                                            ConsoleWriteErrorLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
+                                        }
+                                    }
+
+                                    if (procedure != null)
+                                    {
+                                        try
+                                        {
+                                            // Start logging now.
+                                            if (m_commandLineOptions.TraceToConsole)
                                             {
-                                                // Start logging now.
-                                                if (m_commandLineOptions.TraceToConsole)
-                                                {
-                                                    m_dumpingExecutionLog = true;
-                                                    var logTask = new Task(() => LogDumpTask());
-                                                    logTask.Start();
-                                                }
+                                                m_dumpingExecutionLog = true;
+                                                var logTask = new Task(() => LogDumpTask());
+                                                logTask.Start();
+                                            }
 
-                                                var result = StepBroMain.ExecuteProcedure(procedure, arguments.ToArray());
+                                            var execution = StepBroMain.ExecuteProcedure(procedure, arguments.ToArray());
+                                            var result = execution.Result;
+                                            createdReport = execution.Report;
 
-                                                if (m_commandLineOptions.Verbose)
-                                                {
-                                                    if (result != null)
-                                                    {
-                                                        ConsoleWriteLine("Procedure execution ended. " + result.ResultText());
-                                                    }
-                                                    else
-                                                    {
-                                                        ConsoleWriteLine("Procedure execution ended.");
-                                                    }
-                                                }
-                                                else if (m_commandLineOptions.ExitCode == ExitValueOption.ReturnValue)
-                                                {
-                                                    if (procedure.ReturnType == TypeReference.TypeInt64)
-                                                    {
-                                                        retval = (Int32)(Int64)result.ReturnValue;
-                                                    }
-                                                }
-
-                                                if (m_commandLineOptions.ExitCode == ExitValueOption.Verdict)
+                                            if (result != null)
+                                            {
+                                                if (m_commandLineOptions.ExitCode == ExitValueOption.SubVerdict)
                                                 {
                                                     switch (result.ProcedureResult.Verdict)
                                                     {
@@ -413,17 +349,48 @@ namespace StepBro.Cmd
                                                             break;
                                                     }
                                                 }
-                                            }
-                                            catch (TargetParameterCountException)
-                                            {
-                                                retval = -1;
-                                                ConsoleWriteErrorLine("Error: The number of arguments does not match the target procedure.");
+                                                else if (m_commandLineOptions.ExitCode == ExitValueOption.Verdict)
+                                                {
+                                                    switch (result.ProcedureResult.Verdict)
+                                                    {
+                                                        case Verdict.Unset:
+                                                        case Verdict.Pass:
+                                                            break;
+                                                        case Verdict.Inconclusive:
+                                                        case Verdict.Fail:
+                                                        case Verdict.Abandoned:
+                                                            retval = 1;
+                                                            break;
+                                                        case Verdict.Error:
+                                                            retval = -1;
+                                                            break;
+                                                    }
+                                                }
+                                                else if (m_commandLineOptions.ExitCode == ExitValueOption.ReturnValue)
+                                                {
+                                                    if (procedure.ReturnType == TypeReference.TypeInt64)
+                                                    {
+                                                        retval = (Int32)(Int64)result.ReturnValue;
+                                                    }
+                                                }
+
+                                                if (m_commandLineOptions.Verbose)
+                                                {
+                                                    ConsoleWriteLine("Procedure execution ended. " + result.ResultText());
+                                                }
+                                                else
+                                                {
+                                                    if (!m_commandLineOptions.PrintReport)
+                                                    {
+                                                        ConsoleWriteLine("Procedure execution ended.");
+                                                    }
+                                                }
                                             }
                                         }
-                                        else
+                                        catch (TargetParameterCountException)
                                         {
                                             retval = -1;
-                                            ConsoleWriteErrorLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
+                                            ConsoleWriteErrorLine("Error: The number of arguments does not match the target procedure.");
                                         }
                                     }
                                 }
@@ -516,22 +483,26 @@ namespace StepBro.Cmd
                 ConsoleWriteErrorLine($"Error: {ex.GetType().Name}, {ex.Message}");
                 retval = -1;
             }
-            finally
-            {
-                m_activitiesRunning = false;
-                while (m_dumpingExecutionLog)
-                {
-                    System.Threading.Thread.Sleep(50);
-                }
-                FlushBufferedConsoleOutput();
-                if (m_commandLineOptions.Debugging)
-                {
-                    DebugLogUtils.DumpToFile();
-                    ConsoleWriteLine($"Internal Debug Log saved in {DebugLogUtils.DumpFilePath}");
-                }
 
-                StepBroMain.Deinitialize();
+            m_activitiesRunning = false;
+            while (m_dumpingExecutionLog)
+            {
+                System.Threading.Thread.Sleep(50);
             }
+            FlushBufferedConsoleOutput();
+
+            if (m_commandLineOptions.PrintReport && createdReport != null)
+            {
+                m_outputFormatter.WriteReport(createdReport);
+            }
+
+            if (m_commandLineOptions.Debugging)
+            {
+                DebugLogUtils.DumpToFile();
+                ConsoleWriteLine($"Internal Debug Log saved in {DebugLogUtils.DumpFilePath}");
+            }
+
+            StepBroMain.Deinitialize();
 
             if (m_commandLineOptions.AwaitKeypress)
             {
@@ -596,7 +567,7 @@ namespace StepBro.Cmd
             var zero = logEntry.Timestamp;
             while (logEntry != null || m_activitiesRunning)
             {
-                m_logDumpFormatter.LogEntry(logEntry, zero);
+                m_outputFormatter.WriteLogEntry(logEntry, zero);
 
                 // Wait until log is empty and there is no running execution.
                 while (logEntry.Next == null && m_activitiesRunning == true)

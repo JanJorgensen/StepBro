@@ -4,7 +4,7 @@ namespace StepBro.Core.Execution
 {
     public interface IScriptExecutionManager
     {
-        IExecutionResult ExecuteFileElement(
+        IScriptExecution ExecuteFileElement(
             //ScriptExecutionConfiguration configuration,
             IFileElement element,
             IPartner partner,

@@ -183,46 +183,44 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
     if (passedPreTest)
     {
         var iterator = suite.GetProcedureIterator();
-        using (testReport)
+
+        // TODO: Save setup data in report
+        // TODO: Save test suite data in report
+
+        var summary = testReport.CreateTestSummary();
+
+        while (iterator.GetNext())
         {
-            // TODO: Save setup data in report
-            // TODO: Save test suite data in report
+            TestCase testcase = iterator.Procedure as TestCase;
+            testReport.StartGroup("Testcase " + testcase.Name, "<description of testcase>");
+            // TODO: Save test case data in report
+            log ("Starting Test: " + testcase.Name);
 
-            var summary = testReport.CreateTestSummary();
+            testReport.AddSection("Setup", "");
+            NextProcedureIsHighLevel("SETUP");
+            testcase.Setup();
+            var result = this.LastCallResult;
 
-            while (iterator.GetNext())
+            if (result.Verdict < fail)  // Only run the test if the setup succeeded.
             {
-                TestCase testcase = iterator.Procedure as TestCase;
-                testReport.StartGroup("Testcase " + testcase.Name, "<description of testcase>");
-                // TODO: Save test case data in report
-                log ("Starting Test: " + testcase.Name);
-
-                testReport.AddSection("Setup", "");
-                NextProcedureIsHighLevel("SETUP");
-                testcase.Setup();
-                var result = this.LastCallResult;
-
-                if (result.Verdict < fail)  // Only run the test if the setup succeeded.
-                {
-                    testReport.AddSection("Test", "");
-                    NextProcedureIsHighLevel("TEST");
-                    iterator.Procedure( iterator.Arguments );
-                    result = result.SelectIfWorse(this.LastCallResult);
-                }
-
-                testReport.AddSection("Cleanup", "");
-                NextProcedureIsHighLevel("CLEANUP");
-                testcase.Cleanup();
+                testReport.AddSection("Test", "");
+                NextProcedureIsHighLevel("TEST");
+                iterator.Procedure( iterator.Arguments );
                 result = result.SelectIfWorse(this.LastCallResult);
-
-                summary.AddResult(testcase.Name, result);
             }
-            testReport.Close();
-            testReport.DumpToLog();
-            // TODO: Save report in selected format in the selected location (file or URL). Selection taken from configuration file.
 
-            this.SetResult(summary.GetResultVerdict(), summary.GetResultDescription());     // Keep this as the last statement; if there were any failed tests, the procedure will exit after this statement.
+            testReport.AddSection("Cleanup", "");
+            NextProcedureIsHighLevel("CLEANUP");
+            testcase.Cleanup();
+            result = result.SelectIfWorse(this.LastCallResult);
+
+            summary.AddResult(testcase.Name, result);
         }
+        testReport.Close();     // Close the report, but don't remove it; the report might be printed or saved by the host application.
+        //testReport.DumpToLog();
+        // TODO: Save report in selected format in the selected location (file or URL). Selection taken from configuration file.
+
+        this.SetResult(summary.GetResultVerdict(), summary.GetResultDescription());     // Keep this as the last statement; if there were any failed tests, the procedure will exit after this statement.
     }
 }
 

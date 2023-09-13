@@ -18,8 +18,12 @@ namespace StepBro.Core.Addons
 
         public OutputType FormatterType { get { return OutputType.Console; } }
 
-        public IOutputFormatter Create()
+        public IOutputFormatter Create(bool createHighLevelLogSections, ITextWriter writer = null)
         {
+            if (writer != null)
+            {
+                throw new NotSupportedException();
+            }
             return new TextToConsoleFormatter();
         }
 
@@ -34,7 +38,7 @@ namespace StepBro.Core.Addons
             {
             }
 
-            public void LogEntry(LogEntry entry, DateTime zero)
+            public bool WriteLogEntry(LogEntry entry, DateTime zero)
             {
                 var txt = entry.ToClearText(zero, false, false);
                 if (txt != null)
@@ -72,7 +76,14 @@ namespace StepBro.Core.Addons
                     }
                     Console.WriteLine(txt);
                     Console.ForegroundColor = ConsoleColor.White;
+                    return true;
                 }
+                return false;
+            }
+
+            public void WriteReport(DataReport report)
+            {
+                throw new NotImplementedException();
             }
 
             void ITextWriter.Write(string text)

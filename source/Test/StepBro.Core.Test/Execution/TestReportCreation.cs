@@ -50,7 +50,18 @@ namespace StepBroCoreTest.Execution
         public void CreateReportWithinUsing()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
-                "DataReport Func(){ DataReport result = null; using ( var r = StartReport(\"daType\", \"Test#9\")) { expect (5 > 4); result = r; } return result; }");
+                """
+                    DataReport Func()
+                    { 
+                        DataReport result = null; 
+                        using ( var r = StartReport("daType", "Test#9")) 
+                        { 
+                            expect (5 > 4); 
+                            result = r; 
+                        } 
+                        return result;
+                    }
+                """);
 
             Assert.AreEqual(typeof(DataReport), proc.ReturnType.Type);
             Assert.AreEqual(0, proc.Parameters.Length);

@@ -32,6 +32,7 @@ namespace StepBro.Core.Data.Report
 
         public void AddData(ReportData data)
         {
+            if (m_isLocked) throw new InvalidOperationException("The report group is locked/closed.");
             m_data.Add(data);
         }
 

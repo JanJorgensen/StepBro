@@ -22,7 +22,7 @@ namespace StepBro.Core.Api
 
         Type TryGetType(IEnumerable<UsingData> usings, string name);
 
-        IEnumerable<IAddon> GetAddons { get; }
+        IEnumerable<IAddon> Addons { get; }
 
         T TryGetAddon<T>(string name) where T : class, IAddon;
 

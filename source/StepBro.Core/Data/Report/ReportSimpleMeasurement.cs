@@ -31,7 +31,29 @@ namespace StepBro.Core.Data.Report
 
         public override string ToString()
         {
-            return String.Format("Measurement '{0}': {1}", this.ID, StringUtils.ObjectToString(this.Value));
+            return String.Format("Measurement " + this.FormatString());
+        }
+
+        public string FormatString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("'");
+            sb.Append(m_id);
+            sb.Append("'");
+            if (!String.IsNullOrEmpty(m_instance))
+            {
+                sb.Append(" - ");
+                sb.Append(m_instance);
+            }
+            sb.Append(": ");
+            sb.Append(StringUtils.ObjectToString(this.Value));
+            if (!String.IsNullOrEmpty(m_unit))
+            {
+                sb.Append(" [");
+                sb.Append(m_unit);
+                sb.Append("]");
+            }
+            return sb.ToString();
         }
     }
 }

@@ -388,7 +388,7 @@ namespace StepBro.Core
             return null;
         }
 
-        public static IExecutionResult ExecuteProcedure(IFileProcedure procedure, params object[] arguments)
+        public static IScriptExecution ExecuteProcedure(IFileProcedure procedure, params object[] arguments)
         {
             return m_scriptExecutionManager.ExecuteFileElement(procedure, null, arguments);
         }

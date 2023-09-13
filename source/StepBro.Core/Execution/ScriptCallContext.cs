@@ -585,7 +585,7 @@ namespace StepBro.Core.Execution
         {
             get
             {
-                return new ProcedureResult(m_procedure.FullName, m_verdict, m_failureLine, m_failureDescription, m_failureID, m_startTime, m_endTime);
+                return new ProcedureResult(m_procedure.FullName, m_failureLine, m_currentTestStepTitle, m_verdict, m_failureDescription, m_failureID, m_startTime, m_endTime);
             }
         }
 

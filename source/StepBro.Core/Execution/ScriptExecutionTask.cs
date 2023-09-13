@@ -28,6 +28,7 @@ namespace StepBro.Core.Execution
 
         public ITaskControl Task { get { return this as ITaskControl; } }
         public IExecutionResult Result { get { return this as IExecutionResult; } }
+        public DataReport Report { get { return m_taskContext?.Report; } }
 
         TaskExecutionState ITaskControl.CurrentState { get { return m_currentState; } }
 

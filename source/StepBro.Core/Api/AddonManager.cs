@@ -344,7 +344,7 @@ namespace StepBro.Core.Api
             }
         }
 
-        public IEnumerable<IAddon> GetAddons
+        public IEnumerable<IAddon> Addons
         {
             get
             {
