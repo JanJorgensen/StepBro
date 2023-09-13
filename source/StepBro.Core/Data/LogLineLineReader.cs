@@ -78,6 +78,7 @@ namespace StepBro.Core.Data
         }
 
         private object m_sync;
+        private bool m_newEntry = true;
         private LogLineData m_entry = null;
 
         public event EventHandler LinesAdded;
@@ -87,6 +88,7 @@ namespace StepBro.Core.Data
             this.Source = source;
             m_sync = sync;
             m_entry = first;
+            m_newEntry = true;
         }
 
         public void NotifyNew(LogLineData entry)
@@ -96,6 +98,7 @@ namespace StepBro.Core.Data
                 if (m_entry == null)
                 {
                     m_entry = entry;
+                    m_newEntry = true;
                     Monitor.Pulse(m_sync);  // In case someone is waiting.
                 }
                 this.LinesAdded?.Invoke(this, EventArgs.Empty);
@@ -129,6 +132,23 @@ namespace StepBro.Core.Data
                     return true;
                 }
                 else return false;
+            }
+        }
+
+        public bool NextUnlessNewEntry()
+        {
+            lock (m_sync)
+            {
+                if (!m_newEntry && m_entry != null)
+                {
+                    m_entry = m_entry.Next;
+                    return true;
+                }
+                else
+                {
+                    m_newEntry = false;
+                }
+                return false;
             }
         }
 

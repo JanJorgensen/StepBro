@@ -78,6 +78,11 @@ namespace StepBro.Core.Data
             return false;
         }
 
+        public bool NextUnlessNewEntry()
+        {
+            return Next(); // Next works the same as NextUnlessNewEntry for this line reader
+        }
+
         public IEnumerable<ILineReaderEntry> Peak()
         {
             if (m_index < m_list.Count)

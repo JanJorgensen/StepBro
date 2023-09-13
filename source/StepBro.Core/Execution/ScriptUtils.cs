@@ -243,12 +243,18 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan timeout, bool removeFound = true)
+        public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan timeout, bool skipCurrent = true, bool removeFound = false)
         {
             System.Diagnostics.Debug.WriteLine("Reader.Await: " + text);
             if (context != null && context.LoggingEnabled) context.Logger.Log("Await \"" + text + "\"");
             var comparer = StringUtils.CreateComparer(text);
             reader.DebugDump();
+
+            // If we do not want to match with the current entry
+            if(skipCurrent)
+            {
+                reader.NextUnlessNewEntry();
+            }
 
             // If the reader has timestamp, set the timeout relative to the time of the current entry; otherwise just use current wall time.
             DateTime entry = (reader.LinesHaveTimestamp && reader.Current != null) ? reader.Current.Timestamp : DateTime.Now;
