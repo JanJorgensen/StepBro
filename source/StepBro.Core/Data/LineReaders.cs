@@ -20,6 +20,7 @@ namespace StepBro.Core.Data
         private readonly List<string> m_list;
         private int m_index;
         private EntryWrapper m_current;
+        private EntryWrapper m_previous;
 
         public StringListLineReader(List<string> list, INameable source = null)
         {
@@ -43,7 +44,16 @@ namespace StepBro.Core.Data
             }
         }
 
-        public ILineReaderEntry Previous { get { throw new NotImplementedException("StringListLineReader does not have the Previous element implemented."); } }
+        public ILineReaderEntry Previous 
+        { 
+            get 
+            {
+                if (m_index > 0 && m_index - 1 < m_list.Count && m_list.Count > 0) m_previous = new EntryWrapper(m_index - 1, m_list[m_index - 1]);
+                else m_previous = null;
+
+                return m_previous;
+            } 
+        }
 
         public bool LinesHaveTimestamp { get { return false; } }
 
