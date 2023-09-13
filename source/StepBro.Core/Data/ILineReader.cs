@@ -16,6 +16,7 @@ namespace StepBro.Core.Data
         INameable Source { get; }
         object Sync { get; }
         ILineReaderEntry Current { get; }
+        ILineReaderEntry Previous { get; }
         bool LinesHaveTimestamp { get; }
         bool HasMore { get; }
         bool Next();

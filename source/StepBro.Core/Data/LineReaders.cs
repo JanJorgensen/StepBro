@@ -42,6 +42,9 @@ namespace StepBro.Core.Data
                 return m_current;
             }
         }
+
+        public ILineReaderEntry Previous { get { throw new NotImplementedException("StringListLineReader does not have the Previous element implemented."); } }
+
         public bool LinesHaveTimestamp { get { return false; } }
 
         public bool HasMore { get { return (m_index < (m_list.Count - 1)); } }
