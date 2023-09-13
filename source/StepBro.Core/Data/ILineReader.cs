@@ -19,6 +19,7 @@ namespace StepBro.Core.Data
         bool LinesHaveTimestamp { get; }
         bool HasMore { get; }
         bool Next();
+        bool NextUnlessNewEntry();
         void Flush(ILineReaderEntry stopAt = null);
         IEnumerable<ILineReaderEntry> Peak();
         event EventHandler LinesAdded;
