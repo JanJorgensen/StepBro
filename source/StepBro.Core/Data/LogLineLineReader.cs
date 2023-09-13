@@ -79,7 +79,6 @@ namespace StepBro.Core.Data
 
         private object m_sync;
         private LogLineData m_entry = null;
-        private LogLineData m_previousEntry = null;
 
         public event EventHandler LinesAdded;
 
@@ -88,7 +87,6 @@ namespace StepBro.Core.Data
             this.Source = source;
             m_sync = sync;
             m_entry = first;
-            m_previousEntry = null;
         }
 
         public void NotifyNew(LogLineData entry)
@@ -119,8 +117,6 @@ namespace StepBro.Core.Data
 
         public ILineReaderEntry Current { get { return m_entry; } }
 
-        public ILineReaderEntry Previous { get { return m_previousEntry; } }
-
         public INameable Source { get; private set; }
 
         public bool Next()
@@ -129,7 +125,6 @@ namespace StepBro.Core.Data
             {
                 if (m_entry != null)
                 {
-                    m_previousEntry = m_entry;
                     m_entry = m_entry.Next;
                     return true;
                 }
@@ -143,7 +138,6 @@ namespace StepBro.Core.Data
             {
                 lock (m_sync)
                 {
-                    m_previousEntry = null;
                     m_entry = (LogLineData)stopAt;
                 }
             }
@@ -151,7 +145,6 @@ namespace StepBro.Core.Data
             {
                 lock (m_sync)
                 {
-                    m_previousEntry = null;
                     m_entry = null;
                 }
             }

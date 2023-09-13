@@ -44,17 +44,6 @@ namespace StepBro.Core.Data
             }
         }
 
-        public ILineReaderEntry Previous 
-        { 
-            get 
-            {
-                if (m_index > 0 && m_index - 1 < m_list.Count && m_list.Count > 0) m_previous = new EntryWrapper(m_index - 1, m_list[m_index - 1]);
-                else m_previous = null;
-
-                return m_previous;
-            } 
-        }
-
         public bool LinesHaveTimestamp { get { return false; } }
 
         public bool HasMore { get { return (m_index < (m_list.Count - 1)); } }
