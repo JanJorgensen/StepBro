@@ -266,12 +266,12 @@ namespace StepBro.Core.Execution
             do
             {
                 // If there isn't anything in the reader right now
-                // we wait 50ms to see if anything shows up
+                // we wait 5ms to see if anything shows up
                 lock (reader.Sync)
                 {
                     if (reader.Current == null)
                     {
-                        Monitor.Wait(reader.Sync, 50);
+                        Monitor.Wait(reader.Sync, 5);
                     }
                 }
 
