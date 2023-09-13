@@ -255,12 +255,18 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan timeout, bool removeFound = true)
+        public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan timeout, bool skipCurrent = true, bool removeFound = false)
         {
             System.Diagnostics.Debug.WriteLine("Reader.Await: " + text);
             if (context != null && context.LoggingEnabled) context.Logger.Log("Await \"" + text + "\"");
             var comparer = StringUtils.CreateComparer(text);
             reader.DebugDump();
+
+            // If we do not want to match with the current entry
+            if(skipCurrent)
+            {
+                reader.NextUnlessNewEntry();
+            }
 
             // If the reader has timestamp, set the timeout relative to the time of the current entry; otherwise just use current wall time.
             DateTime entry = (reader.LinesHaveTimestamp && reader.Current != null) ? reader.Current.Timestamp : DateTime.Now;
@@ -271,24 +277,56 @@ namespace StepBro.Core.Execution
             //bool sleep = false;
             do
             {
-                var result = reader.Find(null, comparer, true);
-                if (result != null)
-                {
-                    if (removeFound)
-                    {
-                        reader.Next();
-                    }
-                    return result;
-                }
+                // If there isn't anything in the reader right now
+                // we wait 5ms to see if anything shows up
+                // The OS has a hard time keeping up with anything less than 5ms
+                // anyway, as we need to get chosen as a thread again after the
+                // timeout. Because of this, any awaits should be longer than 5ms anyway.
                 lock (reader.Sync)
                 {
                     if (reader.Current == null)
                     {
-                        Monitor.Wait(reader.Sync, 50);
+                        Monitor.Wait(reader.Sync, 5);
                     }
                 }
-                //sleep = true;
-            } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero);
+
+                // We look for the string we want to find
+                var result = reader.Find(null, comparer, true);
+
+                // If the string was found
+                if (result != null)
+                {
+                    if (reader.LinesHaveTimestamp)
+                    {
+                        // We take the timestamp of the found string
+                        DateTime foundTimeStamp = reader.Current.Timestamp;
+
+                        if (removeFound)
+                        {
+                            reader.Next();
+                        }
+
+                        // We check if the time stamp is within the allowed time
+                        if (foundTimeStamp <= to)
+                        {
+                            return result;
+                        }
+                    }
+                    else
+                    {
+                        if (removeFound)
+                        {
+                            reader.Next();
+                        }
+
+                        if (DateTime.Now.TimeTill(to) > TimeSpan.Zero)
+                        {
+                            return result;
+                        }
+                    }
+                    break;
+                }
+            } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
 
             if (context != null)
             {

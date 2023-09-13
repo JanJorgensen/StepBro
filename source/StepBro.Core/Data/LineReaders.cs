@@ -20,11 +20,13 @@ namespace StepBro.Core.Data
         private readonly List<string> m_list;
         private int m_index;
         private EntryWrapper m_current;
+        private bool m_currentEntryIsNew = true;
 
         public StringListLineReader(List<string> list, INameable source = null)
         {
             m_list = list;
             m_index = (m_list.Count > 0) ? 0 : -1;
+            m_currentEntryIsNew = true;
             this.Source = source;
         }
 
@@ -74,7 +76,17 @@ namespace StepBro.Core.Data
             else if (m_index < (m_list.Count))
             {
                 m_index++;  // Skip past the last entry
+                m_currentEntryIsNew = true;
             }
+            return false;
+        }
+
+        public bool NextUnlessNewEntry()
+        {
+            if (!m_currentEntryIsNew)
+                return Next();
+            else if (m_index < (m_list.Count - 1) || m_index == 0)
+                m_currentEntryIsNew = false;
             return false;
         }
 
