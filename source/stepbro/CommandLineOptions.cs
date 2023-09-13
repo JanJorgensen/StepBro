@@ -27,9 +27,6 @@ namespace StepBro.Cmd
         [Option('w', "wait", Default = false, HelpText = "Awaits key press before terminating.")]
         public bool AwaitKeypress { get; set; } = false;
 
-        //[Option("report_result", Default = false, HelpText = "Dumps the execution result.")]
-        //public bool ReportResult { get; set; } = false;
-
         [Option("print_report", Default = false, HelpText = "Prints the generated execution/test report in the text format selected by the 'format' option.")]
         public bool PrintReport { get; set; } = false;
 
