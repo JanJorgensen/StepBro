@@ -40,21 +40,27 @@ namespace StepBro.Core.Addons
             public bool WriteLogEntry(LogEntry entry, DateTime zero)
             {
                 var txt = entry.ToClearText(zero, false);
+                var prefix = "            ";
                 if (txt != null)
                 {
-                    var prefix = "            ";
                     switch (entry.EntryType)
                     {
                         case Logging.LogEntry.Type.PreHighLevel:
-                            if (m_createHighLevelLogSections)
-                            {
-                                prefix = "##[group]   ";
-                            }
-                            else
+                            //if (m_createHighLevelLogSections)
+                            //{
+                            //    prefix = "##[group]            ";
+                            //}
+                            //else
                             {
                                 prefix = "##[section]            ";
                             }
                             break;
+                        //case LogEntry.Type.Post:
+                        //    if (m_createHighLevelLogSections && entry.EntryType == LogEntry.Type.Post && entry.Parent.EntryType == LogEntry.Type.PreHighLevel)
+                        //    {
+                        //        prefix = "##[endgroup]            ";
+                        //    }
+                        //    break;
                         case Logging.LogEntry.Type.Error:
                         case Logging.LogEntry.Type.Failure:
                             prefix = "##[error]   ";
@@ -68,6 +74,13 @@ namespace StepBro.Core.Addons
                     }
                     m_writer.WriteLine(prefix + txt);
                     return true;
+                }
+                else
+                {
+                    if (m_createHighLevelLogSections && entry.EntryType == LogEntry.Type.Post && entry.Parent.EntryType == LogEntry.Type.PreHighLevel)
+                    {
+                        m_writer.WriteLine("##[endgroup]");
+                    }
                 }
                 return false;
             }
@@ -87,6 +100,7 @@ namespace StepBro.Core.Addons
                         {
                             m_writer.WriteLine($"    {result.Item1}:{new String(' ', width1 - result.Item1.Length)}{result.Item2.ToString(false)}");
                         }
+                        m_writer.WriteLine("##[endgroup]");
                         m_writer.WriteLine("");     // Empty line
                     }
 
@@ -164,8 +178,9 @@ namespace StepBro.Core.Addons
                         else
                         {
                             m_writer.WriteLine(indent.Peek() + "    No data.");
-                            m_writer.WriteLine("");     // Empty line
                         }
+                        m_writer.WriteLine("##[endgroup]");
+                        m_writer.WriteLine("");     // Empty line
 
                         if (group.LogEnd.Id != group.LogStart.Id)
                         {
@@ -182,6 +197,7 @@ namespace StepBro.Core.Addons
                             }
 
                             indent.Pop();
+                            m_writer.WriteLine("##[endgroup]");
                             m_writer.WriteLine("");     // Empty line
                         }
                     }
@@ -209,7 +225,6 @@ namespace StepBro.Core.Addons
                         m_writer.WriteLine(indent.Peek() + data.FormatString());
                     }
                     indent.Pop();
-                    m_writer.WriteLine("");     // Empty line
                 }
                 if (measurements.Count > 0)
                 {
@@ -222,7 +237,6 @@ namespace StepBro.Core.Addons
                         m_writer.WriteLine(indent.Peek() + data.FormatString());
                     }
                     indent.Pop();
-                    m_writer.WriteLine("");     // Empty line
                 }
             }
 
