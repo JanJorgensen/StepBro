@@ -257,6 +257,7 @@ namespace StepBro.Core.Execution
         [Public]
         public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan timeout, bool skipCurrent = true, bool removeFound = false)
         {
+            Console.WriteLine("Entering Await");
             System.Diagnostics.Debug.WriteLine("Reader.Await: " + text);
             if (context != null && context.LoggingEnabled) context.Logger.Log("Await \"" + text + "\"");
             var comparer = StringUtils.CreateComparer(text);
@@ -274,9 +275,18 @@ namespace StepBro.Core.Execution
             // The time where the timeout expires.
             DateTime to = (timeout == TimeSpan.MaxValue) ? DateTime.MaxValue : entry + timeout;
 
+            Console.WriteLine($"ENTRYish {DateTime.Now.Millisecond} TO {to.Millisecond}");
+
             //bool sleep = false;
+            bool lastCheck = true; // Used to check one last time after time has passed
             do
             {
+                if (DateTime.Now.TimeTill(to) <= TimeSpan.Zero)
+                {
+                    Console.WriteLine($"DOING LAST CHECK. NOW {DateTime.Now} NOWMS {DateTime.Now.Millisecond}");
+                    lastCheck = false;
+                }
+                
                 // If there isn't anything in the reader right now
                 // we wait 5ms to see if anything shows up
                 // The OS has a hard time keeping up with anything less than 5ms
@@ -293,9 +303,14 @@ namespace StepBro.Core.Execution
                 // We look for the string we want to find
                 var result = reader.Find(null, comparer, true);
 
+                if (result == null)
+                {
+                    Console.WriteLine($"!!!!!!!!!!!!!!! STRING NOT FOUND !!!!!!!!!!!!!!! NOW {DateTime.Now.Millisecond} TO {to.Millisecond}");
+                }
                 // If the string was found
                 if (result != null)
                 {
+                    Console.WriteLine($"Result found NOW {DateTime.Now.Millisecond} TO {to.Millisecond}");
                     if (reader.LinesHaveTimestamp)
                     {
                         // We take the timestamp of the found string
@@ -309,7 +324,12 @@ namespace StepBro.Core.Execution
                         // We check if the time stamp is within the allowed time
                         if (foundTimeStamp <= to)
                         {
+                            Console.WriteLine($"Found result within time limit NOW {DateTime.Now.Millisecond} TO {to.Millisecond}");
                             return result;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"!!!!!!!!!!!!!!! STRING FOUND BUT OUTSIDE TIMESTAMP !!!!!!!!!!!!!!! FOUND {foundTimeStamp} FOUNDMS {foundTimeStamp.Millisecond} TO {to} TOMS {to.Millisecond}");
                         }
                     }
                     else
@@ -326,7 +346,8 @@ namespace StepBro.Core.Execution
                     }
                     break;
                 }
-            } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
+            } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero || lastCheck); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
+            Console.WriteLine($"DONE WITH LOOKING. NOW {DateTime.Now} NOWMS {DateTime.Now.Millisecond}");
 
             if (context != null)
             {
