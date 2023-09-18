@@ -103,8 +103,8 @@ namespace StepBro.Core
             DateTime timestamp = DateTime.Now;
             if (context != null && context.LoggingEnabled)
             {
-                var subheaderText = String.IsNullOrEmpty(subheader) ? "" : (", " + subheader);
-                var logentry = context.Logger.Log(String.Format("Adding section \"{0}\" to report.{1}", header, subheaderText));
+                var subheaderText = String.IsNullOrEmpty(subheader) ? "." : (", " + subheader);
+                var logentry = context.Logger.Log(String.Format("Adding section \"{0}\" to report{1}", header, subheaderText));
                 timestamp = logentry.Timestamp;
             }
             this.AddData(context, new ReportGroupSection(timestamp, header, subheader));

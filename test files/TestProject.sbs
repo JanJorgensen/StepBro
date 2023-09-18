@@ -30,6 +30,7 @@ procedure void FirstTestCase() : TestCase
 {
 }
 
+[Summary: "This the second testcase. It makes a temperature measurement.", Reference: "T73"]
 procedure void SecondTestCase() : TestCase
 {
     step "Init";

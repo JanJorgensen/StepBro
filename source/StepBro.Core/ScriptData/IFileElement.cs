@@ -10,7 +10,8 @@ namespace StepBro.Core.ScriptData
         IFileElement BaseElement { get; }
         IFileElement ParentElement { get; }
         FileElementType ElementType { get; }
-        string Purpose { get; }
+        string Summary { get; }
+        string DocReference { get; }
         int UniqueID { get; }
         AccessModifier AccessLevel { get; }
         IEnumerable<IPartner> ListPartners();
