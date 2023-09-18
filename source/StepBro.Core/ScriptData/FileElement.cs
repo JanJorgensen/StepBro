@@ -17,7 +17,8 @@ namespace StepBro.Core.ScriptData
         private string m_elementName;
         private string m_elementFullName = null;
         private FileElementType m_elementType;
-        private string m_purpose;
+        private string m_summary;
+        private string m_docReference;
         private static int g_nextID = 1000;
         private readonly int m_uid = g_nextID++;
         protected PropertyBlock m_propertyBlock = null;
@@ -141,13 +142,22 @@ namespace StepBro.Core.ScriptData
             internal set { m_parentFile = value; }
         }
 
-        public string Purpose
+        public string Summary
         {
             get
             {
-                return m_purpose;
+                return m_summary;
             }
-            internal set { m_purpose = value; }
+            internal set { m_summary = value; }
+        }
+
+        public string DocReference
+        {
+            get
+            {
+                return m_docReference;
+            }
+            internal set { m_docReference = value; }
         }
 
         public IdentifierType Type
@@ -168,7 +178,7 @@ namespace StepBro.Core.ScriptData
 
         protected abstract TypeReference GetDataType();
 
-        public object Reference
+        object IIdentifierInfo.Reference
         {
             get
             {
