@@ -285,6 +285,7 @@ namespace StepBro.Core.Execution
                 // TODO: Find a better solution than this.
                 if (DateTime.Now.TimeTill(to) <= TimeSpan.Zero)
                 {
+                    Thread.Yield();
                     lastCheck = false;
                 }
                 
