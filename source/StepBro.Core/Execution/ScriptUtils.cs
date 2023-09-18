@@ -275,6 +275,8 @@ namespace StepBro.Core.Execution
             DateTime to = (timeout == TimeSpan.MaxValue) ? DateTime.MaxValue : entry + timeout;
 
             //bool sleep = false;
+            // TODO: Can still occassionally fail because timestamps are unreliable.
+            //       Look into a way to make timestamps more reliable. -MKL
             bool doOneLastCheck = true; // Used to check one last time after time has passed
             do
             {
