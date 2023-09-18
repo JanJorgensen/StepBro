@@ -177,7 +177,16 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
 {
     bool passedPreTest = true;
     var testReport = StartReport("TestReport", suite.Name);
-    testReport.StartGroup("Test Setup", "The test configuration and preconditions.");
+    var procedureSummary = suite.PreTest.ProcedureData.Summary;
+    if (System.String.IsNullOrEmpty(procedureSummary))
+    {
+        procedureSummary = "";
+    }
+    else
+    {
+        procedureSummary = ".  " + procedureSummary;
+    }
+    testReport.StartGroup("Test Suite Test Setup", "The test configuration and preconditions. Setup procedure: " + suite.PreTest.FullName + "." + procedureSummary);
     NextProcedureIsHighLevel("PRETEST");
     passedPreTest = suite.PreTest();        // Keep this in separate line, to make sure this is a high-level procedure call.
     if (passedPreTest)
@@ -192,7 +201,16 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
         while (iterator.GetNext())
         {
             TestCase testcase = iterator.Procedure as TestCase;
-            testReport.StartGroup("Testcase " + testcase.Name, "<description of testcase>");
+            procedureSummary = testcase.ProcedureData.Summary;
+            if (System.String.IsNullOrEmpty(procedureSummary))
+            {
+                procedureSummary = "";
+            }
+            else
+            {
+                procedureSummary = " " + procedureSummary;
+            }
+           testReport.StartGroup("Testcase " + testcase.ProcedureData.FullName, procedureSummary);
             // TODO: Save test case data in report
             log ("Starting Test: " + testcase.Name);
 

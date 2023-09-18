@@ -40,20 +40,13 @@ namespace StepBro.Core.Addons
             public bool WriteLogEntry(LogEntry entry, DateTime zero)
             {
                 var txt = entry.ToClearText(zero, false);
+                var prefix = "            ";
                 if (txt != null)
                 {
-                    var prefix = "            ";
                     switch (entry.EntryType)
                     {
                         case Logging.LogEntry.Type.PreHighLevel:
-                            if (m_createHighLevelLogSections)
-                            {
-                                prefix = "##[group]   ";
-                            }
-                            else
-                            {
-                                prefix = "##[section]            ";
-                            }
+                            prefix = "##[section]            ";
                             break;
                         case Logging.LogEntry.Type.Error:
                         case Logging.LogEntry.Type.Failure:
@@ -87,6 +80,7 @@ namespace StepBro.Core.Addons
                         {
                             m_writer.WriteLine($"    {result.Item1}:{new String(' ', width1 - result.Item1.Length)}{result.Item2.ToString(false)}");
                         }
+                        m_writer.WriteLine("##[endgroup]");
                         m_writer.WriteLine("");     // Empty line
                     }
 
@@ -96,7 +90,7 @@ namespace StepBro.Core.Addons
                     foreach (var group in report.ListGroups())
                     {
                         m_writer.WriteLine("##[group] " + group.Name);
-                        if (String.IsNullOrEmpty(group.Description))
+                        if (!String.IsNullOrEmpty(group.Description))
                         {
                             m_writer.WriteLine(indent.Peek() + "  Description: " + group.Description);
                         }
@@ -164,8 +158,9 @@ namespace StepBro.Core.Addons
                         else
                         {
                             m_writer.WriteLine(indent.Peek() + "    No data.");
-                            m_writer.WriteLine("");     // Empty line
                         }
+                        m_writer.WriteLine("##[endgroup]");
+                        m_writer.WriteLine("");     // Empty line
 
                         if (group.LogEnd.Id != group.LogStart.Id)
                         {
@@ -182,6 +177,7 @@ namespace StepBro.Core.Addons
                             }
 
                             indent.Pop();
+                            m_writer.WriteLine("##[endgroup]");
                             m_writer.WriteLine("");     // Empty line
                         }
                     }
@@ -200,7 +196,7 @@ namespace StepBro.Core.Addons
 
                 if (expects.Count > 0)
                 {
-                    m_writer.WriteLine(indent.Peek() + "##[section] Test Results");
+                    m_writer.WriteLine("##[section]" + indent.Peek() + "Test Results");
 
                     indent.Push(indent.Peek() + "    ");
                     var indentString = indent.Peek();
@@ -209,11 +205,10 @@ namespace StepBro.Core.Addons
                         m_writer.WriteLine(indent.Peek() + data.FormatString());
                     }
                     indent.Pop();
-                    m_writer.WriteLine("");     // Empty line
                 }
                 if (measurements.Count > 0)
                 {
-                    m_writer.WriteLine(indent.Peek() + "##[section] Measurements");
+                    m_writer.WriteLine("##[section]"+ indent.Peek() + "Measurements");
 
                     indent.Push(indent.Peek() + "    ");
                     var indentString = indent.Peek();
@@ -222,7 +217,6 @@ namespace StepBro.Core.Addons
                         m_writer.WriteLine(indent.Peek() + data.FormatString());
                     }
                     indent.Pop();
-                    m_writer.WriteLine("");     // Empty line
                 }
             }
 

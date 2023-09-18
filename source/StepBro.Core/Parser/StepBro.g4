@@ -605,7 +605,7 @@ attributes
     ;
 
 attribute_section
-    : '[' propertyblockStatementList ']'
+    : OPEN_BRACKET propertyblockStatementList CLOSE_BRACKET
     ;
 
 // LAMBDA EXPRESSION

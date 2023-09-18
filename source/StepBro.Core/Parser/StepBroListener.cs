@@ -31,6 +31,7 @@ namespace StepBro.Core.Parser
         protected IToken m_elementStart = null;
         protected string m_name = null;
         protected string m_currentNamespace = null;
+        private List<PropertyBlockEntry> m_fileElementAttributes = null;
         protected FileTestList m_currentTestList = null;
         protected Stack<SBExpressionData> m_testListEntryArguments = null;
         //private SBExpressionData m_overrideVariable = null;
@@ -136,9 +137,29 @@ namespace StepBro.Core.Parser
             m_fileElementModifier = AccessModifier.Public;    // Default is 'public'.
             m_currentFileElement = null;
 
+            m_fileElementAttributes = m_lastAttributes;
+            m_lastAttributes = null;
+
 #if (PRINT_TREE)
             m_indent = m_indent.Substring(0, m_indent.Length - 4) + "|   ";
 #endif
+        }
+
+        public override void ExitFileElement([NotNull] SBP.FileElementContext context)
+        {
+            if (m_fileElementAttributes != null)
+            {
+                var summary = m_fileElementAttributes.FirstOrDefault(e => e.BlockEntryType == PropertyBlockEntryType.Value && e.Name == "Summary" && (e as PropertyBlockValue).IsStringOrIdentifier) as PropertyBlockValue;
+                if (summary != null)
+                {
+                    m_currentFileElement.Summary = summary.ValueAsString();
+                }
+                var reference = m_fileElementAttributes.FirstOrDefault(e => e.BlockEntryType == PropertyBlockEntryType.Value && e.Name == "Reference" && (e as PropertyBlockValue).IsStringOrIdentifier) as PropertyBlockValue;
+                if (summary != null)
+                {
+                    m_currentFileElement.DocReference = reference.ValueAsString();
+                }
+            }
         }
 
         public override void EnterElementModifier([NotNull] SBP.ElementModifierContext context)
