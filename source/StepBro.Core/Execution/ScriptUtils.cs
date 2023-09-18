@@ -275,7 +275,7 @@ namespace StepBro.Core.Execution
             DateTime to = (timeout == TimeSpan.MaxValue) ? DateTime.MaxValue : entry + timeout;
 
             //bool sleep = false;
-            bool lastCheck = true; // Used to check one last time after time has passed
+            bool doOneLastCheck = true; // Used to check one last time after time has passed
             do
             {
                 // Used to mitigate the issue where the stepbro thread can be paused
@@ -288,7 +288,7 @@ namespace StepBro.Core.Execution
                     // This usually means the thread that creates timestamps for the logs
                     // gets a chance to run.
                     Thread.Yield();
-                    lastCheck = false;
+                    doOneLastCheck = false;
                 }
                 
                 // If there isn't anything in the reader right now
@@ -320,16 +320,7 @@ namespace StepBro.Core.Execution
                             reader.Next();
                         }
 
-                        // We check if the time stamp is within the allowed time
-                        if (foundTimeStamp <= to)
-                        {
-                            return result;
-                        }
-                        else
-                        {
-                            System.Diagnostics.Debug.WriteLine($"String found in the check after timeout, this is likely okay and is because of the thread being paused on the test PC.");
-                            return result;
-                        }
+                        return result;
                     }
                     else
                     {
@@ -338,18 +329,10 @@ namespace StepBro.Core.Execution
                             reader.Next();
                         }
 
-                        if (DateTime.Now.TimeTill(to) > TimeSpan.Zero)
-                        {
-                            return result;
-                        }
-                        else
-                        {
-                            System.Diagnostics.Debug.WriteLine($"String found in the check after timeout, this is likely okay and is because of the thread being paused on the test PC.");
-                            return result;
-                        }
+                        return result;
                     }
                 }
-            } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero || lastCheck); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
+            } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero || doOneLastCheck); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
 
             if (context != null)
             {
