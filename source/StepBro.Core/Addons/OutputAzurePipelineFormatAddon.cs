@@ -46,21 +46,8 @@ namespace StepBro.Core.Addons
                     switch (entry.EntryType)
                     {
                         case Logging.LogEntry.Type.PreHighLevel:
-                            //if (m_createHighLevelLogSections)
-                            //{
-                            //    prefix = "##[group]            ";
-                            //}
-                            //else
-                            {
-                                prefix = "##[section]            ";
-                            }
+                            prefix = "##[section]            ";
                             break;
-                        //case LogEntry.Type.Post:
-                        //    if (m_createHighLevelLogSections && entry.EntryType == LogEntry.Type.Post && entry.Parent.EntryType == LogEntry.Type.PreHighLevel)
-                        //    {
-                        //        prefix = "##[endgroup]            ";
-                        //    }
-                        //    break;
                         case Logging.LogEntry.Type.Error:
                         case Logging.LogEntry.Type.Failure:
                             prefix = "##[error]   ";
@@ -74,13 +61,6 @@ namespace StepBro.Core.Addons
                     }
                     m_writer.WriteLine(prefix + txt);
                     return true;
-                }
-                else
-                {
-                    //if (m_createHighLevelLogSections && entry.EntryType == LogEntry.Type.Post && entry.Parent.EntryType == LogEntry.Type.PreHighLevel)
-                    //{
-                    //    m_writer.WriteLine("##[endgroup]");
-                    //}
                 }
                 return false;
             }
