@@ -77,10 +77,10 @@ namespace StepBro.Core.Addons
                 }
                 else
                 {
-                    if (m_createHighLevelLogSections && entry.EntryType == LogEntry.Type.Post && entry.Parent.EntryType == LogEntry.Type.PreHighLevel)
-                    {
-                        m_writer.WriteLine("##[endgroup]");
-                    }
+                    //if (m_createHighLevelLogSections && entry.EntryType == LogEntry.Type.Post && entry.Parent.EntryType == LogEntry.Type.PreHighLevel)
+                    //{
+                    //    m_writer.WriteLine("##[endgroup]");
+                    //}
                 }
                 return false;
             }
