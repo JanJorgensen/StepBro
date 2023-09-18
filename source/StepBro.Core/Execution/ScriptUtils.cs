@@ -282,9 +282,11 @@ namespace StepBro.Core.Execution
                 // while the log we are waiting for ticks in.
                 // The log would have a timestamp that may be too late
                 // however, the actual time it ticked in was on time in most cases.
-                // TODO: Find a better solution than this.
                 if (DateTime.Now.TimeTill(to) <= TimeSpan.Zero)
                 {
+                    // Yield the thread so other ready threads gets a chance to run.
+                    // This usually means the thread that creates timestamps for the logs
+                    // gets a chance to run.
                     Thread.Yield();
                     lastCheck = false;
                 }
