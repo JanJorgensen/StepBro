@@ -48,6 +48,8 @@ namespace StepBro.Core.Data
 
         public bool HasMore { get { return (m_index < (m_list.Count - 1)); } }
 
+        public bool HasSyncPulse { get { return false; } }
+
         public INameable Source { get; private set; }
 
         public event EventHandler LinesAdded;

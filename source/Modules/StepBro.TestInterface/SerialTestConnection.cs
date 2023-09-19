@@ -1081,7 +1081,7 @@ namespace StepBro.TestInterface
             {
                 if (m_asyncLogLineReader == null)
                 {
-                    m_asyncLogLineReader = new LogLineLineReader(this, null, m_eventLogSync);
+                    m_asyncLogLineReader = new LogLineLineReader(this, null, m_eventLogSync, true);
                 }
                 return m_asyncLogLineReader;
             }

@@ -80,15 +80,17 @@ namespace StepBro.Core.Data
         private object m_sync;
         private bool m_firstEntryIsNew = true;
         private LogLineData m_entry = null;
+        private bool m_hasSyncPulse = false;
 
         public event EventHandler LinesAdded;
 
-        public LogLineLineReader(INameable source, LogLineData first, object sync)
+        public LogLineLineReader(INameable source, LogLineData first, object sync, bool hasSyncPulse = false)
         {
             this.Source = source;
             m_sync = sync;
             m_entry = first;
             m_firstEntryIsNew = true;
+            m_hasSyncPulse = hasSyncPulse;
         }
 
         public void NotifyNew(LogLineData entry)
@@ -115,6 +117,8 @@ namespace StepBro.Core.Data
                 return (entry != null) ? entry.Next != null : false;
             }
         }
+
+        public bool HasSyncPulse { get { return m_hasSyncPulse; } }
 
         public object Sync { get { return m_sync; } }
 

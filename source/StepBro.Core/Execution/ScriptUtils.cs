@@ -299,7 +299,7 @@ namespace StepBro.Core.Execution
                 // Synchronize with reader
                 lock (reader.Sync)
                 {
-                    if (reader.Current == null)
+                    if (reader.HasSyncPulse)
                     {
                         synchronize = Monitor.Wait(reader.Sync, synchronizeTimeout);
                     }
