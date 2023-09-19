@@ -275,35 +275,41 @@ namespace StepBro.Core.Execution
             DateTime to = (timeout == TimeSpan.MaxValue) ? DateTime.MaxValue : entry + timeout;
 
             //bool sleep = false;
-            // TODO: Can still occassionally fail because timestamps are unreliable.
-            //       Look into a way to make timestamps more reliable. -MKL
             bool doOneLastCheck = true; // Used to check one last time after time has passed
             do
             {
-                // Used to mitigate the issue where the stepbro thread can be paused
+                // Used to fix the issue where the stepbro thread can be paused
                 // while the log we are waiting for ticks in.
                 // The log would have a timestamp that may be too late
                 // however, the actual time it ticked in was on time in most cases.
+                // (Or at least very close to on time, which is the closest we can get
+                // in a non real-time OS)
                 if (DateTime.Now.TimeTill(to) <= TimeSpan.Zero)
                 {
-                    // Yield the thread so other ready threads gets a chance to run.
-                    // This usually means the thread that creates timestamps for the logs
-                    // gets a chance to run.
-                    Thread.Yield();
                     doOneLastCheck = false;
                 }
+
+                // Whether we have succesfully synchronized with reader
+                bool synchronize = true;
+
+                // High enough that we ensure the reader has a chance to report new data
+                // low enough that we do not hang for too long before reporting a failure.
+                const int synchronizeTimeout = 15000;
                 
-                // If there isn't anything in the reader right now
-                // we wait 5ms to see if anything shows up
-                // The OS has a hard time keeping up with anything less than 5ms
-                // anyway, as we need to get chosen as a thread again after the
-                // timeout. Because of this, any awaits should be longer than 5ms anyway.
+                // Synchronize with reader
                 lock (reader.Sync)
                 {
                     if (reader.Current == null)
                     {
-                        Monitor.Wait(reader.Sync, 5);
+                        synchronize = Monitor.Wait(reader.Sync, synchronizeTimeout);
                     }
+                }
+
+                // If we failed to synchronize with reader, we report a failure.
+                if (synchronize == false)
+                {
+                    context.ReportFailure($"Reader failed to synchronize within {synchronizeTimeout} milliseconds, ensure reader is not disconnected.");
+                    break;
                 }
 
                 // We look for the string we want to find

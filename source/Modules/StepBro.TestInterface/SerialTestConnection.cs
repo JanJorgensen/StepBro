@@ -824,82 +824,92 @@ namespace StepBro.TestInterface
                     //{
                     //    DebugLogEntry.Register(new DebugLogEntryString(m_name + " INDEX WRONG!!"));
                     //}
-                    while (index < knownCount)
+                    // Lock m_eventLogSync so we do not begin looking through the data before we have
+                    // added all the data to the log
+                    lock (m_eventLogSync)
                     {
-                        char ch = m_inputBuffer[index];
-                        if (ch != '\n' && ch != '\r')
+                        while (index < knownCount)
                         {
-                            index++;
-                        }
-                        else
-                        {
-                            //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Line end"));
-                            if (index == 0)
+                            char ch = m_inputBuffer[index];
+                            if (ch != '\n' && ch != '\r')
                             {
-                                m_inputBuffer.Eat(1);
-                                knownCount--;
-                                continue;
-                            }
-                            var line = m_inputBuffer.Get(0, index, index + 1);
-                            knownCount -= (index + 1);
-                            index = 0;
-                            //DebugLogEntry.Register(new DebugLogEntryString(m_name + " After Get: " + index.ToString() + ", " + knownCount.ToString()));
-
-                            var s = new string(line, 1, line.Length - 1);
-                            if (line[0] == EventLineChar)
-                            {
-                                //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Event line received: " + s));
-                                lock (m_sync)
-                                {
-                                    AddToLog(LogType.ReceivedAsync, 0, new string(line));
-                                }
-                                m_events.Enqueue(new string(line, 1, line.Length - 1));
-                                while (m_events.Count > 1000)
-                                {
-                                    m_events.Dequeue();     // Ensure queue buffer is not eating all memory.
-                                }
+                                index++;
                             }
                             else
                             {
-                                if (line[0] == ResponseMultiLineChar)
+                                //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Line end"));
+                                if (index == 0)
                                 {
-                                    //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Multi response line received: " + s));
+                                    m_inputBuffer.Eat(1);
+                                    knownCount--;
+                                    continue;
+                                }
+                                var line = m_inputBuffer.Get(0, index, index + 1);
+                                knownCount -= (index + 1);
+                                index = 0;
+                                //DebugLogEntry.Register(new DebugLogEntryString(m_name + " After Get: " + index.ToString() + ", " + knownCount.ToString()));
+
+                                var s = new string(line, 1, line.Length - 1);
+                                if (line[0] == EventLineChar)
+                                {
+                                    //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Event line received: " + s));
                                     lock (m_sync)
                                     {
-                                        AddToLog(LogType.ReceivedPartial, 0, new string(line));
+                                        AddToLog(LogType.ReceivedAsync, 0, new string(line));
                                     }
-                                    if (m_currentExecutingCommand != null)
+                                    m_events.Enqueue(new string(line, 1, line.Length - 1));
+                                    while (m_events.Count > 1000)
                                     {
-                                        m_responseLines.Enqueue(s);
+                                        m_events.Dequeue();     // Ensure queue buffer is not eating all memory.
                                     }
                                 }
-                                else if (line[0] == ResponseEndLineChar)
+                                else
                                 {
-                                    var l = new string(line);
-                                    lock (m_sync)
+                                    if (line[0] == ResponseMultiLineChar)
                                     {
-                                        AddToLog((l.StartsWith(ResponseErrorPrefix)) ? LogType.ReceivedError : LogType.ReceivedEnd, 0, l);
-                                    }
-                                    if (m_currentExecutingCommand != null)
-                                    {
-                                        //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Response line received: " + s));
-                                        try
+                                        //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Multi response line received: " + s));
+                                        lock (m_sync)
                                         {
-                                            m_currentExecutingCommand.SetResult(new string(line), m_responseLines.ToArray());
+                                            AddToLog(LogType.ReceivedPartial, 0, new string(line));
                                         }
-                                        finally
+                                        if (m_currentExecutingCommand != null)
                                         {
+                                            m_responseLines.Enqueue(s);
                                         }
-                                        OnEndCommand();
                                     }
-                                    else
+                                    else if (line[0] == ResponseEndLineChar)
                                     {
-                                        //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Response line received (no command active): " + s));
+                                        var l = new string(line);
+                                        lock (m_sync)
+                                        {
+                                            AddToLog((l.StartsWith(ResponseErrorPrefix)) ? LogType.ReceivedError : LogType.ReceivedEnd, 0, l);
+                                        }
+                                        if (m_currentExecutingCommand != null)
+                                        {
+                                            //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Response line received: " + s));
+                                            try
+                                            {
+                                                m_currentExecutingCommand.SetResult(new string(line), m_responseLines.ToArray());
+                                            }
+                                            finally
+                                            {
+                                            }
+                                            OnEndCommand();
+                                        }
+                                        else
+                                        {
+                                            //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Response line received (no command active): " + s));
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                }
+                // Notify anyone waiting on the connection that we can be checked now
+                lock (m_eventLogSync)
+                {
+                    Monitor.PulseAll(m_eventLogSync);
                 }
                 //else
                 //{
