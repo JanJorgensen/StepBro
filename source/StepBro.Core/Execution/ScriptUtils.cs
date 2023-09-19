@@ -312,27 +312,12 @@ namespace StepBro.Core.Execution
                 // If the string was found
                 if (result != null)
                 {
-                    if (reader.LinesHaveTimestamp)
+                    if (removeFound)
                     {
-                        // We take the timestamp of the found string
-                        DateTime foundTimeStamp = reader.Current.Timestamp;
-
-                        if (removeFound)
-                        {
-                            reader.Next();
-                        }
-
-                        return result;
+                        reader.Next();
                     }
-                    else
-                    {
-                        if (removeFound)
-                        {
-                            reader.Next();
-                        }
 
-                        return result;
-                    }
+                    return result;
                 }
             } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero || doOneLastCheck); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
 
