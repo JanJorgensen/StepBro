@@ -55,7 +55,6 @@ DATETIME : 'datetime' ;
 DECIMAL : 'decimal' ;
 DO : 'do' ;
 DOUBLE : 'double' ;
-DYNAMIC: 'dynamic' ;
 ELSE : 'else' ;
 EMPTY : 'empty' ;
 ENUM : 'enum' ;

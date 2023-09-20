@@ -21,11 +21,6 @@ namespace StepBro.Core.Parser
         /// </summary>
         internal sealed class VarSpecifiedType { private VarSpecifiedType() { } }
 
-        /// <summary>
-        /// Type used for indicating that a variable is specified with 'dynamic' instead of an explicit type.
-        /// </summary>
-        internal sealed class DynamicSpecifiedType { private DynamicSpecifiedType() { } }
-
         public override void ExitTypeVoid([NotNull] SBP.TypeVoidContext context)
         {
             m_typeStack.Push((TypeReference)typeof(void));
@@ -117,11 +112,6 @@ namespace StepBro.Core.Parser
         public override void ExitVariableVarType([NotNull] SBP.VariableVarTypeContext context)
         {
             m_typeStack.Push((TypeReference)typeof(VarSpecifiedType));
-        }
-
-        public override void ExitVariableDynamicType([NotNull] SBP.VariableDynamicTypeContext context)
-        {
-            m_typeStack.Push((TypeReference)typeof(DynamicSpecifiedType));
         }
 
         public TypeReference ParseTypeString(
