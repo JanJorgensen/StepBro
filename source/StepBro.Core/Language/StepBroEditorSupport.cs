@@ -44,7 +44,7 @@ namespace StepBro.Core.Language
             this.AddTokenStyle(EditorTextStyles.Keyword,
                 Lexer.ALT, Lexer.ASSERT, Lexer.AWAIT, Lexer.BASE, Lexer.BOOL, Lexer.BREAK,
                 Lexer.CONST, Lexer.CONTINUE, Lexer.DATATABLE, Lexer.DATETIME, Lexer.DECIMAL,
-                Lexer.DO, Lexer.DOUBLE, Lexer.DYNAMIC, Lexer.ELSE, Lexer.EMPTY, Lexer.ENUM,
+                Lexer.DO, Lexer.DOUBLE, Lexer.ELSE, Lexer.EMPTY, Lexer.ENUM,
                 Lexer.ERROR, Lexer.EXECUTION, Lexer.EXPECT, Lexer.FAIL, Lexer.FALSE,
                 Lexer.FOR, Lexer.FOREACH, Lexer.FUNCTION, Lexer.IF, Lexer.IGNORE,
                 Lexer.IN, Lexer.INCONCLUSIVE, Lexer.INTEGER, Lexer.INT_, Lexer.IS,

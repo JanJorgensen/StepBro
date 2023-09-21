@@ -179,9 +179,8 @@ localVariableDeclaration	// Used in procedure-scope and in for-loop initializer.
 
 simpleVariableDeclaration : variableType variableDeclaratorWithAssignment ;	// One single variable; used in using statement.
 
-variableType : variableVarType | variableDynamicType | type ;
+variableType : variableVarType | type ;
 variableVarType : VAR ;
-variableDynamicType : DYNAMIC ;
 
 //variableModifiers : variableModifier* ;
 
