@@ -303,27 +303,27 @@ namespace StepBro.Core.Execution
                     {
                         synchronize = Monitor.Wait(reader.Sync, synchronizeTimeout);
                     }
-                }
-
-                // If we failed to synchronize with reader, we report a failure.
-                if (synchronize == false)
-                {
-                    context.ReportFailure($"Reader failed to synchronize within {synchronizeTimeout} milliseconds, ensure reader is not disconnected.");
-                    break;
-                }
-
-                // We look for the string we want to find
-                var result = reader.Find(null, comparer, true);
-
-                // If the string was found
-                if (result != null)
-                {
-                    if (removeFound)
+                
+                    // If we failed to synchronize with reader, we report a failure.
+                    if (synchronize == false)
                     {
-                        reader.Next();
+                        context.ReportFailure($"Reader failed to synchronize within {synchronizeTimeout} milliseconds, ensure reader is not disconnected.");
+                        break;
                     }
 
-                    return result;
+                    // We look for the string we want to find
+                    var result = reader.Find(null, comparer, true);
+
+                    // If the string was found
+                    if (result != null)
+                    {
+                        if (removeFound)
+                        {
+                            reader.Next();
+                        }
+
+                        return result;
+                    }
                 }
             } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero || doOneLastCheck); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
 
