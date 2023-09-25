@@ -236,7 +236,7 @@ namespace StepBro.Core.Execution
         {
             // Entry timestamp - If there are no timestamps on this reader, we set the entry time to the minimum time possible
             //                   as we would then not use the timeout at all
-            DateTime entryTime = (reader.LinesHaveTimestamp && reader.Current != null) ? reader.Current.Timestamp : DateTime.MinValue;
+            DateTime entryTime = (reader.LinesHaveTimestamp && reader.LatestTimeStamp != DateTime.MinValue) ? reader.LatestTimeStamp : DateTime.MinValue;
 
             // Limit timestamp - The latest timestamp we will look for in the log
             DateTime limitTime = (limit == default || limit == TimeSpan.MaxValue) ? DateTime.MaxValue : entryTime + limit;
@@ -264,13 +264,28 @@ namespace StepBro.Core.Execution
                 
                 foreach (var entry in peaker)
                 {
+                    // If the entry time was not set, because the reader was empty
+                    // we set it to the first entry in the reader.
+                    if (entryTime == DateTime.MinValue)
+                    {
+                        entryTime = entry.Timestamp;
+                    }
+
                     var result = comparer(entry.Text);
-                    if (result != null && (!reader.LinesHaveTimestamp || reader.Current.Timestamp.TimeTill(limitTime) >= TimeSpan.Zero))
+                    if (result != null && (!reader.LinesHaveTimestamp || entry.Timestamp.TimeTill(limitTime) > TimeSpan.Zero))
                     {
                         reader.Flush(entry);
                         return result;
                     }
                     last = entry;
+                }
+
+                lock (reader.Sync)
+                {
+                    if (reader.Current == null)
+                    {
+                        Monitor.Wait(reader.Sync, 5);
+                    }
                 }
             } while (DateTime.Now.TimeTill(timeoutTime) > TimeSpan.Zero);
 

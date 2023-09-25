@@ -80,6 +80,7 @@ namespace StepBro.Core.Data
         private object m_sync;
         private bool m_firstEntryIsNew = true;
         private LogLineData m_entry = null;
+        private DateTime m_latestTimestamp = DateTime.MinValue;
 
         public event EventHandler LinesAdded;
 
@@ -118,6 +119,8 @@ namespace StepBro.Core.Data
 
         public object Sync { get { return m_sync; } }
 
+        public DateTime LatestTimeStamp { get { return m_latestTimestamp; } }
+
         public ILineReaderEntry Current { get { return m_entry; } }
 
         public INameable Source { get; private set; }
@@ -128,6 +131,7 @@ namespace StepBro.Core.Data
             {
                 if (m_entry != null)
                 {
+                    m_latestTimestamp = m_entry.Timestamp;
                     m_entry = m_entry.Next;
                     return true;
                 }
@@ -141,6 +145,7 @@ namespace StepBro.Core.Data
             {
                 if (!m_firstEntryIsNew && m_entry != null)
                 {
+                    m_latestTimestamp = m_entry.Timestamp;
                     m_entry = m_entry.Next;
                     return true;
                 }
@@ -159,12 +164,17 @@ namespace StepBro.Core.Data
                 lock (m_sync)
                 {
                     m_entry = (LogLineData)stopAt;
+                    m_latestTimestamp = m_entry.Timestamp;
                 }
             }
             else
             {
                 lock (m_sync)
                 {
+                    // This timestamp can be significantly off with real-time
+                    // but as we get rid of every other entry, there is no better
+                    // choice for latest timestamp.
+                    m_latestTimestamp = m_entry.Timestamp;
                     m_entry = null;
                 }
             }
