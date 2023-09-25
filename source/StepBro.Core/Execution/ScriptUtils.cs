@@ -222,24 +222,32 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static string Find(this ILineReader reader, [Implicit] ICallContext context, string text, bool flushIfNotFound = false)
+        public static string Find(this ILineReader reader, [Implicit] ICallContext context, string text, bool flushIfNotFound = false, TimeSpan timeout = default)
         {
             System.Diagnostics.Debug.WriteLine("Reader.Find: " + text);
             reader.DebugDump();
             //if (context != null && context.LoggingEnabled) context.Logger.Log("Find", "\"" + text + "\"");
             var comparer = StringUtils.CreateComparer(text);
-            return Find(reader, context, comparer, flushIfNotFound);
+            return Find(reader, context, comparer, flushIfNotFound, timeout);
         }
 
         [Public]
-        public static string Find(this ILineReader reader, [Implicit] ICallContext context, Func<string, string> comparer, bool flushIfNotFound = false)
+        public static string Find(this ILineReader reader, [Implicit] ICallContext context, Func<string, string> comparer, bool flushIfNotFound = false, TimeSpan timeout = default)
         {
             var peaker = reader.Peak();
+
+            // Entry timestamp - If there are no timestamps on this reader, we set the entry time to the minimum time possible
+            //                   as we would then not use the timeout at all
+            DateTime entryTime = (reader.LinesHaveTimestamp && reader.Current != null) ? reader.Current.Timestamp : DateTime.MinValue;
+
+            // Timeout timestamp
+            DateTime timeoutTime = (timeout == default || timeout == TimeSpan.MaxValue) ? DateTime.MaxValue : entryTime + timeout;
+
             ILineReaderEntry last = null;
             foreach (var entry in peaker)
             {
                 var result = comparer(entry.Text);
-                if (result != null)
+                if (result != null && (!reader.LinesHaveTimestamp || reader.Current.Timestamp.TimeTill(timeoutTime) >= TimeSpan.Zero))
                 {
                     reader.Flush(entry);
                     return result;
@@ -255,14 +263,7 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan limit, bool skipCurrent = true, bool removeFound = false)
-        {
-            // Use limit both as the limit for the timestamps, and the timeout for real time
-            return Await(reader, context, text, limit, limit, skipCurrent, removeFound);
-        }
-
-        [Public]
-        public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan limit, TimeSpan timeout, bool skipCurrent = true, bool removeFound = false)
+        public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan timeout, bool skipCurrent = true, bool removeFound = false)
         {
             System.Diagnostics.Debug.WriteLine("Reader.Await: " + text);
             if (context != null && context.LoggingEnabled) context.Logger.Log("Await \"" + text + "\"");
@@ -279,10 +280,7 @@ namespace StepBro.Core.Execution
             DateTime entry = (reader.LinesHaveTimestamp && reader.Current != null) ? reader.Current.Timestamp : DateTime.Now;
 
             // The latest time the timestamp is allowed to be
-            DateTime to = (limit == TimeSpan.MaxValue) ? DateTime.MaxValue : entry + limit;
-
-            // The latest real-time we should look, in case we missed the last few logs
-            DateTime latestRealtime = (timeout == TimeSpan.MaxValue) ? entry : entry + timeout;
+            DateTime to = (timeout == TimeSpan.MaxValue) ? DateTime.MaxValue : entry + timeout;
 
             //bool sleep = false;
             do
@@ -336,14 +334,14 @@ namespace StepBro.Core.Execution
                             reader.Next();
                         }
 
-                        if (DateTime.Now.TimeTill(to) > TimeSpan.Zero)
+                        if (DateTime.Now.TimeTill(to) >= TimeSpan.Zero)
                         {
                             return result;
                         }
                     }
                     break;
                 }
-            } while (DateTime.Now.TimeTill(to) >= TimeSpan.Zero || DateTime.Now.TimeTill(latestRealtime) >= TimeSpan.Zero); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
+            } while (DateTime.Now.TimeTill(to) >= TimeSpan.Zero); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
 
             if (context != null)
             {
