@@ -180,12 +180,13 @@ namespace StepBro.Streams
                     }, m_port.BytesToRead);
                 }
             } 
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
                 // The port was closed while we were trying to receive data.
                 // This means we just throw away the data as we do not need it,
                 // otherwise the port would not have closed.
-                // In other words: Do nothing.
+                // We write the exception into the logger, in case the user wants to handle it from the script.
+                m_asyncLogger.LogError(ex.Message);
             }
         }
 
