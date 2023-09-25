@@ -131,7 +131,7 @@ namespace StepBro.Core.Data
             {
                 if (m_entry != null)
                 {
-                    m_latestTimestamp = m_entry.Timestamp;
+                    m_latestTimestamp = (m_entry.Next != null ? m_entry.Next.Timestamp : m_entry.Timestamp);
                     m_entry = m_entry.Next;
                     return true;
                 }
@@ -145,7 +145,7 @@ namespace StepBro.Core.Data
             {
                 if (!m_firstEntryIsNew && m_entry != null)
                 {
-                    m_latestTimestamp = m_entry.Timestamp;
+                    m_latestTimestamp = (m_entry.Next != null ? m_entry.Next.Timestamp : m_entry.Timestamp);
                     m_entry = m_entry.Next;
                     return true;
                 }
