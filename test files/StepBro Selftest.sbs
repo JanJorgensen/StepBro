@@ -8,17 +8,62 @@ procedure void ScriptExecution(string file, string element, string model = "", i
 {
 	log ("file: " + file);
 	log ("element: " + element);
-	log ("model: " + model);
+	var modelString = " -m " + model;
+	if (!System.String.IsNullOrEmpty(model))
+	{ 
+		log ("model: " + model);
+	}
+	else
+	{
+		modelString = "";
+	}
 	log ("expectedReturn: " + expectedReturn);
+
+    var process = Process.Start(@"stepbro.exe", "\"" + file + "\" -t -e " + element + modelString, logOutput: true, workingDirectory: this.FileDirectory);
+	process.WaitForExit(expectReturnCodeZero: true);
+	process.OutputLines.DebugDump();
 }
 
-public testlist AllTests
+public testlist ConsoleTests
 {
-	* ScriptExecution(file: "Peter", element: "Madsen", expectedReturn: -4)
-	* ScriptExecution(file: "Knud", element: "Jensen")
+	* ScriptExecution(file: @"..\Scripts\TestFramework.sbs", element: "Madsen", expectedReturn: -4)
+	* ScriptExecution(file: @"..\Scripts\TestFramework.sbs", element: "Jensen")
 }
 
 public procedure void SayHello()
 {
 	log("Hello!!");
 }
+
+public procedure void ProcedureFail()
+{
+	expect (3 > 11);
+}
+
+public procedure void LongDelay()
+{
+	delay(20s, "Waiting for my food...");
+}
+
+public procedure void LoopWithTimeout()
+{
+	while (true) : 
+		Title: "Awaiting the thing to happen",
+    	Timeout: 20s,
+    	UserBreak: "I saw it!",
+    	UserBreak: "Error"
+	{
+		delay(5s);
+	}
+}
+
+public procedure void Caller()
+{
+	Called(5, "Moster");
+}
+
+public procedure void Called(int number, string text)
+{
+	log("Number: " + number + ". Text: " + text);
+}
+

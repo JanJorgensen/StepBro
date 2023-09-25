@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.ScriptData;
+using System.Collections.ObjectModel;
 
 namespace StepBro.Core.Execution
 {
@@ -15,5 +16,7 @@ namespace StepBro.Core.Execution
             IFileElement element,
             IPartner partner,
             params object[] arguments);
+
+        ReadOnlyObservableCollection<IScriptExecution> Executions { get; }
     }
 }

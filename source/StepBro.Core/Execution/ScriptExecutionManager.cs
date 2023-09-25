@@ -1,9 +1,11 @@
-﻿using StepBro.Core.General;
+﻿using StepBro.Core.Data;
+using StepBro.Core.General;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace StepBro.Core.Execution
 {
@@ -11,12 +13,11 @@ namespace StepBro.Core.Execution
     {
         private ILoggerScope m_logger = null;
         private ILoadedFilesManager m_loadedFilesManager = null;
-        //private ILogSinkManager m_logSinkManager = null;
         private TaskManager m_taskManager = null;
-        private readonly List<WeakReference<ScriptExecutionTask>> m_tasks = new List<WeakReference<ScriptExecutionTask>>();
+        private readonly ObservableCollection<IScriptExecution> m_tasks = new ObservableCollection<IScriptExecution>();
 
         public ScriptExecutionManager(out IService serviceAccess) :
-            base(nameof(ScriptExecutionManager), out serviceAccess, 
+            base(nameof(ScriptExecutionManager), out serviceAccess,
                 typeof(ILogger), typeof(ILoadedFilesManager), typeof(TaskManager), typeof(IConfigurationFileManager))
         {
         }
@@ -25,7 +26,6 @@ namespace StepBro.Core.Execution
         {
             m_logger = manager.Get<ILogger>() as ILoggerScope;
             m_loadedFilesManager = manager.Get<ILoadedFilesManager>();
-            //m_logSinkManager = manager.Get<ILogSinkManager>();
             m_taskManager = manager.Get<TaskManager>();
         }
 
@@ -49,9 +49,18 @@ namespace StepBro.Core.Execution
         {
             this.ExpectServiceStarted();
 
-            var scriptTask = new ScriptExecutionTask(m_logger, /*m_logSinkManager,*/ m_loadedFilesManager, m_taskManager, element, arguments);
-            m_tasks.Add(new WeakReference<ScriptExecutionTask>(scriptTask));
+            var scriptTask = new ScriptExecutionTask(m_logger, m_loadedFilesManager, m_taskManager, element, arguments);
+            m_tasks.Add(scriptTask);
             return scriptTask;
         }
+
+        public ReadOnlyObservableCollection<IScriptExecution> Executions
+        {
+            get
+            {
+                return new ReadOnlyObservableCollection<IScriptExecution>(m_tasks);
+            }
+        }
+
     }
 }

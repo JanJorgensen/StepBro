@@ -98,6 +98,11 @@ namespace StepBro.Core.Execution
             }
         }
 
+        public void SetLoopExitReason(string reason)
+        {
+            m_context.SetLoopExitReason(reason);
+        }
+
         public ILogger Logger
         {
             get

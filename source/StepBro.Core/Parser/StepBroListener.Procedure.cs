@@ -552,11 +552,17 @@ namespace StepBro.Core.Parser
             }
 
             var statementExpressions = new List<Expression>();
-            var loopExpressions = new List<Expression>();
-            loopExpressions.Add(
+            var loopExpressions = new List<Expression>
+            {
                 Expression.IfThen(
                     Expression.Not(conditionExpression),
-                    Expression.Break(breakLabel)));
+                    Expression.Block(
+                        Expression.Call(
+                            m_currentProcedure.ContextReferenceInternal,
+                            typeof(IScriptCallContext).GetMethod("SetLoopExitReason", new Type[] { typeof(string) }),
+                            Expression.Constant("Expression")),
+                        Expression.Break(breakLabel)))
+            };
 
             varLoopIndex = forOuterScope.AddVariable(
                 CreateStatementVariableName(context, "forLoop_index"),
@@ -647,6 +653,10 @@ namespace StepBro.Core.Parser
                             varTimeoutTime.VariableExpression),
                         Expression.Block(
                             Expression.IfThen(loggingEnabled, timeoutLoggingCall),
+                            Expression.Call(
+                                m_currentProcedure.ContextReferenceInternal,
+                                typeof(IScriptCallContext).GetMethod("SetLoopExitReason", new Type[] { typeof(string) }),
+                                Expression.Constant("Timeout")),
                             Expression.Break(breakLabel))));
             }
 
@@ -745,11 +755,17 @@ namespace StepBro.Core.Parser
             }
 
             var statementExpressions = new List<Expression>();
-            var loopExpressions = new List<Expression>();
-            loopExpressions.Add(
+            var loopExpressions = new List<Expression>
+            {
                 Expression.IfThen(
                     Expression.Not(conditionExpression),
-                    Expression.Break(breakLabel)));
+                    Expression.Block(
+                        Expression.Call(
+                            m_currentProcedure.ContextReferenceInternal,
+                            typeof(IScriptCallContext).GetMethod("SetLoopExitReason", new Type[] { typeof(string) }),
+                            Expression.Constant("Expression")),
+                        Expression.Break(breakLabel)))
+            };
 
             varLoopIndex = whileScope.AddVariable(
                 CreateStatementVariableName(context, "whileLoop_index"),
@@ -840,6 +856,10 @@ namespace StepBro.Core.Parser
                             varTimeoutTime.VariableExpression),
                         Expression.Block(
                             Expression.IfThen(loggingEnabled, timeoutLoggingCall),
+                            Expression.Call(
+                                m_currentProcedure.ContextReferenceInternal,
+                                typeof(IScriptCallContext).GetMethod("SetLoopExitReason", new Type[] { typeof(string) }),
+                                Expression.Constant("Timeout")),
                             Expression.Break(breakLabel))));
             }
 
@@ -891,7 +911,13 @@ namespace StepBro.Core.Parser
             var scopeForLoop = this.TryGetLoopScope();
             if (scopeForLoop != null)
             {
-                m_scopeStack.Peek().AddStatementCode(Expression.Break(scopeForLoop.BreakLabel));
+                m_scopeStack.Peek().AddStatementCode(
+                    Expression.Block(
+                        Expression.Call(
+                            m_currentProcedure.ContextReferenceInternal,
+                            typeof(IScriptCallContext).GetMethod("SetLoopExitReason", new Type[] { typeof(string) }),
+                            Expression.Constant("Break")),
+                        Expression.Break(scopeForLoop.BreakLabel)));
             }
             else
             {

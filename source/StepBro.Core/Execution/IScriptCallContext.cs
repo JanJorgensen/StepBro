@@ -32,5 +32,7 @@ namespace StepBro.Core.Execution
         void LogError(string text);
 
         ILoadedFilesManager LoadedFiles { get; }
+
+        void SetLoopExitReason(string reason);
     }
 }
