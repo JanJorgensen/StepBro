@@ -255,7 +255,14 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan timeout, bool skipCurrent = true, bool removeFound = false)
+        public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan limit, bool skipCurrent = true, bool removeFound = false)
+        {
+            // Use limit both as the limit for the timestamps, and the timeout for real time
+            return Await(reader, context, text, limit, limit, skipCurrent, removeFound);
+        }
+
+        [Public]
+        public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan limit, TimeSpan timeout, bool skipCurrent = true, bool removeFound = false)
         {
             System.Diagnostics.Debug.WriteLine("Reader.Await: " + text);
             if (context != null && context.LoggingEnabled) context.Logger.Log("Await \"" + text + "\"");
@@ -271,8 +278,11 @@ namespace StepBro.Core.Execution
             // If the reader has timestamp, set the timeout relative to the time of the current entry; otherwise just use current wall time.
             DateTime entry = (reader.LinesHaveTimestamp && reader.Current != null) ? reader.Current.Timestamp : DateTime.Now;
 
-            // The time where the timeout expires.
-            DateTime to = (timeout == TimeSpan.MaxValue) ? DateTime.MaxValue : entry + timeout;
+            // The latest time the timestamp is allowed to be
+            DateTime to = (limit == TimeSpan.MaxValue) ? DateTime.MaxValue : entry + limit;
+
+            // The latest real-time we should look, in case we missed the last few logs
+            DateTime latestRealtime = (timeout == TimeSpan.MaxValue) ? entry : entry + timeout;
 
             //bool sleep = false;
             do
@@ -288,6 +298,13 @@ namespace StepBro.Core.Execution
                     {
                         Monitor.Wait(reader.Sync, 5);
                     }
+                }
+
+                // If the current entry in the reader has a timestamp after our limit
+                // we break as we know that any entry after this would have been too late
+                if (reader.Current != null && reader.Current.Timestamp > to)
+                {
+                    break;
                 }
 
                 // We look for the string we want to find
@@ -326,7 +343,7 @@ namespace StepBro.Core.Execution
                     }
                     break;
                 }
-            } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
+            } while (DateTime.Now.TimeTill(to) >= TimeSpan.Zero || DateTime.Now.TimeTill(latestRealtime) >= TimeSpan.Zero); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
 
             if (context != null)
             {
