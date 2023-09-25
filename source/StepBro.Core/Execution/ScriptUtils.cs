@@ -256,7 +256,7 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan timeout, bool skipCurrent = true, bool removeFound = false, TimeSpan ts = default(TimeSpan))
+        public static string Await(this ILineReader reader, [Implicit] ICallContext context, string text, TimeSpan timeout, bool skipCurrent = true, bool removeFound = false)
         {
             System.Diagnostics.Debug.WriteLine("Reader.Await: " + text);
             if (context != null && context.LoggingEnabled) context.Logger.Log("Await \"" + text + "\"");
