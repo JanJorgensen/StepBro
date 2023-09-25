@@ -45,7 +45,7 @@ namespace StepBro.Core.Data
             }
         }
         public bool LinesHaveTimestamp { get { return false; } }
-        public DateTime LatestTimeStamp { get { return DateTime.Now; } }
+        public DateTime LatestTimeStamp { get { throw new NotImplementedException(); } }
         public bool HasMore { get { return (m_index < (m_list.Count - 1)); } }
 
         public INameable Source { get; private set; }
