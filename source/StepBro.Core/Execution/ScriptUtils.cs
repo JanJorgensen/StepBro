@@ -270,19 +270,22 @@ namespace StepBro.Core.Execution
                 timeoutTime = entryTime + timeout;
             }
 
+            var peaker = reader.Peak();
+
             ILineReaderEntry last = null;
             do
             {
-                lock (reader.Sync)
+                if (timeout != default)
                 {
-                    if (reader.Current == null)
+                    lock (reader.Sync)
                     {
-                        Monitor.Wait(reader.Sync, 5);
+                        if (reader.Current == null)
+                        {
+                            Monitor.Wait(reader.Sync, 5);
+                        }
                     }
                 }
 
-                var peaker = reader.Peak();
-                
                 foreach (var entry in peaker)
                 {
                     // If the entry time was not set, because the reader was empty
