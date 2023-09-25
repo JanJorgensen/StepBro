@@ -174,7 +174,10 @@ namespace StepBro.Core.Data
                     // This timestamp can be significantly off with real-time
                     // but as we get rid of every other entry, there is no better
                     // choice for latest timestamp.
-                    m_latestTimestamp = m_entry.Timestamp;
+                    if (m_entry != null)
+                    {
+                        m_latestTimestamp = m_entry.Timestamp;
+                    }
                     m_entry = null;
                 }
             }
