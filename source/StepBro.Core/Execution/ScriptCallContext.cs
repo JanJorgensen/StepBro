@@ -28,8 +28,7 @@ namespace StepBro.Core.Execution
         private ILogger m_loggerInside;
         private ILoggerScope m_loggerInsideScope;
         private IExecutionScopeStatusUpdate m_statusUpdaterOnEntry;
-        //Stack<ITaskStatusUpdate> m_createdStatusUpdaters = null;
-        //ITaskStatusUpdate m_currentStatusUpdater = null;
+        private Stack<IExecutionScopeStatusUpdate> m_statusUpdaterStack = new Stack<IExecutionScopeStatusUpdate>();
         private int m_currentStatementLine = 0;
         private int m_currentStatementColumn = 0;
         private string m_currentLogLocation = "0";
@@ -48,6 +47,7 @@ namespace StepBro.Core.Execution
         private ProcedureResult m_lastCallResult = null;
         private string m_nextCallHighLevelType = null;
         private IFolderShortcutsSource m_folderShortcuts = null;
+        private string m_loopExitReason = null;
 
         internal ScriptCallContext(
             ScriptTaskContext task,
@@ -63,6 +63,7 @@ namespace StepBro.Core.Execution
             m_callLoggingOption = callLoggingOption;
             m_loggerInside = m_loggerOnEntry = logger;
             m_statusUpdaterOnEntry = statusUpdater;
+            m_statusUpdaterStack.Push(m_statusUpdaterOnEntry);
             m_loggingEnabled = true;    // Initial
             m_procedure = procedure;
             m_taskManager = taskManager;
@@ -85,6 +86,7 @@ namespace StepBro.Core.Execution
             m_loggerOnEntry = parent.Logger as ILoggerScope;
             m_loggerInside = m_loggerOnEntry;
             m_statusUpdaterOnEntry = parent.StatusUpdater;
+            m_statusUpdaterStack.Push(m_statusUpdaterOnEntry);
             m_loggingEnabled = parent.LoggingEnabled;
             m_errorListener = parent.m_errorListener;
 
@@ -98,19 +100,6 @@ namespace StepBro.Core.Execution
             this.SetupFromProcedure(arguments);
 
             m_currentReport = parent.m_currentReport;
-
-            //m_createdlogger = logger.LogEntering(procedure.ElementName, procedure.Purpose);
-            //if (separateStateLevel)
-            //{
-            //    m_currentStatusUpdater = parent.StatusUpdate.CreateSubTaskStatusReporter(procedure.Purpose);
-            //    m_currentStatusUpdater.Disposed += M_currentStatusUpdater_Disposed;
-            //    m_createdStatusUpdaters = new Stack<ITaskStatusUpdate>(4);
-            //    m_createdStatusUpdaters.Push(m_currentStatusUpdater);
-            //}
-            //else
-            //{
-            //    m_currentStatusUpdater = parent.StatusUpdate;
-            //}
         }
 
         private void SetupFromProcedure(object[] arguments)
@@ -139,12 +128,17 @@ namespace StepBro.Core.Execution
                 {
                     argText.Append("<no arguments>");
                 }
-                var textPrefix = (m_parentContext?.m_nextCallHighLevelType != null) ? (m_parentContext.m_nextCallHighLevelType + " - ") : "";
+                var isHighlevel = m_parentContext?.m_nextCallHighLevelType != null;
+                var textPrefix = isHighlevel ? (m_parentContext.m_nextCallHighLevelType + " - ") : "";
                 m_loggerInsideScope = m_loggerOnEntry.LogEntering(
-                    (m_parentContext?.m_nextCallHighLevelType != null),
+                    isHighlevel,
                     (m_isDynamicCall ? "<DYNAMIC CALL> " : "") + m_procedure.FullName,
                     textPrefix + argText.ToString(),
                     new LoggerDynamicLocationSource(this.GetDynamicLogLocation));
+                if (isHighlevel)
+                {
+                    m_statusUpdaterStack.Push(m_statusUpdaterStack.Peek().CreateProgressReporter(m_parentContext.m_nextCallHighLevelType + ": " + m_procedure.FullName));
+                }
                 m_loggerInside = m_loggerInsideScope;
                 m_startTime = m_loggerInsideScope.FirstLogEntryInScope.Timestamp;   // Same timestamp as the loggeg entry.
             }
@@ -162,11 +156,6 @@ namespace StepBro.Core.Execution
             m_loggerInside = null;
             m_loggerInsideScope = null;
             m_endTime = DateTime.Now;
-            //m_createdlogger.Dispose();
-            //if (m_firstCreatedStatusUpdater != null)
-            //{
-            //    m_firstCreatedStatusUpdater.Dispose();
-            //}
         }
 
         public void Dispose()
@@ -276,6 +265,7 @@ namespace StepBro.Core.Execution
             get
             {
                 return m_statusUpdaterOnEntry;
+                //return m_statusUpdaterStack.Peek();
             }
         }
 
@@ -596,6 +586,10 @@ namespace StepBro.Core.Execution
                 return m_task.LoadedFilesManager;
             }
         }
+        public void SetLoopExitReason(string reason)
+        {
+            m_loopExitReason = reason;
+        }
 
         bool IProcedureThis.HasFails { get { return m_failCount > 0; } }
 
@@ -621,6 +615,11 @@ namespace StepBro.Core.Execution
                 return false;
             }
         }
+        string IProcedureThis.LastLoopExitReason
+        {
+            get { return m_loopExitReason; }
+        }
+
 
         string IProcedureThis.FileName
         {

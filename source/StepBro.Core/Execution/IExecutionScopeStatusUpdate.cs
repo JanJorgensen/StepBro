@@ -10,6 +10,13 @@ namespace StepBro.Core.Execution
         Error
     }
 
+    /// <summary>
+    /// Delegate type for state buttons.
+    /// </summary>
+    /// <param name="activated">Whether the button is being activated (true) or released (false).</param>
+    /// <returns>Whether the button should be shown in pushed state.</returns>
+    public delegate bool StateButtonAction(bool activated);
+
     public interface IExecutionScopeStatusUpdate : IDisposable, ITaskStateReporting
     {
         /// <summary>
@@ -41,22 +48,8 @@ namespace StepBro.Core.Execution
             long progressMax = -1,
             Func<long, string> progressFormatter = null);
 
-        void AddActionButton(string title, Func<bool, bool> activationAction);
+        void AddActionButton(string title, StateButtonAction activationAction);
 
-        /// <summary>
-        /// Notifies exit of the subtask.
-        /// </summary>
-        event EventHandler Disposed;
-
-        /// <summary>
-        /// Notifies that the initial expected time now is exceeded.
-        /// </summary>
-        event EventHandler ExpectedTimeExceeded;
-
-        AttentionColor ProgressColor { get; set; }
-
-        //void SetProgress(long progress);
-        //void IndicateProgress();
-        //void SetText(string text);
+        void SetProgressColor(AttentionColor color);
     }
 }

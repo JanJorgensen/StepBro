@@ -39,16 +39,17 @@ namespace StepBro.Core.Execution
 
         [Public]
 #pragma warning disable IDE1006 // Naming Styles
-        public static void delay([Implicit] ICallContext context, TimeSpan time)
+        public static void delay([Implicit] ICallContext context, TimeSpan time, string purpose = null)
 #pragma warning restore IDE1006 // Naming Styles
         {
             if (context != null && context.LoggingEnabled)
             {
-                context.Logger.Log($"{(long)time.TotalMilliseconds}ms");
+                string purposetext = String.IsNullOrEmpty(purpose) ? "" : " - " + purpose;
+                context.Logger.Log($"{(long)time.TotalMilliseconds}ms{purposetext}");
             }
             if (time >= g_fiveSeconds)
             {
-                var reporter = context.StatusUpdater.CreateProgressReporter("delay", time);
+                var reporter = context.StatusUpdater.CreateProgressReporter(String.IsNullOrEmpty(purpose) ? "delay" : purpose, time);
                 using (reporter)
                 {
                     bool skipClicked = false;

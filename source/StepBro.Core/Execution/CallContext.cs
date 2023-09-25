@@ -93,7 +93,7 @@ namespace StepBro.Core.Execution
         {
             get
             {
-                throw new NotImplementedException();
+                return m_parentScriptContext.StatusUpdater;
             }
         }
 
@@ -101,7 +101,7 @@ namespace StepBro.Core.Execution
         {
             get
             {
-                throw new NotImplementedException();
+                return m_break;
             }
         }
 
