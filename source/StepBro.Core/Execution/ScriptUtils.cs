@@ -302,7 +302,7 @@ namespace StepBro.Core.Execution
 
                 // If the current entry in the reader has a timestamp after our limit
                 // we break as we know that any entry after this would have been too late
-                if (reader.Current != null && reader.Current.Timestamp > to)
+                if (reader.Current != null && reader.LinesHaveTimestamp && reader.Current.Timestamp > to)
                 {
                     break;
                 }
