@@ -273,6 +273,14 @@ namespace StepBro.Core.Execution
             ILineReaderEntry last = null;
             do
             {
+                lock (reader.Sync)
+                {
+                    if (reader.Current == null)
+                    {
+                        Monitor.Wait(reader.Sync, 5);
+                    }
+                }
+
                 var peaker = reader.Peak();
                 
                 foreach (var entry in peaker)
@@ -291,14 +299,6 @@ namespace StepBro.Core.Execution
                         return result;
                     }
                     last = entry;
-                }
-
-                lock (reader.Sync)
-                {
-                    if (reader.Current == null)
-                    {
-                        Monitor.Wait(reader.Sync, 5);
-                    }
                 }
             } while (DateTime.Now.TimeTill(timeoutTime) > TimeSpan.Zero);
 
