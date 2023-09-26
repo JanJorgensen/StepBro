@@ -4,6 +4,7 @@ using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBroCoreTest.Data;
 using System;
+using System.Collections.Generic;
 
 namespace StepBro.Core.Test.Data
 {
@@ -17,10 +18,89 @@ namespace StepBro.Core.Test.Data
         //void Flush(ILineReaderEntry stopAt = null);
         //IEnumerable<ILineReaderEntry> Peak();
 
+        public static List<string> CreateListOfStrings()
+        {
+            var list = new List<string>();
+            list.AddRange(new string[] {
+                "Anders",
+                "Anders",
+                "Andres", // ! 
+                "Anders",
+                "Anders",
+                "Anders",
+                "Anders",
+                "Bent Fabric",
+                "Bente Bent",
+                "Anders",
+                "Anders",
+                "Bent Nollerik",
+                "Bodil",
+                "Anders",
+                "Anders",
+                "Anders",
+                "Anders",
+                "Bente Birk",
+                "Anders A",
+                "Anders B",
+                "Anders C",
+                "Anders D",
+                "Anders E",
+                "Anders F",
+                "Anders G",
+                "Christian",
+            });
+            return list;
+        }
+
+        public static LogLineData CreateLogLineData()
+        {
+            LogLineData first = new LogLineData(
+                null,
+                LogLineData.LogType.Neutral,
+                0,
+                "*Anders",
+                DateTime.Parse("2023-09-26T11:35:00.0000000Z"));
+
+            LogLineData second = new LogLineData(
+                first,
+                LogLineData.LogType.Neutral,
+                1,
+                "*Bent",
+                DateTime.Parse("2023-09-26T11:36:00.0000000Z"));
+
+            LogLineData third = new LogLineData(
+                second,
+                LogLineData.LogType.Neutral,
+                1,
+                "*Christian",
+                DateTime.Parse("2023-09-26T11:37:00.0000000Z"));
+
+            LogLineData fourth = new LogLineData(
+                third,
+                LogLineData.LogType.Neutral,
+                1,
+                "*Dorte",
+                DateTime.Parse("2023-09-26T11:38:00.0000000Z"));
+
+            LogLineData fifth = new LogLineData(
+                fourth,
+                LogLineData.LogType.Neutral,
+                1,
+                "*Emil",
+                DateTime.Parse("2023-09-26T11:39:00.0000000Z"));
+
+            return first;
+        }
+
+        public static LogLineLineReader CreateLogLineLineReader(LogLineData first, object sync)
+        {
+            return new LogLineLineReader(null, first, sync);
+        }
+
         [TestMethod]
         public void LineReaderCreation()
         {
-            var list = DummyClass.CreateListOfStrings();
+            var list = CreateListOfStrings();
             var reader = list.ToLineReader();
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
@@ -29,7 +109,7 @@ namespace StepBro.Core.Test.Data
         [TestMethod]
         public void LineReaderNext()
         {
-            var list = DummyClass.CreateListOfStrings();
+            var list = CreateListOfStrings();
             var reader = list.ToLineReader();
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
@@ -49,7 +129,7 @@ namespace StepBro.Core.Test.Data
         [TestMethod]
         public void LineReaderPeakAndFlush()
         {
-            var list = DummyClass.CreateListOfStrings();
+            var list = CreateListOfStrings();
             var reader = list.ToLineReader();
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
@@ -72,8 +152,8 @@ namespace StepBro.Core.Test.Data
         public void LogLineLineReaderCreation()
         {
             object sync = new object();
-            var logLineData = DummyClass.CreateLogLineData();
-            var reader = DummyClass.CreateLogLineLineReader(logLineData, sync);
+            var logLineData = CreateLogLineData();
+            var reader = CreateLogLineLineReader(logLineData, sync);
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
             Assert.IsTrue(reader.LinesHaveTimestamp);
@@ -83,8 +163,8 @@ namespace StepBro.Core.Test.Data
         public void LogLineLineReaderFind01()
         {
             object sync = new object();
-            var logLineData = DummyClass.CreateLogLineData();
-            var reader = DummyClass.CreateLogLineLineReader(logLineData, sync);
+            var logLineData = CreateLogLineData();
+            var reader = CreateLogLineLineReader(logLineData, sync);
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
             Assert.IsTrue(reader.LinesHaveTimestamp);
@@ -97,8 +177,8 @@ namespace StepBro.Core.Test.Data
         public void LogLineLineReaderFind02()
         {
             object sync = new object();
-            var logLineData = DummyClass.CreateLogLineData();
-            var reader = DummyClass.CreateLogLineLineReader(logLineData, sync);
+            var logLineData = CreateLogLineData();
+            var reader = CreateLogLineLineReader(logLineData, sync);
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
             Assert.IsTrue(reader.LinesHaveTimestamp);
@@ -111,8 +191,8 @@ namespace StepBro.Core.Test.Data
         public void LogLineLineReaderFind03()
         {
             object sync = new object();
-            var logLineData = DummyClass.CreateLogLineData();
-            var reader = DummyClass.CreateLogLineLineReader(logLineData, sync);
+            var logLineData = CreateLogLineData();
+            var reader = CreateLogLineLineReader(logLineData, sync);
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
             Assert.IsTrue(reader.LinesHaveTimestamp);
@@ -125,8 +205,8 @@ namespace StepBro.Core.Test.Data
         public void LogLineLineReaderFind04()
         {
             object sync = new object();
-            var logLineData = DummyClass.CreateLogLineData();
-            var reader = DummyClass.CreateLogLineLineReader(logLineData, sync);
+            var logLineData = CreateLogLineData();
+            var reader = CreateLogLineLineReader(logLineData, sync);
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
             Assert.IsTrue(reader.LinesHaveTimestamp);
@@ -142,8 +222,8 @@ namespace StepBro.Core.Test.Data
         public void LogLineLineReaderFind05()
         {
             object sync = new object();
-            var logLineData = DummyClass.CreateLogLineData();
-            var reader = DummyClass.CreateLogLineLineReader(logLineData, sync);
+            var logLineData = CreateLogLineData();
+            var reader = CreateLogLineLineReader(logLineData, sync);
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
             Assert.IsTrue(reader.LinesHaveTimestamp);
@@ -159,8 +239,8 @@ namespace StepBro.Core.Test.Data
         public void LogLineLineReaderFind06()
         {
             object sync = new object();
-            var logLineData = DummyClass.CreateLogLineData();
-            var reader = DummyClass.CreateLogLineLineReader(logLineData, sync);
+            var logLineData = CreateLogLineData();
+            var reader = CreateLogLineLineReader(logLineData, sync);
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
             Assert.IsTrue(reader.LinesHaveTimestamp);
@@ -176,8 +256,8 @@ namespace StepBro.Core.Test.Data
         public void LogLineLineReaderFind07()
         {
             object sync = new object();
-            var logLineData = DummyClass.CreateLogLineData();
-            var reader = DummyClass.CreateLogLineLineReader(logLineData, sync);
+            var logLineData = CreateLogLineData();
+            var reader = CreateLogLineLineReader(logLineData, sync);
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
             Assert.IsTrue(reader.LinesHaveTimestamp);
@@ -193,8 +273,8 @@ namespace StepBro.Core.Test.Data
         public void LogLineLineReaderAwait01()
         {
             object sync = new object();
-            var logLineData = DummyClass.CreateLogLineData();
-            var reader = DummyClass.CreateLogLineLineReader(logLineData, sync);
+            var logLineData = CreateLogLineData();
+            var reader = CreateLogLineLineReader(logLineData, sync);
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
             Assert.IsTrue(reader.LinesHaveTimestamp);
@@ -207,8 +287,8 @@ namespace StepBro.Core.Test.Data
         public void LogLineLineReaderAwait02()
         {
             object sync = new object();
-            var logLineData = DummyClass.CreateLogLineData();
-            var reader = DummyClass.CreateLogLineLineReader(logLineData, sync);
+            var logLineData = CreateLogLineData();
+            var reader = CreateLogLineLineReader(logLineData, sync);
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
             Assert.IsTrue(reader.LinesHaveTimestamp);
@@ -225,8 +305,8 @@ namespace StepBro.Core.Test.Data
         public void LogLineLineReaderAwait03()
         {
             object sync = new object();
-            var logLineData = DummyClass.CreateLogLineData();
-            var reader = DummyClass.CreateLogLineLineReader(logLineData, sync);
+            var logLineData = CreateLogLineData();
+            var reader = CreateLogLineLineReader(logLineData, sync);
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
             Assert.IsTrue(reader.LinesHaveTimestamp);
@@ -242,8 +322,8 @@ namespace StepBro.Core.Test.Data
         public void LogLineLineReaderAwait04()
         {
             object sync = new object();
-            var logLineData = DummyClass.CreateLogLineData();
-            var reader = DummyClass.CreateLogLineLineReader(logLineData, sync);
+            var logLineData = CreateLogLineData();
+            var reader = CreateLogLineLineReader(logLineData, sync);
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
             Assert.IsTrue(reader.LinesHaveTimestamp);
@@ -259,8 +339,8 @@ namespace StepBro.Core.Test.Data
         public void LogLineLineReaderAwait05()
         {
             object sync = new object();
-            var logLineData = DummyClass.CreateLogLineData();
-            var reader = DummyClass.CreateLogLineLineReader(logLineData, sync);
+            var logLineData = CreateLogLineData();
+            var reader = CreateLogLineLineReader(logLineData, sync);
             Assert.AreEqual("Anders", reader.Current.Text);
             Assert.IsTrue(reader.HasMore);
             Assert.IsTrue(reader.LinesHaveTimestamp);
