@@ -277,7 +277,7 @@ namespace StepBro.Core.Execution
                     {
                         if (reader.Current == null)
                         {
-                            Monitor.Wait(reader.Sync, 5);
+                            Monitor.Wait(reader.Sync, 50);
                         }
                     }
                 }
@@ -337,16 +337,11 @@ namespace StepBro.Core.Execution
             //bool sleep = false;
             do
             {
-                // If there isn't anything in the reader right now
-                // we wait 5ms to see if anything shows up
-                // The OS has a hard time keeping up with anything less than 5ms
-                // anyway, as we need to get chosen as a thread again after the
-                // timeout. Because of this, any awaits should be longer than 5ms anyway.
                 lock (reader.Sync)
                 {
                     if (reader.Current == null)
                     {
-                        Monitor.Wait(reader.Sync, 5);
+                        Monitor.Wait(reader.Sync, 50);
                     }
                 }
 
