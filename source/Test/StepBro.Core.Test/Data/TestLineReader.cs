@@ -160,7 +160,7 @@ namespace StepBro.Core.Test.Data
         }
 
         [TestMethod]
-        public void LogLineLineReaderFind01()
+        public void LogLineLineReaderFindSuccessfullyWithoutLimit()
         {
             object sync = new object();
             var logLineData = CreateLogLineData();
@@ -174,7 +174,7 @@ namespace StepBro.Core.Test.Data
         }
 
         [TestMethod]
-        public void LogLineLineReaderFind02()
+        public void LogLineLineReaderFindFailureWithShortLimit()
         {
             object sync = new object();
             var logLineData = CreateLogLineData();
@@ -188,7 +188,7 @@ namespace StepBro.Core.Test.Data
         }
 
         [TestMethod]
-        public void LogLineLineReaderFind03()
+        public void LogLineLineReaderFindSuccessfullyWithLimit()
         {
             object sync = new object();
             var logLineData = CreateLogLineData();
@@ -202,7 +202,7 @@ namespace StepBro.Core.Test.Data
         }
 
         [TestMethod]
-        public void LogLineLineReaderFind04()
+        public void LogLineLineReaderFindSuccessfullyWithLimitThenFailureBecausePrevious()
         {
             object sync = new object();
             var logLineData = CreateLogLineData();
@@ -219,7 +219,7 @@ namespace StepBro.Core.Test.Data
         }
 
         [TestMethod]
-        public void LogLineLineReaderFind05()
+        public void LogLineLineReaderFindSuccessfullyTwice()
         {
             object sync = new object();
             var logLineData = CreateLogLineData();
@@ -236,7 +236,7 @@ namespace StepBro.Core.Test.Data
         }
 
         [TestMethod]
-        public void LogLineLineReaderFind06()
+        public void LogLineLineReaderFindSuccessfullyThenFailureBecauseLimit()
         {
             object sync = new object();
             var logLineData = CreateLogLineData();
@@ -253,7 +253,7 @@ namespace StepBro.Core.Test.Data
         }
 
         [TestMethod]
-        public void LogLineLineReaderFind07()
+        public void LogLineLineReaderFindSuccessfullyTwiceWithLimits()
         {
             object sync = new object();
             var logLineData = CreateLogLineData();
@@ -270,7 +270,7 @@ namespace StepBro.Core.Test.Data
         }
 
         [TestMethod]
-        public void LogLineLineReaderAwait01()
+        public void LogLineLineReaderAwaitSuccessfullyWithLongTimeout()
         {
             object sync = new object();
             var logLineData = CreateLogLineData();
@@ -284,7 +284,7 @@ namespace StepBro.Core.Test.Data
         }
 
         [TestMethod]
-        public void LogLineLineReaderAwait02()
+        public void LogLineLineReaderAwaitSuccessfullyWithShortTimeout()
         {
             object sync = new object();
             var logLineData = CreateLogLineData();
@@ -302,7 +302,7 @@ namespace StepBro.Core.Test.Data
         }
 
         [TestMethod]
-        public void LogLineLineReaderAwait03()
+        public void LogLineLineReaderAwaitSuccessfullyThenFailureBecausePrevious()
         {
             object sync = new object();
             var logLineData = CreateLogLineData();
@@ -319,7 +319,7 @@ namespace StepBro.Core.Test.Data
         }
 
         [TestMethod]
-        public void LogLineLineReaderAwait04()
+        public void LogLineLineReaderAwaitSuccessfullyTwice()
         {
             object sync = new object();
             var logLineData = CreateLogLineData();
@@ -336,7 +336,7 @@ namespace StepBro.Core.Test.Data
         }
 
         [TestMethod]
-        public void LogLineLineReaderAwait05()
+        public void LogLineLineReaderAwaitSuccessfullyTwiceWithShortTimeout()
         {
             object sync = new object();
             var logLineData = CreateLogLineData();
