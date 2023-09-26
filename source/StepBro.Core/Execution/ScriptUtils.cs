@@ -223,35 +223,90 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static string Find(this ILineReader reader, [Implicit] ICallContext context, string text, bool flushIfNotFound = false)
+        public static string Find(this ILineReader reader, [Implicit] ICallContext context, string text, bool flushIfNotFound = false, TimeSpan limit = default, TimeSpan timeout = default)
         {
             System.Diagnostics.Debug.WriteLine("Reader.Find: " + text);
             reader.DebugDump();
             //if (context != null && context.LoggingEnabled) context.Logger.Log("Find", "\"" + text + "\"");
             var comparer = StringUtils.CreateComparer(text);
-            return Find(reader, context, comparer, flushIfNotFound);
+            return Find(reader, context, comparer, flushIfNotFound, limit, timeout);
         }
 
         [Public]
-        public static string Find(this ILineReader reader, [Implicit] ICallContext context, Func<string, string> comparer, bool flushIfNotFound = false)
+        public static string Find(this ILineReader reader, [Implicit] ICallContext context, Func<string, string> comparer, bool flushIfNotFound = false, TimeSpan limit = default, TimeSpan timeout = default)
         {
-            var peaker = reader.Peak();
-            ILineReaderEntry last = null;
-            foreach (var entry in peaker)
+            // Reference timestamp
+            DateTime referenceTime = DateTime.MinValue;
+
+            if (!reader.LinesHaveTimestamp && limit != default)
             {
-                var result = comparer(entry.Text);
-                if (result != null)
-                {
-                    reader.Flush(entry);
-                    return result;
-                }
-                last = entry;
+                throw new NotSupportedException("If the used linereader does not have timestamps, we can not put a limit on the time.");
             }
+            else if (reader.LinesHaveTimestamp)
+            {
+                referenceTime = reader.LatestTimeStamp; // Defaults to DateTime.MinValue
+            }
+            
+            // Limit timestamp - The latest timestamp we will look for in the log
+            DateTime limitTime = (limit == default || limit == TimeSpan.MaxValue) ? DateTime.MaxValue : referenceTime + limit;
+
+            // Timeout timestamp - The amount of realtime we can look for the data, as the data may appear asynchronously in some use cases
+            DateTime timeoutTime;
+            
+            if (timeout == default)
+            {
+                timeoutTime = DateTime.MinValue; // Default is we look through the log once and then exit
+            }
+            else if (timeout == TimeSpan.MaxValue)
+            {
+                timeoutTime = DateTime.MaxValue;
+            }
+            else
+            {
+                timeoutTime = DateTime.Now + timeout;
+            }
+
+            var peaker = reader.Peak();
+
+            ILineReaderEntry last = null;
+            do
+            {
+                if (timeout != default)
+                {
+                    lock (reader.Sync)
+                    {
+                        if (reader.Current == null)
+                        {
+                            Monitor.Wait(reader.Sync, 5);
+                        }
+                    }
+                }
+
+                foreach (var entry in peaker)
+                {
+                    // If the entry time was not set, because the reader was empty
+                    // we set it to the first entry in the reader.
+                    if (referenceTime == DateTime.MinValue && reader.LinesHaveTimestamp)
+                    {
+                        referenceTime = entry.Timestamp;
+                    }
+
+                    var result = comparer(entry.Text);
+                    if (result != null && (!reader.LinesHaveTimestamp || entry.Timestamp.TimeTill(limitTime) > TimeSpan.Zero))
+                    {
+                        reader.Flush(entry);
+                        return result;
+                    }
+                    last = entry;
+                }
+            } while (DateTime.Now.TimeTill(timeoutTime) > TimeSpan.Zero);
+
             if (flushIfNotFound)
             {
                 reader.Flush(last);     // First flush until the last seen entry
                 reader.Next();          // ... then also flush the last seen.
             }
+
             return null;
         }
 
@@ -272,7 +327,7 @@ namespace StepBro.Core.Execution
             // If the reader has timestamp, set the timeout relative to the time of the current entry; otherwise just use current wall time.
             DateTime entry = (reader.LinesHaveTimestamp && reader.Current != null) ? reader.Current.Timestamp : DateTime.Now;
 
-            // The time where the timeout expires.
+            // The latest time the timestamp is allowed to be
             DateTime to = (timeout == TimeSpan.MaxValue) ? DateTime.MaxValue : entry + timeout;
 
             //bool sleep = false;

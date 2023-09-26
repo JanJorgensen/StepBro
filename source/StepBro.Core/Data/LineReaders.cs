@@ -13,7 +13,7 @@ namespace StepBro.Core.Data
             public EntryWrapper(int index, string text) { this.Index = index; this.Text = text; }
             public int Index { get; private set; }
             public string Text { get; private set; }
-            public DateTime Timestamp => throw new NotImplementedException();
+            public DateTime Timestamp => throw new NotSupportedException("Timestamps are not supported for StringListLineReaders");
         }
 
         private readonly object m_sync = new object();
@@ -45,7 +45,7 @@ namespace StepBro.Core.Data
             }
         }
         public bool LinesHaveTimestamp { get { return false; } }
-
+        public DateTime LatestTimeStamp { get { throw new NotSupportedException("Timestamps are not supported for StringListLineReaders"); } }
         public bool HasMore { get { return (m_index < (m_list.Count - 1)); } }
 
         public INameable Source { get; private set; }

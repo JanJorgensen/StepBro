@@ -162,20 +162,31 @@ namespace StepBro.Streams
 
         private void Port_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
-            m_dataReceivedCounter++;
-            if (m_binaryFifo != null)
+            try
             {
-                m_binaryFifo.Add((byte[] buffer, int offset, int count) =>
+                m_dataReceivedCounter++;
+                if (m_binaryFifo != null)
                 {
-                    return this.TickReceiveCounter(m_port.Read(buffer, offset, count));
-                }, m_port.BytesToRead);
-            }
-            else if (m_textualFifo != null)
+                    m_binaryFifo.Add((byte[] buffer, int offset, int count) =>
+                    {
+                        return this.TickReceiveCounter(m_port.Read(buffer, offset, count));
+                    }, m_port.BytesToRead);
+                }
+                else if (m_textualFifo != null)
+                {
+                    m_textualFifo.Add((char[] buffer, int offset, int count) =>
+                    {
+                        return this.TickReceiveCounter(m_port.Read(buffer, offset, count));
+                    }, m_port.BytesToRead);
+                }
+            } 
+            catch (InvalidOperationException ex)
             {
-                m_textualFifo.Add((char[] buffer, int offset, int count) =>
-                {
-                    return this.TickReceiveCounter(m_port.Read(buffer, offset, count));
-                }, m_port.BytesToRead);
+                // The port was closed while we were trying to receive data.
+                // This means we just throw away the data as we do not need it,
+                // otherwise the port would not have closed.
+                // We write the exception into the logger, in case the user wants to handle it from the script.
+                m_asyncLogger.LogError(ex.Message);
             }
         }
 
