@@ -236,13 +236,13 @@ namespace StepBro.Core.Execution
         public static string Find(this ILineReader reader, [Implicit] ICallContext context, Func<string, string> comparer, bool flushIfNotFound = false, TimeSpan limit = default, TimeSpan timeout = default)
         {
             // Reference timestamp
-            DateTime referenceTime = default;
+            DateTime referenceTime = DateTime.MinValue;
 
             if (!reader.LinesHaveTimestamp && limit != default)
             {
                 throw new NotSupportedException("If the used linereader does not have timestamps, we can not put a limit on the time.");
             }
-            else
+            else if (reader.LinesHaveTimestamp)
             {
                 referenceTime = reader.LatestTimeStamp; // Defaults to DateTime.MinValue
             }
