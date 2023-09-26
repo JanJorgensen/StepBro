@@ -39,7 +39,7 @@ namespace StepBroCoreTest.Mocks
         public event EventHandler Disposed;
         public event EventHandler ExpectedTimeExceeded { add { } remove { } }
 
-        public void AddActionButton(string title, Func<bool,bool> activationAction)
+        public void AddActionButton(string title, StateButtonAction activationAction)
         {
             throw new AccessViolationException();
             //MiniLogger.Instance.Add("TaskUpdate(" + m_level + ").AddActionButton: " + title);
@@ -99,12 +99,17 @@ namespace StepBroCoreTest.Mocks
             MiniLogger.Instance.Add(String.Format("TaskUpdate({0}).UpdateStatus: {1}, {2}", m_level, String.IsNullOrEmpty(text) ? "<no text>" : text, (progress >= 0) ? progress.ToString() : "<no progress>"));
         }
 
-        public bool EnterPauseIfRequested(string state)
+        //public bool EnterPauseIfRequested(string state)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        public void ProgressSetup(long start, long length, Func<long, string> toText)
         {
             throw new NotImplementedException();
         }
 
-        public void ProgressSetup(long start, long length, Func<long, string> toText)
+        public void SetProgressColor(AttentionColor color)
         {
             throw new NotImplementedException();
         }

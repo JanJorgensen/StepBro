@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,8 @@ namespace StepBro.Core.Execution
         IFileElement TargetElement { get; }
         void StartExecution();
         ITaskControl Task { get; }
+        ReadOnlyObservableCollection<IExecutionScopeStatus> StateStack { get; }
+
         IExecutionResult Result { get; }
         DataReport Report { get; }
     }

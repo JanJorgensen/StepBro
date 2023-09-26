@@ -10,17 +10,18 @@ namespace StepBro.Core.Execution
 {
     internal interface IProcedureThis
     {
+        string Name { get; }
+        string FileName { get; }
+        string FileDirectory { get; }
         bool HasFails { get; }
         bool HasErrors { get; }
         bool HasFailsOrErrors { get; }
         ErrorID LastError { get; }
-        string Name { get; }
         void ReportFailure(string failureDescription, ErrorID id = null);
         void ReportError(string errorDescription, ErrorID id = null);
         ProcedureResult Result { get; }
         ProcedureResult LastCallResult { get; }
-        bool SetResult(Verdict verdict, string description); 
-        string FileName { get; }
-        string FileDirectory { get; }
+        bool SetResult(Verdict verdict, string description);
+        string LastLoopExitReason { get; }
     }
 }
