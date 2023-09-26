@@ -234,25 +234,20 @@ namespace StepBro.Core.Execution
         [Public]
         public static string Find(this ILineReader reader, [Implicit] ICallContext context, Func<string, string> comparer, bool flushIfNotFound = false, TimeSpan limit = default, TimeSpan timeout = default)
         {
-            // Entry timestamp - If there are no timestamps on this reader, we set the entry time to the minimum time possible
-            //                   as we would then not use the timeout at all
-            DateTime entryTime;
+            // Reference timestamp
+            DateTime referenceTime = default;
 
-            if (!reader.LinesHaveTimestamp)
+            if (!reader.LinesHaveTimestamp && limit != default)
             {
-                entryTime = DateTime.Now;
-            }
-            else if (reader.LatestTimeStamp != DateTime.MinValue)
-            {
-                entryTime = reader.LatestTimeStamp;
+                throw new NotSupportedException("If the used linereader does not have timestamps, we can not put a limit on the time.");
             }
             else
             {
-                entryTime = DateTime.MinValue;
+                referenceTime = reader.LatestTimeStamp; // Defaults to DateTime.MinValue
             }
-
+            
             // Limit timestamp - The latest timestamp we will look for in the log
-            DateTime limitTime = (limit == default || limit == TimeSpan.MaxValue) ? DateTime.MaxValue : entryTime + limit;
+            DateTime limitTime = (limit == default || limit == TimeSpan.MaxValue) ? DateTime.MaxValue : referenceTime + limit;
 
             // Timeout timestamp - The amount of realtime we can look for the data, as the data may appear asynchronously in some use cases
             DateTime timeoutTime;
@@ -267,7 +262,7 @@ namespace StepBro.Core.Execution
             }
             else
             {
-                timeoutTime = entryTime + timeout;
+                timeoutTime = DateTime.Now + timeout;
             }
 
             var peaker = reader.Peak();
@@ -290,9 +285,9 @@ namespace StepBro.Core.Execution
                 {
                     // If the entry time was not set, because the reader was empty
                     // we set it to the first entry in the reader.
-                    if (entryTime == DateTime.MinValue && reader.LinesHaveTimestamp)
+                    if (referenceTime == DateTime.MinValue && reader.LinesHaveTimestamp)
                     {
-                        entryTime = entry.Timestamp;
+                        referenceTime = entry.Timestamp;
                     }
 
                     var result = comparer(entry.Text);
@@ -348,13 +343,6 @@ namespace StepBro.Core.Execution
                     {
                         Monitor.Wait(reader.Sync, 5);
                     }
-                }
-
-                // If the current entry in the reader has a timestamp after our limit
-                // we break as we know that any entry after this would have been too late
-                if (reader.Current != null && reader.LinesHaveTimestamp && reader.Current.Timestamp > to)
-                {
-                    break;
                 }
 
                 // We look for the string we want to find
