@@ -2,6 +2,7 @@
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.General;
+using StepBro.Core.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -331,6 +332,51 @@ namespace StepBroCoreTest.Data
         {
             context.ReportFailure("<the failure description>");
             return null;
+        }
+
+        public static LogLineData CreateLogLineData()
+        {
+            LogLineData first = new LogLineData(
+                null, 
+                LogLineData.LogType.Neutral, 
+                0, 
+                "*Anders", 
+                DateTime.Parse("2023-09-26T11:35:00.0000000Z"));
+
+            LogLineData second = new LogLineData(
+                first,
+                LogLineData.LogType.Neutral,
+                1,
+                "*Bent",
+                DateTime.Parse("2023-09-26T11:36:00.0000000Z"));
+
+            LogLineData third = new LogLineData(
+                second,
+                LogLineData.LogType.Neutral,
+                1,
+                "*Christian",
+                DateTime.Parse("2023-09-26T11:37:00.0000000Z"));
+
+            LogLineData fourth = new LogLineData(
+                third,
+                LogLineData.LogType.Neutral,
+                1,
+                "*Dorte",
+                DateTime.Parse("2023-09-26T11:38:00.0000000Z"));
+
+            LogLineData fifth = new LogLineData(
+                fourth,
+                LogLineData.LogType.Neutral,
+                1,
+                "*Emil",
+                DateTime.Parse("2023-09-26T11:39:00.0000000Z"));
+
+            return first;
+        }
+
+        public static LogLineLineReader CreateLogLineLineReader(LogLineData first, object sync)
+        {
+            return new LogLineLineReader(null, first, sync);
         }
     }
 }

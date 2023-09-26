@@ -65,6 +65,15 @@ namespace StepBro.Core.Data
             Text = text;
             if (previous != null) previous.Next = this;
         }
+
+        public LogLineData(LogLineData previous, LogType type, uint id, string text, DateTime timestamp)
+        {
+            this.Type = type;
+            this.ID = id;
+            this.Timestamp = timestamp;
+            Text = text;
+            if (previous != null) previous.Next = this;
+        }
     }
 
     public class LogLineEventArgs : EventArgs

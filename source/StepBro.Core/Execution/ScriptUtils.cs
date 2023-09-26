@@ -289,6 +289,10 @@ namespace StepBro.Core.Execution
                     if (referenceTime == DateTime.MinValue && reader.LinesHaveTimestamp)
                     {
                         referenceTime = entry.Timestamp;
+                        if (limitTime != DateTime.MaxValue)
+                        {
+                            limitTime = referenceTime + limit;
+                        }
                     }
 
                     var result = comparer(entry.Text);
@@ -324,8 +328,8 @@ namespace StepBro.Core.Execution
                 reader.NextUnlessNewEntry();
             }
 
-            // If the reader has timestamp, set the timeout relative to the time of the current entry; otherwise just use current wall time.
-            DateTime entry = (reader.LinesHaveTimestamp && reader.Current != null) ? reader.Current.Timestamp : DateTime.Now;
+            // As the purpose of Await is to wait for something in real time, we use DateTime.Now as our entry time
+            DateTime entry = DateTime.Now;
 
             // The latest time the timestamp is allowed to be
             DateTime to = (timeout == TimeSpan.MaxValue) ? DateTime.MaxValue : entry + timeout;
@@ -352,35 +356,11 @@ namespace StepBro.Core.Execution
                 // If the string was found
                 if (result != null)
                 {
-                    if (reader.LinesHaveTimestamp)
+                    if (removeFound)
                     {
-                        // We take the timestamp of the found string
-                        DateTime foundTimeStamp = reader.Current.Timestamp;
-
-                        if (removeFound)
-                        {
-                            reader.Next();
-                        }
-
-                        // We check if the time stamp is within the allowed time
-                        if (foundTimeStamp <= to)
-                        {
-                            return result;
-                        }
+                        reader.Next();
                     }
-                    else
-                    {
-                        if (removeFound)
-                        {
-                            reader.Next();
-                        }
-
-                        if (DateTime.Now.TimeTill(to) > TimeSpan.Zero)
-                        {
-                            return result;
-                        }
-                    }
-                    break;
+                    return result; // If we are here, we have found the result in the allotted time
                 }
             } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
 
