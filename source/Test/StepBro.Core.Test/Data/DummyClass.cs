@@ -2,6 +2,7 @@
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.General;
+using StepBro.Core.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -286,40 +287,6 @@ namespace StepBroCoreTest.Data
             yield return "Berditto";
             yield return "Chrushtor";
             yield return "Dowfick";
-        }
-
-        public static List<string> CreateListOfStrings()
-        {
-            var list = new List<string>();
-            list.AddRange(new string[] { 
-                "Anders",
-                "Anders",
-                "Andres", // ! 
-                "Anders",
-                "Anders",
-                "Anders",
-                "Anders",
-                "Bent Fabric",
-                "Bente Bent",
-                "Anders",
-                "Anders",
-                "Bent Nollerik",
-                "Bodil",
-                "Anders",
-                "Anders",
-                "Anders",
-                "Anders",
-                "Bente Birk",
-                "Anders A",
-                "Anders B",
-                "Anders C",
-                "Anders D",
-                "Anders E",
-                "Anders F",
-                "Anders G",
-                "Christian",
-            });
-            return list;
         }
     
         public static object MethodReportingError([Implicit] ICallContext context)
