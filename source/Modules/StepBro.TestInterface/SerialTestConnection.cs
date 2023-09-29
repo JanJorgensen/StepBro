@@ -177,15 +177,10 @@ namespace StepBro.TestInterface
                         }
                         else
                         {
-                            m_state = CommandState.EndResponseReceived;
                             var s = last[1..];
                             if (m_expectedReturnType == null)
                             {
-                                if (last.Equals(":OK"))
-                                {
-                                    m_state = CommandState.EndResponseReceived;
-                                }
-                                else
+                                if (!last.Equals(":OK"))
                                 {
                                     if (s.StartsWith('\"'))
                                     {
@@ -208,6 +203,10 @@ namespace StepBro.TestInterface
                                         m_result = s;
                                     }
                                 }
+                                // We set the state after we set m_result, as we could otherwise
+                                // have a race condition where the result is read before we have
+                                // assigned it.
+                                m_state = CommandState.EndResponseReceived;
                             }
                             else
                             {
@@ -250,6 +249,13 @@ namespace StepBro.TestInterface
                                 catch
                                 {
                                     m_state = CommandState.EndResultFormatError;
+                                }
+
+                                // If we did not get an error, we know we have a proper
+                                // end response.
+                                if (m_state != CommandState.EndResultFormatError)
+                                {
+                                    m_state = CommandState.EndResponseReceived;
                                 }
                             }
                         }
