@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime.Misc;
 using StepBro.Core.Data;
+using StepBro.Core.Execution;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -168,7 +169,8 @@ namespace StepBro.Core.Parser
                     }
                 }
 
-                if (ResolveQualifiedIdentifier(m_variableName, true).IsUnknownIdentifier)
+                SBExpressionData resolvedIdentifier = ResolveQualifiedIdentifier(m_variableName, true);
+                if (resolvedIdentifier.IsUnknownIdentifier)
                 {
                     m_variables.Add(
                         new VariableData(
@@ -178,11 +180,20 @@ namespace StepBro.Core.Parser
                 }
                 else
                 {
+                    int lineFirstDeclared = -1;
+                    if (resolvedIdentifier.IsProcedureReference)
+                    {
+                        lineFirstDeclared = ((IProcedureReference)resolvedIdentifier.Value).ProcedureData.Line;
+                    }
+                    else if (resolvedIdentifier.Token != null)
+                    {
+                        lineFirstDeclared = resolvedIdentifier.Token.Line;
+                    }
                     m_errors.SymanticError(
                         context.Start.Line, 
                         context.Start.Column, 
                         false,
-                        "Illegal to declare variable with same name as another variable or other type of element in the same scope.");
+                        $"Illegal to declare variable with same name as another variable or other type of element in the same scope. Variable: {m_variableName}." + (lineFirstDeclared != -1 ? $" First declared: Line {lineFirstDeclared}." : ""));
                 }
                 m_variableName = null;
                 m_variableInitializer = null;
