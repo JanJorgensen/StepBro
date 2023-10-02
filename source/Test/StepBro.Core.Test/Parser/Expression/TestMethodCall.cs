@@ -301,7 +301,7 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        public void TestOutVariableInt()
+        public void TestOutVariableIntSuccess()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 """
@@ -329,6 +329,46 @@ namespace StepBroCoreTest.Parser
                 {
                     int a = 0;
                     bool success = Int64.TryParse("abc", out a);
+                    return success;
+                }
+                """);
+            Assert.AreEqual(typeof(bool), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(bool));
+            Assert.AreEqual(false, (bool)result);
+        }
+
+        [TestMethod]
+        public void TestOutVariableBoolSuccess()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                bool Func()
+                {
+                    bool a = false;
+                    bool success = Boolean.TryParse("true", out a);
+                    return a;
+                }
+                """);
+            Assert.AreEqual(typeof(bool), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(bool));
+            Assert.AreEqual(true, (bool)result);
+        }
+
+        [TestMethod]
+        public void TestOutVariableBoolFailure()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                bool Func()
+                {
+                    bool a = false;
+                    bool success = Boolean.TryParse("123", out a);
                     return success;
                 }
                 """);
