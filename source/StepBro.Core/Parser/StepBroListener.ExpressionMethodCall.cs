@@ -920,6 +920,11 @@ namespace StepBro.Core.Parser
                                 continue;
                             }
                         }
+                        else if (argPicker.Current.Argument == "out")
+                        {
+                            suggestedAssignmentsOut.Add(argPicker.Pick());
+                            continue;
+                        }
                         else
                         {
                             // TODO: Report argument not found, maybe

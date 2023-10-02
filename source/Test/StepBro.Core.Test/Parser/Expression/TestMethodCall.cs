@@ -299,5 +299,45 @@ namespace StepBroCoreTest.Parser
                 "var value = rnd.Next(0, 100);",
                 false));
         }
+
+        [TestMethod]
+        public void TestOutVariableInt()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    int a = 0;
+                    bool success = Int64.TryParse("7", out a);
+                    return a;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(7L, (long)result);
+        }
+
+        [TestMethod]
+        public void TestOutVariableIntFailure()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                bool Func()
+                {
+                    int a = 0;
+                    bool success = Int64.TryParse("abc", out a);
+                    return success;
+                }
+                """);
+            Assert.AreEqual(typeof(bool), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(bool));
+            Assert.AreEqual(false, (bool)result);
+        }
     }
 }
