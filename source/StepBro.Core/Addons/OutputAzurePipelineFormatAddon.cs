@@ -162,7 +162,7 @@ namespace StepBro.Core.Addons
                         m_writer.WriteLine("##[endgroup]");
                         m_writer.WriteLine("");     // Empty line
 
-                        if (group.LogEnd.Id != group.LogStart.Id)
+                        if (group.LogEnd != null && group.LogEnd.Id != group.LogStart.Id)
                         {
                             m_writer.WriteLine("##[group] " + group.Name + " - execution log");
                             indent.Push(indent.Peek() + "    ");
@@ -179,6 +179,16 @@ namespace StepBro.Core.Addons
                             indent.Pop();
                             m_writer.WriteLine("##[endgroup]");
                             m_writer.WriteLine("");     // Empty line
+                        }
+                        else if (group.LogEnd == null)
+                        {
+                            m_writer.WriteLine("##[error] An error has occurred. Dumping log.");
+                            var entry = group.LogStart;
+                            while (entry != null)
+                            {
+                                WriteLogEntry(entry, entry.Timestamp);
+                                entry = entry.Next;
+                            }
                         }
                     }
                 }
