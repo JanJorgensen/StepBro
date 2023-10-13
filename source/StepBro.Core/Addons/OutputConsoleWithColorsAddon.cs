@@ -83,7 +83,7 @@ namespace StepBro.Core.Addons
 
             public void WriteReport(DataReport report)
             {
-                throw new NotImplementedException();
+                throw new NotImplementedException("Test reports are not yet supported for console format.");
             }
 
             void ITextWriter.Write(string text)
