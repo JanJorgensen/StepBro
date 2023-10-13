@@ -180,7 +180,7 @@ namespace StepBro.Core.Addons
                             m_writer.WriteLine("##[endgroup]");
                             m_writer.WriteLine("");     // Empty line
                         }
-                        else if (group.LogEnd == null)
+                        else if (group.LogEnd == null) // If group.LogEnd is null, a fatal error has occurred during execution
                         {
                             m_writer.WriteLine("##[error] An error has occurred. Dumping log.");
                             var entry = group.LogStart;
