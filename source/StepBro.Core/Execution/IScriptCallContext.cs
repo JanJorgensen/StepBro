@@ -20,6 +20,10 @@ namespace StepBro.Core.Execution
         void EnterTestStep(int line, int column, int index, string title);
         void EnterStatement(int line, int column);
 
+        bool IsSimpleExpectStatementWithValue{ get; set; }
+        string ExpectStatementValue { get; set; }
+
+
         IScriptCallContext EnterNewScriptContext(IFileProcedure procedure, ContextLogOption procedureLoggingOption, bool isDynamicCall, object[] arguments);
         IScriptCallContext EnterNewScriptContext(IProcedureReference procedure, ContextLogOption procedureLoggingOption, bool isDynamicCall, object[] arguments);
 

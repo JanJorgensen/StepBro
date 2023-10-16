@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Tree;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.ScriptData;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using static StepBro.Core.Parser.Grammar.StepBro;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
@@ -31,6 +33,7 @@ namespace StepBro.Core.Parser
         private bool m_enteredLoopStatement = false;
         private string m_modifiers = null;
         //private bool m_awaitsExpectExpression = false;
+        private bool m_isSimpleExpectWithValue = false;
 
         public IFileProcedure LastParsedProcedure { get { return m_lastProcedure; } }
 
@@ -89,6 +92,30 @@ namespace StepBro.Core.Parser
             m_procedureStack.Pop(); // Pop current. New current is the at the top.
             m_currentProcedure = (m_procedureStack.Count > 0) ? m_procedureStack.Peek() : null;
         }
+
+        private string GetNodeText(IParseTree node)
+        {
+            if (node.ChildCount == 0) { return node.GetText(); }
+            if (node.ChildCount == 1) { return GetNodeText(node.GetChild(0)); }
+            else
+            {
+                var left = node.GetChild(0);
+                StringBuilder sb = new StringBuilder();
+                sb.Append(GetNodeText(left));
+                for (int i = 1; i < node.ChildCount; i++)
+                {
+                    var n = node.GetChild(i);
+                    if (left.SourceInterval.a < n.SourceInterval.b)
+                    {
+                        sb.Append(new string(' ', n.SourceInterval.b - left.SourceInterval.a - 1));
+                    }
+                    sb.Append(GetNodeText(n));
+                    left = n;
+                }
+                return sb.ToString();
+            }
+        }
+
 
         public override void EnterProcedureDeclaration([NotNull] SBP.ProcedureDeclarationContext context)
         {
@@ -1310,6 +1337,14 @@ namespace StepBro.Core.Parser
         {
             this.AddEnterStatement(context);
             m_expressionData.PushStackLevel("ExpectStatement");
+            m_isSimpleExpectWithValue = false;
+            var expression = context.GetChild(context.ChildCount - 2).GetChild(1).GetChild(0) as SBP.ExpressionContext;
+
+            if (expression is SBP.ExpBinaryContext || expression is SBP.ExpBetweenContext)
+            {
+                m_isSimpleExpectWithValue = true;
+            }
+
             //m_awaitsExpectExpression = true;
         }
 
@@ -1325,7 +1360,9 @@ namespace StepBro.Core.Parser
                 return;
             }
 
-            string expressionText = context.GetChild(context.ChildCount - 2).GetChild(1).GetText();
+            ExpressionType nodetype = expression.ExpressionCode.NodeType;
+
+            string expressionText = GetNodeText(context.GetChild(context.ChildCount - 2).GetChild(1));
             string title = String.Empty;
             if (context.ChildCount > 3)
             {
@@ -1333,13 +1370,7 @@ namespace StepBro.Core.Parser
                 title = title.Substring(1, title.Length - 2);   // Strip quotes
             }
 
-            //if (expression.ExpressionCode.NodeType == ExpressionType.Equal ||
-            //    expression.ExpressionCode.NodeType == ExpressionType.NotEqual)
-            //{
-            //    throw new NotImplementedException();
-            //}
-
-            if (!(expression.ExpressionCode.Type == typeof(bool)))
+            if (expression.ExpressionCode.Type != typeof(bool))
             {
                 m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Expression for 'expect' statement is not boolean.");
             }
@@ -1347,27 +1378,11 @@ namespace StepBro.Core.Parser
             {
                 LabelTarget returnLabel = Expression.Label(typeof(bool));
                 var contextParameter = Expression.Parameter(typeof(IScriptCallContext), "context");
-                var actualValueParameter = Expression.Parameter(typeof(string).MakeByRefType(), "actualValue");
-
-                // delegate bool ExpectStatementEvaluationDelegate(IScriptCallContext context, out string actualValue);
-
-                var evaluationDelegate = Expression.Lambda<ExpectStatementEvaluationDelegate>(
-                        Expression.Block(
-                            Expression.Condition(
-                                expression.ExpressionCode,
-                                Expression.Block(
-                                    Expression.Assign(actualValueParameter, Expression.Constant("<TRUE>")),
-                                    Expression.Label(returnLabel, Expression.Constant(true))),
-                                Expression.Block(
-                                    Expression.Assign(actualValueParameter, Expression.Constant("<FALSE>")),
-                                    Expression.Label(returnLabel, Expression.Constant(false))))),
-                        contextParameter,
-                        actualValueParameter);
 
                 var expectCall = Expression.Call(
                     s_ExpectStatement,
                     m_currentProcedure.ContextReferenceInternal,
-                    evaluationDelegate,
+                    expression.ExpressionCode,
                     isAssert ? Expression.Constant(Verdict.Error) : Expression.Constant(Verdict.Fail),
                     Expression.Constant(title),
                     Expression.Constant(expressionText));
@@ -1377,8 +1392,15 @@ namespace StepBro.Core.Parser
                     Expression.Return(m_currentProcedure.ReturnLabel, Expression.Default(m_currentProcedure.ReturnType.Type)),
                     Expression.Empty());
 
-                m_scopeStack.Peek().AddStatementCode(conditionalReturn);
+                var stepCode = Expression.Block(
+                    Expression.Assign(
+                        Expression.Property(m_currentProcedure.ContextReferenceInternal, nameof(IScriptCallContext.IsSimpleExpectStatementWithValue)), Expression.Constant(m_isSimpleExpectWithValue)),
+                    conditionalReturn);
+
+                m_scopeStack.Peek().AddStatementCode(stepCode);
             }
+
+            m_isSimpleExpectWithValue = false;
         }
 
         #endregion

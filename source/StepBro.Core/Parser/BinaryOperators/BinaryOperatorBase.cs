@@ -21,7 +21,7 @@ namespace StepBro.Core.Parser.BinaryOperators
         private static LessThanOperator g_LessThanOp = new LessThanOperator();
         private static GreaterThanOrEqualOperator g_GreaterThanOrEqualOp = new GreaterThanOrEqualOperator();
         private static LessThanOrEqualOperator g_LessThanOrEqualOp = new LessThanOrEqualOperator();
-        private static GreaterThanOrEqualOperator g_GreaterThanOrApproxOp = new GreaterThanOrEqualOperator();
+        private static GreaterThanOrApproxOperator g_GreaterThanOrApproxOp = new GreaterThanOrApproxOperator();
         private static LessThanOrApproxOperator g_LessThanOrApproxOp = new LessThanOrApproxOperator();
         private static LogicalAndOperator g_LogicalAndOp = new LogicalAndOperator();
         private static LogicalOrOperator g_LogicalOrOp = new LogicalOrOperator();

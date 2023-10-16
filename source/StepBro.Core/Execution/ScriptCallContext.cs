@@ -406,16 +406,32 @@ namespace StepBro.Core.Execution
             return false;
         }
 
-        public void ReportExpectResult(string title, string expected, string actual, Verdict verdict)
+        public void ReportExpectResult(string title, string expected, Verdict verdict)
         {
             string resultDescription;
-            if (String.IsNullOrEmpty(title))
+            string actual = null;
+            actual = this.ExpectStatementValue;
+            if (this.IsSimpleExpectStatementWithValue && !String.IsNullOrEmpty(actual))
             {
-                resultDescription = $"EXPECT: {expected}; Actual: {actual}  =>  {verdict}";
+                if (String.IsNullOrEmpty(title))
+                {
+                    resultDescription = $"EXPECT: {expected}; Value: {actual}, Verdict: {verdict}";
+                }
+                else
+                {
+                    resultDescription = $"EXPECT {title}: {expected}; Value: {actual}, Verdict: {verdict}";
+                }
             }
             else
             {
-                resultDescription = $"EXPECT: {expected}; Actual: {actual}  =>  {verdict}";
+                if (String.IsNullOrEmpty(title))
+                {
+                    resultDescription = $"EXPECT: {expected}; Verdict: {verdict}";
+                }
+                else
+                {
+                    resultDescription = $"EXPECT {title}: {expected}; Verdict: {verdict}";
+                }
             }
 
             if (verdict == Verdict.Error)
@@ -463,6 +479,10 @@ namespace StepBro.Core.Execution
                 throw new NotImplementedException();
             }
         }
+
+        public bool IsSimpleExpectStatementWithValue { get; set; }
+
+        public string ExpectStatementValue { get; set; }
 
         public void LogStatement(string text)
         {

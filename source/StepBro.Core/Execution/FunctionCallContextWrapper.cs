@@ -168,6 +168,10 @@ namespace StepBro.Core.Execution
         {
         }
 
+        public bool IsSimpleExpectStatementWithValue { get; set; }
+
+        public string ExpectStatementValue { get; set; }
+
         public IEnumerable<IFolderShortcut> ListShortcuts()
         {
             return m_context.ListShortcuts();
@@ -198,9 +202,9 @@ namespace StepBro.Core.Execution
             return true;
         }
 
-        public void ReportExpectResult(string title, string expected, string actual, Verdict verdict)
+        public void ReportExpectResult(string title, string expected, Verdict verdict)
         {
-            m_context.ReportExpectResult(title, expected, actual, verdict);
+            m_context.ReportExpectResult(title, expected, verdict);
         }
 
         public bool SetResultFromSub(IScriptCallContext sub)

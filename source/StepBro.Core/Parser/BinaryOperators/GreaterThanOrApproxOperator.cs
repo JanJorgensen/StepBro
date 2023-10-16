@@ -64,7 +64,7 @@ namespace StepBro.Core.Parser.BinaryOperators
                     {
                         return new SBExpressionData(
                             Expression.Call(
-                                typeof(ExecutionHelperMethods).GetMethod("GreaterThanApprox", new Type[] { typeof(double), typeof(double) }),
+                                typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GreaterThanOrApprox), new Type[] { typeof(double), typeof(double) }),
                                 first.ExpressionCode,
                                 last.ExpressionCode));
                     }
@@ -72,7 +72,7 @@ namespace StepBro.Core.Parser.BinaryOperators
                     {
                         return new SBExpressionData(
                             Expression.Call(
-                                typeof(ExecutionHelperMethods).GetMethod("GreaterThanApprox", new Type[] { typeof(long), typeof(double) }),
+                                typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GreaterThanOrApprox), new Type[] { typeof(long), typeof(double) }),
                                 first.ExpressionCode,
                                 last.ExpressionCode));
                     }
@@ -80,7 +80,7 @@ namespace StepBro.Core.Parser.BinaryOperators
                     {
                         return new SBExpressionData(
                             Expression.Call(
-                                typeof(ExecutionHelperMethods).GetMethod("GreaterThanApprox", new Type[] { typeof(double), typeof(long) }),
+                                typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GreaterThanOrApprox), new Type[] { typeof(double), typeof(long) }),
                                 first.ExpressionCode,
                                 last.ExpressionCode));
                     }
