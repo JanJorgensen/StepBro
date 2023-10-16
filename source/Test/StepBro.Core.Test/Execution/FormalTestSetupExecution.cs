@@ -329,7 +329,7 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("4 - Normal - 7 Log - Doing setup for FirstTestCase");
             log.ExpectNext("4 - Post");
             log.ExpectNext("3 - Pre - <DYNAMIC CALL> myfile.FirstTestCase - ( (<empty>) )");
-            log.ExpectNext("4 - Normal - 10 - EXPECT: 5<9; Actual: <TRUE>  =>  Pass");
+            log.ExpectNext("4 - Normal - 10 - EXPECT: 5 < 9; Value: 5, Verdict: Pass");
             log.ExpectNext("4 - Post");
             log.ExpectNext("3 - Pre - myfile.TestCaseBaseCleanup - <no arguments>");
             log.ExpectNext("4 - Normal - 8 Log - Doing cleanup for FirstTestCase");
@@ -339,7 +339,7 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("4 - Normal - 7 Log - Doing setup for SecondTestCase");
             log.ExpectNext("4 - Post");
             log.ExpectNext("3 - Pre - <DYNAMIC CALL> myfile.SecondTestCase - ( (<empty>) )");
-            log.ExpectNext("4 - Error - 11 - EXPECT: 4>7; Actual: <FALSE>  =>  Fail");
+            log.ExpectNext("4 - Error - 11 - EXPECT: 4 > 7; Value: 4, Verdict: Fail");
             log.ExpectNext("4 - Post");
             log.ExpectNext("3 - Pre - myfile.TestCaseBaseCleanup - <no arguments>");
             log.ExpectNext("4 - Normal - 8 Log - Doing cleanup for SecondTestCase");
@@ -349,7 +349,7 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("4 - Normal - 9 Log - Doing special setup for ThirdTestCase");
             log.ExpectNext("4 - Post");
             log.ExpectNext("3 - Pre - <DYNAMIC CALL> myfile.ThirdTestCase - ( (<empty>) )");
-            log.ExpectNext("4 - Normal - 12 - EXPECT: 7<=8; Actual: <TRUE>  =>  Pass");
+            log.ExpectNext("4 - Normal - 12 - EXPECT: 7 <= 8; Value: 7, Verdict: Pass");
             log.ExpectNext("4 - Post");
             log.ExpectNext("3 - Pre - myfile.TestCaseBaseCleanup - <no arguments>");
             log.ExpectNext("4 - Normal - 8 Log - Doing cleanup for ThirdTestCase");

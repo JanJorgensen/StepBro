@@ -821,15 +821,14 @@ namespace StepBro.Core.Execution
         }
 
         /// <summary>
-        /// Helper method to create a string representation of a value and then just return the value itself.
+        /// Helper method to save the value for an expect statement, and then just return the value itself.
         /// </summary>
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="value">Input value</param>
-        /// <param name="valueText">The textual representation of the input value.</param>
         /// <returns>Input value directly.</returns>
-        public static T GetExpectValueText<T>(T value, out string valueText)
+        public static T SaveExpectValueText<T>(IScriptCallContext context, T value)
         {
-            valueText = StringUtils.ObjectToString(value, false);
+            context.ExpectStatementValue = StringUtils.ObjectToString(value, false);
             return value;
         }
 
@@ -873,17 +872,14 @@ namespace StepBro.Core.Execution
         /// <returns>Whether the procedure should skip the rest and return immediately.</returns>
         public static bool ExpectStatement(
             IScriptCallContext context,
-            ExpectStatementEvaluationDelegate evaluation,
+            bool success,
             Verdict negativeVerdict,
             string title,
             string expected)
         {
-            bool success;
             try
             {
-                string actual;
-                success = evaluation(context, out actual);
-                context.ReportExpectResult(title, expected, actual, success ? Verdict.Pass : negativeVerdict);
+                context.ReportExpectResult(title, expected, success ? Verdict.Pass : negativeVerdict);
 
                 if (success) return false;
                 else if (negativeVerdict == Verdict.Error) return true;

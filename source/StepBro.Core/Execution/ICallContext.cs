@@ -24,7 +24,7 @@ namespace StepBro.Core.Execution
 
         void ReportFailure(string failureDescription, ErrorID id = null);
         void ReportError(string errorDescription, ErrorID id = null, Exception exception = null);
-        void ReportExpectResult(string title, string expected, string actual, Verdict verdict);
+        void ReportExpectResult(string title, string expected, Verdict verdict);
 
         /// <summary>
         /// Creates a new named call context.

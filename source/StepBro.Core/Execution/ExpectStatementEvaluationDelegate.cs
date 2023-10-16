@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Execution
 {
-    internal delegate bool ExpectStatementEvaluationDelegate(IScriptCallContext context, out string actualValue);
+    internal delegate bool ExpectStatementEvaluationDelegate(IScriptCallContext context);
 }

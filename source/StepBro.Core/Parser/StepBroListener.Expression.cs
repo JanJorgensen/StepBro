@@ -19,6 +19,7 @@ namespace StepBro.Core.Parser
 {
     internal partial class StepBroListener
     {
+        private static MethodInfo s_SaveExpectValueText = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.SaveExpectValueText));
         private static MethodInfo s_AwaitAsyncVoid = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.AwaitAsyncVoid));
         private static MethodInfo s_AwaitAsyncTyped = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.AwaitAsyncTyped));
         private static MethodInfo s_AwaitAsyncToTyped = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.AwaitAsyncToTyped));
@@ -385,6 +386,12 @@ namespace StepBro.Core.Parser
 
                     try
                     {
+                        if (m_isSimpleExpectWithValue)
+                        {
+                            var t = first.DataType.Type;
+                            var valueSaver = s_SaveExpectValueText.MakeGenericMethod(t);
+                            first = new SBExpressionData(Expression.Call(valueSaver, m_currentProcedure.ContextReferenceInternal, first.ExpressionCode));
+                        }
                         var result = op.Resolve(this, first, last);
                         System.Diagnostics.Debug.Assert(result != null);
                         m_expressionData.Push(result);
@@ -475,6 +482,13 @@ namespace StepBro.Core.Parser
             var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
             if (CheckExpressionsForErrors(context, first, middle, last))
             {
+                if (m_isSimpleExpectWithValue)
+                {
+                    var t = middle.DataType.Type;
+                    var valueSaver = s_SaveExpectValueText.MakeGenericMethod(t);
+                    middle = new SBExpressionData(Expression.Call(valueSaver, m_currentProcedure.ContextReferenceInternal, middle.ExpressionCode));
+                }
+
                 var op1 = context.op1.Type;
                 var op2 = context.op2.Type;
                 // TODO: Check if operator is returned

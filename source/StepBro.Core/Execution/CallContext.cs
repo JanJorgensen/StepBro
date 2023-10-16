@@ -150,7 +150,7 @@ namespace StepBro.Core.Execution
             throw new NotImplementedException();
         }
 
-        public void ReportExpectResult(string title, string expected, string actual, Verdict verdict)
+        public void ReportExpectResult(string title, string expected, Verdict verdict)
         {
             throw new NotImplementedException();
         }
