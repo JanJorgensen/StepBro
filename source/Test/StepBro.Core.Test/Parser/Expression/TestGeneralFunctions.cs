@@ -116,6 +116,46 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
+        public void TestContainsMatchDirectlyOnString()
+        {
+            var file = FileBuilder.ParseFile(null,
+                """
+                using System.Linq;
+
+                bool Func()
+                {
+                    string str = "Benny";
+                    bool b = str.Contains("Be");
+                    return b;
+                }
+                """);
+            var proc = file.GetFileElement<IFileProcedure>("Func");
+            Assert.AreEqual(typeof(bool), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsTrue(result is bool);
+            Assert.IsTrue((bool)result);
+
+            file = FileBuilder.ParseFile(null,
+                """
+                using System.Linq;
+
+                bool Func()
+                {
+                    string str = "Benny";
+                    bool b = str.Contains("Bes");
+                    return b;
+                }
+                """);
+            proc = file.GetFileElement<IFileProcedure>("Func");
+            Assert.AreEqual(typeof(bool), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            result = proc.Call();
+            Assert.IsTrue(result is bool);
+            Assert.IsFalse((bool)result);
+        }
+
+        [TestMethod]
         public void TestFindMatch()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
