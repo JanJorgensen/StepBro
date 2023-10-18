@@ -21,7 +21,7 @@ namespace StepBroCoreTest
             f.AppendLine("   return this.HasFails;");
             f.AppendLine("}");
             var file = FileBuilder.ParseFile(null, f.ToString());
-            var procedure = file.GetFileElement<IFileProcedure>("MyProcedure"); ;
+            var procedure = file.GetFileElement<IFileProcedure>("MyProcedure");
 
             var taskContext = ExecutionHelper.ExeContext();
             var result = taskContext.CallProcedure(procedure);

@@ -746,9 +746,14 @@ namespace StepBro.Core.Parser
                 var p = parameters[i];
                 if (state == ArgumentInsertState.ExtensionInstance)
                 {
-                    suggestedAssignmentsOut.Add(new SBExpressionData(extensionInstance));
+                    SBExpressionData extensionInstanceData = new SBExpressionData(extensionInstance);
+                    suggestedAssignmentsOut.Add(extensionInstanceData);
                     thisParameterHandled = true;
                     state = ArgumentInsertState.Initial;
+                    if (IsParameterAssignableFromArgument(p, extensionInstanceData))
+                        matchScore += 5; // If we have the correct extension instance then it is more correct than a method that does not use the extension instance (This is a choice we have made)
+                    else
+                        matchScore -= 5; // If it is incorrect, we should not use it
                     continue;
                 }
                 else if (state == ArgumentInsertState.ProcedureContext)

@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StepBro.Core.Parser;
+using StepBro.Core.ScriptData;
 using System;
 using static StepBroCoreTest.Parser.ExpressionParser;
 
@@ -67,6 +68,78 @@ namespace StepBroCoreTest.Parser
 
             proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "bool Func(){ var strings = [\"Anders\", \"Benny\", \"Chris\", \"Dennis\"]; bool b = strings.ContainsMatch(\"Bes*\"); return b; }");
+            Assert.AreEqual(typeof(bool), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            result = proc.Call();
+            Assert.IsTrue(result is bool);
+            Assert.IsFalse((bool)result);
+        }
+
+        [TestMethod]
+        public void TestContainsMatchDirectlyOnStringArray()
+        {
+            var file = FileBuilder.ParseFile(null,
+                """
+                bool Func()
+                {
+                    string[] strings = ["Anders", "Benny", "Chris", "Dennis"];
+                    bool b = strings.Contains("Benny");
+                    return b;
+                }
+                """);
+            var proc = file.GetFileElement<IFileProcedure>("Func");
+            Assert.AreEqual(typeof(bool), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsTrue(result is bool);
+            Assert.IsTrue((bool)result);
+
+            file = FileBuilder.ParseFile(null,
+                """
+                bool Func()
+                {
+                    string[] strings = ["Anders", "Benny", "Chris", "Dennis"];
+                    bool b = strings.Contains("Bes");
+                    return b;
+                }
+                """);
+            proc = file.GetFileElement<IFileProcedure>("Func");
+            Assert.AreEqual(typeof(bool), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            result = proc.Call();
+            Assert.IsTrue(result is bool);
+            Assert.IsFalse((bool)result);
+        }
+
+        [TestMethod]
+        public void TestContainsMatchDirectlyOnString()
+        {
+            var file = FileBuilder.ParseFile(null,
+                """
+                bool Func()
+                {
+                    string str = "Benny";
+                    bool b = str.Contains("Be");
+                    return b;
+                }
+                """);
+            var proc = file.GetFileElement<IFileProcedure>("Func");
+            Assert.AreEqual(typeof(bool), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsTrue(result is bool);
+            Assert.IsTrue((bool)result);
+
+            file = FileBuilder.ParseFile(null,
+                """
+                bool Func()
+                {
+                    string str = "Benny";
+                    bool b = str.Contains("Bes");
+                    return b;
+                }
+                """);
+            proc = file.GetFileElement<IFileProcedure>("Func");
             Assert.AreEqual(typeof(bool), proc.ReturnType.Type);
             Assert.AreEqual(0, proc.Parameters.Length);
             result = proc.Call();
