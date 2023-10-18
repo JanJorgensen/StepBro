@@ -80,8 +80,6 @@ namespace StepBroCoreTest.Parser
         {
             var file = FileBuilder.ParseFile(null,
                 """
-                using System.Linq;
-
                 bool Func()
                 {
                     string[] strings = ["Anders", "Benny", "Chris", "Dennis"];
@@ -98,8 +96,6 @@ namespace StepBroCoreTest.Parser
 
             file = FileBuilder.ParseFile(null,
                 """
-                using System.Linq;
-
                 bool Func()
                 {
                     string[] strings = ["Anders", "Benny", "Chris", "Dennis"];
@@ -120,8 +116,6 @@ namespace StepBroCoreTest.Parser
         {
             var file = FileBuilder.ParseFile(null,
                 """
-                using System.Linq;
-
                 bool Func()
                 {
                     string str = "Benny";
@@ -138,8 +132,6 @@ namespace StepBroCoreTest.Parser
 
             file = FileBuilder.ParseFile(null,
                 """
-                using System.Linq;
-
                 bool Func()
                 {
                     string str = "Benny";
