@@ -132,7 +132,7 @@ namespace StepBro.Core.Execution
                 var textPrefix = isHighlevel ? (m_parentContext.m_nextCallHighLevelType + " - ") : "";
                 m_loggerInsideScope = m_loggerOnEntry.LogEntering(
                     isHighlevel,
-                    (m_isDynamicCall ? "<DYNAMIC CALL> " : "") + m_procedure.FullName,
+                    ((m_parentContext != null) ? m_parentContext.m_currentStatementLine.ToString() + " " : "")  + (m_isDynamicCall ? "<DYNAMIC CALL> " : "") + m_procedure.FullName,
                     textPrefix + argText.ToString(),
                     new LoggerDynamicLocationSource(this.GetDynamicLogLocation));
                 if (isHighlevel)
@@ -228,6 +228,17 @@ namespace StepBro.Core.Execution
             {
                 m_fileLine = value;
             }
+        }
+
+        public string[] GetCallStack()
+        {
+            List<string> stack = new List<string>();
+            stack.Add($"at {m_procedure.FullName}() in {m_procedure.ParentFile.FilePath}:line {m_currentStatementLine}");
+            if (m_parentContext != null)
+            {
+                stack.AddRange(m_parentContext.GetCallStack());
+            }
+            return stack.ToArray();
         }
 
         public ContextLogOption CallLoggingOption
@@ -546,7 +557,11 @@ namespace StepBro.Core.Execution
             }
             if (ex != null)
             {
-                this.LogError(errorDescription + (errorDescription.EndsWith(".") ? " " : ".") + "\n\t" + ex.GetType().Name + " - " + ex.Message + "\n" + ex.StackTrace);
+                this.LogError(errorDescription + (errorDescription.EndsWith(".") ? " " : ".") + " " + ex.GetType().Name + " - " + ex.Message);
+                if (m_currentReport != null)
+                {
+                    m_currentReport.AddUnhandledExeception(this, ex, this.GetCallStack());
+                }
             }
             else
             {

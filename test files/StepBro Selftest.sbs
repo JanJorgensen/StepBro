@@ -1,5 +1,6 @@
 using StepBro.Process;
 using StepBro.Core.Tasks;
+using TestModule;
 
 public using @"..\Scripts\TestFramework.sbs";
 
@@ -38,6 +39,30 @@ public procedure void SayHello()
 public procedure void ProcedureFail()
 {
 	expect (3 > 11);
+}
+
+public procedure void ExpectReporting()
+{
+	decimal length = 45.0;
+	decimal MinLength = 30.0;
+	decimal MaxLength = 60.0;
+	expect "Length of cord": (length >~ MinLength);
+}
+
+public procedure int ThrowUnhandledException()
+{
+	log("Entered!");
+	var testReport = StartReport("TestReport", "UnitTest");
+	testReport.StartGroup("The Test", "");
+	DoThrowUnhandledException();
+	log("After the error.");
+	testReport.Close();
+	return 11;
+}
+
+procedure void DoThrowUnhandledException()
+{
+	TestClassWithOnlyStaticMethods.MethodThrowingException();
 }
 
 public procedure void LongDelay()

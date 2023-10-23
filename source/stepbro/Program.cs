@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using StepBro.Core;
 using StepBro.Core.Addons;
 using StepBro.Core.Data;
+using StepBro.Core.Execution;
 using StepBro.Core.File;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
@@ -57,6 +58,7 @@ namespace StepBro.Cmd
             IService m_hostService = null;
             m_hostAccess = new HostAccess(out m_hostService);
             var selectedOutputAddon = OutputConsoleWithColorsAddon.Name;
+            IExecutionResult result = null;
             DataReport createdReport = null;
 
             try
@@ -327,7 +329,7 @@ namespace StepBro.Cmd
                                             }
 
                                             var execution = StepBroMain.ExecuteProcedure(procedure, arguments.ToArray());
-                                            var result = execution.Result;
+                                            result = execution.Result;
                                             createdReport = execution.Report;
 
                                             if (result != null)
@@ -494,6 +496,37 @@ namespace StepBro.Cmd
             if (m_commandLineOptions.PrintReport && createdReport != null)
             {
                 m_outputFormatter.WriteReport(createdReport);
+            }
+            else
+            {
+                if (result != null && result.Exception != null)
+                {
+                    ConsoleWriteLine("");
+                    ConsoleWriteErrorLine("EXCEPTION DETAILS");
+                    ConsoleWriteLine($"    Type: {result.Exception.GetType().FullName}");
+                    ConsoleWriteLine($"    Message: {result.Exception.Message}");
+                    if (!String.IsNullOrEmpty(result.Exception.HelpLink)) ConsoleWriteLine($"    Help: {result.Exception.HelpLink}");
+                    List<string> callstack = new List<string>();
+                    if (result.Exception is UnhandledExceptionInScriptException)
+                    {
+                        callstack.AddRange((result.Exception as UnhandledExceptionInScriptException).GetPrintableCallStack());
+                    }
+                    else
+                    {
+                        if (result.Exception.StackTrace != null)
+                        {
+                            callstack.AddRange(result.Exception.StackTrace.Split("\r\n"));
+                        }
+                    }
+                    if (callstack.Count > 0)
+                    {
+                        ConsoleWriteLine("    Call Stack:");
+                        foreach (var l in callstack)
+                        {
+                            ConsoleWriteLine("        " + l.Trim());
+                        }
+                    }
+                }
             }
 
             if (m_commandLineOptions.Debugging)

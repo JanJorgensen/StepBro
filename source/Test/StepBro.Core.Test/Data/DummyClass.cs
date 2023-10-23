@@ -299,5 +299,9 @@ namespace StepBroCoreTest.Data
             context.ReportFailure("<the failure description>");
             return null;
         }
+        public static object MethodThrowingException()
+        {
+            throw new KeyNotFoundException();
+        }
     }
 }

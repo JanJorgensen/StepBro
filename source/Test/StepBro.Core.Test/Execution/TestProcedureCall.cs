@@ -89,7 +89,7 @@ namespace StepBroCoreTest
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyFile.Bent - <no arguments>");
             log.ExpectNext("2 - Normal - 6 Log - This is Bent");
-            log.ExpectNext("2 - Pre - MyFile.Anders - <no arguments>");
+            log.ExpectNext("2 - Pre - 7 MyFile.Anders - <no arguments>");
             log.ExpectNext("3 - Normal - 3 Log - This is Anders");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
@@ -107,12 +107,12 @@ namespace StepBroCoreTest
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyFile.Christian - <no arguments>");
             log.ExpectNext("2 - Normal - 10 Log - This is Christian");
-            log.ExpectNext("2 - Pre - MyFile.Anders - <no arguments>");
+            log.ExpectNext("2 - Pre - 11 MyFile.Anders - <no arguments>");
             log.ExpectNext("3 - Normal - 3 Log - This is Anders");
             log.ExpectNext("3 - Post");
-            log.ExpectNext("2 - Pre - MyFile.Bent - <no arguments>");
+            log.ExpectNext("2 - Pre - 12 MyFile.Bent - <no arguments>");
             log.ExpectNext("3 - Normal - 6 Log - This is Bent");
-            log.ExpectNext("3 - Pre - MyFile.Anders - <no arguments>");
+            log.ExpectNext("3 - Pre - 7 MyFile.Anders - <no arguments>");
             log.ExpectNext("4 - Normal - 3 Log - This is Anders");
             log.ExpectNext("4 - Post");
             log.ExpectNext("3 - Post");
@@ -131,7 +131,7 @@ namespace StepBroCoreTest
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyFile.Dennis - <no arguments>");
             log.ExpectNext("2 - Normal - 6 Log - This is Dennis");
-            log.ExpectNext("2 - Pre - MyFile.Anders - <no arguments>");
+            log.ExpectNext("2 - Pre - 8 MyFile.Anders - <no arguments>");
             log.ExpectNext("3 - Normal - 3 Log - This is Anders");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
@@ -149,12 +149,12 @@ namespace StepBroCoreTest
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyFile.Christian - <no arguments>");
             log.ExpectNext("2 - Normal - 10 Log - This is Christian");
-            log.ExpectNext("2 - PreHighLevel - MyFile.Anders - TEST - <no arguments>");
+            log.ExpectNext("2 - PreHighLevel - 12 MyFile.Anders - TEST - <no arguments>");
             log.ExpectNext("3 - Normal - 3 Log - This is Anders");
             log.ExpectNext("3 - Post");
-            log.ExpectNext("2 - PreHighLevel - MyFile.Bent - TEST - <no arguments>");
+            log.ExpectNext("2 - PreHighLevel - 14 MyFile.Bent - TEST - <no arguments>");
             log.ExpectNext("3 - Normal - 6 Log - This is Bent");
-            log.ExpectNext("3 - Pre - MyFile.Anders - <no arguments>");
+            log.ExpectNext("3 - Pre - 7 MyFile.Anders - <no arguments>");
             log.ExpectNext("4 - Normal - 3 Log - This is Anders");
             log.ExpectNext("4 - Post");
             log.ExpectNext("3 - Post");
@@ -173,7 +173,7 @@ namespace StepBroCoreTest
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyFile.Dennis - <no arguments>");
             log.ExpectNext("2 - Normal - 6 Log - This is Dennis");
-            log.ExpectNext("2 - PreHighLevel - MyFile.Anders - TEST - <no arguments>");
+            log.ExpectNext("2 - PreHighLevel - 9 MyFile.Anders - TEST - <no arguments>");
             log.ExpectNext("3 - Normal - 3 Log - This is Anders");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
@@ -256,19 +256,19 @@ namespace StepBroCoreTest
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyFile.Anders - <no arguments>");
 
-            log.ExpectNext("2 - Pre - MyFile.Bent - <no arguments>");
+            log.ExpectNext("2 - Pre - 8 MyFile.Bent - <no arguments>");
             log.ExpectNext("3 - Normal - 4 Log - a: 5, b: Ups, c: False, d: 230");
             log.ExpectNext("3 - Post");
             
-            log.ExpectNext("2 - Pre - MyFile.Bent - <no arguments>");
+            log.ExpectNext("2 - Pre - 9 MyFile.Bent - <no arguments>");
             log.ExpectNext("3 - Normal - 4 Log - a: 28, b: Wow, c: True, d: 126");
             log.ExpectNext("3 - Post");
 
-            log.ExpectNext("2 - Pre - MyFile.Bent - <no arguments>");
+            log.ExpectNext("2 - Pre - 10 MyFile.Bent - <no arguments>");
             log.ExpectNext("3 - Normal - 4 Log - a: 94, b: Wow, c: False, d: 126");
             log.ExpectNext("3 - Post");
 
-            log.ExpectNext("2 - Pre - MyFile.Bent - <no arguments>");
+            log.ExpectNext("2 - Pre - 11 MyFile.Bent - <no arguments>");
             log.ExpectNext("3 - Normal - 4 Log - a: 113, b: Musk, c: True, d: 126");
             log.ExpectNext("3 - Post");
 

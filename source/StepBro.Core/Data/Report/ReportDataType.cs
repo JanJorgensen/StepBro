@@ -10,6 +10,7 @@ namespace StepBro.Core
         ExpectResult,
         SimpleMeasurement,
         DataTable,
-        TestSummary
+        TestSummary,
+        Exception
     }
 }
