@@ -62,11 +62,11 @@ namespace StepBroCoreTest.Execution
             log.DebugDump();
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyFile.ExecuteAllTests - <no arguments>");
-            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.FirstTestCase - ( (<empty>) )");
+            log.ExpectNext("2 - Pre - 16 <DYNAMIC CALL> MyFile.FirstTestCase - ( (<empty>) )");
             log.ExpectNext("3 - Post");
-            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.SecondTestCase - ( (<empty>) )");
+            log.ExpectNext("2 - Pre - 16 <DYNAMIC CALL> MyFile.SecondTestCase - ( (<empty>) )");
             log.ExpectNext("3 - Post");
-            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.ThirdTestCase - ( (<empty>) )");
+            log.ExpectNext("2 - Pre - 16 <DYNAMIC CALL> MyFile.ThirdTestCase - ( (<empty>) )");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
@@ -117,11 +117,11 @@ namespace StepBroCoreTest.Execution
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyFile.ExecuteAllTests - <no arguments>");
-            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (b: \"Brian\") )");
+            log.ExpectNext("2 - Pre - 16 <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (b: \"Brian\") )");
             log.ExpectNext("3 - Post");
-            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (<empty>) )");
+            log.ExpectNext("2 - Pre - 16 <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (<empty>) )");
             log.ExpectNext("3 - Post");
-            log.ExpectNext("2 - Pre - <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (<empty>) )");
+            log.ExpectNext("2 - Pre - 16 <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (<empty>) )");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
@@ -165,7 +165,7 @@ namespace StepBroCoreTest.Execution
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - myfile.ExecuteAllTests - <no arguments>");
-            log.ExpectNext("2 - Pre - <DYNAMIC CALL> myfile.FirstTestCase - ( (<empty>) )");
+            log.ExpectNext("2 - Pre - 6 <DYNAMIC CALL> myfile.FirstTestCase - ( (<empty>) )");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
@@ -263,7 +263,7 @@ namespace StepBroCoreTest.Execution
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - topfile.CallParkOnMySuite - <no arguments>");
-            log.ExpectNext("2 - Pre - topfile.ParkProc - <no arguments>");
+            log.ExpectNext("2 - Pre - 20 topfile.ParkProc - <no arguments>");
             log.ExpectNext("3 - Normal - 16 Log - Park");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");

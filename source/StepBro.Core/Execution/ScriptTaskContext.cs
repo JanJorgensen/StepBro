@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using StepBro.Core.Data;
 using StepBro.Core.General;
 using StepBro.Core.Logging;
@@ -21,9 +22,9 @@ namespace StepBro.Core.Execution
         private DataReport m_dataReport = null;
 
         public void Setup(
-            ILoggerScope logger, 
-            ContextLogOption callerLoggingOption, 
-            IExecutionScopeStatusUpdate statusUpdate, 
+            ILoggerScope logger,
+            ContextLogOption callerLoggingOption,
+            IExecutionScopeStatusUpdate statusUpdate,
             ILoadedFilesManager loadedFilesManager,
             TaskManager taskManager)
         {
@@ -60,24 +61,29 @@ namespace StepBro.Core.Execution
                 invokeArguments[0] = context;
                 m_value = runtimeProcedure.DynamicInvoke(invokeArguments);
                 m_result = context.Result;
-                m_dataReport = context.TryGetReport();
                 return m_value;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                var theException = (ex.InnerException != null) ? ex.InnerException : ex;
+                if (theException is not UnhandledExceptionInScriptException)
+                {
+                    context.ReportError("Unhandled Exception", null, theException);
+                    theException = new UnhandledExceptionInScriptException(theException, context);
+                }
+                m_result = (theException as UnhandledExceptionInScriptException).Context.Result;
+                throw theException;
             }
             finally
             {
+                m_dataReport = context.TryGetReport();
+                if (m_dataReport != null)
+                {
+                    m_dataReport.Close(context);
+                }
                 context.InternalDispose();
             }
         }
-
-        //public object CallProcedure(IProcedureReference procedure, LoggerRoot logger, ContextLogOption callerLoggingOption, IExecutionScopeStatusUpdate statusUpdate, params object[] arguments)
-        //{
-        //    this.Setup(logger, callerLoggingOption, statusUpdate);
-        //    return this.DoCallProcedure(procedure.ProcedureInfo, arguments);
-        //}
 
         public object CallProcedure(IProcedureReference procedure, params object[] arguments)
         {

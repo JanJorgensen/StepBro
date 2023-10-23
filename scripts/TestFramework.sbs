@@ -201,6 +201,7 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
         while (iterator.GetNext())
         {
             TestCase testcase = iterator.Procedure as TestCase;
+            summary.AddEntryBeforeResult(testcase.Name);    // Register test case before execution; in case execution is terminated by an unhandled exeception.
             procedureSummary = testcase.ProcedureData.Summary;
             if (System.String.IsNullOrEmpty(procedureSummary))
             {
@@ -210,7 +211,7 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
             {
                 procedureSummary = " " + procedureSummary;
             }
-           testReport.StartGroup("Testcase " + testcase.ProcedureData.FullName, procedureSummary);
+            testReport.StartGroup("Testcase " + testcase.ProcedureData.FullName, procedureSummary);
             // TODO: Save test case data in report
             log ("Starting Test: " + testcase.Name);
 

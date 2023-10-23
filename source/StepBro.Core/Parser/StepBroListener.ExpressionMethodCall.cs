@@ -574,6 +574,16 @@ namespace StepBro.Core.Parser
                             subCallContextContainer,
                             typeof(InternalDisposer<IScriptCallContext>).GetMethod("Dispose"));
 
+                        ParameterExpression catchParam = Expression.Parameter(typeof(Exception));
+
+                        var reportUnhandledException = Expression.Call(
+                            Expression.Convert(subCallContext, typeof(ScriptCallContext)),
+                            typeof(ScriptCallContext).GetMethod(nameof(ScriptCallContext.ReportError), new Type[] { typeof(string), typeof(ErrorID), typeof(Exception) }),
+                            Expression.Constant("Unhandled Exception"),
+                            Expression.Constant(null, typeof(ErrorID)),
+                            catchParam);
+
+
                         var completeProcedureCall = Expression.Block(
                             new ParameterExpression[] { procRefVar, callArgsArray, subCallContextContainer },
                             Expression.TryCatchFinally(
@@ -589,8 +599,17 @@ namespace StepBro.Core.Parser
                                     ),
                                 disposeSubContext,
                                 Expression.Catch(
-                                    typeof(Exception),
-                                    Expression.Rethrow())
+                                    typeof(UnhandledExceptionInScriptException),
+                                    Expression.Rethrow()),
+                                Expression.Catch(
+                                    catchParam,
+                                    Expression.Block(
+                                        reportUnhandledException,
+                                        Expression.Throw(
+                                            Expression.New(
+                                                typeof(UnhandledExceptionInScriptException).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0],
+                                                catchParam,
+                                                Expression.Convert(subCallContext, typeof(ScriptCallContext))))))
                                 ));
 
                         m_scopeStack.Peek().AddStatementCode(completeProcedureCall);

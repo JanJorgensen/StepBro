@@ -221,8 +221,8 @@ namespace StepBroCoreTest.Execution
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - topfile.Run - <no arguments>");
-            log.ExpectNext("2 - Pre - basefile.CallParkOnTestCaseBase - <no arguments>");
-            log.ExpectNext("3 - Pre - topfile.ParkProc - <no arguments>");
+            log.ExpectNext("2 - Pre - 10 basefile.CallParkOnTestCaseBase - <no arguments>");
+            log.ExpectNext("3 - Pre - 8 topfile.ParkProc - <no arguments>");
             log.ExpectNext("4 - Normal - 6 Log - Park");
             log.ExpectNext("4 - Post");
             log.ExpectNext("3 - Post");
@@ -307,8 +307,8 @@ namespace StepBroCoreTest.Execution
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - topfile.Run - <no arguments>");
-            log.ExpectNext("2 - Pre - basefile.CallParkOnTestCaseBase - <no arguments>");
-            log.ExpectNext("3 - Pre - topfile.ParkProc - <no arguments>");
+            log.ExpectNext("2 - Pre - 12 basefile.CallParkOnTestCaseBase - <no arguments>");
+            log.ExpectNext("3 - Pre - 8 topfile.ParkProc - <no arguments>");
             log.ExpectNext("4 - Normal - 8 Log - Park");
             log.ExpectNext("4 - Post");
             log.ExpectNext("3 - Post");
@@ -368,9 +368,9 @@ namespace StepBroCoreTest.Execution
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - topfile.Run - <no arguments>");
-            log.ExpectNext("2 - Pre - topfile.ParkProc - <no arguments>");
+            log.ExpectNext("2 - Pre - 13 topfile.ParkProc - <no arguments>");
             log.ExpectNext("3 - Normal - 8 Log - Args: 30, 00:00:00.0500000");
-            log.ExpectNext("3 - Pre - topfile.Proc - <no arguments>");
+            log.ExpectNext("3 - Pre - 9 topfile.Proc - <no arguments>");
             log.ExpectNext("4 - Normal - 4 Log - Proc Was Called");
             log.ExpectNext("4 - Post");
             log.ExpectNext("3 - Post");

@@ -52,6 +52,8 @@ namespace StepBro.Core.Execution
 
         TimeSpan IExecutionResult.ExecutionTime { get { return m_end - m_start; } }
 
+        Exception IExecutionResult.Exception { get { return m_taskContext.ExecutionExeception; } }
+
         object IExecutionResult.ReturnValue { get { return m_returnValue; } }
 
         public IFileElement TargetElement { get { return m_targetElement; } }
@@ -125,20 +127,10 @@ namespace StepBro.Core.Execution
             m_start = DateTime.Now;
             this.SetState(TaskExecutionState.Running);
 
-            try
-            {
-                m_returnValue = m_taskContext.CallProcedure(m_targetElement as IFileProcedure, m_arguments);
-                this.SetState(TaskExecutionState.Ended);
-            }
-            catch
-            {
-                this.SetState(TaskExecutionState.EndedByException);
-            }
-            finally
-            {
-                m_end = DateTime.Now;
-                logger.LogExit("Script execution ended. " + m_taskContext.Result.ResultText(m_returnValue));
-            }
+            m_returnValue = m_taskContext.CallProcedure(m_targetElement as IFileProcedure, m_arguments);
+            this.SetState((m_taskContext.ExecutionExeception == null) ? TaskExecutionState.Ended : TaskExecutionState.EndedByException);
+            m_end = DateTime.Now;
+            logger.LogExit("Script execution ended. " + m_taskContext.Result.ResultText(m_returnValue));
         }
 
         bool ITaskControl.RequestPause()

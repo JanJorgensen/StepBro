@@ -91,8 +91,9 @@ namespace StepBro.Core
             ILogEntry logStart = null;
             if (context != null && context.Logger is LoggerScope)
             {
-                if (description == null) description = "";
-                logStart = context.Logger.Log($"Starting report group \"{name}\". {description}");
+                if (String.IsNullOrEmpty(description)) description = "";
+                else description = " " + description;
+                logStart = context.Logger.Log($"Starting report group \"{name}\".{description}");
             }
             m_currentGroup = new ReportGroup(name, description, (LogEntry)logStart);
             m_groups.Add(m_currentGroup);
@@ -108,6 +109,12 @@ namespace StepBro.Core
                 timestamp = logentry.Timestamp;
             }
             this.AddData(context, new ReportGroupSection(timestamp, header, subheader));
+        }
+
+        public void AddUnhandledExeception(ICallContext context, Exception ex, string[] scriptCallstack)
+        {
+            var data = new ReportException(DateTime.Now, ex, scriptCallstack);
+            this.AddData(context, data);
         }
 
         public ReportTestSummary CreateTestSummary()

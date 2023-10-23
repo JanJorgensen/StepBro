@@ -8,5 +8,9 @@ namespace TestModule
 {
     public class TestClassWithOnlyStaticMethods
     {
+        public static void MethodThrowingException()
+        {
+            throw new KeyNotFoundException();
+        }
     }
 }

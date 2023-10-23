@@ -94,7 +94,7 @@ namespace StepBro.Core.Addons
                         {
                             m_writer.WriteLine(indent.Peek() + "  Description: " + group.Description);
                         }
-                        if (group.ListData().Count(d => d.Type == ReportDataType.ExpectResult || d.Type == ReportDataType.SimpleMeasurement) > 0)
+                        if (group.ListData().Count(d => d.Type == ReportDataType.ExpectResult || d.Type == ReportDataType.SimpleMeasurement || d.Type == ReportDataType.Exception) > 0)
                         {
                             indent.Push(indent.Peek() + "    ");
 
@@ -117,6 +117,7 @@ namespace StepBro.Core.Addons
                                             continue;
                                         case ReportDataType.ExpectResult:
                                         case ReportDataType.SimpleMeasurement:
+                                        case ReportDataType.Exception:
                                             sectionData.Add(data);
                                             break;
                                         case ReportDataType.TextLine:
@@ -203,6 +204,7 @@ namespace StepBro.Core.Addons
             {
                 var expects = sectionData.Where(d => d.Type == ReportDataType.ExpectResult).Select(d => d as ExpectResultData).ToList();
                 var measurements = sectionData.Where(d => d.Type == ReportDataType.SimpleMeasurement).Select(d => d as ReportSimpleMeasurement).ToList();
+                var exceptionEntry = sectionData.FirstOrDefault(d => d.Type == ReportDataType.Exception) as ReportException;
 
                 if (expects.Count > 0)
                 {
@@ -226,6 +228,37 @@ namespace StepBro.Core.Addons
                     {
                         m_writer.WriteLine(indent.Peek() + data.FormatString());
                     }
+                    indent.Pop();
+                }
+
+                if (exceptionEntry != null)
+                {
+                    m_writer.WriteLine("##[section]" + indent.Peek() + "Exception");
+
+                    indent.Push(indent.Peek() + "    ");
+                    var indentString = indent.Peek();
+                    var exception = exceptionEntry.Exception;
+                    if (exception is UnhandledExceptionInScriptException)
+                    {
+                        exception = exception.InnerException;
+                    }
+                    m_writer.WriteLine(indent.Peek() + "Type: " + exception.GetType().FullName);
+                    m_writer.WriteLine(indent.Peek() + "Message: " + exception.Message);
+                    if (!String.IsNullOrEmpty(exception.HelpLink))
+                    {
+                        m_writer.WriteLine(indent.Peek() + "Help: " + exception.HelpLink);
+                    }
+
+                    string[] stack = UnhandledExceptionInScriptException.CreatePrintableCallStack(exception, exceptionEntry.ScriptCallstack);
+                    if (stack != null && stack.Length > 0)
+                    {
+                        m_writer.WriteLine(indent.Peek() + "Call Stack: ");
+                        foreach (var s in stack)
+                        {
+                            m_writer.WriteLine(indent.Peek() + "    " + s.Trim());
+                        }
+                    }
+
                     indent.Pop();
                 }
             }
