@@ -1,0 +1,10 @@
+procedure void HelloStepBro()
+{
+    log("Hello Automation World!");
+	delay(4s);
+}
+
+procedure void ExpectGreaterThanTen(int value)
+{
+    expect (value > 10);
+}
