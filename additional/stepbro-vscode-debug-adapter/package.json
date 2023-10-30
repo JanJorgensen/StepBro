@@ -2,23 +2,76 @@
   "name": "stepbro-vscode-debug-adapter",
   "displayName": "StepBro VSCode Debug Adapter",
   "description": "VSCode Debug Adapter for the StepBro Language",
+  "publisher": "SchmutStein",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.83.0"
   },
   "categories": [
-    "Other"
+    "Debuggers"
   ],
+  "author": {
+    "name": "Schmutstein"
+  },
+  "license": "MIT",
   "activationEvents": [
-    "onCommand:stepbro-vscode-debug-adapter.helloWorld"
+    "onCommand:stepbro-vscode-debug.startSession"
   ],
   "main": "./out/typescript/extension.js",
   "contributes": {
+    "configuration": {
+        "type": "object",
+        "title": "%configuration.title%",
+        "properties": {
+            "mono-debug.exceptionOptions": {
+                "type": "object",
+                "additionalProperties": {
+                    "type": "string",
+                    "enum": [
+                        "never",
+                        "always",
+                        "unhandled"
+                    ],
+                    "enumDescriptions": [
+                        "%breakMode.never%",
+                        "%breakMode.always%",
+                        "%breakMode.unhandled%"
+                    ],
+                    "description": "%configuration.exceptionOptions.description2%",
+                    "default": "never"
+                },
+                "description": "%configuration.exceptionOptions.description%",
+                "default": {
+                    "System.Exception": "never",
+                    "System.SystemException": "never",
+                    "System.ArithmeticException": "never",
+                    "System.ArrayTypeMismatchException": "never",
+                    "System.DivideByZeroException": "never",
+                    "System.IndexOutOfRangeException": "never",
+                    "System.InvalidCastException": "never",
+                    "System.NullReferenceException": "never",
+                    "System.OutOfMemoryException": "never",
+                    "System.OverflowException": "never",
+                    "System.StackOverflowException": "never",
+                    "System.TypeInitializationException": "never"
+                }
+            }
+        }
+    },
     "commands": [
-      {
-        "command": "stepbro-vscode-debug-adapter.helloWorld",
-        "title": "Hello World"
-      }
+    ],
+    "breakpoints": [
+        {
+            "language": "stepbro"
+        }
+    ],
+    "debuggers": [
+        {
+            "type": "stepbro",
+		    "label": "StepBro",
+			"program": "./bin/Release/stepbro-debug-adapter.exe",
+            "startSessionCommand": "extension.mono-debug.startSession"
+        }
     ]
   },
   "scripts": {
