@@ -5,6 +5,25 @@
 {
 	"version": "0.2.0",
 	"configurations": [
+        {
+            "name": "Extension",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceRoot}"
+			],
+			"stopOnEntry": false,
+			"outFiles": [
+				"${workspaceRoot}/out/**/*.js"
+			]
+		},
+		{
+			"type": "coreclr",
+			"request": "launch",
+			"name": "Server",
+			"program": "${workspaceRoot}/bin/Debug/stepbro-debug-adapter.exe"
+		},
 		{
 			"name": "Run Extension",
 			"type": "extensionHost",
