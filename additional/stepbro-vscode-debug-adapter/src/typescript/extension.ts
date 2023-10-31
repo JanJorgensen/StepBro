@@ -13,7 +13,7 @@ export function activate(context: vscode.ExtensionContext)
 		});
 	}));
 
-    context.subscriptions.push(vscode.commands.registerCommand('stepbro-vscode-debug.startSession', config => startSession(config)));
+    context.subscriptions.push(vscode.commands.registerCommand('extension.stepbro-vscode-debug.startSession', config => startSession(config)));
 }
 
 // This method is called when your extension is deactivated

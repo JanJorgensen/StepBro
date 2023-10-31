@@ -13,7 +13,7 @@ function activate(context) {
             value: "ConsoleTest.sbs"
         });
     }));
-    context.subscriptions.push(vscode.commands.registerCommand('stepbro-vscode-debug.startSession', config => startSession(config)));
+    context.subscriptions.push(vscode.commands.registerCommand('extension.stepbro-vscode-debug.startSession', config => startSession(config)));
 }
 exports.activate = activate;
 // This method is called when your extension is deactivated
