@@ -11,24 +11,6 @@
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"args": [
-				"--extensionDevelopmentPath=${workspaceRoot}"
-			],
-			"stopOnEntry": false,
-			"outFiles": [
-				"${workspaceRoot}/out/**/*.js"
-			]
-		},
-		{
-			"type": "coreclr",
-			"request": "launch",
-			"name": "Server",
-			"program": "${workspaceRoot}/bin/Debug/stepbro-debug-adapter.exe"
-		},
-		{
-			"name": "Run Extension",
-			"type": "extensionHost",
-			"request": "launch",
-			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}"
 			],
 			"outFiles": [
@@ -37,15 +19,21 @@
 			"preLaunchTask": "${defaultBuildTask}"
 		},
 		{
+			"type": "coreclr",
+			"request": "launch",
+			"name": "Server",
+			"program": "${workspaceFolder}/bin/Debug/stepbro-debug-adapter.exe"
+		},
+		{
 			"name": "Extension Tests",
 			"type": "extensionHost",
 			"request": "launch",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/typescript/test/suite/index"
+				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
 			],
 			"outFiles": [
-				"${workspaceFolder}/out/typescript/test/**/*.js"
+				"${workspaceFolder}/out/test/**/*.js"
 			],
 			"preLaunchTask": "${defaultBuildTask}"
 		}

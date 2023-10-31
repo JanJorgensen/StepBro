@@ -14,63 +14,67 @@
     "name": "Schmutstein"
   },
   "license": "MIT",
-  "activationEvents": [
-    "onCommand:stepbro-vscode-debug.startSession"
-  ],
-  "main": "./out/typescript/extension.js",
+  "activationEvents": ["onDebug", "onCommand:extension.stepbro-vscode-debug.getProgramName"],
+  "main": "./out/extension.js",
   "contributes": {
-    "configuration": {
-        "type": "object",
-        "title": "%configuration.title%",
-        "properties": {
-            "mono-debug.exceptionOptions": {
-                "type": "object",
-                "additionalProperties": {
-                    "type": "string",
-                    "enum": [
-                        "never",
-                        "always",
-                        "unhandled"
-                    ],
-                    "enumDescriptions": [
-                        "%breakMode.never%",
-                        "%breakMode.always%",
-                        "%breakMode.unhandled%"
-                    ],
-                    "description": "%configuration.exceptionOptions.description2%",
-                    "default": "never"
-                },
-                "description": "%configuration.exceptionOptions.description%",
-                "default": {
-                    "System.Exception": "never",
-                    "System.SystemException": "never",
-                    "System.ArithmeticException": "never",
-                    "System.ArrayTypeMismatchException": "never",
-                    "System.DivideByZeroException": "never",
-                    "System.IndexOutOfRangeException": "never",
-                    "System.InvalidCastException": "never",
-                    "System.NullReferenceException": "never",
-                    "System.OutOfMemoryException": "never",
-                    "System.OverflowException": "never",
-                    "System.StackOverflowException": "never",
-                    "System.TypeInitializationException": "never"
-                }
-            }
-        }
-    },
-    "commands": [
-    ],
-    "breakpoints": [
+    "breakpoints":
+    [
         {
             "language": "stepbro"
         }
     ],
-    "debuggers": [
+    "commands":
+    [
+        {
+            "command": "extension.stepbro-vscode-debug.startSession",
+            "title": "Start Debug Session",
+            "category": "Debug"
+        }
+    ],
+    "debuggers":
+    [
         {
             "type": "stepbro",
-		    "label": "StepBro",
+		    "label": "StepBro Debug Adapter",
 			"program": "./bin/Release/stepbro-debug-adapter.exe",
-            "startSessionCommand": "extension.mono-debug.startSession"
+            "configurationAttributes": {
+                "launch": {
+                  "required": ["program"],
+                  "properties": {
+                    "program": {
+                      "type": "string",
+                      "description": "Absolute path to a stepbro file.",
+                      "default": "${workspaceFolder}/${command:AskForProgramName}",
+                    }
+                  }
+                }
+            },
+
+            "initialConfigurations": [
+              {
+                "type": "stepbro",
+                "request": "launch",
+                "name": "Ask for file name",
+                "program": "${workspaceFolder}/${command:AskForProgramName}"
+              }
+            ],
+
+            "configurationSnippets": [
+              {
+                "label": "StepBro Debug: Launch",
+                "description": "A new configuration for launching a stepbro debug adapter",
+                "body": {
+                  "type": "stepbro",
+                  "request": "launch",
+                  "name": "Ask for file name",
+                  "program": "^\"\\${workspaceFolder}/${command:AskForProgramName}\""
+                }
+              }
+            ],
+
+            "variables": {
+              "AskForProgramName": "extension.stepbro-vscode-debug.getProgramName"
+            }
         }
     ]
   },
