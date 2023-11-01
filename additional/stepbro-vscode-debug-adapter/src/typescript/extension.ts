@@ -21,6 +21,14 @@ export function deactivate() {}
 
 function startSession(config: any)
 {
-    console.log("We started a session!");
-	vscode.commands.executeCommand('vscode.startDebug', config);
+    console.log("Trying to start a session...");
+    vscode.debug.startDebugging((vscode.workspace.workspaceFolders != undefined ? vscode.workspace.workspaceFolders[0] : undefined), config)
+    .then(test => {
+        console.log((vscode.workspace.workspaceFolders != undefined ? vscode.workspace.workspaceFolders[0] : undefined));
+        console.log(config);
+        console.log("Session started!");
+    })
+    .then(undefined, err => {
+        console.log("ERROR: " + err);
+    });
 }
