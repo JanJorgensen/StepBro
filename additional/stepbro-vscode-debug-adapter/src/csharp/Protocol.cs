@@ -137,9 +137,14 @@ namespace VSCodeDebug
 				var read = await inputStream.ReadAsync(buffer, 0, buffer.Length);
 
 				if (read == 0) {
+                    Console.WriteLine("End of stream");
 					// end of stream
 					break;
 				}
+
+                // Test writelines to see if we have any data
+                Console.WriteLine(buffer);
+                Console.WriteLine(read);
 
 				if (read > 0) {
 					_rawData.Append(buffer, read);
