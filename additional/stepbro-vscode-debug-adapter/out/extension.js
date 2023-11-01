@@ -14,6 +14,8 @@ function activate(context) {
         });
     }));
     context.subscriptions.push(vscode.commands.registerCommand('extension.stepbro-vscode-debug.startSession', config => startSession(config)));
+    context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('stepbro', new StepBroDebugAdapterExecutableDescriptorFactory())); // This maybe??
+    console.log("Executable pushed");
 }
 exports.activate = activate;
 // This method is called when your extension is deactivated
@@ -30,5 +32,13 @@ function startSession(config) {
         .then(undefined, err => {
         console.log("ERROR: " + err);
     });
+}
+class StepBroDebugAdapterExecutableDescriptorFactory {
+    createDebugAdapterDescriptor(session, executable) {
+        return new vscode.DebugAdapterExecutable("c:/SW_development/StepBro/additional/stepbro-vscode-debug-adapter/bin/Debug/stepbro-debug-adapter.exe");
+    }
+    dispose() {
+        // Do nothing
+    }
 }
 //# sourceMappingURL=extension.js.map
