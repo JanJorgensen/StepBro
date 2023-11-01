@@ -84,7 +84,7 @@
                 }
               },
               {
-                "label": "StepBro Debug: Attac",
+                "label": "StepBro Debug: Attach",
                 "description": "A configuration for attaching a stepbro debug adapter",
                 "body": {
                   "type": "stepbro",
