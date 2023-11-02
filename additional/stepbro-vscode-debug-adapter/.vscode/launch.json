@@ -19,10 +19,12 @@
 			"preLaunchTask": "${defaultBuildTask}"
 		},
 		{
+            // This can not automatically attach to the right process
+            // but the process is called "stepbro-debug-adapter.exe"
+            // so find that one and attach to it.
 			"type": "coreclr",
-			"request": "launch",
+			"request": "attach",
 			"name": "Server",
-			"program": "${workspaceFolder}/bin/Debug/stepbro-debug-adapter.exe"
 		},
 		{
 			"name": "Extension Tests",
