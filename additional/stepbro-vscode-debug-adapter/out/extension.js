@@ -7,18 +7,33 @@ const vscode = require("vscode");
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 function activate(context) {
+    // Register a command that gets program name for people using that launch setup
     context.subscriptions.push(vscode.commands.registerCommand('extension.stepbro-vscode-debug.getProgramName', config => {
         return vscode.window.showInputBox({
             placeHolder: "Please enter the name of a stepbro file in the workspace folder",
             value: "ConsoleTest.sbs"
         });
     }));
-    // Write out events sent from the debug adapter
-    context.subscriptions.push(vscode.debug.onDidReceiveDebugSessionCustomEvent((e) => {
-        console.log(e.event);
+    // Set up the 5 event handlers defined in the API
+    // https://code.visualstudio.com/api/references/vscode-api#debug
+    context.subscriptions.push(vscode.debug.onDidChangeActiveDebugSession((e) => {
+        console.log("Active Debug Session Change: " + e?.name); // Just to have an implementation
     }));
+    context.subscriptions.push(vscode.debug.onDidChangeBreakpoints((e) => {
+        console.log("Breakpoint change: " + e);
+    }));
+    // Custom events are currently used for debugging
+    context.subscriptions.push(vscode.debug.onDidReceiveDebugSessionCustomEvent((e) => {
+        console.log("Custom event: " + e.event);
+    }));
+    context.subscriptions.push(vscode.debug.onDidStartDebugSession((e) => {
+        console.log("Start Debug Session: " + e.name);
+    }));
+    context.subscriptions.push(vscode.debug.onDidTerminateDebugSession((e) => {
+        console.log("Terminate Debug Session: " + e.name);
+    }));
+    // Register the stepbro debug adapter as an executable (So we can write it in C#)
     context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('stepbro', new StepBroDebugAdapterExecutableDescriptorFactory())); // This maybe??
-    // vscode.debug.startDebugging(vscode.workspace.workspaceFolders != undefined ? vscode.workspace.workspaceFolders[0] : undefined, undefined as unknown as vscode.DebugConfiguration);
 }
 exports.activate = activate;
 // This method is called when your extension is deactivated

@@ -16,7 +16,7 @@ namespace VSCodeDebug
 
             OperatingSystem os = Environment.OSVersion;
 			if (os.Platform != PlatformID.MacOSX && os.Platform != PlatformID.Unix && os.Platform != PlatformID.Win32NT) {
-				SendErrorResponse(response, 3000, "StepBro Debug is not supported on this platform ({_platform}).", new { _platform = os.Platform.ToString() }, true, true);
+				SendErrorResponse(response, 3000, "StepBro Debug Adapter is not supported on this platform ({_platform}).", new { _platform = os.Platform.ToString() }, true, true);
 				return;
 			}
 
