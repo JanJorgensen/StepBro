@@ -4,10 +4,6 @@ namespace VSCodeDebug
 {
 	public class StepBroDebugSession : DebugSession
 	{
-        private readonly string[] STEPBRO_EXTENSIONS = new String[] {
-			".sbs",
-		};
-
         public StepBroDebugSession() : base()
 		{
             // TODO
