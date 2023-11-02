@@ -5,6 +5,8 @@ namespace VSCodeDebug
 {
     internal class Program
     {
+        static DebugSession _session = null;
+        
         private static void Main(string[] argv)
         {
             // stdin/stdout
@@ -14,8 +16,8 @@ namespace VSCodeDebug
 
         private static void RunSession(Stream inputStream, Stream outputStream)
 		{
-			DebugSession debugSession = new StepBroDebugSession();
-			debugSession.Start(inputStream, outputStream).Wait();
+			_session = new StepBroDebugSession();
+			_session.Start(inputStream, outputStream).Wait();
 		}
 
         public static void Log(bool predicate, string format, params object[] data)
@@ -28,7 +30,15 @@ namespace VSCodeDebug
 
         public static void Log(string format, params object[] data)
 		{
-			Console.WriteLine(format, data);
+            if (_session != null)
+            {
+                string message = String.Format(format, data);
+                _session.SendEvent(new Event(message));
+            }
+            else
+            {
+                Console.WriteLine(format, data);
+            }
         }
     }
 }

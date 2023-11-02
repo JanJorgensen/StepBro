@@ -13,29 +13,20 @@ function activate(context) {
             value: "ConsoleTest.sbs"
         });
     }));
-    context.subscriptions.push(vscode.commands.registerCommand('extension.stepbro-vscode-debug.startSession', config => startSession(config)));
+    // Write out events sent from the debug adapter
+    context.subscriptions.push(vscode.debug.onDidReceiveDebugSessionCustomEvent((e) => {
+        console.log(e.event);
+    }));
     context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('stepbro', new StepBroDebugAdapterExecutableDescriptorFactory())); // This maybe??
-    console.log("Executable pushed");
+    // vscode.debug.startDebugging(vscode.workspace.workspaceFolders != undefined ? vscode.workspace.workspaceFolders[0] : undefined, undefined as unknown as vscode.DebugConfiguration);
 }
 exports.activate = activate;
 // This method is called when your extension is deactivated
 function deactivate() { }
 exports.deactivate = deactivate;
-function startSession(config) {
-    console.log("Trying to start a session...");
-    vscode.debug.startDebugging((vscode.workspace.workspaceFolders != undefined ? vscode.workspace.workspaceFolders[0] : undefined), config)
-        .then(test => {
-        console.log((vscode.workspace.workspaceFolders != undefined ? vscode.workspace.workspaceFolders[0] : undefined));
-        console.log(config);
-        console.log("Session started!");
-    })
-        .then(undefined, err => {
-        console.log("ERROR: " + err);
-    });
-}
 class StepBroDebugAdapterExecutableDescriptorFactory {
     createDebugAdapterDescriptor(session, executable) {
-        return new vscode.DebugAdapterExecutable("c:/SW_development/StepBro/additional/stepbro-vscode-debug-adapter/bin/Debug/stepbro-debug-adapter.exe");
+        return new vscode.DebugAdapterExecutable("c:/SW_development/StepBro/additional/stepbro-vscode-debug-adapter/bin/Debug/stepbro-debug-adapter.exe"); // TODO: Update with a more generic name eventually
     }
     dispose() {
         // Do nothing

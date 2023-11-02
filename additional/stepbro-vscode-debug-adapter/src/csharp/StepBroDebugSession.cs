@@ -11,12 +11,12 @@ namespace VSCodeDebug
         public StepBroDebugSession() : base()
 		{
             // TODO
-            Console.WriteLine("Constructor");
+            Program.Log("Constructor");
         }
 
         public override void Initialize(Response response, dynamic args)
         {
-            Console.WriteLine("Initialize");
+            Program.Log("Initialize");
 
             OperatingSystem os = Environment.OSVersion;
 			if (os.Platform != PlatformID.MacOSX && os.Platform != PlatformID.Unix && os.Platform != PlatformID.Win32NT) {
@@ -47,87 +47,87 @@ namespace VSCodeDebug
 
 		public override void Launch(Response response, dynamic arguments)
         {
-            Console.WriteLine("Launch");
+            Program.Log("Launch");
         }
 
 		public override void Attach(Response response, dynamic arguments)
         {
-            Console.WriteLine("Attach");
+            Program.Log("Attach");
         }
 
 		public override void Disconnect(Response response, dynamic arguments)
         {
-            Console.WriteLine("Disconnect");
+            Program.Log("Disconnect");
         }
 
 		public override void SetFunctionBreakpoints(Response response, dynamic arguments)
 		{
-            Console.WriteLine("SetFunctionBreakpoints");
+            Program.Log("SetFunctionBreakpoints");
 		}
 
 		public override void SetExceptionBreakpoints(Response response, dynamic arguments)
 		{
-            Console.WriteLine("SetExceptionBreakpoints");
+            Program.Log("SetExceptionBreakpoints");
 		}
 
 		public override void SetBreakpoints(Response response, dynamic arguments)
         {
-            Console.WriteLine("SetBreakpoints");
+            Program.Log("SetBreakpoints");
         }
 
 		public override void Continue(Response response, dynamic arguments)
         {
-            Console.WriteLine("Continue");
+            Program.Log("Continue");
         }
 
 		public override void Next(Response response, dynamic arguments)
         {
-            Console.WriteLine("Next");
+            Program.Log("Next");
         }
 
 		public override void StepIn(Response response, dynamic arguments)
         {
-            Console.WriteLine("StepIn");
+            Program.Log("StepIn");
         }
 
 		public override void StepOut(Response response, dynamic arguments)
         {
-            Console.WriteLine("StepOut");
+            Program.Log("StepOut");
         }
 
 		public override void Pause(Response response, dynamic arguments)
         {
-            Console.WriteLine("Pause");
+            Program.Log("Pause");
         }
 
 		public override void StackTrace(Response response, dynamic arguments)
         {
-            Console.WriteLine("StackTrace");
+            Program.Log("StackTrace");
         }
 
 		public override void Scopes(Response response, dynamic arguments)
         {
-            Console.WriteLine("Scopes");
+            Program.Log("Scopes");
         }
 
 		public override void Variables(Response response, dynamic arguments)
         {
-            Console.WriteLine("Variables");
+            Program.Log("Variables");
         }
 
 		public override void Source(Response response, dynamic arguments)
         {
-            Console.WriteLine("Source");
+            Program.Log("Source");
         }
 
 		public override void Threads(Response response, dynamic arguments)
         {
-            Console.WriteLine("Threads");
+            Program.Log("Threads");
         }
 
 		public override void Evaluate(Response response, dynamic arguments)
         {
-            Console.WriteLine("Evaluate");
+            Program.Log("Evaluate");
         }
     }
 }

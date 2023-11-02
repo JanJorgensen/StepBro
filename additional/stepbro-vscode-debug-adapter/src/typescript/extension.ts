@@ -15,35 +15,21 @@ export function activate(context: vscode.ExtensionContext)
 		});
 	}));
 
-    context.subscriptions.push(vscode.commands.registerCommand('extension.stepbro-vscode-debug.startSession', config => startSession(config)));
+    // Write out events sent from the debug adapter
+    context.subscriptions.push(vscode.debug.onDidReceiveDebugSessionCustomEvent((e) => {
+		console.log(e.event);
+	}));
 
     context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('stepbro', new StepBroDebugAdapterExecutableDescriptorFactory())); // This maybe??
 
-    console.log("Executable pushed");
+    // vscode.debug.startDebugging(vscode.workspace.workspaceFolders != undefined ? vscode.workspace.workspaceFolders[0] : undefined, undefined as unknown as vscode.DebugConfiguration);
 }
 
 // This method is called when your extension is deactivated
 export function deactivate() {}
 
-function startSession(config: any)
-{
-    console.log("Trying to start a session...");
-
-    vscode.debug.startDebugging((vscode.workspace.workspaceFolders != undefined ? vscode.workspace.workspaceFolders[0] : undefined), config)
-    .then(test => {
-        console.log((vscode.workspace.workspaceFolders != undefined ? vscode.workspace.workspaceFolders[0] : undefined));
-        console.log(config);
-        console.log("Session started!");
-    })
-    .then(undefined, err => {
-        console.log("ERROR: " + err);
-    });
-}
-
 class StepBroDebugAdapterExecutableDescriptorFactory implements vscode.DebugAdapterDescriptorFactory
 {
-    private server?: Net.Server;
-
     createDebugAdapterDescriptor(session: vscode.DebugSession, executable: vscode.DebugAdapterExecutable | undefined): vscode.ProviderResult<vscode.DebugAdapterDescriptor>
     {
         return new vscode.DebugAdapterExecutable("c:/SW_development/StepBro/additional/stepbro-vscode-debug-adapter/bin/Debug/stepbro-debug-adapter.exe"); // TODO: Update with a more generic name eventually

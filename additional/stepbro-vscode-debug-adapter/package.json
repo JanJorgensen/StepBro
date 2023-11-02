@@ -22,13 +22,7 @@
             "language": "stepbro"
         }
     ],
-    "commands": [
-        {
-            "command": "extension.stepbro-vscode-debug.startSession",
-            "title": "Start Debug Session",
-            "category": "Debug"
-        }
-    ],
+    "commands": [],
     "debuggers": [
         {
             "type": "stepbro",
