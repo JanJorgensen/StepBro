@@ -33,7 +33,8 @@ function activate(context) {
         console.log("Terminate Debug Session: " + e.name);
     }));
     // Register the stepbro debug adapter as an executable (So we can write it in C#)
-    context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('stepbro', new StepBroDebugAdapterExecutableDescriptorFactory())); // This maybe??
+    context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('stepbro', new StepBroDebugAdapterExecutableDescriptorFactory()));
+    context.subscriptions.push(vscode.debug.registerDebugAdapterTrackerFactory('stepbro', new StepBroDebugAdapterTrackerFactory()));
 }
 exports.activate = activate;
 // This method is called when your extension is deactivated
@@ -45,6 +46,14 @@ class StepBroDebugAdapterExecutableDescriptorFactory {
     }
     dispose() {
         // Do nothing
+    }
+}
+class StepBroDebugAdapterTrackerFactory {
+    createDebugAdapterTracker(session) {
+        return {
+            onWillReceiveMessage: m => console.log(`> ${JSON.stringify(m, undefined, 2)}`),
+            onDidSendMessage: m => console.log(`< ${JSON.stringify(m, undefined, 2)}`)
+        };
     }
 }
 //# sourceMappingURL=extension.js.map

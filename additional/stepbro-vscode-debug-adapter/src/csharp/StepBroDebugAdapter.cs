@@ -30,15 +30,16 @@ namespace VSCodeDebug
 
         public static void Log(string format, params object[] data)
 		{
+            // If we have a client session, we write to it
             if (_session != null)
             {
                 string message = String.Format(format, data);
                 _session.SendEvent(new Event(message));
             }
-            else
-            {
-                Console.WriteLine(format, data);
-            }
+
+            // When we log we both want to write to the client and to here
+            // to ensure both are in sync.
+            Console.WriteLine(format, data);
         }
     }
 }

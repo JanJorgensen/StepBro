@@ -40,7 +40,9 @@ export function activate(context: vscode.ExtensionContext)
     }));
 
     // Register the stepbro debug adapter as an executable (So we can write it in C#)
-    context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('stepbro', new StepBroDebugAdapterExecutableDescriptorFactory())); // This maybe??
+    context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('stepbro', new StepBroDebugAdapterExecutableDescriptorFactory()));
+
+    context.subscriptions.push(vscode.debug.registerDebugAdapterTrackerFactory('stepbro', new StepBroDebugAdapterTrackerFactory()));
 
 }
 
@@ -57,5 +59,16 @@ class StepBroDebugAdapterExecutableDescriptorFactory implements vscode.DebugAdap
     dispose()
     {
         // Do nothing
+    }
+}
+
+class StepBroDebugAdapterTrackerFactory implements vscode.DebugAdapterTrackerFactory
+{
+    createDebugAdapterTracker(session: vscode.DebugSession): vscode.ProviderResult<vscode.DebugAdapterTracker>
+    {
+        return {
+            onWillReceiveMessage: m => console.log(`Received: ${JSON.stringify(m, undefined, 2)}`),
+            onDidSendMessage: m => console.log(`Sent: ${JSON.stringify(m, undefined, 2)}`)
+        }
     }
 }
