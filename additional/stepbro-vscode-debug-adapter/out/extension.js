@@ -51,8 +51,8 @@ class StepBroDebugAdapterExecutableDescriptorFactory {
 class StepBroDebugAdapterTrackerFactory {
     createDebugAdapterTracker(session) {
         return {
-            onWillReceiveMessage: m => console.log(`> ${JSON.stringify(m, undefined, 2)}`),
-            onDidSendMessage: m => console.log(`< ${JSON.stringify(m, undefined, 2)}`)
+            onWillReceiveMessage: m => console.log(`Received: ${JSON.stringify(m, undefined, 2)}`),
+            onDidSendMessage: m => console.log(`Sent: ${JSON.stringify(m, undefined, 2)}`)
         };
     }
 }
