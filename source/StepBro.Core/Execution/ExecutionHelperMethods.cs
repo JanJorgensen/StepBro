@@ -538,11 +538,23 @@ namespace StepBro.Core.Execution
         {
             if (!result.IsCompleted)
             {
-                if (!result.AsyncWaitHandle.WaitOne(10000))
+                if (!result.AsyncWaitHandle.WaitOne(20000))
                 {
                     context.ReportError("Timeout");
                     return default(T);
                 }
+            }
+            if (result.IsFaulted)
+            {
+                if (result is IObjectFaultDescriptor)
+                {
+                    context.ReportError("Async operation failed. Fault: " + ((IObjectFaultDescriptor)result).FaultDescription);
+                }
+                else
+                {
+                    context.ReportError("Async operation failed.");
+                }
+                return default(T);
             }
             return result.Result;
         }
@@ -570,7 +582,9 @@ namespace StepBro.Core.Execution
         {
             if (result != null && !result.IsCompleted)
             {
-                if (!result.AsyncWaitHandle.WaitOne(20000))       // TODO: Register this "task" and replace with loop that waits a short while.
+                // TODO: Register this "task" and replace with loop that waits a short while.
+                // TODO: Ask the object itself what the timeout time should be.
+                if (!result.AsyncWaitHandle.WaitOne(20000))
                 {
                     throw new TimeoutException($"Timeout waiting for asynchronous result in line {context.CurrentScriptFileLine}.");
                 }
@@ -769,9 +783,9 @@ namespace StepBro.Core.Execution
         #endregion
 
         public static TProcedure ProcedureReferenceAs<TProcedure>(
-            IScriptCallContext context, 
-            IProcedureReference procedure, 
-            int targetFileID, 
+            IScriptCallContext context,
+            IProcedureReference procedure,
+            int targetFileID,
             int targetProcedureID) where TProcedure : class, IProcedureReference
         {
             var type = GetProcedure(context, targetFileID, targetProcedureID);
@@ -791,10 +805,10 @@ namespace StepBro.Core.Execution
         }
 
         public static bool ProcedureReferenceIs(
-            IScriptCallContext context, 
-            IProcedureReference procedure, 
-            int fileID, 
-            int procedureID, 
+            IScriptCallContext context,
+            IProcedureReference procedure,
+            int fileID,
+            int procedureID,
             bool isNot)
         {
             var type = GetProcedure(context, fileID, procedureID);
