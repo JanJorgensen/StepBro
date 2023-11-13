@@ -22,7 +22,46 @@
             "language": "stepbro"
         }
     ],
-    "commands": [],
+    "menus": {
+        "editor/title/run": [
+            {
+              "command": "extension.stepbro-vscode-debug.runEditorContents",
+              "when": "resourceLangId == stepbro",
+              "group": "navigation@1"
+            },
+            {
+              "command": "extension.stepbro-vscode-debug.debugEditorContents",
+              "when": "resourceLangId == stepbro",
+              "group": "navigation@2"
+            }
+        ],
+        "commandPalette": [
+            {
+              "command": "extension.stepbro-vscode-debug.debugEditorContents",
+              "when": "resourceLangId == stepbro"
+            },
+            {
+              "command": "extension.stepbro-vscode-debug.runEditorContents",
+              "when": "resourceLangId == stepbro"
+            }
+        ]
+    },
+    "commands": [
+        {
+            "command": "extension.stepbro-vscode-debug.debugEditorContents",
+            "title": "Debug File",
+            "category": "StepBro Debug",
+            "enablement": "!inDebugMode",
+            "icon": "$(debug-alt)"
+        },
+        {
+          "command": "extension.stepbro-vscode-debug.runEditorContents",
+          "title": "Run File",
+          "category": "StepBro Debug",
+          "enablement": "!inDebugMode",
+          "icon": "$(play)"
+        }
+    ],
     "debuggers": [
         {
             "type": "stepbro",
@@ -48,7 +87,7 @@
                         "default": "${workspaceFolder}/${command:AskForProgramName}"
                       }
                     }
-                  }
+                }
             },
 
             "initialConfigurations": [

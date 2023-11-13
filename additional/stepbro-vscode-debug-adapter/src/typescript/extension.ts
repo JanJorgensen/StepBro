@@ -44,6 +44,37 @@ export function activate(context: vscode.ExtensionContext)
 
     context.subscriptions.push(vscode.debug.registerDebugAdapterTrackerFactory('stepbro', new StepBroDebugAdapterTrackerFactory()));
 
+    // Add a command to run or debug the current file
+    context.subscriptions.push(vscode.commands.registerCommand('extension.stepbro-vscode-debug.runEditorContents', (resource: vscode.Uri) => {
+        let targetResource = resource;
+        if (!targetResource && vscode.window.activeTextEditor) {
+            targetResource = vscode.window.activeTextEditor.document.uri;
+        }
+        if (targetResource) {
+            vscode.debug.startDebugging(undefined, {
+                type: 'stepbro',
+                name: 'Run File',
+                request: 'launch',
+                program: targetResource.fsPath
+            },
+                { noDebug: true }
+            );
+        }
+        }),
+        vscode.commands.registerCommand('extension.stepbro-vscode-debug.debugEditorContents', (resource: vscode.Uri) => {
+        let targetResource = resource;
+        if (!targetResource && vscode.window.activeTextEditor) {
+            targetResource = vscode.window.activeTextEditor.document.uri;
+        }
+        if (targetResource) {
+            vscode.debug.startDebugging(undefined, {
+                type: 'stepbro',
+                name: 'Debug File',
+                request: 'launch',
+                program: targetResource.fsPath
+            });
+        }
+    }));
 }
 
 // This method is called when your extension is deactivated
