@@ -44,86 +44,103 @@ namespace VSCodeDebug
 		public override void Launch(Response response, dynamic arguments)
         {
             Program.Log("Launch");
+            SendResponse(response);
         }
 
 		public override void Attach(Response response, dynamic arguments)
         {
             Program.Log("Attach");
+            SendResponse(response);
         }
 
 		public override void Disconnect(Response response, dynamic arguments)
         {
             Program.Log("Disconnect");
+            SendResponse(response);
         }
 
 		public override void SetFunctionBreakpoints(Response response, dynamic arguments)
 		{
             Program.Log("SetFunctionBreakpoints");
+            SendResponse(response);
 		}
 
 		public override void SetExceptionBreakpoints(Response response, dynamic arguments)
 		{
             Program.Log("SetExceptionBreakpoints");
+            SendResponse(response);
 		}
 
 		public override void SetBreakpoints(Response response, dynamic arguments)
         {
             Program.Log("SetBreakpoints");
+            SendResponse(response);
         }
 
 		public override void Continue(Response response, dynamic arguments)
         {
             Program.Log("Continue");
+            SendResponse(response);
         }
 
 		public override void Next(Response response, dynamic arguments)
         {
             Program.Log("Next");
+            SendResponse(response);
         }
 
 		public override void StepIn(Response response, dynamic arguments)
         {
             Program.Log("StepIn");
+            SendResponse(response);
         }
 
 		public override void StepOut(Response response, dynamic arguments)
         {
             Program.Log("StepOut");
+            SendResponse(response);
         }
 
 		public override void Pause(Response response, dynamic arguments)
         {
             Program.Log("Pause");
+            SendResponse(response);
         }
 
 		public override void StackTrace(Response response, dynamic arguments)
         {
             Program.Log("StackTrace");
+            SendResponse(response);
         }
 
 		public override void Scopes(Response response, dynamic arguments)
         {
             Program.Log("Scopes");
+            SendResponse(response);
         }
 
 		public override void Variables(Response response, dynamic arguments)
         {
             Program.Log("Variables");
+            SendResponse(response);
         }
 
 		public override void Source(Response response, dynamic arguments)
         {
             Program.Log("Source");
+            SendResponse(response);
         }
 
 		public override void Threads(Response response, dynamic arguments)
         {
             Program.Log("Threads");
+            SendResponse(response);
         }
 
 		public override void Evaluate(Response response, dynamic arguments)
         {
             Program.Log("Evaluate");
+            SendResponse(response);
         }
     }
 }
