@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace VSCodeDebug
 {
@@ -134,7 +135,12 @@ namespace VSCodeDebug
 		public override void Threads(Response response, dynamic arguments)
         {
             Program.Log("Threads");
-            SendResponse(response);
+            // We need to respond with a thread so the debugger knows which thread to pause
+            var threads = new List<Thread>
+            {
+                new Thread(1, "thread 1")
+            };
+            SendResponse(response, new ThreadsResponseBody(threads));
         }
 
 		public override void Evaluate(Response response, dynamic arguments)
