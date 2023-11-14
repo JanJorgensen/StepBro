@@ -135,7 +135,7 @@ namespace VSCodeDebug
 		public override void Threads(Response response, dynamic arguments)
         {
             Program.Log("Threads");
-            // We need to respond with a thread so the debugger knows which thread to pause
+            // We need to respond with a list of threads so the debugger knows which thread(s) to pause
             var threads = new List<Thread>
             {
                 new Thread(1, "thread 1")
