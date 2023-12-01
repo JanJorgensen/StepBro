@@ -19,7 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.IO.Ports" Version="6.0.0" />
+    <PackageReference Include="System.IO.Ports" Version="7.0.0" />
+    <PackageReference Include="System.Management" Version="7.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\StepBro.Core\StepBro.Core.csproj">
