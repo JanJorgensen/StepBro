@@ -67,6 +67,8 @@ namespace StepBroCoreTest
 
         public IFolderShortcutsSource FolderShortcuts => throw new NotImplementedException();
 
+        public List<int> Breakpoints => throw new NotImplementedException();
+
         public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
         public event EventHandler ObjectContainerListChanged { add { } remove { } }
 

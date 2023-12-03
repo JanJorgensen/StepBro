@@ -35,7 +35,6 @@ namespace StepBro.Core.ScriptData
         ContextLogOption LogOption { get; }
         //bool SeparateStateLevel { get; }
         //bool IsFunction { get; }
-        IEnumerable<int> ListBreakpoints();
-        bool IsBreakpointOnLine(int line);
+        //bool IsBreakpointOnLine(int line);
     }
 }
