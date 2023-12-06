@@ -16,7 +16,15 @@ using static StepBro.Core.Data.LogLineData;
 namespace StepBro.TestInterface
 {
     public class SerialTestConnection :
-        AvailabilityBase, IConnection, IRemoteProcedures, INameable, ILogLineSource, ISettableFromPropertyBlock, INotifyPropertyChanged, ILogLineParent
+        AvailabilityBase, 
+        IConnection, 
+        IRemoteProcedures, 
+        INameable, 
+        INamedObject,
+        ISettableFromPropertyBlock, 
+        INotifyPropertyChanged, 
+        ILogLineParent,
+        ITextCommandInput
     {
         private class CommandData : IAsyncResult<object>, IObjectFaultDescriptor
         {
@@ -171,9 +179,9 @@ namespace StepBro.TestInterface
                     {
                         if (last.StartsWith(":ERROR", StringComparison.InvariantCulture))
                         {
-                            m_state = CommandState.EndResponseError;
                             var i = last.IndexOfAny(new char[] { ' ', ':' }, 6);
                             FaultDescription = last.Substring(i).TrimStart(' ', ':', '-');
+                            m_state = CommandState.EndResponseError;
                         }
                         else
                         {
@@ -184,7 +192,7 @@ namespace StepBro.TestInterface
                                 {
                                     if (s.StartsWith('\"'))
                                     {
-                                        m_result = s[1..(s.Length - 2)];
+                                        m_result = s[1..(s.Length - 1)];
                                     }
                                     else if (TimeUtils.TryParse(s, out TimeSpan v_timespan))
                                     {
@@ -330,6 +338,9 @@ namespace StepBro.TestInterface
             }
         }
 
+        string INamedObject.ShortName { get { return m_name; } }
+        string INamedObject.FullName { get { return m_name; } }
+
         public string DisplayName { get { return (m_name != null) ? m_name : "SerialTestConnection"; } }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -456,7 +467,7 @@ namespace StepBro.TestInterface
                     commandParts.Add(ArgumentToCommandString(a));
                 }
             }
-            var commandData = new CommandData(context, String.Join(" ", commandParts), CommandResponseTimeout, null);
+            var commandData = new CommandData(context, String.Join(" ", commandParts), this.CommandResponseTimeout, null);
             return EnqueueCommand(commandData);
         }
 
@@ -473,6 +484,17 @@ namespace StepBro.TestInterface
                 context.Logger.Log("SendDirect: \"" + text + "\"");
             }
             DoSendDirect(text);
+        }
+
+        bool ITextCommandInput.AcceptingCommands()
+        {
+            return this.IsStillValid && this.IsConnected();
+        }
+
+        void ITextCommandInput.ExecuteCommand(string command)
+        {
+            var commandData = new CommandData(null, command, this.CommandResponseTimeout, null);
+            EnqueueCommand(commandData);
         }
 
         public void AddSetupCommand([Implicit] ICallContext context, string command, params object[] arguments)

@@ -42,11 +42,11 @@ namespace StepBro.Core.Data.Report
 
         public int CountSubFails()
         {
-            return m_procedureResults.Count(r => r.Item2.Verdict == Verdict.Fail);
+            return m_procedureResults.Count(r => r.Item2 == null || r.Item2.Verdict == Verdict.Fail);
         }
         public int CountSubErrors()
         {
-            return m_procedureResults.Count(r => r.Item2.Verdict == Verdict.Error);
+            return m_procedureResults.Count(r => r.Item2 == null || r.Item2.Verdict == Verdict.Error);
         }
 
         public override string ToString()
@@ -59,7 +59,12 @@ namespace StepBro.Core.Data.Report
             Verdict result = Verdict.Pass;
             foreach (var r in m_procedureResults)
             {
-                if (r.Item2.Verdict > result) result = r.Item2.Verdict;
+                if (r.Item2 == null)
+                {
+                    result = Verdict.Error;
+                    break;
+                }
+                else if (r.Item2.Verdict > result) result = r.Item2.Verdict;
             }
             return result;
         }

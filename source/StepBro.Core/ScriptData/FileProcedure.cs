@@ -23,7 +23,6 @@ namespace StepBro.Core.ScriptData
         private readonly ParameterExpression m_callContextParameter;
         private LabelTarget m_returnLabel;
         private Expression m_bodyCode = null;
-        private readonly List<int> m_breakpoints = null;
         private int m_nextTestStepIndex = 1;
         private Delegate m_runtimeProcedure = null;
 
@@ -379,20 +378,6 @@ namespace StepBro.Core.ScriptData
         internal void SetProcedureBody(Expression body)
         {
             m_bodyCode = body;
-        }
-
-        public IEnumerable<int> ListBreakpoints()
-        {
-            if (m_breakpoints == null) yield break;
-            else
-            {
-                foreach (var bp in m_breakpoints) yield return bp;
-            }
-        }
-
-        public bool IsBreakpointOnLine(int line)
-        {
-            return (m_breakpoints != null && m_breakpoints.Contains(line));
         }
 
         public int GetNextStepIndex()

@@ -483,12 +483,12 @@ namespace StepBro.Core.Execution
         public void EnterStatement(int line, int column)
         {
             m_currentStatementLine = line;
-            m_currentLogLocation = line.ToString();   // TODO: Add "Line " to the text.
+            m_currentLogLocation = line.ToString();
             m_currentStatementColumn = column;
-            if (this.Logger != null && this.Logger.IsDebugging && m_procedure.IsBreakpointOnLine(line))
-            {
-                throw new NotImplementedException();
-            }
+            //if (this.Logger != null && this.Logger.IsDebugging && m_procedure.IsBreakpointOnLine(line))
+            //{
+            //    throw new NotImplementedException();
+            //}
         }
 
         public bool IsSimpleExpectStatementWithValue { get; set; }

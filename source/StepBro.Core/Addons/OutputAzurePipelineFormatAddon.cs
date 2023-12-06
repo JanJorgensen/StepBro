@@ -78,7 +78,14 @@ namespace StepBro.Core.Addons
                         var width1 = summary.ListResults().Select(r => r.Item1.Length).Max() + 2;
                         foreach (var result in summary.ListResults())
                         {
-                            m_writer.WriteLine($"    {result.Item1}:{new String(' ', width1 - result.Item1.Length)}{result.Item2.ToString(false)}");
+                            if (result.Item2 != null)
+                            {
+                                m_writer.WriteLine($"    {result.Item1}:{new String(' ', width1 - result.Item1.Length)}{result.Item2.ToString(false)}");
+                            }
+                            else
+                            {
+                                m_writer.WriteLine($"    {result.Item1}:{new String(' ', width1 - result.Item1.Length)}MISSING");
+                            }
                         }
                         m_writer.WriteLine("##[endgroup]");
                         m_writer.WriteLine("");     // Empty line
