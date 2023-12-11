@@ -1,0 +1,28 @@
+using StepBro.Streams;
+using StepBro.TestInterface;
+//using @"TestFramework.sbs";
+
+public SerialPort port = SerialPort()
+{
+    PortName = "COM14",
+    BaudRate = 460800,
+    StopBits = One
+}
+
+type TargetConnection : SerialTestConnection;
+
+public SerialTestConnection device = SerialTestConnection
+{ 
+    Stream = port, 
+    CommandResponseTimeout = 20s,
+    commands : [ 
+        {"Help|Get Help": "help"},
+        {"Help|About":    "about"},
+        {"List|Commands": "list commands"}
+    ]
+}
+
+procedure void Connect()
+{
+    device.Connect();
+}

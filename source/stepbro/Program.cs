@@ -1,18 +1,22 @@
-﻿using Microsoft.VisualBasic;
-using Newtonsoft.Json.Linq;
-using StepBro.Core;
+﻿using StepBro.Core;
 using StepBro.Core.Addons;
+using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.File;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
+using StepBro.Sidekick;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using static StepBro.Core.Data.ObjectMonitor;
 using StepBroMain = StepBro.Core.Main;
@@ -30,8 +34,9 @@ namespace StepBro.Cmd
             ExecuteScript,
             RepeatedParsing
         }
-        private enum State
+        private enum StateOrCommand
         {
+            AwaitCommand,
             LoadMainFile,
             ParseFiles,
             ExecuteScript,
@@ -49,9 +54,8 @@ namespace StepBro.Cmd
         private static IOutputFormatterTypeAddon m_outputAddon = null;
         private static IOutputFormatter m_outputFormatter = null;
         private static List<Tuple<bool, string>> m_bufferedOutput = new List<Tuple<bool, string>>();
-        //Queue<Tuple<Action<object>, object>> m_commandQueue = new Queue<Tuple<Action<object>, object>>();
         private static Mode m_mode = Mode.RunThrough;
-        private static State m_state = State.Exit;
+        private static Queue<StateOrCommand> m_next = new Queue<StateOrCommand>();
 
         private static int Main(string[] args)
         {
@@ -60,6 +64,10 @@ namespace StepBro.Cmd
             var selectedOutputAddon = OutputConsoleWithColorsAddon.Name;
             IExecutionResult result = null;
             DataReport createdReport = null;
+            SideKickPipe sideKickPipe = null;
+            bool sidekickStarted = false;
+            Dictionary<string, ITextCommandInput> commandObjectDictionary = null;
+            EventHandler closeEventHandler = null;
 
             try
             {
@@ -104,11 +112,6 @@ namespace StepBro.Cmd
                     m_commandLineOptions.TraceToConsole = true;
                 }
 
-                // In case the obsolete option is used.
-                if (!String.IsNullOrEmpty(m_commandLineOptions.LogFormat))
-                {
-                    m_commandLineOptions.OutputFormat = m_commandLineOptions.LogFormat;
-                }
                 if (!String.IsNullOrEmpty(m_commandLineOptions.OutputFormat))
                 {
                     selectedOutputAddon = m_commandLineOptions.OutputFormat;
@@ -148,13 +151,13 @@ namespace StepBro.Cmd
                 {
                     if (m_commandLineOptions.Verbose) ConsoleWriteLine("Filename: {0}", m_commandLineOptions.InputFile);
 
-                    m_state = State.LoadMainFile;
+                    m_next.Enqueue(StateOrCommand.LoadMainFile);
 
                     if (!String.IsNullOrEmpty(m_commandLineOptions.TargetElement) && m_commandLineOptions.RepeatedParsing)
                     {
                         ConsoleWriteErrorLine("Options 'execute' and 'repeated parsing' cannot be used at the same time.");
                         retval = -1;
-                        m_state = State.Exit;
+                        m_next.Enqueue(StateOrCommand.Exit);
                     }
 
                     if (m_commandLineOptions.RepeatedParsing)
@@ -183,22 +186,120 @@ namespace StepBro.Cmd
                     //}
                 }
 
+                closeEventHandler = (sender, e) =>
+                {
+                    sideKickPipe.Send(new ShortCommand("CLOSE"));
+                    Thread.Sleep(1000);     // Leave some time for the sidekick application to receive the command.
+                };
+
+                if (m_commandLineOptions.Sidekick)
+                {
+                    AppDomain.CurrentDomain.ProcessExit += closeEventHandler;
+
+                    var hThis = GetConsoleWindow();
+                    sideKickPipe = SideKickPipe.StartServer(hThis.ToString("X"));
+
+
+                    string path = Assembly.GetExecutingAssembly().Location;
+                    var folder = Path.GetDirectoryName(path);
+
+                    var sidekick = new System.Diagnostics.Process();
+                    sidekick.StartInfo.FileName = Path.Combine(folder, "StepBro.Sidekick.exe");
+                    sidekick.StartInfo.Arguments = hThis.ToString("X");
+                    sidekickStarted = sidekick.Start();
+                    if (sidekickStarted)
+                    {
+                        commandObjectDictionary = new Dictionary<string, ITextCommandInput>();
+
+                        while (!sideKickPipe.IsConnected())
+                        {
+                            System.Threading.Thread.Sleep(200);
+                            // TODO: Timeout
+                        }
+
+                        StartLogDumpTask();
+
+                        if (m_mode == Mode.RunThrough)
+                        {
+                            m_next.Enqueue(StateOrCommand.AwaitCommand);
+                        }
+                    }
+                }
+
                 m_activitiesRunning = true;
 
                 IScriptFile file = null;
 
-                while (m_state != State.Exit)
+                StateOrCommand command;
+                while ((command = m_next.Any() ? m_next.Dequeue() : StateOrCommand.Exit) != StateOrCommand.Exit)
                 {
-                    switch (m_state)
+                    switch (command)
                     {
-                        case State.LoadMainFile:
+                        case StateOrCommand.AwaitCommand:
+                        case StateOrCommand.AwaitFileChange:
+                            if (m_mode == Mode.RepeatedParsing && StepBroMain.CheckIfFileParsingNeeded(true))
+                            {
+                                m_next.Enqueue(StateOrCommand.CloseAndDisposeAllFiles);
+                                System.Threading.Thread.Sleep(200);         // Give editor a chance to save all files before the parsing starts.
+                                break;
+                            }
+                            else if (Console.KeyAvailable)
+                            {
+                                var keyInfo = Console.ReadKey(true);
+                                if ((uint)keyInfo.Modifiers == 0)
+                                {
+                                    if (keyInfo.Key == ConsoleKey.C)
+                                    {
+                                        Console.Clear();
+                                    }
+                                    else if (keyInfo.Key == ConsoleKey.X)
+                                    {
+                                        m_next.Enqueue(StateOrCommand.Exit);
+                                        break;
+                                    }
+                                }
+                            }
+                            else if (sidekickStarted)
+                            {
+                                var input = sideKickPipe.TryGetReceived();
+                                if (input != null)
+                                {
+                                    if (input.Item1 == "ShortCommand")
+                                    {
+                                        var shortCommand = JsonSerializer.Deserialize<ShortCommand>(input.Item2);
+                                    }
+                                    else if (input.Item1 == "RequestElementInfo")
+                                    {
+                                        var infoRequest = JsonSerializer.Deserialize<RequestElementInfo>(input.Item2);
+                                    }
+                                    else if (input.Item1 == "ObjectCommand")
+                                    {
+                                        var objectCommand = JsonSerializer.Deserialize<ObjectCommand>(input.Item2);
+
+                                        if (commandObjectDictionary.ContainsKey(objectCommand.Object) && !String.IsNullOrEmpty(objectCommand.Command))
+                                        {
+                                            var obj = commandObjectDictionary[objectCommand.Object];
+                                            if (obj.AcceptingCommands())
+                                            {
+                                                obj.ExecuteCommand(objectCommand.Command);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            System.Threading.Thread.Sleep(150);
+                            m_next.Enqueue(StateOrCommand.AwaitCommand);
+                            break;
+
+                        case StateOrCommand.LoadMainFile:
+                            Trace.WriteLine("StepBro command: " + command.ToString());
                             var filepath = System.IO.Path.GetFullPath(m_commandLineOptions.InputFile);
                             try
                             {
                                 file = StepBroMain.LoadScriptFile(consoleResourceUserObject, filepath);
                                 if (file == null)
                                 {
-                                    m_state = State.Exit;
+                                    m_next.Enqueue(StateOrCommand.Exit);
                                     retval = -1;
                                     ConsoleWriteErrorLine("Error: Loading script file failed ( " + filepath + " )");
                                 }
@@ -210,10 +311,14 @@ namespace StepBro.Cmd
                                 switch (m_mode)
                                 {
                                     case Mode.RunThrough:
+                                        if (sidekickStarted)
+                                        {
+                                            m_next.Enqueue(StateOrCommand.ParseFiles);
+                                        }
                                         break;
                                     case Mode.ExecuteScript:
                                     case Mode.RepeatedParsing:
-                                        m_state = State.ParseFiles;
+                                        m_next.Enqueue(StateOrCommand.ParseFiles);
                                         break;
                                     default:
                                         break;
@@ -221,27 +326,45 @@ namespace StepBro.Cmd
                             }
                             catch (Exception ex)
                             {
-                                m_state = State.Exit;
+                                m_next.Enqueue(StateOrCommand.Exit);
                                 retval = -1;
                                 ConsoleWriteErrorLine("Error: Loading script file failed: " + ex.GetType().Name + ", " + ex.Message);
                             }
                             break;
 
-                        case State.ParseFiles:
+                        case StateOrCommand.ParseFiles:
+                            Trace.WriteLine("StepBro command: " + command.ToString());
                             var parsingSuccess = StepBroMain.ParseFiles(true);
                             if (parsingSuccess)
                             {
+                                if (sidekickStarted)
+                                {
+                                    var objectManager = StepBroMain.ServiceManager.Get<IDynamicObjectManager>();
+                                    var objects = objectManager.GetObjectCollection();
+                                    var commandObjectsContainers = objects.Where(o => o.Object is ITextCommandInput).ToList();
+                                    foreach (var o in commandObjectsContainers)
+                                    {
+                                        commandObjectDictionary.Add(o.FullName, o.Object as ITextCommandInput);
+                                    }
+                                    var message = new CommandObjectsList();
+                                    message.Objects = commandObjectsContainers.Select(o => o.FullName).ToArray();
+                                    sideKickPipe.Send(message);
+                                }
+
                                 switch (m_mode)
                                 {
                                     case Mode.RunThrough:
-                                        m_state = State.Exit;
+                                        if (!sidekickStarted)
+                                        {
+                                            m_next.Enqueue(StateOrCommand.Exit);
+                                        }
                                         break;
                                     case Mode.ExecuteScript:
-                                        m_state = State.ExecuteScript;
+                                        m_next.Enqueue(StateOrCommand.ExecuteScript);
                                         break;
                                     case Mode.RepeatedParsing:
                                         ConsoleWriteLine("No parsing errors.");
-                                        m_state = State.AwaitFileChange;
+                                        m_next.Enqueue(StateOrCommand.AwaitFileChange);
                                         break;
                                     default:
                                         break;
@@ -266,18 +389,19 @@ namespace StepBro.Cmd
                                 {
                                     case Mode.RepeatedParsing:
                                         m_dumpBufferedConsoleOutput = true;
-                                        m_state = State.AwaitFileChange;
+                                        m_next.Enqueue(StateOrCommand.AwaitFileChange);
                                         break;
                                     default:
                                         retval = -1;
-                                        m_state = State.Exit;
+                                        m_next.Enqueue(StateOrCommand.Exit);
                                         break;
                                 }
                             }
                             break;
 
-                        case State.ExecuteScript:
+                        case StateOrCommand.ExecuteScript:
                             {
+                                Trace.WriteLine("StepBro command: " + command.ToString());
                                 IFileElement element = StepBroMain.TryFindFileElement(m_commandLineOptions.TargetElement);
                                 if (element != null)
                                 {
@@ -320,13 +444,7 @@ namespace StepBro.Cmd
                                     {
                                         try
                                         {
-                                            // Start logging now.
-                                            if (m_commandLineOptions.TraceToConsole)
-                                            {
-                                                m_dumpingExecutionLog = true;
-                                                var logTask = new Task(() => LogDumpTask());
-                                                logTask.Start();
-                                            }
+                                            StartLogDumpTask();
 
                                             var execution = StepBroMain.ExecuteProcedure(procedure, arguments.ToArray());
                                             result = execution.Result;
@@ -402,51 +520,26 @@ namespace StepBro.Cmd
                                     ConsoleWriteErrorLine($"Error: File element named '{m_commandLineOptions.TargetElement} was not found.");
                                 }
 
-                                m_state = State.Exit;   // For now, always exit after execution (or attempt).
+                                if (sidekickStarted)
+                                {
+                                    m_next.Enqueue(StateOrCommand.AwaitCommand);
+                                }
+                                else
+                                {
+                                    m_next.Enqueue(StateOrCommand.Exit);   // For now, always exit after execution (or attempt).
+                                }
                             }
                             break;
 
-                        case State.AwaitFileChange:
-
-                            // Collect all relevant files
-
-                            while (true)
-                            {
-                                if (StepBroMain.CheckIfFileParsingNeeded(true))
-                                {
-                                    m_state = State.CloseAndDisposeAllFiles;
-                                    System.Threading.Thread.Sleep(200);         // Give editor a chance to save all files before the sparsing starts.
-                                    break;
-                                }
-                                else if (Console.KeyAvailable)
-                                {
-                                    var keyInfo = Console.ReadKey(true);
-                                    if ((uint)keyInfo.Modifiers == 0)
-                                    {
-                                        if (keyInfo.Key == ConsoleKey.C)
-                                        {
-                                            Console.Clear();
-                                        }
-                                        else if (keyInfo.Key == ConsoleKey.X)
-                                        {
-                                            m_state = State.Exit;
-                                        }
-                                    }
-                                    break;
-                                }
-                                System.Threading.Thread.Sleep(200);
-                            }
-                            break;
-
-                        case State.CloseAndDisposeAllFiles:
-
+                        case StateOrCommand.CloseAndDisposeAllFiles:
+                            Trace.WriteLine("StepBro command: " + command.ToString());
                             StepBroMain.UnregisterFileUsage(consoleResourceUserObject, file);
                             switch (m_mode)
                             {
                                 case Mode.RepeatedParsing:
                                     ConsoleWriteLine("");
                                     ConsoleWriteLine($"{DateTime.Now.ToString("HH:mm:ss")} - Starting parsing");
-                                    m_state = State.LoadMainFile;   // Load the file again and all its dependencies.
+                                    m_next.Enqueue(StateOrCommand.LoadMainFile);   // Load the file again and all its dependencies.
                                     break;
                                 default:
                                     break;
@@ -454,7 +547,7 @@ namespace StepBro.Cmd
 
                             break;
 
-                        case State.Exit:
+                        case StateOrCommand.Exit:
                             break;
                     }
                 }
@@ -485,7 +578,14 @@ namespace StepBro.Cmd
                 ConsoleWriteErrorLine($"Error: {ex.GetType().Name}, {ex.Message}");
                 retval = -1;
             }
+            Trace.WriteLine("StepBro ended command loop");
 
+
+            if (m_commandLineOptions.Sidekick)
+            {
+                AppDomain.CurrentDomain.ProcessExit -= closeEventHandler;
+            }
+            
             m_activitiesRunning = false;
             while (m_dumpingExecutionLog)
             {
@@ -533,6 +633,16 @@ namespace StepBro.Cmd
             {
                 DebugLogUtils.DumpToFile();
                 ConsoleWriteLine($"Internal Debug Log saved in {DebugLogUtils.DumpFilePath}");
+            }
+
+            if (sideKickPipe != null)
+            {
+
+                sideKickPipe.Send(new ShortCommand("CLOSE"));
+
+                Trace.WriteLine("StepBro dispose sidekick");
+                sideKickPipe.Dispose();
+                Trace.WriteLine("StepBro sidekick disposed");
             }
 
             StepBroMain.Deinitialize();
@@ -594,6 +704,16 @@ namespace StepBro.Cmd
             m_bufferedOutput.Clear();
         }
 
+        private static void StartLogDumpTask()
+        {
+            if (!m_dumpingExecutionLog && m_commandLineOptions.TraceToConsole)
+            {
+                m_dumpingExecutionLog = true;
+                var logTask = new Task(() => LogDumpTask());
+                logTask.Start();
+            }
+        }
+
         private static void LogDumpTask()
         {
             var logEntry = StepBroMain.Logger.GetOldestEntry();
@@ -617,5 +737,37 @@ namespace StepBro.Cmd
             Console.ForegroundColor = ConsoleColor.White;
             m_dumpingExecutionLog = false;  // Signal to main thread.
         }
+
+
+        //[DllImport("kernel32.dll", SetLastError = true)]
+        //static extern bool AttachConsole(uint dwProcessId);
+
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+
+        //[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        //static extern bool FreeConsole();
+
+        //[DllImport("kernel32.dll")]
+        //static extern bool SetConsoleCtrlHandler(ConsoleCtrlDelegate HandlerRoutine, bool Add);
+        //delegate Boolean ConsoleCtrlDelegate(CtrlTypes ctrlType);
+        //enum CtrlTypes : uint
+        //{
+        //    CTRL_C = 0,
+        //    CTRL_BREAK,
+        //    CLOSE_EVENT,
+        //    LOGOFF_EVENT = 5,
+        //    SHUTDOWN_EVENT
+        //}
+
+        //static bool is_attached = false;
+        //ConsoleCtrlDelegate ConsoleCtrlDelegateDetach = delegate (CtrlTypes ctrlType)
+        //{
+        //    Trace.WriteLine("Console Event: " + ctrlType.ToString());
+        //    //if (is_attached = !FreeConsole())
+        //    //{
+        //    //}
+        //    return true;
+        //};
     }
 }

@@ -29,7 +29,7 @@ namespace StepBro.TestInterface
         private class CommandData : IAsyncResult<object>, IObjectFaultDescriptor
         {
             public enum CommandState { InQueue, Running, EndResponseReceived, EndTimeout, EndResponseError, EndResultFormatError }
-            private ICallContext m_context = null;
+            private ILogger m_logger = null;
             private readonly DateTime m_start;
             private DateTime m_activated = DateTime.MinValue;
             private TimeSpan m_timeoutTimeSpan;
@@ -44,9 +44,9 @@ namespace StepBro.TestInterface
             private object m_result = null;
             private readonly Func<string[], string, object> m_resultDecoder = null;
 
-            public CommandData(ICallContext context, string command, TimeSpan timeout, Type expectedDataType) : base()
+            public CommandData(ILogger logger, string command, TimeSpan timeout, Type expectedDataType) : base()
             {
-                m_context = context;
+                m_logger = logger;
                 m_start = DateTime.Now;
                 m_command = command;
                 m_timeoutTimeSpan = timeout;
@@ -66,7 +66,7 @@ namespace StepBro.TestInterface
             //    m_result = result;
             //}
 
-            public ICallContext Context { get { return m_context; } }
+            public ILogger Logger { get { return m_logger; } }
             public string Command { get { return m_command; } }
             public CommandState State { get { return m_state; } }
             public DateTime ActivationTimestamp { get { return m_activated; } }
@@ -467,7 +467,7 @@ namespace StepBro.TestInterface
                     commandParts.Add(ArgumentToCommandString(a));
                 }
             }
-            var commandData = new CommandData(context, String.Join(" ", commandParts), this.CommandResponseTimeout, null);
+            var commandData = new CommandData(context?.Logger, String.Join(" ", commandParts), this.CommandResponseTimeout, null);
             return EnqueueCommand(commandData);
         }
 
@@ -493,7 +493,7 @@ namespace StepBro.TestInterface
 
         void ITextCommandInput.ExecuteCommand(string command)
         {
-            var commandData = new CommandData(null, command, this.CommandResponseTimeout, null);
+            var commandData = new CommandData(m_mainLogger, command, this.CommandResponseTimeout, null);
             EnqueueCommand(commandData);
         }
 
@@ -532,7 +532,7 @@ namespace StepBro.TestInterface
             IAsyncResult last = null;
             foreach (var command in m_setupCommands)
             {
-                var commandData = new CommandData(context, command, this.CommandResponseTimeout, null);
+                var commandData = new CommandData((context != null && context.LoggingEnabled) ? context.Logger : null, command, this.CommandResponseTimeout, null);
                 last = EnqueueCommand(commandData);
             }
             return last;    // Return the last command to allow caller to wait until all commands have been executed.
@@ -573,7 +573,7 @@ namespace StepBro.TestInterface
             var task = Task.Run<bool>(() =>
             {
                 // FIRST GET THE LIST OF AVAILABLE COMMANDS
-                var command = new CommandData(context, "list commands", this.CommandResponseTimeout, typeof(List<string>));
+                var command = new CommandData(context?.Logger, "list commands", this.CommandResponseTimeout, typeof(List<string>));
                 var cmd = EnqueueCommand(command);
                 if (cmd.CompletedSynchronously)
                 {
@@ -595,7 +595,7 @@ namespace StepBro.TestInterface
                             var commandName = DecodeCommandListLine(commandListLine, out id);
 
                             // THEN, GET THE INFORMATION FOR EACH COMMAND
-                            command = new CommandData(context, "help " + commandName, this.CommandResponseTimeout, typeof(List<string>));
+                            command = new CommandData(context?.Logger, "help " + commandName, this.CommandResponseTimeout, typeof(List<string>));
                             cmd = EnqueueCommand(command);
 
                             if (cmd.CompletedSynchronously)
@@ -791,8 +791,8 @@ namespace StepBro.TestInterface
                     case LogType.ReceivedError:
                         if (m_currentExecutingCommand != null)
                         {
-                            var logger = m_currentExecutingCommand?.Context?.Logger;
-                            if (logger != null && m_currentExecutingCommand.Context.LoggingEnabled)
+                            var logger = m_currentExecutingCommand?.Logger;
+                            if (logger != null)
                             {
                                 logger.LogDetail("Received: " + text);
                             }
@@ -973,7 +973,7 @@ namespace StepBro.TestInterface
             var commandstring = command.GetAndMarkActive();
             m_loopbackAnswers?.TryGetValue(commandstring, out commandstring);
             if (m_nextResponse != null) commandstring = m_nextResponse;
-            if (command.Context != null && command.Context.LoggingEnabled) command.Context.Logger.LogDetail("Send: " + commandstring);
+            if (command.Logger != null) command.Logger.LogDetail("Send: " + commandstring);
             m_currentExecutingCommand = command;
             DoSendDirect(commandstring);
         }
