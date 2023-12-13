@@ -4,6 +4,7 @@ using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.File;
+using StepBro.Core.General;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using StepBro.Sidekick;
@@ -68,6 +69,9 @@ namespace StepBro.Cmd
             bool sidekickStarted = false;
             Dictionary<string, ITextCommandInput> commandObjectDictionary = null;
             EventHandler closeEventHandler = null;
+            string targetFile = null;
+            string targetElement = null;
+            string targetPartner = null;
 
             try
             {
@@ -147,13 +151,17 @@ namespace StepBro.Cmd
                     }
                 }
 
-                if (!String.IsNullOrEmpty(m_commandLineOptions.InputFile))
+                targetFile = m_commandLineOptions.InputFile;
+                targetElement = m_commandLineOptions.TargetElement;
+                targetPartner = m_commandLineOptions.Model;
+
+                if (!String.IsNullOrEmpty(targetFile))
                 {
-                    if (m_commandLineOptions.Verbose) ConsoleWriteLine("Filename: {0}", m_commandLineOptions.InputFile);
+                    if (m_commandLineOptions.Verbose) ConsoleWriteLine("Filename: {0}", targetFile);
 
                     m_next.Enqueue(StateOrCommand.LoadMainFile);
 
-                    if (!String.IsNullOrEmpty(m_commandLineOptions.TargetElement) && m_commandLineOptions.RepeatedParsing)
+                    if (!String.IsNullOrEmpty(targetElement) && m_commandLineOptions.RepeatedParsing)
                     {
                         ConsoleWriteErrorLine("Options 'execute' and 'repeated parsing' cannot be used at the same time.");
                         retval = -1;
@@ -167,7 +175,7 @@ namespace StepBro.Cmd
                     }
                     else
                     {
-                        if (!String.IsNullOrEmpty(m_commandLineOptions.TargetElement))
+                        if (!String.IsNullOrEmpty(targetElement))
                         {
                             m_mode = Mode.ExecuteScript;
                         }
@@ -175,7 +183,7 @@ namespace StepBro.Cmd
                 }
                 else
                 {
-                    if (!String.IsNullOrEmpty(m_commandLineOptions.Model))
+                    if (!String.IsNullOrEmpty(targetPartner))
                     {
                         retval = -1;
                         ConsoleWriteErrorLine("Error: Model has been specified, but not a target element.");
@@ -188,7 +196,7 @@ namespace StepBro.Cmd
 
                 closeEventHandler = (sender, e) =>
                 {
-                    sideKickPipe.Send(new ShortCommand("CLOSE"));
+                    sideKickPipe.Send(ShortCommand.Close);
                     Thread.Sleep(1000);     // Leave some time for the sidekick application to receive the command.
                 };
 
@@ -267,10 +275,21 @@ namespace StepBro.Cmd
                                     if (input.Item1 == "ShortCommand")
                                     {
                                         var shortCommand = JsonSerializer.Deserialize<ShortCommand>(input.Item2);
-                                    }
-                                    else if (input.Item1 == "RequestElementInfo")
-                                    {
-                                        var infoRequest = JsonSerializer.Deserialize<RequestElementInfo>(input.Item2);
+                                        switch (shortCommand)
+                                        {
+                                            case ShortCommand.Close:
+                                                break;
+                                            case ShortCommand.Parse:
+                                                StepBroMain.Logger.RootLogger.LogUserAction("Request file parsing");
+                                                m_next.Enqueue(StateOrCommand.ParseFiles);
+                                                break;
+                                            case ShortCommand.StopScriptExecution:
+                                                StepBroMain.Logger.RootLogger.LogUserAction("Request stop script execution");
+                                                StepBroMain.RequestStopScriptExecution();
+                                                break;
+                                            default:
+                                                break;
+                                        }
                                     }
                                     else if (input.Item1 == "ObjectCommand")
                                     {
@@ -278,12 +297,25 @@ namespace StepBro.Cmd
 
                                         if (commandObjectDictionary.ContainsKey(objectCommand.Object) && !String.IsNullOrEmpty(objectCommand.Command))
                                         {
+                                            StepBroMain.Logger.RootLogger.LogUserAction("Request run object command \"" + objectCommand.Command + "\"");
                                             var obj = commandObjectDictionary[objectCommand.Object];
                                             if (obj.AcceptingCommands())
                                             {
                                                 obj.ExecuteCommand(objectCommand.Command);
                                             }
                                         }
+                                    }
+                                    else if (input.Item1 == "RunScriptRequest")
+                                    {
+                                        var request = JsonSerializer.Deserialize<RunScriptRequest>(input.Item2);
+                                        targetFile = request.File;
+                                        targetElement = request.Element;
+                                        targetPartner = request.Partner;
+
+                                        string partnertext = String.IsNullOrEmpty(targetPartner) ? "" : (" @ " + targetPartner);
+                                        StepBroMain.Logger.RootLogger.LogUserAction("Request script execution: \"" + targetFile + "\" - " + targetElement + partnertext);
+
+                                        m_next.Enqueue(StateOrCommand.ExecuteScript);
                                     }
                                 }
                             }
@@ -293,7 +325,7 @@ namespace StepBro.Cmd
 
                         case StateOrCommand.LoadMainFile:
                             Trace.WriteLine("StepBro command: " + command.ToString());
-                            var filepath = System.IO.Path.GetFullPath(m_commandLineOptions.InputFile);
+                            var filepath = System.IO.Path.GetFullPath(targetFile);
                             try
                             {
                                 file = StepBroMain.LoadScriptFile(consoleResourceUserObject, filepath);
@@ -339,6 +371,7 @@ namespace StepBro.Cmd
                             {
                                 if (sidekickStarted)
                                 {
+                                    // Update list of variables containing objects with the ITextCommandInput interface.
                                     var objectManager = StepBroMain.ServiceManager.Get<IDynamicObjectManager>();
                                     var objects = objectManager.GetObjectCollection();
                                     var commandObjectsContainers = objects.Where(o => o.Object is ITextCommandInput).ToList();
@@ -346,9 +379,49 @@ namespace StepBro.Cmd
                                     {
                                         commandObjectDictionary.Add(o.FullName, o.Object as ITextCommandInput);
                                     }
-                                    var message = new CommandObjectsList();
-                                    message.Objects = commandObjectsContainers.Select(o => o.FullName).ToArray();
-                                    sideKickPipe.Send(message);
+                                    var commandObjectsMessage = new CommandObjectsList();
+                                    commandObjectsMessage.Objects = commandObjectsContainers.Select(o => o.FullName).ToArray();
+                                    sideKickPipe.Send(commandObjectsMessage);
+
+                                    // Update the list of loaded script files.
+                                    var fileManager = StepBroMain.ServiceManager.Get<ILoadedFilesManager>();
+                                    var files = fileManager.ListFiles<IScriptFile>().ToList();
+                                    var filesMessage = new LoadedFiles();
+                                    filesMessage.Files = files.Select(f => f.FilePath).ToArray();
+                                    sideKickPipe.Send(filesMessage);
+
+                                    // Update the list of file elements in all loaded script files
+                                    foreach (var f in files)
+                                    {
+                                        var elements = f.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration || e.ElementType == FileElementType.TestList).ToList();
+                                        var elementsMessage = new FileElements();
+                                        elementsMessage.File = f.FilePath;
+                                        var elementNames = new List<string>();
+                                        var elementTypes = new List<string>();
+                                        var elementPartners = new List<string[]>();
+                                        foreach (var e in elements)
+                                        {
+                                            elementNames.Add(e.Name);
+                                            string type = "";
+                                            switch (e.ElementType)
+                                            {
+                                                case FileElementType.ProcedureDeclaration:
+                                                    type = "Procedure";
+                                                    break;
+                                                default:
+                                                    type = e.ElementType.ToString();
+                                                    break;
+                                            }
+                                            elementTypes.Add(type);
+
+                                            var partners = e.ListPartners().Select(p => p.Name).ToArray();
+                                            elementPartners.Add(partners);
+                                        }
+                                        elementsMessage.ElementNames = elementNames.ToArray();
+                                        elementsMessage.ElementTypes = elementTypes.ToArray();
+                                        elementsMessage.Partners = elementPartners.ToArray();
+                                        sideKickPipe.Send(elementsMessage);
+                                    }
                                 }
 
                                 switch (m_mode)
@@ -402,7 +475,7 @@ namespace StepBro.Cmd
                         case StateOrCommand.ExecuteScript:
                             {
                                 Trace.WriteLine("StepBro command: " + command.ToString());
-                                IFileElement element = StepBroMain.TryFindFileElement(m_commandLineOptions.TargetElement);
+                                IFileElement element = StepBroMain.TryFindFileElement(targetElement);
                                 if (element != null)
                                 {
                                     List<object> arguments = m_commandLineOptions?.Arguments.Select(
@@ -412,7 +485,7 @@ namespace StepBro.Cmd
 
                                     if (!String.IsNullOrEmpty(m_commandLineOptions.Model))
                                     {
-                                        var partner = element.ListPartners().First(p => String.Equals(m_commandLineOptions.Model, p.Name, StringComparison.InvariantCultureIgnoreCase));
+                                        var partner = element.ListPartners().First(p => String.Equals(targetPartner, p.Name, StringComparison.InvariantCultureIgnoreCase));
                                         if (partner != null)
                                         {
                                             procedure = partner.ProcedureReference;
@@ -637,8 +710,7 @@ namespace StepBro.Cmd
 
             if (sideKickPipe != null)
             {
-
-                sideKickPipe.Send(new ShortCommand("CLOSE"));
+                sideKickPipe.Send(ShortCommand.Close);
 
                 Trace.WriteLine("StepBro dispose sidekick");
                 sideKickPipe.Dispose();

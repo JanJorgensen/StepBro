@@ -38,6 +38,15 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
+        public static bool UserRequestStop
+        {
+            get
+            {
+                return StepBro.Core.Main.m_userRequestStop;
+            }
+        }
+
+        [Public]
 #pragma warning disable IDE1006 // Naming Styles
         public static void delay([Implicit] ICallContext context, TimeSpan time, string purpose = null)
 #pragma warning restore IDE1006 // Naming Styles

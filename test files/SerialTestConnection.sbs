@@ -1,6 +1,6 @@
 using StepBro.Streams;
 using StepBro.TestInterface;
-//using @"TestFramework.sbs";
+using @"..\scripts\TestFramework.sbs";
 
 public SerialPort port = SerialPort()
 {
@@ -25,4 +25,10 @@ public SerialTestConnection device = SerialTestConnection
 procedure void Connect()
 {
     device.Connect();
+}
+
+
+procedure void About() : Action
+{
+    string[] about = await device.SendCommand("about");
 }

@@ -130,7 +130,7 @@ public procedure void TestSuiteInfiniteTestExecution(this TestSuite suite) :
     NextProcedureIsHighLevel("PRETEST");
     passedPreTest = suite.PreTest();
     var iterator = suite.GetProcedureIterator();
-    while (passedPreTest)
+    while (passedPreTest && !UserRequestStop)
     {
         passedPreTest = suite.PreTest();
         iterator.Reset();
@@ -198,7 +198,7 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
 
         var summary = testReport.CreateTestSummary();
 
-        while (iterator.GetNext())
+        while (iterator.GetNext() && !UserRequestStop)
         {
             TestCase testcase = iterator.Procedure as TestCase;
             summary.AddEntryBeforeResult(testcase.Name);    // Register test case before execution; in case execution is terminated by an unhandled exeception.
@@ -267,7 +267,7 @@ public procedure void RunActionWithPreSetup(this Action action)
 
 public procedure void RunActionInLoop(this Action action, timespan time = @1:00:00)
 {
-    while (true) : Timeout: time
+    while (!UserRequestStop) : Timeout: time
     {
         action();
     }
@@ -280,7 +280,7 @@ public procedure void RunActionInLoopWithPreSetup(this Action action, timespan t
     passedPreSetup = action.PreSetup();
     if (passedPreSetup)
     {
-        while (true) : Timeout: time
+        while (!UserRequestStop) : Timeout: time
         {
             NextProcedureIsHighLevel("Action");
             action();

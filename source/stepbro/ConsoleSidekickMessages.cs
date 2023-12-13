@@ -7,10 +7,19 @@ using System.Threading.Tasks;
 
 namespace StepBro.Sidekick
 {
-    public class ShortCommand
+    public enum Command
     {
-        public ShortCommand(string command) {  this.Command = command; }
-        public string Command { get; set; }
+        Close,
+        Parse,
+        StopScriptExecution
+    }
+
+    public enum ShortCommand
+    {
+        None,
+        Close,
+        Parse,
+        StopScriptExecution
     }
 
     public class CommandObjectsList
@@ -28,19 +37,20 @@ namespace StepBro.Sidekick
         public string File { get; set; }
         public string[] ElementNames { get; set; }
         public string[] ElementTypes { get; set; }
+        public string[][] Partners { get; set; }
     }
 
-    public class RequestElementInfo
-    {
-        public string File { get; set; }
-        public string Element { get; set; }
-    }
+    //public class RequestElementInfo
+    //{
+    //    public string File { get; set; }
+    //    public string Element { get; set; }
+    //}
 
-    public class ElementInfo
-    {
-        public string Element { get; set; }
-        public string[] Partners { get; set; }
-    }
+    //public class ElementInfo
+    //{
+    //    public string Element { get; set; }
+    //    public string[] Partners { get; set; }
+    //}
 
     public class ObjectCommand
     {
@@ -51,5 +61,18 @@ namespace StepBro.Sidekick
         }
         public string Object { get; set; }
         public string Command { get; set; }
+    }
+
+    public class RunScriptTarget
+    {
+        public RunScriptTarget(string file, string element, string partner) { this.File = file; this.Element = element; this.Partner = partner; }
+        public string File { get; }
+        public string Element { get; }
+        public string Partner { get; }
+    }
+
+    public class RunScriptRequest : RunScriptTarget
+    {
+        public RunScriptRequest(string file, string element, string partner) : base(file, element, partner) { }
     }
 }

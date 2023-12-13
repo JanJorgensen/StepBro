@@ -1,8 +1,10 @@
 using StepBro.Sidekick;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Windows.Forms;
+using static StepBro.ConsoleSidekick.WinForms.MainForm.FileData;
 
 namespace StepBro.ConsoleSidekick.WinForms
 {
@@ -12,6 +14,23 @@ namespace StepBro.ConsoleSidekick.WinForms
         private nint m_consoleWindow = 0;
         private SideKickPipe m_pipe = null;
         private Rect m_lastConsolePosition = new Rect();
+        private List<FileData> m_files = new List<FileData>();
+        private FileData m_selectedFile = null;
+        private FileData.Element m_selectedElement = null;
+        private string m_selectedPartner = null;
+
+        public class FileData
+        {
+            public class Element
+            {
+                public string Name { get; set; }
+                public string Type { get; set; }
+                public string[] Partners { get; set; }
+            }
+
+            public string File { get; set; }
+            public List<Element> Elements { get; set; }
+        }
 
         public MainForm()
         {
@@ -90,7 +109,6 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void comboBoxCommand_TextUpdate(object sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("comboBoxCommand_TextUpdate");
 
         }
 
@@ -100,13 +118,10 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void comboBoxConnection_SelectedIndexChanged(object sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("comboBoxConnection_SelectedIndexChanged");
         }
 
         private void comboBoxCommand_SelectedIndexChanged(object sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("comboBoxCommand_SelectedIndexChanged");
-
         }
 
         private void buttonMenu_Click(object sender, EventArgs e)
@@ -148,22 +163,71 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void comboBoxScriptFile_SelectedIndexChanged(object sender, EventArgs e)
         {
+            this.UpdateFromFileSelection();
+        }
 
+        private void UpdateFromFileSelection()
+        {
+            var file = m_files.FirstOrDefault(fi => fi.File == (string)comboBoxScriptFile.SelectedItem);
+            if (file != null && comboBoxScriptFile.SelectedIndex >= 0 && (m_selectedFile == null || file.File != m_selectedFile.File))
+            {
+                m_selectedFile = file;
+                m_selectedElement = null;
+                m_selectedPartner = null;
+                comboBoxFileElement.Items.Clear();
+                comboBoxFileElement.SelectedIndex = -1;
+                if (file != null && file.Elements != null)
+                {
+                    comboBoxFileElement.Items.AddRange(file.Elements.Select(e => e.Name).ToArray());
+                }
+                comboBoxFileElement.Enabled = comboBoxFileElement.Items.Count > 0;
+                buttonRunScript.Enabled = comboBoxFileElement.Enabled;
+                if (comboBoxFileElement.Items.Count > 0)
+                {
+                    comboBoxFileElement.SelectedIndex = 0;
+                }
+            }
         }
 
         private void comboBoxFileElement_SelectedIndexChanged(object sender, EventArgs e)
         {
+            UpdateFromElementSelection();
+        }
 
+        private void UpdateFromElementSelection()
+        {
+            if (comboBoxFileElement.SelectedIndex >= 0 && (m_selectedElement == null || (string)comboBoxFileElement.SelectedItem != m_selectedElement.Name))
+            {
+                var file = m_files.FirstOrDefault(fi => fi.File == m_selectedFile.File);
+                m_selectedElement = file.Elements.FirstOrDefault(fi => fi.Name == (string)comboBoxFileElement.SelectedItem);
+                m_selectedPartner = null;
+                comboBoxPartner.Items.Clear();
+                comboBoxPartner.SelectedIndex = -1;
+                comboBoxPartner.Items.Add("<direct / no partner>");
+                if (m_selectedElement.Partners != null)
+                {
+                    comboBoxPartner.Items.AddRange(m_selectedElement.Partners);
+                }
+                comboBoxPartner.Enabled = comboBoxFileElement.Items.Count > 1;
+                comboBoxPartner.SelectedIndex = 0;
+            }
         }
 
         private void comboBoxPartner_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            if (comboBoxPartner.SelectedIndex > 0)
+            {
+                m_selectedPartner = (string)comboBoxPartner.SelectedItem;
+            }
+            else
+            {
+                m_selectedPartner = null;
+            }
         }
 
         private void buttonRunScript_Click(object sender, EventArgs e)
         {
-
+            m_pipe.Send(new RunScriptRequest(m_selectedFile.File, m_selectedElement.Name, m_selectedPartner));
         }
 
         #endregion
@@ -205,10 +269,11 @@ namespace StepBro.ConsoleSidekick.WinForms
                 if (received.Item1 == "ShortCommand")
                 {
                     var cmd = JsonSerializer.Deserialize<ShortCommand>(received.Item2);
-                    if (cmd != null && cmd.Command == "CLOSE")
+                    if (cmd == ShortCommand.Close)
                     {
                         m_pipe.Send(cmd);   // Send back, to make console continue the closing process.
-                        m_pipe.Dispose();   // Maybe too pushy...
+                        Thread.Sleep(100);
+                        m_pipe.Dispose();
                         this.Close();
                     }
                 }
@@ -219,21 +284,72 @@ namespace StepBro.ConsoleSidekick.WinForms
                     comboBoxConnection.Items.Clear();
                     comboBoxConnection.Items.AddRange(objects);
                     comboBoxConnection.SelectedIndex = 0;
-                    comboBoxConnection.Enabled = true;
+                    comboBoxConnection.Enabled = objects.Length > 0;
                     comboBoxCommand.Enabled = objects.Length > 0;
                 }
                 else if (received.Item1 == "LoadedFiles")
                 {
                     var loadedFiles = JsonSerializer.Deserialize<LoadedFiles>(received.Item2);
+                    var files = loadedFiles.Files;
+                    string selected = (comboBoxScriptFile.Items.Count > 0 && comboBoxScriptFile.SelectedIndex >= 0) ? comboBoxScriptFile.SelectedItem.ToString() : null;
+                    comboBoxScriptFile.Items.Clear();
+                    comboBoxScriptFile.Items.AddRange(files);
+                    comboBoxScriptFile.Enabled = files.Length > 0;
+                    int index = 0;
+                    if (selected != null)
+                    {
+                        int i = 0;
+                        foreach (var f in files)
+                        {
+                            if (String.Equals(f, selected)) break;
+                        }
+                        if (i < files.Length) index = i;
+                    }
+                    comboBoxScriptFile.SelectedIndex = index;
+
+                    var fileInfo = new List<FileData>();
+                    foreach (var f in files)
+                    {
+                        var found = m_files.FirstOrDefault(fi => fi.File == f);
+                        if (found == null)
+                        {
+                            found = new FileData();
+                            found.File = f;
+                        }
+                        fileInfo.Add(found);
+                    }
+                    m_files = fileInfo; // Use this updated list.
+
                 }
                 else if (received.Item1 == "FileElements")
                 {
                     var fileElements = JsonSerializer.Deserialize<FileElements>(received.Item2);
+
+                    var file = m_files.FirstOrDefault(fi => fi.File == fileElements.File);
+                    List<Element> updatedElements = new List<Element>();
+                    for (int i = 0; i < fileElements.ElementNames.Length; i++)
+                    {
+                        var element = file.Elements?.FirstOrDefault(e => e.Name == fileElements.ElementNames[i]);
+                        if (element == null)
+                        {
+                            element = new FileData.Element();
+                        }
+                        element.Name = fileElements.ElementNames[i];
+                        element.Type = fileElements.ElementTypes[i];
+                        element.Partners = fileElements.Partners[i];
+                        updatedElements.Add(element);
+                    }
+                    file.Elements = updatedElements;
+
+                    if ((string)comboBoxScriptFile.SelectedItem == file.File)
+                    {
+                        UpdateFromFileSelection();
+                    }
                 }
-                else if (received.Item1 == "ElementInfo")
-                {
-                    var info = JsonSerializer.Deserialize<ElementInfo>(received.Item2);
-                }
+                //else if (received.Item1 == "ElementInfo")
+                //{
+                //    var info = JsonSerializer.Deserialize<ElementInfo>(received.Item2);
+                //}
             }
 
             MoveWindows();
