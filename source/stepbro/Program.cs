@@ -94,10 +94,27 @@ namespace StepBro.Cmd
             {
                 if (!String.IsNullOrWhiteSpace(line)) ConsoleWriteLine(line);
             }
-            if (m_commandLineOptions.Verbose || args.Length == 0)
+            if (args.Length == 0)
             {
-                ConsoleWriteLine("StepBro console application. Type 'stepbro --help' to show the help text.");
+                Console.WriteLine("StepBro console application. Type 'stepbro --help' to show the help text.");
             }
+            else if (m_commandLineOptions.Sidekick)
+            {
+                var back = Console.BackgroundColor;
+                var fore = Console.ForegroundColor;
+                Console.BackgroundColor = ConsoleColor.DarkYellow; Console.ForegroundColor = ConsoleColor.Black;
+
+                Console.Write("    StepBro console application. Press 'C' to clear window. Press 'X' to close the application.    ");
+
+                Console.BackgroundColor = back; Console.ForegroundColor = fore;
+                Console.WriteLine();
+                Console.WriteLine();
+            }
+            else if (m_commandLineOptions.Verbose)
+            {
+                Console.WriteLine("StepBro console application. Type 'stepbro --help' to show the help text.");
+            }
+
             if (m_commandLineOptions.HasParsingErrors)
             {
                 if (m_commandLineOptions.ParsingErrors.Count() == 1 && m_commandLineOptions.ParsingErrors.First().Tag == CommandLine.ErrorType.HelpRequestedError)
@@ -682,7 +699,7 @@ namespace StepBro.Cmd
             {
                 AppDomain.CurrentDomain.ProcessExit -= closeEventHandler;
             }
-            
+
             m_activitiesRunning = false;
             while (m_dumpingExecutionLog)
             {

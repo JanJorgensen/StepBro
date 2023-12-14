@@ -39,7 +39,7 @@ namespace StepBro.Cmd
         [Option("format", HelpText = "Format of the printed execution log and report. Specify the name of the format to use. When used, the execution log will be printed, and the 'trace' option is not necessary")]
         public string OutputFormat { get; set; } = null;
 
-        [Option("sidekick", Default = false, HelpText = "Opens a sidekick window for command input and script execution.")]
+        [Option("sidekick", Default = false, HelpText = "Opens a sidekick window for interactive command input and script execution.")]
         public bool Sidekick { get; set; } = false;
     }
 }
