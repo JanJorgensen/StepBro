@@ -557,7 +557,10 @@ namespace StepBro.Cmd
                             {
                                 if (execution.Task.Ended())
                                 {
-                                    sideKickPipe.Send(ShortCommand.ExecutionStopped);
+                                    if (sidekickStarted)
+                                    {
+                                        sideKickPipe.Send(ShortCommand.ExecutionStopped);
+                                    }
                                     result = execution.Result;
                                     createdReport = execution.Report;
 
