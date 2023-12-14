@@ -33,7 +33,7 @@ namespace StepBro.Core.Execution
         {
             get
             {
-                if (m_executionStateStackReadOnly==null)
+                if (m_executionStateStackReadOnly == null)
                 {
                     m_executionStateStackReadOnly = new ReadOnlyObservableCollection<IExecutionScopeStatus>(m_executionStateStack);
                 }

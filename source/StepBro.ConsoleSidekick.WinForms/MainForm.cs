@@ -18,6 +18,7 @@ namespace StepBro.ConsoleSidekick.WinForms
         private FileData m_selectedFile = null;
         private FileData.Element m_selectedElement = null;
         private string m_selectedPartner = null;
+        private bool m_scriptExecuting = false;
 
         public class FileData
         {
@@ -227,7 +228,14 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void buttonRunScript_Click(object sender, EventArgs e)
         {
-            m_pipe.Send(new RunScriptRequest(m_selectedFile.File, m_selectedElement.Name, m_selectedPartner));
+            if (m_scriptExecuting)
+            {
+                m_pipe.Send(ShortCommand.StopScriptExecution);
+            }
+            else
+            {
+                m_pipe.Send(new RunScriptRequest(m_selectedFile.File, m_selectedElement.Name, m_selectedPartner));
+            }
         }
 
         #endregion
@@ -275,6 +283,16 @@ namespace StepBro.ConsoleSidekick.WinForms
                         Thread.Sleep(100);
                         m_pipe.Dispose();
                         this.Close();
+                    }
+                    else if(cmd == ShortCommand.ExecutionStarted) 
+                    {
+                        buttonRunScript.Text = "Stop";
+                        m_scriptExecuting = true;
+                    }
+                    else if (cmd == ShortCommand.ExecutionStopped)
+                    {
+                        buttonRunScript.Text = "Run";
+                        m_scriptExecuting = false;
                     }
                 }
                 else if (received.Item1 == "CommandObjectsList")

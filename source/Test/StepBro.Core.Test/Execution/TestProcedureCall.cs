@@ -10,6 +10,7 @@ using StepBro.Core.ScriptData;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using StepBroCoreTest.Utils;
+using StepBro.Core;
 
 namespace StepBroCoreTest
 {
@@ -272,6 +273,64 @@ namespace StepBroCoreTest
             log.ExpectNext("3 - Normal - 4 Log - a: 113, b: Musk, c: True, d: 126");
             log.ExpectNext("3 - Post");
 
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
+
+        [TestMethod]
+        public void ProcedureCallThroughPartnerWithDefaultArguments()
+        {
+            var taskContext = ExecutionHelper.ExeContext();
+
+            var content =
+                """
+                namespace MyFile;
+                procedure void Action() :
+                    partner Loop : RunActionInLoop;
+                procedure void RunActionInLoop(this Action action, int iterations = 4)
+                {
+                    int i = 0;
+                    while (i < iterations)
+                    {
+                        action();
+                        i++;
+                    }
+                }
+                void Do() : Action
+                {
+                    log("Blip");
+                }
+                """;
+
+            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile." + Main.StepBroFileExtension, content))[0];
+
+
+            Assert.AreEqual(3, file.ListElements().Count());
+            var doProc = file.ListElements().First(p => p.Name == "Do") as IFileProcedure;
+            Assert.IsNotNull(doProc);
+
+            var partner = doProc.ListPartners().First(p => String.Equals("Loop", p.Name, StringComparison.InvariantCultureIgnoreCase));
+            Assert.IsNotNull(partner);
+            var procedure = partner.ProcedureReference;
+
+            taskContext.CallProcedure(procedure, doProc.ProcedureReference);
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - MyFile.RunActionInLoop - ( StepBro.Core.ScriptData.FileProcedure+Reference`1[ret_System_Void] )");
+            log.ExpectNext("2 - Pre - 9 MyFile.Do - <no arguments>");
+            log.ExpectNext("3 - Normal - 15 Log - Blip");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Pre - 9 MyFile.Do - <no arguments>");
+            log.ExpectNext("3 - Normal - 15 Log - Blip");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Pre - 9 MyFile.Do - <no arguments>");
+            log.ExpectNext("3 - Normal - 15 Log - Blip");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Pre - 9 MyFile.Do - <no arguments>");
+            log.ExpectNext("3 - Normal - 15 Log - Blip");
+            log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
         }

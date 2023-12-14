@@ -222,6 +222,18 @@ namespace StepBro.Core.Parser
                     m_currentProcedure.AddParameter(p);
                 }
             }
+            else
+            {
+                // Transfer the parameter default values to the existing parameters.
+                var procParams = m_currentProcedure.GetFormalParameters();
+                for (int i = 0; i < m_parameters.Count; i++)
+                {
+                    if (m_parameters[i].HasDefaultValue)
+                    {
+                        procParams[i].SetDefaultValue(m_parameters[i].DefaultValue, m_parameters[i].DefaultValueToken);
+                    }
+                }
+            }
         }
 
         public override void EnterProcedureBodyOrNothing([NotNull] SBP.ProcedureBodyOrNothingContext context)

@@ -19,6 +19,8 @@ namespace StepBro.Sidekick
         None,
         Close,
         Parse,
+        ExecutionStarted,
+        ExecutionStopped,
         StopScriptExecution
     }
 

@@ -7,6 +7,7 @@ using StepBro.Core.File;
 using StepBro.Core.General;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
+using StepBro.Core.Tasks;
 using StepBro.Sidekick;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,8 @@ namespace StepBro.Cmd
             AwaitCommand,
             LoadMainFile,
             ParseFiles,
-            ExecuteScript,
+            StartScriptExecution,
+            AwaitScriptExecutionEnd,
             AwaitFileChange,
             CloseAndDisposeAllFiles,
             Exit
@@ -69,6 +71,8 @@ namespace StepBro.Cmd
             bool sidekickStarted = false;
             Dictionary<string, ITextCommandInput> commandObjectDictionary = null;
             EventHandler closeEventHandler = null;
+            IFileProcedure procedure = null;
+            IScriptExecution execution = null;
             string targetFile = null;
             string targetElement = null;
             string targetPartner = null;
@@ -315,7 +319,7 @@ namespace StepBro.Cmd
                                         string partnertext = String.IsNullOrEmpty(targetPartner) ? "" : (" @ " + targetPartner);
                                         StepBroMain.Logger.RootLogger.LogUserAction("Request script execution: \"" + targetFile + "\" - " + targetElement + partnertext);
 
-                                        m_next.Enqueue(StateOrCommand.ExecuteScript);
+                                        m_next.Enqueue(StateOrCommand.StartScriptExecution);
                                     }
                                 }
                             }
@@ -433,7 +437,7 @@ namespace StepBro.Cmd
                                         }
                                         break;
                                     case Mode.ExecuteScript:
-                                        m_next.Enqueue(StateOrCommand.ExecuteScript);
+                                        m_next.Enqueue(StateOrCommand.StartScriptExecution);
                                         break;
                                     case Mode.RepeatedParsing:
                                         ConsoleWriteLine("No parsing errors.");
@@ -472,7 +476,7 @@ namespace StepBro.Cmd
                             }
                             break;
 
-                        case StateOrCommand.ExecuteScript:
+                        case StateOrCommand.StartScriptExecution:
                             {
                                 Trace.WriteLine("StepBro command: " + command.ToString());
                                 IFileElement element = StepBroMain.TryFindFileElement(targetElement);
@@ -481,9 +485,7 @@ namespace StepBro.Cmd
                                     List<object> arguments = m_commandLineOptions?.Arguments.Select(
                                         (a) => StepBroMain.ParseExpression(element?.ParentFile, a)).ToList();
 
-                                    IFileProcedure procedure = null;
-
-                                    if (!String.IsNullOrEmpty(m_commandLineOptions.Model))
+                                    if (!String.IsNullOrEmpty(targetPartner))
                                     {
                                         var partner = element.ListPartners().First(p => String.Equals(targetPartner, p.Name, StringComparison.InvariantCultureIgnoreCase));
                                         if (partner != null)
@@ -491,13 +493,18 @@ namespace StepBro.Cmd
                                             procedure = partner.ProcedureReference;
                                             if (procedure.IsFirstParameterThisReference)
                                             {
-                                                arguments.Insert(0, element);   // TODO: Parser should check whether the 'this' parameter is the correct type.
+                                                object elementReference = element;
+                                                if (element.ElementType == FileElementType.ProcedureDeclaration)
+                                                {
+                                                    elementReference = ((IFileProcedure)element).ProcedureReference;
+                                                }
+                                                arguments.Insert(0, elementReference);   // TODO: Parser should check whether the 'this' parameter is the correct type.
                                             }
                                         }
                                         else
                                         {
                                             retval = -1;
-                                            ConsoleWriteErrorLine($"Error: The specified file element does not have a model named \"{m_commandLineOptions.Model}\".");
+                                            ConsoleWriteErrorLine($"Error: The specified file element does not have a model named \"{targetPartner}\".");
                                         }
                                     }
                                     else
@@ -519,66 +526,17 @@ namespace StepBro.Cmd
                                         {
                                             StartLogDumpTask();
 
-                                            var execution = StepBroMain.ExecuteProcedure(procedure, arguments.ToArray());
-                                            result = execution.Result;
-                                            createdReport = execution.Report;
-
-                                            if (result != null)
+                                            if (sidekickStarted)
                                             {
-                                                if (m_commandLineOptions.ExitCode == ExitValueOption.SubVerdict)
-                                                {
-                                                    switch (result.ProcedureResult.Verdict)
-                                                    {
-                                                        case Verdict.Unset:
-                                                        case Verdict.Pass:
-                                                            break;
-                                                        case Verdict.Inconclusive:
-                                                        case Verdict.Fail:
-                                                        case Verdict.Abandoned:
-                                                            retval = 1;
-                                                            break;
-                                                        case Verdict.Error:
-                                                            retval = -1;
-                                                            break;
-                                                    }
-                                                }
-                                                else if (m_commandLineOptions.ExitCode == ExitValueOption.Verdict)
-                                                {
-                                                    switch (result.ProcedureResult.Verdict)
-                                                    {
-                                                        case Verdict.Unset:
-                                                        case Verdict.Pass:
-                                                            break;
-                                                        case Verdict.Inconclusive:
-                                                        case Verdict.Fail:
-                                                        case Verdict.Abandoned:
-                                                            retval = 1;
-                                                            break;
-                                                        case Verdict.Error:
-                                                            retval = -1;
-                                                            break;
-                                                    }
-                                                }
-                                                else if (m_commandLineOptions.ExitCode == ExitValueOption.ReturnValue)
-                                                {
-                                                    if (procedure.ReturnType == TypeReference.TypeInt64)
-                                                    {
-                                                        retval = (Int32)(Int64)result.ReturnValue;
-                                                    }
-                                                }
-
-                                                if (m_commandLineOptions.Verbose)
-                                                {
-                                                    ConsoleWriteLine("Procedure execution ended. " + result.ResultText());
-                                                }
-                                                else
-                                                {
-                                                    if (!m_commandLineOptions.PrintReport)
-                                                    {
-                                                        ConsoleWriteLine("Procedure execution ended.");
-                                                    }
-                                                }
+                                                execution = StepBroMain.StartProcedureExecution(procedure, arguments.ToArray());
+                                                m_next.Enqueue(StateOrCommand.AwaitCommand);
+                                                sideKickPipe.Send(ShortCommand.ExecutionStarted);
                                             }
+                                            else
+                                            {
+                                                execution = StepBroMain.ExecuteProcedure(procedure, arguments.ToArray());
+                                            }
+                                            m_next.Enqueue(StateOrCommand.AwaitScriptExecutionEnd);
                                         }
                                         catch (TargetParameterCountException)
                                         {
@@ -590,16 +548,79 @@ namespace StepBro.Cmd
                                 else
                                 {
                                     retval = -1;
-                                    ConsoleWriteErrorLine($"Error: File element named '{m_commandLineOptions.TargetElement} was not found.");
+                                    ConsoleWriteErrorLine($"Error: File element named '{targetElement} was not found.");
                                 }
+                            }
+                            break;
 
-                                if (sidekickStarted)
+                        case StateOrCommand.AwaitScriptExecutionEnd:
+                            {
+                                if (execution.Task.Ended())
                                 {
-                                    m_next.Enqueue(StateOrCommand.AwaitCommand);
+                                    sideKickPipe.Send(ShortCommand.ExecutionStopped);
+                                    result = execution.Result;
+                                    createdReport = execution.Report;
+
+                                    if (result != null)
+                                    {
+                                        if (m_commandLineOptions.ExitCode == ExitValueOption.SubVerdict)
+                                        {
+                                            switch (result.ProcedureResult.Verdict)
+                                            {
+                                                case Verdict.Unset:
+                                                case Verdict.Pass:
+                                                    break;
+                                                case Verdict.Inconclusive:
+                                                case Verdict.Fail:
+                                                case Verdict.Abandoned:
+                                                    retval = 1;
+                                                    break;
+                                                case Verdict.Error:
+                                                    retval = -1;
+                                                    break;
+                                            }
+                                        }
+                                        else if (m_commandLineOptions.ExitCode == ExitValueOption.Verdict)
+                                        {
+                                            switch (result.ProcedureResult.Verdict)
+                                            {
+                                                case Verdict.Unset:
+                                                case Verdict.Pass:
+                                                    break;
+                                                case Verdict.Inconclusive:
+                                                case Verdict.Fail:
+                                                case Verdict.Abandoned:
+                                                    retval = 1;
+                                                    break;
+                                                case Verdict.Error:
+                                                    retval = -1;
+                                                    break;
+                                            }
+                                        }
+                                        else if (m_commandLineOptions.ExitCode == ExitValueOption.ReturnValue)
+                                        {
+                                            if (procedure.ReturnType == TypeReference.TypeInt64)
+                                            {
+                                                retval = (Int32)(Int64)result.ReturnValue;
+                                            }
+                                        }
+
+                                        if (m_commandLineOptions.Verbose)
+                                        {
+                                            ConsoleWriteLine("Procedure execution ended. " + result.ResultText());
+                                        }
+                                        else
+                                        {
+                                            if (!m_commandLineOptions.PrintReport)
+                                            {
+                                                ConsoleWriteLine("Procedure execution ended.");
+                                            }
+                                        }
+                                    }
                                 }
                                 else
                                 {
-                                    m_next.Enqueue(StateOrCommand.Exit);   // For now, always exit after execution (or attempt).
+                                    m_next.Enqueue(StateOrCommand.AwaitScriptExecutionEnd);
                                 }
                             }
                             break;

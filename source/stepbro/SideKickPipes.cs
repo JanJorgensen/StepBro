@@ -172,17 +172,8 @@ namespace StepBro
                 {
                     try
                     {
-                        // Read the request from the client. Once the client has
-                        // written to the pipe its security token will be available.
-
                         instance.m_stream = new StreamString(instance.m_pipe);
-
-                        // Verify our identity to the connected client using a
-                        // string that the client anticipates.
-
-                        System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE server sending initial string");
                         instance.m_stream.WriteString("StepBro is it");
-                        System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE server sent initial string");
 
                         instance.m_continueReceiving = true;
                         ReceiverThread(instance);
@@ -196,8 +187,6 @@ namespace StepBro
                 }
                 pipeStream.Close();
             }
-
-            //Console.WriteLine("Client connected on thread[{0}].", threadId);
         }
 
         private static void ReceiverThread(object data)

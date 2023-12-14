@@ -72,7 +72,7 @@ public procedure void TestCaseTestUntilFail( this TestCase testcase ) :
     preconditionsOkay = testcase.PreTest();
     if (preconditionsOkay)
     {
-        while (result < fail)
+        while (result < fail && !UserRequestStop)
         {
             NextProcedureIsHighLevel("Iteration #" + loopIndex);
             testcase();
@@ -90,7 +90,7 @@ public procedure void TestCaseFormalTestUntilFail( this TestCase testcase ) :
     var result = pass;
     NextProcedureIsHighLevel("PreTest");
     testcase.PreTest();
-    while (result < fail)
+    while (result < fail && !UserRequestStop)
     {
         NextProcedureIsHighLevel("Setup #" + loopIndex);
         testcase.Setup();
@@ -267,8 +267,11 @@ public procedure void RunActionWithPreSetup(this Action action)
 
 public procedure void RunActionInLoop(this Action action, timespan time = @1:00:00)
 {
+    int i = 0;
     while (!UserRequestStop) : Timeout: time
     {
+        i++;
+        log ("Iteration #" + i);
         action();
     }
 }
@@ -280,8 +283,11 @@ public procedure void RunActionInLoopWithPreSetup(this Action action, timespan t
     passedPreSetup = action.PreSetup();
     if (passedPreSetup)
     {
+        int i = 0;
         while (!UserRequestStop) : Timeout: time
         {
+            i++;
+            log ("Iteration #" + i);
             NextProcedureIsHighLevel("Action");
             action();
         }
