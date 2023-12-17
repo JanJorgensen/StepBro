@@ -7,13 +7,6 @@ using System.Threading.Tasks;
 
 namespace StepBro.Sidekick
 {
-    public enum Command
-    {
-        Close,
-        Parse,
-        StopScriptExecution
-    }
-
     public enum ShortCommand
     {
         None,
