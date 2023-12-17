@@ -42,7 +42,6 @@ namespace StepBro.Core
         //private static readonly object m_runningTasksSync = new object();
         private static ITask m_parsingInQueue = null;
         private static int m_lastParsingErrorCount = 0;
-        internal static bool m_userRequestStop = false;
 
         //public static object ExecutionHelper { get; private set; }
 
@@ -391,21 +390,14 @@ namespace StepBro.Core
 
         public static IScriptExecution ExecuteProcedure(IFileProcedure procedure, params object[] arguments)
         {
-            m_userRequestStop = false;
             return m_scriptExecutionManager.ExecuteFileElement(procedure, null, arguments);
         }
 
         public static IScriptExecution StartProcedureExecution(IFileProcedure procedure, params object[] arguments)
         {
-            m_userRequestStop = false;
             var execution = m_scriptExecutionManager.CreateFileElementExecution(procedure, null, arguments);
             execution.StartExecution();
             return execution;
-        }
-
-        public static void RequestStopScriptExecution()
-        {
-            m_userRequestStop = true;
         }
 
         public static ICallContext CreateUICallContext()

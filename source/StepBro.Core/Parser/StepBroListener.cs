@@ -11,6 +11,7 @@ using StepBro.Core.General;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -752,16 +753,28 @@ namespace StepBro.Core.Parser
 #if (PRINT_TREE)
         private string m_indent = "";
 
+        private string RuleText(ParserRuleContext context)
+        {
+            var text = this.ContextName(context) + ":             " + this.ShortContextText(context);
+            text += "   [";
+            if (m_scopeStack != null && m_scopeStack.Count > 0)
+            {
+                text += m_scopeStack.Count.ToString() + ", " + m_scopeStack.Peek().StatementCount.ToString();
+            }
+            text += ("][" + m_expressionData.TopToString() + "]");
+            return text;
+        }
+
         public override void EnterEveryRule([NotNull] ParserRuleContext context)
         {
-            System.Diagnostics.Debug.WriteLine(m_indent + "Enter" + this.ContextName(context) + ":             " + this.ShortContextText(context));
+            System.Diagnostics.Debug.WriteLine(m_indent + "ENTER" + RuleText(context));
             m_indent += "    ";
         }
 
         public override void ExitEveryRule([NotNull] ParserRuleContext context)
         {
             m_indent = m_indent.Substring(0, m_indent.Length - 4);
-            //Console.WriteLine(m_indent + "EXIT  - " + this.ContextName(context) + ":             " + this.ShortContextText(context));
+            System.Diagnostics.Debug.WriteLine(m_indent + "Exit" + RuleText(context));
         }
 
         private string ShortContextText(ParserRuleContext context)

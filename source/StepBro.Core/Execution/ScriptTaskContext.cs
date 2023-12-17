@@ -21,6 +21,7 @@ namespace StepBro.Core.Execution
         private Exception m_executionException = null;
         private ProcedureResult m_result = null;
         private DataReport m_dataReport = null;
+        private bool m_stopRequested = false;
 
         public void Setup(
             ILoggerScope logger,
@@ -116,5 +117,12 @@ namespace StepBro.Core.Execution
         public ILoadedFilesManager LoadedFilesManager { get { return m_loadedFilesManager; } }
 
         public DataReport Report { get { return m_dataReport; } }
+
+        internal void RequestStop()
+        {
+            m_stopRequested = true;
+        }
+
+        public bool StopRequested {  get {  return m_stopRequested; } }
     }
 }

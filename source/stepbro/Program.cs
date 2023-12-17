@@ -306,7 +306,10 @@ namespace StepBro.Cmd
                                                 break;
                                             case ShortCommand.StopScriptExecution:
                                                 StepBroMain.Logger.RootLogger.LogUserAction("Request stop script execution");
-                                                StepBroMain.RequestStopScriptExecution();
+                                                if (execution != null && !execution.Task.Ended())
+                                                {
+                                                    execution.Task.RequestStop();
+                                                }
                                                 break;
                                             default:
                                                 break;

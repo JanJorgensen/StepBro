@@ -147,7 +147,8 @@ namespace StepBro.Core.Execution
 
         bool ITaskControl.RequestStop()
         {
-            throw new NotImplementedException();
+            m_taskContext.RequestStop();
+            return true;
         }
 
         bool ITaskControl.Kill()
