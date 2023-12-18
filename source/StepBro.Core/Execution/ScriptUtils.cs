@@ -26,7 +26,7 @@ namespace StepBro.Core.Execution
         private static TimeSpan g_50mills;
         private static TimeSpan g_80mills;
 
-        private static ScriptCallContext ToScriptContext(ICallContext context)
+        internal static ScriptCallContext ToScriptContext(ICallContext context)
         {
             var ctx = context;
             while (ctx != null)
@@ -35,6 +35,12 @@ namespace StepBro.Core.Execution
                 ctx = (ctx as CallContext).ParentContext;
             }
             return null;
+        }
+
+        [Public]
+        public static bool UserRequestStop(ICallContext context)
+        {
+            return ToScriptContext(context).StopRequested();
         }
 
         [Public]

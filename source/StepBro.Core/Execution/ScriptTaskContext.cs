@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using StepBro.Core.Data;
 using StepBro.Core.General;
@@ -20,6 +21,7 @@ namespace StepBro.Core.Execution
         private Exception m_executionException = null;
         private ProcedureResult m_result = null;
         private DataReport m_dataReport = null;
+        private bool m_stopRequested = false;
 
         public void Setup(
             ILoggerScope logger,
@@ -50,16 +52,17 @@ namespace StepBro.Core.Execution
         private object DoCallProcedure(IFileProcedure procedure, object[] arguments)
         {
             Delegate runtimeProcedure = ((FileProcedure)procedure).RuntimeProcedure;
-            var invokeArguments = new object[arguments.Length + 1];
-            Array.Copy(arguments, 0, invokeArguments, 1, arguments.Length);
 
             ScriptCallContext context = null;
             try
             {
                 context = new ScriptCallContext(this, m_logger, m_logOption, m_statusUpdate, procedure, m_taskManager, arguments);
                 context.SetErrorListener(m_errorListener);
-                invokeArguments[0] = context;
-                m_value = runtimeProcedure.DynamicInvoke(invokeArguments);
+                var invokeArguments = new List<object>();
+                invokeArguments.Insert(0, context);
+                ExecutionHelperMethods.SetupCallArguments((FileProcedure)procedure, arguments, invokeArguments);
+
+                m_value = runtimeProcedure.DynamicInvoke(invokeArguments.ToArray());
                 m_result = context.Result;
                 return m_value;
             }
@@ -114,5 +117,12 @@ namespace StepBro.Core.Execution
         public ILoadedFilesManager LoadedFilesManager { get { return m_loadedFilesManager; } }
 
         public DataReport Report { get { return m_dataReport; } }
+
+        internal void RequestStop()
+        {
+            m_stopRequested = true;
+        }
+
+        public bool StopRequested {  get {  return m_stopRequested; } }
     }
 }

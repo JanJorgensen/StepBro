@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace StepBro.Core.Execution
@@ -401,49 +402,11 @@ namespace StepBro.Core.Execution
             {
                 subContext = context.EnterNewScriptContext(procedure, Logging.ContextLogOption.Normal, true, sequencialFirstArguments); // TODO: collect all arguments
 
-                var methodInfo = ((FileProcedure)procedure.ProcedureData).DelegateType.GetMethod("Invoke");
                 var arguments = new List<object>();
                 arguments.Add(subContext);
-
-                var formalParameters = (procedure.ProcedureData as FileProcedure).GetFormalParameters();
-                ArgumentList args = null;
-                if (sequencialFirstArguments != null && sequencialFirstArguments.Length == 1 && sequencialFirstArguments[0].GetType() == typeof(ArgumentList))
+                if (!SetupCallArguments((FileProcedure)procedure.ProcedureData, sequencialFirstArguments, arguments))
                 {
-                    args = sequencialFirstArguments[0] as ArgumentList;
-                }
-                foreach (var p in methodInfo.GetParameters().Skip(1))
-                {
-                    bool handled = false;
-
-                    if (args != null)       // If arguments were given
-                    {
-                        var arg = args.FirstOrDefault(a => a.Name == p.Name);
-                        if (arg != null)    // If argument with same name as parameter was found
-                        {
-                            arguments.Add(arg.Value);
-                            handled = true;
-                        }
-                    }
-
-                    if (!handled)
-                    {
-                        var parameter = formalParameters.FirstOrDefault(fp => fp.Name == p.Name);
-                        if (parameter != null && parameter.HasDefaultValue)  // If parameter found in formal parameters (should never fail...) and there is a default value/argument
-                        {
-                            // Use the default value from the formal parameters.
-                            var value = parameter.DefaultValue;
-                            if (value == null && p.ParameterType.IsValueType)
-                            {
-                                value = Activator.CreateInstance(p.ParameterType);
-                            }
-                            arguments.Add(value);
-                            handled = true;
-                        }
-                    }
-                    if (!handled)
-                    {
-                        // Check the default arguments
-                    }
+                    throw new ArgumentException("Missing procedure arguments.");
                 }
 
                 Delegate runtimeProcedure = ((FileProcedure)procedure.ProcedureData).RuntimeProcedure;
@@ -467,6 +430,61 @@ namespace StepBro.Core.Execution
             {
                 subContext.InternalDispose();
             }
+        }
+
+        internal static bool SetupCallArguments(FileProcedure procedure, object[] sequencialFirstArguments, List<object> arguments)
+        {
+            bool success = true;
+            var methodInfo = procedure.DelegateType.GetMethod("Invoke");
+            var formalParameters = procedure.GetFormalParameters();
+            ArgumentList args = null;
+            if (sequencialFirstArguments != null && sequencialFirstArguments.Length == 1 && sequencialFirstArguments[0].GetType() == typeof(ArgumentList))
+            {
+                args = sequencialFirstArguments[0] as ArgumentList;
+            }
+            else
+            {
+                if (sequencialFirstArguments != null)
+                {
+                    arguments.AddRange(sequencialFirstArguments);
+                }
+            }
+            foreach (var p in methodInfo.GetParameters().Skip(arguments.Count)) // Start from the first missing argument.
+            {
+                bool handled = false;
+
+                if (args != null)       // If arguments were given
+                {
+                    var arg = args.FirstOrDefault(a => a.Name == p.Name);
+                    if (arg != null)    // If argument with same name as parameter was found
+                    {
+                        arguments.Add(arg.Value);
+                        handled = true;
+                    }
+                }
+
+                if (!handled)
+                {
+                    var parameter = formalParameters.FirstOrDefault(fp => fp.Name == p.Name);
+                    if (parameter != null && parameter.HasDefaultValue)  // If parameter found in formal parameters (should never fail...) and there is a default value/argument
+                    {
+                        // Use the default value from the formal parameters.
+                        var value = parameter.DefaultValue;
+                        if (value == null && p.ParameterType.IsValueType)
+                        {
+                            value = Activator.CreateInstance(p.ParameterType);
+                        }
+                        arguments.Add(value);
+                        handled = true;
+                    }
+                }
+                if (!handled)
+                {
+                    success = false;
+                    break;
+                }
+            }
+            return success;
         }
 
         public static object DynamicFunctionCall(

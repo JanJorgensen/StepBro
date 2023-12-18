@@ -42,5 +42,14 @@ namespace StepBro.Core.Parser
         {
             return m_expressionData.Peek().Pop();
         }
+
+        public string TopToString()
+        {
+            if (m_expressionData.Count > 0)
+            {
+                return m_levelName.Peek() + ": " + m_expressionData.Peek().Count;
+            }
+            else return "empty";
+        }
     }
 }

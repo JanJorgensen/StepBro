@@ -36,11 +36,10 @@ namespace StepBro.Cmd
         [Option("exitcode", Default = ExitValueOption.Normal, HelpText = "Application exit code option (ReturnValue, Verdict or SubVerdict).")]
         public ExitValueOption ExitCode { get; set; } = ExitValueOption.Normal;
 
-        [Option("lf", HelpText = "Format of the printed execution log. Specify the name of the log entry converter addon to use. When used, the execution log will be printed, and the 'trace' option is not necessary")]
-        [Obsolete]
-        public string LogFormat { get; set; } = null;
-        
         [Option("format", HelpText = "Format of the printed execution log and report. Specify the name of the format to use. When used, the execution log will be printed, and the 'trace' option is not necessary")]
         public string OutputFormat { get; set; } = null;
+
+        [Option("sidekick", Default = false, HelpText = "Opens a sidekick window for interactive command input and script execution.")]
+        public bool Sidekick { get; set; } = false;
     }
 }

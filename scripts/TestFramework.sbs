@@ -72,7 +72,7 @@ public procedure void TestCaseTestUntilFail( this TestCase testcase ) :
     preconditionsOkay = testcase.PreTest();
     if (preconditionsOkay)
     {
-        while (result < fail)
+        while (result < fail) : Stoppable
         {
             NextProcedureIsHighLevel("Iteration #" + loopIndex);
             testcase();
@@ -90,7 +90,7 @@ public procedure void TestCaseFormalTestUntilFail( this TestCase testcase ) :
     var result = pass;
     NextProcedureIsHighLevel("PreTest");
     testcase.PreTest();
-    while (result < fail)
+    while (result < fail) : Stoppable
     {
         NextProcedureIsHighLevel("Setup #" + loopIndex);
         testcase.Setup();
@@ -130,11 +130,11 @@ public procedure void TestSuiteInfiniteTestExecution(this TestSuite suite) :
     NextProcedureIsHighLevel("PRETEST");
     passedPreTest = suite.PreTest();
     var iterator = suite.GetProcedureIterator();
-    while (passedPreTest)
+    while (passedPreTest) : Stoppable
     {
         passedPreTest = suite.PreTest();
         iterator.Reset();
-        while (iterator.GetNext())
+        while (iterator.GetNext()) : Stoppable
         {
             log ("Starting Test: " + iterator.Procedure.Name);
             TestCase testcase = iterator.Procedure as TestCase;
@@ -155,7 +155,7 @@ public procedure void TestSuiteDirectTestExecution(this TestSuite suite) :
     {
         var summary = CreateTestSummary();
         var iterator = suite.GetProcedureIterator();
-        while (iterator.GetNext())
+        while (iterator.GetNext()) : Stoppable
         {
             log ("Starting Test: " + iterator.Procedure.Name);
             TestCase testcase = iterator.Procedure as TestCase;
@@ -198,7 +198,7 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
 
         var summary = testReport.CreateTestSummary();
 
-        while (iterator.GetNext())
+        while (iterator.GetNext()) : Stoppable
         {
             TestCase testcase = iterator.Procedure as TestCase;
             summary.AddEntryBeforeResult(testcase.Name);    // Register test case before execution; in case execution is terminated by an unhandled exeception.
@@ -249,6 +249,7 @@ public procedure void Action() :
     partner PreSetup: ActionEmptyPreSetup,
     partner WithPreSetup : RunActionWithPreSetup,
     partner Loop : RunActionInLoop,
+    partner LoopForever : RunActionInLoopForever,
     partner LoopWithPreSetup : RunActionInLoopWithPreSetup;
     
 public procedure bool ActionEmptyPreSetup() { return true; }
@@ -267,8 +268,22 @@ public procedure void RunActionWithPreSetup(this Action action)
 
 public procedure void RunActionInLoop(this Action action, timespan time = @1:00:00)
 {
-    while (true) : Timeout: time
+    int i = 0;
+    while (true) : Timeout: time, Stoppable
     {
+        i++;
+        log ("Iteration #" + i);
+        action();
+    }
+}
+
+public procedure void RunActionInLoopForever(this Action action)
+{
+    int i = 0;
+    while (true) : Stoppable
+    {
+        i++;
+        log ("Iteration #" + i);
         action();
     }
 }
@@ -280,8 +295,11 @@ public procedure void RunActionInLoopWithPreSetup(this Action action, timespan t
     passedPreSetup = action.PreSetup();
     if (passedPreSetup)
     {
-        while (true) : Timeout: time
+        int i = 0;
+        while (true) : Timeout: time, Stoppable
         {
+            i++;
+            log ("Iteration #" + i);
             NextProcedureIsHighLevel("Action");
             action();
         }

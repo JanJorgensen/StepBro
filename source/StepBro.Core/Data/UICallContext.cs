@@ -74,5 +74,7 @@ namespace StepBro.Core.Data
         {
             throw new NotImplementedException();
         }
+
+        public bool StopRequested() { throw new NotImplementedException(); }
     }
 }

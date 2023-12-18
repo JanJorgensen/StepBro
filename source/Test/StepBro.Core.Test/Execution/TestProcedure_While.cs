@@ -182,6 +182,30 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
+        public void TestProcedureWhileStatementStoppable()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                "int Func(){ var n = 0;" +
+                "while (true) : Stoppable " +
+                "{ n++; if (n >= 100) break; }" +
+                "return n; }");
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+
+            object result = proc.Call();
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.IsTrue((long)result >= 100l);
+
+            // TODO: Check that loop can be stopped.
+        }
+
+        [TestMethod]
+        [Ignore("Nice way to set stop signal must be found")]
+        public void TestProcedureWhileStatementStoppable_DoStop()
+        {
+            // TODO: Check that loop can be stopped. Just implement in the precious test case.
+        }
+
+        [TestMethod]
         public void TestProcedureWhileStatementDouble01()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(

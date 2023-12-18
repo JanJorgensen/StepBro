@@ -62,6 +62,7 @@ namespace StepBro.Core.ScriptData
         {
             if (m_runtimeProcedure != null) throw new InvalidOperationException("The runtime procedure has already been set.");
             m_runtimeProcedure = @delegate;
+            m_delegateType = @delegate.GetType();
         }
 
         public Delegate RuntimeProcedure

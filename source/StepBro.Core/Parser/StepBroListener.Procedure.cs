@@ -222,6 +222,18 @@ namespace StepBro.Core.Parser
                     m_currentProcedure.AddParameter(p);
                 }
             }
+            else
+            {
+                // Transfer the parameter default values to the existing parameters.
+                var procParams = m_currentProcedure.GetFormalParameters();
+                for (int i = 0; i < m_parameters.Count; i++)
+                {
+                    if (m_parameters[i].HasDefaultValue)
+                    {
+                        procParams[i].SetDefaultValue(m_parameters[i].DefaultValue, m_parameters[i].DefaultValueToken);
+                    }
+                }
+            }
         }
 
         public override void EnterProcedureBodyOrNothing([NotNull] SBP.ProcedureBodyOrNothingContext context)
@@ -472,7 +484,6 @@ namespace StepBro.Core.Parser
         public override void EnterForStatement([NotNull] SBP.ForStatementContext context)
         {
             this.AddEnterStatement(context);
-            //m_lastPropertyBlock = null;
             m_enteredLoopStatement = true;
             m_expressionData.PushStackLevel("for-init");
             m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-init", ProcedureParsingScope.ScopeType.Block));
@@ -550,7 +561,8 @@ namespace StepBro.Core.Parser
             ProcedureVariable varTimeoutTime = null;
             Expression timeout = null;
 
-            var props = m_lastElementPropertyBlock;
+            var props = forLoopScope.GetProperties();
+
             m_lastElementPropertyBlock = null;
 
             condition = this.ResolveForGetOperation(condition);
@@ -735,7 +747,6 @@ namespace StepBro.Core.Parser
         public override void EnterWhileStatement([NotNull] SBP.WhileStatementContext context)
         {
             this.AddEnterStatement(context);
-            //m_lastPropertyBlock = null;
             m_expressionData.PushStackLevel("WhileStatement");
             m_enteredLoopStatement = true;
             m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "while", ProcedureParsingScope.ScopeType.Block));
@@ -753,8 +764,7 @@ namespace StepBro.Core.Parser
             ProcedureVariable varTimeoutTime = null;
             Expression timeout = null;
 
-            var props = m_lastElementPropertyBlock;
-            m_lastElementPropertyBlock = null;
+            var props = whileScope.GetProperties();
 
             condition = this.ResolveForGetOperation(condition);
             if (condition.IsError())
@@ -784,6 +794,7 @@ namespace StepBro.Core.Parser
             var statementExpressions = new List<Expression>();
             var loopExpressions = new List<Expression>
             {
+                this.CreateEnterStatement(context.Start.Line, context.Start.Column),
                 Expression.IfThen(
                     Expression.Not(conditionExpression),
                     Expression.Block(
@@ -844,6 +855,20 @@ namespace StepBro.Core.Parser
                             new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
                             EntryModifiers.Private);
                     }
+                    else if (property.Is("Stoppable", PropertyBlockEntryType.Flag))
+                    {
+                        loopExpressions.Add(
+                            Expression.IfThen(
+                                Expression.Call(
+                                    Expression.Convert(m_currentProcedure.ContextReferenceInternal, typeof(ICallContext)),
+                                    typeof(ICallContext).GetMethod(nameof(ICallContext.StopRequested), new Type[] { })),
+                                Expression.Block(
+                                    Expression.Call(
+                                        m_currentProcedure.ContextReferenceInternal,
+                                        typeof(IScriptCallContext).GetMethod("Log", new Type[] { typeof(string) }),
+                                        Expression.Constant("Loop stopped by user!")),
+                                    Expression.Break(breakLabel))));
+                    }
                 }
             }
             #endregion
@@ -872,10 +897,6 @@ namespace StepBro.Core.Parser
             {
                 timeAssignments.Add(
                     Expression.Assign(varTimeoutTime.VariableExpression, Expression.Add(varEntryTime.VariableExpression, timeout)));
-                loopExpressions.Add(
-                    Expression.IfThen(
-                        Expression.Not(conditionExpression),
-                        Expression.Break(breakLabel)));
                 loopExpressions.Add(
                     Expression.IfThen(
                         Expression.GreaterThan(
