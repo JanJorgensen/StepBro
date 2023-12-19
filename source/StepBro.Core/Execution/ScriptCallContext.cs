@@ -614,6 +614,11 @@ namespace StepBro.Core.Execution
             }
         }
 
+        public bool StopRequested()
+        {
+            return m_task.StopRequested;
+        }
+
         public ILoadedFilesManager LoadedFiles
         {
             get

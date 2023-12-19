@@ -62,5 +62,11 @@ namespace StepBro.Core.Execution
         bool DebugBreakIsSet { get; }
 
         TaskManager TaskManager { get; }
+
+        /// <summary>
+        /// Indicates whether the user or the host application has requested to stop the script execution.
+        /// </summary>
+        /// <returns>Whether to stop execution.</returns>
+        bool StopRequested();
     }
 }

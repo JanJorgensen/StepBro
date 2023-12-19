@@ -27,6 +27,8 @@ namespace StepBro.Core.Parser
 
         #region Block
 
+        #region Element
+
         public override void EnterElementPropertyblock([NotNull] SBP.ElementPropertyblockContext context)
         {
             this.EnterElementProps();
@@ -81,6 +83,70 @@ namespace StepBro.Core.Parser
                 }
             }
         }
+
+        #endregion
+
+        #region Statement
+
+        public override void EnterStatementPropertyblock([NotNull] SBP.StatementPropertyblockContext context)
+        {
+            this.EnterStatementProps();
+        }
+        public override void EnterStatementPropertyList([NotNull] SBP.StatementPropertyListContext context)
+        {
+            this.EnterStatementProps();
+        }
+
+        private void EnterStatementProps()
+        {
+            m_propertyBlockOperands.Clear();
+            m_propertyBlockOperands.Push(new List<PropertyBlockEntry>());
+        }
+
+        public override void ExitStatementPropertyblock([NotNull] SBP.StatementPropertyblockContext context)
+        {
+            if (m_propertyBlockOperands.Count != 1) throw new InvalidOperationException("Unexpected stack depth.");
+            if (m_propertyBlockOperands.Peek().Count != 1) throw new InvalidOperationException("Unexpected element count on stack base.");
+            var block = (PropertyBlock)m_propertyBlockOperands.Peek()[0];
+            m_propertyBlockOperands.Pop();
+            //m_scopeStack.Peek().SetProperties()
+            //m_lastElementPropertyBlock = block;
+            //if (m_currentFileElement != null)
+            //{
+            //    m_currentFileElement.SetPropertyBlockData(m_lastElementPropertyBlock);
+            //    try
+            //    {
+            //        m_currentFileElement.ParsePropertyBlock(this);
+            //    }
+            //    catch (ParsingErrorException ex)
+            //    {
+            //        m_errors.SymanticError(context.Start.Line, -1, false, $"Value '{ex.Name}': {ex.Message}");
+            //    }
+            //}
+        }
+
+        public override void ExitStatementPropertyList([NotNull] SBP.StatementPropertyListContext context)
+        {
+            if (m_propertyBlockOperands.Count != 1) throw new InvalidOperationException("Unexpected stack depth.");
+            m_scopeStack.Peek().SetProperties(m_propertyBlockOperands.Pop());
+            //var block = new PropertyBlock(context.Start.Line, m_propertyBlockOperands.Pop());
+            
+            
+            //if (m_currentFileElement != null)
+            //{
+            //    m_currentFileElement.SetPropertyBlockData(m_lastElementPropertyBlock);
+            //    try
+            //    {
+            //        m_currentFileElement.ParsePropertyBlock(this);
+            //    }
+            //    catch (ParsingErrorException ex)
+            //    {
+            //        m_errors.SymanticError(context.Start.Line, -1, false, $"Value '{ex.Name}': {ex.Message}");
+            //    }
+            //}
+        }
+
+        #endregion
 
         public override void EnterPropertyblock([NotNull] SBP.PropertyblockContext context)
         {
@@ -258,6 +324,7 @@ namespace StepBro.Core.Parser
         }
         public override void ExitPropertyblockStatementValueIdentifierOnly([NotNull] SBP.PropertyblockStatementValueIdentifierOnlyContext context)
         {
+            var stack = m_expressionData.PopStackLevel();
             string name = context.GetText();
             m_propertyBlockOperands.Peek().Add(new PropertyBlockFlag(context.Start.Line, name));
         }

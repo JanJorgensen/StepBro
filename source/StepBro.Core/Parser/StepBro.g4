@@ -395,13 +395,13 @@ blockStatementAttributes : attributes ;
 subStatement : block | statement ;
 
 statement
-    :   (ASSERT | EXPECT) (REGULAR_STRING COLON)? parExpression SEMICOLON			        # expectStatement
-    |   IF parExpression subStatement (ELSE subStatement)?							        # ifStatement
-    |   FOR OPEN_PARENS forControl CLOSE_PARENS ( COLON elementPropertyList )? subStatement	# forStatement
-    |   FOREACH OPEN_PARENS foreachControl CLOSE_PARENS subStatement				        # foreachStatement
-    |   WHILE parExpression ( COLON elementPropertyList )? subStatement	                    # whileStatement
-    |   DO subStatement WHILE parExpression SEMICOLON								        # doWhileStatement
-    |	USING OPEN_PARENS usingExpression CLOSE_PARENS subStatement					        # usingStatement
+    :   (ASSERT | EXPECT) (REGULAR_STRING COLON)? parExpression SEMICOLON			            # expectStatement
+    |   IF parExpression subStatement (ELSE subStatement)?							            # ifStatement
+    |   FOR OPEN_PARENS forControl CLOSE_PARENS ( COLON statementPropertyList )? subStatement   # forStatement
+    |   FOREACH OPEN_PARENS foreachControl CLOSE_PARENS subStatement				            # foreachStatement
+    |   WHILE parExpression ( COLON statementPropertyList )? subStatement	                    # whileStatement
+    |   DO subStatement WHILE parExpression SEMICOLON								            # doWhileStatement
+    |	USING OPEN_PARENS usingExpression CLOSE_PARENS subStatement					            # usingStatement
     //|   'try' block
     //    ( catches 'finally' block
     //    | catches
@@ -414,7 +414,7 @@ statement
     |   THROW expression SEMICOLON													# throwStatement
     |   STEP ((stepIndex COMMA stepTitle) | stepIndex | stepTitle)? SEMICOLON		# stepStatement
     |   LOG logModifier? parExpression SEMICOLON									# logStatement
-    //|   REPORT parExpression SEMICOLON                                              # reportStatement
+    //|   REPORT parExpression SEMICOLON                                            # reportStatement
     |   BREAK SEMICOLON																# breakStatement
     |   CONTINUE SEMICOLON															# continueStatement
     |   GOTO IDENTIFIER SEMICOLON													# gotoStatement
@@ -424,7 +424,7 @@ statement
     |   callAssignment? 
             callReference 
             statementarguments 
-            (( COLON elementPropertyblock ) | SEMICOLON)                            # callStatement
+            (( COLON statementPropertyblock ) | SEMICOLON)                          # callStatement
     |   expression SEMICOLON														# expressionStatement
     |   IDENTIFIER COLON															# labelStatement
     ;
@@ -436,7 +436,7 @@ stepIndex : INTEGER_LITERAL ;
 stepTitle : REGULAR_STRING ;
 
 keywordProcedureCall
-    :	callAssignment? procedureAndArgumentCombinedPhrase statementarguments ( COLON elementPropertyblock )?
+    :	callAssignment? procedureAndArgumentCombinedPhrase statementarguments ( COLON statementPropertyblock )?
     ;
 
 // Replaced with the 'procedureCallStatement':
@@ -547,8 +547,10 @@ altEventGuard : parExpression OP_AND ;
 // PROPERTYBLOCK
 
 elementPropertyblock : propertyblock ;
-
 elementPropertyList : propertyblockStatementList ;
+
+statementPropertyblock : propertyblock ;
+statementPropertyList : propertyblockStatementList ;
 
 propertyblock :	OPEN_BRACE propertyblockStatementList? CLOSE_BRACE ;
 

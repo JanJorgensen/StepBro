@@ -19,6 +19,7 @@ namespace StepBro.Core.Parser
         private List<Expression> m_scopeStatements = new List<Expression>();
         private List<ProcedureParsingScope> m_subStatements = new List<ProcedureParsingScope>();
         private List<ParameterExpression> m_lambdaParameters = null;
+        private List<PropertyBlockEntry> m_propertyBlock = null;
         private List<PropertyBlockEntry> m_attributes = null;
 
         public ProcedureParsingScope(IParsingContext parent, string id, ScopeType type)
@@ -157,6 +158,18 @@ namespace StepBro.Core.Parser
                     yield return fromParent;
                 }
             }
+        }
+
+        public void SetProperties(List<PropertyBlockEntry> props)
+        {
+            m_propertyBlock = props;
+        }
+
+        public List<PropertyBlockEntry> GetProperties()
+        {
+            var props = m_propertyBlock;
+            m_propertyBlock = null;
+            return props;
         }
 
         public void SetAttributes(List<PropertyBlockEntry> attributes = null)

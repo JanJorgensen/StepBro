@@ -140,6 +140,11 @@ namespace StepBro.Core.Execution
 
         public TaskManager TaskManager => throw new NotImplementedException();
 
+        public bool StopRequested()
+        {
+            return m_context.StopRequested();
+        }
+
         public void Dispose()
         {
             throw new NotImplementedException();

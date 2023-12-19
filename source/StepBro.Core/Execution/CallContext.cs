@@ -123,6 +123,11 @@ namespace StepBro.Core.Execution
 
         public TaskManager TaskManager { get { return m_parentContext.TaskManager; } }
 
+        public bool StopRequested()
+        {
+            return ScriptUtils.ToScriptContext(m_parentContext).StopRequested();
+        }
+
         public ICallContext EnterNewContext(string location, bool separateStateLevel)
         {
             if (m_childContext != null)
@@ -163,6 +168,11 @@ namespace StepBro.Core.Execution
         public void ReportError(string errorDescription, ErrorID id = null, Exception exception = null)
         {
             m_parentScriptContext.ReportError(errorDescription, id, exception);
+        }
+
+        bool ICallContext.StopRequested()
+        {
+            throw new NotImplementedException();
         }
     }
 }
