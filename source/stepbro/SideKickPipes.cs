@@ -180,7 +180,7 @@ namespace StepBro
                     }
                     // Catch the IOException that is raised if the pipe is broken
                     // or disconnected.
-                    catch (IOException ex)
+                    catch (IOException)
                     {
                         //Console.WriteLine("ERROR: {0}", ex.Message);
                     }
