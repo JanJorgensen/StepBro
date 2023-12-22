@@ -327,7 +327,7 @@ namespace StepBro.Core
                 ILoggerScope logger = null;
                 try
                 {
-                    logger = m_logRootScope.LogEntering(true, "StepBro.Main.FileParsing", "Starting file parsing", null);
+                    logger = m_logRootScope.LogEntering(true, "FileParsing", "Starting", null);
                     foreach (var f in m_loadedFilesManager.ListFiles<ScriptFile>())
                     {
                         f.ResetBeforeParsing(preserveUpdateableElements: force == false);
@@ -377,7 +377,7 @@ namespace StepBro.Core
         {
             foreach (var file in m_loadedFilesManager.ListFiles<ScriptFile>())
             {
-                var element = file.ListElements().First(
+                var element = file.ListElements().FirstOrDefault(
                     p => String.Equals(name, p.Name, StringComparison.InvariantCultureIgnoreCase) ||
                     String.Equals(name, p.FullName, StringComparison.InvariantCultureIgnoreCase));
                 if (element != null)
