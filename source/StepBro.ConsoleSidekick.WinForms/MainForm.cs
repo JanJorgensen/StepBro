@@ -1,9 +1,7 @@
 using StepBro.Sidekick;
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text.Json;
-using System.Windows.Forms;
 using static StepBro.ConsoleSidekick.WinForms.MainForm.FileData;
 
 namespace StepBro.ConsoleSidekick.WinForms
@@ -12,6 +10,7 @@ namespace StepBro.ConsoleSidekick.WinForms
     {
         private Control m_topControl = null;
         private nint m_consoleWindow = 0;
+        private bool m_firstWindowMove = true;
         private SideKickPipe m_pipe = null;
         private Rect m_lastConsolePosition = new Rect();
         private List<FileData> m_files = new List<FileData>();
@@ -70,13 +69,23 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void MoveWindows()
         {
-            Rect rectConsole = new Rect();
-            GetWindowRect(m_consoleWindow, ref rectConsole);
+            Rect rectConsole;
+            if (DwmGetWindowAttribute(m_consoleWindow, DWMWA_EXTENDED_FRAME_BOUNDS, out rectConsole, Marshal.SizeOf(typeof(Rect))) != 0)
+            {
+                GetWindowRect(m_consoleWindow, ref rectConsole);
+            }
 
             if (!rectConsole.Equals(m_lastConsolePosition))
             {
-                MoveWindow(m_consoleWindow, rectConsole.Left, 0, rectConsole.Right - rectConsole.Left, rectConsole.Bottom - rectConsole.Top, true);
-                GetWindowRect(m_consoleWindow, ref rectConsole);
+                if (m_firstWindowMove)
+                {
+                    MoveWindow(m_consoleWindow, rectConsole.Left, 0, rectConsole.Right - rectConsole.Left, rectConsole.Bottom - rectConsole.Top, true);
+                    if (DwmGetWindowAttribute(m_consoleWindow, DWMWA_EXTENDED_FRAME_BOUNDS, out rectConsole, Marshal.SizeOf(typeof(Rect))) != 0)
+                    {
+                        GetWindowRect(m_consoleWindow, ref rectConsole);
+                    }
+                    m_firstWindowMove = false;
+                }
                 m_lastConsolePosition = rectConsole;
 
                 m_topControl.Top = rectConsole.Bottom;
@@ -266,6 +275,11 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
+
+        const int DWMWA_EXTENDED_FRAME_BOUNDS = 9;
+
+        [DllImport("dwmapi.dll")]
+        static extern int DwmGetWindowAttribute(IntPtr hwnd, int dwAttribute, out Rect pvAttribute, int cbAttribute);
 
         #endregion
 

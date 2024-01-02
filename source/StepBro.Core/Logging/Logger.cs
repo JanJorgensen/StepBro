@@ -5,7 +5,7 @@ namespace StepBro.Core.Logging
 {
     public class Logger : /*LogStorage<LogEntry>, */IDisposable
     {
-        private readonly object m_sync = new object();
+        private readonly object m_sync;
         private ulong m_firstIndex = 0;      // The history index of the first entry currently known. This will only change when entries are disposed.
         private ulong m_lastIndex = 0;
         private readonly string m_outputfile;
@@ -22,6 +22,7 @@ namespace StepBro.Core.Logging
 
         public Logger(string outputFile, bool directLogToFile, string location, string starttext)
         {
+            m_sync = UniqueInteger.m_sync;
             m_outputfile = outputFile;
             m_directLogToFile = directLogToFile && !String.IsNullOrEmpty(outputFile);
 
@@ -29,7 +30,7 @@ namespace StepBro.Core.Logging
             for (int i = 0; i < BLOCK_COUNT; i++) m_blockStarts[i] = null;
 
             m_oldest = new LogEntry(
-                UniqueInteger.GetLong(),
+                UniqueInteger.GetLongDirectly(),
                 DateTime.Now,
                 System.Threading.Thread.CurrentThread.ManagedThreadId,
                 location,
@@ -45,7 +46,7 @@ namespace StepBro.Core.Logging
         {
             lock (m_sync)
             {
-                m_newest = new LogEntry(m_newest, parent, type, UniqueInteger.GetLong(), timestamp, 0, location, text);
+                m_newest = new LogEntry(m_newest, parent, type, UniqueInteger.GetLongDirectly(), timestamp, 0, location, text);
 
                 if ((++m_lastIndex % BLOCK_SIZE) == 0)
                 {

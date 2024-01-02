@@ -48,6 +48,22 @@ namespace StepBro.Cmd
             Exit
         }
 
+        struct ConsoleOutputLine
+        {
+            readonly ulong id;
+            readonly bool isError;
+            readonly string text;
+            public ConsoleOutputLine(bool isError, string text)
+            {
+                this.id = UniqueInteger.GetLongProtected();
+                this.isError = isError;
+                this.text = text;
+            }
+            public ulong ID { get { return id; } }
+            public bool IsError { get {  return isError; } }
+            public string Text { get { return text; } }
+        }
+
         private class ExitException : Exception { }
         private static HostAccess m_hostAccess;
         private static CommandLineOptions m_commandLineOptions = null;
@@ -56,7 +72,7 @@ namespace StepBro.Cmd
         private static bool m_dumpBufferedConsoleOutput = false;
         private static IOutputFormatterTypeAddon m_outputAddon = null;
         private static IOutputFormatter m_outputFormatter = null;
-        private static List<Tuple<bool, string>> m_bufferedOutput = new List<Tuple<bool, string>>();
+        private static Queue<ConsoleOutputLine> m_bufferedOutput = new Queue<ConsoleOutputLine>();
         private static Mode m_mode = Mode.RunThrough;
         private static Queue<StateOrCommand> m_next = new Queue<StateOrCommand>();
 
@@ -192,7 +208,10 @@ namespace StepBro.Cmd
                     if (m_commandLineOptions.RepeatedParsing)
                     {
                         m_mode = Mode.RepeatedParsing;
-                        ConsoleWriteLine("Starting 'repeated parsing'. To exit, press 'x'. To clear view, press 'c'.");
+                        if (!m_commandLineOptions.Sidekick)
+                        {
+                            ConsoleWriteLine("Starting 'repeated parsing'. To exit, press 'x'. To clear view, press 'c'.");
+                        }
                     }
                     else
                     {
@@ -321,7 +340,7 @@ namespace StepBro.Cmd
 
                                         if (commandObjectDictionary.ContainsKey(objectCommand.Object) && !String.IsNullOrEmpty(objectCommand.Command))
                                         {
-                                            StepBroMain.Logger.RootLogger.LogUserAction("Request run object command \"" + objectCommand.Command + "\"");
+                                            StepBroMain.Logger.RootLogger.LogUserAction("Request \'" + objectCommand.Object + "\' command \"" + objectCommand.Command + "\"");
                                             var obj = commandObjectDictionary[objectCommand.Object];
                                             if (obj.AcceptingCommands())
                                             {
@@ -401,7 +420,7 @@ namespace StepBro.Cmd
                                     var commandObjectsContainers = objects.Where(o => o.Object is ITextCommandInput).ToList();
                                     foreach (var o in commandObjectsContainers)
                                     {
-                                        commandObjectDictionary.Add(o.FullName, o.Object as ITextCommandInput);
+                                        commandObjectDictionary[o.FullName] = o.Object as ITextCommandInput;
                                     }
                                     var commandObjectsMessage = new CommandObjectsList();
                                     commandObjectsMessage.Objects = commandObjectsContainers.Select(o => o.FullName).ToArray();
@@ -461,6 +480,7 @@ namespace StepBro.Cmd
                                         break;
                                     case Mode.RepeatedParsing:
                                         ConsoleWriteLine("No parsing errors.");
+                                        m_dumpBufferedConsoleOutput = true;
                                         m_next.Enqueue(StateOrCommand.AwaitFileChange);
                                         break;
                                     default:
@@ -779,7 +799,7 @@ namespace StepBro.Cmd
         {
             if (m_activitiesRunning && m_dumpingExecutionLog)
             {
-                m_bufferedOutput.Add(new Tuple<bool, string>(false, String.Format(value, args)));
+                m_bufferedOutput.Enqueue(new ConsoleOutputLine(false, String.Format(value, args)));
             }
             else
             {
@@ -792,7 +812,7 @@ namespace StepBro.Cmd
         {
             if (m_activitiesRunning && m_dumpingExecutionLog)
             {
-                m_bufferedOutput.Add(new Tuple<bool, string>(true, value));
+                m_bufferedOutput.Enqueue(new ConsoleOutputLine(true, value));
             }
             else
             {
@@ -806,16 +826,21 @@ namespace StepBro.Cmd
 
         private static void FlushBufferedConsoleOutput()
         {
-            foreach (var s in m_bufferedOutput)
+            foreach (var line in m_bufferedOutput)
             {
-                if (s.Item1 == false) Console.WriteLine(s.Item2);
-                else
+                if (line.IsError)
                 {
                     var color = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Error.WriteLine(s.Item2);
+                    Console.Error.WriteLine(line.Text);
                     Console.ForegroundColor = color;
                 }
+                else
+                {
+                    Console.WriteLine(line.Text);
+                }
+
+
             }
             m_bufferedOutput.Clear();
         }
@@ -834,11 +859,12 @@ namespace StepBro.Cmd
         {
             var logEntry = StepBroMain.Logger.GetOldestEntry();
             var zero = logEntry.Timestamp;
+            // Loop until log is empty and there is no running execution.
             while (logEntry != null || m_activitiesRunning)
             {
                 m_outputFormatter.WriteLogEntry(logEntry, zero);
 
-                // Wait until log is empty and there is no running execution.
+                // Wait for next entry in log or activities stopped.
                 while (logEntry.Next == null && m_activitiesRunning == true)
                 {
                     System.Threading.Thread.Sleep(50);
@@ -853,7 +879,6 @@ namespace StepBro.Cmd
             Console.ForegroundColor = ConsoleColor.White;
             m_dumpingExecutionLog = false;  // Signal to main thread.
         }
-
 
         //[DllImport("kernel32.dll", SetLastError = true)]
         //static extern bool AttachConsole(uint dwProcessId);
