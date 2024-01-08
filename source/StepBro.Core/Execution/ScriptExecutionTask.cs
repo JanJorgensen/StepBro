@@ -22,7 +22,8 @@ namespace StepBro.Core.Execution
         private ReadOnlyObservableCollection<IExecutionScopeStatus> m_executionStateStackReadOnly;
         private readonly ILoadedFilesManager m_filesManager;
         private readonly TaskManager m_taskManager;
-        private IFileElement m_targetElement;
+        private readonly string m_targetTitle;
+        private IFileProcedure m_targetProcedure;
         private readonly object[] m_arguments;
         private DateTime m_start = DateTime.MinValue;
         private DateTime m_end = DateTime.MinValue;
@@ -56,7 +57,7 @@ namespace StepBro.Core.Execution
 
         object IExecutionResult.ReturnValue { get { return m_returnValue; } }
 
-        public IFileElement TargetElement { get { return m_targetElement; } }
+        public IFileElement TargetElement { get { return m_targetProcedure; } }
 
         DateTime ITaskControl.StartTime { get { return m_start; } }
 
@@ -66,13 +67,15 @@ namespace StepBro.Core.Execution
             ILoggerScope logger,
             ILoadedFilesManager filesManager,
             TaskManager taskManager,
-            IFileElement targetElement,
+            IFileProcedure targetProcedure,
+            string targetTitle,
             object[] arguments)
         {
             m_logger = logger;
             m_filesManager = filesManager;
             m_taskManager = taskManager;
-            m_targetElement = targetElement;
+            m_targetProcedure = targetProcedure;
+            m_targetTitle = targetTitle;
             m_arguments = arguments;
 
             m_taskContext = new ScriptTaskContext();
@@ -122,12 +125,12 @@ namespace StepBro.Core.Execution
 
         private void ProcedureExecutionTask()
         {
-            var logger = m_logger.LogEntering(true, "Script Execution", m_targetElement.FullName, null);
+            var logger = m_logger.LogEntering(true, "Script Execution", (m_targetTitle != null) ? m_targetTitle : m_targetProcedure.FullName, null);
             m_taskContext.Setup(logger, ContextLogOption.Normal, m_statusUpdateRoot, m_filesManager, m_taskManager);
             m_start = DateTime.Now;
             this.SetState(TaskExecutionState.Running);
 
-            m_returnValue = m_taskContext.CallProcedure(m_targetElement as IFileProcedure, m_arguments);
+            m_returnValue = m_taskContext.CallProcedure(m_targetProcedure as IFileProcedure, m_arguments);
             this.SetState((m_taskContext.ExecutionExeception == null) ? TaskExecutionState.Ended : TaskExecutionState.EndedByException);
             m_end = DateTime.Now;
             logger.LogExit("Script execution ended. " + m_taskContext.Result.ResultText(m_returnValue));

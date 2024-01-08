@@ -35,7 +35,7 @@ namespace StepBroCoreTest.Execution
                 Assert.AreEqual(1, file.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
                 var procedure = file.ListElements().First(p => p.Name == "Main") as IFileProcedure;
 
-                var execution = StepBro.Core.Main.StartProcedureExecution(procedure);
+                var execution = StepBro.Core.Main.StartProcedureExecution(procedure, null);
                 bool isRunning = false;
                 while (execution.Task.CurrentState == StepBro.Core.Tasks.TaskExecutionState.Created) ;
                 while (execution.Task.CurrentState == StepBro.Core.Tasks.TaskExecutionState.StartRequested) ;

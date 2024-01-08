@@ -17,4 +17,9 @@
     <Compile Include="..\stepbro\SideKickPipes.cs" Link="SideKickPipes.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
+    <ProjectReference Include="..\StepBro.UI.WinForms\StepBro.UI.WinForms.csproj" />
+  </ItemGroup>
+
 </Project>

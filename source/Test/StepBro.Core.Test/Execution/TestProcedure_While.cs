@@ -193,7 +193,7 @@ namespace StepBroCoreTest.Parser
 
             object result = proc.Call();
             Assert.IsInstanceOfType(result, typeof(long));
-            Assert.IsTrue((long)result >= 100l);
+            Assert.IsTrue((long)result >= 100L);
 
             // TODO: Check that loop can be stopped.
         }

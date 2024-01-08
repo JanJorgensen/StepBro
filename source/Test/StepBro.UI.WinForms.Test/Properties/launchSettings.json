@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "StepBro.UI.WinForms.Test": {
+      "commandName": "Project",
+      "commandLineArgs": "PCM02Harness.sbs",
+      "workingDirectory": "C:\\SW_development\\esw-platform\\test\\systest\\PCM02"
+    }
+  }
+}
