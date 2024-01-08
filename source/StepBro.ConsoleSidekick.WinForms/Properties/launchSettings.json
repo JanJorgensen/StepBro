@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "StepBro.ConsoleSidekick.WinForms": {
+      "commandName": "Project",
+      "commandLineArgs": "-d",
+      "workingDirectory": "C:\\SW_development\\esw-platform\\test\\systest\\PCM02"
+    }
+  }
+}

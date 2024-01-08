@@ -318,7 +318,7 @@ namespace StepBroCoreTest
             log.DebugDump();
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
-            log.ExpectNext("1 - Pre - MyFile.RunActionInLoop - ( StepBro.Core.ScriptData.FileProcedure+Reference`1[ret_System_Void] )");
+            log.ExpectNext("1 - Pre - MyFile.RunActionInLoop - ( <MyFile.Do> )");
             log.ExpectNext("2 - Pre - 9 MyFile.Do - <no arguments>");
             log.ExpectNext("3 - Normal - 15 Log - Blip");
             log.ExpectNext("3 - Post");

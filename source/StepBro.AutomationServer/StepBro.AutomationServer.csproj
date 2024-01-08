@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <AssemblyName>StepBro.PanelCreator</AssemblyName>
-    <RootNamespace>StepBro.PanelCreator</RootNamespace>
-    <OutputPath>..\..\bin\Modules</OutputPath>
-    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <AssemblyName>stepbro.automationserver</AssemblyName>
+    <RootNamespace>StepBro.AutomationServer</RootNamespace>
+    <OutputPath>..\bin</OutputPath>
+    <ImplicitUsings>enable</ImplicitUsings>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <InvariantGlobalization>true</InvariantGlobalization>
@@ -15,12 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\CommonVersion.cs" Link="CommonVersion.cs" />
+    <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\StepBro.Core\StepBro.Core.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-  </ItemGroup>
 </Project>

@@ -1,46 +1,59 @@
-﻿using Newtonsoft.Json.Linq;
-using StepBro.Core.Api;
+﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using StepBro.PanelCreator.DummyUI;
 using System;
-using System.Threading;
-using System.Xml.Linq;
 
 namespace StepBro.PanelCreator
 {
     [Public]
     public class Panel : StepBro.Core.Api.DynamicStepBroObject, INameable, ISettableFromPropertyBlock
     {
-        public const string MainElementName = "panel";
+        public const string MainElementName = "Main";
 
-        private string m_name = "PanelDefinition";
+        private string m_name = null;
+        private string m_title = null;
         private PropertyBlock m_mainPanelDefinition = null;
         private IPanelElement m_mainPanelElement = null;
 
         public Panel() { }
 
-        public string Name { get { return m_name; } set { m_name = value; } }
+        public string Name
+        {
+            get { return m_name; }
+            set
+            {
+                m_name = value;
+            }
+        }
+        public string Title
+        {
+            get { return m_title; }
+            set
+            {
+                m_title = value;
+            }
+        }
 
         public void Setup(ILogger logger, PropertyBlock data)
         {
-            var mainPanel = data.TryGetElement("Main");
+            var mainPanel = data.TryGetElement(MainElementName);
             if (mainPanel != null)
             {
                 if (mainPanel.BlockEntryType != PropertyBlockEntryType.Block || string.IsNullOrEmpty(mainPanel.SpecifiedTypeName))
                 {
-                    logger.LogError($"The '{MainElementName}' must be defines as a 'block'.");
+                    logger.LogError($"The '{MainElementName}' entry must be defines as a 'block'.");
                     return;
                 }
                 if (string.IsNullOrEmpty(mainPanel.SpecifiedTypeName))
                 {
-                    logger.LogError($"The '{MainElementName}' must have a type specified.");
+                    logger.LogError($"The '{MainElementName}' block must have a type specified.");
                     return;
                 }
                 m_mainPanelDefinition = mainPanel as PropertyBlock;
 
-                var panel = new DummyBaseUIElement(mainPanel.Name, mainPanel.Name, mainPanel.SpecifiedTypeName);
+                var panel = new DummyBaseUIElement(null, mainPanel.Name, mainPanel.Name, mainPanel.SpecifiedTypeName);
                 m_mainPanelElement = panel;
                 panel.Setup(m_mainPanelDefinition);
             }

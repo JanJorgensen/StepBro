@@ -1,0 +1,87 @@
+﻿<DockSiteLayout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" SerializationFormat="All" Version="2">
+	<AutoHideHost />
+	<Content xsi:type="SplitContainer" Orientation="Horizontal" DockedSize="2548,1293">
+		<UIElement xsi:type="ToolWindowContainer" DockedSize="0,0">
+			<UIElement xsi:type="Track" ContainerDockedSize="363,876" CreationDateTime="2023-09-05T11:25:22.0319085+02:00" UniqueId="e989391b-8bf9-4f2a-9c61-53cc7307ae4b" />
+		</UIElement>
+		<UIElement xsi:type="SplitContainer" Orientation="Vertical" DockedSize="842,477">
+			<UIElement xsi:type="Workspace">
+				<Content xsi:type="TabbedMdiHost">
+					<Content xsi:type="SplitContainer" Orientation="Horizontal" DockedSize="2020,477">
+						<UIElement xsi:type="TabbedMdiContainer" DockedSize="877,477" SelectedWindowUniqueId="dcaea37e-62c8-4ffc-9029-d3ea9421be7d">
+							<UIElement xsi:type="DocumentWindowRef" UniqueId="dcaea37e-62c8-4ffc-9029-d3ea9421be7d" />
+						</UIElement>
+						<UIElement xsi:type="TabbedMdiContainer" DockedSize="328,562" SelectedWindowUniqueId="e989391b-8bf9-4f2a-9c61-53cc7307ae4b">
+							<UIElement xsi:type="ToolWindowRef" UniqueId="e989391b-8bf9-4f2a-9c61-53cc7307ae4b" />
+						</UIElement>
+						<UIElement xsi:type="TabbedMdiContainer" DockedSize="0,0">
+							<UIElement xsi:type="Track" ContainerDockedSize="522,1293" CreationDateTime="2023-09-01T12:54:10.5372714+02:00" UniqueId="fa1cf86d-be91-410e-b36d-8f4fa3846265" />
+							<UIElement xsi:type="Track" ContainerDockedSize="522,1293" CreationDateTime="2023-09-01T12:54:58.8419781+02:00" UniqueId="9aa0f317-490a-49d7-b03d-69e7dea9124d" />
+							<UIElement xsi:type="Track" ContainerDockedSize="522,1293" CreationDateTime="2023-09-01T12:53:46.8412588+02:00" UniqueId="d3434aa6-4499-419c-b3df-2fc22365a469" />
+						</UIElement>
+					</Content>
+				</Content>
+			</UIElement>
+			<UIElement xsi:type="SplitContainer" Orientation="Horizontal" DockedSize="840,308">
+				<UIElement xsi:type="ToolWindowContainer" DockedSize="711,308" SelectedWindowUniqueId="fa1cf86d-be91-410e-b36d-8f4fa3846265">
+					<UIElement xsi:type="ToolWindowRef" UniqueId="fa1cf86d-be91-410e-b36d-8f4fa3846265" />
+				</UIElement>
+				<UIElement xsi:type="ToolWindowContainer" DockedSize="341,602" SelectedWindowUniqueId="bf1f8a58-542b-4ee2-b084-39b357bbed67">
+					<UIElement xsi:type="ToolWindowRef" UniqueId="bf1f8a58-542b-4ee2-b084-39b357bbed67" />
+				</UIElement>
+			</UIElement>
+		</UIElement>
+		<UIElement xsi:type="SplitContainer" Orientation="Vertical" DockedSize="460,1291">
+			<UIElement xsi:type="ToolWindowContainer" DockedSize="460,701" SelectedWindowUniqueId="9aa0f317-490a-49d7-b03d-69e7dea9124d">
+				<UIElement xsi:type="ToolWindowRef" UniqueId="9aa0f317-490a-49d7-b03d-69e7dea9124d" />
+			</UIElement>
+			<UIElement xsi:type="ToolWindowContainer" DockedSize="460,316" SelectedWindowUniqueId="d3434aa6-4499-419c-b3df-2fc22365a469">
+				<UIElement xsi:type="ToolWindowRef" UniqueId="d3434aa6-4499-419c-b3df-2fc22365a469" />
+			</UIElement>
+		</UIElement>
+	</Content>
+	<DocumentWindows>
+		<DocumentWindow UniqueId="dcaea37e-62c8-4ffc-9029-d3ea9421be7d" SerializationId="C:\SW_development\StepBro\test files\PanelTest.sbs" ContainerDockedSize="877,477" IsOpen="true" LastActiveDateTime="2023-09-06T12:41:56.700229+02:00" State="Document" FileName="C:\SW_development\StepBro\test files\PanelTest.sbs" />
+	</DocumentWindows>
+	<RaftingHosts>
+		<RaftingHost UniqueId="c9a19df8-592b-4514-b075-73cec1f7df39" Location="908,1158" Size="2022,150" WindowState="Normal">
+			<AutoHideHost />
+			<Content xsi:type="ToolWindowContainer" DockedSize="0,0">
+				<UIElement xsi:type="Track" ContainerDockedSize="1011,148" CreationDateTime="2023-09-01T12:55:09.9929575+02:00" UniqueId="fa1cf86d-be91-410e-b36d-8f4fa3846265" />
+			</Content>
+		</RaftingHost>
+		<RaftingHost UniqueId="12513f8f-fff3-4731-9f60-c7fa3e9e55fe" Location="2083,708" Size="520,1293" WindowState="Normal">
+			<AutoHideHost />
+			<Content xsi:type="ToolWindowContainer" DockedSize="0,0">
+				<UIElement xsi:type="Track" ContainerDockedSize="518,1291" CreationDateTime="2023-09-01T12:56:00.8466779+02:00" UniqueId="d3434aa6-4499-419c-b3df-2fc22365a469" />
+			</Content>
+		</RaftingHost>
+		<RaftingHost UniqueId="63c23c94-9a8a-4ad4-8db6-16a28cb75618" Location="2066,134" Size="801,308" WindowState="Normal">
+			<AutoHideHost />
+			<Content xsi:type="ToolWindowContainer" DockedSize="0,0">
+				<UIElement xsi:type="Track" ContainerDockedSize="799,306" CreationDateTime="2023-09-01T12:56:43.7568303+02:00" UniqueId="9aa0f317-490a-49d7-b03d-69e7dea9124d" />
+			</Content>
+		</RaftingHost>
+		<RaftingHost UniqueId="7376a46b-8215-4c92-ab26-cf07ff4b8d5d" Location="652,804" Size="200,604" WindowState="Normal">
+			<AutoHideHost />
+			<Content xsi:type="ToolWindowContainer" DockedSize="0,0">
+				<UIElement xsi:type="Track" ContainerDockedSize="198,602" CreationDateTime="2023-09-05T11:17:59.0189252+02:00" UniqueId="bf1f8a58-542b-4ee2-b084-39b357bbed67" />
+			</Content>
+		</RaftingHost>
+		<RaftingHost UniqueId="2ba6785e-f650-47d9-841f-f803b305cd75" Location="757,430" Size="330,564" WindowState="Normal">
+			<AutoHideHost />
+			<Content xsi:type="ToolWindowContainer" DockedSize="0,0">
+				<UIElement xsi:type="Track" ContainerDockedSize="328,562" CreationDateTime="2023-09-05T11:25:56.2673098+02:00" UniqueId="e989391b-8bf9-4f2a-9c61-53cc7307ae4b" />
+			</Content>
+		</RaftingHost>
+	</RaftingHosts>
+	<ToolWindows>
+		<ToolWindow UniqueId="f682b5a1-bb93-447d-a239-3ccfaa436609" SerializationId="ToolDocumentList" ContainerDockedSize="200,150" IsOpen="false" State="Docked" />
+		<ToolWindow UniqueId="35f90181-b472-4c50-9e50-b77712ab8cc1" SerializationId="ToolToolsList" ContainerDockedSize="200,150" IsOpen="false" State="Docked" />
+		<ToolWindow UniqueId="d3434aa6-4499-419c-b3df-2fc22365a469" SerializationId="ToolProperties" ContainerDockedSize="460,316" IsOpen="true" LastActiveDateTime="2023-09-01T13:07:58.9626279+02:00" State="Docked" />
+		<ToolWindow UniqueId="9aa0f317-490a-49d7-b03d-69e7dea9124d" SerializationId="ToolOutput" ContainerDockedSize="460,701" IsOpen="true" LastActiveDateTime="2023-09-04T10:10:09.4198584+02:00" State="Docked" />
+		<ToolWindow UniqueId="fa1cf86d-be91-410e-b36d-8f4fa3846265" SerializationId="ToolErrors" ContainerDockedSize="711,308" IsOpen="true" LastActiveDateTime="2023-09-01T12:57:09.394227+02:00" State="Docked" />
+		<ToolWindow UniqueId="bf1f8a58-542b-4ee2-b084-39b357bbed67" SerializationId="ToolCalculator" ContainerDockedSize="341,602" IsOpen="true" LastActiveDateTime="2023-09-05T11:20:11.1844004+02:00" State="Docked" />
+		<ToolWindow UniqueId="e989391b-8bf9-4f2a-9c61-53cc7307ae4b" SerializationId="ToolCustomPanel|StepBro.PanelCreator.UI.PanelView|PanelTest.panel" ContainerDockedSize="328,562" IsOpen="true" LastActiveDateTime="2023-09-05T11:25:52.5970497+02:00" State="Document" />
+	</ToolWindows>
+</DockSiteLayout>

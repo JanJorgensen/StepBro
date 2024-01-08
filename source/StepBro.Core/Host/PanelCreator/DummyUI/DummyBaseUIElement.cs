@@ -9,23 +9,33 @@ using System.Reflection.Emit;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace StepBro.PanelCreator.DummyUI
 {
-    internal class DummyBaseUIElement : IPanelElement
+    internal class DummyBaseUIElement : IPanelElement, INotifyPropertyChanged
     {
+        private static uint g_nextID = 100;
+        public uint m_id;
         private string m_parentPropertyname;
         private string m_name;
         private string m_type;
+        private IPanelElement m_parent = null;
         private List<IPanelElement> m_childs = new List<IPanelElement>();
         private Dictionary<string, object> m_props = new Dictionary<string, object>();
 
-        public DummyBaseUIElement(string propertyName, string name, string type)
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public DummyBaseUIElement(IPanelElement parent, string propertyName, string name, string type)
         {
+            m_id = g_nextID++;
+            m_parent = parent;
             m_parentPropertyname = propertyName;
             m_name = name;
             m_type = type;
         }
+
+        public uint Id { get { return m_id; } }
 
         public string PropertyName
         {
@@ -42,6 +52,8 @@ namespace StepBro.PanelCreator.DummyUI
         {
             get { return m_type; }
         }
+
+        public IPanelElement Parent => throw new NotImplementedException();
 
         public override string ToString()
         {
@@ -87,7 +99,7 @@ namespace StepBro.PanelCreator.DummyUI
                             this.Setup(field as PropertyBlock, false);
                             break;
                         default:
-                            var child = new DummyBaseUIElement(field.Name, field.Name, field.SpecifiedTypeName);
+                            var child = new DummyBaseUIElement(this, field.Name, field.Name, field.SpecifiedTypeName);
                             m_childs.Add(child);
                             child.Setup(field as PropertyBlock);
                             break;
