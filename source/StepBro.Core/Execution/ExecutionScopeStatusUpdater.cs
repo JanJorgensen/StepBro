@@ -262,7 +262,7 @@ namespace StepBro.Core.Execution
             }
         }
 
-        AttentionColor IExecutionScopeStatus.ProgressColor => throw new NotImplementedException();
+        AttentionColor IExecutionScopeStatus.ProgressColor { get { return m_progressColor; } }
 
         DateTime IExecutionScopeStatus.StartTime { get { return m_startTime; } }
 

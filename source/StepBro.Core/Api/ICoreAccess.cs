@@ -42,7 +42,7 @@ namespace StepBro.Core.Api
             get { return null; }
         }
 
-        public event EventHandler CurrentStateChanged;
+        public event EventHandler CurrentStateChanged { add { } remove { } }
 
         public void RequestStopExecution()
         {

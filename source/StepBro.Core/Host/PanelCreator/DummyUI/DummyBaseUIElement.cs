@@ -24,7 +24,7 @@ namespace StepBro.PanelCreator.DummyUI
         private List<IPanelElement> m_childs = new List<IPanelElement>();
         private Dictionary<string, object> m_props = new Dictionary<string, object>();
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
 
         public DummyBaseUIElement(IPanelElement parent, string propertyName, string name, string type)
         {

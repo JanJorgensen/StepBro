@@ -64,6 +64,10 @@ namespace StepBro.Core.Api
             //    }
             //    found = foundFiltered;
             //}
+            if (found == null)
+            {
+                return null;
+            }
             return CloneWithoutGeneralDeviceConfigEntries(found);
         }
 

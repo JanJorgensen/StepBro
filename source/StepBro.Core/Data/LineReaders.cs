@@ -50,7 +50,7 @@ namespace StepBro.Core.Data
 
         public INameable Source { get; private set; }
 
-        public event EventHandler LinesAdded;
+        public event EventHandler LinesAdded { add { } remove { } }
 
         public void Flush(ILineReaderEntry stopAt = null)
         {
