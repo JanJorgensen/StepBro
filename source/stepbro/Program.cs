@@ -214,7 +214,10 @@ namespace StepBro.Cmd
                     if (m_commandLineOptions.RepeatedParsing)
                     {
                         m_mode = Mode.RepeatedParsing;
-                        ConsoleWriteLine("Starting 'repeated parsing'. To exit, press 'x'. To clear view, press 'c'.");
+                        if (!m_commandLineOptions.Sidekick)
+                        {
+                            ConsoleWriteLine("Starting 'repeated parsing'. To exit, press 'x'. To clear view, press 'c'.");
+                        }
                     }
                     else
                     {
