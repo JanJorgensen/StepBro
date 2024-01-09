@@ -99,7 +99,7 @@ namespace StepBro.Sidekick
 
             public override string ToString()
             {
-                return this.FullName;
+                return this.Name;
             }
         }
         public class PanelDefinitionVariable : Variable

@@ -65,14 +65,17 @@
             toolStripComboBoxTool.DropDownStyle = ComboBoxStyle.DropDownList;
             toolStripComboBoxTool.Enabled = false;
             toolStripComboBoxTool.Name = "toolStripComboBoxTool";
-            toolStripComboBoxTool.Size = new Size(180, 23);
+            toolStripComboBoxTool.Size = new Size(120, 23);
             toolStripComboBoxTool.SelectedIndexChanged += toolStripComboBoxTool_SelectedIndexChanged;
             // 
             // toolStripComboBoxToolCommand
             // 
+            toolStripComboBoxToolCommand.AutoSize = false;
             toolStripComboBoxToolCommand.Enabled = false;
             toolStripComboBoxToolCommand.Name = "toolStripComboBoxToolCommand";
-            toolStripComboBoxToolCommand.Size = new Size(200, 23);
+            toolStripComboBoxToolCommand.Size = new Size(250, 23);
+            toolStripComboBoxToolCommand.ToolTipText = "Command prompt for the selected tool/object.";
+            toolStripComboBoxToolCommand.SelectedIndexChanged += toolStripComboBoxToolCommand_SelectedIndexChanged;
             toolStripComboBoxToolCommand.KeyPress += toolStripComboBoxToolCommand_KeyPress;
             toolStripComboBoxToolCommand.TextChanged += toolStripComboBoxToolCommand_TextChanged;
             // 
@@ -145,10 +148,6 @@
         private ToolStripSeparator toolStripSeparatorTool;
         private ToolStripComboBox toolStripComboBoxToolCommand;
         private ToolStripSplitButton toolStripSplitButtonRunScript;
-        private ToolStripMenuItem toolStripMenuProcedureFromNamespaceMogens;
-        private ToolStripMenuItem toolStripMenuItemProcedureMogensDotAllan;
-        private ToolStripMenuItem toolStripMenuItem4;
-        private ToolStripMenuItem toolStripMenuItem5;
         private ToolStripButton toolStripButtonRunCommand;
         private ToolStripButton toolStripButtonStopScriptExecution;
     }

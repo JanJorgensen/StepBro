@@ -19,9 +19,9 @@ namespace StepBro.ConsoleSidekick.WinForms
         private bool m_isConsoleActive = false;
         private SideKickPipe m_pipe = null;
         private Rect m_lastConsolePosition = new Rect();
-        private string m_selectedPartner = null;
         private IExecutionAccess m_executingScript = null;
         private PanelsDialog m_panelsDialog = null;
+        private bool m_settingCommandCombo = false;
         List<WeakReference<ExecutionAccess>> m_activeExecutions = new List<WeakReference<ExecutionAccess>>();
 
         private class ScriptExecutionToolStripMenuItem : ToolStripMenuItem
@@ -116,32 +116,27 @@ namespace StepBro.ConsoleSidekick.WinForms
             System.Diagnostics.Trace.WriteLine("Sidekick closing end");
         }
 
-        #region CONSOLE INTERACTION
-
-        private void ExecuteCommand(string command)
-        {
-            m_pipe.Send(
-                new ObjectCommand(
-                    (toolStripComboBoxTool.Items[toolStripComboBoxTool.SelectedIndex] as FileElements.Variable).FullName,
-                    command));
-        }
-
-        #endregion
-
         #region USER INTERACTION - COMMANDS
 
+        private void toolStripComboBoxTool_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            toolStripComboBoxTool.ToolTipText =
+                "Select tool/object to use for the command prompt. Selected object: '" +
+                (toolStripComboBoxTool.SelectedItem as FileElements.Variable).FullName + "'";
+        }
+        
         private void toolStripComboBoxToolCommand_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
             {
                 e.Handled = true;
-                if (!String.IsNullOrEmpty(toolStripComboBoxToolCommand.Text))
-                {
-                    ExecuteCommand(toolStripComboBoxToolCommand.Text);
-                    toolStripComboBoxToolCommand.Select(0, toolStripComboBoxToolCommand.Text.Length);
-                }
+                ExecuteCommandFromGUI();
             }
+        }
 
+        private void toolStripComboBoxToolCommand_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (m_settingCommandCombo) return;
         }
 
         private void toolStripComboBoxToolCommand_TextChanged(object sender, EventArgs e)
@@ -151,22 +146,38 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void toolStripButtonRunCommand_Click(object sender, EventArgs e)
         {
+            ExecuteCommandFromGUI();
+        }
+
+        private void ExecuteCommandFromGUI()
+        {
             if (!String.IsNullOrEmpty(toolStripComboBoxToolCommand.Text))
             {
-                ExecuteCommand(toolStripComboBoxToolCommand.Text);
-                toolStripComboBoxToolCommand.Select(0, toolStripComboBoxToolCommand.Text.Length);
+                string command = toolStripComboBoxToolCommand.Text;
+                ExecuteCommand(command);
+                m_settingCommandCombo = true;
+                int i = 0;
+                foreach (string known in toolStripComboBoxToolCommand.Items)
+                {
+                    if (string.Equals(command, known))
+                    {
+                        toolStripComboBoxToolCommand.Items.RemoveAt(i);
+                        break;
+                    }
+                    i++;
+                }
+                toolStripComboBoxToolCommand.Items.Insert(0, command);
+                toolStripComboBoxToolCommand.SelectedIndex = 0;
+                toolStripComboBoxToolCommand.Select(0, command.Length);
+                m_settingCommandCombo = false;
             }
         }
 
-        //private void buttonExecute_Click(object sender, EventArgs e)
-        //{
-        //    System.Diagnostics.Debug.WriteLine("buttonExecute_Click");
-        //    if (!String.IsNullOrEmpty(comboBoxCommand.Text))
-        //    {
-        //        ExecuteCommand(comboBoxCommand.Text);
-        //        comboBoxCommand.Select(0, comboBoxCommand.Text.Length);
-        //    }
-        //}
+        private void ExecuteCommand(string command)
+        {
+            var tool = (toolStripComboBoxTool.Items[toolStripComboBoxTool.SelectedIndex] as FileElements.Variable).FullName;
+            //m_pipe.Send(new ObjectCommand(tool, command));
+        }
 
         #endregion
 
@@ -272,6 +283,10 @@ namespace StepBro.ConsoleSidekick.WinForms
                     return (objRect.Left == this.Left && objRect.Top == this.Top && objRect.Right == this.Right && objRect.Bottom == this.Bottom);
                 }
                 return base.Equals(obj);
+            }
+            public override int GetHashCode()
+            {
+                return base.GetHashCode();
             }
         }
 
@@ -456,6 +471,7 @@ namespace StepBro.ConsoleSidekick.WinForms
                         toolStripComboBoxTool.Enabled = false;
                         toolStripComboBoxToolCommand.Enabled = false;
                     }
+                    toolStripComboBoxTool.SelectionLength = 0;
 
                     var panelVariables = elements.Elements.Where(e => e is StepBro.Sidekick.FileElements.PanelDefinitionVariable).Select(e => (StepBro.Sidekick.FileElements.PanelDefinitionVariable)e).ToList();
 
@@ -522,11 +538,6 @@ namespace StepBro.ConsoleSidekick.WinForms
                 var executionEntry = toolStripSplitButtonRunScript.DropDownItems[0] as ScriptExecutionToolStripMenuItem;
                 MenuFileElementExecutionStart(executionEntry.FileElement, executionEntry.Partner, null, null);
             }
-        }
-
-        private void toolStripComboBoxTool_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void PanelsDialog_FormClosed(object sender, FormClosedEventArgs e)

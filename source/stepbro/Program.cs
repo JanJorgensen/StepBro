@@ -550,6 +550,7 @@ namespace StepBro.Cmd
                                         {
                                             variableData = new StepBro.Sidekick.FileElements.Variable();
                                         }
+                                        variableData.Name = v.FullName.Split('.').Last();
                                         variableData.FullName = v.FullName;
                                         if (v.Object is ITextCommandInput)
                                         {
