@@ -16,6 +16,7 @@ namespace StepBro.ConsoleSidekick.WinForms
     {
         private Control m_topControl = null;
         private nint m_consoleWindow = 0;
+        private bool m_isConsoleActive = false;
         private SideKickPipe m_pipe = null;
         private Rect m_lastConsolePosition = new Rect();
         private string m_selectedPartner = null;
@@ -70,6 +71,18 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void MoveWindows()
         {
+            bool consoleActive = (GetForegroundWindow() == m_consoleWindow);
+            if (consoleActive != m_isConsoleActive)
+            {
+                if (consoleActive)
+                {
+                    this.WindowState = FormWindowState.Minimized;
+                    this.Show();
+                    this.WindowState = FormWindowState.Normal;
+                    SetForegroundWindow(m_consoleWindow);
+                }
+                m_isConsoleActive = consoleActive;
+            }
             Rect rectConsole = new Rect();
             if (DwmGetWindowAttribute(m_consoleWindow, DWMWA_EXTENDED_FRAME_BOUNDS, out rectConsole, Marshal.SizeOf(typeof(Rect))) != 0)
             {
@@ -268,6 +281,12 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+
+        [DllImport("User32.dll")]
+        public static extern Int32 SetForegroundWindow(IntPtr hWnd);
 
         const int DWMWA_EXTENDED_FRAME_BOUNDS = 9;
 
