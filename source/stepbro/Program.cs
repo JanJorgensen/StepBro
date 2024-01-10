@@ -48,22 +48,6 @@ namespace StepBro.Cmd
             Exit
         }
 
-        //struct ConsoleOutputLine
-        //{
-        //    readonly ulong id;
-        //    readonly bool isError;
-        //    readonly string text;
-        //    public ConsoleOutputLine(bool isError, string text)
-        //    {
-        //        this.id = UniqueInteger.GetLongProtected();
-        //        this.isError = isError;
-        //        this.text = text;
-        //    }
-        //    public ulong ID { get { return id; } }
-        //    public bool IsError { get { return isError; } }
-        //    public string Text { get { return text; } }
-        //}
-
         private class ExitException : Exception { }
         private static HostAccess m_hostAccess;
         private static CommandLineOptions m_commandLineOptions = null;
@@ -92,6 +76,7 @@ namespace StepBro.Cmd
             IPartner partner = null;
             IScriptExecution execution = null;
             ulong executionStartRequestID = 0UL;
+            bool executionRequestSilent = false;
             string targetFile = null;
             string targetElement = null;
             string targetPartner = null;
@@ -366,6 +351,7 @@ namespace StepBro.Cmd
                                     else if (input.Item1 == nameof(RunScriptRequest))
                                     {
                                         var request = JsonSerializer.Deserialize<RunScriptRequest>(input.Item2);
+                                        executionRequestSilent = request.Silent;
                                         executionStartRequestID = request.RequestID;
                                         targetElement = request.Element;
                                         targetPartner = request.Partner;
@@ -502,6 +488,8 @@ namespace StepBro.Cmd
                                                                 (elementData as FileElements.Procedure).FirstParameterIsInstanceReference = true;
                                                             }
                                                         }
+                                                        (elementData as FileElements.Procedure).Parameters = p.Parameters.Select(p => new FileElements.Parameter(p.Name, p.Value.TypeName())).ToArray();
+                                                        (elementData as FileElements.Procedure).ReturnType = p.ReturnType.TypeName();
                                                     }
                                                     break;
                                                 case FileElementType.TestList:
@@ -994,36 +982,7 @@ namespace StepBro.Cmd
             m_dumpingExecutionLog = false;  // Signal to main thread.
         }
 
-
-        //[DllImport("kernel32.dll", SetLastError = true)]
-        //static extern bool AttachConsole(uint dwProcessId);
-
         [DllImport("kernel32.dll")]
         static extern IntPtr GetConsoleWindow();
-
-        //[DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-        //static extern bool FreeConsole();
-
-        //[DllImport("kernel32.dll")]
-        //static extern bool SetConsoleCtrlHandler(ConsoleCtrlDelegate HandlerRoutine, bool Add);
-        //delegate Boolean ConsoleCtrlDelegate(CtrlTypes ctrlType);
-        //enum CtrlTypes : uint
-        //{
-        //    CTRL_C = 0,
-        //    CTRL_BREAK,
-        //    CLOSE_EVENT,
-        //    LOGOFF_EVENT = 5,
-        //    SHUTDOWN_EVENT
-        //}
-
-        //static bool is_attached = false;
-        //ConsoleCtrlDelegate ConsoleCtrlDelegateDetach = delegate (CtrlTypes ctrlType)
-        //{
-        //    Trace.WriteLine("Console Event: " + ctrlType.ToString());
-        //    //if (is_attached = !FreeConsole())
-        //    //{
-        //    //}
-        //    return true;
-        //};
     }
 }

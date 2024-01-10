@@ -45,6 +45,7 @@ namespace StepBro.ConsoleSidekick.WinForms
             InitializeComponent();
             toolStripButtonRunCommand.Text = "\u23F5";
             toolStripButtonStopScriptExecution.Text = "\u23F9";
+            toolStripButtonAddShortcut.Text = "\u2795";
         }
 
         // TODO: https://stackoverflow.com/questions/1732140/displaying-tooltip-over-a-disabled-control
@@ -83,24 +84,27 @@ namespace StepBro.ConsoleSidekick.WinForms
                 }
                 m_isConsoleActive = consoleActive;
             }
-            Rect rectConsole = new Rect();
-            if (DwmGetWindowAttribute(m_consoleWindow, DWMWA_EXTENDED_FRAME_BOUNDS, out rectConsole, Marshal.SizeOf(typeof(Rect))) != 0)
+            if (consoleActive)
             {
-                GetWindowRect(m_consoleWindow, ref rectConsole);
-            }
-            if (!rectConsole.Equals(m_lastConsolePosition))
-            {
-                MoveWindow(m_consoleWindow, rectConsole.Left, 0, rectConsole.Right - rectConsole.Left, rectConsole.Bottom - rectConsole.Top, true);
+                Rect rectConsole = new Rect();
                 if (DwmGetWindowAttribute(m_consoleWindow, DWMWA_EXTENDED_FRAME_BOUNDS, out rectConsole, Marshal.SizeOf(typeof(Rect))) != 0)
                 {
                     GetWindowRect(m_consoleWindow, ref rectConsole);
                 }
-                m_lastConsolePosition = rectConsole;
+                if (!rectConsole.Equals(m_lastConsolePosition))
+                {
+                    //MoveWindow(m_consoleWindow, rectConsole.Left, 0, rectConsole.Right - rectConsole.Left, rectConsole.Bottom - rectConsole.Top, true);
+                    //if (DwmGetWindowAttribute(m_consoleWindow, DWMWA_EXTENDED_FRAME_BOUNDS, out rectConsole, Marshal.SizeOf(typeof(Rect))) != 0)
+                    //{
+                    //    GetWindowRect(m_consoleWindow, ref rectConsole);
+                    //}
+                    m_lastConsolePosition = rectConsole;
 
-                m_topControl.Top = rectConsole.Bottom;
-                m_topControl.Left = rectConsole.Left;
-                m_topControl.Width = rectConsole.Right - rectConsole.Left;
-                m_topControl.Height = toolStripMain.Height;
+                    m_topControl.Top = rectConsole.Bottom;
+                    m_topControl.Left = rectConsole.Left;
+                    m_topControl.Width = rectConsole.Right - rectConsole.Left;
+                    m_topControl.Height = toolStripMain.Height;
+                }
             }
         }
 
@@ -124,7 +128,7 @@ namespace StepBro.ConsoleSidekick.WinForms
                 "Select tool/object to use for the command prompt. Selected object: '" +
                 (toolStripComboBoxTool.SelectedItem as FileElements.Variable).FullName + "'";
         }
-        
+
         private void toolStripComboBoxToolCommand_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
@@ -186,10 +190,25 @@ namespace StepBro.ConsoleSidekick.WinForms
         private void FileElementExecutionEntry_Click(object sender, EventArgs e)
         {
             var executionEntry = sender as ScriptExecutionToolStripMenuItem;
-            MenuFileElementExecutionStart(executionEntry.FileElement, executionEntry.Partner, null, null);
+            MenuFileElementExecutionStart(true, executionEntry.FileElement, executionEntry.Partner, null, null);
         }
 
-        private void MenuFileElementExecutionStart(string element, string model, string objectVariable, object[] args)
+        private void FileElementExecutionEntry_ShortcutClick(object sender, EventArgs e)
+        {
+            var executionEntry = sender as ScriptExecutionToolStripMenuItem;
+            MenuFileElementExecutionStart(false, executionEntry.FileElement, executionEntry.Partner, null, null);
+        }
+
+        private void toolStripSplitButtonRunScript_ButtonClick(object sender, EventArgs e)
+        {
+            if (toolStripSplitButtonRunScript.Tag != null)
+            {
+                var executionEntry = toolStripSplitButtonRunScript.DropDownItems[0] as ScriptExecutionToolStripMenuItem;
+                MenuFileElementExecutionStart(true, executionEntry.FileElement, executionEntry.Partner, null, null);
+            }
+        }
+
+        private void MenuFileElementExecutionStart(bool addToHistory, string element, string model, string objectVariable, object[] args)
         {
             if (m_executingScript != null && m_executingScript.State == TaskExecutionState.Running)
             {
@@ -200,51 +219,55 @@ namespace StepBro.ConsoleSidekick.WinForms
             toolStripSplitButtonRunScript.Enabled = false;
             toolStripButtonStopScriptExecution.Enabled = true;
 
-            var title = ScripExecutionButtonTitle(element, model, objectVariable, args);
-
-            ScriptExecutionToolStripMenuItem found = null;
-            int historyItems = (toolStripSplitButtonRunScript.Tag != null) ? (int)toolStripSplitButtonRunScript.Tag : 0;
-            if (historyItems > 0)
+            if (addToHistory)
             {
-                for (int i = 0; i < toolStripSplitButtonRunScript.DropDownItems.Count; i++)
+                var title = ScripExecutionButtonTitle(element, model, objectVariable, args);
+
+                ScriptExecutionToolStripMenuItem found = null;
+                int historyItems = (toolStripSplitButtonRunScript.Tag != null) ? (int)toolStripSplitButtonRunScript.Tag : 0;
+                if (historyItems > 0)
                 {
-                    var exeItem = toolStripSplitButtonRunScript.DropDownItems[i] as ScriptExecutionToolStripMenuItem;
-                    if (exeItem == null) break;     // Stop here...
-                    if (string.Equals(exeItem.Text, title, StringComparison.InvariantCulture))
+                    for (int i = 0; i < toolStripSplitButtonRunScript.DropDownItems.Count; i++)
                     {
-                        found = exeItem;
-                        toolStripSplitButtonRunScript.DropDownItems.RemoveAt(i);    // Remove it (to be inserted at the top).
-                        historyItems--;
-                        break;
+                        var exeItem = toolStripSplitButtonRunScript.DropDownItems[i] as ScriptExecutionToolStripMenuItem;
+                        if (exeItem == null) break;     // Stop here...
+                        if (string.Equals(exeItem.Text, title, StringComparison.InvariantCulture))
+                        {
+                            found = exeItem;
+                            toolStripSplitButtonRunScript.DropDownItems.RemoveAt(i);    // Remove it (to be inserted at the top).
+                            historyItems--;
+                            break;
+                        }
                     }
                 }
-            }
-            else
-            {
-                var separator = new ToolStripSeparator();
-                separator.Tag = new object();   // Add tag to indicate 'don't remove'.
-                toolStripSplitButtonRunScript.DropDownItems.Insert(0, separator);
-            }
+                else
+                {
+                    var separator = new ToolStripSeparator();
+                    separator.Tag = new object();   // Add tag to indicate 'don't remove'.
+                    toolStripSplitButtonRunScript.DropDownItems.Insert(0, separator);
+                }
 
-            if (found == null)
-            {
-                found = new ScriptExecutionToolStripMenuItem();
-                found.Text = title;
-                found.FileElement = element;
-                found.Partner = model;
-                found.Tag = new object();
-                found.Click += FileElementExecutionEntry_Click;
-            }
+                if (found == null)
+                {
+                    found = new ScriptExecutionToolStripMenuItem();
+                    found.Text = title;
+                    found.FileElement = element;
+                    found.Partner = model;
+                    found.Tag = new object();
+                    found.Click += FileElementExecutionEntry_Click;
+                }
 
-            historyItems++;
-            toolStripSplitButtonRunScript.Text = found.Text;
-            toolStripSplitButtonRunScript.DropDownItems.Insert(0, found);   // Insert (or re-insert) at the top.
-            if (historyItems > 25)
-            {
-                toolStripSplitButtonRunScript.DropDownItems.RemoveAt(historyItems);
-                historyItems--;
+                historyItems++;
+                toolStripSplitButtonRunScript.Text = found.Text;
+                toolStripSplitButtonRunScript.DropDownItems.Insert(0, found);   // Insert (or re-insert) at the top.
+                if (historyItems > 25)
+                {
+                    toolStripSplitButtonRunScript.DropDownItems.RemoveAt(historyItems);
+                    historyItems--;
+                }
+                toolStripSplitButtonRunScript.Tag = historyItems;
+                toolStripButtonAddShortcut.Enabled = true;
             }
-            toolStripSplitButtonRunScript.Tag = historyItems;
         }
 
         private void ExecutingScript_CurrentStateChanged(object sender, EventArgs e)
@@ -262,6 +285,40 @@ namespace StepBro.ConsoleSidekick.WinForms
         {
             m_executingScript.RequestStopExecution();
             toolStripButtonStopScriptExecution.Enabled = false;
+        }
+
+        private void toolStripButtonAddShortcut_Click(object sender, EventArgs e)
+        {
+            if (toolStripSplitButtonRunScript.Tag != null)
+            {
+                var executionEntry = toolStripSplitButtonRunScript.DropDownItems[0] as ScriptExecutionToolStripMenuItem;
+                var shortcut = new ScriptExecutionToolStripMenuItem();
+                var target = executionEntry.FileElement;
+                shortcut.Name = "toolStripMenuProcedure" + target;
+                if (!String.IsNullOrEmpty(executionEntry.Partner))
+                {
+                    target = target + "." + executionEntry.Partner;
+                    shortcut.Name += ("Dot" + executionEntry.Partner);
+                }
+                else if (!String.IsNullOrEmpty(executionEntry.InstanceObject))
+                {
+                    target = executionEntry.InstanceObject + "." + target;
+                    shortcut.Name = executionEntry.InstanceObject + "Dot" + shortcut.Name;
+                }
+
+                var dialog = new DialogNameInput("Adding Shortcut", "Enter the name to show on the shortcut button.", target);
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    shortcut.Size = new Size(182, 22);
+                    shortcut.Text = dialog.Value;
+                    shortcut.ToolTipText = $"Run " + target;
+                    shortcut.FileElement = executionEntry.FileElement;
+                    shortcut.Partner = executionEntry.Partner;
+                    shortcut.InstanceObject = executionEntry.InstanceObject;
+                    shortcut.Click += FileElementExecutionEntry_ShortcutClick;
+                    toolStripMain.Items.Add(shortcut);
+                }
+            }
         }
 
         #endregion
@@ -529,15 +586,6 @@ namespace StepBro.ConsoleSidekick.WinForms
             var parts = name.Split('.');
             if (parts.Length == 1) return name;
             else return string.Join('.', parts.Skip(1));
-        }
-
-        private void toolStripSplitButtonRunScript_ButtonClick(object sender, EventArgs e)
-        {
-            if (toolStripSplitButtonRunScript.Tag != null)
-            {
-                var executionEntry = toolStripSplitButtonRunScript.DropDownItems[0] as ScriptExecutionToolStripMenuItem;
-                MenuFileElementExecutionStart(executionEntry.FileElement, executionEntry.Partner, null, null);
-            }
         }
 
         private void PanelsDialog_FormClosed(object sender, FormClosedEventArgs e)

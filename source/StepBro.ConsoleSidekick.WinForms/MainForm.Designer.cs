@@ -39,6 +39,8 @@
             toolStripSeparatorTool = new ToolStripSeparator();
             toolStripSplitButtonRunScript = new ToolStripSplitButton();
             toolStripButtonStopScriptExecution = new ToolStripButton();
+            toolStripButtonAddShortcut = new ToolStripButton();
+            toolStripSeparatorBeforeShortcuts = new ToolStripSeparator();
             toolStripMain.SuspendLayout();
             SuspendLayout();
             // 
@@ -52,7 +54,7 @@
             // 
             toolStripMain.BackColor = Color.DarkOrange;
             toolStripMain.GripStyle = ToolStripGripStyle.Hidden;
-            toolStripMain.Items.AddRange(new ToolStripItem[] { toolStripComboBoxTool, toolStripComboBoxToolCommand, toolStripButtonRunCommand, toolStripSeparatorTool, toolStripSplitButtonRunScript, toolStripButtonStopScriptExecution });
+            toolStripMain.Items.AddRange(new ToolStripItem[] { toolStripComboBoxTool, toolStripComboBoxToolCommand, toolStripButtonRunCommand, toolStripSeparatorTool, toolStripSplitButtonRunScript, toolStripButtonStopScriptExecution, toolStripButtonAddShortcut, toolStripSeparatorBeforeShortcuts });
             toolStripMain.Location = new Point(0, 0);
             toolStripMain.Name = "toolStripMain";
             toolStripMain.Padding = new Padding(0, 1, 1, 2);
@@ -119,6 +121,23 @@
             toolStripButtonStopScriptExecution.ToolTipText = "Stop the running script execution";
             toolStripButtonStopScriptExecution.Click += toolStripButtonStopScriptExecution_Click;
             // 
+            // toolStripButtonAddShortcut
+            // 
+            toolStripButtonAddShortcut.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButtonAddShortcut.Enabled = false;
+            toolStripButtonAddShortcut.Image = (Image)resources.GetObject("toolStripButtonAddShortcut.Image");
+            toolStripButtonAddShortcut.ImageTransparentColor = Color.Magenta;
+            toolStripButtonAddShortcut.Name = "toolStripButtonAddShortcut";
+            toolStripButtonAddShortcut.Size = new Size(23, 20);
+            toolStripButtonAddShortcut.Text = "+";
+            toolStripButtonAddShortcut.ToolTipText = "Add shortcut button for the selected script execution.";
+            toolStripButtonAddShortcut.Click += toolStripButtonAddShortcut_Click;
+            // 
+            // toolStripSeparatorBeforeShortcuts
+            // 
+            toolStripSeparatorBeforeShortcuts.Name = "toolStripSeparatorBeforeShortcuts";
+            toolStripSeparatorBeforeShortcuts.Size = new Size(6, 23);
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
@@ -150,5 +169,7 @@
         private ToolStripSplitButton toolStripSplitButtonRunScript;
         private ToolStripButton toolStripButtonRunCommand;
         private ToolStripButton toolStripButtonStopScriptExecution;
+        private ToolStripButton toolStripButtonAddShortcut;
+        private ToolStripSeparator toolStripSeparatorBeforeShortcuts;
     }
 }

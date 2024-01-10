@@ -57,13 +57,25 @@ namespace StepBro.Sidekick
         public enum VariableInterfaces { None = 0, Command = 0x01, MenuCreator = 0x02, PanelCreator = 0x04 }
         public class DataType
         {
-            string Name { get; set; }
-            string BaseType { get; set; }
+            public DataType() { }
+            public DataType(string name, string baseType)
+            {
+                this.Name = name;
+                this.BaseType = baseType;
+            }
+            public string Name { get; set; }
+            public string BaseType { get; set; }
         }
         public class Parameter
         {
-            string Name { get; set; }
-            DataType Type { get; set; }
+            public Parameter() { }
+            public Parameter(string name, string type, string baseType = null)
+            {
+                this.Name = name;
+                this.Type = new DataType(type, baseType);
+            }
+            public string Name { get; set; }
+            public DataType Type { get; set; }
         }
 
         [JsonDerivedType(typeof(Element), typeDiscriminator: "base")]
@@ -85,6 +97,7 @@ namespace StepBro.Sidekick
         public class Procedure : Element
         {
             public bool FirstParameterIsInstanceReference { get; set; } = false;
+            public string ReturnType { get; set; } = null;
             public Parameter[] Parameters { get; set; } = null;
         }
         public class Partner
@@ -158,10 +171,10 @@ namespace StepBro.Sidekick
     public class RunScriptRequest : RequestOrResponse
     {
         public RunScriptRequest(ulong requestID, bool silent, string element, string partner, string objectReference, Argument[] arguments = null) : base(requestID)
-        { 
+        {
             this.Silent = silent;
-            this.Element = element; 
-            this.Partner = partner; 
+            this.Element = element;
+            this.Partner = partner;
             this.ObjectReference = objectReference;
             this.Arguments = arguments;
         }
