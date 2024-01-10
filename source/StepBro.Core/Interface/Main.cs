@@ -377,7 +377,7 @@ namespace StepBro.Core
         {
             foreach (var file in m_loadedFilesManager.ListFiles<ScriptFile>())
             {
-                var element = file.ListElements().First(
+                var element = file.ListElements().FirstOrDefault(
                     p => String.Equals(name, p.Name, StringComparison.InvariantCultureIgnoreCase) ||
                     String.Equals(name, p.FullName, StringComparison.InvariantCultureIgnoreCase));
                 if (element != null)
