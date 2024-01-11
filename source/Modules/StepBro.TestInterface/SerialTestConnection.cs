@@ -448,6 +448,11 @@ namespace StepBro.TestInterface
 
         public IAsyncResult<object> SendCommand([Implicit] ICallContext context, string command, params object[] arguments)
         {
+            if (!m_stream.IsOpen)
+            {
+                context.Logger.LogError("Stream is not opened.");
+                return null;
+            }
             if (AsyncLogFlushOnSendCommand && !NoFlushOnNextCommand)
             {
                 AsyncLog.Flush();
@@ -473,6 +478,11 @@ namespace StepBro.TestInterface
 
         public void SendDirect([Implicit] ICallContext context, string text)
         {
+            if (!m_stream.IsOpen)
+            {
+                context.Logger.LogError("Stream is not opened.");
+                return;
+            }
             if (AsyncLogFlushOnSendCommand && !NoFlushOnNextCommand)
             {
                 AsyncLog.Flush();
@@ -493,6 +503,11 @@ namespace StepBro.TestInterface
 
         void ITextCommandInput.ExecuteCommand(string command)
         {
+            if (!m_stream.IsOpen)
+            {
+                m_mainLogger.LogError("Stream is not opened.");
+                return;
+            }
             var commandData = new CommandData(m_mainLogger, command, this.CommandResponseTimeout, null);
             EnqueueCommand(commandData);
         }

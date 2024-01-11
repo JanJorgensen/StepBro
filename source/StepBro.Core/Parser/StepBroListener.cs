@@ -404,6 +404,10 @@ namespace StepBro.Core.Parser
                     {
                         effectiveProperties = deviceProps.MergeStationPropertiesWithLocalProperties(properties);
                     }
+                    else
+                    {
+                        errors.SymanticError(startToken.Line, startToken.Column, false, $"No data for a device named \"{deviceName}\" can be found in the station properties.");
+                    }
                 }
             }
 

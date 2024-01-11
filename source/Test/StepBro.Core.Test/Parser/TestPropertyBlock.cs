@@ -220,7 +220,7 @@ namespace StepBroCoreTest.Parser
             var block2 = FileBuilder.ParsePropertyBlock("{ be = [Muf, Lom, Kir] }");
 
             var block3 = block1.Merge(block2);
-            Assert.AreEqual("{ ak = [ 7, 6, 5, 4, 3, 2, 1, 0 ], be = [ Muf, Lom, Kir ], cy = [ Mor, Far ] }", block3.GetTestString());
+            Assert.AreEqual("{ ak = [ 7, 6, 5, 4, 3, 2, 1, 0 ], be = [ Identifier: Muf, Identifier: Lom, Identifier: Kir ], cy = [ Mor, Far ] }", block3.GetTestString());
         }
 
         [TestMethod]

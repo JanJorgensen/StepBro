@@ -135,7 +135,11 @@ namespace StepBro
 
         public void Send(object message)
         {
-            string jsonString = JsonSerializer.Serialize(message);
+            System.Diagnostics.Debug.WriteLine("Pipe Sending " + message.GetType().Name);
+            JsonSerializerOptions options = new JsonSerializerOptions();
+            options.WriteIndented = true;
+            options.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+            string jsonString = JsonSerializer.Serialize(message, options);
             m_stream.WriteString(message.GetType().Name + ":" + jsonString);
         }
 
@@ -228,6 +232,7 @@ namespace StepBro
     {
         private Stream ioStream;
         private UnicodeEncoding streamEncoding;
+        private object sendSync = new object();
 
         public StreamString(Stream ioStream)
         {
@@ -262,10 +267,13 @@ namespace StepBro
             {
                 len = (int)UInt16.MaxValue;
             }
-            ioStream.WriteByte((byte)(len / 256));
-            ioStream.WriteByte((byte)(len & 255));
-            ioStream.Write(outBuffer, 0, len);
-            ioStream.Flush();
+            lock (sendSync)
+            {
+                ioStream.WriteByte((byte)(len / 256));
+                ioStream.WriteByte((byte)(len & 255));
+                ioStream.Write(outBuffer, 0, len);
+                ioStream.Flush();
+            }
 
             return outBuffer.Length + 2;
         }

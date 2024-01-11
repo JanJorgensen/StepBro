@@ -9,7 +9,7 @@ namespace StepBro.Core.Data
 {
     public class PropertyBlock : PropertyBlockEntry, IList<PropertyBlockEntry>
     {
-        List<PropertyBlockEntry> m_children = new List<PropertyBlockEntry>();
+        private List<PropertyBlockEntry> m_children = new List<PropertyBlockEntry>();
 
         public PropertyBlock(int line, string name = null) : base(line, PropertyBlockEntryType.Block, name)
         {
@@ -166,7 +166,7 @@ namespace StepBro.Core.Data
 
         public override PropertyBlockEntry Clone(bool skipUsedOrApproved = false)
         {
-            return new PropertyBlock(this.Line, null, m_children.Where( c => !skipUsedOrApproved || !c.IsUsedOrApproved).Select(c => c.Clone(skipUsedOrApproved))).CloneBase(this);
+            return new PropertyBlock(this.Line, null, m_children.Where(c => !skipUsedOrApproved || !c.IsUsedOrApproved).Select(c => c.Clone(skipUsedOrApproved))).CloneBase(this);
         }
 
         public PropertyBlock Clone(Predicate<PropertyBlockEntry> filter = null)
@@ -184,6 +184,16 @@ namespace StepBro.Core.Data
             {
                 return $"Block \"{this.Name}\" with {this.Count} entries.";
             }
+        }
+
+        public override SerializablePropertyBlockEntry CloneForSerialization()
+        {
+            return new SerializablePropertyBlock()
+            {
+                Name = this.Name,
+                SpecifiedType = this.SpecifiedTypeName,
+                Entries = m_children.Select(e => e.CloneForSerialization()).ToArray()
+            };
         }
     }
 }

@@ -49,7 +49,30 @@ namespace StepBro.Core.Execution
         {
             this.ExpectServiceStarted();
 
-            var scriptTask = new ScriptExecutionTask(m_logger, m_loadedFilesManager, m_taskManager, element, arguments);
+            IFileProcedure procedure = null;
+            var argumentList = new List<object>(arguments);
+            string targetTitle = null;
+
+            if (partner != null)
+            {
+                procedure = partner.ProcedureReference;
+                if (procedure.IsFirstParameterThisReference)
+                {
+                    object elementReference = element;
+                    if (element.ElementType == FileElementType.ProcedureDeclaration)
+                    {
+                        elementReference = ((IFileProcedure)element).ProcedureReference;
+                    }
+                    argumentList.Insert(0, elementReference);   // TODO: Parser should check whether the 'this' parameter is the correct type.
+                }
+                targetTitle = element.FullName + "." + partner.Name;
+            }
+            else
+            {
+                procedure = (IFileProcedure)element;
+            }
+
+            var scriptTask = new ScriptExecutionTask(m_logger, m_loadedFilesManager, m_taskManager, procedure, targetTitle, argumentList.ToArray());
             m_tasks.Add(scriptTask);
             return scriptTask;
         }
