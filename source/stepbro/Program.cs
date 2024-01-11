@@ -342,7 +342,8 @@ namespace StepBro.Cmd
 
                                         if (commandObjectDictionary.ContainsKey(objectCommand.Object) && !String.IsNullOrEmpty(objectCommand.Command))
                                         {
-                                            StepBroMain.Logger.RootLogger.LogUserAction("Request run object command \"" + objectCommand.Command + "\"");
+                                            string name = objectCommand.Object.Split(',').Last();
+                                            StepBroMain.Logger.RootLogger.LogUserAction($"Request run '{name}' command \"{objectCommand.Command}\"");
                                             var obj = commandObjectDictionary[objectCommand.Object];
                                             if (obj.AcceptingCommands())
                                             {
