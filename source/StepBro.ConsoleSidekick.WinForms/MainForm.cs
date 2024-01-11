@@ -1,40 +1,53 @@
+using StepBro.Core.Api;
+using StepBro.Core.Data;
+using StepBro.Core.Logging;
+using StepBro.Core.Tasks;
 using StepBro.Sidekick;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
-using static StepBro.ConsoleSidekick.WinForms.MainForm.FileData;
+using static StepBro.ConsoleSidekick.WinForms.MainForm;
 
 namespace StepBro.ConsoleSidekick.WinForms
 {
-    public partial class MainForm : Form
+    public partial class MainForm : Form, ICoreAccess
     {
         private Control m_topControl = null;
         private nint m_consoleWindow = 0;
-        private bool m_firstWindowMove = true;
+        private bool m_isConsoleActive = false;
+        private bool m_forceResize = false;
+        private bool m_moveToTop = true;
         private SideKickPipe m_pipe = null;
         private Rect m_lastConsolePosition = new Rect();
-        private List<FileData> m_files = new List<FileData>();
-        private FileData m_selectedFile = null;
-        private FileData.Element m_selectedElement = null;
-        private string m_selectedPartner = null;
-        private bool m_scriptExecuting = false;
+        private IExecutionAccess m_executingScript = null;
+        private PanelsDialog m_panelsDialog = null;
+        private bool m_settingCommandCombo = false;
+        List<WeakReference<ExecutionAccess>> m_activeExecutions = new List<WeakReference<ExecutionAccess>>();
 
-        public class FileData
+        private class ScriptExecutionToolStripMenuItem : ToolStripMenuItem
         {
-            public class Element
+            public ScriptExecutionToolStripMenuItem() { }
+
+            public ScriptExecutionToolStripMenuItem(string element, string partner, string instanceObject)
             {
-                public string Name { get; set; }
-                public string Type { get; set; }
-                public string[] Partners { get; set; }
+                FileElement = element;
+                Partner = partner;
+                InstanceObject = instanceObject;
             }
 
-            public string File { get; set; }
-            public List<Element> Elements { get; set; }
+            public string FileElement { get; set; } = null;
+            public string Partner { get; set; } = null;
+            public string InstanceObject { get; set; } = null;
         }
 
         public MainForm()
         {
             InitializeComponent();
+            toolStripButtonRunCommand.Text = "\u23F5";
+            toolStripButtonStopScriptExecution.Text = "\u23F9";
+            toolStripButtonAddShortcut.Text = "\u2795";
         }
 
         // TODO: https://stackoverflow.com/questions/1732140/displaying-tooltip-over-a-disabled-control
@@ -42,56 +55,68 @@ namespace StepBro.ConsoleSidekick.WinForms
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+            m_topControl = this.TopLevelControl;
 
             System.Diagnostics.Trace.WriteLine("Sidekick STARTING!!");
 
             string[] args = Environment.GetCommandLineArgs();
 
-            if (args.Length == 0)
+            if (args.Length == 2)
             {
-
+                m_consoleWindow = nint.Parse(args[1], System.Globalization.NumberStyles.HexNumber);
+                m_pipe = SideKickPipe.StartClient(args[1]);
             }
             else
             {
-                m_consoleWindow = nint.Parse(args[1], System.Globalization.NumberStyles.HexNumber);
+                return;
             }
-
-            m_topControl = this.TopLevelControl;
-
-
-            //while (!System.Diagnostics.Debugger.IsAttached)
-            //{
-            //    Thread.Sleep(100);
-            //}
-
-            m_pipe = SideKickPipe.StartClient(args[1]);
+            m_forceResize = true;
         }
 
         private void MoveWindows()
         {
-            Rect rectConsole;
-            if (DwmGetWindowAttribute(m_consoleWindow, DWMWA_EXTENDED_FRAME_BOUNDS, out rectConsole, Marshal.SizeOf(typeof(Rect))) != 0)
+            bool consoleActive = (GetForegroundWindow() == m_consoleWindow);
+            if (consoleActive != m_isConsoleActive)
             {
-                GetWindowRect(m_consoleWindow, ref rectConsole);
-            }
-
-            if (!rectConsole.Equals(m_lastConsolePosition))
-            {
-                if (m_firstWindowMove)
+                if (consoleActive)
                 {
-                    MoveWindow(m_consoleWindow, rectConsole.Left, 0, rectConsole.Right - rectConsole.Left, rectConsole.Bottom - rectConsole.Top, true);
-                    if (DwmGetWindowAttribute(m_consoleWindow, DWMWA_EXTENDED_FRAME_BOUNDS, out rectConsole, Marshal.SizeOf(typeof(Rect))) != 0)
-                    {
-                        GetWindowRect(m_consoleWindow, ref rectConsole);
-                    }
-                    m_firstWindowMove = false;
+                    this.WindowState = FormWindowState.Minimized;
+                    this.Show();
+                    this.WindowState = FormWindowState.Normal;
+                    SetForegroundWindow(m_consoleWindow);
                 }
-                m_lastConsolePosition = rectConsole;
-
-                m_topControl.Top = rectConsole.Bottom;
-                m_topControl.Left = rectConsole.Left;
-                m_topControl.Width = rectConsole.Right - rectConsole.Left;
+                m_isConsoleActive = consoleActive;
             }
+            if (m_forceResize || consoleActive)
+            {
+                Rect rectConsole = new Rect();
+                if (DwmGetWindowAttribute(m_consoleWindow, DWMWA_EXTENDED_FRAME_BOUNDS, out rectConsole, Marshal.SizeOf(typeof(Rect))) != 0)
+                {
+                    GetWindowRect(m_consoleWindow, ref rectConsole);
+                }
+                if (m_forceResize || !rectConsole.Equals(m_lastConsolePosition))
+                {
+                    if (m_moveToTop)
+                    {
+                        MoveWindow(m_consoleWindow, rectConsole.Left, 0, rectConsole.Right - rectConsole.Left, rectConsole.Bottom - rectConsole.Top, true);
+                        if (DwmGetWindowAttribute(m_consoleWindow, DWMWA_EXTENDED_FRAME_BOUNDS, out rectConsole, Marshal.SizeOf(typeof(Rect))) != 0)
+                        {
+                            GetWindowRect(m_consoleWindow, ref rectConsole);
+                        }
+                        m_lastConsolePosition = rectConsole;
+                        m_moveToTop = false;
+                    }
+
+                    m_topControl.Top = rectConsole.Bottom;
+                    m_topControl.Left = rectConsole.Left;
+                    m_topControl.Width = rectConsole.Right - rectConsole.Left;
+                    if (m_forceResize)
+                    {
+                        m_topControl.Height = toolStripMain.Height;
+                    }
+                }
+            }
+            m_forceResize = false;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -106,144 +131,204 @@ namespace StepBro.ConsoleSidekick.WinForms
             System.Diagnostics.Trace.WriteLine("Sidekick closing end");
         }
 
-        #region CONSOLE INTERACTION
-
-        private void ExecuteCommand(string command)
-        {
-            m_pipe.Send(new ObjectCommand(comboBoxConnection.Items[comboBoxConnection.SelectedIndex] as string, command));
-        }
-
-        #endregion
-
-        #region GUI STUFF
-
-        private void comboBoxCommand_TextUpdate(object sender, EventArgs e)
-        {
-
-        }
-
-        #endregion
-
         #region USER INTERACTION - COMMANDS
 
-        private void comboBoxConnection_SelectedIndexChanged(object sender, EventArgs e)
+        private void toolStripComboBoxTool_SelectedIndexChanged(object sender, EventArgs e)
         {
+            toolStripComboBoxTool.ToolTipText =
+                "Select tool/object to use for the command prompt. Selected object: '" +
+                (toolStripComboBoxTool.SelectedItem as FileElements.Variable).FullName + "'";
         }
 
-        private void comboBoxCommand_SelectedIndexChanged(object sender, EventArgs e)
-        {
-        }
-
-        private void buttonMenu_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void comboBoxCommand_KeyPress(object sender, KeyPressEventArgs e)
+        private void toolStripComboBoxToolCommand_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
             {
                 e.Handled = true;
-                if (!String.IsNullOrEmpty(comboBoxCommand.Text))
-                {
-                    ExecuteCommand(comboBoxCommand.Text);
-                    comboBoxCommand.Select(0, comboBoxCommand.Text.Length);
-                }
+                ExecuteCommandFromGUI();
             }
         }
 
-        private void comboBoxCommand_TextChanged(object sender, EventArgs e)
+        private void toolStripComboBoxToolCommand_SelectedIndexChanged(object sender, EventArgs e)
         {
-            buttonExecute.Enabled = !String.IsNullOrEmpty(comboBoxCommand.Text);
+            if (m_settingCommandCombo) return;
         }
 
-        private void buttonExecute_Click(object sender, EventArgs e)
+        private void toolStripComboBoxToolCommand_TextChanged(object sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("buttonExecute_Click");
-            if (!String.IsNullOrEmpty(comboBoxCommand.Text))
+            toolStripButtonRunCommand.Enabled = !String.IsNullOrEmpty(toolStripComboBoxToolCommand.Text);
+        }
+
+        private void toolStripButtonRunCommand_Click(object sender, EventArgs e)
+        {
+            ExecuteCommandFromGUI();
+        }
+
+        private void ExecuteCommandFromGUI()
+        {
+            if (!String.IsNullOrEmpty(toolStripComboBoxToolCommand.Text))
             {
-                ExecuteCommand(comboBoxCommand.Text);
-                comboBoxCommand.Select(0, comboBoxCommand.Text.Length);
+                string command = toolStripComboBoxToolCommand.Text;
+                ExecuteCommand(command);
+                m_settingCommandCombo = true;
+                int i = 0;
+                foreach (string known in toolStripComboBoxToolCommand.Items)
+                {
+                    if (string.Equals(command, known))
+                    {
+                        toolStripComboBoxToolCommand.Items.RemoveAt(i);
+                        break;
+                    }
+                    i++;
+                }
+                toolStripComboBoxToolCommand.Items.Insert(0, command);
+                toolStripComboBoxToolCommand.SelectedIndex = 0;
+                toolStripComboBoxToolCommand.Select(0, command.Length);
+                m_settingCommandCombo = false;
             }
+        }
+
+        private void ExecuteCommand(string command)
+        {
+            var tool = (toolStripComboBoxTool.Items[toolStripComboBoxTool.SelectedIndex] as FileElements.Variable).FullName;
+            m_pipe.Send(new ObjectCommand(tool, command));
         }
 
         #endregion
 
         #region USER INTERACTION - EXECUTION
 
-        private void comboBoxScriptFile_SelectedIndexChanged(object sender, EventArgs e)
+        private void FileElementExecutionEntry_Click(object sender, EventArgs e)
         {
-            this.UpdateFromFileSelection();
+            var executionEntry = sender as ScriptExecutionToolStripMenuItem;
+            MenuFileElementExecutionStart(true, executionEntry.FileElement, executionEntry.Partner, null, null);
         }
 
-        private void UpdateFromFileSelection()
+        private void FileElementExecutionEntry_ShortcutClick(object sender, EventArgs e)
         {
-            var file = m_files.FirstOrDefault(fi => fi.File == (string)comboBoxScriptFile.SelectedItem);
-            if (file != null && comboBoxScriptFile.SelectedIndex >= 0 && (m_selectedFile == null || file.File != m_selectedFile.File))
+            var executionEntry = sender as ScriptExecutionToolStripMenuItem;
+            MenuFileElementExecutionStart(false, executionEntry.FileElement, executionEntry.Partner, null, null);
+        }
+
+        private void toolStripSplitButtonRunScript_ButtonClick(object sender, EventArgs e)
+        {
+            if (toolStripSplitButtonRunScript.Tag != null)
             {
-                m_selectedFile = file;
-                m_selectedElement = null;
-                m_selectedPartner = null;
-                comboBoxFileElement.Items.Clear();
-                comboBoxFileElement.SelectedIndex = -1;
-                if (file != null && file.Elements != null)
+                var executionEntry = toolStripSplitButtonRunScript.DropDownItems[0] as ScriptExecutionToolStripMenuItem;
+                MenuFileElementExecutionStart(true, executionEntry.FileElement, executionEntry.Partner, null, null);
+            }
+        }
+
+        private void MenuFileElementExecutionStart(bool addToHistory, string element, string model, string objectVariable, object[] args)
+        {
+            if (m_executingScript != null && m_executingScript.State == TaskExecutionState.Running)
+            {
+                return;
+            }
+            m_executingScript = ((ICoreAccess)this).StartExecution(element, model, objectVariable, args);
+            m_executingScript.CurrentStateChanged += ExecutingScript_CurrentStateChanged;
+            toolStripSplitButtonRunScript.Enabled = false;
+            toolStripButtonStopScriptExecution.Enabled = true;
+
+            if (addToHistory)
+            {
+                var title = ScripExecutionButtonTitle(element, model, objectVariable, args);
+
+                ScriptExecutionToolStripMenuItem found = null;
+                int historyItems = (toolStripSplitButtonRunScript.Tag != null) ? (int)toolStripSplitButtonRunScript.Tag : 0;
+                if (historyItems > 0)
                 {
-                    comboBoxFileElement.Items.AddRange(file.Elements.Select(e => e.Name).ToArray());
+                    for (int i = 0; i < toolStripSplitButtonRunScript.DropDownItems.Count; i++)
+                    {
+                        var exeItem = toolStripSplitButtonRunScript.DropDownItems[i] as ScriptExecutionToolStripMenuItem;
+                        if (exeItem == null) break;     // Stop here...
+                        if (string.Equals(exeItem.Text, title, StringComparison.InvariantCulture))
+                        {
+                            found = exeItem;
+                            toolStripSplitButtonRunScript.DropDownItems.RemoveAt(i);    // Remove it (to be inserted at the top).
+                            historyItems--;
+                            break;
+                        }
+                    }
                 }
-                comboBoxFileElement.Enabled = comboBoxFileElement.Items.Count > 0;
-                buttonRunScript.Enabled = comboBoxFileElement.Enabled;
-                if (comboBoxFileElement.Items.Count > 0)
+                else
                 {
-                    comboBoxFileElement.SelectedIndex = 0;
+                    var separator = new ToolStripSeparator();
+                    separator.Tag = new object();   // Add tag to indicate 'don't remove'.
+                    toolStripSplitButtonRunScript.DropDownItems.Insert(0, separator);
                 }
-            }
-        }
 
-        private void comboBoxFileElement_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            UpdateFromElementSelection();
-        }
-
-        private void UpdateFromElementSelection()
-        {
-            if (comboBoxFileElement.SelectedIndex >= 0 && (m_selectedElement == null || (string)comboBoxFileElement.SelectedItem != m_selectedElement.Name))
-            {
-                var file = m_files.FirstOrDefault(fi => fi.File == m_selectedFile.File);
-                m_selectedElement = file.Elements.FirstOrDefault(fi => fi.Name == (string)comboBoxFileElement.SelectedItem);
-                m_selectedPartner = null;
-                comboBoxPartner.Items.Clear();
-                comboBoxPartner.SelectedIndex = -1;
-                comboBoxPartner.Items.Add("<direct / no partner>");
-                if (m_selectedElement.Partners != null)
+                if (found == null)
                 {
-                    comboBoxPartner.Items.AddRange(m_selectedElement.Partners);
+                    found = new ScriptExecutionToolStripMenuItem();
+                    found.Text = title;
+                    found.FileElement = element;
+                    found.Partner = model;
+                    found.Tag = new object();
+                    found.Click += FileElementExecutionEntry_Click;
                 }
-                comboBoxPartner.Enabled = comboBoxFileElement.Items.Count > 1;
-                comboBoxPartner.SelectedIndex = 0;
+
+                historyItems++;
+                toolStripSplitButtonRunScript.Text = found.Text;
+                toolStripSplitButtonRunScript.DropDownItems.Insert(0, found);   // Insert (or re-insert) at the top.
+                if (historyItems > 25)
+                {
+                    toolStripSplitButtonRunScript.DropDownItems.RemoveAt(historyItems);
+                    historyItems--;
+                }
+                toolStripSplitButtonRunScript.Tag = historyItems;
+                toolStripButtonAddShortcut.Enabled = true;
             }
         }
 
-        private void comboBoxPartner_SelectedIndexChanged(object sender, EventArgs e)
+        private void ExecutingScript_CurrentStateChanged(object sender, EventArgs e)
         {
-            if (comboBoxPartner.SelectedIndex > 0)
+            if (m_executingScript.State.HasEnded())
             {
-                m_selectedPartner = (string)comboBoxPartner.SelectedItem;
-            }
-            else
-            {
-                m_selectedPartner = null;
+                m_executingScript.CurrentStateChanged -= ExecutingScript_CurrentStateChanged;
+                toolStripSplitButtonRunScript.Enabled = true;
+                toolStripButtonStopScriptExecution.Enabled = false;
+                m_executingScript = null;
             }
         }
 
-        private void buttonRunScript_Click(object sender, EventArgs e)
+        private void toolStripButtonStopScriptExecution_Click(object sender, EventArgs e)
         {
-            if (m_scriptExecuting)
+            m_executingScript.RequestStopExecution();
+            toolStripButtonStopScriptExecution.Enabled = false;
+        }
+
+        private void toolStripButtonAddShortcut_Click(object sender, EventArgs e)
+        {
+            if (toolStripSplitButtonRunScript.Tag != null)
             {
-                m_pipe.Send(ShortCommand.StopScriptExecution);
-            }
-            else
-            {
-                m_pipe.Send(new RunScriptRequest(m_selectedFile.File, m_selectedElement.Name, m_selectedPartner));
+                var executionEntry = toolStripSplitButtonRunScript.DropDownItems[0] as ScriptExecutionToolStripMenuItem;
+                var shortcut = new ScriptExecutionToolStripMenuItem();
+                var target = executionEntry.FileElement;
+                shortcut.Name = "toolStripMenuProcedure" + target;
+                if (!String.IsNullOrEmpty(executionEntry.Partner))
+                {
+                    target = target + "." + executionEntry.Partner;
+                    shortcut.Name += ("Dot" + executionEntry.Partner);
+                }
+                else if (!String.IsNullOrEmpty(executionEntry.InstanceObject))
+                {
+                    target = executionEntry.InstanceObject + "." + target;
+                    shortcut.Name = executionEntry.InstanceObject + "Dot" + shortcut.Name;
+                }
+
+                var dialog = new DialogNameInput("Adding Shortcut", "Enter the name to show on the shortcut button.", target);
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    shortcut.Size = new Size(182, 22);
+                    shortcut.Text = dialog.Value;
+                    shortcut.ToolTipText = $"Run " + target;
+                    shortcut.FileElement = executionEntry.FileElement;
+                    shortcut.Partner = executionEntry.Partner;
+                    shortcut.InstanceObject = executionEntry.InstanceObject;
+                    shortcut.Click += FileElementExecutionEntry_ShortcutClick;
+                    toolStripMain.Items.Add(shortcut);
+                }
             }
         }
 
@@ -267,6 +352,10 @@ namespace StepBro.ConsoleSidekick.WinForms
                 }
                 return base.Equals(obj);
             }
+            public override int GetHashCode()
+            {
+                return base.GetHashCode();
+            }
         }
 
         [LibraryImport("user32.dll", SetLastError = true)]
@@ -275,6 +364,12 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, ref Rect rectangle);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+
+        [DllImport("User32.dll")]
+        public static extern Int32 SetForegroundWindow(IntPtr hWnd);
 
         const int DWMWA_EXTENDED_FRAME_BOUNDS = 9;
 
@@ -286,7 +381,7 @@ namespace StepBro.ConsoleSidekick.WinForms
         private void timerMasterPull_Tick(object sender, EventArgs e)
         {
             Tuple<string, string> received;
-            while ((received = m_pipe.TryGetReceived()) != null)
+            while (m_pipe != null && (received = m_pipe.TryGetReceived()) != null)
             {
                 if (received.Item1 == "ShortCommand")
                 {
@@ -298,93 +393,312 @@ namespace StepBro.ConsoleSidekick.WinForms
                         m_pipe.Dispose();
                         this.Close();
                     }
-                    else if(cmd == ShortCommand.ExecutionStarted) 
+                    else if (cmd == ShortCommand.ExecutionStarted)
                     {
-                        buttonRunScript.Text = "Stop";
-                        m_scriptExecuting = true;
+                        //buttonRunScript.Text = "Stop";
+                        //m_scriptExecuting = true;
                     }
                     else if (cmd == ShortCommand.ExecutionStopped)
                     {
-                        buttonRunScript.Text = "Run";
-                        m_scriptExecuting = false;
+                        //buttonRunScript.Text = "Run";
+                        //m_scriptExecuting = false;
                     }
                 }
-                else if (received.Item1 == "CommandObjectsList")
+                else if (received.Item1 == nameof(StepBro.Sidekick.FileElements))
                 {
-                    var commandObjects = JsonSerializer.Deserialize<CommandObjectsList>(received.Item2);
-                    var objects = commandObjects.Objects;
-                    comboBoxConnection.Items.Clear();
-                    comboBoxConnection.Items.AddRange(objects);
-                    comboBoxConnection.SelectedIndex = 0;
-                    comboBoxConnection.Enabled = objects.Length > 0;
-                    comboBoxCommand.Enabled = objects.Length > 0;
+                    var elements = JsonSerializer.Deserialize<StepBro.Sidekick.FileElements>(received.Item2);
+                    var commandObjectVariables = elements.Elements.Where(e => e is StepBro.Sidekick.FileElements.Variable && (e as StepBro.Sidekick.FileElements.Variable).Interfaces.HasFlag(FileElements.VariableInterfaces.Command)).Select(e => (StepBro.Sidekick.FileElements.Variable)e).ToList();
+                    var namespaces = elements.Elements.Select(e => NamespaceFromFullName(e.FullName)).Distinct().ToList();
+
+                    for (int di = 0; di < toolStripSplitButtonRunScript.DropDownItems.Count;)
+                    {
+                        if (toolStripSplitButtonRunScript.DropDownItems[di].Tag == null)
+                        {
+                            toolStripSplitButtonRunScript.DropDownItems.RemoveAt(di);
+                        }
+                        else di++;
+                    }
+
+                    foreach (var ns in namespaces)
+                    {
+                        var namespaceMenu = new ToolStripMenuItem();
+
+                        var procedures = elements.Elements.Where(e => NamespaceFromFullName(e.FullName) == ns && e is FileElements.Procedure).Cast<FileElements.Procedure>().ToList();
+                        procedures.Sort(delegate (FileElements.Procedure x, FileElements.Procedure y)
+                        {
+                            if (x.FullName == null && y.FullName == null) return 0;
+                            else if (x.FullName == null) return -1;
+                            else if (y.FullName == null) return 1;
+                            else return x.FullName.CompareTo(y.FullName);
+                        });
+
+                        if (procedures.Count > 0)
+                        {
+                            toolStripSplitButtonRunScript.Enabled = true;
+                        }
+                        foreach (var procedure in procedures)
+                        {
+                            ToolStripMenuItem procedureMenu = (procedure.Partners != null && procedure.Partners.Length > 0) ? new ToolStripMenuItem() : new ScriptExecutionToolStripMenuItem();
+                            procedureMenu.Name = "toolStripMenuProcedure" + procedure.Name;
+                            procedureMenu.Size = new Size(182, 22);
+                            procedureMenu.Text = procedure.Name;
+                            procedureMenu.ToolTipText = $"Procedure '{procedure.FullName}'";
+                            namespaceMenu.DropDownItems.Add(procedureMenu);
+
+                            if (procedure.Partners != null && procedure.Partners.Length > 0)
+                            {
+                                var options = new List<FileElements.Partner>(procedure.Partners);
+                                options.Insert(0, null); // Add the 'no partner' option.
+                                foreach (var partner in options)
+                                {
+                                    var procedureExecutionOptionMenu = new ScriptExecutionToolStripMenuItem(procedure.FullName, (partner != null) ? partner.Name : null, null);
+                                    procedureExecutionOptionMenu.Size = new Size(182, 22);
+                                    if (partner != null)
+                                    {
+                                        procedureExecutionOptionMenu.Name = "toolStripMenuProcedure" + procedure.Name + "Dot" + partner.Name;
+                                        procedureExecutionOptionMenu.Text = procedure.Name + "." + partner.Name;
+                                        procedureExecutionOptionMenu.ToolTipText = $"Procedure '{procedure.FullName}' partner '{partner.Name}'";
+                                    }
+                                    else
+                                    {
+                                        procedureExecutionOptionMenu.Name = "toolStripMenuProcedureOptionDirect" + procedure.Name;
+                                        procedureExecutionOptionMenu.Text = procedure.Name;
+                                        procedureExecutionOptionMenu.ToolTipText = $"Procedure '{procedure.FullName}'";
+                                    }
+                                    procedureExecutionOptionMenu.Click += FileElementExecutionEntry_Click;
+                                    procedureMenu.DropDownItems.Add(procedureExecutionOptionMenu);
+                                }
+                            }
+                            else
+                            {
+                                var executionItem = procedureMenu as ScriptExecutionToolStripMenuItem;
+                                executionItem.FileElement = procedure.FullName;
+                                procedureMenu.Click += FileElementExecutionEntry_Click;
+                            }
+                        }
+
+                        var tests = elements.Elements.Where(e => NamespaceFromFullName(e.FullName) == ns && e is FileElements.TestList).Cast<FileElements.TestList>().ToList();
+                        tests.Sort(delegate (FileElements.TestList x, FileElements.TestList y)
+                        {
+                            if (x.FullName == null && y.FullName == null) return 0;
+                            else if (x.FullName == null) return -1;
+                            else if (y.FullName == null) return 1;
+                            else return x.FullName.CompareTo(y.FullName);
+                        });
+                        foreach (var testlist in tests)
+                        {
+                            var testlistMenu = new ToolStripMenuItem();
+                            testlistMenu.Name = "toolStripMenuTestList" + testlist.Name;
+                            testlistMenu.Size = new Size(182, 22);
+                            testlistMenu.Text = testlist.Name;
+                            testlistMenu.ToolTipText = $"The testlist '{testlist.FullName}'";
+                            namespaceMenu.DropDownItems.Add(testlistMenu);
+
+                            foreach (var partner in testlist.Partners)
+                            {
+                                var testlistExecutionOptionMenu = new ScriptExecutionToolStripMenuItem();
+                                testlistExecutionOptionMenu.FileElement = testlist.FullName;
+                                testlistExecutionOptionMenu.Partner = partner.Name;
+                                testlistExecutionOptionMenu.Size = new Size(182, 22);
+                                testlistExecutionOptionMenu.Name = "toolStripMenuTestlist" + testlist.Name + "Dot" + partner.Name;
+                                testlistExecutionOptionMenu.Text = testlist.Name + "." + partner.Name;
+                                testlistExecutionOptionMenu.ToolTipText = $"Test '{testlist.FullName}' model '{partner.Name}'";
+                                testlistExecutionOptionMenu.Click += FileElementExecutionEntry_Click;
+                                testlistMenu.DropDownItems.Add(testlistExecutionOptionMenu);
+                            }
+                        }
+
+                        namespaceMenu.Name = "toolStripMenuNamespace" + ns;
+                        namespaceMenu.Size = new Size(182, 22);
+                        namespaceMenu.Text = "Namespace " + ns;
+                        namespaceMenu.ToolTipText = $"All procedures and testlists in the namespace '{ns}'";
+                        toolStripSplitButtonRunScript.DropDownItems.Add(namespaceMenu);
+                    }
+
+                    var selectedTool = toolStripComboBoxTool.SelectedItem as FileElements.Variable;
+                    toolStripComboBoxTool.Items.Clear();
+                    int selection = 0;
+                    int i = 0;
+                    foreach (var toolVar in commandObjectVariables)
+                    {
+                        toolStripComboBoxTool.Items.Add(toolVar);
+                        if (selectedTool != null && toolVar.FullName == selectedTool.FullName)
+                        {
+                            selection = i;
+                        }
+                        i++;
+                    }
+                    if (toolStripComboBoxTool.Items.Count > 0)
+                    {
+                        toolStripComboBoxTool.Enabled = true;
+                        toolStripComboBoxToolCommand.Enabled = true;
+                        toolStripComboBoxTool.SelectedIndex = selection;
+                    }
+                    else
+                    {
+                        toolStripComboBoxTool.Enabled = false;
+                        toolStripComboBoxToolCommand.Enabled = false;
+                    }
+                    toolStripComboBoxTool.SelectionLength = 0;
+
+                    var panelVariables = elements.Elements.Where(e => e is StepBro.Sidekick.FileElements.PanelDefinitionVariable).Select(e => (StepBro.Sidekick.FileElements.PanelDefinitionVariable)e).ToList();
+
+                    if (panelVariables.Count > 0)
+                    {
+                        if (m_panelsDialog == null)
+                        {
+                            m_panelsDialog = new PanelsDialog((ICoreAccess)this);
+                            m_panelsDialog.FormClosed += PanelsDialog_FormClosed;
+                            m_panelsDialog.Show();
+                        }
+                        foreach (var panel in panelVariables)
+                        {
+                            m_panelsDialog.AddCustomPanel(
+                                panel.Title,
+                                (PropertyBlock)panel.PanelDefinition.CloneAsPropertyBlockEntry());
+                        }
+                    }
                 }
-                else if (received.Item1 == "LoadedFiles")
+                else if (received.Item1 == nameof(StepBro.Sidekick.ExecutionStateUpdate))
                 {
-                    var loadedFiles = JsonSerializer.Deserialize<LoadedFiles>(received.Item2);
-                    var files = loadedFiles.Files;
-                    string selected = (comboBoxScriptFile.Items.Count > 0 && comboBoxScriptFile.SelectedIndex >= 0) ? comboBoxScriptFile.SelectedItem.ToString() : null;
-                    comboBoxScriptFile.Items.Clear();
-                    comboBoxScriptFile.Items.AddRange(files);
-                    comboBoxScriptFile.Enabled = files.Length > 0;
-                    int index = 0;
-                    if (selected != null)
+                    var state = JsonSerializer.Deserialize<StepBro.Sidekick.ExecutionStateUpdate>(received.Item2);
+                    var execution = this.TryGetExecution(state.RequestID);
+                    if (execution != null)
                     {
-                        int i = 0;
-                        foreach (var f in files)
-                        {
-                            if (String.Equals(f, selected)) break;
-                        }
-                        if (i < files.Length) index = i;
-                    }
-                    comboBoxScriptFile.SelectedIndex = index;
-
-                    var fileInfo = new List<FileData>();
-                    foreach (var f in files)
-                    {
-                        var found = m_files.FirstOrDefault(fi => fi.File == f);
-                        if (found == null)
-                        {
-                            found = new FileData();
-                            found.File = f;
-                        }
-                        fileInfo.Add(found);
-                    }
-                    m_files = fileInfo; // Use this updated list.
-
-                }
-                else if (received.Item1 == "FileElements")
-                {
-                    var fileElements = JsonSerializer.Deserialize<FileElements>(received.Item2);
-
-                    var file = m_files.FirstOrDefault(fi => fi.File == fileElements.File);
-                    List<Element> updatedElements = new List<Element>();
-                    for (int i = 0; i < fileElements.ElementNames.Length; i++)
-                    {
-                        var element = file.Elements?.FirstOrDefault(e => e.Name == fileElements.ElementNames[i]);
-                        if (element == null)
-                        {
-                            element = new FileData.Element();
-                        }
-                        element.Name = fileElements.ElementNames[i];
-                        element.Type = fileElements.ElementTypes[i];
-                        element.Partners = fileElements.Partners[i];
-                        updatedElements.Add(element);
-                    }
-                    file.Elements = updatedElements;
-
-                    if ((string)comboBoxScriptFile.SelectedItem == file.File)
-                    {
-                        UpdateFromFileSelection();
+                        execution.NotifyState(state.State);
                     }
                 }
-                //else if (received.Item1 == "ElementInfo")
-                //{
-                //    var info = JsonSerializer.Deserialize<ElementInfo>(received.Item2);
-                //}
             }
 
             MoveWindows();
+        }
+
+        string ScripExecutionButtonTitle(string element, string model, string objectVariable, object[] args)
+        {
+            if (String.IsNullOrEmpty(model))
+            {
+                return element;
+            }
+            else
+            {
+                return element + "." + model;
+            }
+        }
+
+        private static string NamespaceFromFullName(string name)
+        {
+            var parts = name.Split('.');
+            if (parts.Length == 1) return "";
+            else return parts[0];
+        }
+
+        private static string NameFromFullName(string name)
+        {
+            var parts = name.Split('.');
+            if (parts.Length == 1) return name;
+            else return string.Join('.', parts.Skip(1));
+        }
+
+        private void PanelsDialog_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            m_panelsDialog.FormClosed -= PanelsDialog_FormClosed;
+            m_panelsDialog = null;
+        }
+
+        private ExecutionAccess TryGetExecution(ulong id)
+        {
+            var i = 0;
+            while (m_activeExecutions.Count > i)
+            {
+                ExecutionAccess target;
+                if (m_activeExecutions[i].TryGetTarget(out target))
+                {
+                    if (target.ID == id)
+                    {
+                        return target;
+                    }
+                    i++;
+                }
+                else
+                {
+                    m_activeExecutions.RemoveAt(i);     // Target disposed; remove from the list.
+                }
+            }
+            return null;
+        }
+
+        #region ICoreAccess
+
+        public int ExecutionsRunning => throw new NotImplementedException();
+
+        IExecutionAccess ICoreAccess.StartExecution(string element, string model, string objectVariable, object[] args)
+        {
+            var execution = new ExecutionAccess(this, m_pipe);
+            m_activeExecutions.Add(new WeakReference<ExecutionAccess>(execution));
+            m_pipe.Send(new RunScriptRequest(execution.ID, false, element, model, null));
+            return execution;
+        }
+
+        #endregion
+
+        private class ExecutionAccess : IExecutionAccess, IDisposing
+        {
+            private MainForm m_parent;
+            private SideKickPipe m_pipe;
+            private bool m_active = true;
+
+            public ExecutionAccess(MainForm parent, SideKickPipe pipe)
+            {
+                m_parent = parent;
+                m_pipe = pipe;
+                this.ID = UniqueInteger.GetLongProtected();
+            }
+
+            ~ExecutionAccess()
+            {
+                this.Dispose();
+            }
+
+            public void Dispose()
+            {
+                if (m_active)
+                {
+                    m_active = false;
+                    if (this.Disposing != null) this.Disposing(this, EventArgs.Empty);
+                    m_pipe.Send(new ReleaseRequest(this.ID));
+                }
+            }
+
+            public ulong ID { get; private set; }
+
+            public event EventHandler Disposing;
+
+            public void NotifyState(TaskExecutionState state)
+            {
+                if (state != this.State)
+                {
+                    this.State = state;
+                    if (CurrentStateChanged != null) this.CurrentStateChanged(this, EventArgs.Empty);
+                }
+            }
+
+            #region IExecutionAccess
+
+            public TaskExecutionState State { get; set; } = TaskExecutionState.StartRequested;
+
+            public object ReturnValue { get; set; }
+
+            public event EventHandler CurrentStateChanged;
+
+            public void RequestStopExecution()
+            {
+                if (!this.State.HasEnded())
+                {
+                    m_pipe.Send(new StopExecutionRequest(this.ID));
+                }
+            }
+
+            #endregion
         }
     }
 }

@@ -26,5 +26,10 @@ namespace StepBro.Core.Data
         {
             return new PropertyBlockEvent(this.Line, null, m_verdict).CloneBase(this);
         }
+
+        public override SerializablePropertyBlockEntry CloneForSerialization()
+        {
+            return new SerializablePropertyBlockEvent() { Name = this.Name, SpecifiedType = this.SpecifiedTypeName, Verdict = m_verdict };
+        }
     }
 }

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace StepBro.Core.Data
 {
+    [JsonDerivedType(typeof(Identifier), typeDiscriminator: "id")]
     public class PropertyBlockValue : PropertyBlockEntry
     {
         private object m_value;
@@ -24,8 +26,10 @@ namespace StepBro.Core.Data
             m_solver = solver;
         }
 
-        public object Value { get { return m_value; } }
+        public object Value { get { return m_value; } set { m_value = value; } }
 
+
+        [JsonIgnore]
         public bool IsStringOrIdentifier { get { return m_value is string || m_value is Identifier; } }
 
         public override string ToString()
@@ -79,6 +83,69 @@ namespace StepBro.Core.Data
         public override PropertyBlockEntry Clone(bool skipUsedOrApproved = false)
         {
             return new PropertyBlockValue(this.Line, null, m_value, m_solver).CloneBase(this);
+        }
+
+        public override SerializablePropertyBlockEntry CloneForSerialization()
+        {
+            string name = this.IsArrayEntry ? null : this.Name;
+            string type = this.IsArrayEntry ? null : this.SpecifiedTypeName;
+            if (m_value == null)
+            {
+                return new SerializablePropertyBlockValueNull()
+                {
+                    Name = name,
+                    SpecifiedType = type
+                };
+            }
+            else if (m_value is bool)
+            {
+                return new SerializablePropertyBlockValueBool()
+                {
+                    Name = name,
+                    SpecifiedType = type,
+                    Value = (bool)m_value
+                };
+            }
+            else if (m_value is bool)
+            {
+                return new SerializablePropertyBlockValueBool()
+                {
+                    Name = name,
+                    SpecifiedType = type,
+                    Value = (bool)m_value
+                };
+            }
+            else if (m_value is long)
+            {
+                return new SerializablePropertyBlockValueInt()
+                {
+                    Name = name,
+                    SpecifiedType = type,
+                    Value = (long)m_value
+                };
+            }
+            else if (m_value is string)
+            {
+                return new SerializablePropertyBlockValueString()
+                {
+                    Name = name,
+                    SpecifiedType = type,
+                    Value = (string)m_value
+                };
+            }
+            else if (m_value is Identifier)
+            {
+                return new SerializablePropertyBlockValueString()
+                {
+                    Name = name,
+                    SpecifiedType = type,
+                    Value = ((Identifier)m_value).Name
+                };
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
         }
     }
 
