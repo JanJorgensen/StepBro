@@ -349,6 +349,10 @@ namespace StepBro.Cmd
                                             {
                                                 obj.ExecuteCommand(objectCommand.Command);
                                             }
+                                            else
+                                            {
+                                                StepBroMain.Logger.RootLogger.LogError($"'{name}' is not accepting commands.");
+                                            }
                                         }
                                     }
                                     else if (input.Item1 == nameof(RunScriptRequest))
