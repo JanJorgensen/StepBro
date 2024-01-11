@@ -17,6 +17,8 @@ namespace StepBro.ConsoleSidekick.WinForms
         private Control m_topControl = null;
         private nint m_consoleWindow = 0;
         private bool m_isConsoleActive = false;
+        private bool m_forceResize = false;
+        private bool m_moveToTop = true;
         private SideKickPipe m_pipe = null;
         private Rect m_lastConsolePosition = new Rect();
         private IExecutionAccess m_executingScript = null;
@@ -68,6 +70,7 @@ namespace StepBro.ConsoleSidekick.WinForms
             {
                 return;
             }
+            m_forceResize = true;
         }
 
         private void MoveWindows()
@@ -84,28 +87,36 @@ namespace StepBro.ConsoleSidekick.WinForms
                 }
                 m_isConsoleActive = consoleActive;
             }
-            if (consoleActive)
+            if (m_forceResize || consoleActive)
             {
                 Rect rectConsole = new Rect();
                 if (DwmGetWindowAttribute(m_consoleWindow, DWMWA_EXTENDED_FRAME_BOUNDS, out rectConsole, Marshal.SizeOf(typeof(Rect))) != 0)
                 {
                     GetWindowRect(m_consoleWindow, ref rectConsole);
                 }
-                if (!rectConsole.Equals(m_lastConsolePosition))
+                if (m_forceResize || !rectConsole.Equals(m_lastConsolePosition))
                 {
-                    //MoveWindow(m_consoleWindow, rectConsole.Left, 0, rectConsole.Right - rectConsole.Left, rectConsole.Bottom - rectConsole.Top, true);
-                    //if (DwmGetWindowAttribute(m_consoleWindow, DWMWA_EXTENDED_FRAME_BOUNDS, out rectConsole, Marshal.SizeOf(typeof(Rect))) != 0)
-                    //{
-                    //    GetWindowRect(m_consoleWindow, ref rectConsole);
-                    //}
-                    m_lastConsolePosition = rectConsole;
+                    if (m_moveToTop)
+                    {
+                        MoveWindow(m_consoleWindow, rectConsole.Left, 0, rectConsole.Right - rectConsole.Left, rectConsole.Bottom - rectConsole.Top, true);
+                        if (DwmGetWindowAttribute(m_consoleWindow, DWMWA_EXTENDED_FRAME_BOUNDS, out rectConsole, Marshal.SizeOf(typeof(Rect))) != 0)
+                        {
+                            GetWindowRect(m_consoleWindow, ref rectConsole);
+                        }
+                        m_lastConsolePosition = rectConsole;
+                        m_moveToTop = false;
+                    }
 
                     m_topControl.Top = rectConsole.Bottom;
                     m_topControl.Left = rectConsole.Left;
                     m_topControl.Width = rectConsole.Right - rectConsole.Left;
-                    m_topControl.Height = toolStripMain.Height;
+                    if (m_forceResize)
+                    {
+                        m_topControl.Height = toolStripMain.Height;
+                    }
                 }
             }
+            m_forceResize = false;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -180,7 +191,7 @@ namespace StepBro.ConsoleSidekick.WinForms
         private void ExecuteCommand(string command)
         {
             var tool = (toolStripComboBoxTool.Items[toolStripComboBoxTool.SelectedIndex] as FileElements.Variable).FullName;
-            //m_pipe.Send(new ObjectCommand(tool, command));
+            m_pipe.Send(new ObjectCommand(tool, command));
         }
 
         #endregion
