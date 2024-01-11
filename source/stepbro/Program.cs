@@ -226,14 +226,14 @@ namespace StepBro.Cmd
                     //}
                 }
 
-                closeEventHandler = (sender, e) =>
-                {
-                    m_sideKickPipe.Send(ShortCommand.Close);
-                    Thread.Sleep(1000);     // Leave some time for the sidekick application to receive the command.
-                };
-
                 if (m_commandLineOptions.Sidekick)
                 {
+                    closeEventHandler = (sender, e) =>
+                    {
+                        m_sideKickPipe.Send(ShortCommand.Close);
+                        Thread.Sleep(1000);     // Leave some time for the sidekick application to receive the command.
+                    };
+
                     AppDomain.CurrentDomain.ProcessExit += closeEventHandler;
 
                     var hThis = GetConsoleWindow();
@@ -414,25 +414,14 @@ namespace StepBro.Cmd
                                     retval = -1;
                                     ConsoleWriteErrorLine("Error: Loading script file failed ( " + filepath + " )");
                                 }
-                                var shortcuts = ServiceManager.Global.Get<IFolderManager>();
-                                var projectShortcuts = new FolderCollection(FolderShortcutOrigin.Project);
-                                projectShortcuts.AddShortcut(StepBro.Core.Api.Constants.TOP_FILE_FOLDER_SHORTCUT, System.IO.Path.GetDirectoryName(file.FilePath));
-                                shortcuts.AddSource(projectShortcuts);
-
-                                switch (m_mode)
+                                else
                                 {
-                                    case Mode.RunThrough:
-                                        if (sidekickStarted)
-                                        {
-                                            m_next.Enqueue(StateOrCommand.ParseFiles);
-                                        }
-                                        break;
-                                    case Mode.ExecuteScript:
-                                    case Mode.RepeatedParsing:
-                                        m_next.Enqueue(StateOrCommand.ParseFiles);
-                                        break;
-                                    default:
-                                        break;
+                                    var shortcuts = ServiceManager.Global.Get<IFolderManager>();
+                                    var projectShortcuts = new FolderCollection(FolderShortcutOrigin.Project);
+                                    projectShortcuts.AddShortcut(StepBro.Core.Api.Constants.TOP_FILE_FOLDER_SHORTCUT, System.IO.Path.GetDirectoryName(file.FilePath));
+                                    shortcuts.AddSource(projectShortcuts);
+
+                                    m_next.Enqueue(StateOrCommand.ParseFiles);  // File has been loaded; start the parsing.
                                 }
                             }
                             catch (Exception ex)
