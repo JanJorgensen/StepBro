@@ -54,6 +54,7 @@ namespace StepBro.Cmd
         private static bool m_activitiesRunning = false;
         private static bool m_dumpingExecutionLog = false;
         private static bool m_dumpBufferedConsoleOutput = false;
+        private static DateTime zeroTime;
         private static IOutputFormatterTypeAddon m_outputAddon = null;
         private static IOutputFormatter m_outputFormatter = null;
         private static List<Tuple<bool, string>> m_bufferedOutput = new List<Tuple<bool, string>>();
@@ -299,6 +300,7 @@ namespace StepBro.Cmd
                                     if (keyInfo.Key == ConsoleKey.C)
                                     {
                                         Console.Clear();
+                                        zeroTime = DateTime.Now;
                                     }
                                     else if (keyInfo.Key == ConsoleKey.X)
                                     {
@@ -952,6 +954,7 @@ namespace StepBro.Cmd
         {
             if (!m_dumpingExecutionLog && m_commandLineOptions.TraceToConsole)
             {
+                
                 m_dumpingExecutionLog = true;
                 var logTask = new Task(() => LogDumpTask());
                 logTask.Start();
@@ -961,10 +964,10 @@ namespace StepBro.Cmd
         private static void LogDumpTask()
         {
             var logEntry = StepBroMain.Logger.GetOldestEntry();
-            var zero = logEntry.Timestamp;
+            zeroTime = logEntry.Timestamp;
             while (logEntry != null || m_activitiesRunning)
             {
-                m_outputFormatter.WriteLogEntry(logEntry, zero);
+                m_outputFormatter.WriteLogEntry(logEntry, zeroTime);
 
                 // Wait until log is empty and there is no running execution.
                 while (logEntry.Next == null && m_activitiesRunning == true)
