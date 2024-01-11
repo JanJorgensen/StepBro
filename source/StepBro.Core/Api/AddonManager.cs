@@ -69,6 +69,7 @@ namespace StepBro.Core.Api
         private Dictionary<string, IIdentifierInfo> m_lookup = new Dictionary<string, IIdentifierInfo>();
         private List<IAddonTypeHandler> m_specialTypeHandlers = new List<IAddonTypeHandler>();
         private List<IAddon> m_addons = new List<IAddon>();
+        private Dictionary<Type, Dictionary<string, List<MethodInfo>>> m_extensionMethods = new Dictionary<Type, Dictionary<string, List<MethodInfo>>>();
 
         public AddonManager(Action<IAddonManager> basicModulesLoader, out IService serviceAccess) :
             base("AddonManager", out serviceAccess, typeof(Logging.ILogger))
@@ -279,54 +280,80 @@ namespace StepBro.Core.Api
             //}
         }
 
-        public IEnumerable<MethodInfo> ListExtensionMethods(Type thistype, Func<MethodInfo, bool> filter = null)
+        public IEnumerable<MethodInfo> ListExtensionMethods(Type thistype, string name)
         {
             // TODO: Optimize this; takes most of the parsing time!!!
-            var f = (filter != null) ? filter : (a => true);
-            List<MethodInfo> returned = new List<MethodInfo>();
-            foreach (var tt in thistype.SelfAndInterfaces())
+            Dictionary<string, List<MethodInfo>> typeMethods = null;
+            if (!m_extensionMethods.ContainsKey(thistype))
             {
-                foreach (var t in m_types)
+                typeMethods = new Dictionary<string, List<MethodInfo>>();
+                m_extensionMethods.Add(thistype, typeMethods);
+            }
+            else
+            {
+                typeMethods = m_extensionMethods[thistype];
+            }
+
+            List<MethodInfo> extensionMethods = null;
+            if (!typeMethods.ContainsKey(name))
+            {
+                extensionMethods = new List<MethodInfo>();
+                typeMethods.Add(name, extensionMethods);
+
+                foreach (var tt in thistype.SelfAndInterfaces())
                 {
-                    foreach (var method in t.Item2.GetMethods(BindingFlags.Public | BindingFlags.Static).Where(m => m.IsExtension()).Where(f))
+                    foreach (var t in m_types)
                     {
-                        var m = method;
-                        if (method.IsGenericMethodDefinition)
+                        foreach (var method in t.Item2.GetMethods(BindingFlags.Public | BindingFlags.Static).Where(m => m.IsExtension() && m.Name == name))
                         {
-                            var genericArgs = method.GetGenericArguments();
-                            if (genericArgs.Length == 1)
+                            var m = method;
+                            if (method.IsGenericMethodDefinition)
                             {
-                                var pars = method.GetParameters();
-                                System.Diagnostics.Debug.Assert(pars.Length >= 1);
-                                // Is the extension-type the same as the generic argument?
-                                if (genericArgs[0] == pars[0].ParameterType)
+                                var genericArgs = method.GetGenericArguments();
+                                if (genericArgs.Length == 1)
                                 {
-                                    m = m.MakeGenericMethod(thistype);
-                                }
-                                else if (
-                                    thistype.IsGenericType &&
-                                    pars[0].ParameterType.IsGenericType &&
-                                    genericArgs[0] == pars[0].ParameterType.GetGenericArguments()[0])
-                                {
-                                    m = m.MakeGenericMethod(thistype.GetGenericArguments()[0]);
-                                }
-                                else
-                                {
-                                    // Not implemented/supported, just skip !
+                                    var pars = method.GetParameters();
+                                    System.Diagnostics.Debug.Assert(pars.Length >= 1);
+                                    // Is the extension-type the same as the generic argument?
+                                    if (genericArgs[0] == pars[0].ParameterType)
+                                    {
+                                        m = m.MakeGenericMethod(thistype);
+                                    }
+                                    else if (
+                                        thistype.IsGenericType &&
+                                        pars[0].ParameterType.IsGenericType &&
+                                        //pars[0].ParameterType.GetGenericArguments().Length == 1 &&
+                                        genericArgs[0] == pars[0].ParameterType.GetGenericArguments()[0])
+                                    {
+                                        m = m.MakeGenericMethod(thistype.GetGenericArguments()[0]);
+                                    }
+                                    else
+                                    {
+                                        // Not implemented/supported, just skip !
+                                        continue;
+                                    }
                                 }
                             }
-                        }
 
-                        if (m.GetParameters()[0].IsAssignableFrom(tt))
-                        {
-                            if (!returned.Contains(m))
+                            if (m.GetParameters()[0].IsAssignableFrom(tt))
                             {
-                                yield return m;
-                                returned.Add(m);
+                                if (!extensionMethods.Contains(m))
+                                {
+                                    extensionMethods.Add(m);
+                                }
                             }
                         }
                     }
                 }
+            }
+            else
+            {
+                extensionMethods = typeMethods[name];
+            }
+
+            foreach (var mi in extensionMethods)
+            {
+                yield return mi;
             }
         }
 

@@ -80,15 +80,13 @@ namespace StepBroCoreTest
             addons.AddAssembly(typeof(System.Linq.Enumerable).Assembly, false);
 
             var methods = new List<System.Reflection.MethodInfo>(
-                addons.ListExtensionMethods(
-                    typeof(IEnumerable<int>)).Where(mi => mi.Name == "Select"));
+                addons.ListExtensionMethods( typeof(IEnumerable<int>), "Select"));
 
             Assert.IsTrue(methods.Select(mi => mi.Name).Contains("Select"));
 
 
             methods = new List<System.Reflection.MethodInfo>(
-                addons.ListExtensionMethods(
-                    typeof(List<int>)).Where(mi => mi.Name == "Select"));
+                addons.ListExtensionMethods(typeof(List<int>), "Select"));
 
             Assert.IsTrue(methods.Select(mi => mi.Name).Contains("Select"));
         }
@@ -101,8 +99,7 @@ namespace StepBroCoreTest
             IAddonManager addons = AddonManager.Create();
             addons.AddAssembly(AddonManager.StepBroCoreAssembly, false);
 
-            var methods = addons.ListExtensionMethods(
-                    typeof(IProcedureReference)).Where(mi => mi.Name == "DynamicInvoke").ToList();
+            var methods = addons.ListExtensionMethods(typeof(IProcedureReference), "DynamicInvoke").ToList();
             Assert.AreEqual(1, methods.Count);
             Assert.AreEqual("DynamicInvoke", methods[0].Name);
         }

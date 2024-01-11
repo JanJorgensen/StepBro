@@ -351,3 +351,5 @@ MigrationBackup/
 source/bin5/
 source/stepbro/Properties/launchSettings.json
 launchSettings.json
+test files/Profiling/BigCallTree.sbs
+test files/Profiling/ManyTools.sbs

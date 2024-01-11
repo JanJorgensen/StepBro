@@ -18,7 +18,7 @@ namespace StepBro.Core.Api
 
         IEnumerable<IIdentifierInfo> List(IEnumerable<UsingData> usings);
 
-        IEnumerable<MethodInfo> ListExtensionMethods(Type type, Func<MethodInfo, bool> filter = null);
+        IEnumerable<MethodInfo> ListExtensionMethods(Type type, string name);
 
         Type TryGetType(IEnumerable<UsingData> usings, string name);
 
