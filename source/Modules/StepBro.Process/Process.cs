@@ -113,12 +113,31 @@ namespace StepBro.Process
             // bool moveWindow = false
             )
         {
-            if (context != null)
-            {
-                filename = FileReferenceUtils.ResolveShortcutPath(context.ListShortcuts(), filename);
-            }
 
             var osProcess = new OSProcess();
+            var process = new Process(context.Logger, osProcess);
+
+            if (String.IsNullOrEmpty(filename))
+            {
+                if (context != null)
+                {
+                    context.ReportError("Error starting process. Spefified file path is empty.");
+                    process.SetState(TaskExecutionState.ErrorStarting);
+                    return process;
+                }
+            }
+            if (context != null)
+            {
+                string error = null;
+                filename = context.ListShortcuts().ResolveShortcutPath(filename, ref error);
+                if (filename == null)
+                {
+                    context.ReportError("Error starting process. File path fault. " + error);
+                    process.SetState(TaskExecutionState.ErrorStarting);
+                    return process;
+                }
+            }
+
             osProcess.StartInfo.FileName = filename;
             if (!String.IsNullOrEmpty(arguments))
             {
@@ -143,7 +162,6 @@ namespace StepBro.Process
             }
 
             ObjectMonitorManager.Register(osProcess);
-            var process = new Process(context.Logger, osProcess);
             osProcess.m_parent = process;
             process.m_logProcessOutput = (context != null && context.LoggingEnabled && logOutput);
 

@@ -129,7 +129,13 @@ namespace StepBro.Core.Execution
         [Public]
         public static string GetFullPath(this string filepath, [Implicit] ICallContext context)
         {
-            return FileReferenceUtils.GetFullPath(context.ListShortcuts(), filepath);
+            string error = null;
+            var result = context.ListShortcuts().GetFullPath(filepath, ref error);
+            if (result == null)
+            {
+                context.ReportError(error);
+            }
+            return result;
         }
 
         [Public]
