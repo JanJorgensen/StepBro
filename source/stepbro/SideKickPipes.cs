@@ -56,6 +56,8 @@ namespace StepBro
         {
             if (!m_disposed)
             {
+                System.Diagnostics.Trace.WriteLine("Sidekick pipe dispose!!");
+
                 m_continueReceiving = false;
                 m_continue = false;
                 if (m_disposeEvent != null)
@@ -69,6 +71,7 @@ namespace StepBro
                     m_thread.Join();
                     m_thread = null;
                 }
+                System.Diagnostics.Trace.WriteLine("Sidekick thread stopped");
                 if (m_pipe != null)
                 {
                     m_pipe.Close();
@@ -198,32 +201,36 @@ namespace StepBro
             var instance = data as SideKickPipe;
             //instance.m_pipe.ReadTimeout = 1000;
             System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE receiver thread started");
-
-            while (instance.m_continueReceiving)
+            try
             {
-                var s = instance.m_stream.ReadString();
-                if (s == null)
+                while (instance.m_continueReceiving)
                 {
-                    instance.m_continueReceiving = false;
-                }
-                else
-                {
-                    System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE Received: " + s);
-                    if (String.Equals(s, "CLOSE"))
+                    var s = instance.m_stream.ReadString();
+                    if (s == null)
                     {
                         instance.m_continueReceiving = false;
                     }
                     else
                     {
+                        System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE Received: " + s);
                         var colonIndex = s.IndexOf(':');
                         if (colonIndex > 0)
                         {
-                            instance.m_received.Enqueue(new Tuple<string, string>(s.Substring(0, colonIndex), s.Substring(colonIndex + 1)));
+                            var message = new Tuple<string, string>(s.Substring(0, colonIndex), s.Substring(colonIndex + 1));
+                            instance.m_received.Enqueue(message);
+                            if (instance.m_continueReceiving && String.Equals(message.Item2, "close", StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                instance.m_continueReceiving = false;
+                                instance.Send(s);   // Return the close-request to the other side.
+                            }
                         }
                     }
                 }
             }
-            System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE stopping receiver");
+            finally
+            {
+                System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE stopping receiver");
+            }
         }
     }
 
@@ -243,9 +250,7 @@ namespace StepBro
         public string ReadString()
         {
             var b1 = ioStream.ReadByte();
-            System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE ReadString B1: " + b1.ToString());
             var b2 = ioStream.ReadByte();
-            System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE ReadString B2: " + b2.ToString());
             if (b1 >= 0 && b2 >= 0)
             {
                 int len = (b1 * 256) + b2;

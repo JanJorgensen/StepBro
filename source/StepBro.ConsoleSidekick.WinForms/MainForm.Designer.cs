@@ -33,6 +33,10 @@
             toolTip = new ToolTip(components);
             timerMasterPull = new System.Windows.Forms.Timer(components);
             toolStripMain = new ToolStrip();
+            toolStripDropDownButtonMainMenu = new ToolStripDropDownButton();
+            toolStripMenuItemClearDisplay = new ToolStripMenuItem();
+            toolStripSeparator1 = new ToolStripSeparator();
+            toolStripMenuItemExit = new ToolStripMenuItem();
             toolStripComboBoxTool = new ToolStripComboBox();
             toolStripComboBoxToolCommand = new ToolStripComboBox();
             toolStripButtonRunCommand = new ToolStripButton();
@@ -54,12 +58,41 @@
             // 
             toolStripMain.BackColor = Color.DarkOrange;
             toolStripMain.GripStyle = ToolStripGripStyle.Hidden;
-            toolStripMain.Items.AddRange(new ToolStripItem[] { toolStripComboBoxTool, toolStripComboBoxToolCommand, toolStripButtonRunCommand, toolStripSeparatorTool, toolStripSplitButtonRunScript, toolStripButtonStopScriptExecution, toolStripButtonAddShortcut, toolStripSeparatorBeforeShortcuts });
+            toolStripMain.Items.AddRange(new ToolStripItem[] { toolStripDropDownButtonMainMenu, toolStripComboBoxTool, toolStripComboBoxToolCommand, toolStripButtonRunCommand, toolStripSeparatorTool, toolStripSplitButtonRunScript, toolStripButtonStopScriptExecution, toolStripButtonAddShortcut, toolStripSeparatorBeforeShortcuts });
             toolStripMain.Location = new Point(0, 0);
             toolStripMain.Name = "toolStripMain";
             toolStripMain.Padding = new Padding(0, 1, 1, 2);
             toolStripMain.Size = new Size(1368, 26);
             toolStripMain.TabIndex = 0;
+            // 
+            // toolStripDropDownButtonMainMenu
+            // 
+            toolStripDropDownButtonMainMenu.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripDropDownButtonMainMenu.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemClearDisplay, toolStripSeparator1, toolStripMenuItemExit });
+            toolStripDropDownButtonMainMenu.Image = (Image)resources.GetObject("toolStripDropDownButtonMainMenu.Image");
+            toolStripDropDownButtonMainMenu.ImageTransparentColor = Color.Magenta;
+            toolStripDropDownButtonMainMenu.Name = "toolStripDropDownButtonMainMenu";
+            toolStripDropDownButtonMainMenu.Size = new Size(31, 20);
+            toolStripDropDownButtonMainMenu.Text = "M";
+            // 
+            // toolStripMenuItemClearDisplay
+            // 
+            toolStripMenuItemClearDisplay.Name = "toolStripMenuItemClearDisplay";
+            toolStripMenuItemClearDisplay.Size = new Size(180, 22);
+            toolStripMenuItemClearDisplay.Text = "Clear Display";
+            toolStripMenuItemClearDisplay.Click += toolStripMenuItemClearDisplay_Click;
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(177, 6);
+            // 
+            // toolStripMenuItemExit
+            // 
+            toolStripMenuItemExit.Name = "toolStripMenuItemExit";
+            toolStripMenuItemExit.Size = new Size(180, 22);
+            toolStripMenuItemExit.Text = "Exit";
+            toolStripMenuItemExit.Click += toolStripMenuItemExit_Click;
             // 
             // toolStripComboBoxTool
             // 
@@ -171,5 +204,9 @@
         private ToolStripButton toolStripButtonStopScriptExecution;
         private ToolStripButton toolStripButtonAddShortcut;
         private ToolStripSeparator toolStripSeparatorBeforeShortcuts;
+        private ToolStripDropDownButton toolStripDropDownButtonMainMenu;
+        private ToolStripMenuItem toolStripMenuItemClearDisplay;
+        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripMenuItem toolStripMenuItemExit;
     }
 }

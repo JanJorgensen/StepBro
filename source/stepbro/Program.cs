@@ -79,8 +79,10 @@ namespace StepBro.Cmd
             ulong executionStartRequestID = 0UL;
             bool executionRequestSilent = false;
             string targetFile = null;
+            string targetFileFullPath = null;
             string targetElement = null;
             string targetPartner = null;
+            string targetObject = null;
 
             try
             {
@@ -136,6 +138,7 @@ namespace StepBro.Cmd
             {
                 StepBroMain.Initialize(m_hostService);
                 StepBroMain.Logger.IsDebugging = m_commandLineOptions.Debugging;
+                var objectManager = StepBroMain.ServiceManager.Get<IDynamicObjectManager>();
 
                 if (m_commandLineOptions.Verbose)
                 {
@@ -319,7 +322,8 @@ namespace StepBro.Cmd
                                         var shortCommand = JsonSerializer.Deserialize<ShortCommand>(input.Item2);
                                         switch (shortCommand)
                                         {
-                                            case ShortCommand.Close:
+                                            case ShortCommand.RequestClose:
+                                                m_next.Enqueue(StateOrCommand.Exit);
                                                 break;
                                             case ShortCommand.Parse:
                                                 StepBroMain.Logger.RootLogger.LogUserAction("Request file parsing");
@@ -362,9 +366,11 @@ namespace StepBro.Cmd
                                         executionStartRequestID = request.RequestID;
                                         targetElement = request.Element;
                                         targetPartner = request.Partner;
+                                        targetObject = request.ObjectReference;
 
+                                        string objectInstanceText = String.IsNullOrEmpty(request.ObjectReference) ? "" : (request.ObjectReference.Split('.').Last() + ".");
                                         string partnertext = String.IsNullOrEmpty(targetPartner) ? "" : (" @ " + targetPartner);
-                                        StepBroMain.Logger.RootLogger.LogUserAction("Request script execution: " + targetElement + partnertext);
+                                        StepBroMain.Logger.RootLogger.LogUserAction("Request script execution: " + objectInstanceText + targetElement + partnertext);
 
                                         m_next.Enqueue(StateOrCommand.StartScriptExecution);
                                     }
@@ -404,15 +410,15 @@ namespace StepBro.Cmd
 
                         case StateOrCommand.LoadMainFile:
                             Trace.WriteLine("StepBro command: " + command.ToString());
-                            var filepath = System.IO.Path.GetFullPath(targetFile);
+                            targetFileFullPath = System.IO.Path.GetFullPath(targetFile);
                             try
                             {
-                                file = StepBroMain.LoadScriptFile(consoleResourceUserObject, filepath);
+                                file = StepBroMain.LoadScriptFile(consoleResourceUserObject, targetFileFullPath);
                                 if (file == null)
                                 {
                                     m_next.Enqueue(StateOrCommand.Exit);
                                     retval = -1;
-                                    ConsoleWriteErrorLine("Error: Loading script file failed ( " + filepath + " )");
+                                    ConsoleWriteErrorLine("Error: Loading script file failed ( " + targetFileFullPath + " )");
                                 }
                                 else
                                 {
@@ -444,12 +450,11 @@ namespace StepBro.Cmd
                                 if (sidekickStarted)
                                 {
                                     // Update list of variables containing objects with the ITextCommandInput interface.
-                                    var objectManager = StepBroMain.ServiceManager.Get<IDynamicObjectManager>();
                                     var objects = objectManager.GetObjectCollection();
                                     var commandObjectsContainers = objects.Where(o => o.Object is ITextCommandInput).ToList();
                                     foreach (var o in commandObjectsContainers)
                                     {
-                                        commandObjectDictionary.Add(o.FullName, o.Object as ITextCommandInput);
+                                        commandObjectDictionary[o.FullName] = o.Object as ITextCommandInput;    // Add or override.
                                     }
                                     var commandObjectsMessage = new CommandObjectsList();
                                     commandObjectsMessage.Objects = commandObjectsContainers.Select(o => o.FullName).ToArray();
@@ -458,6 +463,15 @@ namespace StepBro.Cmd
                                     // Update the list of loaded script files.
                                     var fileManager = StepBroMain.ServiceManager.Get<ILoadedFilesManager>();
                                     var files = fileManager.ListFiles<IScriptFile>().ToList();
+
+                                    var variableTypes = new Dictionary<string, TypeReference>();
+                                    for (int i = 0; i < files.Count; i++)
+                                    {
+                                        foreach (var v in files[i].ListElements().Where(e => e.ElementType == FileElementType.FileVariable))
+                                        {
+                                            variableTypes[v.FullName] = v.DataType;
+                                        }
+                                    }
 
                                     var elementsMessage = new StepBro.Sidekick.FileElements();
                                     var elementList = new List<StepBro.Sidekick.FileElements.Element>();
@@ -474,14 +488,24 @@ namespace StepBro.Cmd
                                                 case FileElementType.ProcedureDeclaration:
                                                     {
                                                         elementData = new FileElements.Procedure();
+                                                        var procedureData = elementData as FileElements.Procedure;
                                                         var p = e as IFileProcedure;
                                                         if (p.Parameters.Length > 0 && p.IsFirstParameterThisReference)
                                                         {
                                                             var par = p.Parameters[0];
-                                                            if (par.Value.HasProcedureReference)
+                                                            (elementData as FileElements.Procedure).FirstParameterIsInstanceReference = true;
+
+                                                            var instances = new List<string>();
+                                                            foreach (var v in objects)
                                                             {
-                                                                // TODO: add more type checking on that first parameter.
-                                                                (elementData as FileElements.Procedure).FirstParameterIsInstanceReference = true;
+                                                                if (par.Value.IsAssignableFrom(variableTypes[v.FullName]))
+                                                                {
+                                                                    instances.Add(v.FullName);
+                                                                }
+                                                            }
+                                                            if (instances.Count > 0)
+                                                            {
+                                                                procedureData.CompatibleObjectInstances = instances.ToArray();
                                                             }
                                                         }
                                                         (elementData as FileElements.Procedure).Parameters = p.Parameters.Select(p => new FileElements.Parameter(p.Name, p.Value.TypeName())).ToArray();
@@ -542,6 +566,7 @@ namespace StepBro.Cmd
                                         }
                                         elementList.Add(variableData);
                                     }
+                                    elementsMessage.TopFile = targetFileFullPath;
                                     elementsMessage.Files = files.Select(f => f.FilePath).ToArray();
                                     elementsMessage.Elements = elementList.ToArray();
                                     m_sideKickPipe.Send(elementsMessage);
@@ -560,6 +585,7 @@ namespace StepBro.Cmd
                                         break;
                                     case Mode.RepeatedParsing:
                                         ConsoleWriteLine("No parsing errors.");
+                                        m_dumpBufferedConsoleOutput = true;
                                         m_next.Enqueue(StateOrCommand.AwaitFileChange);
                                         break;
                                     default:
@@ -616,6 +642,20 @@ namespace StepBro.Cmd
                                     }
                                     else
                                     {
+                                        if (!String.IsNullOrEmpty(targetObject))
+                                        {
+                                            var theObject = objectManager.GetObjectCollection().FirstOrDefault(v => string.Equals(v.FullName, targetObject, StringComparison.InvariantCulture));
+                                            if (theObject != null)
+                                            {
+                                                arguments.Insert(0, theObject.Object);
+                                            }
+                                            else
+                                            {
+                                                retval = -1;
+                                                ConsoleWriteErrorLine($"Error: Target object '{targetObject}' was not found in the list of global variables.");
+                                            }
+                                        }
+
                                         if (!(element is IFileProcedure))
                                         {
                                             retval = -1;
@@ -869,10 +909,9 @@ namespace StepBro.Cmd
             if (m_sideKickPipe != null)
             {
                 m_sideKickPipe.Send(ShortCommand.Close);
+                Thread.Sleep(50);
 
-                Trace.WriteLine("StepBro dispose sidekick");
                 m_sideKickPipe.Dispose();
-                Trace.WriteLine("StepBro sidekick disposed");
             }
 
             StepBroMain.Deinitialize();

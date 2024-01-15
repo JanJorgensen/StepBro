@@ -39,7 +39,9 @@ namespace StepBro.Sidekick
     public enum ShortCommand
     {
         None,
-        Close,
+        RequestClose,   // From sidekick to console; this can be rejected/ignored.
+        Close,          // Force closing.
+        ClearDisplay,
         Parse,
         ExecutionStarted,
         ExecutionStopped,
@@ -99,6 +101,7 @@ namespace StepBro.Sidekick
             public bool FirstParameterIsInstanceReference { get; set; } = false;
             public string ReturnType { get; set; } = null;
             public Parameter[] Parameters { get; set; } = null;
+            public string[] CompatibleObjectInstances { get; set; } = null;
         }
         public class Partner
         {
@@ -121,6 +124,7 @@ namespace StepBro.Sidekick
             public SerializablePropertyBlockEntry PanelDefinition { get; set; } = null;
         }
 
+        public string TopFile { get; set; }
         public string[] Files { get; set; }
         public Element[] Elements { get; set; }
     }
