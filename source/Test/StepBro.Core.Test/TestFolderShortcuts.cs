@@ -36,7 +36,7 @@ namespace StepBroCoreTest
         {
             string error = null;
             Assert.AreEqual(@"C:\temp", m_collection.ListShortcuts().ResolveShortcutPath("[Anna]", ref error));
-            Assert.AreEqual(@"C:\temp\sub", m_collection.ListShortcuts().ResolveShortcutPath("[Christina], ref error", ref error));
+            Assert.AreEqual(@"C:\temp\sub", m_collection.ListShortcuts().ResolveShortcutPath("[Christina]", ref error));
         }
 
         [TestMethod]

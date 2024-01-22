@@ -453,7 +453,7 @@ namespace StepBro.Core.Parser
                     else if (methods.Count() > 0 && matchingMethods.Count() == 0)
                     {
                         // The method exists, but no method fits with the given call
-                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"No method named \"{left.Token.Text}\" could be found with matching parameters. Did you forget a suffix?");
+                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"No method named \"{left.Token.Text}\" could be found with matching parameters.");
                     }
                     else
                     {
