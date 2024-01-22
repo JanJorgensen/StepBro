@@ -794,7 +794,7 @@ namespace StepBro.TestInterface
             try
             {
                 System.Diagnostics.Debug.WriteLine($"TESTCONNECTION {type} {id}: {text}");
-                m_lastLogLine = new LogLineData(m_lastLogLine, type, id, text);
+                m_lastLogLine = new LogLineData(m_lastLogLine, type, id, text, 1); // First character of Serial Connection messages should be ignored
                 if (m_firstLogLine == null)
                 {
                     m_firstLogLine = m_lastLogLine;
@@ -822,7 +822,7 @@ namespace StepBro.TestInterface
                         {
                             lock (m_eventLogSync)
                             {
-                                m_lastEventLogLine = new LogLineData(m_lastEventLogLine, type, id, text);
+                                m_lastEventLogLine = new LogLineData(m_lastEventLogLine, type, id, text, 1); // First character of Serial Connection messages should be ignored
                                 m_asyncLogLineReader.NotifyNew(m_lastEventLogLine);
                             }
                         }
