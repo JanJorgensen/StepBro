@@ -10,4 +10,10 @@
     <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="CustomToolBar\ColumnSeparator.cs">
+      <SubType>Component</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>

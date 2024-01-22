@@ -1,16 +1,16 @@
+using CommandLine;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Logging;
-using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using StepBro.Sidekick;
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using StepBro.UI.WinForms;
+using System.Windows.Forms;
 using static StepBro.ConsoleSidekick.WinForms.MainForm;
+using StepBro.UI.WinForms.CustomToolBar;
 
 namespace StepBro.ConsoleSidekick.WinForms
 {
@@ -27,7 +27,11 @@ namespace StepBro.ConsoleSidekick.WinForms
         private IExecutionAccess m_executingScript = null;
         private PanelsDialog m_panelsDialog = null;
         private bool m_settingCommandCombo = false;
-        List<WeakReference<ExecutionAccess>> m_activeExecutions = new List<WeakReference<ExecutionAccess>>();
+        private List<WeakReference<ExecutionAccess>> m_activeExecutions = new List<WeakReference<ExecutionAccess>>();
+        private bool m_userFileRead = false;
+        private string m_userFile = null;
+        private object m_userShortcutItemTag = new object();
+        private List<Tuple<string, StepBro.UI.WinForms.CustomToolBar.ToolBar>> m_customToolStrips = new List<Tuple<string, StepBro.UI.WinForms.CustomToolBar.ToolBar>>();
 
         private class ScriptExecutionToolStripMenuItem : ToolStripMenuItem
         {
@@ -47,39 +51,7 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             public void SetText()
             {
-                if (!String.IsNullOrEmpty(InstanceObject))
-                {
-                    if (this.ShowFullName)
-                    {
-                        this.Text = InstanceObject + "." + this.FileElement.Split('.').Last();
-                    }
-                    else
-                    {
-                        this.Text = InstanceObject.Split('.').Last() + "." + this.FileElement.Split('.').Last();
-                    }
-                }
-                else if (!String.IsNullOrEmpty(Partner))
-                {
-                    if (this.ShowFullName)
-                    {
-                        this.Text = this.FileElement + "." + this.Partner;
-                    }
-                    else
-                    {
-                        this.Text = this.FileElement.Split('.').Last() + "." + this.Partner;
-                    }
-                }
-                else
-                {
-                    if (this.ShowFullName)
-                    {
-                        this.Text = this.FileElement;
-                    }
-                    else
-                    {
-                        this.Text = this.FileElement.Split('.').Last();
-                    }
-                }
+                this.Text = MainForm.ScripExecutionButtonTitle(this.ShowFullName, this.FileElement, this.Partner, this.InstanceObject, null);
             }
 
             public bool Equals(string element, string partner, string instanceObject)
@@ -90,6 +62,27 @@ namespace StepBro.ConsoleSidekick.WinForms
                 if (!String.Equals(instanceObject, this.InstanceObject)) return false;
                 return true;
             }
+        }
+
+        public class UserData
+        {
+            public class Shortcut
+            {
+                public string Name { get; set; }
+                public string Element { get; set; }
+                public string Partner { get; set; } = null;
+                public string InstanceObject { get; set; } = null;
+            }
+
+            public class PanelSetting
+            {
+                public string Panel { get; set; }
+                public string ID { get; set; }
+                public string Value { get; set; }
+            }
+
+            public Shortcut[] Shortcuts { get; set; } = null;
+            public PanelSetting[] PanelSettings { get; set; } = null;
         }
 
         public MainForm()
@@ -122,6 +115,53 @@ namespace StepBro.ConsoleSidekick.WinForms
                 return;
             }
             m_forceResize = true;
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (m_closeRequestedByConsole)
+            {
+                System.Diagnostics.Trace.WriteLine("Sidekick base.OnFormClosing() - as requested");
+
+                var userData = new UserData();
+
+                var shortcuts = new List<UserData.Shortcut>();
+                foreach (var shortcut in toolStripMain.Items.Cast<ToolStripItem>().Where(o => object.Equals(m_userShortcutItemTag, o.Tag)).Cast<ScriptExecutionToolStripMenuItem>())
+                {
+                    var shortcutData = new UserData.Shortcut();
+                    shortcutData.Name = shortcut.Text;
+                    shortcutData.Element = shortcut.FileElement;
+                    shortcutData.Partner = shortcut.Partner;
+                    shortcutData.InstanceObject = shortcut.InstanceObject;
+                    shortcuts.Add(shortcutData);
+                }
+                if (shortcuts.Count > 0)
+                {
+                    userData.Shortcuts = shortcuts.ToArray();
+                }
+
+                if (userData.Shortcuts != null || userData.PanelSettings != null)
+                {
+                    JsonSerializerOptions options = new JsonSerializerOptions();
+                    options.WriteIndented = true;
+                    options.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+
+                    using (FileStream createStream = File.Create(m_userFile))
+                    {
+                        JsonSerializer.Serialize(createStream, userData, options);
+                    }
+                }
+
+
+                base.OnFormClosing(e);
+            }
+            else
+            {
+                System.Diagnostics.Trace.WriteLine("Sidekick base.OnFormClosing() - requesting console app");
+                m_pipe.Send(ShortCommand.RequestClose);
+                e.Cancel = true;    // Don't close; wait for close request from console.
+            }
+            System.Diagnostics.Trace.WriteLine("Sidekick closing end");
         }
 
         private void MoveWindows()
@@ -163,33 +203,11 @@ namespace StepBro.ConsoleSidekick.WinForms
                     m_topControl.Width = rectConsole.Right - rectConsole.Left;
                     if (m_forceResize)
                     {
-                        m_topControl.Height = toolStripMain.Height;
+                        m_topControl.Height = toolStripMain.Height + 40;
                     }
                 }
             }
             m_forceResize = false;
-        }
-
-        protected override void OnFormClosing(FormClosingEventArgs e)
-        {
-            if (m_closeRequestedByConsole)
-            {
-                System.Diagnostics.Trace.WriteLine("Sidekick base.OnFormClosing() - as requested");
-                //if (m_pipe != null)
-                //{
-                //    m_pipe.Send(ShortCommand.Close);
-                //    m_pipe.Dispose();
-                //    m_pipe = null;
-                //}
-                base.OnFormClosing(e);
-            }
-            else
-            {
-                System.Diagnostics.Trace.WriteLine("Sidekick base.OnFormClosing() - requesting console app");
-                m_pipe.Send(ShortCommand.RequestClose);
-                e.Cancel = true;    // Don't close; wait for close request from console.
-            }
-            System.Diagnostics.Trace.WriteLine("Sidekick closing end");
         }
 
         #region USER INTERACTION - COMMANDS
@@ -268,7 +286,23 @@ namespace StepBro.ConsoleSidekick.WinForms
         private void FileElementExecutionEntry_ShortcutClick(object sender, EventArgs e)
         {
             var executionEntry = sender as ScriptExecutionToolStripMenuItem;
-            MenuFileElementExecutionStart(false, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null);
+            if (toolStripMenuItemDeleteShortcut.Checked)
+            {
+                var choise = MessageBox.Show(
+                    this,
+                    "Should the shortcut\r\n\r\n\"" + executionEntry.Text + "\"\r\n\r\nbe deleted?",
+                    "StepBro - Deleting shortcut",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (choise == DialogResult.Yes)
+                {
+                    toolStripMain.Items.Remove(executionEntry);
+                }
+                toolStripMenuItemDeleteShortcut.Checked = false;
+            }
+            else
+            {
+                MenuFileElementExecutionStart(false, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null);
+            }
         }
 
         private void toolStripSplitButtonRunScript_ButtonClick(object sender, EventArgs e)
@@ -293,7 +327,7 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             if (addToHistory)
             {
-                var title = ScripExecutionButtonTitle(element, model, objectVariable, args);
+                var title = ScripExecutionButtonTitle(false, element, model, objectVariable, args);
 
                 ScriptExecutionToolStripMenuItem found = null;
                 int historyItems = (toolStripSplitButtonRunScript.Tag != null) ? (int)toolStripSplitButtonRunScript.Tag : 0;
@@ -366,20 +400,13 @@ namespace StepBro.ConsoleSidekick.WinForms
             if (toolStripSplitButtonRunScript.Tag != null)
             {
                 var executionEntry = toolStripSplitButtonRunScript.DropDownItems[0] as ScriptExecutionToolStripMenuItem;
-                var shortcut = new ScriptExecutionToolStripMenuItem();
-                shortcut.FileElement = executionEntry.FileElement;
-                shortcut.Partner = executionEntry.Partner;
-                shortcut.InstanceObject = executionEntry.InstanceObject;
-                shortcut.SetText();
-                shortcut.Name = "toolStripMenuProcedure" + shortcut.Text.Replace(".", "Dot");
-                shortcut.Size = new Size(182, 22);
-                shortcut.ToolTipText = null; // $"Run " + target;
-                shortcut.Click += FileElementExecutionEntry_ShortcutClick;
-
-                var dialog = new DialogNameInput("Adding Shortcut", "Enter the name to show on the shortcut button.", shortcut.Text);
+                var dialog = new DialogNameInput(
+                    "Adding Shortcut",
+                    "Enter the name to show on the shortcut button.",
+                    ScripExecutionButtonTitle(false, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null));
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    toolStripMain.Items.Add(shortcut);
+                    this.AddShortcut(dialog.Value, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject);
                 }
             }
         }
@@ -430,6 +457,26 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         #endregion
 
+        private void AddShortcut(string title, string element, string partner, string instanceObject)
+        {
+            var shortcut = new ScriptExecutionToolStripMenuItem();
+            shortcut.Text = title;
+            shortcut.FileElement = element;
+            shortcut.Partner = partner;
+            shortcut.InstanceObject = instanceObject;
+            shortcut.SetText();
+            shortcut.Name = "toolStripMenuProcedure" + shortcut.Text.Replace(".", "Dot");
+            shortcut.Size = new Size(182, 22);
+            shortcut.ToolTipText = null; // $"Run " + target;
+            shortcut.Tag = m_userShortcutItemTag;
+            shortcut.Click += FileElementExecutionEntry_ShortcutClick;
+
+            toolStripMenuItemDeleteShortcut.Enabled = true;
+            toolStripMenuItemDeleteAllShortcuts.Enabled = true;
+
+            toolStripMain.Items.Add(shortcut);
+        }
+
         private void timerMasterPull_Tick(object sender, EventArgs e)
         {
             Tuple<string, string> received;
@@ -476,6 +523,8 @@ namespace StepBro.ConsoleSidekick.WinForms
                     // If short name alone is used, will there be name clashes? If so, use the full name.
                     bool useFullNameInUseableObject = objectsForProcedures.Select(s => s.Split('.').Last()).Distinct().Count() != objectsForProcedures.Count;
 
+                    #region Tool variables used as instance references
+
                     foreach (var useableObject in objectsForProcedures)
                     {
                         string shortName = useableObject.Split('.').Last();
@@ -506,6 +555,10 @@ namespace StepBro.ConsoleSidekick.WinForms
                             objectMenu.DropDownItems.Add(procedureMenu);
                         }
                     }
+
+                    #endregion
+
+                    #region Namespace sections
 
                     foreach (var ns in namespaces)
                     {
@@ -619,6 +672,8 @@ namespace StepBro.ConsoleSidekick.WinForms
                             }
                         }
 
+                        #region TestLists
+
                         var tests = elements.Elements.Where(e => NamespaceFromFullName(e.FullName) == ns && e is FileElements.TestList).Cast<FileElements.TestList>().ToList();
                         tests.Sort(delegate (FileElements.TestList x, FileElements.TestList y)
                         {
@@ -651,6 +706,8 @@ namespace StepBro.ConsoleSidekick.WinForms
                             }
                         }
 
+                        #endregion
+
                         if (namespaceMenu.DropDownItems.Count > 0)
                         {
                             namespaceMenu.Name = "toolStripMenuNamespace" + ns;
@@ -661,6 +718,10 @@ namespace StepBro.ConsoleSidekick.WinForms
                         }
 
                     }
+
+                    #endregion
+
+                    #region Tool variables
 
                     var selectedTool = toolStripComboBoxTool.SelectedItem as FileElements.Variable;
                     toolStripComboBoxTool.Items.Clear();
@@ -688,6 +749,10 @@ namespace StepBro.ConsoleSidekick.WinForms
                     }
                     toolStripComboBoxTool.SelectionLength = 0;
 
+                    #endregion
+
+                    #region Panel tool variables
+
                     var panelVariables = elements.Elements.Where(e => e is StepBro.Sidekick.FileElements.PanelDefinitionVariable).Select(e => (StepBro.Sidekick.FileElements.PanelDefinitionVariable)e).ToList();
 
                     if (panelVariables.Count > 0)
@@ -705,6 +770,99 @@ namespace StepBro.ConsoleSidekick.WinForms
                                 (PropertyBlock)panel.PanelDefinition.CloneAsPropertyBlockEntry());
                         }
                     }
+
+                    #endregion
+
+                    #region ToolBar tool variables
+
+                    var toolbarVariables = elements.Elements.Where(e => e is StepBro.Sidekick.FileElements.ToolBarDefinitionVariable).Select(e => (StepBro.Sidekick.FileElements.ToolBarDefinitionVariable)e).ToList();
+
+                    var newToolBarList = new List<Tuple<string, StepBro.UI.WinForms.CustomToolBar.ToolBar>>();
+                    if (toolbarVariables.Count > 0)
+                    {
+                        foreach (var toolbarVar in toolbarVariables)
+                        {
+                            StepBro.UI.WinForms.CustomToolBar.ToolBar toolBar = null;
+                            var existing = m_customToolStrips.Where(t => t.Item1 == toolbarVar.FullName).FirstOrDefault();
+                            if (existing != null)
+                            {
+                                toolBar = existing.Item2;
+                            }
+                            else
+                            {
+                                toolBar = new StepBro.UI.WinForms.CustomToolBar.ToolBar(this);
+                            }
+                            newToolBarList.Add(new Tuple<string, UI.WinForms.CustomToolBar.ToolBar>(toolbarVar.FullName, toolBar));
+
+                            toolBar.Setup(toolbarVar.FullName, toolbarVar.ToolBarDefinition.CloneAsPropertyBlockEntry() as PropertyBlock);
+                        }
+
+                        //if (m_panelsDialog == null)
+                        //{
+                        //    m_panelsDialog = new PanelsDialog((ICoreAccess)this);
+                        //    m_panelsDialog.FormClosed += PanelsDialog_FormClosed;
+                        //    m_panelsDialog.Show();
+                        //}
+                        //foreach (var panel in panelVariables)
+                        //{
+                        //    m_panelsDialog.AddCustomPanel(
+                        //        panel.Title,
+                        //        (PropertyBlock)panel.PanelDefinition.CloneAsPropertyBlockEntry());
+                        //}
+                    }
+                    //var customToolBars = this.Controls.Cast<Control>().Where(c => c is ToolBar).ToList();
+                    //foreach (var tb in customToolBars)
+                    //{
+                    //    this.Controls.Remove(tb);
+                    //}
+
+                    this.Controls.Clear();
+                    m_customToolStrips = newToolBarList.ToList();
+                    m_customToolStrips.Reverse();
+                    int tabIndex = m_customToolStrips.Count;
+                    foreach (var tbData in m_customToolStrips)
+                    {
+                        if (tabIndex % 2 == 0)
+                        {
+                            tbData.Item2.DefaultBackColor = Color.Beige;
+                        }
+                        //tbData.Item2.DefaultBackColor = (tabIndex % 2 == 0) ? Color.Beige : Color.Wheat;
+                        tbData.Item2.TabIndex = tabIndex--;
+                        this.Controls.Add(tbData.Item2);
+                    }
+                    this.Controls.Add(toolStripMain);
+
+                    if (m_customToolStrips.Count > 0)
+                    {
+                        this.Height = m_customToolStrips[0].Item2.Bounds.Bottom + 2;
+                    }
+                    else
+                    {
+                        this.Height = toolStripMain.Bounds.Bottom + 2;
+                    }
+
+                    #endregion
+
+                    #region Loading persisted shortcuts
+
+                    if (!m_userFileRead)
+                    {
+                        m_userFile = Path.ChangeExtension(Path.GetFileNameWithoutExtension(elements.TopFile), "user.json");
+                        m_userFileRead = true;
+                        if (File.Exists(m_userFile))
+                        {
+                            var data = JsonSerializer.Deserialize<UserData>(File.ReadAllText(m_userFile));
+                            if (data.Shortcuts != null)
+                            {
+                                foreach (var shortcut in data.Shortcuts)
+                                {
+                                    this.AddShortcut(shortcut.Name, shortcut.Element, shortcut.Partner, shortcut.InstanceObject);
+                                }
+                            }
+                        }
+                    }
+
+                    #endregion
                 }
                 else if (received.Item1 == nameof(StepBro.Sidekick.ExecutionStateUpdate))
                 {
@@ -720,15 +878,27 @@ namespace StepBro.ConsoleSidekick.WinForms
             MoveWindows();
         }
 
-        string ScripExecutionButtonTitle(string element, string model, string objectVariable, object[] args)
+        public static string ScripExecutionButtonTitle(bool showFullName, string element, string partner, string objectVariable, object[] args)
         {
-            if (String.IsNullOrEmpty(model))
+            var elementName = (showFullName && String.IsNullOrEmpty(objectVariable)) ? element : element.Split('.').Last();
+            if (!String.IsNullOrEmpty(objectVariable))
             {
-                return element;
+                if (showFullName)
+                {
+                    return objectVariable + "." + elementName;
+                }
+                else
+                {
+                    return objectVariable.Split('.').Last() + "." + elementName;
+                }
+            }
+            else if (!String.IsNullOrEmpty(partner))
+            {
+                return elementName + "." + partner;
             }
             else
             {
-                return element + "." + model;
+                return elementName;
             }
         }
 
@@ -856,6 +1026,11 @@ namespace StepBro.ConsoleSidekick.WinForms
         private void toolStripMenuItemExit_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void toolStripMenuItemDeleteAllShortcuts_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -391,6 +391,8 @@ namespace StepBro.Core.Parser
             var dataSetters = new List<Expression>();
             var objectReference = Expression.Variable(objectType);
 
+            bool isSettableFromPropertyBlock = objectType.GetInterface(nameof(ISettableFromPropertyBlock)) != null;
+
             var deviceEntry = properties.TryGetElement(Constants.VARIABLE_DEVICE_REFERENCE);
             if (deviceEntry != null && deviceEntry.BlockEntryType == PropertyBlockEntryType.Value && (deviceEntry as PropertyBlockValue).IsStringOrIdentifier)
             {
@@ -522,12 +524,18 @@ namespace StepBro.Core.Parser
                         }
                         else
                         {
-                            errors.SymanticError(startToken.Line, startToken.Column, false, $"The object has no property named \"{entry.Name}\".");
+                            if (!isSettableFromPropertyBlock)
+                            {
+                                errors.SymanticError(startToken.Line, startToken.Column, false, $"The object has no property named \"{entry.Name}\".");
+                            }
                         }
                     }
                     else
                     {
-                        errors.InternalError(startToken.Line, startToken.Column, $"Element type is not expected (entry \"{entry.Name}\").");
+                        if (!isSettableFromPropertyBlock)
+                        {
+                            errors.InternalError(startToken.Line, startToken.Column, $"Element type is not expected (entry \"{entry.Name}\").");
+                        }
                     }
                 }
                 //else if (entry.BlockEntryType == PropertyBlockEntryType.Block)
@@ -548,8 +556,6 @@ namespace StepBro.Core.Parser
                     // Not handled yet; just let it fall through.
                 }
             }
-
-            bool isSettableFromPropertyBlock = objectType.GetInterface(nameof(ISettableFromPropertyBlock)) != null;
 
             if (dataSetters.Count > 0 || isSettableFromPropertyBlock)
             {

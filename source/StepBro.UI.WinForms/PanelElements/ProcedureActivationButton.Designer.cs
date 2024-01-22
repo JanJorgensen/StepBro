@@ -46,7 +46,6 @@
             button.Click += button_Click;
             button.KeyDown += button_KeyDown;
             button.KeyUp += button_KeyUp;
-            button.MouseClick += button_MouseClick;
             button.MouseDown += button_MouseDown;
             button.MouseUp += button_MouseUp;
             // 

@@ -134,7 +134,7 @@ namespace StepBro.Core.Execution
             if (result == null)
             {
                 context.ReportError(error);
-            }
+            } 
             return result;
         }
 

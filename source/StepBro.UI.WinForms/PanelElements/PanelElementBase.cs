@@ -16,14 +16,6 @@ namespace StepBro.UI.WinForms.PanelElements
 {
     public partial class PanelElementBase : UserControl, IPanelElement
     {
-        protected class ProcedureInfo
-        {
-            public string Name { get; set; } = null;
-            public string Partner { get; set; } = null;
-            public string TargetObject { get; set; } = null;
-            //public bool FirstParameterIsSelf { get; set; } = false;
-            public bool IsUsed { get { return !string.IsNullOrEmpty(Name); } }
-        }
 
 
         private static uint g_nextID = 100;
@@ -74,7 +66,7 @@ namespace StepBro.UI.WinForms.PanelElements
 
         public string PropertyName => throw new NotImplementedException();
 
-        public string ElementName { get {  return this.Name; } }
+        public string ElementName { get { return this.Name; } }
 
         public string ElementType => throw new NotImplementedException();
 
@@ -82,7 +74,10 @@ namespace StepBro.UI.WinForms.PanelElements
 
         public IEnumerable<IPanelElement> GetChilds()
         {
-            throw new NotImplementedException();
+            foreach (var child in m_children)
+            {
+                yield return child;
+            }
         }
 
         public object GetProperty([Implicit] ICallContext context, string property)
