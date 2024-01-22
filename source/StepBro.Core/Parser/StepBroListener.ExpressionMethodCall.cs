@@ -102,7 +102,7 @@ namespace StepBro.Core.Parser
         {
             MethodCall, ProcedureCall, FunctionCall,
             DynamicProcedureCall, DynamicFunctionCall,
-            DynamicObjectMethodCall
+            DynamicObjectMethodCall, Error
         }
 
         public void HandleParensExpression(
@@ -445,7 +445,24 @@ namespace StepBro.Core.Parser
                 else
                 {
                     // Handle none or more than one alternative
-                    throw new NotImplementedException();
+                    if (matchingMethods.Count() > 0)
+                    {
+                        // Multiple methods can be used, all fit the call.
+                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"Ambiguity in method resolve for method: {left.Token.Text}.");
+                    }
+                    else if (methods.Count() > 0 && matchingMethods.Count() == 0)
+                    {
+                        // The method exists, but no method fits with the given call
+                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"No method named \"{left.Token.Text}\" could be found with matching parameters.");
+                    }
+                    else
+                    {
+                        // The method does not exist
+                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"No method named \"{left.Token.Text}\" could be found.");
+                    }
+
+                    // Set the call type to error so we do not get an exception
+                    callType = ParansExpressionType.Error;
                 }
 
                 #endregion
@@ -639,7 +656,7 @@ namespace StepBro.Core.Parser
                                 null));
                     }
                 }
-                else    // Not a procedure or function; a method.
+                else if (callType != ParansExpressionType.Error)    // Not a procedure or function; a method.
                 {
                     switch (left.ReferencedType)
                     {
