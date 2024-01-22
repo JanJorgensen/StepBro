@@ -59,35 +59,40 @@ namespace StepBro.Core.Test.Data
                 LogLineData.LogType.Neutral,
                 0,
                 "*Anders",
-                DateTime.Parse("2023-09-26T11:35:00.0000000Z"));
+                DateTime.Parse("2023-09-26T11:35:00.0000000Z"),
+                1);
 
             LogLineData second = new LogLineData(
                 first,
                 LogLineData.LogType.Neutral,
                 1,
                 "*Bent",
-                DateTime.Parse("2023-09-26T11:36:00.0000000Z"));
+                DateTime.Parse("2023-09-26T11:36:00.0000000Z"),
+                1);
 
             LogLineData third = new LogLineData(
                 second,
                 LogLineData.LogType.Neutral,
                 1,
                 "*Christian",
-                DateTime.Parse("2023-09-26T11:37:00.0000000Z"));
+                DateTime.Parse("2023-09-26T11:37:00.0000000Z"),
+                1);
 
             LogLineData fourth = new LogLineData(
                 third,
                 LogLineData.LogType.Neutral,
                 1,
                 "*Dorte",
-                DateTime.Parse("2023-09-26T11:38:00.0000000Z"));
+                DateTime.Parse("2023-09-26T11:38:00.0000000Z"),
+                1);
 
             LogLineData fifth = new LogLineData(
                 fourth,
                 LogLineData.LogType.Neutral,
                 1,
                 "*Emil",
-                DateTime.Parse("2023-09-26T11:39:00.0000000Z"));
+                DateTime.Parse("2023-09-26T11:39:00.0000000Z"),
+                1);
 
             return first;
         }

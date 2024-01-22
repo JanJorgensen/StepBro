@@ -168,9 +168,20 @@ namespace StepBro.Process
             process.SetState(TaskExecutionState.StartRequested);
             try
             {
+                // We can not redirect anything if we use shell
+                if (useShell)
+                {
+                    osProcess.StartInfo.RedirectStandardError = false;
+                    osProcess.StartInfo.RedirectStandardInput = false;
+                    osProcess.StartInfo.RedirectStandardOutput = false;
+                }
                 osProcess.Start();
-                osProcess.BeginErrorReadLine();
-                osProcess.BeginOutputReadLine();
+                // We can only do this if we do not run through shell
+                if (!useShell)
+                {
+                    osProcess.BeginErrorReadLine();
+                    osProcess.BeginOutputReadLine();
+                }
                 if (startTimeout > TimeSpan.Zero)
                 {
                     if (!process.AwaitStart(context, startTimeout))

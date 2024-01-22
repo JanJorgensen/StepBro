@@ -4,6 +4,7 @@ namespace StepBro.Core.Data
 {
     public class LogLineData : ILineReaderEntry
     {
+        private int _subStringIndex = 0;
         public enum LogType
         {
             /// <summary>
@@ -53,11 +54,11 @@ namespace StepBro.Core.Data
         {
             get
             {
-                return this.Text.Substring(1);
+                return this.Text.Substring(_subStringIndex);
             }
         }
 
-        public LogLineData(LogLineData previous, LogType type, uint id, string text)
+        public LogLineData(LogLineData previous, LogType type, uint id, string text, int subStringIndex = 0)
         {
             this.Type = type;
             this.ID = id;
@@ -66,7 +67,7 @@ namespace StepBro.Core.Data
             if (previous != null) previous.Next = this;
         }
 
-        public LogLineData(LogLineData previous, LogType type, uint id, string text, DateTime timestamp)
+        public LogLineData(LogLineData previous, LogType type, uint id, string text, DateTime timestamp, int subStringIndex = 0)
         {
             this.Type = type;
             this.ID = id;

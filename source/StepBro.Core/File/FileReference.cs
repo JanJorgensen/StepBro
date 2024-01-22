@@ -149,7 +149,14 @@ namespace StepBro.Core.File
         public static string GetFullPath(this IEnumerable<IFolderShortcut> shortcuts, string path, ref string errorMessage)
         {
             string resolved = shortcuts.ResolveShortcutPath(path, ref errorMessage);
-            return System.IO.Path.GetFullPath(resolved);
+            if (resolved == null)
+            {
+                return null;
+            }
+            else
+            {
+                return System.IO.Path.GetFullPath(resolved);
+            }
         }
     }
 
