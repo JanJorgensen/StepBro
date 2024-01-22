@@ -64,6 +64,7 @@ namespace StepBro.Core.Data
             this.ID = id;
             this.Timestamp = DateTime.Now;
             Text = text;
+            this._subStringIndex = subStringIndex;
             if (previous != null) previous.Next = this;
         }
 
@@ -73,6 +74,7 @@ namespace StepBro.Core.Data
             this.ID = id;
             this.Timestamp = timestamp;
             Text = text;
+            this._subStringIndex = subStringIndex;
             if (previous != null) previous.Next = this;
         }
     }
