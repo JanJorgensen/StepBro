@@ -56,7 +56,7 @@ namespace StepBro.Sidekick
 
     public class FileElements
     {
-        public enum VariableInterfaces { None = 0, Command = 0x01, MenuCreator = 0x02, PanelCreator = 0x04 }
+        public enum VariableInterfaces { None = 0, Command = 0x01, MenuCreator = 0x02, ToolBarCreator = 0x04, PanelCreator = 0x08 }
         public class DataType
         {
             public DataType() { }
@@ -85,6 +85,7 @@ namespace StepBro.Sidekick
         [JsonDerivedType(typeof(TestList), typeDiscriminator: "testlist")]
         [JsonDerivedType(typeof(Variable), typeDiscriminator: "variable")]
         [JsonDerivedType(typeof(PanelDefinitionVariable), typeDiscriminator: "panelVariable")]
+        [JsonDerivedType(typeof(ToolBarDefinitionVariable), typeDiscriminator: "toolbarVariable")]
         public class Element
         {
             public int File { get; set; }
@@ -122,6 +123,11 @@ namespace StepBro.Sidekick
         {
             public string Title { get; set; } = null;
             public SerializablePropertyBlockEntry PanelDefinition { get; set; } = null;
+        }
+        public class ToolBarDefinitionVariable : Variable
+        {
+            public string Title { get; set; } = null;
+            public SerializablePropertyBlockEntry ToolBarDefinition { get; set; } = null;
         }
 
         public string TopFile { get; set; }

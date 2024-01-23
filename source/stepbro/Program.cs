@@ -1,4 +1,5 @@
-﻿using StepBro.Core;
+﻿//#define STOP_BEFORE_PARSING
+using StepBro.Core;
 using StepBro.Core.Addons;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
@@ -20,7 +21,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using static StepBro.Core.Data.ObjectMonitor;
 using StepBroMain = StepBro.Core.Main;
 
 namespace StepBro.Cmd
@@ -189,7 +189,10 @@ namespace StepBro.Cmd
 
                 if (!String.IsNullOrEmpty(targetFile))
                 {
-                    if (m_commandLineOptions.Verbose) ConsoleWriteLine("Filename: {0}", targetFile);
+                    if (m_commandLineOptions.Verbose || m_commandLineOptions.RepeatedParsing || m_commandLineOptions.Sidekick)
+                    {
+                        ConsoleWriteLine("File to load: {0}", targetFile);
+                    }
 
                     m_next.Enqueue(StateOrCommand.LoadMainFile);
 
@@ -272,12 +275,12 @@ namespace StepBro.Cmd
 
                 m_activitiesRunning = true;
 
-#if DEBUG
-                //Console.WriteLine("<PRESS ANY KEY TO CONTINUE>");
-                //while (!Console.KeyAvailable)
-                //{
-                //    System.Threading.Thread.Sleep(25);
-                //}
+#if STOP_BEFORE_PARSING
+                Console.WriteLine("<PRESS ANY KEY TO CONTINUE>");
+                while (!Console.KeyAvailable)
+                {
+                    System.Threading.Thread.Sleep(25);
+                }
 #endif
 
                 IScriptFile file = null;
@@ -285,13 +288,24 @@ namespace StepBro.Cmd
                 StateOrCommand command;
                 while ((command = m_next.Any() ? m_next.Dequeue() : StateOrCommand.Exit) != StateOrCommand.Exit)
                 {
+                    if (command != StateOrCommand.AwaitCommand && command != StateOrCommand.AwaitFileChange)
+                    {
+                        Trace.WriteLine("StepBro command: " + command.ToString());
+                    }
                     switch (command)
                     {
                         case StateOrCommand.AwaitCommand:
                         case StateOrCommand.AwaitFileChange:
                             if (m_mode == Mode.RepeatedParsing && StepBroMain.CheckIfFileParsingNeeded(true))
                             {
-                                m_next.Enqueue(StateOrCommand.CloseAndDisposeAllFiles);
+                                if (sidekickStarted)
+                                {
+                                    m_next.Enqueue(StateOrCommand.ParseFiles);
+                                }
+                                else
+                                {
+                                    m_next.Enqueue(StateOrCommand.CloseAndDisposeAllFiles);
+                                }
                                 System.Threading.Thread.Sleep(200);         // Give editor a chance to save all files before the parsing starts.
                                 break;
                             }
@@ -409,7 +423,6 @@ namespace StepBro.Cmd
                             break;
 
                         case StateOrCommand.LoadMainFile:
-                            Trace.WriteLine("StepBro command: " + command.ToString());
                             targetFileFullPath = System.IO.Path.GetFullPath(targetFile);
                             try
                             {
@@ -439,7 +452,6 @@ namespace StepBro.Cmd
                             break;
 
                         case StateOrCommand.ParseFiles:
-                            Trace.WriteLine("StepBro command: " + command.ToString());
                             if (m_commandLineOptions.Verbose)
                             {
                                 StepBroMain.Logger.RootLogger.LogDetail("Request parsing files");
@@ -545,7 +557,16 @@ namespace StepBro.Cmd
                                     foreach (var v in objects)
                                     {
                                         StepBro.Sidekick.FileElements.Variable variableData;
-                                        if (v.Object is StepBro.PanelCreator.Panel)
+                                        if (v.Object is StepBro.ToolBarCreator.ToolBar)
+                                        {
+                                            variableData = new StepBro.Sidekick.FileElements.ToolBarDefinitionVariable();
+                                            variableData.DataType = v.Object.GetType().FullName;
+                                            variableData.Interfaces |= StepBro.Sidekick.FileElements.VariableInterfaces.ToolBarCreator;
+                                            var panel = v.Object as StepBro.ToolBarCreator.ToolBar;
+                                            ((FileElements.ToolBarDefinitionVariable)variableData).Title = panel.Title;
+                                            ((FileElements.ToolBarDefinitionVariable)variableData).ToolBarDefinition = panel.Definition.CloneForSerialization();
+                                        }
+                                        else if (v.Object is StepBro.PanelCreator.Panel)
                                         {
                                             variableData = new StepBro.Sidekick.FileElements.PanelDefinitionVariable();
                                             variableData.DataType = v.Object.GetType().FullName;
@@ -623,7 +644,6 @@ namespace StepBro.Cmd
 
                         case StateOrCommand.StartScriptExecution:
                             {
-                                Trace.WriteLine("StepBro command: " + command.ToString());
                                 element = StepBroMain.TryFindFileElement(targetElement);
                                 partner = null;
                                 if (element != null)
@@ -798,12 +818,12 @@ namespace StepBro.Cmd
                                 else
                                 {
                                     m_next.Enqueue(StateOrCommand.AwaitScriptExecutionEnd);
+                                    Thread.Sleep(100);
                                 }
                             }
                             break;
 
                         case StateOrCommand.CloseAndDisposeAllFiles:
-                            Trace.WriteLine("StepBro command: " + command.ToString());
                             StepBroMain.UnregisterFileUsage(consoleResourceUserObject, file);
                             switch (m_mode)
                             {
@@ -909,8 +929,6 @@ namespace StepBro.Cmd
             if (m_sideKickPipe != null)
             {
                 m_sideKickPipe.Send(ShortCommand.Close);
-                Thread.Sleep(50);
-
                 m_sideKickPipe.Dispose();
             }
 

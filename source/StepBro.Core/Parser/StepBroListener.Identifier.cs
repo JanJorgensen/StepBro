@@ -114,6 +114,10 @@ namespace StepBro.Core.Parser
                     result.Argument = input.Argument;
                     return result;
                 }
+                else
+                {
+                    return input;
+                }
             }
             return input;
         }

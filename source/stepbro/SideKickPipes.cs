@@ -205,9 +205,11 @@ namespace StepBro
             {
                 while (instance.m_continueReceiving)
                 {
+                    System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE receiver: ReadString");
                     var s = instance.m_stream.ReadString();
                     if (s == null)
                     {
+                        System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE Received nothing");
                         instance.m_continueReceiving = false;
                     }
                     else

@@ -16,9 +16,9 @@ namespace StepBro.UI.WinForms.PanelElements
     public partial class ProcedureActivationButton : PanelElementBase
     {
         private enum Mode { ActivateOnClick = 0, ClickToStop, RunWhilePushed }
-        private ProcedureInfo m_startProcedure;
-        private ProcedureInfo m_stopProcedure;
-        private ProcedureInfo m_enabledCheckProcedure;
+        private ProcedureActivationInfo m_startProcedure;
+        private ProcedureActivationInfo m_stopProcedure;
+        private ProcedureActivationInfo m_enabledCheckProcedure;
         private Mode m_mode = Mode.ActivateOnClick;
         private IExecutionAccess m_execution = null;
         private Color m_buttonColorNormal = Color.White;
@@ -55,7 +55,7 @@ namespace StepBro.UI.WinForms.PanelElements
                     {
                         if (m_startProcedure == null)
                         {
-                            m_startProcedure = new ProcedureInfo();
+                            m_startProcedure = new ProcedureActivationInfo();
                         }
                         m_startProcedure.Name = valueField.ValueAsString();
                     }
@@ -63,7 +63,7 @@ namespace StepBro.UI.WinForms.PanelElements
                     {
                         if (m_startProcedure == null)
                         {
-                            m_startProcedure = new ProcedureInfo();
+                            m_startProcedure = new ProcedureActivationInfo();
                         }
                         m_startProcedure.Partner = valueField.ValueAsString();
                     }
@@ -117,11 +117,12 @@ namespace StepBro.UI.WinForms.PanelElements
 
         private void Execution_CurrentStateChanged(object sender, EventArgs e)
         {
-            if (this.InvokeRequired)
-            {
-                this.BeginInvoke(new Action(() => { Execution_CurrentStateChanged(sender, e); }));
-            }
-            else if (m_execution != null)
+            this.BeginInvoke(this.HandleExecutionStateChange);
+        }
+
+        private void HandleExecutionStateChange()
+        {
+            if (m_execution != null)
             {
                 System.Diagnostics.Debug.WriteLine("Execution_CurrentStateChanged; in GUI");
                 if (m_execution.State.HasEnded())
@@ -173,10 +174,6 @@ namespace StepBro.UI.WinForms.PanelElements
             {
                 this.StartProcedure();
             }
-        }
-
-        private void button_MouseClick(object sender, MouseEventArgs e)
-        {
         }
 
         private void button_MouseDown(object sender, MouseEventArgs e)
