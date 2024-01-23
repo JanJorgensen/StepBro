@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace StepBro.Sidekick
+namespace StepBro.Sidekick.Messages
 {
 
     public class Argument
@@ -42,6 +42,7 @@ namespace StepBro.Sidekick
         RequestClose,   // From sidekick to console; this can be rejected/ignored.
         Close,          // Force closing.
         ClearDisplay,
+        EndFileElements,
         Parse,
         ExecutionStarted,
         ExecutionStopped,
@@ -54,85 +55,91 @@ namespace StepBro.Sidekick
         public string[] Objects { get; set; }
     }
 
-    public class FileElements
+    public enum VariableInterfaces { None = 0, Command = 0x01, MenuCreator = 0x02, ToolBarCreator = 0x04, PanelCreator = 0x08 }
+    public class DataType
     {
-        public enum VariableInterfaces { None = 0, Command = 0x01, MenuCreator = 0x02, ToolBarCreator = 0x04, PanelCreator = 0x08 }
-        public class DataType
+        public DataType() { }
+        public DataType(string name, string baseType)
         {
-            public DataType() { }
-            public DataType(string name, string baseType)
-            {
-                this.Name = name;
-                this.BaseType = baseType;
-            }
-            public string Name { get; set; }
-            public string BaseType { get; set; }
+            this.Name = name;
+            this.BaseType = baseType;
         }
-        public class Parameter
+        public string Name { get; set; }
+        public string BaseType { get; set; }
+    }
+    public class Parameter
+    {
+        public Parameter() { }
+        public Parameter(string name, string type, string baseType = null)
         {
-            public Parameter() { }
-            public Parameter(string name, string type, string baseType = null)
-            {
-                this.Name = name;
-                this.Type = new DataType(type, baseType);
-            }
-            public string Name { get; set; }
-            public DataType Type { get; set; }
+            this.Name = name;
+            this.Type = new DataType(type, baseType);
         }
+        public string Name { get; set; }
+        public DataType Type { get; set; }
+    }
 
-        [JsonDerivedType(typeof(Element), typeDiscriminator: "base")]
-        [JsonDerivedType(typeof(Procedure), typeDiscriminator: "procedure")]
-        [JsonDerivedType(typeof(TestList), typeDiscriminator: "testlist")]
-        [JsonDerivedType(typeof(Variable), typeDiscriminator: "variable")]
-        [JsonDerivedType(typeof(PanelDefinitionVariable), typeDiscriminator: "panelVariable")]
-        [JsonDerivedType(typeof(ToolBarDefinitionVariable), typeDiscriminator: "toolbarVariable")]
-        public class Element
-        {
-            public int File { get; set; }
-            public string Name { get; set; }
-            public string FullName { get; set; }
-            public string BaseElement { get; set; } = null;
-            public Partner[] Partners { get; set; } = null;
-        }
-        public class TestList : Element
-        {
-        }
-        public class Procedure : Element
-        {
-            public bool FirstParameterIsInstanceReference { get; set; } = false;
-            public string ReturnType { get; set; } = null;
-            public Parameter[] Parameters { get; set; } = null;
-            public string[] CompatibleObjectInstances { get; set; } = null;
-        }
-        public class Partner
-        {
-            public string Name { get; set; }
-            public string ProcedureType { get; set; }
-        }
-        public class Variable : Element
-        {
-            public string DataType { get; set; }
-            public VariableInterfaces Interfaces { get; set; }
+    [JsonDerivedType(typeof(Element), typeDiscriminator: "base")]
+    [JsonDerivedType(typeof(Procedure), typeDiscriminator: "procedure")]
+    [JsonDerivedType(typeof(TestList), typeDiscriminator: "testlist")]
+    [JsonDerivedType(typeof(Variable), typeDiscriminator: "variable")]
+    [JsonDerivedType(typeof(PanelDefinitionVariable), typeDiscriminator: "panelVariable")]
+    [JsonDerivedType(typeof(ToolBarDefinitionVariable), typeDiscriminator: "toolbarVariable")]
+    public class Element
+    {
+        public int File { get; set; }
+        public string Name { get; set; }
+        public string FullName { get; set; }
+        public string BaseElement { get; set; } = null;
+        public Partner[] Partners { get; set; } = null;
+    }
+    public class TestList : Element
+    {
+    }
+    public class Procedure : Element
+    {
+        public bool FirstParameterIsInstanceReference { get; set; } = false;
+        public string ReturnType { get; set; } = null;
+        public Parameter[] Parameters { get; set; } = null;
+        public string[] CompatibleObjectInstances { get; set; } = null;
+    }
+    public class Partner
+    {
+        public string Name { get; set; }
+        public string ProcedureType { get; set; }
+    }
+    public class Variable : Element
+    {
+        public string DataType { get; set; }
+        public VariableInterfaces Interfaces { get; set; }
 
-            public override string ToString()
-            {
-                return this.Name;
-            }
-        }
-        public class PanelDefinitionVariable : Variable
+        public override string ToString()
         {
-            public string Title { get; set; } = null;
-            public SerializablePropertyBlockEntry PanelDefinition { get; set; } = null;
+            return this.Name;
         }
-        public class ToolBarDefinitionVariable : Variable
-        {
-            public string Title { get; set; } = null;
-            public SerializablePropertyBlockEntry ToolBarDefinition { get; set; } = null;
-        }
+    }
+    public class PanelDefinitionVariable : Variable
+    {
+        public string Title { get; set; } = null;
+        public SerializablePropertyBlockEntry PanelDefinition { get; set; } = null;
+    }
+    public class ToolBarDefinitionVariable : Variable
+    {
+        public string Title { get; set; } = null;
+        public SerializablePropertyBlockEntry ToolBarDefinition { get; set; } = null;
+    }
 
+    public class FileElement
+    {
+        public FileElement(Element data) { this.Data = data; }
+
+        public Element Data { get; set; }
+    }
+
+    public class StartFileElements
+    {
         public string TopFile { get; set; }
         public string[] Files { get; set; }
-        public Element[] Elements { get; set; }
     }
 
     //public class RequestElementInfo

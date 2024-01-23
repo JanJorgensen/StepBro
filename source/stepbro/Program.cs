@@ -1,4 +1,4 @@
-﻿//#define STOP_BEFORE_PARSING
+﻿#define STOP_BEFORE_PARSING
 using StepBro.Core;
 using StepBro.Core.Addons;
 using StepBro.Core.Api;
@@ -236,7 +236,7 @@ namespace StepBro.Cmd
                 {
                     closeEventHandler = (sender, e) =>
                     {
-                        m_sideKickPipe.Send(ShortCommand.Close);
+                        m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.Close);
                         Thread.Sleep(1000);     // Leave some time for the sidekick application to receive the command.
                     };
 
@@ -331,15 +331,15 @@ namespace StepBro.Cmd
                                 var input = m_sideKickPipe.TryGetReceived();
                                 if (input != null)
                                 {
-                                    if (input.Item1 == nameof(ShortCommand))
+                                    if (input.Item1 == nameof(StepBro.Sidekick.Messages.ShortCommand))
                                     {
-                                        var shortCommand = JsonSerializer.Deserialize<ShortCommand>(input.Item2);
+                                        var shortCommand = JsonSerializer.Deserialize<StepBro.Sidekick.Messages.ShortCommand>(input.Item2);
                                         switch (shortCommand)
                                         {
-                                            case ShortCommand.RequestClose:
+                                            case StepBro.Sidekick.Messages.ShortCommand.RequestClose:
                                                 m_next.Enqueue(StateOrCommand.Exit);
                                                 break;
-                                            case ShortCommand.Parse:
+                                            case StepBro.Sidekick.Messages.ShortCommand.Parse:
                                                 StepBroMain.Logger.RootLogger.LogUserAction("Request file parsing");
                                                 m_next.Enqueue(StateOrCommand.ParseFiles);
                                                 break;
@@ -354,9 +354,9 @@ namespace StepBro.Cmd
                                                 break;
                                         }
                                     }
-                                    else if (input.Item1 == nameof(ObjectCommand))
+                                    else if (input.Item1 == nameof(StepBro.Sidekick.Messages.ObjectCommand))
                                     {
-                                        var objectCommand = JsonSerializer.Deserialize<ObjectCommand>(input.Item2);
+                                        var objectCommand = JsonSerializer.Deserialize<StepBro.Sidekick.Messages.ObjectCommand>(input.Item2);
 
                                         if (commandObjectDictionary.ContainsKey(objectCommand.Object) && !String.IsNullOrEmpty(objectCommand.Command))
                                         {
@@ -373,9 +373,9 @@ namespace StepBro.Cmd
                                             }
                                         }
                                     }
-                                    else if (input.Item1 == nameof(RunScriptRequest))
+                                    else if (input.Item1 == nameof(StepBro.Sidekick.Messages.RunScriptRequest))
                                     {
-                                        var request = JsonSerializer.Deserialize<RunScriptRequest>(input.Item2);
+                                        var request = JsonSerializer.Deserialize<StepBro.Sidekick.Messages.RunScriptRequest>(input.Item2);
                                         executionRequestSilent = request.Silent;
                                         executionStartRequestID = request.RequestID;
                                         targetElement = request.Element;
@@ -388,9 +388,9 @@ namespace StepBro.Cmd
 
                                         m_next.Enqueue(StateOrCommand.StartScriptExecution);
                                     }
-                                    else if (input.Item1 == nameof(StopExecutionRequest))
+                                    else if (input.Item1 == nameof(StepBro.Sidekick.Messages.StopExecutionRequest))
                                     {
-                                        var request = JsonSerializer.Deserialize<StopExecutionRequest>(input.Item2);
+                                        var request = JsonSerializer.Deserialize<StepBro.Sidekick.Messages.StopExecutionRequest>(input.Item2);
                                         var reqistration = m_requestObjectDictionary.FirstOrDefault(r => r.Item1 == request.RequestID);
                                         if (reqistration != null)
                                         {
@@ -400,9 +400,9 @@ namespace StepBro.Cmd
                                             }
                                         }
                                     }
-                                    else if (input.Item1 == nameof(ReleaseRequest))
+                                    else if (input.Item1 == nameof(StepBro.Sidekick.Messages.ReleaseRequest))
                                     {
-                                        var request = JsonSerializer.Deserialize<ReleaseRequest>(input.Item2);
+                                        var request = JsonSerializer.Deserialize<StepBro.Sidekick.Messages.ReleaseRequest>(input.Item2);
                                         var reqistration = m_requestObjectDictionary.FirstOrDefault(r => r.Item1 == request.RequestID);
                                         if (reqistration != null)
                                         {
@@ -468,7 +468,7 @@ namespace StepBro.Cmd
                                     {
                                         commandObjectDictionary[o.FullName] = o.Object as ITextCommandInput;    // Add or override.
                                     }
-                                    var commandObjectsMessage = new CommandObjectsList();
+                                    var commandObjectsMessage = new StepBro.Sidekick.Messages.CommandObjectsList();
                                     commandObjectsMessage.Objects = commandObjectsContainers.Select(o => o.FullName).ToArray();
                                     m_sideKickPipe.Send(commandObjectsMessage);
 
@@ -485,8 +485,7 @@ namespace StepBro.Cmd
                                         }
                                     }
 
-                                    var elementsMessage = new StepBro.Sidekick.FileElements();
-                                    var elementList = new List<StepBro.Sidekick.FileElements.Element>();
+                                    var elementList = new List<StepBro.Sidekick.Messages.Element>();
                                     for (int i = 0; i < files.Count; i++)
                                     {
                                         var f = files[i];
@@ -494,18 +493,18 @@ namespace StepBro.Cmd
                                         var elements = f.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration || e.ElementType == FileElementType.TestList).ToList();
                                         foreach (var e in elements)
                                         {
-                                            StepBro.Sidekick.FileElements.Element elementData = null;
+                                            StepBro.Sidekick.Messages.Element elementData = null;
                                             switch (e.ElementType)
                                             {
                                                 case FileElementType.ProcedureDeclaration:
                                                     {
-                                                        elementData = new FileElements.Procedure();
-                                                        var procedureData = elementData as FileElements.Procedure;
+                                                        elementData = new StepBro.Sidekick.Messages.Procedure();
+                                                        var procedureData = elementData as StepBro.Sidekick.Messages.Procedure;
                                                         var p = e as IFileProcedure;
                                                         if (p.Parameters.Length > 0 && p.IsFirstParameterThisReference)
                                                         {
                                                             var par = p.Parameters[0];
-                                                            (elementData as FileElements.Procedure).FirstParameterIsInstanceReference = true;
+                                                            (elementData as StepBro.Sidekick.Messages.Procedure).FirstParameterIsInstanceReference = true;
 
                                                             var instances = new List<string>();
                                                             foreach (var v in objects)
@@ -520,12 +519,12 @@ namespace StepBro.Cmd
                                                                 procedureData.CompatibleObjectInstances = instances.ToArray();
                                                             }
                                                         }
-                                                        (elementData as FileElements.Procedure).Parameters = p.Parameters.Select(p => new FileElements.Parameter(p.Name, p.Value.TypeName())).ToArray();
-                                                        (elementData as FileElements.Procedure).ReturnType = p.ReturnType.TypeName();
+                                                        (elementData as StepBro.Sidekick.Messages.Procedure).Parameters = p.Parameters.Select(p => new StepBro.Sidekick.Messages.Parameter(p.Name, p.Value.TypeName())).ToArray();
+                                                        (elementData as StepBro.Sidekick.Messages.Procedure).ReturnType = p.ReturnType.TypeName();
                                                     }
                                                     break;
                                                 case FileElementType.TestList:
-                                                    elementData = new FileElements.TestList();
+                                                    elementData = new StepBro.Sidekick.Messages.TestList();
                                                     break;
                                                 default:
                                                     break;
@@ -538,59 +537,67 @@ namespace StepBro.Cmd
 
                                                 if (e.ListPartners().Any())
                                                 {
-                                                    var elementPartners = new List<FileElements.Partner>();
+                                                    var elementPartners = new List<StepBro.Sidekick.Messages.Partner>();
                                                     foreach (var p in e.ListPartners())
                                                     {
-                                                        var partnerData = new FileElements.Partner();
+                                                        var partnerData = new StepBro.Sidekick.Messages.Partner();
                                                         partnerData.Name = p.Name;
                                                         partnerData.ProcedureType = p.ProcedureName;
                                                         elementPartners.Add(partnerData);
                                                     }
                                                     elementData.Partners = elementPartners.ToArray();
                                                 }
-                                                //elementPartners.Add(partners);
-
                                                 elementList.Add(elementData);
                                             }
                                         }
                                     }
                                     foreach (var v in objects)
                                     {
-                                        StepBro.Sidekick.FileElements.Variable variableData;
+                                        StepBro.Sidekick.Messages.Variable variableData;
                                         if (v.Object is StepBro.ToolBarCreator.ToolBar)
                                         {
-                                            variableData = new StepBro.Sidekick.FileElements.ToolBarDefinitionVariable();
+                                            variableData = new StepBro.Sidekick.Messages.ToolBarDefinitionVariable();
                                             variableData.DataType = v.Object.GetType().FullName;
-                                            variableData.Interfaces |= StepBro.Sidekick.FileElements.VariableInterfaces.ToolBarCreator;
+                                            variableData.Interfaces |= StepBro.Sidekick.Messages.VariableInterfaces.ToolBarCreator;
                                             var panel = v.Object as StepBro.ToolBarCreator.ToolBar;
-                                            ((FileElements.ToolBarDefinitionVariable)variableData).Title = panel.Title;
-                                            ((FileElements.ToolBarDefinitionVariable)variableData).ToolBarDefinition = panel.Definition.CloneForSerialization();
+                                            ((StepBro.Sidekick.Messages.ToolBarDefinitionVariable)variableData).Title = panel.Title;
+                                            ((StepBro.Sidekick.Messages.ToolBarDefinitionVariable)variableData).ToolBarDefinition = panel.Definition.CloneForSerialization();
                                         }
                                         else if (v.Object is StepBro.PanelCreator.Panel)
                                         {
-                                            variableData = new StepBro.Sidekick.FileElements.PanelDefinitionVariable();
+                                            variableData = new StepBro.Sidekick.Messages.PanelDefinitionVariable();
                                             variableData.DataType = v.Object.GetType().FullName;
-                                            variableData.Interfaces |= StepBro.Sidekick.FileElements.VariableInterfaces.PanelCreator;
+                                            variableData.Interfaces |= StepBro.Sidekick.Messages.VariableInterfaces.PanelCreator;
                                             var panel = v.Object as StepBro.PanelCreator.Panel;
-                                            ((FileElements.PanelDefinitionVariable)variableData).Title = panel.Title;
-                                            ((FileElements.PanelDefinitionVariable)variableData).PanelDefinition = panel.MainPanelDefinition.CloneForSerialization();
+                                            ((StepBro.Sidekick.Messages.PanelDefinitionVariable)variableData).Title = panel.Title;
+                                            ((StepBro.Sidekick.Messages.PanelDefinitionVariable)variableData).PanelDefinition = panel.MainPanelDefinition.CloneForSerialization();
                                         }
                                         else
                                         {
-                                            variableData = new StepBro.Sidekick.FileElements.Variable();
+                                            variableData = new StepBro.Sidekick.Messages.Variable();
                                         }
                                         variableData.Name = v.FullName.Split('.').Last();
                                         variableData.FullName = v.FullName;
                                         if (v.Object is ITextCommandInput)
                                         {
-                                            variableData.Interfaces |= StepBro.Sidekick.FileElements.VariableInterfaces.Command;
+                                            variableData.Interfaces |= StepBro.Sidekick.Messages.VariableInterfaces.Command;
                                         }
                                         elementList.Add(variableData);
                                     }
-                                    elementsMessage.TopFile = targetFileFullPath;
-                                    elementsMessage.Files = files.Select(f => f.FilePath).ToArray();
-                                    elementsMessage.Elements = elementList.ToArray();
-                                    m_sideKickPipe.Send(elementsMessage);
+
+                                    // Send the stuff...
+
+                                    var startMessage = new StepBro.Sidekick.Messages.StartFileElements();
+                                    startMessage.TopFile = targetFileFullPath;
+                                    startMessage.Files = files.Select(f => f.FilePath).ToArray();
+                                    m_sideKickPipe.Send(startMessage);
+
+                                    foreach (var e in elementList)
+                                    {
+                                        m_sideKickPipe.Send(new StepBro.Sidekick.Messages.FileElement(e));
+                                    }
+
+                                    m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.EndFileElements);
                                 }
 
                                 switch (m_mode)
@@ -703,7 +710,7 @@ namespace StepBro.Cmd
                                                     executionStartRequestID = 0UL;
                                                 }
                                                 m_next.Enqueue(StateOrCommand.AwaitCommand);
-                                                m_sideKickPipe.Send(ShortCommand.ExecutionStarted);
+                                                m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.ExecutionStarted);
                                             }
                                             else
                                             {
@@ -744,10 +751,10 @@ namespace StepBro.Cmd
                                         var executionReqistration = m_requestObjectDictionary.FirstOrDefault(e => Object.ReferenceEquals(execution, e.Item2));
                                         if (executionReqistration != null)
                                         {
-                                            m_sideKickPipe.Send(new ExecutionStateUpdate(executionReqistration.Item1, execution.Task.CurrentState));
+                                            m_sideKickPipe.Send(new StepBro.Sidekick.Messages.ExecutionStateUpdate(executionReqistration.Item1, execution.Task.CurrentState));
                                         }
 
-                                        m_sideKickPipe.Send(ShortCommand.ExecutionStopped);
+                                        m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.ExecutionStopped);
                                     }
                                     result = execution.Result;
                                     createdReport = execution.Report;
@@ -928,7 +935,7 @@ namespace StepBro.Cmd
 
             if (m_sideKickPipe != null)
             {
-                m_sideKickPipe.Send(ShortCommand.Close);
+                m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.Close);
                 m_sideKickPipe.Dispose();
             }
 
@@ -952,7 +959,7 @@ namespace StepBro.Cmd
             var execution = m_requestObjectDictionary.FirstOrDefault(e => e.Item2 is IScriptExecution && Object.ReferenceEquals(executionTask, e.Item2));
             if (execution != null)
             {
-                m_sideKickPipe.Send(new ExecutionStateUpdate(execution.Item1, executionTask.CurrentState));
+                m_sideKickPipe.Send(new StepBro.Sidekick.Messages.ExecutionStateUpdate(execution.Item1, executionTask.CurrentState));
             }
         }
 
@@ -1005,7 +1012,7 @@ namespace StepBro.Cmd
         {
             if (!m_dumpingExecutionLog && m_commandLineOptions.TraceToConsole)
             {
-                
+
                 m_dumpingExecutionLog = true;
                 var logTask = new Task(() => LogDumpTask());
                 logTask.Start();

@@ -3,14 +3,10 @@ using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Logging;
 using StepBro.Core.Tasks;
-using StepBro.Sidekick;
+using StepBro.Sidekick.Messages;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text.Json;
-using StepBro.UI.WinForms;
-using System.Windows.Forms;
-using static StepBro.ConsoleSidekick.WinForms.MainForm;
-using StepBro.UI.WinForms.CustomToolBar;
 
 namespace StepBro.ConsoleSidekick.WinForms
 {
@@ -28,6 +24,8 @@ namespace StepBro.ConsoleSidekick.WinForms
         private PanelsDialog m_panelsDialog = null;
         private bool m_settingCommandCombo = false;
         private List<WeakReference<ExecutionAccess>> m_activeExecutions = new List<WeakReference<ExecutionAccess>>();
+        private string m_topScriptFile = null;
+        private List<Element> m_fileElements = null;
         private bool m_userFileRead = false;
         private string m_userFile = null;
         private object m_userShortcutItemTag = new object();
@@ -216,7 +214,7 @@ namespace StepBro.ConsoleSidekick.WinForms
         {
             toolStripComboBoxTool.ToolTipText =
                 "Select tool/object to use for the command prompt. Selected object: '" +
-                (toolStripComboBoxTool.SelectedItem as FileElements.Variable).FullName + "'";
+                (toolStripComboBoxTool.SelectedItem as Variable).FullName + "'";
         }
 
         private void toolStripComboBoxToolCommand_KeyPress(object sender, KeyPressEventArgs e)
@@ -269,7 +267,7 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void ExecuteCommand(string command)
         {
-            var tool = (toolStripComboBoxTool.Items[toolStripComboBoxTool.SelectedIndex] as FileElements.Variable).FullName;
+            var tool = (toolStripComboBoxTool.Items[toolStripComboBoxTool.SelectedIndex] as Variable).FullName;
             m_pipe.Send(new ObjectCommand(tool, command));
         }
 
@@ -485,6 +483,10 @@ namespace StepBro.ConsoleSidekick.WinForms
                 if (received.Item1 == nameof(ShortCommand))
                 {
                     var cmd = JsonSerializer.Deserialize<ShortCommand>(received.Item2);
+                    if (cmd == ShortCommand.EndFileElements)
+                    {
+                        this.HandleReceivedFileElements();
+                    }
                     if (cmd == ShortCommand.Close)
                     {
                         m_closeRequestedByConsole = true;
@@ -504,369 +506,19 @@ namespace StepBro.ConsoleSidekick.WinForms
                         //m_scriptExecuting = false;
                     }
                 }
-                else if (received.Item1 == nameof(StepBro.Sidekick.FileElements))
+                else if (received.Item1 == nameof(StepBro.Sidekick.Messages.StartFileElements))
                 {
-                    var elements = JsonSerializer.Deserialize<StepBro.Sidekick.FileElements>(received.Item2);
-                    var commandObjectVariables = elements.Elements.Where(e => e is StepBro.Sidekick.FileElements.Variable && (e as StepBro.Sidekick.FileElements.Variable).Interfaces.HasFlag(FileElements.VariableInterfaces.Command)).Select(e => (StepBro.Sidekick.FileElements.Variable)e).ToList();
-                    var namespaces = elements.Elements.Select(e => NamespaceFromFullName(e.FullName)).Distinct().ToList();
-                    var objectsForProcedures = elements.Elements.Where(e => e is FileElements.Procedure && (e as FileElements.Procedure).CompatibleObjectInstances != null).SelectMany(e => ((e as FileElements.Procedure).CompatibleObjectInstances)).Distinct().ToList();
-
-                    for (int di = 0; di < toolStripSplitButtonRunScript.DropDownItems.Count;)
-                    {
-                        if (toolStripSplitButtonRunScript.DropDownItems[di].Tag == null)
-                        {
-                            toolStripSplitButtonRunScript.DropDownItems.RemoveAt(di);
-                        }
-                        else di++;
-                    }
-
-                    // If short name alone is used, will there be name clashes? If so, use the full name.
-                    bool useFullNameInUseableObject = objectsForProcedures.Select(s => s.Split('.').Last()).Distinct().Count() != objectsForProcedures.Count;
-
-                    #region Tool variables used as instance references
-
-                    foreach (var useableObject in objectsForProcedures)
-                    {
-                        string shortName = useableObject.Split('.').Last();
-
-                        var objectMenu = new ToolStripMenuItem();
-                        objectMenu.Name = "toolStripMenuObject" + useableObject.Replace(".", "Dot");
-                        objectMenu.Size = new Size(182, 22);
-                        objectMenu.Text = useFullNameInUseableObject ? useableObject : shortName;
-                        objectMenu.ToolTipText = null;
-                        toolStripSplitButtonRunScript.DropDownItems.Add(objectMenu);
-
-                        var procedures = elements.Elements.Where(e => e is FileElements.Procedure && (e as FileElements.Procedure).CompatibleObjectInstances != null && (e as FileElements.Procedure).CompatibleObjectInstances.Any(s => string.Equals(s, useableObject, StringComparison.InvariantCulture))).Cast<FileElements.Procedure>().ToList();
-                        foreach (var procedure in procedures)
-                        {
-                            string callText = (useFullNameInUseableObject ? useableObject : shortName) + "." + procedure.Name;
-                            var procedureMenu = new ScriptExecutionToolStripMenuItem();
-                            procedureMenu.Name = "toolStripMenuProcedure" + procedure.Name + "On" + useableObject.Replace(".", "Dot");
-                            procedureMenu.Size = new Size(182, 22);
-                            procedureMenu.Text = procedure.Name;
-                            procedureMenu.ToolTipText = null;
-
-                            procedureMenu.FileElement = procedure.FullName;
-                            procedureMenu.InstanceObject = useableObject;
-                            procedureMenu.Click += FileElementExecutionEntry_Click;
-
-                            if (procedure.Parameters.Length > 1) procedureMenu.Enabled = false;     // TODO: Enable user to input the arguments.
-
-                            objectMenu.DropDownItems.Add(procedureMenu);
-                        }
-                    }
-
-                    #endregion
-
-                    #region Namespace sections
-
-                    foreach (var ns in namespaces)
-                    {
-                        var namespaceMenu = new ToolStripMenuItem();
-
-                        var procedures = elements.Elements.Where(e => NamespaceFromFullName(e.FullName) == ns && e is FileElements.Procedure).Cast<FileElements.Procedure>().ToList();
-                        procedures.Sort(delegate (FileElements.Procedure x, FileElements.Procedure y)
-                        {
-                            if (x.FullName == null && y.FullName == null) return 0;
-                            else if (x.FullName == null) return -1;
-                            else if (y.FullName == null) return 1;
-                            else return x.FullName.CompareTo(y.FullName);
-                        });
-
-                        if (procedures.Count > 0)
-                        {
-                            toolStripSplitButtonRunScript.Enabled = true;
-                        }
-                        foreach (var procedure in procedures)
-                        {
-                            if ((procedure.Partners != null && procedure.Partners.Length > 0) ||
-                                (procedure.CompatibleObjectInstances != null && procedure.CompatibleObjectInstances.Length > 0))
-                            {
-                                ToolStripMenuItem procedureMenu = new ToolStripMenuItem();
-                                procedureMenu.Name = "toolStripMenuProcedure" + procedure.Name;
-                                procedureMenu.Size = new Size(182, 22);
-                                procedureMenu.Text = procedure.Name;
-                                procedureMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}'";
-                                namespaceMenu.DropDownItems.Add(procedureMenu);
-
-                                if (procedure.Partners != null && procedure.Partners.Length > 0)
-                                {
-                                    var options = new List<FileElements.Partner>(procedure.Partners);
-                                    options.Insert(0, null); // Add the 'no partner' option.
-                                    foreach (var partner in options)
-                                    {
-                                        var procedureExecutionOptionMenu = new ScriptExecutionToolStripMenuItem(procedure.FullName, (partner != null) ? partner.Name : null, null);
-                                        procedureExecutionOptionMenu.Size = new Size(182, 22);
-                                        if (partner != null)
-                                        {
-                                            procedureExecutionOptionMenu.Name = "toolStripMenuProcedure" + procedure.Name + "Dot" + partner.Name;
-                                            procedureExecutionOptionMenu.Text = procedure.Name + "." + partner.Name;
-                                            procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}' partner '{partner.Name}'";
-                                            var partnerProcedure = procedures.FirstOrDefault(p => p.FullName == partner.ProcedureType);
-                                            if (partnerProcedure == null ||
-                                                (partnerProcedure.Parameters != null && partnerProcedure.Parameters.Length > ((partnerProcedure.FirstParameterIsInstanceReference) ? 1 : 0)))   // TODO: Check whether that first parameter is the parent procedure.
-                                            {
-                                                procedureExecutionOptionMenu.Enabled = false;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            procedureExecutionOptionMenu.Name = "toolStripMenuProcedureOptionDirect" + procedure.Name;
-                                            procedureExecutionOptionMenu.Text = procedure.Name;
-                                            procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}'";
-                                            if (procedure.Parameters != null && procedure.Parameters.Length > 0)
-                                            {
-                                                procedureExecutionOptionMenu.Enabled = false;
-                                            }
-                                        }
-                                        procedureExecutionOptionMenu.Click += FileElementExecutionEntry_Click;
-                                        procedureMenu.DropDownItems.Add(procedureExecutionOptionMenu);
-                                    }
-                                }
-                                else if (procedure.CompatibleObjectInstances != null && procedure.CompatibleObjectInstances.Length > 0)
-                                {
-                                    foreach (var variable in procedure.CompatibleObjectInstances)
-                                    {
-                                        string shortName = variable.Split('.').Last();
-
-                                        var procedureExecutionOptionMenu = new ScriptExecutionToolStripMenuItem(procedure.FullName, null, variable);
-                                        procedureExecutionOptionMenu.Size = new Size(182, 22);
-                                        procedureExecutionOptionMenu.Name = "toolStripMenuProcedure" + procedure.Name + "On" + variable.Replace(".", "Dot");
-                                        procedureExecutionOptionMenu.SetText();
-                                        procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}' partner '{partner.Name}'";
-                                        procedureExecutionOptionMenu.Click += FileElementExecutionEntry_Click;
-                                        if (procedure.Parameters == null || procedure.Parameters.Length > 1)     // TODO: Enable user to input the arguments.
-                                        {
-                                            procedureExecutionOptionMenu.Enabled = false;
-                                        }
-                                        procedureMenu.DropDownItems.Add(procedureExecutionOptionMenu);
-                                    }
-                                }
-                                else
-                                {
-                                    var executionItem = procedureMenu as ScriptExecutionToolStripMenuItem;
-                                    executionItem.FileElement = procedure.FullName;
-                                    executionItem.SetText();
-                                    if (procedure.Parameters != null && procedure.Parameters.Length > 0)     // TODO: Enable user to input the arguments.
-                                    {
-                                        executionItem.Enabled = false;
-                                    }
-                                    procedureMenu.Click += FileElementExecutionEntry_Click;
-                                }
-                            }
-                            else
-                            {
-                                // No partners or instance object, just the direct procedure call.
-
-                                var procedureMenu = new ScriptExecutionToolStripMenuItem(procedure.FullName, null, null);
-                                procedureMenu.Size = new Size(182, 22);
-                                procedureMenu.SetText();
-                                procedureMenu.Name = "toolStripMenuProcedure" + procedure.FullName;
-                                procedureMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}'";
-                                if (procedure.Parameters != null && procedure.Parameters.Length > 0)
-                                {
-                                    procedureMenu.Enabled = false;
-                                }
-                                procedureMenu.Click += FileElementExecutionEntry_Click;
-                                namespaceMenu.DropDownItems.Add(procedureMenu);
-                            }
-                        }
-
-                        #region TestLists
-
-                        var tests = elements.Elements.Where(e => NamespaceFromFullName(e.FullName) == ns && e is FileElements.TestList).Cast<FileElements.TestList>().ToList();
-                        tests.Sort(delegate (FileElements.TestList x, FileElements.TestList y)
-                        {
-                            if (x.FullName == null && y.FullName == null) return 0;
-                            else if (x.FullName == null) return -1;
-                            else if (y.FullName == null) return 1;
-                            else return x.FullName.CompareTo(y.FullName);
-                        });
-                        foreach (var testlist in tests)
-                        {
-                            var testlistMenu = new ToolStripMenuItem();
-                            testlistMenu.Name = "toolStripMenuTestList" + testlist.Name;
-                            testlistMenu.Size = new Size(182, 22);
-                            testlistMenu.Text = testlist.Name;
-                            testlistMenu.ToolTipText = null; // $"The testlist '{testlist.FullName}'";
-                            namespaceMenu.DropDownItems.Add(testlistMenu);
-
-                            foreach (var partner in testlist.Partners)
-                            {
-                                var testlistExecutionOptionMenu = new ScriptExecutionToolStripMenuItem();
-                                testlistExecutionOptionMenu.FileElement = testlist.FullName;
-                                testlistExecutionOptionMenu.Partner = partner.Name;
-                                testlistExecutionOptionMenu.Size = new Size(182, 22);
-                                testlistExecutionOptionMenu.Name = "toolStripMenuTestlist" + testlist.Name + "Dot" + partner.Name;
-                                testlistExecutionOptionMenu.SetText();
-                                testlistExecutionOptionMenu.ToolTipText = null; // $"Test '{testlist.FullName}' model '{partner.Name}'";
-                                testlistExecutionOptionMenu.BackColor = Color.Purple;
-                                testlistExecutionOptionMenu.Click += FileElementExecutionEntry_Click;
-                                testlistMenu.DropDownItems.Add(testlistExecutionOptionMenu);
-                            }
-                        }
-
-                        #endregion
-
-                        if (namespaceMenu.DropDownItems.Count > 0)
-                        {
-                            namespaceMenu.Name = "toolStripMenuNamespace" + ns;
-                            namespaceMenu.Size = new Size(182, 22);
-                            namespaceMenu.Text = "Namespace " + ns;
-                            namespaceMenu.ToolTipText = null; // $"All procedures and testlists in the namespace '{ns}'";
-                            toolStripSplitButtonRunScript.DropDownItems.Add(namespaceMenu);
-                        }
-
-                    }
-
-                    #endregion
-
-                    #region Tool variables
-
-                    var selectedTool = toolStripComboBoxTool.SelectedItem as FileElements.Variable;
-                    toolStripComboBoxTool.Items.Clear();
-                    int selection = 0;
-                    int i = 0;
-                    foreach (var toolVar in commandObjectVariables)
-                    {
-                        toolStripComboBoxTool.Items.Add(toolVar);
-                        if (selectedTool != null && toolVar.FullName == selectedTool.FullName)
-                        {
-                            selection = i;
-                        }
-                        i++;
-                    }
-                    if (toolStripComboBoxTool.Items.Count > 0)
-                    {
-                        toolStripComboBoxTool.Enabled = true;
-                        toolStripComboBoxToolCommand.Enabled = true;
-                        toolStripComboBoxTool.SelectedIndex = selection;
-                    }
-                    else
-                    {
-                        toolStripComboBoxTool.Enabled = false;
-                        toolStripComboBoxToolCommand.Enabled = false;
-                    }
-                    toolStripComboBoxTool.SelectionLength = 0;
-
-                    #endregion
-
-                    #region Panel tool variables
-
-                    var panelVariables = elements.Elements.Where(e => e is StepBro.Sidekick.FileElements.PanelDefinitionVariable).Select(e => (StepBro.Sidekick.FileElements.PanelDefinitionVariable)e).ToList();
-
-                    if (panelVariables.Count > 0)
-                    {
-                        if (m_panelsDialog == null)
-                        {
-                            m_panelsDialog = new PanelsDialog((ICoreAccess)this);
-                            m_panelsDialog.FormClosed += PanelsDialog_FormClosed;
-                            m_panelsDialog.Show();
-                        }
-                        foreach (var panel in panelVariables)
-                        {
-                            m_panelsDialog.AddCustomPanel(
-                                panel.Title,
-                                (PropertyBlock)panel.PanelDefinition.CloneAsPropertyBlockEntry());
-                        }
-                    }
-
-                    #endregion
-
-                    #region ToolBar tool variables
-
-                    var toolbarVariables = elements.Elements.Where(e => e is StepBro.Sidekick.FileElements.ToolBarDefinitionVariable).Select(e => (StepBro.Sidekick.FileElements.ToolBarDefinitionVariable)e).ToList();
-
-                    var newToolBarList = new List<Tuple<string, StepBro.UI.WinForms.CustomToolBar.ToolBar>>();
-                    if (toolbarVariables.Count > 0)
-                    {
-                        foreach (var toolbarVar in toolbarVariables)
-                        {
-                            StepBro.UI.WinForms.CustomToolBar.ToolBar toolBar = null;
-                            var existing = m_customToolStrips.Where(t => t.Item1 == toolbarVar.FullName).FirstOrDefault();
-                            if (existing != null)
-                            {
-                                toolBar = existing.Item2;
-                            }
-                            else
-                            {
-                                toolBar = new StepBro.UI.WinForms.CustomToolBar.ToolBar(this);
-                            }
-                            newToolBarList.Add(new Tuple<string, UI.WinForms.CustomToolBar.ToolBar>(toolbarVar.FullName, toolBar));
-
-                            toolBar.Setup(toolbarVar.FullName, toolbarVar.ToolBarDefinition.CloneAsPropertyBlockEntry() as PropertyBlock);
-                        }
-
-                        //if (m_panelsDialog == null)
-                        //{
-                        //    m_panelsDialog = new PanelsDialog((ICoreAccess)this);
-                        //    m_panelsDialog.FormClosed += PanelsDialog_FormClosed;
-                        //    m_panelsDialog.Show();
-                        //}
-                        //foreach (var panel in panelVariables)
-                        //{
-                        //    m_panelsDialog.AddCustomPanel(
-                        //        panel.Title,
-                        //        (PropertyBlock)panel.PanelDefinition.CloneAsPropertyBlockEntry());
-                        //}
-                    }
-                    //var customToolBars = this.Controls.Cast<Control>().Where(c => c is ToolBar).ToList();
-                    //foreach (var tb in customToolBars)
-                    //{
-                    //    this.Controls.Remove(tb);
-                    //}
-
-                    this.Controls.Clear();
-                    m_customToolStrips = newToolBarList.ToList();
-                    m_customToolStrips.Reverse();
-                    int tabIndex = m_customToolStrips.Count;
-                    foreach (var tbData in m_customToolStrips)
-                    {
-                        if (tabIndex % 2 == 0)
-                        {
-                            tbData.Item2.DefaultBackColor = Color.Beige;
-                        }
-                        //tbData.Item2.DefaultBackColor = (tabIndex % 2 == 0) ? Color.Beige : Color.Wheat;
-                        tbData.Item2.TabIndex = tabIndex--;
-                        this.Controls.Add(tbData.Item2);
-                    }
-                    this.Controls.Add(toolStripMain);
-
-                    if (m_customToolStrips.Count > 0)
-                    {
-                        this.Height = m_customToolStrips[0].Item2.Bounds.Bottom + 2;
-                    }
-                    else
-                    {
-                        this.Height = toolStripMain.Bounds.Bottom + 2;
-                    }
-
-                    #endregion
-
-                    #region Loading persisted shortcuts
-
-                    if (!m_userFileRead)
-                    {
-                        m_userFile = Path.ChangeExtension(Path.GetFileNameWithoutExtension(elements.TopFile), "user.json");
-                        m_userFileRead = true;
-                        if (File.Exists(m_userFile))
-                        {
-                            var data = JsonSerializer.Deserialize<UserData>(File.ReadAllText(m_userFile));
-                            if (data.Shortcuts != null)
-                            {
-                                foreach (var shortcut in data.Shortcuts)
-                                {
-                                    this.AddShortcut(shortcut.Name, shortcut.Element, shortcut.Partner, shortcut.InstanceObject);
-                                }
-                            }
-                        }
-                    }
-
-                    #endregion
+                    var startData = JsonSerializer.Deserialize<StepBro.Sidekick.Messages.StartFileElements>(received.Item2);
+                    m_topScriptFile = startData.TopFile;
+                    m_fileElements = new List<Element>();
                 }
-                else if (received.Item1 == nameof(StepBro.Sidekick.ExecutionStateUpdate))
+                else if (received.Item1 == nameof(StepBro.Sidekick.Messages.FileElement))
                 {
-                    var state = JsonSerializer.Deserialize<StepBro.Sidekick.ExecutionStateUpdate>(received.Item2);
+                    m_fileElements.Add(JsonSerializer.Deserialize<StepBro.Sidekick.Messages.FileElement>(received.Item2).Data);
+                }
+                else if (received.Item1 == nameof(ExecutionStateUpdate))
+                {
+                    var state = JsonSerializer.Deserialize<ExecutionStateUpdate>(received.Item2);
                     var execution = this.TryGetExecution(state.RequestID);
                     if (execution != null)
                     {
@@ -877,6 +529,369 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             MoveWindows();
         }
+
+
+        private void HandleReceivedFileElements()
+        {
+            var commandObjectVariables = m_fileElements.Where(e => e is Variable && (e as Variable).Interfaces.HasFlag(VariableInterfaces.Command)).Select(e => (Variable)e).ToList();
+            var namespaces = m_fileElements.Select(e => NamespaceFromFullName(e.FullName)).Distinct().ToList();
+            var objectsForProcedures = m_fileElements.Where(e => e is Procedure && (e as Procedure).CompatibleObjectInstances != null).SelectMany(e => ((e as Procedure).CompatibleObjectInstances)).Distinct().ToList();
+            var allProcedures = m_fileElements.Where(e => e is Procedure).Cast<Procedure>().ToList();
+
+            for (int di = 0; di < toolStripSplitButtonRunScript.DropDownItems.Count;)
+            {
+                if (toolStripSplitButtonRunScript.DropDownItems[di].Tag == null)
+                {
+                    toolStripSplitButtonRunScript.DropDownItems.RemoveAt(di);
+                }
+                else di++;
+            }
+
+            // If short name alone is used, will there be name clashes? If so, use the full name.
+            bool useFullNameInUseableObject = objectsForProcedures.Select(s => s.Split('.').Last()).Distinct().Count() != objectsForProcedures.Count;
+
+            #region Tool variables used as instance references
+
+            foreach (var useableObject in objectsForProcedures)
+            {
+                string shortName = useableObject.Split('.').Last();
+
+                var objectMenu = new ToolStripMenuItem();
+                objectMenu.Name = "toolStripMenuObject" + useableObject.Replace(".", "Dot");
+                objectMenu.Size = new Size(182, 22);
+                objectMenu.Text = useFullNameInUseableObject ? useableObject : shortName;
+                objectMenu.ToolTipText = null;
+                toolStripSplitButtonRunScript.DropDownItems.Add(objectMenu);
+
+                var procedures = allProcedures.Where(p => p.CompatibleObjectInstances != null && p.CompatibleObjectInstances.Any(s => string.Equals(s, useableObject, StringComparison.InvariantCulture))).ToList();
+                foreach (var procedure in procedures)
+                {
+                    string callText = (useFullNameInUseableObject ? useableObject : shortName) + "." + procedure.Name;
+                    var procedureMenu = new ScriptExecutionToolStripMenuItem();
+                    procedureMenu.Name = "toolStripMenuProcedure" + procedure.Name + "On" + useableObject.Replace(".", "Dot");
+                    procedureMenu.Size = new Size(182, 22);
+                    procedureMenu.Text = procedure.Name;
+                    procedureMenu.ToolTipText = null;
+
+                    procedureMenu.FileElement = procedure.FullName;
+                    procedureMenu.InstanceObject = useableObject;
+                    procedureMenu.Click += FileElementExecutionEntry_Click;
+
+                    if (procedure.Parameters.Length > 1) procedureMenu.Enabled = false;     // TODO: Enable user to input the arguments.
+
+                    objectMenu.DropDownItems.Add(procedureMenu);
+                }
+            }
+
+            #endregion
+
+            #region Namespace sections
+
+            foreach (var ns in namespaces)
+            {
+                var namespaceMenu = new ToolStripMenuItem();
+
+                var procedures = allProcedures.Where(p => NamespaceFromFullName(p.FullName) == ns).ToList();
+                procedures.Sort(delegate (Procedure x, Procedure y)
+                {
+                    if (x.FullName == null && y.FullName == null) return 0;
+                    else if (x.FullName == null) return -1;
+                    else if (y.FullName == null) return 1;
+                    else return x.FullName.CompareTo(y.FullName);
+                });
+
+                if (procedures.Count > 0)
+                {
+                    toolStripSplitButtonRunScript.Enabled = true;
+                }
+                foreach (var procedure in procedures)
+                {
+                    if ((procedure.Partners != null && procedure.Partners.Length > 0) ||
+                        (procedure.CompatibleObjectInstances != null && procedure.CompatibleObjectInstances.Length > 0))
+                    {
+                        ToolStripMenuItem procedureMenu = new ToolStripMenuItem();
+                        procedureMenu.Name = "toolStripMenuProcedure" + procedure.Name;
+                        procedureMenu.Size = new Size(182, 22);
+                        procedureMenu.Text = procedure.Name;
+                        procedureMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}'";
+                        namespaceMenu.DropDownItems.Add(procedureMenu);
+
+                        if (procedure.Partners != null && procedure.Partners.Length > 0)
+                        {
+                            var options = new List<Partner>(procedure.Partners);
+                            options.Insert(0, null); // Add the 'no partner' option.
+                            foreach (var partner in options)
+                            {
+                                var procedureExecutionOptionMenu = new ScriptExecutionToolStripMenuItem(procedure.FullName, (partner != null) ? partner.Name : null, null);
+                                procedureExecutionOptionMenu.Size = new Size(182, 22);
+                                if (partner != null)
+                                {
+                                    procedureExecutionOptionMenu.Name = "toolStripMenuProcedure" + procedure.Name + "Dot" + partner.Name;
+                                    procedureExecutionOptionMenu.Text = procedure.Name + "." + partner.Name;
+                                    procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}' partner '{partner.Name}'";
+                                    var partnerProcedure = procedures.FirstOrDefault(p => p.FullName == partner.ProcedureType);
+                                    if (partnerProcedure == null ||
+                                        (partnerProcedure.Parameters != null && partnerProcedure.Parameters.Length > ((partnerProcedure.FirstParameterIsInstanceReference) ? 1 : 0)))   // TODO: Check whether that first parameter is the parent procedure.
+                                    {
+                                        procedureExecutionOptionMenu.Enabled = false;
+                                    }
+                                }
+                                else
+                                {
+                                    procedureExecutionOptionMenu.Name = "toolStripMenuProcedureOptionDirect" + procedure.Name;
+                                    procedureExecutionOptionMenu.Text = procedure.Name;
+                                    procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}'";
+                                    if (procedure.Parameters != null && procedure.Parameters.Length > 0)
+                                    {
+                                        procedureExecutionOptionMenu.Enabled = false;
+                                    }
+                                }
+                                procedureExecutionOptionMenu.Click += FileElementExecutionEntry_Click;
+                                procedureMenu.DropDownItems.Add(procedureExecutionOptionMenu);
+                            }
+                        }
+                        else if (procedure.CompatibleObjectInstances != null && procedure.CompatibleObjectInstances.Length > 0)
+                        {
+                            foreach (var variable in procedure.CompatibleObjectInstances)
+                            {
+                                string shortName = variable.Split('.').Last();
+
+                                var procedureExecutionOptionMenu = new ScriptExecutionToolStripMenuItem(procedure.FullName, null, variable);
+                                procedureExecutionOptionMenu.Size = new Size(182, 22);
+                                procedureExecutionOptionMenu.Name = "toolStripMenuProcedure" + procedure.Name + "On" + variable.Replace(".", "Dot");
+                                procedureExecutionOptionMenu.SetText();
+                                procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}' partner '{partner.Name}'";
+                                procedureExecutionOptionMenu.Click += FileElementExecutionEntry_Click;
+                                if (procedure.Parameters == null || procedure.Parameters.Length > 1)     // TODO: Enable user to input the arguments.
+                                {
+                                    procedureExecutionOptionMenu.Enabled = false;
+                                }
+                                procedureMenu.DropDownItems.Add(procedureExecutionOptionMenu);
+                            }
+                        }
+                        else
+                        {
+                            var executionItem = procedureMenu as ScriptExecutionToolStripMenuItem;
+                            executionItem.FileElement = procedure.FullName;
+                            executionItem.SetText();
+                            if (procedure.Parameters != null && procedure.Parameters.Length > 0)     // TODO: Enable user to input the arguments.
+                            {
+                                executionItem.Enabled = false;
+                            }
+                            procedureMenu.Click += FileElementExecutionEntry_Click;
+                        }
+                    }
+                    else
+                    {
+                        // No partners or instance object, just the direct procedure call.
+
+                        var procedureMenu = new ScriptExecutionToolStripMenuItem(procedure.FullName, null, null);
+                        procedureMenu.Size = new Size(182, 22);
+                        procedureMenu.SetText();
+                        procedureMenu.Name = "toolStripMenuProcedure" + procedure.FullName;
+                        procedureMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}'";
+                        if (procedure.Parameters != null && procedure.Parameters.Length > 0)
+                        {
+                            procedureMenu.Enabled = false;
+                        }
+                        procedureMenu.Click += FileElementExecutionEntry_Click;
+                        namespaceMenu.DropDownItems.Add(procedureMenu);
+                    }
+                }
+
+                #region TestLists
+
+                var tests = m_fileElements.Where(e => NamespaceFromFullName(e.FullName) == ns && e is TestList).Cast<TestList>().ToList();
+                tests.Sort(delegate (TestList x, TestList y)
+                {
+                    if (x.FullName == null && y.FullName == null) return 0;
+                    else if (x.FullName == null) return -1;
+                    else if (y.FullName == null) return 1;
+                    else return x.FullName.CompareTo(y.FullName);
+                });
+                foreach (var testlist in tests)
+                {
+                    var testlistMenu = new ToolStripMenuItem();
+                    testlistMenu.Name = "toolStripMenuTestList" + testlist.Name;
+                    testlistMenu.Size = new Size(182, 22);
+                    testlistMenu.Text = testlist.Name;
+                    testlistMenu.ToolTipText = null; // $"The testlist '{testlist.FullName}'";
+                    namespaceMenu.DropDownItems.Add(testlistMenu);
+
+                    foreach (var partner in testlist.Partners)
+                    {
+                        var testlistExecutionOptionMenu = new ScriptExecutionToolStripMenuItem();
+                        testlistExecutionOptionMenu.FileElement = testlist.FullName;
+                        testlistExecutionOptionMenu.Partner = partner.Name;
+                        testlistExecutionOptionMenu.Size = new Size(182, 22);
+                        testlistExecutionOptionMenu.Name = "toolStripMenuTestlist" + testlist.Name + "Dot" + partner.Name;
+                        testlistExecutionOptionMenu.SetText();
+                        testlistExecutionOptionMenu.ToolTipText = null; // $"Test '{testlist.FullName}' model '{partner.Name}'";
+                        testlistExecutionOptionMenu.BackColor = Color.Purple;
+                        testlistExecutionOptionMenu.Click += FileElementExecutionEntry_Click;
+                        testlistMenu.DropDownItems.Add(testlistExecutionOptionMenu);
+                    }
+                }
+
+                #endregion
+
+                if (namespaceMenu.DropDownItems.Count > 0)
+                {
+                    namespaceMenu.Name = "toolStripMenuNamespace" + ns;
+                    namespaceMenu.Size = new Size(182, 22);
+                    namespaceMenu.Text = "Namespace " + ns;
+                    namespaceMenu.ToolTipText = null; // $"All procedures and testlists in the namespace '{ns}'";
+                    toolStripSplitButtonRunScript.DropDownItems.Add(namespaceMenu);
+                }
+
+            }
+
+            #endregion
+
+            #region Tool variables
+
+            var selectedTool = toolStripComboBoxTool.SelectedItem as Variable;
+            toolStripComboBoxTool.Items.Clear();
+            int selection = 0;
+            int i = 0;
+            foreach (var toolVar in commandObjectVariables)
+            {
+                toolStripComboBoxTool.Items.Add(toolVar);
+                if (selectedTool != null && toolVar.FullName == selectedTool.FullName)
+                {
+                    selection = i;
+                }
+                i++;
+            }
+            if (toolStripComboBoxTool.Items.Count > 0)
+            {
+                toolStripComboBoxTool.Enabled = true;
+                toolStripComboBoxToolCommand.Enabled = true;
+                toolStripComboBoxTool.SelectedIndex = selection;
+            }
+            else
+            {
+                toolStripComboBoxTool.Enabled = false;
+                toolStripComboBoxToolCommand.Enabled = false;
+            }
+            toolStripComboBoxTool.SelectionLength = 0;
+
+            #endregion
+
+            #region Panel tool variables
+
+            var panelVariables = m_fileElements.Where(e => e is PanelDefinitionVariable).Cast<PanelDefinitionVariable>().ToList();
+
+            if (panelVariables.Count > 0)
+            {
+                if (m_panelsDialog == null)
+                {
+                    m_panelsDialog = new PanelsDialog((ICoreAccess)this);
+                    m_panelsDialog.FormClosed += PanelsDialog_FormClosed;
+                    m_panelsDialog.Show();
+                }
+                foreach (var panel in panelVariables)
+                {
+                    m_panelsDialog.AddCustomPanel(
+                        panel.Title,
+                        (PropertyBlock)panel.PanelDefinition.CloneAsPropertyBlockEntry());
+                }
+            }
+
+            #endregion
+
+            #region ToolBar tool variables
+
+            var toolbarVariables = m_fileElements.Where(e => e is ToolBarDefinitionVariable).Cast<ToolBarDefinitionVariable>().ToList();
+
+            var newToolBarList = new List<Tuple<string, StepBro.UI.WinForms.CustomToolBar.ToolBar>>();
+            if (toolbarVariables.Count > 0)
+            {
+                foreach (var toolbarVar in toolbarVariables)
+                {
+                    StepBro.UI.WinForms.CustomToolBar.ToolBar toolBar = null;
+                    var existing = m_customToolStrips.Where(t => t.Item1 == toolbarVar.FullName).FirstOrDefault();
+                    if (existing != null)
+                    {
+                        toolBar = existing.Item2;
+                    }
+                    else
+                    {
+                        toolBar = new StepBro.UI.WinForms.CustomToolBar.ToolBar(this);
+                    }
+                    newToolBarList.Add(new Tuple<string, UI.WinForms.CustomToolBar.ToolBar>(toolbarVar.FullName, toolBar));
+
+                    toolBar.Setup(toolbarVar.FullName, toolbarVar.ToolBarDefinition.CloneAsPropertyBlockEntry() as PropertyBlock);
+                }
+
+                //if (m_panelsDialog == null)
+                //{
+                //    m_panelsDialog = new PanelsDialog((ICoreAccess)this);
+                //    m_panelsDialog.FormClosed += PanelsDialog_FormClosed;
+                //    m_panelsDialog.Show();
+                //}
+                //foreach (var panel in panelVariables)
+                //{
+                //    m_panelsDialog.AddCustomPanel(
+                //        panel.Title,
+                //        (PropertyBlock)panel.PanelDefinition.CloneAsPropertyBlockEntry());
+                //}
+            }
+            //var customToolBars = this.Controls.Cast<Control>().Where(c => c is ToolBar).ToList();
+            //foreach (var tb in customToolBars)
+            //{
+            //    this.Controls.Remove(tb);
+            //}
+
+            this.Controls.Clear();
+            m_customToolStrips = newToolBarList.ToList();
+            m_customToolStrips.Reverse();
+            int tabIndex = m_customToolStrips.Count;
+            foreach (var tbData in m_customToolStrips)
+            {
+                if (tabIndex % 2 == 0)
+                {
+                    tbData.Item2.DefaultBackColor = Color.Beige;
+                }
+                //tbData.Item2.DefaultBackColor = (tabIndex % 2 == 0) ? Color.Beige : Color.Wheat;
+                tbData.Item2.TabIndex = tabIndex--;
+                this.Controls.Add(tbData.Item2);
+            }
+            this.Controls.Add(toolStripMain);
+
+            if (m_customToolStrips.Count > 0)
+            {
+                this.Height = m_customToolStrips[0].Item2.Bounds.Bottom + 2;
+            }
+            else
+            {
+                this.Height = toolStripMain.Bounds.Bottom + 2;
+            }
+
+            #endregion
+
+            #region Loading persisted shortcuts
+
+            if (!m_userFileRead)
+            {
+                m_userFile = Path.ChangeExtension(Path.GetFileNameWithoutExtension(m_topScriptFile), "user.json");
+                m_userFileRead = true;
+                if (File.Exists(m_userFile))
+                {
+                    var data = JsonSerializer.Deserialize<UserData>(File.ReadAllText(m_userFile));
+                    if (data.Shortcuts != null)
+                    {
+                        foreach (var shortcut in data.Shortcuts)
+                        {
+                            this.AddShortcut(shortcut.Name, shortcut.Element, shortcut.Partner, shortcut.InstanceObject);
+                        }
+                    }
+                }
+            }
+
+            #endregion
+        }
+
 
         public static string ScripExecutionButtonTitle(bool showFullName, string element, string partner, string objectVariable, object[] args)
         {
