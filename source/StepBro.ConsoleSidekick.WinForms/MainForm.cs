@@ -7,6 +7,7 @@ using StepBro.Sidekick.Messages;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace StepBro.ConsoleSidekick.WinForms
 {
@@ -62,14 +63,47 @@ namespace StepBro.ConsoleSidekick.WinForms
             }
         }
 
-        public class UserData
+        private class ObjectCommandToolStripMenuItem : ToolStripMenuItem
         {
+            public ObjectCommandToolStripMenuItem() { }
+
+            public ObjectCommandToolStripMenuItem(string text, string instance, string command)
+            {
+                this.Text = text;
+                this.Instance = instance;
+                this.Command = command;
+            }
+
+            public string Instance { get; set; } = null;
+            public new string Command { get; set; } = null;
+
+            public bool Equals(string text, string instance, string command)
+            {
+                if (!String.Equals(text, this.Text, StringComparison.InvariantCulture)) return false;
+                if (!String.Equals(instance, this.Instance, StringComparison.InvariantCulture)) return false;
+                if (!String.Equals(command, this.Command, StringComparison.InvariantCulture)) return false;
+                return true;
+            }
+        }
+
+        public class UserDataCurrent
+        {
+            [JsonDerivedType(typeof(ProcedureShortcut), typeDiscriminator: "procedure")]
+            [JsonDerivedType(typeof(ObjectCommandShortcut), typeDiscriminator: "command")]
             public class Shortcut
             {
-                public string Name { get; set; }
-                public string Element { get; set; }
+                public string Text { get; set; }
+            }
+            public class ProcedureShortcut : Shortcut
+            {
+                public string Element { get; set; } = null;
                 public string Partner { get; set; } = null;
-                public string InstanceObject { get; set; } = null;
+                public string Instance { get; set; } = null;
+            }
+            public class ObjectCommandShortcut : Shortcut
+            {
+                public string Instance { get; set; } = null;
+                public string Command { get; set; } = null;
             }
 
             public class PanelSetting
@@ -79,6 +113,7 @@ namespace StepBro.ConsoleSidekick.WinForms
                 public string Value { get; set; }
             }
 
+            public int version { get; set; } = 2;
             public Shortcut[] Shortcuts { get; set; } = null;
             public PanelSetting[] PanelSettings { get; set; } = null;
         }
@@ -121,17 +156,30 @@ namespace StepBro.ConsoleSidekick.WinForms
             {
                 System.Diagnostics.Trace.WriteLine("Sidekick base.OnFormClosing() - as requested");
 
-                var userData = new UserData();
+                var userData = new UserDataCurrent();
 
-                var shortcuts = new List<UserData.Shortcut>();
-                foreach (var shortcut in toolStripMain.Items.Cast<ToolStripItem>().Where(o => object.Equals(m_userShortcutItemTag, o.Tag)).Cast<ScriptExecutionToolStripMenuItem>())
+                var shortcuts = new List<UserDataCurrent.Shortcut>();
+                foreach (var shortcut in toolStripMain.Items.Cast<ToolStripItem>().Where(o => object.Equals(m_userShortcutItemTag, o.Tag)))
                 {
-                    var shortcutData = new UserData.Shortcut();
-                    shortcutData.Name = shortcut.Text;
-                    shortcutData.Element = shortcut.FileElement;
-                    shortcutData.Partner = shortcut.Partner;
-                    shortcutData.InstanceObject = shortcut.InstanceObject;
-                    shortcuts.Add(shortcutData);
+                    if (shortcut is ScriptExecutionToolStripMenuItem)
+                    {
+                        var typed = shortcut as ScriptExecutionToolStripMenuItem;
+                        var shortcutData = new UserDataCurrent.ProcedureShortcut();
+                        shortcutData.Text = typed.Text;
+                        shortcutData.Element = typed.FileElement;
+                        shortcutData.Partner = typed.Partner;
+                        shortcutData.Instance = typed.InstanceObject;
+                        shortcuts.Add(shortcutData);
+                    }
+                    else if (shortcut is ObjectCommandToolStripMenuItem)
+                    {
+                        var typed = shortcut as ObjectCommandToolStripMenuItem;
+                        var shortcutData = new UserDataCurrent.ObjectCommandShortcut();
+                        shortcutData.Text = typed.Text;
+                        shortcutData.Instance = typed.Instance;
+                        shortcutData.Command = typed.Command;
+                        shortcuts.Add(shortcutData);
+                    }
                 }
                 if (shortcuts.Count > 0)
                 {
@@ -268,7 +316,34 @@ namespace StepBro.ConsoleSidekick.WinForms
         private void ExecuteCommand(string command)
         {
             var tool = (toolStripComboBoxTool.Items[toolStripComboBoxTool.SelectedIndex] as Variable).FullName;
-            m_pipe.Send(new ObjectCommand(tool, command));
+            this.ExecuteCommand(tool, command);
+        }
+
+        private void ExecuteCommand(string instance, string command)
+        {
+            m_pipe.Send(new ObjectCommand(instance, command));
+        }
+
+        private void ObjectCommandExecutionEntry_ShortcutClick(object sender, EventArgs e)
+        {
+            var executionEntry = sender as ObjectCommandToolStripMenuItem;
+            if (toolStripMenuItemDeleteShortcut.Checked)
+            {
+                var choise = MessageBox.Show(
+                    this,
+                    "Should the shortcut\r\n\r\n\"" + executionEntry.Text + "\"\r\n\r\nbe deleted?",
+                    "StepBro - Deleting shortcut",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (choise == DialogResult.Yes)
+                {
+                    toolStripMain.Items.Remove(executionEntry);
+                }
+                toolStripMenuItemDeleteShortcut.Checked = false;
+            }
+            else
+            {
+                this.ExecuteCommand(executionEntry.Instance, executionEntry.Command);
+            }
         }
 
         #endregion
@@ -395,16 +470,40 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void toolStripButtonAddShortcut_Click(object sender, EventArgs e)
         {
-            if (toolStripSplitButtonRunScript.Tag != null)
+            bool procAvailable = toolStripSplitButtonRunScript.Tag != null;
+            bool commandAvailable = !String.IsNullOrEmpty(toolStripComboBoxToolCommand.Text);
+            if (procAvailable || commandAvailable)
             {
-                var executionEntry = toolStripSplitButtonRunScript.DropDownItems[0] as ScriptExecutionToolStripMenuItem;
-                var dialog = new DialogNameInput(
-                    "Adding Shortcut",
-                    "Enter the name to show on the shortcut button.",
-                    ScripExecutionButtonTitle(false, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null));
+                ScriptExecutionToolStripMenuItem executionEntry = null;
+                string procDescription = "";
+                string procButtonText = "";
+                string commandDescription = "";
+                string commandButtonText = "";
+
+                if (procAvailable)
+                {
+                    executionEntry = toolStripSplitButtonRunScript.DropDownItems[0] as ScriptExecutionToolStripMenuItem;
+                    procButtonText = ScripExecutionButtonTitle(false, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null);
+                    procDescription = procButtonText;
+                }
+                if (commandAvailable)
+                {
+                    commandButtonText = toolStripComboBoxToolCommand.Text;
+                    commandDescription = "On " + toolStripComboBoxTool.Text + ": " + commandButtonText;
+                }
+
+                var dialog = new DialogAddShortcut("Adding Shortcut", procDescription, commandDescription, procButtonText, commandButtonText);
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    this.AddShortcut(dialog.Value, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject);
+                    if (dialog.ProcedureExecutionSelected)
+                    {
+                        this.AddProcedureShortcut(dialog.ButtonText, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject);
+                    }
+                    else
+                    {
+                        var tool = (toolStripComboBoxTool.Items[toolStripComboBoxTool.SelectedIndex] as Variable).FullName;
+                        this.AddObjectCommandShortcut(dialog.ButtonText, tool, toolStripComboBoxToolCommand.Text);
+                    }
                 }
             }
         }
@@ -455,19 +554,36 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         #endregion
 
-        private void AddShortcut(string title, string element, string partner, string instanceObject)
+        private void AddProcedureShortcut(string text, string element, string partner, string instanceObject)
         {
             var shortcut = new ScriptExecutionToolStripMenuItem();
-            shortcut.Text = title;
+            shortcut.Text = text;
             shortcut.FileElement = element;
             shortcut.Partner = partner;
             shortcut.InstanceObject = instanceObject;
-            shortcut.SetText();
             shortcut.Name = "toolStripMenuProcedure" + shortcut.Text.Replace(".", "Dot");
             shortcut.Size = new Size(182, 22);
             shortcut.ToolTipText = null; // $"Run " + target;
             shortcut.Tag = m_userShortcutItemTag;
             shortcut.Click += FileElementExecutionEntry_ShortcutClick;
+
+            toolStripMenuItemDeleteShortcut.Enabled = true;
+            toolStripMenuItemDeleteAllShortcuts.Enabled = true;
+
+            toolStripMain.Items.Add(shortcut);
+        }
+
+        private void AddObjectCommandShortcut(string text, string instance, string command)
+        {
+            var shortcut = new ObjectCommandToolStripMenuItem();
+            shortcut.Text = text;
+            shortcut.Instance = instance;
+            shortcut.Command = command;
+            shortcut.Name = "toolStripMenuCommand" + text.Replace(".", "Dot");
+            shortcut.Size = new Size(182, 22);
+            shortcut.ToolTipText = null; // $"Run " + target;
+            shortcut.Tag = m_userShortcutItemTag;
+            shortcut.Click += ObjectCommandExecutionEntry_ShortcutClick;
 
             toolStripMenuItemDeleteShortcut.Enabled = true;
             toolStripMenuItemDeleteAllShortcuts.Enabled = true;
@@ -874,16 +990,27 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             if (!m_userFileRead)
             {
-                m_userFile = Path.ChangeExtension(Path.GetFileNameWithoutExtension(m_topScriptFile), "user.json");
+                // Change the extension
+                m_userFile = Path.Combine(Path.GetDirectoryName(m_topScriptFile), Path.GetFileNameWithoutExtension(m_topScriptFile)) + ".user.json";
                 m_userFileRead = true;
+
                 if (File.Exists(m_userFile))
                 {
-                    var data = JsonSerializer.Deserialize<UserData>(File.ReadAllText(m_userFile));
+                    var data = JsonSerializer.Deserialize<UserDataCurrent>(File.ReadAllText(m_userFile));
                     if (data.Shortcuts != null)
                     {
                         foreach (var shortcut in data.Shortcuts)
                         {
-                            this.AddShortcut(shortcut.Name, shortcut.Element, shortcut.Partner, shortcut.InstanceObject);
+                            if (shortcut is UserDataCurrent.ProcedureShortcut)
+                            {
+                                var typed = shortcut as UserDataCurrent.ProcedureShortcut;
+                                this.AddProcedureShortcut(typed.Text, typed.Element, typed.Partner, typed.Instance);
+                            }
+                            else if (shortcut is UserDataCurrent.ObjectCommandShortcut)
+                            {
+                                var typed = shortcut as UserDataCurrent.ObjectCommandShortcut;
+                                this.AddObjectCommandShortcut(typed.Text, typed.Instance, typed.Command);
+                            }
                         }
                     }
                 }
@@ -971,6 +1098,11 @@ namespace StepBro.ConsoleSidekick.WinForms
             return execution;
         }
 
+        void ICoreAccess.ExecuteObjectCommand(string objectVariable, string command)
+        {
+            ExecuteCommand(objectVariable, command);
+        }
+
         #endregion
 
         private class ExecutionAccess : IExecutionAccess, IDisposing
@@ -1035,7 +1167,7 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void toolStripMenuItemClearDisplay_Click(object sender, EventArgs e)
         {
-
+            m_pipe.Send(ShortCommand.ClearDisplay);
         }
 
         private void toolStripMenuItemExit_Click(object sender, EventArgs e)
@@ -1045,7 +1177,6 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void toolStripMenuItemDeleteAllShortcuts_Click(object sender, EventArgs e)
         {
-
         }
     }
 }

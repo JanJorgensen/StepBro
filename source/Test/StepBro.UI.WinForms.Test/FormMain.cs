@@ -195,6 +195,11 @@ namespace StepBro.UI.WinForms.Test
             }
             return new ExecutionAccessDummy(Core.Tasks.TaskExecutionState.ErrorStarting);
         }
+
+        void ICoreAccess.ExecuteObjectCommand(string objectVariable, string command)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class ExecutionAccessWrapper : IExecutionAccess
