@@ -843,7 +843,7 @@ namespace StepBro.ConsoleSidekick.WinForms
                         testlistExecutionOptionMenu.Name = "toolStripMenuTestlist" + testlist.Name + "Dot" + partner.Name;
                         testlistExecutionOptionMenu.SetText();
                         testlistExecutionOptionMenu.ToolTipText = null; // $"Test '{testlist.FullName}' model '{partner.Name}'";
-                        testlistExecutionOptionMenu.BackColor = Color.Purple;
+                        testlistExecutionOptionMenu.BackColor = Color.Thistle;
                         testlistExecutionOptionMenu.Click += FileElementExecutionEntry_Click;
                         testlistMenu.DropDownItems.Add(testlistExecutionOptionMenu);
                     }
