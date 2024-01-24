@@ -45,6 +45,19 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     if (element.BlockEntryType == PropertyBlockEntryType.Value)
                     {
                         var valueField = element as PropertyBlockValue;
+                        if (valueField.Name.Equals("Text", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            this.Text = valueField.ValueAsString();
+                        }
+                        else if (valueField.Name.Equals("Color", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            try
+                            {
+                                Color color = (Color)(typeof(Color).GetProperty(valueField.ValueAsString()).GetValue(null));
+                                this.BackColor = color;
+                            }
+                            finally { }
+                        }
                     }
                     else if (element.BlockEntryType == PropertyBlockEntryType.Flag)
                     {
@@ -188,7 +201,5 @@ namespace StepBro.UI.WinForms.CustomToolBar
         }
 
         #endregion
-
-
     }
 }
