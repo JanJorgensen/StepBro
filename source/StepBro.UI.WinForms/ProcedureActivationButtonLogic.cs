@@ -120,7 +120,7 @@ namespace StepBro.UI.WinForms
                 if (m_mode == Mode.ClickToStop)
                 {
                     this.SendCommand(ButtonCommand.Disable);
-                    this.SendCommand(ButtonCommand.ShowActive);
+                    this.SendCommand(ButtonCommand.ShowAwaitingExecutionEnd);
                 }
             }
         }

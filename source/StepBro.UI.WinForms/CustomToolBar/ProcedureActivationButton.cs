@@ -55,7 +55,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                             try
                             {
                                 Color color = (Color)(typeof(Color).GetProperty(valueField.ValueAsString()).GetValue(null));
-                                this.BackColor = color;
+                                this.BackColor = m_normalBack = color;
                             }
                             finally { }
                         }
@@ -116,6 +116,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     this.Checked = false;
                     break;
                 case ButtonCommand.ShowActive:
+                    this.BackColor = Color.Orange;
                     break;
                 case ButtonCommand.ShowNormal:
                     this.BackColor = m_normalBack;
@@ -155,6 +156,12 @@ namespace StepBro.UI.WinForms.CustomToolBar
             {
                 m_logic.ButtonReleased();
             }
+        }
+
+        protected override void OnCheckedChanged(EventArgs e)
+        {
+            base.OnCheckedChanged(e);
+            m_logic.CheckedChanged(this.Checked);
         }
 
         #region IToolBarElement
