@@ -148,6 +148,7 @@ namespace StepBro.Core.Parser
 
         public override void ExitFileElement([NotNull] SBP.FileElementContext context)
         {
+            // TODO: Add doc-comment data to the element
             if (m_fileElementAttributes != null)
             {
                 var summary = m_fileElementAttributes.FirstOrDefault(e => e.BlockEntryType == PropertyBlockEntryType.Value && e.Name == "Summary" && (e as PropertyBlockValue).IsStringOrIdentifier) as PropertyBlockValue;
@@ -425,7 +426,6 @@ namespace StepBro.Core.Parser
                         {
                             entry.Tag = "Property";
                             bool dataError = false;
-                            System.Diagnostics.Debug.WriteLine($"Property type: {objectProperty.PropertyType.Name}");
                             Expression valueExpression = null;
                             object value = valueEntry.Value;
                             if (value != null)
@@ -734,23 +734,26 @@ namespace StepBro.Core.Parser
             m_currentFileElement.ParseBaseElement();
             if (m_currentFileElement.BaseElement == null) return;
 
-            if (m_currentFileElement.BaseElement.ElementType == FileElementType.FileVariable && m_lastElementPropertyBlock != null)
+            if (m_currentFileElement.BaseElement.ElementType == FileElementType.FileVariable)
             {
-                FileVariable fileVariable = m_currentFileElement.BaseElement as FileVariable;
-                var parentProperties = ScriptFile.GetFileVariableAllData(fileVariable);
-                var mergedProps = parentProperties.Merge(m_lastElementPropertyBlock);
-                ScriptFile.SetFileVariableAllData(fileVariable, mergedProps);
-
-                if (mergedProps != null && mergedProps.Count > 0)
+                if (m_lastElementPropertyBlock != null)
                 {
-                    var initAction = this.CreateVariableContainerObjectInitAction(
-                        fileVariable.VariableOwnerAccess.Container.DataType.Type, mergedProps, m_errors, context.Start);
-                    fileVariable.VariableOwnerAccess.DataInitializer = initAction;
-                    if (mergedProps.Count(e => e.Tag == null) > 0)
+                    FileVariable fileVariable = m_currentFileElement.BaseElement as FileVariable;
+                    var parentProperties = ScriptFile.GetFileVariableAllData(fileVariable);
+                    var mergedProps = parentProperties.Merge(m_lastElementPropertyBlock);
+                    ScriptFile.SetFileVariableAllData(fileVariable, mergedProps);
+
+                    if (mergedProps != null && mergedProps.Count > 0)
                     {
-                        var customProperties = new PropertyBlock(context.Start.Line);
-                        customProperties.AddRange(mergedProps.Where(e => e.Tag == null));
-                        ScriptFile.SetFileVariableCustomData(fileVariable, customProperties);
+                        var initAction = this.CreateVariableContainerObjectInitAction(
+                            fileVariable.VariableOwnerAccess.Container.DataType.Type, mergedProps, m_errors, context.Start);
+                        fileVariable.VariableOwnerAccess.DataInitializer = initAction;
+                        if (mergedProps.Count(e => e.Tag == null) > 0)
+                        {
+                            var customProperties = new PropertyBlock(context.Start.Line);
+                            customProperties.AddRange(mergedProps.Where(e => e.Tag == null));
+                            ScriptFile.SetFileVariableCustomData(fileVariable, customProperties);
+                        }
                     }
                 }
             }
