@@ -8,7 +8,7 @@ namespace StepBro.Core.Data
     public abstract class PropertyBlockEntry
     {
         private readonly int m_line;
-        private string m_specifiedDataType;
+        private string m_specifiedDataType = null;
         private string m_name;
         private bool m_isArrayEntry = false;
         private bool? m_isUsedOrApproved;
@@ -51,6 +51,10 @@ namespace StepBro.Core.Data
                 m_specifiedDataType = value;
             }
         }
+
+        public bool HasTypeSpecified { get { return !String.IsNullOrEmpty(m_specifiedDataType); } }
+
+        public string TypeOrName { get { return this.HasTypeSpecified ? m_specifiedDataType : m_name; } }
 
         public bool IsArrayEntry
         {
