@@ -20,6 +20,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
         {
             m_coreAccess = coreAccess;
             m_menuLogic = new MenuLogic(this, coreAccess);
+            this.Margin = new Padding(1, Margin.Top, 1, Margin.Bottom);
         }
 
         #region IToolBarElementSetup

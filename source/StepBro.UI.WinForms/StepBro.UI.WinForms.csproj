@@ -11,9 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="CustomToolBar\ColumnSeparator.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Update="CustomToolBar\ColumnSeparator.cs" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿#define STOP_BEFORE_PARSING
+﻿//#define STOP_BEFORE_PARSING
 using StepBro.Core;
 using StepBro.Core.Addons;
 using StepBro.Core.Api;
@@ -336,6 +336,10 @@ namespace StepBro.Cmd
                                         var shortCommand = JsonSerializer.Deserialize<StepBro.Sidekick.Messages.ShortCommand>(input.Item2);
                                         switch (shortCommand)
                                         {
+                                            case Sidekick.Messages.ShortCommand.ClearDisplay:
+                                                Console.Clear();
+                                                zeroTime = DateTime.Now;
+                                                break;
                                             case StepBro.Sidekick.Messages.ShortCommand.RequestClose:
                                                 m_next.Enqueue(StateOrCommand.Exit);
                                                 break;

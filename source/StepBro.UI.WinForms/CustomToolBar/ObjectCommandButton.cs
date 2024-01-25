@@ -21,6 +21,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
         public ObjectCommandButton(ICoreAccess coreAccess) : base()
         {
             m_coreAccess = coreAccess;
+            this.Margin = new Padding(1, Margin.Top, 1, Margin.Bottom);
         }
 
         #region IToolBarElementSetup

@@ -73,6 +73,14 @@ namespace StepBro.UI.WinForms.CustomToolBar
                             m_parent.DropDownItems.Add(button);
                             button.Setup(elementBlock);
                         }
+                        else if (type == nameof(ObjectCommandButton))
+                        {
+                            var button = new ObjectCommandButton(m_coreAccess);
+                            m_parent.DropDownItems.Add(button);
+                            button.Size = new Size(23, 20);
+                            button.AutoSize = true;
+                            button.Setup(elementBlock);
+                        }
                         else if (element.Name == nameof(Separator))
                         {
                             var separator = new Separator(element.Name);

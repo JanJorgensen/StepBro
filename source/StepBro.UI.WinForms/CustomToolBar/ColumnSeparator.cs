@@ -7,14 +7,9 @@ using System.Threading.Tasks;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
-    internal class ColumnSeparator : ToolStripSeparator
+    public class ColumnSeparator : Separator
     {
-        public ColumnSeparator(string name) : base()
-        {
-            this.Name = name;
-        }
-
-        public void Setup(PropertyBlock definition)
+        public ColumnSeparator(string name) : base(name)
         {
         }
     }

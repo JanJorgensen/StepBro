@@ -60,7 +60,7 @@
             // toolStripMain
             // 
             toolStripMain.AutoSize = false;
-            toolStripMain.BackColor = Color.DarkOrange;
+            toolStripMain.BackColor = Color.SandyBrown;
             toolStripMain.GripStyle = ToolStripGripStyle.Hidden;
             toolStripMain.Items.AddRange(new ToolStripItem[] { toolStripDropDownButtonMainMenu, toolStripComboBoxTool, toolStripComboBoxToolCommand, toolStripButtonRunCommand, toolStripSeparatorTool, toolStripSplitButtonRunScript, toolStripButtonStopScriptExecution, toolStripSeparatorBeforeShortcuts, toolStripButtonAddShortcut });
             toolStripMain.Location = new Point(0, 0);
@@ -97,14 +97,14 @@
             // 
             toolStripMenuItemDeleteShortcut.CheckOnClick = true;
             toolStripMenuItemDeleteShortcut.Name = "toolStripMenuItemDeleteShortcut";
-            toolStripMenuItemDeleteShortcut.Size = new Size(180, 22);
+            toolStripMenuItemDeleteShortcut.Size = new Size(174, 22);
             toolStripMenuItemDeleteShortcut.Text = "Delete shortcut";
             toolStripMenuItemDeleteShortcut.ToolTipText = "After selecting this, click the shortcut to delete.";
             // 
             // toolStripMenuItemDeleteAllShortcuts
             // 
             toolStripMenuItemDeleteAllShortcuts.Name = "toolStripMenuItemDeleteAllShortcuts";
-            toolStripMenuItemDeleteAllShortcuts.Size = new Size(180, 22);
+            toolStripMenuItemDeleteAllShortcuts.Size = new Size(174, 22);
             toolStripMenuItemDeleteAllShortcuts.Text = "Delete all shortcuts";
             toolStripMenuItemDeleteAllShortcuts.Click += toolStripMenuItemDeleteAllShortcuts_Click;
             // 

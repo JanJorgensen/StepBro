@@ -563,6 +563,8 @@ namespace StepBro.ConsoleSidekick.WinForms
             shortcut.InstanceObject = instanceObject;
             shortcut.Name = "toolStripMenuProcedure" + shortcut.Text.Replace(".", "Dot");
             shortcut.Size = new Size(182, 22);
+            shortcut.Margin = new Padding(1, shortcut.Margin.Top, 1, shortcut.Margin.Bottom);
+            shortcut.BackColor = Color.PeachPuff;
             shortcut.ToolTipText = null; // $"Run " + target;
             shortcut.Tag = m_userShortcutItemTag;
             shortcut.Click += FileElementExecutionEntry_ShortcutClick;
@@ -581,6 +583,8 @@ namespace StepBro.ConsoleSidekick.WinForms
             shortcut.Command = command;
             shortcut.Name = "toolStripMenuCommand" + text.Replace(".", "Dot");
             shortcut.Size = new Size(182, 22);
+            shortcut.Margin = new Padding(1, shortcut.Margin.Top, 1, shortcut.Margin.Bottom);
+            shortcut.BackColor= Color.Lavender;
             shortcut.ToolTipText = null; // $"Run " + target;
             shortcut.Tag = m_userShortcutItemTag;
             shortcut.Click += ObjectCommandExecutionEntry_ShortcutClick;
@@ -978,6 +982,7 @@ namespace StepBro.ConsoleSidekick.WinForms
             if (m_customToolStrips.Count > 0)
             {
                 this.Height = m_customToolStrips[0].Item2.Bounds.Bottom + 2;
+                m_customToolStrips[0].Item2.AdjustColumns();
             }
             else
             {

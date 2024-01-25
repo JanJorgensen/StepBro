@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
-    internal class Separator : ToolStripSeparator
+    public class Separator : ToolStripSeparator
     {
         public Separator(string name) : base()
         {
             this.Name = name;
+            this.Margin = new Padding(1, 0, 1, 0);
         }
 
         public void Setup(PropertyBlock definition)

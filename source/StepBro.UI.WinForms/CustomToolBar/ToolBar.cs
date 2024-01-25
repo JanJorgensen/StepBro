@@ -1,4 +1,5 @@
-﻿using StepBro.Core.Api;
+﻿using CommandLine;
+using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.PanelCreator;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -19,6 +21,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
         private ICoreAccess m_coreAccess = null;
         bool m_colorSet = false;
         bool m_settingDefaultColor = false;
+        //private static List<ColumnSeparator> g_columns = new List<ColumnSeparator>();
 
         public ToolBar() : base()
         {
@@ -67,6 +70,51 @@ namespace StepBro.UI.WinForms.CustomToolBar
             this.Setup(definition);
         }
 
+        public IEnumerable<ColumnSeparator> ListColumns()
+        {
+            foreach (var column in this.Items.Cast<ToolStripItem>().Where(item => item is ColumnSeparator).Cast<ColumnSeparator>())
+            {
+                yield return column;
+            }
+        }
+
+        public void AdjustColumns()
+        {
+            var toolbars = this.Parent.Controls.Cast<Control>().Where(c => c is ToolBar).Cast<ToolBar>().ToList();
+
+            var titleLabels = toolbars.Where(t => t.Items[0] is Label && ((Label)t.Items[0]).Name.Equals("title", StringComparison.InvariantCultureIgnoreCase)).Select(t => t.Items[0]).Cast<Label>().ToList();
+            int widest = 0;
+            foreach (var label in titleLabels)
+            {
+                widest = Math.Max(widest, label.Bounds.Left + label.Width);
+            }
+            foreach (var label in titleLabels)
+            {
+                label.Margin = new Padding(label.Margin.Left, label.Margin.Top, (widest + 2) - (label.Bounds.Left + label.Width), label.Margin.Bottom);
+            }
+
+            var columns = new List<ColumnSeparator>();
+            foreach (var toolbar in toolbars)
+            {
+                columns.AddRange(toolbar.ListColumns());
+            }
+            var columnNames = columns.Select(c => c.Name).Distinct().ToList();
+            var handledColumns = new List<string>();
+            foreach (var column in columns)
+            {
+                if (!handledColumns.Contains(column.Name))
+                {
+                    var separators = columns.Where(c => c.Name == column.Name);
+                    int maxWidth = separators.Select(s => s.Bounds.Left - s.Margin.Left).Max();
+                    foreach (var col in separators)
+                    {
+                        col.Margin = new Padding(maxWidth - (col.Bounds.Left - col.Margin.Left) + 2, col.Margin.Top, col.Margin.Right, col.Margin.Bottom);
+                    }
+                    handledColumns.Add(column.Name);
+                }
+            }
+        }
+
         #region IToolBarElementSetup
 
         public void Clear()
@@ -77,7 +125,6 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
             this.Items.Clear();
         }
-
         public ICoreAccess Core { get { return m_coreAccess; } }
 
         public void Setup(PropertyBlock definition)
@@ -97,6 +144,24 @@ namespace StepBro.UI.WinForms.CustomToolBar
                         }
                         finally { }
                     }
+                    else if (valueField.TypeOrName == "Label")
+                    {
+                        if (valueField.IsStringOrIdentifier)
+                        {
+                            var text = valueField.ValueAsString();
+                            Label label;
+                            if (valueField.HasTypeSpecified)
+                            {
+                                label = new Label(valueField.Name);
+                            }
+                            else
+                            {
+                                label = new Label("label" + text.Replace(" ", "_").Replace(".", "Dot"));
+                            }
+                            label.Text = text;
+                            this.Items.Add(label);
+                        }
+                    }
                 }
                 else if (element.BlockEntryType == PropertyBlockEntryType.Flag)
                 {
@@ -106,16 +171,17 @@ namespace StepBro.UI.WinForms.CustomToolBar
                         var separator = new Separator("Separator");
                         this.Items.Add(separator);
                     }
-                    //if (flagField.Name == nameof(StretchChilds))
-                    //{
-                    //    StretchChilds = true;
-                    //    SizeToChilds = false;
-                    //}
-                    //else if (flagField.Name == nameof(SizeToChilds))
-                    //{
-                    //    SizeToChilds = true;
-                    //    StretchChilds = false;
-                    //}
+                    else if (element.TypeOrName == nameof(ColumnSeparator))
+                    {
+                        string name = element.Name;
+                        if (!element.HasTypeSpecified)
+                        {
+                            int index = this.Items.Cast<ToolStripItem>().Count(i => i is ColumnSeparator);
+                            name = "column" + index;
+                        }
+                        var separator = new ColumnSeparator(element.Name);
+                        this.Items.Add(separator);
+                    }
                 }
                 else if (element.BlockEntryType == PropertyBlockEntryType.Block)
                 {
@@ -134,6 +200,14 @@ namespace StepBro.UI.WinForms.CustomToolBar
                         else if (type == nameof(ProcedureActivationButton))
                         {
                             var button = new ProcedureActivationButton(m_coreAccess);
+                            this.Items.Add(button);
+                            button.Size = new Size(23, 20);
+                            button.AutoSize = true;
+                            button.Setup(elementBlock);
+                        }
+                        else if (type == nameof(ObjectCommandButton))
+                        {
+                            var button = new ObjectCommandButton(m_coreAccess);
                             this.Items.Add(button);
                             button.Size = new Size(23, 20);
                             button.AutoSize = true;
@@ -160,9 +234,10 @@ namespace StepBro.UI.WinForms.CustomToolBar
                             this.Items.Add(separator);
                             separator.Setup(elementBlock);
                         }
-                        if (element.Name == nameof(ColumnSeparator))
+                        else if (element.Name == nameof(ColumnSeparator))
                         {
-                            var separator = new ColumnSeparator("Separator");
+                            int index = this.Items.Cast<ToolStripItem>().Count(i => i is ColumnSeparator);
+                            var separator = new ColumnSeparator("column" + index);
                             this.Items.Add(separator);
                             separator.Setup(elementBlock);
                         }
