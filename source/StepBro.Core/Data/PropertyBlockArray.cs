@@ -152,5 +152,15 @@ namespace StepBro.Core.Data
             array.AddRange(m_entries.Where(c => !skipUsedOrApproved || !c.IsUsedOrApproved).Select(c => c.Clone(skipUsedOrApproved)));
             return array;
         }
+
+        public override SerializablePropertyBlockEntry CloneForSerialization()
+        {
+            return new SerializablePropertyBlockArray()
+            {
+                Name = this.Name,
+                SpecifiedType = this.SpecifiedTypeName,
+                Entries = m_entries.Select(e => e.CloneForSerialization()).ToArray()
+            };
+        }
     }
 }

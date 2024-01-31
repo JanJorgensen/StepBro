@@ -554,6 +554,11 @@ namespace StepBro.Core.Execution
 
         public static T AwaitAsyncTyped<T>(IScriptCallContext context, Tasks.IAsyncResult<T> result)
         {
+            if (result == null)
+            {
+                context.ReportError("No async result data. Did the method fail to execute?");
+                return default(T);
+            }
             if (!result.IsCompleted)
             {
                 if (!result.AsyncWaitHandle.WaitOne(20000))

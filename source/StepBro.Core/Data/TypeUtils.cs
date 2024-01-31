@@ -84,6 +84,12 @@ namespace StepBro.Core.Data
             else return type.Name;
         }
 
+        public static string TypeName(this TypeReference type)
+        {
+            if (type.DynamicType != null) return type.DynamicType.ToString();
+            return type.Type.TypeName();
+        }
+
         public static IEnumerable<Type> SelfBasesAndInterfaces(this Type type, bool includeBaseClasses = true, bool includeInterfaces = true)
         {
             yield return type;

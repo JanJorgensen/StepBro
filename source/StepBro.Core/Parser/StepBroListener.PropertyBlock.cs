@@ -130,8 +130,8 @@ namespace StepBro.Core.Parser
             if (m_propertyBlockOperands.Count != 1) throw new InvalidOperationException("Unexpected stack depth.");
             m_scopeStack.Peek().SetProperties(m_propertyBlockOperands.Pop());
             //var block = new PropertyBlock(context.Start.Line, m_propertyBlockOperands.Pop());
-            
-            
+
+
             //if (m_currentFileElement != null)
             //{
             //    m_currentFileElement.SetPropertyBlockData(m_lastElementPropertyBlock);
@@ -163,9 +163,10 @@ namespace StepBro.Core.Parser
             block.AddRange(childs);
         }
 
-        //public override void EnterPropertyblockStatement([NotNull] SBP.PropertyblockStatementContext context)
-        //{
-        //}
+        public override void EnterPropertyblockStatement([NotNull] SBP.PropertyblockStatementContext context)
+        {
+            m_propertyEntryType = null;
+        }
 
         //public override void ExitPropertyblockStatement([NotNull] SBP.PropertyblockStatementContext context)
         //{
@@ -175,7 +176,6 @@ namespace StepBro.Core.Parser
         {
             m_expressionData.PushStackLevel("Block Statement Named");   // For the entry name.
             m_propertyEntryName = null;
-            m_propertyEntryType = null;
         }
 
         public override void ExitPropertyblockStatementNamed([NotNull] SBP.PropertyblockStatementNamedContext context)
@@ -325,8 +325,19 @@ namespace StepBro.Core.Parser
         public override void ExitPropertyblockStatementValueIdentifierOnly([NotNull] SBP.PropertyblockStatementValueIdentifierOnlyContext context)
         {
             var stack = m_expressionData.PopStackLevel();
-            string name = context.GetText();
-            m_propertyBlockOperands.Peek().Add(new PropertyBlockFlag(context.Start.Line, name));
+            PropertyBlockFlag flag;
+            if (m_propertyEntryType == null)
+            {
+                string name = context.GetText();
+                flag = new PropertyBlockFlag(context.Start.Line, name);
+            }
+            else
+            {
+                string name = context.children[1].GetText();
+                flag = new PropertyBlockFlag(context.Start.Line, name);
+                flag.SpecifiedTypeName = m_propertyEntryType;
+            }
+            m_propertyBlockOperands.Peek().Add(flag);
         }
 
         #region Event

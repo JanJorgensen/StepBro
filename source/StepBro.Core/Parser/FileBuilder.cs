@@ -3,6 +3,7 @@ using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Tree;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
+using StepBro.Core.File;
 using StepBro.Core.General;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
@@ -497,6 +498,7 @@ namespace StepBro.Core.Parser
         {
             var addons = services.Get<IAddonManager>();
             var filesManager = services.Get<ILoadedFilesManager>();
+            var shortcutsManager = ServiceManager.Global.Get<IFolderManager>();
 
             var filesToParse = new List<ScriptFile>();
             if (topfile != null)
@@ -603,9 +605,14 @@ namespace StepBro.Core.Parser
 
                         if (fu.Contains("["))     // It's a path using a folder shortcut.
                         {
-                            throw new NotImplementedException();
+                            string error = null;
+                            string path = shortcutsManager.ListShortcuts().ResolveShortcutPath(fu, ref error);
+                            if (System.IO.File.Exists(path))
+                            {
+                                foundMatchingFile = path;
+                            }
                         }
-                        else if (fu.Contains("\\"))     // It's a relative or absolute path
+                        else if (fu.Contains("\\") || fu.Contains("/"))     // It's a relative or absolute path
                         {
                             string path = Path.GetFullPath(Path.Combine(basefolder, fu));
                             if (System.IO.File.Exists(path))

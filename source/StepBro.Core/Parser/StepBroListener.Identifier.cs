@@ -114,6 +114,10 @@ namespace StepBro.Core.Parser
                     result.Argument = input.Argument;
                     return result;
                 }
+                else
+                {
+                    return input;
+                }
             }
             return input;
         }
@@ -302,6 +306,17 @@ namespace StepBro.Core.Parser
                 {
                     foundIdentifier = this.TryGetFileElementInScope(m_file?.Usings, identifier);
                 }
+                //if (foundIdentifier == null && inFunctionScope)
+                //{
+                //    if (m_addonManager != null)
+                //    {
+                //        var foundScriptUtilsAccess = this.ResolveDotIdentifierTypeReference(s_ScriptUtilsTypeData, SBExpressionData.CreateIdentifier(identifier, token: token));
+                //        if (foundScriptUtilsAccess != null)
+                //        {
+                //            return foundScriptUtilsAccess;
+                //        }
+                //    }
+                //}
             }
 
         returnFound:
@@ -729,7 +744,7 @@ namespace StepBro.Core.Parser
             else if (leftType.IsTypeDefinition)
             {
                 var methods = leftType.GetMethods().Where(mi => mi.Name == rightString).ToList();
-                methods.AddRange(m_addonManager.ListExtensionMethods(leftType).Where(mi => mi.Name == rightString));
+                methods.AddRange(m_addonManager.ListExtensionMethods(leftType, rightString));
                 if (methods.Count > 0)
                 {
                     return new SBExpressionData(
@@ -819,7 +834,7 @@ namespace StepBro.Core.Parser
             {
 
                 var methods = type.GetMethods().Where(mi => mi.Name == rightString).ToList();
-                methods.AddRange(m_addonManager.ListExtensionMethods(left.DataType.Type, mi => mi.Name == rightString));
+                methods.AddRange(m_addonManager.ListExtensionMethods(left.DataType.Type, rightString));
                 var properties = type.GetProperties().Where(pi => pi.Name == rightString).ToList();
 
                 //if (methods.Count > 0 && properties.Count > 1)

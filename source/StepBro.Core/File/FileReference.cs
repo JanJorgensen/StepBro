@@ -105,7 +105,7 @@ namespace StepBro.Core.File
             }
         }
 
-        public static string ResolveShortcutPath(this IEnumerable<IFolderShortcut> shortcuts, string path)
+        public static string ResolveShortcutPath(this IEnumerable<IFolderShortcut> shortcuts, string path, ref string errorMessage)
         {
             if (String.IsNullOrEmpty(path))
             {
@@ -123,9 +123,13 @@ namespace StepBro.Core.File
                 IFolderShortcut shortcut = shortcuts.FirstOrDefault(s => s.Name == splittedPath.Name);
                 if (shortcut != null)
                 {
-                    string p = ResolveShortcutPath(shortcuts, shortcut.Path);
+                    string p = ResolveShortcutPath(shortcuts, shortcut.Path, ref errorMessage);
 
-                    if (String.IsNullOrEmpty(splittedPath.Value))
+                    if (p == null)
+                    {
+                        return null;
+                    }
+                    else if (String.IsNullOrEmpty(splittedPath.Value))
                     {
                         return p;
                     }
@@ -136,15 +140,23 @@ namespace StepBro.Core.File
                 }
                 else
                 {
-                    throw new ArgumentException("Unknown folder shortcut: '" + splittedPath.Name + "'.");
+                    errorMessage = "Unknown folder shortcut: '" + splittedPath.Name + "'.";
+                    return null;
                 }
             }
         }
 
-        public static string GetFullPath(this IEnumerable<IFolderShortcut> shortcuts, string path)
+        public static string GetFullPath(this IEnumerable<IFolderShortcut> shortcuts, string path, ref string errorMessage)
         {
-            string resolved = ResolveShortcutPath(shortcuts, path);
-            return System.IO.Path.GetFullPath(resolved);
+            string resolved = shortcuts.ResolveShortcutPath(path, ref errorMessage);
+            if (resolved == null)
+            {
+                return null;
+            }
+            else
+            {
+                return System.IO.Path.GetFullPath(resolved);
+            }
         }
     }
 

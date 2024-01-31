@@ -327,10 +327,11 @@ namespace StepBro.Core
                 ILoggerScope logger = null;
                 try
                 {
-                    logger = m_logRootScope.LogEntering(true, "FileParsing", "Starting", null);
+                    logger = m_logRootScope.LogEntering(true, "StepBro.Main.FileParsing", "Starting file parsing", null);
                     foreach (var f in m_loadedFilesManager.ListFiles<ScriptFile>())
                     {
-                        f.ResetBeforeParsing(preserveUpdateableElements: force == false);
+                        f.ResetBeforeParsing(preserveUpdateableElements: true);
+                        //f.ResetBeforeParsing(preserveUpdateableElements: force == false);
                     }
 
                     m_lastParsingErrorCount = FileBuilder.ParseFiles(m_serviceManagerAdmin.Manager, logger, (IScriptFile)null);
@@ -388,14 +389,14 @@ namespace StepBro.Core
             return null;
         }
 
-        public static IScriptExecution ExecuteProcedure(IFileProcedure procedure, params object[] arguments)
+        public static IScriptExecution ExecuteProcedure(IFileElement element, IPartner partner, params object[] arguments)
         {
-            return m_scriptExecutionManager.ExecuteFileElement(procedure, null, arguments);
+            return m_scriptExecutionManager.ExecuteFileElement(element, partner, arguments);
         }
 
-        public static IScriptExecution StartProcedureExecution(IFileProcedure procedure, params object[] arguments)
+        public static IScriptExecution StartProcedureExecution(IFileElement element, IPartner partner, params object[] arguments)
         {
-            var execution = m_scriptExecutionManager.CreateFileElementExecution(procedure, null, arguments);
+            var execution = m_scriptExecutionManager.CreateFileElementExecution(element, partner, arguments);
             execution.StartExecution();
             return execution;
         }

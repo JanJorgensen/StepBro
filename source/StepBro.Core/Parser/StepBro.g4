@@ -597,7 +597,10 @@ propertyblockArrayEntry
 
 propertyblockStatementValueNormal : primaryOrQualified ;
 
-propertyblockStatementValueIdentifierOnly : IDENTIFIER ;
+propertyblockStatementValueIdentifierOnly 
+    :	(propertyblockStatementTypeSpecifier IDENTIFIER)
+    |   IDENTIFIER
+    ;
 
 
 // ATTRIBUTES

@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace StepBro.Core.Data
 {
     public abstract class PropertyBlockEntry
     {
         private readonly int m_line;
-        private string m_specifiedDataType;
+        private string m_specifiedDataType = null;
         private string m_name;
         private bool m_isArrayEntry = false;
         private bool? m_isUsedOrApproved;
@@ -50,6 +52,10 @@ namespace StepBro.Core.Data
             }
         }
 
+        public bool HasTypeSpecified { get { return !String.IsNullOrEmpty(m_specifiedDataType); } }
+
+        public string TypeOrName { get { return this.HasTypeSpecified ? m_specifiedDataType : m_name; } }
+
         public bool IsArrayEntry
         {
             get { return m_isArrayEntry; }
@@ -77,7 +83,7 @@ namespace StepBro.Core.Data
 
         public bool Is(string name, PropertyBlockEntryType type)
         {
-            return String.Equals(m_name, name) && BlockEntryType == type;
+            return string.Equals(m_name, name) && BlockEntryType == type;
         }
 
         public bool IsUsedOrApproved
@@ -98,5 +104,133 @@ namespace StepBro.Core.Data
             this.IsAdditionAssignment = baseElement.IsAdditionAssignment;
             return this;
         }
+
+        public abstract SerializablePropertyBlockEntry CloneForSerialization();
     }
+
+    #region Serialization
+
+    [JsonDerivedType(typeof(SerializablePropertyBlockFlag), typeDiscriminator: "flag")]
+    [JsonDerivedType(typeof(SerializablePropertyBlockValueNull), typeDiscriminator: "null")]
+    [JsonDerivedType(typeof(SerializablePropertyBlockValueBool), typeDiscriminator: "bool")]
+    [JsonDerivedType(typeof(SerializablePropertyBlockValueString), typeDiscriminator: "string")]
+    [JsonDerivedType(typeof(SerializablePropertyBlockValueInt), typeDiscriminator: "int")]
+    [JsonDerivedType(typeof(SerializablePropertyBlockValueIdentifier), typeDiscriminator: "identifier")]
+    [JsonDerivedType(typeof(SerializablePropertyBlock), typeDiscriminator: "block")]
+    [JsonDerivedType(typeof(SerializablePropertyBlockArray), typeDiscriminator: "array")]
+    [JsonDerivedType(typeof(SerializablePropertyBlockEvent), typeDiscriminator: "event")]
+    public abstract class SerializablePropertyBlockEntry
+    {
+        [JsonPropertyOrder(0)]
+        public string Name { get; set; } = null;
+        [JsonPropertyOrder(1)]
+        public string SpecifiedType { get; set; } = null;
+        public abstract PropertyBlockEntry CloneAsPropertyBlockEntry();
+    }
+    public class SerializablePropertyBlockFlag : SerializablePropertyBlockEntry
+    {
+        public override PropertyBlockEntry CloneAsPropertyBlockEntry()
+        {
+            var data = new PropertyBlockFlag(-1, this.Name);
+            data.SpecifiedTypeName = SpecifiedType;
+            return data;
+        }
+    }
+    public class SerializablePropertyBlockValueNull : SerializablePropertyBlockEntry
+    {
+        public override PropertyBlockEntry CloneAsPropertyBlockEntry()
+        {
+            var data = new PropertyBlockValue(-1, this.Name, null);
+            data.SpecifiedTypeName = SpecifiedType;
+            return data;
+        }
+    }
+    public class SerializablePropertyBlockValueBool : SerializablePropertyBlockEntry
+    {
+        [JsonPropertyOrder(2)]
+        public bool Value { get; set; }
+
+        public override PropertyBlockEntry CloneAsPropertyBlockEntry()
+        {
+            var data = new PropertyBlockValue(-1, this.Name, this.Value);
+            data.SpecifiedTypeName = SpecifiedType;
+            return data;
+        }
+    }
+    public class SerializablePropertyBlockValueString : SerializablePropertyBlockEntry
+    {
+        [JsonPropertyOrder(2)]
+        public string Value { get; set; }
+
+        public override PropertyBlockEntry CloneAsPropertyBlockEntry()
+        {
+            var data = new PropertyBlockValue(-1, this.Name, this.Value);
+            data.SpecifiedTypeName = SpecifiedType;
+            return data;
+        }
+    }
+    public class SerializablePropertyBlockValueInt : SerializablePropertyBlockEntry
+    {
+        [JsonPropertyOrder(2)]
+        public long Value { get; set; }
+
+        public override PropertyBlockEntry CloneAsPropertyBlockEntry()
+        {
+            var data = new PropertyBlockValue(-1, this.Name, this.Value);
+            data.SpecifiedTypeName = SpecifiedType;
+            return data;
+        }
+    }
+    public class SerializablePropertyBlockValueIdentifier : SerializablePropertyBlockEntry
+    {
+        [JsonPropertyOrder(2)]
+        public string Value { get; set; }
+
+        public override PropertyBlockEntry CloneAsPropertyBlockEntry()
+        {
+            var data = new PropertyBlockValue(-1, this.Name, (Identifier)this.Value);
+            data.SpecifiedTypeName = SpecifiedType;
+            return data;
+        }
+    }
+    public class SerializablePropertyBlock : SerializablePropertyBlockEntry
+    {
+        [JsonPropertyOrder(2)]
+        public SerializablePropertyBlockEntry[] Entries { get; set; }
+
+        public override PropertyBlockEntry CloneAsPropertyBlockEntry()
+        {
+            var block = new PropertyBlock(-1, this.Name);
+            block.SpecifiedTypeName = SpecifiedType;
+            block.AddRange(this.Entries.Select(e => e.CloneAsPropertyBlockEntry()));
+            return block;
+        }
+    }
+    public class SerializablePropertyBlockArray : SerializablePropertyBlockEntry
+    {
+        [JsonPropertyOrder(2)]
+        public SerializablePropertyBlockEntry[] Entries { get; set; }
+
+        public override PropertyBlockEntry CloneAsPropertyBlockEntry()
+        {
+            var block = new PropertyBlockArray(-1, this.Name);
+            block.SpecifiedTypeName = SpecifiedType;
+            block.AddRange(this.Entries.Select(e => e.CloneAsPropertyBlockEntry()));
+            return block;
+        }
+    }
+    public class SerializablePropertyBlockEvent : SerializablePropertyBlockEntry
+    {
+        [JsonPropertyOrder(2)]
+        public Verdict Verdict { get; set; }
+
+        public override PropertyBlockEntry CloneAsPropertyBlockEntry()
+        {
+            var data = new PropertyBlockEvent(-1, this.Name, this.Verdict);
+            data.SpecifiedTypeName = SpecifiedType;
+            return data;
+        }
+    }
+
+    #endregion
 }
