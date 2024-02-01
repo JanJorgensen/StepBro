@@ -560,8 +560,14 @@ namespace StepBro.Core.ScriptData
         public IEnumerable<IFileElement> ListPublicElements(string userNamespace, bool onlyLocal = false)
         {
             AccessModifier access = AccessModifier.Public;
-            if (String.Equals(userNamespace, m_namespace, StringComparison.InvariantCulture)) access = AccessModifier.Protected;
-            foreach (var element in this.ListElements().Where(e => e.AccessLevel >= access && e.ElementType != FileElementType.Override)) yield return element;
+            if (String.Equals(userNamespace, m_namespace, StringComparison.InvariantCulture))
+            {
+                access = AccessModifier.Protected;
+            }
+            foreach (var element in this.ListElements().Where(e => e.AccessLevel >= access))
+            {
+                yield return element;
+            }
         }
 
         public IFileElement this[string name]
