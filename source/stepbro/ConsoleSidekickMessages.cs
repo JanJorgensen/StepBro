@@ -154,17 +154,6 @@ namespace StepBro.Sidekick.Messages
     //    public string[] Partners { get; set; }
     //}
 
-    public class ObjectCommand
-    {
-        public ObjectCommand(string @object, string command)
-        {
-            this.Object = @object;
-            this.Command = command;
-        }
-        public string Object { get; set; }
-        public string Command { get; set; }
-    }
-
     public class RequestOrResponse
     {
         public RequestOrResponse()
@@ -176,6 +165,18 @@ namespace StepBro.Sidekick.Messages
             this.RequestID = id;
         }
         public ulong RequestID { get; set; }
+        public string ExecutionNote { get; set; } = null;
+    }
+
+    public class ObjectCommand : RequestOrResponse
+    {
+        public ObjectCommand(string @object, string command)
+        {
+            this.Object = @object;
+            this.Command = command;
+        }
+        public string Object { get; set; }
+        public string Command { get; set; }
     }
 
     public class ReleaseRequest : RequestOrResponse

@@ -29,13 +29,13 @@ namespace StepBro.Cmd
     {
         private enum Mode
         {
-            /// <summary>
-            /// After checking command line parameters, just exit.
-            /// </summary>
-            RunThrough,
-            ExecuteScript,
-            RepeatedParsing
+            DryRun,
+            SinglePass,
+            Loop,   // Not used directly, but states after this all includes looping.
+            RepeatedParsing,
+            WorkbenchWithSidekick
         }
+
         private enum StateOrCommand
         {
             AwaitCommand,
@@ -43,7 +43,7 @@ namespace StepBro.Cmd
             ParseFiles,
             StartScriptExecution,
             AwaitScriptExecutionEnd,
-            AwaitFileChange,
+            //AwaitFileChange,
             CloseAndDisposeAllFiles,
             Exit
         }
@@ -58,9 +58,10 @@ namespace StepBro.Cmd
         private static IOutputFormatterTypeAddon m_outputAddon = null;
         private static IOutputFormatter m_outputFormatter = null;
         private static List<Tuple<bool, string>> m_bufferedOutput = new List<Tuple<bool, string>>();
-        private static Mode m_mode = Mode.RunThrough;
+        private static Mode m_mode = Mode.DryRun;
         private static Queue<StateOrCommand> m_next = new Queue<StateOrCommand>();
         private static SideKickPipe m_sideKickPipe = null;
+        private static bool sidekickStarted = false;
         private static List<Tuple<ulong, object>> m_requestObjectDictionary = new List<Tuple<ulong, object>>();
 
         private static int Main(string[] args)
@@ -70,19 +71,18 @@ namespace StepBro.Cmd
             var selectedOutputAddon = OutputConsoleWithColorsAddon.Name;
             IExecutionResult result = null;
             DataReport createdReport = null;
-            bool sidekickStarted = false;
             Dictionary<string, ITextCommandInput> commandObjectDictionary = null;
             EventHandler closeEventHandler = null;
             IFileElement element = null;
             IPartner partner = null;
             IScriptExecution execution = null;
-            ulong executionStartRequestID = 0UL;
             bool executionRequestSilent = false;
             string targetFile = null;
             string targetFileFullPath = null;
             string targetElement = null;
             string targetPartner = null;
             string targetObject = null;
+            ulong targetExecutionStartRequestID = 0UL;
 
             try
             {
@@ -211,13 +211,6 @@ namespace StepBro.Cmd
                             ConsoleWriteLine("Starting 'repeated parsing'. To exit, press 'x'. To clear view, press 'c'.");
                         }
                     }
-                    else
-                    {
-                        if (!String.IsNullOrEmpty(targetElement))
-                        {
-                            m_mode = Mode.ExecuteScript;
-                        }
-                    }
                 }
                 else
                 {
@@ -266,10 +259,7 @@ namespace StepBro.Cmd
 
                         StartLogDumpTask();
 
-                        if (m_mode == Mode.RunThrough)
-                        {
-                            m_next.Enqueue(StateOrCommand.AwaitCommand);
-                        }
+                        m_mode = Mode.WorkbenchWithSidekick;
                     }
                 }
 
@@ -286,17 +276,16 @@ namespace StepBro.Cmd
                 IScriptFile file = null;
 
                 StateOrCommand command;
-                while ((command = m_next.Any() ? m_next.Dequeue() : StateOrCommand.Exit) != StateOrCommand.Exit)
+                while ((command = m_next.Any() ? m_next.Dequeue() : (m_mode >= Mode.Loop ? StateOrCommand.AwaitCommand : StateOrCommand.Exit)) != StateOrCommand.Exit)
                 {
-                    if (command != StateOrCommand.AwaitCommand && command != StateOrCommand.AwaitFileChange)
+                    if (command != StateOrCommand.AwaitCommand)
                     {
                         Trace.WriteLine("StepBro command: " + command.ToString());
                     }
                     switch (command)
                     {
                         case StateOrCommand.AwaitCommand:
-                        case StateOrCommand.AwaitFileChange:
-                            if (m_mode == Mode.RepeatedParsing && StepBroMain.CheckIfFileParsingNeeded(true))
+                            if (m_commandLineOptions.RepeatedParsing && StepBroMain.CheckIfFileParsingNeeded(true))
                             {
                                 if (sidekickStarted)
                                 {
@@ -381,15 +370,15 @@ namespace StepBro.Cmd
                                     {
                                         var request = JsonSerializer.Deserialize<StepBro.Sidekick.Messages.RunScriptRequest>(input.Item2);
                                         executionRequestSilent = request.Silent;
-                                        executionStartRequestID = request.RequestID;
+                                        targetExecutionStartRequestID = request.RequestID;
                                         targetElement = request.Element;
                                         targetPartner = request.Partner;
                                         targetObject = request.ObjectReference;
 
                                         string objectInstanceText = String.IsNullOrEmpty(request.ObjectReference) ? "" : (request.ObjectReference.Split('.').Last() + ".");
                                         string partnertext = String.IsNullOrEmpty(targetPartner) ? "" : (" @ " + targetPartner);
-                                        StepBroMain.Logger.RootLogger.LogUserAction("Request script execution: " + objectInstanceText + targetElement + partnertext);
-
+                                        string noteText = String.IsNullOrEmpty(request.ExecutionNote) ? "" : (" - \"" + request.ExecutionNote + "\"");
+                                        StepBroMain.Logger.RootLogger.LogUserAction("Request script execution: " + objectInstanceText + targetElement + partnertext + noteText);
                                         m_next.Enqueue(StateOrCommand.StartScriptExecution);
                                     }
                                     else if (input.Item1 == nameof(StepBro.Sidekick.Messages.StopExecutionRequest))
@@ -422,7 +411,6 @@ namespace StepBro.Cmd
                             if (m_next.Count == 0)
                             {
                                 System.Threading.Thread.Sleep(150);
-                                m_next.Enqueue(StateOrCommand.AwaitCommand);
                             }
                             break;
 
@@ -604,24 +592,23 @@ namespace StepBro.Cmd
                                     m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.EndFileElements);
                                 }
 
-                                switch (m_mode)
+                                if (!String.IsNullOrEmpty(targetElement))
                                 {
-                                    case Mode.RunThrough:
-                                        if (!sidekickStarted)
-                                        {
+                                    m_next.Enqueue(StateOrCommand.StartScriptExecution);
+                                }
+                                else
+                                {
+                                    switch (m_mode)
+                                    {
+                                        case Mode.RepeatedParsing:
+                                        case Mode.WorkbenchWithSidekick:
+                                            ConsoleWriteLine("No parsing errors.");
+                                            m_dumpBufferedConsoleOutput = true;
+                                            break;
+                                        default:
                                             m_next.Enqueue(StateOrCommand.Exit);
-                                        }
-                                        break;
-                                    case Mode.ExecuteScript:
-                                        m_next.Enqueue(StateOrCommand.StartScriptExecution);
-                                        break;
-                                    case Mode.RepeatedParsing:
-                                        ConsoleWriteLine("No parsing errors.");
-                                        m_dumpBufferedConsoleOutput = true;
-                                        m_next.Enqueue(StateOrCommand.AwaitFileChange);
-                                        break;
-                                    default:
-                                        break;
+                                            break;
+                                    }
                                 }
                             }
                             else
@@ -642,8 +629,8 @@ namespace StepBro.Cmd
                                 switch (m_mode)
                                 {
                                     case Mode.RepeatedParsing:
+                                    case Mode.WorkbenchWithSidekick:
                                         m_dumpBufferedConsoleOutput = true;
-                                        m_next.Enqueue(StateOrCommand.AwaitFileChange);
                                         break;
                                     default:
                                         retval = -1;
@@ -655,99 +642,113 @@ namespace StepBro.Cmd
 
                         case StateOrCommand.StartScriptExecution:
                             {
-                                element = StepBroMain.TryFindFileElement(targetElement);
-                                partner = null;
-                                if (element != null)
+                                bool executionStarted = false;
+                                if (execution != null)
                                 {
-                                    List<object> arguments = m_commandLineOptions?.Arguments.Select(
-                                        (a) => StepBroMain.ParseExpression(element?.ParentFile, a)).ToList();
-
-                                    if (!String.IsNullOrEmpty(targetPartner))
+                                    ConsoleWriteErrorLine("Error: Execution already running.");
+                                }
+                                else
+                                {
+                                    bool error = false;
+                                    element = StepBroMain.TryFindFileElement(targetElement);
+                                    partner = null;
+                                    if (element != null)
                                     {
-                                        partner = element.ListPartners().First(p => String.Equals(targetPartner, p.Name, StringComparison.InvariantCultureIgnoreCase));
-                                        if (partner == null)
+                                        List<object> arguments = m_commandLineOptions?.Arguments.Select(
+                                            (a) => StepBroMain.ParseExpression(element?.ParentFile, a)).ToList();
+
+                                        if (!String.IsNullOrEmpty(targetPartner))
                                         {
-                                            retval = -1;
-                                            ConsoleWriteErrorLine($"Error: The specified file element does not have a model named \"{targetPartner}\".");
+                                            partner = element.ListPartners().First(p => String.Equals(targetPartner, p.Name, StringComparison.InvariantCultureIgnoreCase));
+                                            if (partner == null)
+                                            {
+                                                ConsoleWriteErrorLine($"Error: The specified file element does not have a model named \"{targetPartner}\".");
+                                                error = true;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (!String.IsNullOrEmpty(targetObject))
+                                            {
+                                                var theObject = objectManager.GetObjectCollection().FirstOrDefault(v => string.Equals(v.FullName, targetObject, StringComparison.InvariantCulture));
+                                                if (theObject != null)
+                                                {
+                                                    arguments.Insert(0, theObject.Object);
+                                                }
+                                                else
+                                                {
+                                                    ConsoleWriteErrorLine($"Error: Target object '{targetObject}' was not found in the list of global variables.");
+                                                    error = true;
+                                                }
+                                            }
+
+                                            if (!(element is IFileProcedure))
+                                            {
+                                                ConsoleWriteErrorLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
+                                                error = true;
+                                            }
+                                        }
+
+                                        if (!error)
+                                        {
+                                            try
+                                            {
+                                                StartLogDumpTask();
+
+                                                if (m_commandLineOptions.Verbose)
+                                                {
+                                                    StepBroMain.Logger.RootLogger.LogDetail("Request script execution");
+                                                }
+                                                if (sidekickStarted)
+                                                {
+                                                    execution = StepBroMain.StartProcedureExecution(element, partner, arguments.ToArray());
+                                                    if (targetExecutionStartRequestID != 0UL)
+                                                    {
+                                                        m_requestObjectDictionary.Add(new Tuple<ulong, object>(targetExecutionStartRequestID, execution));
+                                                        execution.Task.CurrentStateChanged += ExecutionTask_CurrentStateChanged;
+                                                    }
+                                                    m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.ExecutionStarted);
+                                                }
+                                                else
+                                                {
+                                                    execution = StepBroMain.ExecuteProcedure(element, partner, arguments.ToArray());
+                                                }
+
+                                                executionStarted = true;
+                                                m_next.Enqueue(StateOrCommand.AwaitScriptExecutionEnd);
+                                            }
+                                            catch (TargetParameterCountException)
+                                            {
+                                                ConsoleWriteErrorLine("Error: The number of arguments does not match the target procedure.");
+                                            }
                                         }
                                     }
                                     else
                                     {
-                                        if (!String.IsNullOrEmpty(targetObject))
-                                        {
-                                            var theObject = objectManager.GetObjectCollection().FirstOrDefault(v => string.Equals(v.FullName, targetObject, StringComparison.InvariantCulture));
-                                            if (theObject != null)
-                                            {
-                                                arguments.Insert(0, theObject.Object);
-                                            }
-                                            else
-                                            {
-                                                retval = -1;
-                                                ConsoleWriteErrorLine($"Error: Target object '{targetObject}' was not found in the list of global variables.");
-                                            }
-                                        }
-
-                                        if (!(element is IFileProcedure))
-                                        {
-                                            retval = -1;
-                                            ConsoleWriteErrorLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
-                                        }
-                                    }
-
-                                    if (retval == 0)
-                                    {
-                                        try
-                                        {
-                                            StartLogDumpTask();
-
-                                            if (m_commandLineOptions.Verbose)
-                                            {
-                                                StepBroMain.Logger.RootLogger.LogDetail("Request script execution");
-                                            }
-                                            if (sidekickStarted)
-                                            {
-                                                execution = StepBroMain.StartProcedureExecution(element, partner, arguments.ToArray());
-                                                if (executionStartRequestID != 0UL)
-                                                {
-                                                    m_requestObjectDictionary.Add(new Tuple<ulong, object>(executionStartRequestID, execution));
-                                                    execution.Task.CurrentStateChanged += ExecutionTask_CurrentStateChanged;
-                                                    executionStartRequestID = 0UL;
-                                                }
-                                                m_next.Enqueue(StateOrCommand.AwaitCommand);
-                                                m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.ExecutionStarted);
-                                            }
-                                            else
-                                            {
-                                                execution = StepBroMain.ExecuteProcedure(element, partner, arguments.ToArray());
-                                            }
-                                            m_next.Enqueue(StateOrCommand.AwaitScriptExecutionEnd);
-                                        }
-                                        catch (TargetParameterCountException)
-                                        {
-                                            retval = -1;
-                                            ConsoleWriteErrorLine("Error: The number of arguments does not match the target procedure.");
-                                        }
+                                        ConsoleWriteErrorLine($"Error: File element named '{targetElement} was not found.");
                                     }
                                 }
-                                else
+
+                                if (!executionStarted)
                                 {
-                                    retval = -1;
-                                    ConsoleWriteErrorLine($"Error: File element named '{targetElement} was not found.");
+                                    if (sidekickStarted && targetExecutionStartRequestID != 0UL)
+                                    {
+                                        m_sideKickPipe.Send(new StepBro.Sidekick.Messages.ExecutionStateUpdate(targetExecutionStartRequestID, TaskExecutionState.ErrorStarting));
+                                    }
+                                    else
+                                    {
+                                        retval = -1;
+                                    }
                                 }
-                            }
-                            if (m_next.Count == 0)
-                            {
-                                System.Threading.Thread.Sleep(150);
-                                m_next.Enqueue(StateOrCommand.AwaitCommand);
+                                targetElement = null;
+                                targetObject = null;
+                                targetPartner = null;
+                                targetExecutionStartRequestID = 0UL;
                             }
                             break;
 
                         case StateOrCommand.AwaitScriptExecutionEnd:
                             {
-                                if (sidekickStarted)
-                                {
-                                    m_next.Enqueue(StateOrCommand.AwaitCommand);
-                                }
                                 if (execution.Task.Ended())
                                 {
                                     if (sidekickStarted)
@@ -762,6 +763,7 @@ namespace StepBro.Cmd
                                     }
                                     result = execution.Result;
                                     createdReport = execution.Report;
+                                    execution = null;
 
                                     if (result != null)
                                     {
@@ -828,6 +830,10 @@ namespace StepBro.Cmd
                                 }
                                 else
                                 {
+                                    if (sidekickStarted)
+                                    {
+                                        m_next.Enqueue(StateOrCommand.AwaitCommand);
+                                    }
                                     m_next.Enqueue(StateOrCommand.AwaitScriptExecutionEnd);
                                     Thread.Sleep(100);
                                 }
@@ -851,6 +857,11 @@ namespace StepBro.Cmd
 
                         case StateOrCommand.Exit:
                             break;
+                    }
+
+                    if (m_next.Count == 0)
+                    {
+                        Thread.Sleep(150);
                     }
                 }
             }
@@ -985,6 +996,10 @@ namespace StepBro.Cmd
             if (m_activitiesRunning && m_dumpingExecutionLog)
             {
                 m_bufferedOutput.Add(new Tuple<bool, string>(true, value));
+                if (sidekickStarted)
+                {
+                    m_dumpBufferedConsoleOutput = true;
+                }
             }
             else
             {
@@ -1034,12 +1049,12 @@ namespace StepBro.Cmd
                 // Wait until log is empty and there is no running execution.
                 while (logEntry.Next == null && m_activitiesRunning == true)
                 {
-                    System.Threading.Thread.Sleep(50);
                     if (m_dumpBufferedConsoleOutput)
                     {
                         FlushBufferedConsoleOutput();
                         m_dumpBufferedConsoleOutput = false;
                     }
+                    Thread.Sleep(50);
                 }
                 logEntry = logEntry.Next;
             }

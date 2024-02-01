@@ -584,7 +584,7 @@ namespace StepBro.ConsoleSidekick.WinForms
             shortcut.Name = "toolStripMenuCommand" + text.Replace(".", "Dot");
             shortcut.Size = new Size(182, 22);
             shortcut.Margin = new Padding(1, shortcut.Margin.Top, 1, shortcut.Margin.Bottom);
-            shortcut.BackColor= Color.Lavender;
+            shortcut.BackColor = Color.Lavender;
             shortcut.ToolTipText = null; // $"Run " + target;
             shortcut.Tag = m_userShortcutItemTag;
             shortcut.Click += ObjectCommandExecutionEntry_ShortcutClick;
@@ -1099,7 +1099,12 @@ namespace StepBro.ConsoleSidekick.WinForms
         {
             var execution = new ExecutionAccess(this, m_pipe);
             m_activeExecutions.Add(new WeakReference<ExecutionAccess>(execution));
-            m_pipe.Send(new RunScriptRequest(execution.ID, false, element, model, objectVariable));
+            var request = new RunScriptRequest(execution.ID, false, element, model, objectVariable);
+            if (toolStripTextBoxExeNote.Visible)
+            {
+                request.ExecutionNote = toolStripTextBoxExeNote.Text;
+            }
+            m_pipe.Send(request);
             return execution;
         }
 
@@ -1114,6 +1119,7 @@ namespace StepBro.ConsoleSidekick.WinForms
         {
             private MainForm m_parent;
             private SideKickPipe m_pipe;
+            private TaskExecutionState m_state = TaskExecutionState.StartRequested;
             private bool m_active = true;
 
             public ExecutionAccess(MainForm parent, SideKickPipe pipe)
@@ -1153,7 +1159,14 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             #region IExecutionAccess
 
-            public TaskExecutionState State { get; set; } = TaskExecutionState.StartRequested;
+            public TaskExecutionState State
+            {
+                get { return m_state; }
+                private set
+                {
+                    m_state = value;
+                }
+            }
 
             public object ReturnValue { get; set; }
 
@@ -1182,6 +1195,17 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void toolStripMenuItemDeleteAllShortcuts_Click(object sender, EventArgs e)
         {
+        }
+
+        private void toolStripMenuItemExeNoteInput_CheckedChanged(object sender, EventArgs e)
+        {
+            toolStripTextBoxExeNote.Visible = toolStripMenuItemExeNoteInput.Checked;
+            SetExtraFieldsSeparatorVisibility();
+        }
+
+        private void SetExtraFieldsSeparatorVisibility()
+        {
+            toolStripSeparatorExtraFields.Visible = toolStripTextBoxExeNote.Visible;
         }
     }
 }
