@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Xml.Linq;
 
 namespace StepBro.Core.ScriptData
 {
@@ -31,10 +32,11 @@ namespace StepBro.Core.ScriptData
         private List<FileVariable> m_fileScopeVariables = new List<FileVariable>();
         private List<FileVariable> m_fileScopeVariablesBefore = new List<FileVariable>();
         private List<FileElement> m_elements = new List<FileElement>();
+        private List<FileElement> m_elementsBefore = new List<FileElement>();
         private bool m_typeScanIncluded = false;
         private DateTime m_lastFileChange = DateTime.MinValue;
-        private readonly DateTime m_lastTypeScan = DateTime.MinValue;
-        private readonly DateTime m_lastParsing = DateTime.MinValue;
+        //private DateTime m_lastTypeScan = DateTime.MinValue;
+        //private DateTime m_lastParsing = DateTime.MinValue;
         private FolderCollection m_folderShortcuts = null;
 
         /// <summary>
@@ -43,9 +45,6 @@ namespace StepBro.Core.ScriptData
         private Dictionary<string, List<IIdentifierInfo>> m_rootIdentifiers = null;
 
         public event EventHandler ObjectContainerListChanged;
-
-        //private readonly Dictionary<string, List<IIdentifierInfo>> m_fileScopeIdentifiers = null;
-        //private readonly Dictionary<string, List<IIdentifierInfo>> m_fileAndProcedureScopeIdentifiers = null;
 
         internal ScriptFile(string filepath = null, AntlrInputStream filestream = null) : base(filepath, LoadedFileType.StepBroScript)
         {
@@ -207,28 +206,24 @@ namespace StepBro.Core.ScriptData
             m_typeScanIncluded = true;
         }
 
-        /// <summary>
-        /// ResetBeforeParsing
-        /// </summary>
-        /// <param name="preserveUpdateableElements">Whether to save element objects and just update the changes.</param>
-        public void ResetBeforeParsing(bool preserveUpdateableElements)
+        internal void ResetBeforeParsing()
         {
-            m_namespaceUsings = new List<UsingData>();
+            m_namespaceUsings = new List<UsingData>();  // Discard any existing.
             m_fileProperties = null;
 
-            if (!preserveUpdateableElements)
-            {
-                foreach (var fsv in ((IEnumerable<FileVariable>)m_fileScopeVariables).Reverse())
-                {
-                    object value = fsv.VariableOwnerAccess.Container.GetValue(null);
-                    if (value != null && value is IDisposable)
-                    {
-                        ((IDisposable)value).Dispose();
-                    }
-                    // TODO: Set container.CreateNeeded
-                }
-                m_fileScopeVariables.Clear();
-            }
+            //if (!preserveUpdateableElements)
+            //{
+            //    foreach (var fsv in ((IEnumerable<FileVariable>)m_fileScopeVariables).Reverse())
+            //    {
+            //        object value = fsv.VariableOwnerAccess.Container.GetValue(null);
+            //        if (value != null && value is IDisposable)
+            //        {
+            //            ((IDisposable)value).Dispose();
+            //        }
+            //        // TODO: Set container.CreateNeeded
+            //    }
+            //    m_fileScopeVariables.Clear();
+            //}
             foreach (var fu in m_fileUsings.Where(u => u.Identifier.Type == IdentifierType.FileNamespace))
             {
                 if (fu.Identifier.Reference != null)
@@ -239,7 +234,9 @@ namespace StepBro.Core.ScriptData
                     }
                 }
             }
+            m_rootIdentifiers = null;
             m_fileUsings = new List<UsingData>();
+            m_elementsBefore = m_elements;
             m_elements = new List<FileElement>();
 
             m_typeScanIncluded = false;
@@ -427,6 +424,8 @@ namespace StepBro.Core.ScriptData
             return m_elements.FirstOrDefault(e => String.Equals(name, e.Name, StringComparison.InvariantCulture)) as T;
         }
 
+        #region File Variables
+
         public IValueContainer<T> TryGetVariableContainer<T>(int id)
         {
             var t = typeof(T);
@@ -539,6 +538,33 @@ namespace StepBro.Core.ScriptData
             }
             m_fileScopeVariablesBefore = null;
         }
+
+        #endregion
+
+        internal FileElementOverride CreateOrGetOverrideElement(int line, string name)
+        {
+            foreach (var e in m_elementsBefore)
+            {
+                if (e.Name == name && e is FileElementOverride)
+                {
+                    return e as FileElementOverride;
+                }
+            }
+            return new FileElementOverride(this, line, null, name);
+        }
+
+        internal FileElementTypeDef CreateOrGetTypeDefElement(int line, string name)
+        {
+            foreach (var e in m_elementsBefore)
+            {
+                if (e.Name == name && e is FileElementTypeDef)
+                {
+                    return e as FileElementTypeDef;
+                }
+            }
+            return new FileElementTypeDef(this, line, null, name);
+        }
+
 
         internal void AddElement(FileElement function)
         {
@@ -766,15 +792,15 @@ namespace StepBro.Core.ScriptData
                 Select(nu => new Tuple<string, IIdentifierInfo>(nu.Alias, nu.Identifier));
         }
 
-        internal IEnumerable<ScriptFile> ListResolvedFileUsings(bool publicOnly = false)
+        internal IEnumerable<ScriptFile> ListResolvedFileUsings(bool publicOnly = false, bool recursively = false)
         {
             foreach (var u in m_fileUsings)
             {
-                if ((!publicOnly || u.IsPublic) && u.Identifier.Reference != null && u.Identifier.Type == IdentifierType.FileByName)
+                if (recursively || ((!publicOnly || u.IsPublic) && u.Identifier.Reference != null && u.Identifier.Type == IdentifierType.FileByName))
                 {
                     var file = u.Identifier.Reference as ScriptFile;
                     yield return file;
-                    foreach (var childUsing in file.ListResolvedFileUsings(true))
+                    foreach (var childUsing in file.ListResolvedFileUsings(true, recursively))
                     {
                         yield return childUsing;
                     }

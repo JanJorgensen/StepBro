@@ -501,14 +501,19 @@ namespace StepBro.Core.Parser
             var shortcutsManager = ServiceManager.Global.Get<IFolderManager>();
 
             var filesToParse = new List<ScriptFile>();
-            if (topfile != null)
+            if (topfile == null)
             {
-                filesToParse.Add(topfile as ScriptFile);
+                topfile = filesManager.TopScriptFile as ScriptFile;
             }
-            else
+            filesToParse.Add(topfile as ScriptFile);
+
+            object parserUser = new object();
+            var filesInTreeBeforeParsing = ((ScriptFile)topfile).ListResolvedFileUsings(false, true).Append(topfile as ScriptFile).Distinct().ToList();
+            foreach (var file in filesInTreeBeforeParsing)
             {
-                filesToParse.Add(filesManager.TopScriptFile as ScriptFile);
+                file.RegisterDependant(parserUser);
             }
+
             var fileListeners = new Dictionary<ScriptFile, StepBroListener>();
             var fileContexts = new Dictionary<ScriptFile, SBP.CompilationUnitContext>();
             var namespaceFiles = new Dictionary<string, IdentifierInfo>();
@@ -520,6 +525,7 @@ namespace StepBro.Core.Parser
             while (fileParsingStack.Count > 0)
             {
                 var file = fileParsingStack.Dequeue();
+                file.ResetBeforeParsing();
                 file.MarkForTypeScanning();
                 ITokenSource lexer = new Grammar.StepBroLexer(file.GetParserFileStream(services.Get<ITextFileSystem>()));
                 ITokenStream tokens = new CommonTokenStream(lexer);
@@ -640,10 +646,10 @@ namespace StepBro.Core.Parser
                         if (foundMatchingFile != null)
                         {
                             // Load and add file to fileParsingStack
-                            object dummyUser = new object();    // The parser will set the current scriptfile as a dependant.
-                            if (Main.LoadScriptFile(user: dummyUser, filepath: foundMatchingFile) is ScriptFile loadedFile)
+                            if (Main.LoadScriptFile(parserUser, filepath: foundMatchingFile) is ScriptFile loadedFile)
                             {
-                                loadedFile.UnregisterDependant(dummyUser);
+                                // Note: The parser will set the current scriptfile as a dependant.
+                                
                                 fileParsingStack.Enqueue(loadedFile);
                                 filesToParse.Add(loadedFile);
                                 return loadedFile;
@@ -777,14 +783,14 @@ namespace StepBro.Core.Parser
                                 break;
                             case FileElementType.Override:
                                 {
-                                    var overrider = new FileElementOverride(file, element.Line, null, file.Namespace, element.Name);
+                                    var overrider = file.CreateOrGetOverrideElement(element.Line, element.Name);
                                     overrider.SetAsType(element.AsType);
                                     file.AddElement(overrider);
                                 }
                                 break;
                             case FileElementType.TypeDef:
                                 {
-                                    var typedef = new FileElementTypeDef(file, element.Line, file.Namespace, element.Name);
+                                    var typedef = file.CreateOrGetTypeDefElement(element.Line, element.Name);
                                     typedef.SetDeclaration(element.DataType);
                                     file.AddElement(typedef);
                                 }
@@ -912,12 +918,30 @@ namespace StepBro.Core.Parser
                         file.LastSuccessfulParsing = file.LastParsing;
                     }
                 }
+#if DEBUG
+                // Dump the id's of all the elements
+                foreach (var file in filesToParse)
+                {
+                    foreach (var element in file.ListElements())
+                    {
+                        System.Diagnostics.Debug.WriteLine(file.FileName + ": " + element.UniqueID.ToString() + " " + element.Name);
+                    }
+                }
+#endif
             }
             finally
             {
+                foreach (var file in filesInTreeBeforeParsing)
+                {
+                    file.UnregisterDependant(parserUser);
+                }
                 foreach (var file in filesToParse)
                 {
                     file.DisposeFileStream();
+                    if (file.IsDependantOf(parserUser))
+                    {
+                        file.UnregisterDependant(parserUser);
+                    }
                 }
             }
             #endregion

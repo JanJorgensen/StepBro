@@ -279,12 +279,6 @@ namespace StepBro.Core
                     {
                         try
                         {
-                            context.UpdateStatus($"Resetting files ({(force ? "forced" : "not forced")})");
-                            foreach (var f in m_loadedFilesManager.ListFiles<ScriptFile>())
-                            {
-                                f.ResetBeforeParsing(preserveUpdateableElements: force == false);
-                            }
-
                             context.UpdateStatus("Parsing files");
                             m_lastParsingErrorCount = FileBuilder.ParseFiles(m_serviceManagerAdmin.Manager, context.Logger, (IScriptFile)null);
                         }
@@ -328,12 +322,6 @@ namespace StepBro.Core
                 try
                 {
                     logger = m_logRootScope.LogEntering(true, "StepBro.Main.FileParsing", "Starting file parsing", null);
-                    foreach (var f in m_loadedFilesManager.ListFiles<ScriptFile>())
-                    {
-                        f.ResetBeforeParsing(preserveUpdateableElements: true);
-                        //f.ResetBeforeParsing(preserveUpdateableElements: force == false);
-                    }
-
                     m_lastParsingErrorCount = FileBuilder.ParseFiles(m_serviceManagerAdmin.Manager, logger, (IScriptFile)null);
                 }
                 finally

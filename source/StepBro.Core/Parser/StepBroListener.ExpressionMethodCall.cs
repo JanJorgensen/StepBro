@@ -160,7 +160,7 @@ namespace StepBro.Core.Parser
                         return;
 
                     case SBExpressionType.Identifier:
-                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"\"{left.ToString()}\" is unresolved.");
+                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"\"{(string)(left.Value)}\" is unresolved.");
                         return;
 
                     case SBExpressionType.Expression:

@@ -713,7 +713,7 @@ namespace StepBro.Core.Parser
 
         public override void EnterFileElementOverride([NotNull] SBP.FileElementOverrideContext context)
         {
-            m_currentFileElement = new FileElementOverride(m_file, context.Start.Line, null, m_currentNamespace, "");
+            m_currentFileElement = new FileElementOverride(m_file, context.Start.Line, null, "");
         }
 
         public override void ExitFileElementOverride([NotNull] SBP.FileElementOverrideContext context)

@@ -15,8 +15,8 @@ namespace StepBro.Core.ScriptData
         private Tuple<string, IToken> m_asTypeData = null;
         private TypeReference m_asType = null;
 
-        public FileElementOverride(IScriptFile file, int line, IFileElement parentElement, string @namespace, string name) 
-            : base(file, line, parentElement, @namespace, name, AccessModifier.None, FileElementType.Override)
+        public FileElementOverride(IScriptFile file, int line, IFileElement parentElement, string name) 
+            : base(file, line, parentElement, file.Namespace, name, AccessModifier.None, FileElementType.Override)
         {
             this.BaseElementName = name;
         }

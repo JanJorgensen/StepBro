@@ -31,7 +31,19 @@ namespace StepBro.Core.ScriptData
                 var numUnresolved = listener.ParseTypedef(m_declaration, reportErrors: reportErrors, token: m_declaration.Token);
                 if (numUnresolved == 0 && m_declaration.ResolvedType != null)
                 {
-                    m_typeReference = new TypeReference(new TypeDef(this.Name, m_declaration.ResolvedType));
+                    var type = new TypeReference(new TypeDef(this.Name, m_declaration.ResolvedType));
+                    if (m_typeReference == null || 
+                        !Object.ReferenceEquals(type.Type, m_typeReference.Type) ||
+                        !String.Equals((type.DynamicType as TypeDef).Name, (m_typeReference.DynamicType as TypeDef).Name) ||
+                        !Object.ReferenceEquals((type.DynamicType as TypeDef).Type.Type, (m_typeReference.DynamicType as TypeDef).Type.Type) ||
+                        !Object.ReferenceEquals((type.DynamicType as TypeDef).Type.DynamicType, (m_typeReference.DynamicType as TypeDef).Type.DynamicType))
+                    {
+                        m_typeReference = type;
+                    }
+                }
+                else
+                {
+                    m_typeReference = null;
                 }
                 return numUnresolved;
             }
