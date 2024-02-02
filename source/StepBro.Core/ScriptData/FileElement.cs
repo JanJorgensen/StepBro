@@ -20,12 +20,20 @@ namespace StepBro.Core.ScriptData
         private string m_summary;
         private string m_docReference;
         private static int g_nextID = 1000;
-        private readonly int m_uid = g_nextID++;
+        protected readonly int m_uid = g_nextID++;
         protected PropertyBlock m_propertyBlock = null;
         private readonly List<IPartner> m_partners = new List<IPartner>();
 
         public FileElement(IScriptFile file, int line, IFileElement parentElement, string @namespace, string name, AccessModifier access, FileElementType type)
         {
+            System.Diagnostics.Debug.WriteLine(
+                "~~~~~~~~ FILE ELEMENT " +
+                type.ToString().ToUpper() + ": " +
+                m_uid.ToString() + " " +
+                ((file != null) ? file.FileName : "<no file>") + " - " +
+                (String.IsNullOrEmpty(@namespace) ? "" : @namespace) + " " +
+                name);
+
             m_parentFile = file;
             m_line = line;
             m_baseElement = null;
