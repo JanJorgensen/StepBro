@@ -44,7 +44,7 @@
                 },
                 {
                     "name": "keyword.other.types.stepbro",
-                    "match": "\\b(bool|void|testlist|int|string|type|namespace)\\b"
+                    "match": "\\b(bool|void|testlist|int|integer|decimal|verdict|datetime|timespan|string|type|namespace|var|double|object)\\b"
                 },
                 {
                     "name": "keyword.other.step.stepbro",
@@ -173,7 +173,7 @@
                 },
                 {
                     "name": "support.type.built-in.property-name.stepbro",
-                    "match": "(?<![a-zA-Z][a-zA-Z0-9]*[ ]+)\\b[a-zA-Z][a-zA-Z0-9]*\\b(?=[ ]*\\=)"
+                    "match": "(?<![a-zA-Z][a-zA-Z0-9]*[ ]+)\\b[a-zA-Z][a-zA-Z0-9]*\\b(?=[ ]*\\=?![ ]*\\=)"
                 }
             ]
         },
