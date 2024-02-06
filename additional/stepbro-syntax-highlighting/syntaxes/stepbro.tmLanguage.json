@@ -63,7 +63,7 @@
                     "match": "\\b(partner)\\b"
                 },
                 {
-                    "name": "keyword.other.await.stepbro",
+                    "name": "entity.other.attribute-name.await.stepbro",
                     "match": "\\b(await)\\b"
                 },
                 {
