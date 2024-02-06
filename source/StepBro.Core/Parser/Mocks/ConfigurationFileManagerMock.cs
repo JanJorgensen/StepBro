@@ -16,5 +16,10 @@ namespace StepBro.Core.Parser.Mocks
         {
             throw new NotImplementedException();
         }
+
+        public FolderConfiguration ReadFolderConfig(string configFile)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

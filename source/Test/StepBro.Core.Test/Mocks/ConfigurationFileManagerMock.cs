@@ -18,5 +18,10 @@ namespace StepBro.Core.Test.Mocks
         {
             return this.StationProperties;
         }
+
+        public FolderConfiguration ReadFolderConfig(string configFile)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -499,6 +499,7 @@ namespace StepBro.Core.Parser
             var addons = services.Get<IAddonManager>();
             var filesManager = services.Get<ILoadedFilesManager>();
             var shortcutsManager = ServiceManager.Global.Get<IFolderManager>();
+            var configFileManager = ServiceManager.Global.Get<IConfigurationFileManager>();
 
             var filesToParse = new List<ScriptFile>();
             if (topfile == null)
@@ -638,6 +639,28 @@ namespace StepBro.Core.Parser
                                     break;
                                 }
 
+                                var cfgFile = Path.GetFullPath(Path.Combine(basefolder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
+                                if (System.IO.File.Exists(cfgFile))
+                                {
+                                    var folderConfig = configFileManager.ReadFolderConfig(cfgFile);
+                                    if (folderConfig != null)
+                                    {
+                                        foreach (var lib in folderConfig.LibFolders)
+                                        {
+                                            path = Path.GetFullPath(Path.Combine(basefolder, lib, fu));
+                                            if (System.IO.File.Exists(path))
+                                            {
+                                                foundMatchingFile = path;
+                                                break;
+                                            }
+                                        }
+                                        if (folderConfig.IsSearchRoot)
+                                        {
+                                            break;  // Don't search deeper now.
+                                        }
+                                    }
+                                }
+
                                 // Not found yet; try the parent folder.
                                 basefolder = Path.GetDirectoryName(basefolder);
                             }
@@ -649,7 +672,7 @@ namespace StepBro.Core.Parser
                             if (Main.LoadScriptFile(parserUser, filepath: foundMatchingFile) is ScriptFile loadedFile)
                             {
                                 // Note: The parser will set the current scriptfile as a dependant.
-                                
+
                                 fileParsingStack.Enqueue(loadedFile);
                                 filesToParse.Add(loadedFile);
                                 return loadedFile;
@@ -741,7 +764,7 @@ namespace StepBro.Core.Parser
                 {
                     foreach (var element in fileScanData.TopElement.Childs)
                     {
-                        var firstPropFlag = (element.PropertyFlags != null) ? element.PropertyFlags[0] : null; 
+                        var firstPropFlag = (element.PropertyFlags != null) ? element.PropertyFlags[0] : null;
                         var accessModifier = (element.Modifiers != null && element.Modifiers.Count > 0) ? (AccessModifier)Enum.Parse(typeof(AccessModifier), element.Modifiers[0], true) : DefaultAccess;
                         switch (element.Type)
                         {
@@ -832,7 +855,7 @@ namespace StepBro.Core.Parser
                 file.UpdateRootIdentifiers();
             }
 
-            var numberItemsToParse = (signaturesToParseNow.Count > 0 ) ? int.MaxValue - 1 : 0;
+            var numberItemsToParse = (signaturesToParseNow.Count > 0) ? int.MaxValue - 1 : 0;
             var numberUnparsedItemsBefore = int.MaxValue;
             var signaturesToParseAgain = new List<Tuple<FileElement, StepBroListener>>();
             // Continue parsing signatures until no more elements can be resolved
