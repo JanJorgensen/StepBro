@@ -40,7 +40,7 @@
             [
                 {
                     "name": "keyword.control.stepbro",
-                    "match": "\\b(if|while|for|return)\\b"
+                    "match": "\\b(if|while|for|return|else)\\b"
                 },
                 {
                     "name": "keyword.other.types.stepbro",
@@ -48,19 +48,27 @@
                 },
                 {
                     "name": "keyword.other.step.stepbro",
-                    "match": "step"
+                    "match": "\\b(step)\\b"
                 },
                 {
                     "name": "keyword.other.using.stepbro",
-                    "match": "using"
+                    "match": "\\b(using)\\b"
                 },
                 {
                     "name": "keyword.other.stepbro",
                     "match": "\\b(true|false|override|this)\\b"
                 },
                 {
-                    "name": "keyword.control.partner.stepbro",
-                    "match": "partner"
+                    "name": "keyword.other.partner.stepbro",
+                    "match": "\\b(partner)\\b"
+                },
+                {
+                    "name": "keyword.other.await.stepbro",
+                    "match": "\\b(await)\\b"
+                },
+                {
+                    "name": "keyword.other.as.stepbro",
+                    "match": "\\b(as)\\b"
                 }
             ]
         },
@@ -158,6 +166,14 @@
                 {
                     "name": "support.type.argument.stepbro",
                     "match": "(?<=(\\(.*,[ ]*(this)*[ ]*))[a-zA-Z][a-zA-Z0-9]*[ ]+(?![^a-zA-Z])"
+                },
+                {
+                    "name": "support.type.definition.stepbro",
+                    "match": "([a-zA-Z][a-zA-Z0-9]*)[ ]+(?=[a-zA-Z][a-zA-Z0-9]*[ ]*\\=)"
+                },
+                {
+                    "name": "support.type.built-in.property-name.stepbro",
+                    "match": "(?<![a-zA-Z][a-zA-Z0-9]*[ ]+)\\b[a-zA-Z][a-zA-Z0-9]*\\b(?=[ ]*\\=)"
                 }
             ]
         },
@@ -191,11 +207,15 @@
             [
                 {
                     "name": "support.type.built-in.object-name.stepbro",
-                    "match": "(?<=(type)) [a-zA-Z][a-zA-Z0-9]*"
+                    "match": "(?<=(type))[ ]+[a-zA-Z][a-zA-Z0-9]*"
                 },
                 {
                     "name": "support.type.built-in.object-name.stepbro",
                     "match": "(?<=(type [a-zA-Z][a-zA-Z0-9]*[ ]*:))[ ]*[a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                    "name": "support.type.override.built-in.object-name.stepbro",
+                    "match": "(?<=(override [a-zA-Z][a-zA-Z0-9]*[ ]+as))[ ]+[a-zA-Z][a-zA-Z0-9]*"
                 }
             ]
         },
