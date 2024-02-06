@@ -52,7 +52,7 @@
                 },
                 {
                     "name": "keyword.other.using.stepbro",
-                    "match": "\\b(using)\\b"
+                    "match": "\\b([public ]*using)\\b"
                 },
                 {
                     "name": "keyword.other.stepbro",
@@ -92,7 +92,7 @@
             [
                 {
                     "name": "entity.name.function.stepbro",
-                    "match": "procedure"
+                    "match": "\\bprocedure\\b"
                 },
                 {
                     "name": "keyword.other.protection.stepbro",
