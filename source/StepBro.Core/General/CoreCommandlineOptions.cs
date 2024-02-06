@@ -17,10 +17,13 @@ namespace StepBro.Core.General
         public bool Debugging { get; set; }
 
         [Option('e', "execute", HelpText = "File element (procedure or test suite) to execute.")]
-        public string TargetElement { get; set; }
+        public string TargetElement { get; set; } = null;
+
+        [Option('i', "instance", HelpText = "Object/variable instance to use for the file element to execute.")]
+        public string TargetInstance { get; set; } = null;
 
         [Option('m', "model", HelpText = "Model procedure to handle the execution of the target element.")]
-        public string Model { get; set; }
+        public string TargetModel { get; set; }
 
         [Option('a', "arguments", Separator = ',')]
         public IEnumerable<string> Arguments { get; set; }

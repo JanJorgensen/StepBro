@@ -185,7 +185,8 @@ namespace StepBro.Cmd
 
                 targetFile = m_commandLineOptions.InputFile;
                 targetElement = m_commandLineOptions.TargetElement;
-                targetPartner = m_commandLineOptions.Model;
+                targetObject = m_commandLineOptions.TargetInstance;
+                targetPartner = m_commandLineOptions.TargetModel;
 
                 if (!String.IsNullOrEmpty(targetFile))
                 {
@@ -194,13 +195,15 @@ namespace StepBro.Cmd
                         ConsoleWriteLine("File to load: {0}", targetFile);
                     }
 
-                    m_next.Enqueue(StateOrCommand.LoadMainFile);
-
-                    if (!String.IsNullOrEmpty(targetElement) && m_commandLineOptions.RepeatedParsing)
+                    if (!String.IsNullOrEmpty(targetElement) && m_commandLineOptions.RepeatedParsing && !m_commandLineOptions.Sidekick)
                     {
                         ConsoleWriteErrorLine("Options 'execute' and 'repeated parsing' cannot be used at the same time.");
                         retval = -1;
                         m_next.Enqueue(StateOrCommand.Exit);
+                    }
+                    else
+                    {
+                        m_next.Enqueue(StateOrCommand.LoadMainFile);
                     }
 
                     if (m_commandLineOptions.RepeatedParsing)
@@ -219,13 +222,9 @@ namespace StepBro.Cmd
                         retval = -1;
                         ConsoleWriteErrorLine("Error: Model has been specified, but not a target element.");
                     }
-                    //else
-                    //{
-                    //    ConsoleWriteLine("No target element specified; no execution started.");
-                    //}
                 }
 
-                if (m_commandLineOptions.Sidekick)
+                if (retval == 0 && m_commandLineOptions.Sidekick)
                 {
                     closeEventHandler = (sender, e) =>
                     {
@@ -276,7 +275,7 @@ namespace StepBro.Cmd
                 IScriptFile file = null;
 
                 StateOrCommand command;
-                while ((command = m_next.Any() ? m_next.Dequeue() : (m_mode >= Mode.Loop ? StateOrCommand.AwaitCommand : StateOrCommand.Exit)) != StateOrCommand.Exit)
+                while (retval == 0 && (command = m_next.Any() ? m_next.Dequeue() : (m_mode >= Mode.Loop ? StateOrCommand.AwaitCommand : StateOrCommand.Exit)) != StateOrCommand.Exit)
                 {
                     if (command != StateOrCommand.AwaitCommand)
                     {
@@ -421,7 +420,6 @@ namespace StepBro.Cmd
                                 file = StepBroMain.LoadScriptFile(consoleResourceUserObject, targetFileFullPath);
                                 if (file == null)
                                 {
-                                    m_next.Enqueue(StateOrCommand.Exit);
                                     retval = -1;
                                     ConsoleWriteErrorLine("Error: Loading script file failed ( " + targetFileFullPath + " )");
                                 }
@@ -437,7 +435,6 @@ namespace StepBro.Cmd
                             }
                             catch (Exception ex)
                             {
-                                m_next.Enqueue(StateOrCommand.Exit);
                                 retval = -1;
                                 ConsoleWriteErrorLine("Error: Loading script file failed: " + ex.GetType().Name + ", " + ex.Message);
                             }
