@@ -1,6 +1,6 @@
 # StepBro
 
-StepBro is a .NET7 based automation framework especially for:
+StepBro is a .NET8 based automation framework especially for:
  * automated system testing (both desktop and embedded system testing),
  * application scripting and
  * workbench instrument automation
