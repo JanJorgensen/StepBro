@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <!-- Template generated code from Antlr4BuildTasks.Template v 8.10 -->
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>StepBro.Core</RootNamespace>
     <AssemblyName>StepBro.Core</AssemblyName>
     <OutputPath>..\bin</OutputPath>
