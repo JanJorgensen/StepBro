@@ -313,7 +313,7 @@ namespace StepBro.TestInterface
             m_instanceID = rnd.Next(1000000);
             m_newResponseDataEvent = new AutoResetEvent(false);
             SetupDebugCommands();
-            m_mainLogger = StepBro.Core.Main.RootLogger;
+            m_mainLogger = StepBro.Core.Main.RootLogger.CreateSubLocation(m_name);
         }
 
         protected override void DoDispose(bool disposing)
@@ -335,6 +335,7 @@ namespace StepBro.TestInterface
                 if (String.IsNullOrWhiteSpace(value)) throw new ArgumentException();
                 if (m_name != null) throw new InvalidOperationException("The object is already named.");
                 m_name = value;
+                m_mainLogger = StepBro.Core.Main.RootLogger.CreateSubLocation(m_name);  // Create new scope.
             }
         }
 
@@ -804,7 +805,11 @@ namespace StepBro.TestInterface
                     case LogType.ReceivedEnd:
                     case LogType.ReceivedPartial:
                     case LogType.ReceivedError:
-                        if (m_currentExecutingCommand != null)
+                        if (m_mainLogger != null)
+                        {
+                            m_mainLogger.LogAsync("Received: " + text);
+                        }
+                        else if (m_currentExecutingCommand != null)
                         {
                             var logger = m_currentExecutingCommand?.Logger;
                             if (logger != null)
@@ -816,7 +821,7 @@ namespace StepBro.TestInterface
                     case LogType.ReceivedAsync:
                         if (m_mainLogger != null)
                         {
-                            m_mainLogger.LogAsync("Event: " + text);
+                            m_mainLogger.LogAsync("Event:    " + text);
                         }
                         if (m_asyncLogLineReader != null)
                         {
@@ -989,6 +994,7 @@ namespace StepBro.TestInterface
             m_loopbackAnswers?.TryGetValue(commandstring, out commandstring);
             if (m_nextResponse != null) commandstring = m_nextResponse;
             if (command.Logger != null) command.Logger.LogDetail("Send: " + commandstring);
+            else if (m_mainLogger != null) m_mainLogger.LogAsync("Send: " + commandstring);
             m_currentExecutingCommand = command;
             DoSendDirect(commandstring);
         }
