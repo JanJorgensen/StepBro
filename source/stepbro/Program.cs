@@ -377,7 +377,8 @@ namespace StepBro.Cmd
                                         string objectInstanceText = String.IsNullOrEmpty(request.ObjectReference) ? "" : (request.ObjectReference.Split('.').Last() + ".");
                                         string partnertext = String.IsNullOrEmpty(targetPartner) ? "" : (" @ " + targetPartner);
                                         string noteText = String.IsNullOrEmpty(request.ExecutionNote) ? "" : (" - \"" + request.ExecutionNote + "\"");
-                                        StepBroMain.Logger.RootLogger.LogUserAction("Request script execution: " + objectInstanceText + targetElement + partnertext + noteText);
+                                        string elementText = String.IsNullOrEmpty(objectInstanceText) ? targetElement : targetElement.Split('.').Last();
+                                        StepBroMain.Logger.RootLogger.LogUserAction("Request script execution: " + objectInstanceText + elementText + partnertext + noteText);
                                         m_next.Enqueue(StateOrCommand.StartScriptExecution);
                                     }
                                     else if (input.Item1 == nameof(StepBro.Sidekick.Messages.StopExecutionRequest))
