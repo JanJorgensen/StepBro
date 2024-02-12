@@ -1,6 +1,7 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.Logging;
 using StepBro.ToolBarCreator;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
         private ICoreAccess m_coreAccess = null;
         private ProcedureActivationButtonLogic m_logic;
         private Color m_normalBack;
+        private string m_text = "";
 
         public ProcedureActivationButton(ICoreAccess coreAccess) : base()
         {
@@ -35,10 +37,11 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public ICoreAccess Core { get { return m_coreAccess; } }
 
-        public void Setup(PropertyBlock definition)
+        public void Setup(ILogger logger, PropertyBlock definition)
         {
             this.Name = definition.Name;
-            this.Text = definition.Name;   // Just the default text.
+            m_text = definition.Name;
+            this.Text = "\u23F5 " + m_text;   // Just the default text.
             foreach (var element in definition)
             {
                 if (!m_logic.Setup(element))
@@ -48,21 +51,34 @@ namespace StepBro.UI.WinForms.CustomToolBar
                         var valueField = element as PropertyBlockValue;
                         if (valueField.Name.Equals("Text", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            this.Text = valueField.ValueAsString();
+                            m_text = valueField.ValueAsString();
+                            this.Text = "\u23F5 " + m_text;
                         }
                         else if (valueField.Name.Equals("Color", StringComparison.InvariantCultureIgnoreCase))
                         {
+                            var colorName = valueField.ValueAsString();
                             try
                             {
-                                Color color = (Color)(typeof(Color).GetProperty(valueField.ValueAsString()).GetValue(null));
+                                Color color = (Color)(typeof(Color).GetProperty(colorName).GetValue(null));
                                 this.BackColor = m_normalBack = color;
                             }
+                            catch 
+                            {
+                                logger.LogError("Toolbar line " + valueField.Line + ": No color named '" + colorName + "'.");
+                            }
                             finally { }
+                        }
+                        else
+                        {
+                            ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
                         }
                     }
                     else if (element.BlockEntryType == PropertyBlockEntryType.Flag)
                     {
                         var flagField = element as PropertyBlockFlag;
+                        {
+                            ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
+                        }
                         //if (flagField.Name == nameof(StretchChilds))
                         //{
                         //    StretchChilds = true;
@@ -76,6 +92,9 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     }
                     else if (element.BlockEntryType == PropertyBlockEntryType.Block)
                     {
+                        {
+                            ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
+                        }
                         //var type = element.SpecifiedTypeName;
                         //if (type != null)
                         //{
@@ -120,10 +139,22 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     break;
                 case ButtonCommand.ShowNormal:
                     this.BackColor = m_normalBack;
+                    this.Text = "\u23F5 " + m_text;
                     break;
                 case ButtonCommand.ShowAwaitingExecutionEnd:
                     this.BackColor = Color.Red;
+                    this.Text = "\u231B " + m_text;
                     break;
+                case ButtonCommand.ShowPlaySymbol:
+                    this.Text = "\u23F5 " + m_text;
+                    break;
+                case ButtonCommand.ShowStopSymbol:
+                    this.Text = "\u23F9 " + m_text;
+                    break;
+                case ButtonCommand.ShowWaitSymbol:
+                    this.Text = "\u231B " + m_text;
+                    break;
+                default: break;
             }
         }
 

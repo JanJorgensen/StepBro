@@ -1,5 +1,6 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
+using StepBro.Core.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
         }
 
 
-        public void Setup(PropertyBlock definition)
+        public void Setup(ILogger logger, PropertyBlock definition)
         {
             m_parent.Name = definition.Name;
             m_parent.Text = definition.Name;
@@ -35,6 +36,10 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     {
                         m_parent.Text = valueField.ValueAsString();
                     }
+                    else
+                    {
+                        ToolBar.ReportTypeUnknown(logger, element.Line, valueField.TypeOrName);
+                    }
                 }
                 else if (element.BlockEntryType == PropertyBlockEntryType.Flag)
                 {
@@ -43,6 +48,10 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     {
                         var separator = new Separator("Separator");
                         m_parent.DropDownItems.Add(separator);
+                    }
+                    else
+                    {
+                        ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
                     }
                     //if (flagField.Name == nameof(StretchChilds))
                     //{
@@ -65,13 +74,13 @@ namespace StepBro.UI.WinForms.CustomToolBar
                         {
                             var menu = new ToolStripMenuSubMenu(m_coreAccess);
                             m_parent.DropDownItems.Add(menu);
-                            menu.Setup(elementBlock);
+                            menu.Setup(logger, elementBlock);
                         }
                         else if (type == nameof(ProcedureActivationButton))
                         {
                             var button = new ProcedureActivationButton(m_coreAccess);
                             m_parent.DropDownItems.Add(button);
-                            button.Setup(elementBlock);
+                            button.Setup(logger, elementBlock);
                         }
                         else if (type == nameof(ObjectCommandButton))
                         {
@@ -79,13 +88,17 @@ namespace StepBro.UI.WinForms.CustomToolBar
                             m_parent.DropDownItems.Add(button);
                             button.Size = new Size(23, 20);
                             button.AutoSize = true;
-                            button.Setup(elementBlock);
+                            button.Setup(logger, elementBlock);
                         }
-                        else if (element.Name == nameof(Separator))
+                        else if (type == nameof(Separator))
                         {
                             var separator = new Separator(element.Name);
                             m_parent.DropDownItems.Add(separator);
                             separator.Setup(elementBlock);
+                        }
+                        else
+                        {
+                            ToolBar.ReportTypeUnknown(logger, element.Line, type);
                         }
                     }
                     else
@@ -95,6 +108,10 @@ namespace StepBro.UI.WinForms.CustomToolBar
                             var separator = new Separator(element.Name);
                             m_parent.DropDownItems.Add(separator);
                             separator.Setup(elementBlock);
+                        }
+                        else
+                        {
+                            ToolBar.ReportTypeUnknown(logger, element.Line, element.Name);
                         }
                     }
                 }

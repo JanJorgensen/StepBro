@@ -1,6 +1,7 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.Logging;
 using StepBro.ToolBarCreator;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public ICoreAccess Core { get { return m_coreAccess; } }
 
-        public void Setup(PropertyBlock definition)
+        public void Setup(ILogger logger, PropertyBlock definition)
         {
             this.Name = definition.Name;
             this.Text = definition.Name;   // Just the default text.
@@ -56,20 +57,35 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     }
                     else if (valueField.Name.Equals("Color", StringComparison.InvariantCultureIgnoreCase))
                     {
+                        var colorName = valueField.ValueAsString();
                         try
                         {
-                            Color color = (Color)(typeof(Color).GetProperty(valueField.ValueAsString()).GetValue(null));
+                            Color color = (Color)(typeof(Color).GetProperty(colorName).GetValue(null));
                             this.BackColor = color;
                         }
+                        catch
+                        {
+                            logger.LogError("Toolbar line " + valueField.Line + ": No color named '" + colorName + "'.");
+                        }
                         finally { }
+                    }
+                    else
+                    {
+                        ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
                     }
                 }
                 else if (element.BlockEntryType == PropertyBlockEntryType.Flag)
                 {
                     var flagField = element as PropertyBlockFlag;
+                    {
+                        ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
+                    }
                 }
                 else if (element.BlockEntryType == PropertyBlockEntryType.Block)
                 {
+                    {
+                        ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
+                    }
                     //var type = element.SpecifiedTypeName;
                     //if (type != null)
                     //{

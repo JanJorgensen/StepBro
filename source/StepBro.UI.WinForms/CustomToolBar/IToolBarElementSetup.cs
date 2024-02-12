@@ -1,5 +1,6 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
+using StepBro.Core.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,6 @@ namespace StepBro.UI.WinForms.CustomToolBar
     {
         void Clear();
         ICoreAccess Core { get; }
-        void Setup(PropertyBlock definition);
+        void Setup(ILogger logger, PropertyBlock definition);
     }
 }

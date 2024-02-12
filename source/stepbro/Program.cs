@@ -62,6 +62,7 @@ namespace StepBro.Cmd
         private static Queue<StateOrCommand> m_next = new Queue<StateOrCommand>();
         private static SideKickPipe m_sideKickPipe = null;
         private static bool sidekickStarted = false;
+        private static ILoggerScope m_sidekickLogger = null;
         private static List<Tuple<ulong, object>> m_requestObjectDictionary = new List<Tuple<ulong, object>>();
 
         private static int Main(string[] args)
@@ -232,6 +233,8 @@ namespace StepBro.Cmd
                         Thread.Sleep(1000);     // Leave some time for the sidekick application to receive the command.
                     };
 
+                    m_sidekickLogger = StepBroMain.Logger.RootLogger.CreateSubLocation("SideKick");
+
                     AppDomain.CurrentDomain.ProcessExit += closeEventHandler;
 
                     var hThis = GetConsoleWindow();
@@ -343,6 +346,19 @@ namespace StepBro.Cmd
                                             //    }
                                             //    break;
                                             default:
+                                                break;
+                                        }
+                                    }
+                                    else if (input.Item1 == nameof(StepBro.Sidekick.Messages.Log))
+                                    {
+                                        var data = JsonSerializer.Deserialize<StepBro.Sidekick.Messages.Log>(input.Item2);
+                                        switch (data.LogType)
+                                        {
+                                            case Sidekick.Messages.Log.Type.Normal:
+                                                m_sidekickLogger.LogUserAction(data.Text);
+                                                break;
+                                            case Sidekick.Messages.Log.Type.Error:
+                                                m_sidekickLogger.LogError(data.Text);
                                                 break;
                                         }
                                     }

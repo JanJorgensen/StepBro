@@ -11,7 +11,7 @@ using System.Text.Json.Serialization;
 
 namespace StepBro.ConsoleSidekick.WinForms
 {
-    public partial class MainForm : Form, ICoreAccess
+    public partial class MainForm : Form, ICoreAccess, ILogger
     {
         private Control m_topControl = null;
         private nint m_consoleWindow = 0;
@@ -122,6 +122,7 @@ namespace StepBro.ConsoleSidekick.WinForms
         {
             InitializeComponent();
             toolStripButtonRunCommand.Text = "\u23F5";
+            //toolStripButtonRunCommand.Text = "\u25B6";
             toolStripButtonStopScriptExecution.Text = "\u23F9";
             toolStripButtonAddShortcut.Text = "\u2795";
             toolStripDropDownButtonMainMenu.Text = "\u2630";
@@ -941,7 +942,7 @@ namespace StepBro.ConsoleSidekick.WinForms
                     }
                     newToolBarList.Add(new Tuple<string, UI.WinForms.CustomToolBar.ToolBar>(toolbarVar.FullName, toolBar));
 
-                    toolBar.Setup(toolbarVar.FullName, toolbarVar.ToolBarDefinition.CloneAsPropertyBlockEntry() as PropertyBlock);
+                    toolBar.Setup(this, toolbarVar.FullName, toolbarVar.ToolBarDefinition.CloneAsPropertyBlockEntry() as PropertyBlock);
                 }
 
                 //if (m_panelsDialog == null)
@@ -965,6 +966,7 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             this.Controls.Clear();
             m_customToolStrips = newToolBarList.ToList();
+            m_customToolStrips.Sort((l, r) => r.Item2.Priority.CompareTo(l.Item2.Priority));
             m_customToolStrips.Reverse();
             int tabIndex = m_customToolStrips.Count;
             foreach (var tbData in m_customToolStrips)
@@ -1207,5 +1209,60 @@ namespace StepBro.ConsoleSidekick.WinForms
         {
             toolStripSeparatorExtraFields.Visible = toolStripTextBoxExeNote.Visible;
         }
+
+        #region ILogger
+
+        bool ILogger.IsDebugging { get { return false; } }
+
+        string ILogger.Location { get { return "Sidekick"; } }
+
+        ILoggerScope ILogger.LogEntering(string location, string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        ILoggerScope ILogger.CreateSubLocation(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        ILogEntry ILogger.Log(string text)
+        {
+            var log = new Log() { LogType = Log.Type.Normal, Text = text };
+            m_pipe.Send(log);
+            System.Diagnostics.Debug.WriteLine("ILogger.LogError: " + text);
+            return null;
+        }
+
+        void ILogger.LogDetail(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ILogger.LogAsync(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ILogger.LogError(string text)
+        {
+            var log = new Log() { LogType = Log.Type.Error, Text = text };
+            m_pipe.Send(log);
+            System.Diagnostics.Debug.WriteLine("ILogger.LogError: " + text);
+        }
+
+        void ILogger.LogUserAction(string text)
+        {
+            var log = new Log() { LogType = Log.Type.Normal, Text = text };
+            m_pipe.Send(log);
+            System.Diagnostics.Debug.WriteLine("ILogger.LogError: " + text);
+        }
+
+        void ILogger.LogSystem(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
     }
 }

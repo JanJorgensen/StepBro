@@ -1,6 +1,7 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.Logging;
 using StepBro.ToolBarCreator;
 using System;
 using System.Collections.Generic;
@@ -36,9 +37,9 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public ICoreAccess Core { get { return m_coreAccess; } }
 
-        public void Setup(PropertyBlock definition)
+        public void Setup(ILogger logger, PropertyBlock definition)
         {
-            m_menuLogic.Setup(definition);
+            m_menuLogic.Setup(logger, definition);
         }
 
         #endregion

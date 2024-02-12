@@ -24,7 +24,10 @@ namespace StepBro.UI.WinForms
             SetUnchecked,
             ShowActive,
             ShowNormal,
-            ShowAwaitingExecutionEnd
+            ShowAwaitingExecutionEnd,
+            ShowPlaySymbol,
+            ShowStopSymbol,
+            ShowWaitSymbol
         }
 
         public interface IProcedureActivationButton
@@ -105,6 +108,7 @@ namespace StepBro.UI.WinForms
                 else if (m_mode == Mode.ClickToStop)
                 {
                     this.SendCommand(ButtonCommand.ShowActive);
+                    this.SendCommand(ButtonCommand.ShowStopSymbol);
                 }
                 m_execution = m_coreAccess.StartExecution(m_startProcedure.Name, m_startProcedure.Partner, m_startProcedure.TargetObject, null);
                 m_execution.CurrentStateChanged += Execution_CurrentStateChanged;
@@ -140,10 +144,7 @@ namespace StepBro.UI.WinForms
                     m_execution.CurrentStateChanged -= Execution_CurrentStateChanged;
                     m_execution = null;
                     this.SendCommand(ButtonCommand.Enable);
-                    if (m_mode == Mode.ClickToStop)
-                    {
-                        this.SendCommand(ButtonCommand.ShowNormal);
-                    }
+                    this.SendCommand(ButtonCommand.ShowNormal);
                 }
             }
         }

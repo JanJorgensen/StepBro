@@ -2,6 +2,7 @@
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.Logging;
 using StepBro.PanelCreator;
 using StepBro.ToolBarCreator;
 using StepBro.UI.WinForms.PanelElements;
@@ -21,6 +22,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
         private ICoreAccess m_coreAccess = null;
         bool m_colorSet = false;
         bool m_settingDefaultColor = false;
+        int m_priority = 10;
         //private static List<ColumnSeparator> g_columns = new List<ColumnSeparator>();
 
         public ToolBar() : base()
@@ -38,6 +40,8 @@ namespace StepBro.UI.WinForms.CustomToolBar
                 m_colorSet = true;
             }
         }
+
+        public int Priority { get { return m_priority; } }
 
         public new Color DefaultBackColor
         {
@@ -62,12 +66,12 @@ namespace StepBro.UI.WinForms.CustomToolBar
             m_coreAccess = coreAccess;
         }
 
-        public void Setup(string name, PropertyBlock definition)
+        public void Setup(ILogger logger, string name, PropertyBlock definition)
         {
             this.Text = name.Split(".").Last();
             this.Name = name.Replace(' ', '_').Replace(".", "Dot");
             this.Tag = name;
-            this.Setup(definition);
+            this.Setup(logger, definition);
         }
 
         public IEnumerable<ColumnSeparator> ListColumns()
@@ -127,7 +131,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
         }
         public ICoreAccess Core { get { return m_coreAccess; } }
 
-        public void Setup(PropertyBlock definition)
+        public void Setup(ILogger logger, PropertyBlock definition)
         {
             this.Items.Clear();
             foreach (var element in definition)
@@ -137,10 +141,15 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     var valueField = element as PropertyBlockValue;
                     if (valueField.Name == "Color")
                     {
+                        var colorName = valueField.ValueAsString();
                         try
                         {
-                            Color color = (Color)(typeof(Color).GetProperty(valueField.ValueAsString()).GetValue(null));
+                            Color color = (Color)(typeof(Color).GetProperty(colorName).GetValue(null));
                             this.BackColor = color;
+                        }
+                        catch
+                        {
+                            logger.LogError("Toolbar line " + valueField.Line + ": No color named " + colorName);
                         }
                         finally { }
                     }
@@ -162,11 +171,30 @@ namespace StepBro.UI.WinForms.CustomToolBar
                             this.Items.Add(label);
                         }
                     }
+                    else if (string.Equals(valueField.Name, "priority", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        if (valueField.Value != null && (valueField.Value is Int64 || valueField.Value is Int32))
+                        {
+                            m_priority = Convert.ToInt32(valueField.Value);
+                        }
+                        else
+                        {
+                            if (logger != null)
+                            {
+                                logger.LogError("Value type for '" + valueField.Name + "' (line " + valueField.Line + ") is wrong. It must be an integer value.");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (valueField.HasTypeSpecified) ToolBar.ReportTypeUnknown(logger, element.Line, valueField.SpecifiedTypeName);
+                        else ToolBar.ReportTypeUnknown(logger, element.Line, valueField.Name);
+                    }
                 }
                 else if (element.BlockEntryType == PropertyBlockEntryType.Flag)
                 {
                     var flagField = element as PropertyBlockFlag;
-                    if (element.Name == nameof(Separator))
+                    if (element.TypeOrName == nameof(Separator))
                     {
                         var separator = new Separator("Separator");
                         this.Items.Add(separator);
@@ -182,20 +210,25 @@ namespace StepBro.UI.WinForms.CustomToolBar
                         var separator = new ColumnSeparator(element.Name);
                         this.Items.Add(separator);
                     }
+                    else
+                    {
+                        if (flagField.HasTypeSpecified) ToolBar.ReportTypeUnknown(logger, element.Line, flagField.SpecifiedTypeName);
+                        else ToolBar.ReportTypeUnknown(logger, element.Line, flagField.Name);
+                    }
                 }
                 else if (element.BlockEntryType == PropertyBlockEntryType.Block)
                 {
                     var elementBlock = element as PropertyBlock;
-                    var type = element.SpecifiedTypeName;
-                    if (type != null)
+                    if (elementBlock.HasTypeSpecified)
                     {
+                        var type = element.SpecifiedTypeName;
                         if (type == "Menu")
                         {
                             var menu = new ToolStripDropDownMenu(m_coreAccess);
                             this.Items.Add(menu);
                             menu.Size = new Size(30, 20);
                             menu.AutoSize = true;
-                            menu.Setup(elementBlock);
+                            menu.Setup(logger, elementBlock);
                         }
                         else if (type == nameof(ProcedureActivationButton))
                         {
@@ -203,7 +236,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                             this.Items.Add(button);
                             button.Size = new Size(23, 20);
                             button.AutoSize = true;
-                            button.Setup(elementBlock);
+                            button.Setup(logger, elementBlock);
                         }
                         else if (type == nameof(ObjectCommandButton))
                         {
@@ -211,7 +244,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                             this.Items.Add(button);
                             button.Size = new Size(23, 20);
                             button.AutoSize = true;
-                            button.Setup(elementBlock);
+                            button.Setup(logger, elementBlock);
                         }
                         else if (type == nameof(Separator))
                         {
@@ -224,6 +257,10 @@ namespace StepBro.UI.WinForms.CustomToolBar
                             var separator = new ColumnSeparator(element.Name);
                             this.Items.Add(separator);
                             separator.Setup(elementBlock);
+                        }
+                        else
+                        {
+                            ToolBar.ReportTypeUnknown(logger, element.Line, type);
                         }
                     }
                     else
@@ -241,12 +278,24 @@ namespace StepBro.UI.WinForms.CustomToolBar
                             this.Items.Add(separator);
                             separator.Setup(elementBlock);
                         }
+                        else
+                        {
+                            ToolBar.ReportTypeUnknown(logger, element.Line, element.Name);
+                        }
                     }
                 }
             }
         }
 
         #endregion
+
+        public static void ReportTypeUnknown(ILogger logger, int line, string type)
+        {
+            if (logger != null)
+            {
+                logger.LogError("Toolbar definition line " + line + ", unknown type: \"" + type + "\".");
+            }
+        }
 
         #region IToolBarElement
 

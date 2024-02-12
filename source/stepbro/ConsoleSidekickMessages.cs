@@ -50,6 +50,13 @@ namespace StepBro.Sidekick.Messages
         GetObjectExtraData
     }
 
+    public class Log
+    {
+        public enum Type { Normal, Error }
+        public Type LogType { get; set;} = Type.Normal;
+        public string Text { get; set; }
+    }
+
     public class CommandObjectsList
     {
         public string[] Objects { get; set; }
