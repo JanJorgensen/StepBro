@@ -552,15 +552,19 @@ elementPropertyList : propertyblockStatementList ;
 statementPropertyblock : propertyblock ;
 statementPropertyList : propertyblockStatementList ;
 
-propertyblock :	OPEN_BRACE propertyblockStatementList? CLOSE_BRACE ;
+propertyblock :	OPEN_BRACE propertyblockStatementList? propertyBlockCommaTooMuch? CLOSE_BRACE ;
 
-propertyblockStatementList : propertyblockStatement (COMMA propertyblockStatement)* ;
+propertyBlockCommaTooMuch : COMMA ;
+
+propertyblockStatementList : propertyblockStatement ((COMMA propertyblockStatement) | propertyblockStatementMissingCommaSeparation)* ;
     
 propertyblockStatement
     :	propertyblockStatementEvent
     |	propertyblockStatementNamed
     |	propertyblockStatementValueIdentifierOnly						// Short form of 'Identifier = true' or '<some property> = Identifier'
     ;
+
+propertyblockStatementMissingCommaSeparation : propertyblockStatement ;
 
 propertyblockStatementNamed 
     :	(   (propertyblockStatementTypeSpecifier propertyblockStatementTypeSpecifier propertyblockStatementTypeSpecifier propertyblockStatementNameSpecifier) | 
@@ -585,15 +589,17 @@ propertyblockStatementEvent
     |	ON identifierOrQualified COLON identifierOrQualified ASSIGNMENT expression	# propertyblockEventAssignment
     ;
 
-propertyblockArray : OPEN_BRACKET propertyblockArrayEntryList? CLOSE_BRACKET ;
+propertyblockArray : OPEN_BRACKET propertyblockArrayEntryList? propertyBlockCommaTooMuch? CLOSE_BRACKET ;
 
-propertyblockArrayEntryList : propertyblockArrayEntry (COMMA propertyblockArrayEntry)* ;
+propertyblockArrayEntryList : propertyblockArrayEntry ((COMMA propertyblockArrayEntry) | propertyblockArrayEntryMissingCommaSeparation)* ;
 
 propertyblockArrayEntry
     :	propertyblock			# propertyblockArrayEntryPropertyBlock
     |	propertyblockArray		# propertyblockArrayEntryArray
     |	primaryOrQualified		# propertyblockArrayEntryPrimary
     ;
+
+propertyblockArrayEntryMissingCommaSeparation : propertyblockArrayEntry ;
 
 propertyblockStatementValueNormal : primaryOrQualified ;
 

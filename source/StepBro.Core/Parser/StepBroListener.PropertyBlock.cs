@@ -163,6 +163,11 @@ namespace StepBro.Core.Parser
             block.AddRange(childs);
         }
 
+        public override void EnterPropertyBlockCommaTooMuch([NotNull] SBP.PropertyBlockCommaTooMuchContext context)
+        {
+            m_errors.SymanticError(context.Start.Line, context.Start.Column, true, "Redundant comma at the end of elements.");
+        }
+
         public override void EnterPropertyblockStatement([NotNull] SBP.PropertyblockStatementContext context)
         {
             m_propertyEntryType = null;
@@ -171,6 +176,11 @@ namespace StepBro.Core.Parser
         //public override void ExitPropertyblockStatement([NotNull] SBP.PropertyblockStatementContext context)
         //{
         //}
+
+        public override void EnterPropertyblockStatementMissingCommaSeparation([NotNull] SBP.PropertyblockStatementMissingCommaSeparationContext context)
+        {
+            m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Missing comma separation before this element.");
+        }
 
         public override void EnterPropertyblockStatementNamed([NotNull] SBP.PropertyblockStatementNamedContext context)
         {
@@ -288,6 +298,11 @@ namespace StepBro.Core.Parser
             var homeList = m_propertyBlockOperands.Peek();
             var array = (PropertyBlockArray)homeList[homeList.Count - 1];    // This block is last in the current stack level.
             array.AddRange(childs);
+        }
+
+        public override void EnterPropertyblockArrayEntryMissingCommaSeparation([NotNull] SBP.PropertyblockArrayEntryMissingCommaSeparationContext context)
+        {
+            m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Missing comma separation before this element.");
         }
 
         public override void EnterPropertyblockArrayEntryPropertyBlock([NotNull] SBP.PropertyblockArrayEntryPropertyBlockContext context)

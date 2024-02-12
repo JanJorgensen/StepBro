@@ -5,6 +5,7 @@ using StepBro.Core.ScriptData;
 using System.IO;
 using System.Collections.Specialized;
 using System.Text;
+using System.Linq;
 
 namespace StepBro.Core.Parser
 {
@@ -112,7 +113,7 @@ namespace StepBro.Core.Parser
             var err = new ErrorData(line, charPositionInLine, description, justWarning);
             m_errors.Add(err);
             this.NotifyAdd(err);
-            if (m_throwOnSyntax) throw new Exception(description);
+            if (!justWarning && m_throwOnSyntax) throw new Exception(description);
         }
 
         public void UnresolvedType(int line, int charPositionInLine, string name)
@@ -157,7 +158,8 @@ namespace StepBro.Core.Parser
 #endif
         }
 
-        public int ErrorCount { get { return m_errors.Count; } }
+        public int ErrorCount { get { return m_errors.Count(e => e.JustWarning == false); } }
+        public int WarningCount { get { return m_errors.Count(e => e.JustWarning == true); } }
 
         public IErrorData this[int index] { get { return m_errors[index]; } }
 
