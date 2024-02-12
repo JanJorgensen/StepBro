@@ -94,6 +94,7 @@ namespace StepBro.Core.Data
                 return new SerializablePropertyBlockValueNull()
                 {
                     Name = name,
+                    Line = this.Line,
                     SpecifiedType = type
                 };
             }
@@ -102,6 +103,7 @@ namespace StepBro.Core.Data
                 return new SerializablePropertyBlockValueBool()
                 {
                     Name = name,
+                    Line = this.Line,
                     SpecifiedType = type,
                     Value = (bool)m_value
                 };
@@ -111,6 +113,7 @@ namespace StepBro.Core.Data
                 return new SerializablePropertyBlockValueBool()
                 {
                     Name = name,
+                    Line = this.Line,
                     SpecifiedType = type,
                     Value = (bool)m_value
                 };
@@ -120,6 +123,7 @@ namespace StepBro.Core.Data
                 return new SerializablePropertyBlockValueInt()
                 {
                     Name = name,
+                    Line = this.Line,
                     SpecifiedType = type,
                     Value = (long)m_value
                 };
@@ -129,6 +133,7 @@ namespace StepBro.Core.Data
                 return new SerializablePropertyBlockValueString()
                 {
                     Name = name,
+                    Line = this.Line,
                     SpecifiedType = type,
                     Value = (string)m_value
                 };
@@ -138,6 +143,7 @@ namespace StepBro.Core.Data
                 return new SerializablePropertyBlockValueString()
                 {
                     Name = name,
+                    Line = this.Line,
                     SpecifiedType = type,
                     Value = ((Identifier)m_value).Name
                 };

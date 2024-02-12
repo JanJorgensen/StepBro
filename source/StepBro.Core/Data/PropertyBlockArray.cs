@@ -159,6 +159,7 @@ namespace StepBro.Core.Data
             return new SerializablePropertyBlockArray()
             {
                 Name = this.Name,
+                Line = this.Line,
                 SpecifiedType = this.SpecifiedTypeName,
                 Entries = m_entries.Select(e => e.CloneForSerialization()).ToArray()
             };
