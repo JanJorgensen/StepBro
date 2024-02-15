@@ -889,13 +889,13 @@ namespace StepBro.ConsoleSidekick.WinForms
                 toolStripComboBoxTool.Enabled = true;
                 toolStripComboBoxToolCommand.Enabled = true;
                 toolStripComboBoxTool.SelectedIndex = selection;
+                toolStripComboBoxTool.SelectionLength = 0;
             }
             else
             {
                 toolStripComboBoxTool.Enabled = false;
                 toolStripComboBoxToolCommand.Enabled = false;
             }
-            toolStripComboBoxTool.SelectionLength = 0;
 
             #endregion
 
