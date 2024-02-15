@@ -447,8 +447,11 @@ namespace StepBro.Core.ScriptData
             foreach (var uf in m_fileUsings)
             {
                 var file = uf.Identifier.Reference as ScriptFile;
-                var found = file.TryGetVariableContainer<T>(id);
-                if (found != null) return found;
+                if (file != null)
+                {
+                    var found = file.TryGetVariableContainer<T>(id);
+                    if (found != null) return found;
+                }
             }
             foreach (var un in m_namespaceUsings)
             {

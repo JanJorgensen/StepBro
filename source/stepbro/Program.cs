@@ -10,6 +10,7 @@ using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using StepBro.Sidekick;
+using StepBro.TestInterface;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -377,7 +378,15 @@ namespace StepBro.Cmd
                                             }
                                             else
                                             {
-                                                StepBroMain.Logger.RootLogger.LogError($"'{name}' is not accepting commands.");
+                                                string errorMessage = $"'{name}' is not accepting commands.";
+
+                                                // In cases where obj is a SerialTestConnection we add an extra part to the error message
+                                                if (obj.GetType().BaseType.IsAssignableFrom(typeof(SerialTestConnection)))
+                                                {
+                                                    errorMessage += " Did you forget to open the stream?";
+                                                }
+
+                                                StepBroMain.Logger.RootLogger.LogError(errorMessage);
                                             }
                                         }
                                     }
