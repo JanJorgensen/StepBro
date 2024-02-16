@@ -179,6 +179,21 @@ namespace StepBro.Core.Test.Parser
         }
 
         [TestMethod]
+        public void FileParsing_NamespaceBeforeMultipleUsing()
+        {
+            var file = new StringBuilder();
+            file.AppendLine("namespace test;");
+            file.AppendLine("using StepBro.ToolBarCreator;");
+            file.AppendLine("using System;");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("test.sbs", file.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);
+            Assert.IsTrue(files[0].Errors[0].Message.Contains("Namespace should be declared after the last \"using\" statement.", StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        [TestMethod]
         public void FileParsing_NamespaceBetweenUsings()
         {
             var file = new StringBuilder();

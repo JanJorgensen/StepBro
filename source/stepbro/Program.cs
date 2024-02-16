@@ -378,13 +378,7 @@ namespace StepBro.Cmd
                                             }
                                             else
                                             {
-                                                string errorMessage = $"'{name}' is not accepting commands.";
-
-                                                // In cases where obj is a SerialTestConnection we add an extra part to the error message
-                                                if (obj.GetType().BaseType.IsAssignableFrom(typeof(SerialTestConnection)))
-                                                {
-                                                    errorMessage += " Did you forget to open the stream?";
-                                                }
+                                                string errorMessage = $"'{name}' is not accepting commands. Did you forget to open or connect?";
 
                                                 StepBroMain.Logger.RootLogger.LogError(errorMessage);
                                             }
