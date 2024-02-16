@@ -163,5 +163,34 @@ namespace StepBro.Core.Test.Parser
             Assert.AreEqual(1, files[0].Errors.ErrorCount);
             Assert.IsTrue(files[0].Errors[0].Message.Contains("missing ';'", StringComparison.InvariantCultureIgnoreCase), "Found: " + files[0].Errors[0].Message);
         }
+
+        [TestMethod]
+        public void FileParsing_NamespaceBeforeUsing()
+        {
+            var file = new StringBuilder();
+            file.AppendLine("namespace test;");
+            file.AppendLine("using StepBro.ToolBarCreator;");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("test.sbs", file.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);
+            Assert.IsTrue(files[0].Errors[0].Message.Contains("Namespace should be declared after the last \"using\" statement.", StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        [TestMethod]
+        public void FileParsing_NamespaceBetweenUsings()
+        {
+            var file = new StringBuilder();
+            file.AppendLine("using System;");
+            file.AppendLine("namespace test;");
+            file.AppendLine("using StepBro.ToolBarCreator;");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("test.sbs", file.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);
+            Assert.IsTrue(files[0].Errors[0].Message.Contains("Namespace should be declared after the last \"using\" statement.", StringComparison.InvariantCultureIgnoreCase));
+        }
     }
 }

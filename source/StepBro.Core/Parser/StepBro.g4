@@ -19,7 +19,10 @@ usingDeclaration
     :   PUBLIC? USING identifierOrQualified SEMICOLON                   # UsingDeclarationWithIdentifier
     |   PUBLIC? USING typedefName ASSIGNMENT typedefType SEMICOLON      # TypeAlias
     |   PUBLIC? USING (REGULAR_STRING | VERBATIUM_STRING) SEMICOLON     # UsingDeclarationWithPath
+    |   namespaceErroneousDeclaration                                   # Error
     ;
+
+namespaceErroneousDeclaration : namespaceDeclaration ;
 
 namespace : identifierOrQualified ;
 

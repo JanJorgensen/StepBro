@@ -121,6 +121,11 @@ namespace StepBro.Core.Parser
             }
         }
 
+        public override void EnterNamespaceErroneousDeclaration([NotNull] SBP.NamespaceErroneousDeclarationContext context)
+        {
+            m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Namespace should be declared after the last \"using\" statement.");
+        }
+
         public override void EnterNamespace([NotNull] SBP.NamespaceContext context)
         {
             this.PrepareForExpressionParsing("namespace");
