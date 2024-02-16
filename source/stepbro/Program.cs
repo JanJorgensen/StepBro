@@ -10,6 +10,7 @@ using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using StepBro.Sidekick;
+using StepBro.TestInterface;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -377,7 +378,9 @@ namespace StepBro.Cmd
                                             }
                                             else
                                             {
-                                                StepBroMain.Logger.RootLogger.LogError($"'{name}' is not accepting commands.");
+                                                string errorMessage = $"'{name}' is not accepting commands. Did you forget to open or connect?";
+
+                                                StepBroMain.Logger.RootLogger.LogError(errorMessage);
                                             }
                                         }
                                     }

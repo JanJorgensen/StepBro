@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Modules\StepBro.TestInterface\StepBro.TestInterface.csproj" />
     <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
   </ItemGroup>
 

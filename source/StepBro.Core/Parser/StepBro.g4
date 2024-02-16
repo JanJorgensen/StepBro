@@ -13,13 +13,20 @@ compilationUnit : fileProperties? usingDeclarations namespaceDeclaration? fileEl
 
 fileProperties : elementPropertyblock ;
 
-usingDeclarations : usingDeclaration* ;
+usingDeclarations : usingDeclarationCheck* ;
+
+usingDeclarationCheck
+    :   usingDeclaration
+    |   namespaceErroneousDeclaration usingDeclaration
+    ;
 
 usingDeclaration 
     :   PUBLIC? USING identifierOrQualified SEMICOLON                   # UsingDeclarationWithIdentifier
     |   PUBLIC? USING typedefName ASSIGNMENT typedefType SEMICOLON      # TypeAlias
     |   PUBLIC? USING (REGULAR_STRING | VERBATIUM_STRING) SEMICOLON     # UsingDeclarationWithPath
     ;
+
+namespaceErroneousDeclaration : namespaceDeclaration ;
 
 namespace : identifierOrQualified ;
 
