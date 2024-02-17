@@ -10,8 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Xml.Linq;
 
 namespace StepBro.Core.ScriptData
 {
@@ -53,7 +51,7 @@ namespace StepBro.Core.ScriptData
             m_lastFileChange = DateTime.Now;   // TODO: take this from file timestamp.
             m_parserFileStream = filestream;
             m_folderShortcuts = new FolderCollection(FolderShortcutOrigin.ScriptFile);
-            if (!String.IsNullOrEmpty(filepath))
+            if (!string.IsNullOrEmpty(filepath))
             {
                 var folder = this.FilePath;
                 if (this.FilePath == this.FileName) // In case there's no path
@@ -505,6 +503,38 @@ namespace StepBro.Core.ScriptData
                         (obj as INameable).Name = v.VariableOwnerAccess.Container.Name;
                     }
                 }
+                if (v.VariableOwnerAccess.DataCreated)
+                {
+                    var obj = v.VariableOwnerAccess.Container.GetValue();
+                    if (obj != null && obj is ISettableFromPropertyBlock)
+                    {
+                        object props;
+                        if (v.VariableOwnerAccess.Tags.TryGetValue(ScriptFile.VARIABLE_CUSTOM_PROPS_TAG, out props) && props is PropertyBlock)
+                        {
+                            var errors = new List<Tuple<int, string>>();
+                            try
+                            {
+                                ((ISettableFromPropertyBlock)obj).PreScanData(props as PropertyBlock, errors);
+
+                                foreach (var e in errors)
+                                {
+                                    this.ErrorsInternal.SymanticError(e.Item1, -1, false, e.Item2);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                this.ErrorsInternal.InternalError(v.Line, -1, "Exception scanning data: " + ex.Message);
+                            }
+                        }
+                        else
+                        {
+                            //this.ErrorsInternal.InternalError(v.Line, -1, "No data (PropertyBlock) for '" + v.Name + "'.");
+
+                            // It should not be an error...
+                        }
+                    }
+                }
+
                 if (doInit)
                 {
                     if (logger != null)

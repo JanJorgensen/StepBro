@@ -23,7 +23,6 @@ namespace StepBro.UI.WinForms.CustomToolBar
         bool m_colorSet = false;
         bool m_settingDefaultColor = false;
         int m_priority = 10;
-        //private static List<ColumnSeparator> g_columns = new List<ColumnSeparator>();
 
         public ToolBar() : base()
         {

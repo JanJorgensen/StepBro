@@ -252,6 +252,10 @@ namespace StepBroCoreTest.Parser
             this.IntA = valueA;
         }
 
+        public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+        {
+        }
+
         public void Setup(ILogger logger, PropertyBlock data)
         {
             bool errors = false;

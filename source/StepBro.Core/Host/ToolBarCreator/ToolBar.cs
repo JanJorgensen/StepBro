@@ -4,6 +4,7 @@ using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using StepBro.PanelCreator.DummyUI;
 using System;
+using System.Collections.Generic;
 
 namespace StepBro.ToolBarCreator
 {
@@ -34,35 +35,54 @@ namespace StepBro.ToolBarCreator
             }
         }
 
+        public static string[] ToolbarElementTypes()
+        {
+            return new string[] { "ProcedureActivationButton", "ObjectCommandButton", "Menu", "ColumnSeparator", "Label" };
+        }
+
+        public static string[] ToolbarPropertiesAndFlags()
+        {
+            return new string[] { "Color" };
+        }
+
+        public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+        {
+            var color = new PropertyBlockDecoder.ValueString<object>("Color");
+            var text = new PropertyBlockDecoder.ValueString<object>("Text");
+            var instance = new PropertyBlockDecoder.ValueString<object>("Instance");
+
+            var procButton = new PropertyBlockDecoder.Block<object, object>("ProcedureActivationButton",
+                color, text, instance,
+                new PropertyBlockDecoder.ValueString<object>("Procedure"),
+                new PropertyBlockDecoder.ValueString<object>("Partner"),
+                new PropertyBlockDecoder.Flag<object>("Stoppable"),
+                new PropertyBlockDecoder.Flag<object>("StopOnButtonRelease")
+                );
+            var objCmdButton = new PropertyBlockDecoder.Block<object, object>("ObjectCommandButton",
+                color, text, instance,
+                new PropertyBlockDecoder.ValueString<object>("Command")
+                );
+
+            var menu = new PropertyBlockDecoder.Block<object, object>("Menu");
+            menu.SetChilds(menu, procButton, objCmdButton);
+
+            var root = new PropertyBlockDecoder.Block<object, object>
+                (
+                    new PropertyBlockDecoder.ValueString<object>("Label"),
+                    color,
+                    new PropertyBlockDecoder.ValueInt<object>("Priority"),
+                    new PropertyBlockDecoder.Flag<object>("ColumnSeparator"),
+                    menu, procButton, objCmdButton
+                );
+            root.DecodeData(data, null, errors);
+        }
+
         public void Setup(ILogger logger, PropertyBlock data)
         {
             m_definition = data;
-            //var mainPanel = data.TryGetElement(MainElementName);
-            //if (mainPanel != null)
-            //{
-            //    if (mainPanel.BlockEntryType != PropertyBlockEntryType.Block || string.IsNullOrEmpty(mainPanel.SpecifiedTypeName))
-            //    {
-            //        logger.LogError($"The '{MainElementName}' entry must be defines as a 'block'.");
-            //        return;
-            //    }
-            //    if (string.IsNullOrEmpty(mainPanel.SpecifiedTypeName))
-            //    {
-            //        logger.LogError($"The '{MainElementName}' block must have a type specified.");
-            //        return;
-            //    }
-            //    m_mainPanelDefinition = mainPanel as PropertyBlock;
-
-            //    var panel = new DummyBaseUIElement(null, mainPanel.Name, mainPanel.Name, mainPanel.SpecifiedTypeName);
-            //    m_mainPanelElement = panel;
-            //    panel.Setup(m_mainPanelDefinition);
-            //}
-            //else
-            //{
-            //    logger.LogError($"The '{MainElementName}' definition is missing.");
-            //}
         }
 
-        public void SetPanelReference(IToolBarElement panel)
+        public void SetToolBarReference(IToolBarElement panel)
         {
             //m_mainPanelElement = panel;
         }
