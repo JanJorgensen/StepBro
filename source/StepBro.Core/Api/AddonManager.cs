@@ -91,7 +91,7 @@ namespace StepBro.Core.Api
         protected override void Start(ServiceManager manager, ITaskContext context)
         {
             var host = manager.Get<IHost>();
-            m_hostIsWPF = (host != null) ? host.IsWPFApplication : false;
+            m_hostIsWPF = (host != null) ? (host.Type == HostType.WPF) : false;
 
             if (m_basicModulesLoader != null)
             {

@@ -8,10 +8,16 @@ using StepBro.Core.Data;
 
 namespace StepBro.Core.Host
 {
+    public enum HostType
+    {
+        Console,
+        WinForms,
+        WPF
+    }
+
     public interface IHost
     {
-        //System.Windows.Forms.Form GetMainForm();
-        bool IsWPFApplication { get; }
+        HostType Type { get; }
         IEnumerable<Type> ListHostCodeModuleTypes();
         IEnumerable<NamedData<object>> ListHostCodeModuleInstances();
     }
