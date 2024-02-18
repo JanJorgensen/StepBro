@@ -21,7 +21,6 @@ namespace StepBro.UI.WinForms.PanelElements
         private static uint g_nextID = 100;
         private uint m_id;
         private IPanelElement m_parent = null;
-        private List<IPanelElement> m_children;
 
         public PanelElementBase()
         {
@@ -70,14 +69,11 @@ namespace StepBro.UI.WinForms.PanelElements
 
         public string ElementType => throw new NotImplementedException();
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
 
-        public IEnumerable<IPanelElement> GetChilds()
+        public virtual IEnumerable<IPanelElement> GetChilds()
         {
-            foreach (var child in m_children)
-            {
-                yield return child;
-            }
+            yield break;
         }
 
         public object GetProperty([Implicit] ICallContext context, string property)
@@ -106,7 +102,7 @@ namespace StepBro.UI.WinForms.PanelElements
             {
                 var i = name.IndexOf('.');
                 var first = name.Substring(0, i);
-                var child = m_children.FirstOrDefault(c => c.ElementName == first);
+                var child = this.GetChilds().FirstOrDefault(c => c.ElementName == first);
                 if (child != null)
                 {
                     child = child.TryFindChildElement(context, name.Substring(i + 1));
@@ -115,7 +111,7 @@ namespace StepBro.UI.WinForms.PanelElements
             }
             else
             {
-                return m_children.FirstOrDefault(c => c.ElementName == name);
+                return this.GetChilds().FirstOrDefault(c => c.ElementName == name);
             }
         }
 

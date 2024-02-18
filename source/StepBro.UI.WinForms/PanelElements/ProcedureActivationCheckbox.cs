@@ -13,10 +13,10 @@ namespace StepBro.UI.WinForms.PanelElements
 {
     public partial class ProcedureActivationCheckbox : PanelElementBase
     {
-        private ProcedureActivationInfo m_changeProcedure;
+        //private ProcedureActivationInfo m_changeProcedure;
         private ProcedureActivationInfo m_setProcedure;
         private ProcedureActivationInfo m_resetProcedure;
-        private ProcedureActivationInfo m_enabledCheckProcedure;
+        //private ProcedureActivationInfo m_enabledCheckProcedure;
 
         public ProcedureActivationCheckbox()
         {

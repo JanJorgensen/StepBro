@@ -11,8 +11,8 @@ namespace StepBro.UI.WinForms
         private enum Mode { ActivateOnClick = 0, ClickToStop, RunWhilePushed }
         private Mode m_mode = Mode.ActivateOnClick;
         private ProcedureActivationInfo m_startProcedure;
-        private ProcedureActivationInfo m_stopProcedure;
-        private ProcedureActivationInfo m_enabledCheckProcedure;
+        //private ProcedureActivationInfo m_stopProcedure;
+        //private ProcedureActivationInfo m_enabledCheckProcedure;
         private IExecutionAccess m_execution = null;
 
         public enum ButtonCommand

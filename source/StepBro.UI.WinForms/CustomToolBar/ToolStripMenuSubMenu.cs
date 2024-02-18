@@ -55,7 +55,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public string ElementType => throw new NotImplementedException();
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
 
         public IEnumerable<IToolBarElement> GetChilds()
         {
