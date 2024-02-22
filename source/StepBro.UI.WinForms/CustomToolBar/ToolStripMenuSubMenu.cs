@@ -12,36 +12,22 @@ using System.Threading.Tasks;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
-    internal class ToolStripMenuSubMenu : ToolStripMenuItem, IToolBarElement, IToolBarElementSetup
+    internal class ToolStripMenuSubMenu : ToolStripMenuItem, IMenu, IToolBarElement
     {
         private ICoreAccess m_coreAccess = null;
-        private MenuLogic m_menuLogic = null;
 
-        public ToolStripMenuSubMenu(ICoreAccess coreAccess) : base()
+        public ToolStripMenuSubMenu(ICoreAccess coreAccess, string name) : base()
         {
             m_coreAccess = coreAccess;
-            m_menuLogic = new MenuLogic(this, coreAccess);
+            this.Name = name;
+            this.Text = name;
         }
 
-        #region IToolBarElementSetup
-
-        public void Clear()
+        public void SetTitle(string title)
         {
-            foreach (IToolBarElementSetup item in this.DropDownItems)
-            {
-                item.Clear();
-            }
-            this.DropDownItems.Clear();
+            this.Text = title;
         }
 
-        public ICoreAccess Core { get { return m_coreAccess; } }
-
-        public void Setup(ILogger logger, PropertyBlock definition)
-        {
-            m_menuLogic.Setup(logger, definition);
-        }
-
-        #endregion
 
         #region IToolBarElement
 

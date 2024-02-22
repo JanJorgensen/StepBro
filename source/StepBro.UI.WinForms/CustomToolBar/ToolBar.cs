@@ -14,21 +14,134 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static StepBro.Core.Data.PropertyBlockDecoder;
+using static StepBro.UI.WinForms.WinFormsPropertyBlockDecoder;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
-    public class ToolBar : ToolStrip, StepBro.ToolBarCreator.IToolBarElement, IToolBarElementSetup
+    public class ToolBar : ToolStrip, IMenuItemHost, StepBro.ToolBarCreator.IToolBarElement
     {
-        private ICoreAccess m_coreAccess = null;
+        private static ICoreAccess m_coreAccess = null;
         bool m_colorSet = false;
         bool m_settingDefaultColor = false;
         int m_priority = 10;
+        private static PropertyBlockDecoder.Block<object, ToolBar> m_decoder = null;
 
         public ToolBar() : base()
         {
             this.GripStyle = ToolStripGripStyle.Hidden;
             this.AutoSize = false;
             this.Height = 26;
+        }
+
+        private static void SetupDataDecoder()
+        {
+            var procButtonElements = new Element[] {
+                new ValueColor<ProcedureActivationButton>("Color", (b, c) => { b.BackColor = c; return null; }),
+                new ValueString<ProcedureActivationButton>("Text", (b, v) => { b.Text = v.ValueAsString(); return null; }),
+                new ValueString<ProcedureActivationButton>("Instance", "Object", (b, v) => { b.Instance = v.ValueAsString(); return null; }),
+                new ValueString<ProcedureActivationButton>("Procedure", (b, v) => { b.Procedure = v.ValueAsString(); return null; }),
+                new ValueString<ProcedureActivationButton>("Partner", "Model", (b, v) => { b.Partner = v.ValueAsString(); return null; }),
+                new Flag <ProcedureActivationButton>("Stoppable", (b, f) => { b.SetStoppable(); return null; }),
+                new Flag<ProcedureActivationButton>("StopOnButtonRelease", (b, f) => { b.SetStopOnButtonRelease(); return null; })
+            };
+            var procButton = new Block<IMenuItemHost, ProcedureActivationButton>(
+                "ProcedureActivationButton",
+                (m, n) =>
+                {
+                    var button = new ProcedureActivationButton(m_coreAccess, n);
+                    m.Add(button);
+                    button.Size = new Size(23, 20);
+                    button.AutoSize = true;
+                    return button;
+                },
+                procButtonElements);
+
+            var objCmdButtonElements = new Element[] {
+                new ValueColor<ObjectCommandButton>("Color", (b, c) => { b.BackColor = c; return null; }),
+                new ValueString<ObjectCommandButton>("Text", (b, v) => { b.Text = v.ValueAsString(); return null; }),
+                new ValueString<ObjectCommandButton>("Instance", (b, v) => { b.ObjectInstance = v.ValueAsString(); return null; }),
+                new ValueString<ObjectCommandButton>("Command", (b, v) => { b.ObjectCommand = v.ValueAsString(); return null; })
+            };
+            var objCmdButton = new Block<IMenuItemHost, ObjectCommandButton>(
+                "ObjectCommandButton",
+                (m, n) =>
+                {
+                    var button = new ObjectCommandButton(m_coreAccess, n);
+                    m.Add(button);
+                    button.Size = new Size(23, 20);
+                    button.AutoSize = true;
+                    return button;
+                },
+                objCmdButtonElements);
+
+            var menuTitle = new ValueString<IMenu>("Text", "Title", (m, v) => { m.SetTitle(v.ValueAsString()); return null; });
+
+            var subMenu = new Block<ToolStripDropDownMenu, ToolStripMenuSubMenu>("Menu", "SubMenu", 
+                (m, n) =>
+                {
+                    var menu = new ToolStripMenuSubMenu(m_coreAccess, n);
+                    m.DropDownItems.Add(menu);
+                    menu.Size = new Size(30, 20);
+                    menu.AutoSize = true; 
+                    return menu;
+                });
+            subMenu.SetChilds(menuTitle, subMenu, procButton, objCmdButton);
+
+            var toolbarMenu = new Block<ToolBar, ToolStripDropDownMenu>("Menu", "DropDownMenu", 
+                (t, n) =>
+                {
+                    var menu = new ToolStripDropDownMenu(m_coreAccess, n);
+                    t.Items.Add(menu);
+                    menu.Size = new Size(30, 20);
+                    menu.AutoSize = true;
+                    return menu;
+                });
+            toolbarMenu.SetChilds(menuTitle, subMenu, procButton, objCmdButton);
+
+            m_decoder = new Block<object, ToolBar>
+                (
+                    new ValueString<ToolBar>("Label", (t, v) =>
+                        {
+                            var text = v.ValueAsString();
+                            Label label;
+                            if (v.HasTypeSpecified)
+                            {
+                                label = new Label(v.Name);
+                            }
+                            else
+                            {
+                                label = new Label("label" + text.Replace(" ", "_").Replace(".", "Dot"));
+                            }
+                            label.Text = text;
+                            t.Items.Add(label);
+                            return null;    // No errors
+                        }),
+                    new ValueColor<ToolBar>("Color", (t, c) => { t.BackColor = c; return null; }),
+                    new ValueInt<ToolBar>("Priority", (t, v) => { t.Priority = Convert.ToInt32(v.Value); return null; }),
+                    new Flag<ToolBar>("Separator", (t, f) =>
+                    {
+                        var separator = new Separator("Separator");
+                        t.Items.Add(separator);
+                        return null;
+                    }),
+                    new Flag<ToolBar>("ColumnSeparator", (t, f) =>
+                    {
+                        string name = f.Name;
+                        if (!f.HasTypeSpecified)
+                        {
+                            int index = t.Items.Cast<ToolStripItem>().Count(i => i is ColumnSeparator);
+                            name = "column" + index;
+                        }
+                        var separator = new ColumnSeparator(name);
+                        t.Items.Add(separator); t.Items.Add(separator);
+                        return null;
+                    }),
+                    toolbarMenu, procButton, objCmdButton
+                );
         }
 
         protected override void OnBackColorChanged(EventArgs e)
@@ -40,7 +153,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
-        public int Priority { get { return m_priority; } }
+        public int Priority { get { return m_priority; } set { m_priority = value; } }
 
         public new Color DefaultBackColor
         {
@@ -68,7 +181,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
         public void Setup(ILogger logger, string name, PropertyBlock definition)
         {
             this.Text = name.Split(".").Last();
-            this.Name = name.Replace(' ', '_').Replace(".", "Dot");
+            this.Name = name;
             this.Tag = name;
             this.Setup(logger, definition);
         }
@@ -118,14 +231,12 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
-        #region IToolBarElementSetup
-
         public void Clear()
         {
-            foreach (IToolBarElementSetup item in this.Items)
-            {
-                item.Clear();
-            }
+            //foreach (IToolBarElementSetup item in this.Items)
+            //{
+            //    item.Clear();
+            //}
             this.Items.Clear();
         }
         public ICoreAccess Core { get { return m_coreAccess; } }
@@ -133,160 +244,18 @@ namespace StepBro.UI.WinForms.CustomToolBar
         public void Setup(ILogger logger, PropertyBlock definition)
         {
             this.Items.Clear();
-            foreach (var element in definition)
+            var errors = new List<Tuple<int, string>>();
+            if (m_decoder == null)
             {
-                if (element.BlockEntryType == PropertyBlockEntryType.Value)
-                {
-                    var valueField = element as PropertyBlockValue;
-                    if (valueField.Name == "Color")
-                    {
-                        var colorName = valueField.ValueAsString();
-                        try
-                        {
-                            Color color = (Color)(typeof(Color).GetProperty(colorName).GetValue(null));
-                            this.BackColor = color;
-                        }
-                        catch
-                        {
-                            logger.LogError("Toolbar line " + valueField.Line + ": No color named " + colorName);
-                        }
-                        finally { }
-                    }
-                    else if (valueField.TypeOrName == "Label")
-                    {
-                        if (valueField.IsStringOrIdentifier)
-                        {
-                            var text = valueField.ValueAsString();
-                            Label label;
-                            if (valueField.HasTypeSpecified)
-                            {
-                                label = new Label(valueField.Name);
-                            }
-                            else
-                            {
-                                label = new Label("label" + text.Replace(" ", "_").Replace(".", "Dot"));
-                            }
-                            label.Text = text;
-                            this.Items.Add(label);
-                        }
-                    }
-                    else if (string.Equals(valueField.Name, "priority", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        if (valueField.Value != null && (valueField.Value is Int64 || valueField.Value is Int32))
-                        {
-                            m_priority = Convert.ToInt32(valueField.Value);
-                        }
-                        else
-                        {
-                            if (logger != null)
-                            {
-                                logger.LogError("Value type for '" + valueField.Name + "' (line " + valueField.Line + ") is wrong. It must be an integer value.");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (valueField.HasTypeSpecified) ToolBar.ReportTypeUnknown(logger, element.Line, valueField.SpecifiedTypeName);
-                        else ToolBar.ReportTypeUnknown(logger, element.Line, valueField.Name);
-                    }
-                }
-                else if (element.BlockEntryType == PropertyBlockEntryType.Flag)
-                {
-                    var flagField = element as PropertyBlockFlag;
-                    if (element.TypeOrName == nameof(Separator))
-                    {
-                        var separator = new Separator("Separator");
-                        this.Items.Add(separator);
-                    }
-                    else if (element.TypeOrName == nameof(ColumnSeparator))
-                    {
-                        string name = element.Name;
-                        if (!element.HasTypeSpecified)
-                        {
-                            int index = this.Items.Cast<ToolStripItem>().Count(i => i is ColumnSeparator);
-                            name = "column" + index;
-                        }
-                        var separator = new ColumnSeparator(element.Name);
-                        this.Items.Add(separator);
-                    }
-                    else
-                    {
-                        if (flagField.HasTypeSpecified) ToolBar.ReportTypeUnknown(logger, element.Line, flagField.SpecifiedTypeName);
-                        else ToolBar.ReportTypeUnknown(logger, element.Line, flagField.Name);
-                    }
-                }
-                else if (element.BlockEntryType == PropertyBlockEntryType.Block)
-                {
-                    var elementBlock = element as PropertyBlock;
-                    if (elementBlock.HasTypeSpecified)
-                    {
-                        var type = element.SpecifiedTypeName;
-                        if (type == "Menu")
-                        {
-                            var menu = new ToolStripDropDownMenu(m_coreAccess);
-                            this.Items.Add(menu);
-                            menu.Size = new Size(30, 20);
-                            menu.AutoSize = true;
-                            menu.Setup(logger, elementBlock);
-                        }
-                        else if (type == nameof(ProcedureActivationButton))
-                        {
-                            var button = new ProcedureActivationButton(m_coreAccess);
-                            this.Items.Add(button);
-                            button.Size = new Size(23, 20);
-                            button.AutoSize = true;
-                            button.Setup(logger, elementBlock);
-                        }
-                        else if (type == nameof(ObjectCommandButton))
-                        {
-                            var button = new ObjectCommandButton(m_coreAccess);
-                            this.Items.Add(button);
-                            button.Size = new Size(23, 20);
-                            button.AutoSize = true;
-                            button.Setup(logger, elementBlock);
-                        }
-                        else if (type == nameof(Separator))
-                        {
-                            var separator = new Separator(element.Name);
-                            this.Items.Add(separator);
-                            separator.Setup(elementBlock);
-                        }
-                        else if (type == nameof(ColumnSeparator))
-                        {
-                            var separator = new ColumnSeparator(element.Name);
-                            this.Items.Add(separator);
-                            separator.Setup(elementBlock);
-                        }
-                        else
-                        {
-                            ToolBar.ReportTypeUnknown(logger, element.Line, type);
-                        }
-                    }
-                    else
-                    {
-                        if (element.Name == nameof(Separator))
-                        {
-                            var separator = new Separator("Separator");
-                            this.Items.Add(separator);
-                            separator.Setup(elementBlock);
-                        }
-                        else if (element.Name == nameof(ColumnSeparator))
-                        {
-                            int index = this.Items.Cast<ToolStripItem>().Count(i => i is ColumnSeparator);
-                            var separator = new ColumnSeparator("column" + index);
-                            this.Items.Add(separator);
-                            separator.Setup(elementBlock);
-                        }
-                        else
-                        {
-                            ToolBar.ReportTypeUnknown(logger, element.Line, element.Name);
-                        }
-                    }
-                }
+                SetupDataDecoder();
+            }
+            m_decoder.DecodeData(definition, this, errors);
+
+            foreach (var error in errors)
+            {
+                logger.LogError($"Toolbar '{this.Name}' line " + error.Item1 + ": " + error.Item2);
             }
         }
-
-        #endregion
 
         public static void ReportTypeUnknown(ILogger logger, int line, string type)
         {
@@ -338,6 +307,11 @@ namespace StepBro.UI.WinForms.CustomToolBar
         public IToolBarElement TryFindChildElement([Implicit] ICallContext context, string name)
         {
             throw new NotImplementedException();
+        }
+
+        public void Add(ToolStripMenuItem item)
+        {
+            this.Items.Add(item);
         }
 
         #endregion

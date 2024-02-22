@@ -8,54 +8,94 @@ namespace StepBro.Core.Data
 {
     public class PropertyBlockDecoder
     {
-        public abstract class Element<TParent>
+        public abstract class Element
         {
+            public string TypeOrName { get; private set; }
+            public string AlternativeTypeOrName { get; private set; } = null;
+            public PropertyBlockEntryType EntryType { get; private set; }
+
             public Element(string typeOrName, PropertyBlockEntryType type)
             {
                 this.TypeOrName = typeOrName;
                 this.EntryType = type;
             }
 
-            public bool TryDecode(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
+            public Element(string typeOrName, string altTypeOrName, PropertyBlockEntryType type)
             {
-                if (entry.BlockEntryType == this.EntryType && entry.TypeOrName == this.TypeOrName)
+                this.TypeOrName = typeOrName;
+                this.AlternativeTypeOrName = altTypeOrName;
+                this.EntryType = type;
+            }
+
+            public bool TryDecode(PropertyBlockEntry entry, object parent, List<Tuple<int, string>> errors)
+            {
+                if (entry.BlockEntryType == this.EntryType && (entry.TypeOrName == this.TypeOrName || (this.AlternativeTypeOrName != null && entry.TypeOrName == this.AlternativeTypeOrName)))
                 {
-                    this.TryCreateOrSet(entry, parent, errors);
+                    this.TryCreateOrSet(parent, entry, errors);
                     return true;    // There might be errors, but name and type did match.
                 }
 
                 return false;   // Not me...
             }
 
-            protected abstract void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors);
-
-            public string TypeOrName { get; private set; }
-            public PropertyBlockEntryType EntryType { get; private set; }
+            protected abstract void TryCreateOrSet(object parent, PropertyBlockEntry entry, List<Tuple<int, string>> errors);
         }
 
-        public class Block<TParent, TThis> : Element<TParent>
+        public abstract class Element<TParent> : Element where TParent : class
         {
-            private Func<TParent, PropertyBlockEntry, TThis> m_creator;
-            private Element<TThis>[] m_childs;
+            public Element(string typeOrName, PropertyBlockEntryType type) : base(typeOrName, type)
+            {
+            }
 
-            public Block(string name, Func<TParent, PropertyBlockEntry, TThis> creator, params Element<TThis>[] childs) :
+            public Element(string typeOrName, string altTypeOrName, PropertyBlockEntryType type) : base(typeOrName, altTypeOrName, type)
+            {
+            }
+
+            protected override void TryCreateOrSet(object parent, PropertyBlockEntry entry, List<Tuple<int, string>> errors)
+            {
+                var typedParent = parent as TParent;
+                if (parent == null || typedParent != null)
+                {
+                    this.TryCreateOrSet(entry, typedParent, errors);
+                }
+                else
+                {
+                    errors.Add(new Tuple<int, string>(entry.Line, $"The '{this.GetType().Name}' cannot be added to a parent of type '{parent.GetType().Name}'."));
+                }
+            }
+
+            protected abstract void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors);
+        }
+
+        public class Block<TParent, TThis> : Element<TParent> where TParent : class
+        {
+            private Func<TParent, string, TThis> m_creator;
+            private Element[] m_childs;
+
+            public Block(string name, Func<TParent, string, TThis> creator, params Element[] childs) :
                 base(name, PropertyBlockEntryType.Block)
             {
                 m_creator = creator;
                 m_childs = childs;
             }
-            public Block(Func<TParent, PropertyBlockEntry, TThis> creator, params Element<TThis>[] childs) :
+            public Block(string name, string altName, Func<TParent, string, TThis> creator, params Element[] childs) :
+                base(name, altName, PropertyBlockEntryType.Block)
+            {
+                m_creator = creator;
+                m_childs = childs;
+            }
+            public Block(Func<TParent, string, TThis> creator, params Element[] childs) :
                 this("<root>", creator, childs)
             { }
 
-            public Block(string name, params Element<TThis>[] childs) :
+            public Block(string name, params Element[] childs) :
                 this(name, null, childs)
             { }
-            public Block(params Element<TThis>[] childs) :
+            public Block(params Element[] childs) :
                 this("<root>", null, childs)
             { }
 
-            public void SetChilds(params Element<TThis>[] childs)
+            public void SetChilds(params Element[] childs)
             {
                 m_childs = childs;
             }
@@ -63,7 +103,8 @@ namespace StepBro.Core.Data
             protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
             {
                 if (m_creator == null) return;
-                var data = m_creator(parent, entry);
+                string name = entry.HasTypeSpecified ? entry.Name : null;
+                var data = m_creator(parent, name);
                 if (data != null)
                 {
                     this.DecodeData(entry, data, errors);
@@ -96,18 +137,25 @@ namespace StepBro.Core.Data
 
         #region Values
 
-        public abstract class Value<TParent> : Element<TParent>
+        public abstract class Value<TParent> : Element<TParent> where TParent : class
         {
             public Value(string typeOrName) : base(typeOrName, PropertyBlockEntryType.Value)
             {
             }
+            public Value(string typeOrName, string altTypeOrName) : base(typeOrName, altTypeOrName, PropertyBlockEntryType.Value)
+            {
+            }
         }
 
-        public class ValueString<TParent> : Value<TParent>
+        public class ValueString<TParent> : Value<TParent> where TParent: class
         {
             private Func<TParent, PropertyBlockValue, string> m_setter;
 
             public ValueString(string typeOrName, Func<TParent, PropertyBlockValue, string> setter = null) : base(typeOrName)
+            {
+                m_setter = setter;
+            }
+            public ValueString(string typeOrName, string altTypeOrName, Func<TParent, PropertyBlockValue, string> setter = null) : base(typeOrName, altTypeOrName)
             {
                 m_setter = setter;
             }
@@ -138,7 +186,7 @@ namespace StepBro.Core.Data
             }
         }
 
-        public class ValueInt<TParent> : Value<TParent>
+        public class ValueInt<TParent> : Value<TParent> where TParent : class
         {
             private Func<TParent, PropertyBlockValue, string> m_setter;
 
@@ -173,7 +221,7 @@ namespace StepBro.Core.Data
             }
         }
 
-        public class ValueBool<TParent> : Value<TParent>
+        public class ValueBool<TParent> : Value<TParent> where TParent : class
         {
             private Func<TParent, PropertyBlockValue, string> m_setter;
 
@@ -210,7 +258,7 @@ namespace StepBro.Core.Data
 
         #endregion
 
-        public class Flag<TParent> : Element<TParent>
+        public class Flag<TParent> : Element<TParent> where TParent : class
         {
             private Func<TParent, PropertyBlockFlag, string> m_setter;
 

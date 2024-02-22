@@ -71,6 +71,7 @@ namespace StepBro.ToolBarCreator
                     new PropertyBlockDecoder.ValueString<object>("Label"),
                     color,
                     new PropertyBlockDecoder.ValueInt<object>("Priority"),
+                    new PropertyBlockDecoder.Flag<object>("Separator"),
                     new PropertyBlockDecoder.Flag<object>("ColumnSeparator"),
                     menu, procButton, objCmdButton
                 );

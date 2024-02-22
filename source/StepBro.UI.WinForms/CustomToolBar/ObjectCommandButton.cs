@@ -13,95 +13,30 @@ using static StepBro.UI.WinForms.ProcedureActivationButtonLogic;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
-    public class ObjectCommandButton : ToolStripMenuItem, IToolBarElement, IToolBarElementSetup
+    public class ObjectCommandButton : ToolStripMenuItem, IToolBarElement
     {
         private ICoreAccess m_coreAccess = null;
         private string m_object = null;
         private string m_command = null;
 
-        public ObjectCommandButton(ICoreAccess coreAccess) : base()
+        public ObjectCommandButton(ICoreAccess coreAccess, string name) : base()
         {
             m_coreAccess = coreAccess;
             this.Margin = new Padding(1, Margin.Top, 1, Margin.Bottom);
+            this.Name = name;
+            this.Text = name;   // Just the default text.
         }
 
-        #region IToolBarElementSetup
-
-        public void Clear()
+        public string ObjectInstance
         {
-            throw new NotImplementedException();
+            get { return m_object; }
+            set { m_object = value; }
         }
-
-        public ICoreAccess Core { get { return m_coreAccess; } }
-
-        public void Setup(ILogger logger, PropertyBlock definition)
+        public string ObjectCommand
         {
-            this.Name = definition.Name;
-            this.Text = definition.Name;   // Just the default text.
-            foreach (var element in definition)
-            {
-                if (element.BlockEntryType == PropertyBlockEntryType.Value)
-                {
-                    var valueField = element as PropertyBlockValue;
-                    if (valueField.Name.Equals("Instance", StringComparison.InvariantCultureIgnoreCase) || valueField.Name.Equals("Object", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        m_object = valueField.ValueAsString();
-                    }
-                    else if (valueField.Name.Equals("Command", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        m_command = valueField.ValueAsString();
-                    }
-                    else if (valueField.Name.Equals("Text", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        this.Text = valueField.ValueAsString();
-                    }
-                    else if (valueField.Name.Equals("Color", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        var colorName = valueField.ValueAsString();
-                        try
-                        {
-                            Color color = (Color)(typeof(Color).GetProperty(colorName).GetValue(null));
-                            this.BackColor = color;
-                        }
-                        catch
-                        {
-                            logger.LogError("Toolbar line " + valueField.Line + ": No color named '" + colorName + "'.");
-                        }
-                        finally { }
-                    }
-                    else
-                    {
-                        ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
-                    }
-                }
-                else if (element.BlockEntryType == PropertyBlockEntryType.Flag)
-                {
-                    var flagField = element as PropertyBlockFlag;
-                    {
-                        ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
-                    }
-                }
-                else if (element.BlockEntryType == PropertyBlockEntryType.Block)
-                {
-                    {
-                        ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
-                    }
-                    //var type = element.SpecifiedTypeName;
-                    //if (type != null)
-                    //{
-                    //    var elementBlock = element as PropertyBlock;
-                    //    if (type == nameof(Menu))
-                    //    {
-                    //        var menu = new Menu(m_coreAccess);
-                    //        this.DropDownItems.Add(menu);
-                    //        menu.Setup(element.Name, elementBlock);
-                    //    }
-                    //}
-                }
-            }
+            get { return m_command; }
+            set { m_command = value; }
         }
-
-        #endregion
 
         protected override void OnClick(EventArgs e)
         {

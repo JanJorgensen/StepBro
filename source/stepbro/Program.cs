@@ -9,8 +9,6 @@ using StepBro.Core.General;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
-using StepBro.Sidekick;
-using StepBro.TestInterface;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

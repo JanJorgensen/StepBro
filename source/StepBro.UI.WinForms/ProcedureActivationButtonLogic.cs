@@ -36,6 +36,28 @@ namespace StepBro.UI.WinForms
             void BeginInvoke(Action action);
         }
 
+        public void SetStoppable()
+        {
+            m_mode = Mode.ClickToStop;
+            this.SendCommand(ButtonCommand.ModeCheckOnClick);
+        }
+        public void SetStopOnButtonRelease()
+        {
+            m_mode = Mode.RunWhilePushed;
+        }
+
+        public bool HasStartAction { get { return m_startProcedure != null; } }
+        public ProcedureActivationInfo StartAction
+        {
+            get
+            {
+                if (m_startProcedure == null)
+                {
+                    m_startProcedure = new ProcedureActivationInfo();
+                }
+                return m_startProcedure;
+            }
+        }
 
         public ProcedureActivationButtonLogic(IProcedureActivationButton parentControl, ICoreAccess coreAccess)
         {
@@ -97,7 +119,7 @@ namespace StepBro.UI.WinForms
             m_parentControl.CommandHandler(command);
         }
 
-        private void StartProcedure()
+        private void DoStartProcedure()
         {
             if (m_startProcedure != null && !String.IsNullOrEmpty(m_startProcedure.Name))
             {
@@ -116,7 +138,7 @@ namespace StepBro.UI.WinForms
             }
         }
 
-        private void StopProcedure()
+        private void DoStopProcedure()
         {
             if (m_execution != null && !m_execution.State.HasEnded())
             {
@@ -153,7 +175,7 @@ namespace StepBro.UI.WinForms
         {
             if (m_mode == Mode.ActivateOnClick)
             {
-                this.StartProcedure();
+                this.DoStartProcedure();
             }
         }
 
@@ -161,7 +183,7 @@ namespace StepBro.UI.WinForms
         {
             if (m_mode == Mode.RunWhilePushed)
             {
-                this.StartProcedure();
+                this.DoStartProcedure();
             }
         }
 
@@ -169,7 +191,7 @@ namespace StepBro.UI.WinForms
         {
             if (m_mode == Mode.RunWhilePushed)
             {
-                this.StopProcedure();
+                this.DoStopProcedure();
             }
         }
 
@@ -177,11 +199,11 @@ namespace StepBro.UI.WinForms
         {
             if (@checked)
             {
-                this.StartProcedure();
+                this.DoStartProcedure();
             }
             else
             {
-                this.StopProcedure();
+                this.DoStopProcedure();
             }
         }
     }

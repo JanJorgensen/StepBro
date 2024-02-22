@@ -1,48 +1,31 @@
 ﻿using StepBro.Core.Api;
-using StepBro.Core.Data;
 using StepBro.Core.Execution;
-using StepBro.Core.Logging;
 using StepBro.ToolBarCreator;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
-    internal class ToolStripDropDownMenu : ToolStripDropDownButton, IToolBarElement, IToolBarElementSetup
+    internal class ToolStripDropDownMenu : ToolStripDropDownButton, IToolBarElement, IMenu, IMenuItemHost
     {
         private ICoreAccess m_coreAccess = null;
-        private MenuLogic m_menuLogic = null;
 
-        public ToolStripDropDownMenu(ICoreAccess coreAccess) : base()
+        public ToolStripDropDownMenu(ICoreAccess coreAccess, string name) : base()
         {
             m_coreAccess = coreAccess;
-            m_menuLogic = new MenuLogic(this, coreAccess);
             this.Margin = new Padding(1, Margin.Top, 1, Margin.Bottom);
+            this.Name = name;
+            this.Text = name;
         }
 
-        #region IToolBarElementSetup
-
-        public void Clear()
+        public void SetTitle(string title)
         {
-            foreach (IToolBarElementSetup item in this.DropDownItems)
-            {
-                item.Clear();
-            }
-            this.DropDownItems.Clear();
+            this.Text = title;
         }
 
-        public ICoreAccess Core { get { return m_coreAccess; } }
-
-        public void Setup(ILogger logger, PropertyBlock definition)
+        public void Add(ToolStripMenuItem item)
         {
-            m_menuLogic.Setup(logger, definition);
+            this.DropDownItems.Add(item);
         }
-
-        #endregion
 
         #region IToolBarElement
 

@@ -9,107 +9,133 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using static StepBro.UI.WinForms.ProcedureActivationButtonLogic;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
-    public class ProcedureActivationButton : ToolStripMenuItem, IToolBarElement, IToolBarElementSetup, ProcedureActivationButtonLogic.IProcedureActivationButton
+    public class ProcedureActivationButton : ToolStripMenuItem, IToolBarElement, ProcedureActivationButtonLogic.IProcedureActivationButton
     {
         private ICoreAccess m_coreAccess = null;
         private ProcedureActivationButtonLogic m_logic;
         private Color m_normalBack;
         private string m_text = "";
 
-        public ProcedureActivationButton(ICoreAccess coreAccess) : base()
+        public ProcedureActivationButton(ICoreAccess coreAccess, string name) : base()
         {
             m_coreAccess = coreAccess;
             m_logic = new ProcedureActivationButtonLogic(this, coreAccess);
             m_normalBack = this.BackColor;
             this.Margin = new Padding(1, Margin.Top, 1, Margin.Bottom);
+            this.Name = name;
+            m_text = name;
+            this.Text = "\u23F5 " + m_text;   // Just the default text.
+        }
+
+        public string Instance
+        {
+            get { return m_logic.StartAction.TargetObject; }
+            set { m_logic.StartAction.TargetObject = value; }
+        }
+        public string Procedure
+        {
+            get { return m_logic.StartAction.Name; }
+            set { m_logic.StartAction.Name = value; }
+        }
+        public string Partner
+        {
+            get { return m_logic.StartAction.Partner; }
+            set { m_logic.StartAction.Partner = value; }
+        }
+
+        public void SetStoppable()
+        {
+            m_logic.SetStoppable();
+        }
+        public void SetStopOnButtonRelease()
+        {
+            m_logic.SetStopOnButtonRelease();
         }
 
         #region IToolBarElementSetup
 
-        public void Clear()
-        {
-            throw new NotImplementedException();
-        }
+        //public void Clear()
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        public ICoreAccess Core { get { return m_coreAccess; } }
+        //public ICoreAccess Core { get { return m_coreAccess; } }
 
-        public void Setup(ILogger logger, PropertyBlock definition)
-        {
-            this.Name = definition.Name;
-            m_text = definition.Name;
-            this.Text = "\u23F5 " + m_text;   // Just the default text.
-            foreach (var element in definition)
-            {
-                if (!m_logic.Setup(element))
-                {
-                    if (element.BlockEntryType == PropertyBlockEntryType.Value)
-                    {
-                        var valueField = element as PropertyBlockValue;
-                        if (valueField.Name.Equals("Text", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            m_text = valueField.ValueAsString();
-                            this.Text = "\u23F5 " + m_text;
-                        }
-                        else if (valueField.Name.Equals("Color", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            var colorName = valueField.ValueAsString();
-                            try
-                            {
-                                Color color = (Color)(typeof(Color).GetProperty(colorName).GetValue(null));
-                                this.BackColor = m_normalBack = color;
-                            }
-                            catch 
-                            {
-                                logger.LogError("Toolbar line " + valueField.Line + ": No color named '" + colorName + "'.");
-                            }
-                            finally { }
-                        }
-                        else
-                        {
-                            ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
-                        }
-                    }
-                    else if (element.BlockEntryType == PropertyBlockEntryType.Flag)
-                    {
-                        var flagField = element as PropertyBlockFlag;
-                        {
-                            ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
-                        }
-                        //if (flagField.Name == nameof(StretchChilds))
-                        //{
-                        //    StretchChilds = true;
-                        //    SizeToChilds = false;
-                        //}
-                        //else if (flagField.Name == nameof(SizeToChilds))
-                        //{
-                        //    SizeToChilds = true;
-                        //    StretchChilds = false;
-                        //}
-                    }
-                    else if (element.BlockEntryType == PropertyBlockEntryType.Block)
-                    {
-                        {
-                            ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
-                        }
-                        //var type = element.SpecifiedTypeName;
-                        //if (type != null)
-                        //{
-                        //    var elementBlock = element as PropertyBlock;
-                        //    if (type == nameof(Menu))
-                        //    {
-                        //        var menu = new Menu(m_coreAccess);
-                        //        this.DropDownItems.Add(menu);
-                        //        menu.Setup(element.Name, elementBlock);
-                        //    }
-                        //}
-                    }
-                }
-            }
-        }
+        //public void Setup(ILogger logger, PropertyBlock definition)
+        //{
+        //    foreach (var element in definition)
+        //    {
+        //        if (!m_logic.Setup(element))
+        //        {
+        //            if (element.BlockEntryType == PropertyBlockEntryType.Value)
+        //            {
+        //                var valueField = element as PropertyBlockValue;
+        //                if (valueField.Name.Equals("Text", StringComparison.InvariantCultureIgnoreCase))
+        //                {
+        //                    m_text = valueField.ValueAsString();
+        //                    this.Text = "\u23F5 " + m_text;
+        //                }
+        //                else if (valueField.Name.Equals("Color", StringComparison.InvariantCultureIgnoreCase))
+        //                {
+        //                    var colorName = valueField.ValueAsString();
+        //                    try
+        //                    {
+        //                        Color color = (Color)(typeof(Color).GetProperty(colorName).GetValue(null));
+        //                        this.BackColor = m_normalBack = color;
+        //                    }
+        //                    catch
+        //                    {
+        //                        logger.LogError("Toolbar line " + valueField.Line + ": No color named '" + colorName + "'.");
+        //                    }
+        //                    finally { }
+        //                }
+        //                else
+        //                {
+        //                    ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
+        //                }
+        //            }
+        //            else if (element.BlockEntryType == PropertyBlockEntryType.Flag)
+        //            {
+        //                var flagField = element as PropertyBlockFlag;
+        //                {
+        //                    ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
+        //                }
+        //                //if (flagField.Name == nameof(StretchChilds))
+        //                //{
+        //                //    StretchChilds = true;
+        //                //    SizeToChilds = false;
+        //                //}
+        //                //else if (flagField.Name == nameof(SizeToChilds))
+        //                //{
+        //                //    SizeToChilds = true;
+        //                //    StretchChilds = false;
+        //                //}
+        //            }
+        //            else if (element.BlockEntryType == PropertyBlockEntryType.Block)
+        //            {
+        //                {
+        //                    ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
+        //                }
+        //                //var type = element.SpecifiedTypeName;
+        //                //if (type != null)
+        //                //{
+        //                //    var elementBlock = element as PropertyBlock;
+        //                //    if (type == nameof(Menu))
+        //                //    {
+        //                //        var menu = new Menu(m_coreAccess);
+        //                //        this.DropDownItems.Add(menu);
+        //                //        menu.Setup(element.Name, elementBlock);
+        //                //    }
+        //                //}
+        //            }
+        //        }
+        //    }
+        //}
 
         #endregion
 
