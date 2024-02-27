@@ -444,8 +444,8 @@ namespace StepBro.Cmd
                                 else
                                 {
                                     var shortcuts = ServiceManager.Global.Get<IFolderManager>();
-                                    var projectShortcuts = new FolderCollection(FolderShortcutOrigin.Project);
-                                    projectShortcuts.AddShortcut(StepBro.Core.Api.Constants.TOP_FILE_FOLDER_SHORTCUT, System.IO.Path.GetDirectoryName(file.FilePath));
+                                    var projectShortcuts = new FolderShortcutCollection(FolderShortcutOrigin.Project);
+                                    projectShortcuts.AddShortcut(StepBro.Core.Api.Constants.TOP_FILE_FOLDER_SHORTCUT, System.IO.Path.GetDirectoryName(file.FilePath), isResolved: true);
                                     shortcuts.AddSource(projectShortcuts);
 
                                     m_next.Enqueue(StateOrCommand.ParseFiles);  // File has been loaded; start the parsing.

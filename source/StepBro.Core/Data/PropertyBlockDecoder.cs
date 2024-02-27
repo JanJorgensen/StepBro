@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static StepBro.Core.Data.PropertyBlockDecoder;
 
 namespace StepBro.Core.Data
 {
@@ -131,6 +132,57 @@ namespace StepBro.Core.Data
                     {
                         errors.Add(new Tuple<int, string>(child.Line, "Unknown element \"" + child.TypeOrName + "\" or wrong usage."));
                     }
+                }
+            }
+        }
+
+        public abstract class Array<TParent> : Element<TParent> where TParent : class
+        {
+            public Array(string typeOrName) : base(typeOrName, PropertyBlockEntryType.Array)
+            {
+            }
+            public Array(string typeOrName, string altTypeOrName) : base(typeOrName, altTypeOrName, PropertyBlockEntryType.Array)
+            {
+            }
+        }
+
+        public class ArrayString<TParent> : Array<TParent> where TParent : class
+        {
+            private Func<TParent, List<string>, string> m_setter;
+
+            public ArrayString(string typeOrName, Func<TParent, List<string>, string> setter = null) : base(typeOrName)
+            {
+                m_setter = setter;
+            }
+            public ArrayString(string typeOrName, string altTypeOrName, Func<TParent, List<string>, string> setter = null) : base(typeOrName, altTypeOrName)
+            {
+                m_setter = setter;
+            }
+
+            protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
+            {
+                if (m_setter == null) return;
+                var arrayEntry = entry as PropertyBlockArray;
+                bool allAreStrings = arrayEntry.All(e => e.BlockEntryType == PropertyBlockEntryType.Value && (e as PropertyBlockValue).IsStringOrIdentifier);
+                if (allAreStrings)
+                {
+                    var stringList = arrayEntry.Select(e => (e as PropertyBlockValue).ValueAsString()).ToList();
+                    try
+                    {
+                        var error = (m_setter(parent, stringList));
+                        if (error != null)
+                        {
+                            errors.Add(new Tuple<int, string>(entry.Line, "Value could not be set for \"" + entry.TypeOrName + "\"; " + error));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add(new Tuple<int, string>(entry.Line, "Error setting value for \"" + entry.TypeOrName + "\"; " + ex.Message));
+                    }
+                }
+                else
+                {
+                    errors.Add(new Tuple<int, string>(entry.Line, "Value for \"" + entry.TypeOrName + "\"should be an array of strings."));
                 }
             }
         }

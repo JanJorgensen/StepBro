@@ -66,6 +66,8 @@ namespace StepBroCoreTest.Mocks
         #region ILoggerScope
         ILogEntry ILoggerScope.FirstLogEntryInScope => throw new NotImplementedException();
 
+        bool ILoggerScope.ErrorsLogged => throw new NotImplementedException();
+
         bool ILogger.IsDebugging => throw new NotImplementedException();
 
         string ILogger.Location => throw new NotImplementedException();

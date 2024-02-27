@@ -35,7 +35,9 @@ namespace StepBro.Core.ScriptData
         private DateTime m_lastFileChange = DateTime.MinValue;
         //private DateTime m_lastTypeScan = DateTime.MinValue;
         //private DateTime m_lastParsing = DateTime.MinValue;
-        private FolderCollection m_folderShortcuts = null;
+        private FolderShortcutCollection m_folderShortcuts = null;
+        private List<FolderConfiguration> m_folderConfigs = new List<FolderConfiguration>();
+        private bool m_allFolderConfigsRead = false;
 
         /// <summary>
         /// Reachable script elements and namespaces with this files current usings.
@@ -50,7 +52,7 @@ namespace StepBro.Core.ScriptData
             m_errors = new ErrorCollector(this, false);
             m_lastFileChange = DateTime.Now;   // TODO: take this from file timestamp.
             m_parserFileStream = filestream;
-            m_folderShortcuts = new FolderCollection(FolderShortcutOrigin.ScriptFile);
+            m_folderShortcuts = new FolderShortcutCollection(FolderShortcutOrigin.ScriptFile);
             if (!string.IsNullOrEmpty(filepath))
             {
                 var folder = this.FilePath;
@@ -58,7 +60,8 @@ namespace StepBro.Core.ScriptData
                 {
                     folder = System.IO.Path.GetDirectoryName(this.GetFullPath());
                 }
-                m_folderShortcuts.AddShortcut(Constants.CURRENT_FILE_FOLDER_SHORTCUT, folder);
+                m_folderShortcuts.AddShortcut(Constants.CURRENT_FILE_FOLDER_SHORTCUT, folder, isResolved: true);
+                m_folderShortcuts.AddSource(new FolderShortcutsFromDelegate(this.ListConfigurationFolderShortcuts));
             }
         }
 
@@ -208,6 +211,7 @@ namespace StepBro.Core.ScriptData
         {
             m_namespaceUsings = new List<UsingData>();  // Discard any existing.
             m_fileProperties = null;
+            m_folderConfigs.Clear();
 
             //if (!preserveUpdateableElements)
             //{
@@ -234,6 +238,7 @@ namespace StepBro.Core.ScriptData
             }
             m_rootIdentifiers = null;
             m_fileUsings = new List<UsingData>();
+            m_allFolderConfigsRead = false;
             m_elementsBefore = m_elements;
             m_elements = new List<FileElement>();
 
@@ -637,6 +642,55 @@ namespace StepBro.Core.ScriptData
             }
         }
 
+        public FolderConfiguration TryOpenFolderConfiguration(IConfigurationFileManager cfgManager, int usingLine, string file)
+        {
+            var errors = new List<Tuple<int, string>>();
+            var folderConfig = cfgManager.ReadFolderConfig(file, errors);
+
+            if (errors.Count > 0)
+            {
+                var errortext = "";
+                foreach (var e in errors)
+                {
+                    if (e.Item1 <= 0) errortext = $"Config file '{file}': {e.Item2}";
+                    else errortext = $"Config file '{file}' line {e.Item1}: {e.Item2}";
+                }
+
+                m_errors.ConfigError(usingLine, 0, errortext);
+            }
+            if (folderConfig != null)
+            {
+                this.AddFolderConfig(folderConfig);
+                if (folderConfig.IsSearchRoot)
+                {
+                    m_allFolderConfigsRead = true;
+                }
+            }
+            return folderConfig;
+        }
+
+        public void AddFolderConfig(FolderConfiguration configuration)
+        {
+            if (!m_folderConfigs.Exists(e => Object.ReferenceEquals(configuration, e)))
+            {
+                m_folderConfigs.Add(configuration);
+            }
+            if (configuration.IsSearchRoot)
+            {
+                m_allFolderConfigsRead = true;
+            }
+        }
+
+        public bool AllFolderConfigsRead { get { return m_allFolderConfigsRead; } }
+
+        IEnumerable<IFolderShortcut> ListConfigurationFolderShortcuts()
+        {
+            foreach (var cfg in m_folderConfigs)
+            {
+                foreach (var sc in cfg.Shortcuts) yield return sc;
+            }
+        }
+
         public IEnumerable<UsingData> Usings
         {
             get
@@ -668,7 +722,7 @@ namespace StepBro.Core.ScriptData
             }
         }
 
-        internal void ResolveFileUsings(Converter<string, IScriptFile> resolver)
+        internal void ResolveFileUsings(Func<string, int, IScriptFile> resolver)
         {
             var c = m_fileUsings.Count;
             for (int i = 0; i < c; i++)
@@ -677,7 +731,7 @@ namespace StepBro.Core.ScriptData
                 {
                     try
                     {
-                        var resolved = resolver(m_fileUsings[i].Identifier.Name);
+                        var resolved = resolver(m_fileUsings[i].Identifier.Name, m_fileUsings[i].Line);
                         if (resolved != null)
                         {
                             m_fileUsings[i] = new UsingData(m_fileUsings[i].Line, m_fileUsings[i].IsPublic, m_fileUsings[i].Identifier.Name, IdentifierType.FileByName, resolved);

@@ -50,6 +50,10 @@ namespace StepBro.Core.Logging
         void EnteredParallelTask(string text);
         void LogExit(string text);
         ILogEntry FirstLogEntryInScope { get; }
+        /// <summary>
+        /// Indicates whether any errors were logged directly in this scope.
+        /// </summary>
+        bool ErrorsLogged { get; }
     }
 
     internal interface IProtectedLogger : ILoggerScope

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -17,7 +18,7 @@ namespace StepBro.Core.File
         Configuration,
         User,
         Project,
-        ScriptFile,
+        ScriptFile
         //Context
     }
 
@@ -26,6 +27,8 @@ namespace StepBro.Core.File
         FolderShortcutOrigin Origin { get; }
         string Name { get; }
         string Path { get; }
+        public bool IsResolved { get; }
+        string ResolvedPath { get; }
     }
 
     public interface IFolderShortcutsSource
@@ -37,17 +40,36 @@ namespace StepBro.Core.File
         IEnumerable<IFolderShortcut> ListShortcuts();
     }
 
+    public delegate IEnumerable<IFolderShortcut> FolderShortcutsDelegate();
+
+    public class FolderShortcutsFromDelegate : IFolderShortcutsSource
+    {
+        private readonly FolderShortcutsDelegate m_delegate;
+        public FolderShortcutsFromDelegate(FolderShortcutsDelegate @delegate)
+        {
+            if (@delegate == null) throw new ArgumentNullException();
+            m_delegate = @delegate;
+        }
+
+        public IEnumerable<IFolderShortcut> ListShortcuts()
+        {
+            return m_delegate();
+        }
+    }
+
     public class FolderShortcut : IFolderShortcut
     {
         private FolderShortcutOrigin m_origin;
         private string m_name;
         private string m_path;
+        private string m_resolvedPath;
 
-        public FolderShortcut(FolderShortcutOrigin origin, string name, string path)
+        public FolderShortcut(FolderShortcutOrigin origin, string name, string path, string resolved = null)
         {
             m_origin = origin;
             m_name = name;
             m_path = path;
+            m_resolvedPath = resolved;
         }
 
         public FolderShortcutOrigin Origin
@@ -71,6 +93,31 @@ namespace StepBro.Core.File
             get
             {
                 return m_path;
+            }
+        }
+
+        public string ResolvedPath
+        {
+            get
+            {
+                return m_resolvedPath;
+            }
+        }
+
+        public bool IsResolved {  get {  return m_resolvedPath != null; } }
+
+        public bool TryResolve(IEnumerable<IFolderShortcut> shortcuts, string basePath, ref string errorMessage)
+        {
+            string resolved = shortcuts.ResolveShortcutPath(m_path, ref errorMessage);
+            if (resolved == null)
+            {
+                m_resolvedPath = null;
+                return false;
+            }
+            else
+            {
+                m_resolvedPath = System.IO.Path.GetFullPath(resolved, basePath);
+                return true;
             }
         }
 
@@ -123,7 +170,7 @@ namespace StepBro.Core.File
                 IFolderShortcut shortcut = shortcuts.FirstOrDefault(s => s.Name == splittedPath.Name);
                 if (shortcut != null)
                 {
-                    string p = ResolveShortcutPath(shortcuts, shortcut.Path, ref errorMessage);
+                    string p = shortcut.IsResolved ? shortcut.ResolvedPath : ResolveShortcutPath(shortcuts, shortcut.Path, ref errorMessage);
 
                     if (p == null)
                     {
@@ -160,13 +207,13 @@ namespace StepBro.Core.File
         }
     }
 
-    public class FolderCollection : IFolderShortcutsSource
+    public class FolderShortcutCollection : IFolderShortcutsSource
     {
         FolderShortcutOrigin m_origin;
         List<IFolderShortcutsSource> m_collections = new List<IFolderShortcutsSource>();
         List<IFolderShortcut> m_shortcuts = new List<IFolderShortcut>();
 
-        public FolderCollection(FolderShortcutOrigin origin, params IFolderShortcutsSource[] collections)
+        public FolderShortcutCollection(FolderShortcutOrigin origin, params IFolderShortcutsSource[] collections)
         {
             m_origin = origin;
             m_collections.AddRange(collections);
@@ -182,9 +229,9 @@ namespace StepBro.Core.File
             m_collections.Add(source);
         }
 
-        public IFolderShortcut AddShortcut(string name, string path)
+        public IFolderShortcut AddShortcut(string name, string path, bool isResolved = false)
         {
-            FolderShortcut shortcut = new FolderShortcut(m_origin, name, path);
+            FolderShortcut shortcut = new FolderShortcut(m_origin, name, path, isResolved ? path : null);
             m_shortcuts.Add(shortcut);
             return shortcut;
         }
@@ -223,9 +270,9 @@ namespace StepBro.Core.File
 
     internal class FolderManager : ServiceBase<IFolderManager, FolderManager>, IFolderManager
     {
-        private FolderCollection m_collections = null;
-        private FolderCollection m_environmentShortcuts = new FolderCollection(FolderShortcutOrigin.Environment);
-        private FolderCollection m_configurationShortcuts = new FolderCollection(FolderShortcutOrigin.Configuration);
+        private FolderShortcutCollection m_collections = null;
+        private FolderShortcutCollection m_environmentShortcuts = new FolderShortcutCollection(FolderShortcutOrigin.Environment);
+        private FolderShortcutCollection m_configurationShortcuts = new FolderShortcutCollection(FolderShortcutOrigin.Configuration);
 
         public FolderManager(out IService serviceAccess) :
             base("FolderManager", out serviceAccess)
@@ -250,7 +297,7 @@ namespace StepBro.Core.File
                 var folder = System.Environment.GetFolderPath(sf);
                 if (!String.IsNullOrEmpty(folder))
                 {
-                    m_environmentShortcuts.AddShortcut(sfname, folder);
+                    m_environmentShortcuts.AddShortcut(sfname, folder, isResolved: true);
                 }
             }
             foreach (DictionaryEntry ev in Environment.GetEnvironmentVariables())
@@ -261,11 +308,11 @@ namespace StepBro.Core.File
                     var key = ev.Key as string;
                     if (!m_environmentShortcuts.ListShortcuts().Any(k => String.Equals(k.Name, key, StringComparison.InvariantCultureIgnoreCase)) && System.IO.Directory.Exists(value))
                     {
-                        m_environmentShortcuts.AddShortcut(key, value);
+                        m_environmentShortcuts.AddShortcut(key, value, isResolved: true);
                     }
                 }
             }
-            m_collections = new FolderCollection(FolderShortcutOrigin.Root, m_environmentShortcuts, m_configurationShortcuts);
+            m_collections = new FolderShortcutCollection(FolderShortcutOrigin.Root, m_environmentShortcuts, m_configurationShortcuts);
         }
     }
 }

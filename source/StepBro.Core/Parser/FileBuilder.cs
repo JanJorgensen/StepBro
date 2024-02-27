@@ -505,6 +505,8 @@ namespace StepBro.Core.Parser
             var shortcutsManager = ServiceManager.Global.Get<IFolderManager>();
             var configFileManager = ServiceManager.Global.Get<IConfigurationFileManager>();
 
+            configFileManager.ResetFolderConfigurations();
+
             var filesToParse = new List<ScriptFile>();
             if (topfile == null)
             {
@@ -587,7 +589,7 @@ namespace StepBro.Core.Parser
                 }
 
                 file.ResolveFileUsings(
-                    fu =>
+                    (fu, line) =>
                     {
                         string basefolder = Path.GetDirectoryName(file.GetFullPath());
                         var fuName = Path.GetFileName(fu);
@@ -618,9 +620,21 @@ namespace StepBro.Core.Parser
                         {
                             string error = null;
                             string path = shortcutsManager.ListShortcuts().ResolveShortcutPath(fu, ref error);
-                            if (System.IO.File.Exists(path))
+                            if (String.IsNullOrEmpty(path))
                             {
-                                foundMatchingFile = path;
+                                string errorText = ".";
+                                if (!String.IsNullOrEmpty(error))
+                                {
+                                    errorText = "; " + error;
+                                }
+                                file.ErrorsInternal.SymanticError(line, -1, false, $"Parsing '{file.FileName}': Unable to resolve using path \"{fu}\"{errorText}");
+                            }
+                            else
+                            {
+                                if (System.IO.File.Exists(path))
+                                {
+                                    foundMatchingFile = path;
+                                }
                             }
                         }
                         else if (fu.Contains("\\") || fu.Contains("/"))     // It's a relative or absolute path
@@ -646,9 +660,28 @@ namespace StepBro.Core.Parser
                                 var cfgFile = Path.GetFullPath(Path.Combine(basefolder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
                                 if (System.IO.File.Exists(cfgFile))
                                 {
-                                    var folderConfig = configFileManager.ReadFolderConfig(cfgFile);
+                                    var folderConfig = file.TryOpenFolderConfiguration(configFileManager, line, cfgFile);
+
+
+                                    //var errors = new List<Tuple<int, string>>();
+                                    //var folderConfig = configFileManager.ReadFolderConfig(cfgFile, errors);
+
+                                    //if (errors.Count > 0)
+                                    //{
+                                    //    var errortext = "";
+                                    //    foreach (var e in errors)
+                                    //    {
+                                    //        if (e.Item1 <= 0) errortext = $"Config file '{cfgFile}': {e.Item2}";
+                                    //        else errortext = $"Config file '{cfgFile}' line {e.Item1}: {e.Item2}";
+                                    //    }
+
+                                    //    file.ErrorsInternal.ConfigError(line, 0, errortext);
+                                    //}
+
                                     if (folderConfig != null)
                                     {
+                                        //file.AddFolderConfig(folderConfig);
+
                                         foreach (var lib in folderConfig.LibFolders)
                                         {
                                             path = Path.GetFullPath(Path.Combine(basefolder, lib, fu));
@@ -729,6 +762,31 @@ namespace StepBro.Core.Parser
                 );
 
             }
+
+            foreach (var file in filesToParse)
+            {
+                if (!file.AllFolderConfigsRead)
+                {
+                    string basefolder = Path.GetDirectoryName(file.GetFullPath());
+
+                    while (basefolder != Path.GetPathRoot(basefolder))
+                    {
+                        var cfgFile = Path.GetFullPath(Path.Combine(basefolder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
+                        if (System.IO.File.Exists(cfgFile))
+                        {
+                            var folderConfig = file.TryOpenFolderConfiguration(configFileManager, -1, cfgFile);
+                            if (folderConfig != null && folderConfig.IsSearchRoot)
+                            {
+                                break;  // Don't search deeper now.
+                            }
+                        }
+
+                        // Not found yet; try the parent folder.
+                        basefolder = Path.GetDirectoryName(basefolder);
+                    }
+                }
+            }
+
             #endregion
 
             //===================================================//

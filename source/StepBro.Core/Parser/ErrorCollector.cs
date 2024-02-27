@@ -135,6 +135,10 @@ namespace StepBro.Core.Parser
         {
             this.SymanticError(line, charPositionInLine, false, $"Unable to find/resolve using: \"{@using}\".");
         }
+        public void ConfigError(int line, int charPositionInLine, string error)
+        {
+            this.SymanticError(line, charPositionInLine, false, $"Configuration error: {error}.");
+        }
 
         public void IncompatibleDataType(int line, int charPositionInLine, string type, string expectedType)
         {
