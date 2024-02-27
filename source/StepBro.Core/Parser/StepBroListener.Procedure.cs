@@ -1265,8 +1265,9 @@ namespace StepBro.Core.Parser
             {
                 var propertyBlock = m_lastElementPropertyBlock;
 
-                var resultVar = Expression.Variable(code.Type, "logValue");
-                var assignVar = Expression.Assign(resultVar, code);
+                var logExpressionResultVar = Expression.Variable(code.Type, "logExpressionValue");
+                var assignLogExpressionResultVar = Expression.Assign(logExpressionResultVar, code);
+                var logStringVar = Expression.Variable(typeof(string), "logString");
 
                 var loggingEnabled = Expression.Property(
                     Expression.Convert(m_currentProcedure.ContextReferenceInternal, typeof(ICallContext)),
@@ -1277,7 +1278,7 @@ namespace StepBro.Core.Parser
                 {
                     if (code.Type.IsPrimitive || code.Type.IsEnum)
                     {
-                        logValue = Expression.Call(resultVar, typeof(object).GetMethod("ToString", new Type[] { }));
+                        logValue = Expression.Call(logExpressionResultVar, typeof(object).GetMethod("ToString", new Type[] { }));
                     }
                     else
                     {
@@ -1290,16 +1291,14 @@ namespace StepBro.Core.Parser
 
                             var helperCall = Expression.Call(helper,
                                 m_currentProcedure?.ContextReferenceInternal,
-                                logValue);
+                                code);
 
                             var logListStatementBlock = Expression.IfThen(
                                 loggingEnabled,
                                 Expression.Block(
-                                    new ParameterExpression[] { resultVar },
+                                    new ParameterExpression[] { logExpressionResultVar },
                                     Expression.TryCatch(
-                                        Expression.Block(
-                                            assignVar,
-                                            helperCall),
+                                        helperCall,
                                         Expression.Catch(
                                             typeof(Exception),
                                             Expression.Empty()))));
@@ -1312,30 +1311,38 @@ namespace StepBro.Core.Parser
                         else
                         {
                             logValue = Expression.Condition(
-                                Expression.Equal(resultVar, Expression.Constant(null)),
+                                Expression.Equal(logExpressionResultVar, Expression.Constant(null)),
                                 Expression.Constant("<null>"),
                                 Expression.Call(typeof(string).GetMethod("Concat", new Type[] { typeof(string), typeof(string), typeof(string) }),
                                         Expression.Property(
-                                            Expression.Call(resultVar, typeof(object).GetMethod("GetType", new Type[] { })),
+                                            Expression.Call(logExpressionResultVar, typeof(object).GetMethod("GetType", new Type[] { })),
                                             "FullName"),
                                         Expression.Constant(" - "),
-                                        Expression.Call(resultVar, typeof(object).GetMethod("ToString", new Type[] { }))));
+                                        Expression.Call(logExpressionResultVar, typeof(object).GetMethod("ToString", new Type[] { }))));
                         }
                     }
+                }
+                else
+                {
+                    logValue = Expression.Condition(
+                        Expression.Equal(logExpressionResultVar, Expression.Constant(null)),
+                        Expression.Constant("<null>"),
+                        Expression.Convert(logExpressionResultVar, typeof(string)));
                 }
 
                 var loggingCall = Expression.Call(
                     m_currentProcedure.ContextReferenceInternal,
                     typeof(IScriptCallContext).GetMethod("LogStatement", new Type[] { typeof(string) }),
-                    logValue);
+                    logStringVar);
 
                 var statementBlock = Expression.IfThen(
                     loggingEnabled,
                     Expression.Block(
-                        new ParameterExpression[] { resultVar },
+                        new ParameterExpression[] { logExpressionResultVar, logStringVar },
                         Expression.TryCatch(
                             Expression.Block(
-                                assignVar,
+                                assignLogExpressionResultVar,
+                                Expression.Assign(logStringVar, logValue),
                                 loggingCall),
                             Expression.Catch(
                                 typeof(Exception),
