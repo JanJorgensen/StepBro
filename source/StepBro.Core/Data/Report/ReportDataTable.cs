@@ -26,7 +26,7 @@ namespace StepBro.Core
         private List<DataFieldtInfo> m_fields = new List<DataFieldtInfo>();
         private List<List<object>> m_sets = new List<List<object>>();
 
-        public ReportDataTable(DateTime timestamp, string title, string subttitle, DataSetDirection dataSetDirection) : base(timestamp, ReportDataType.DataTable)
+        public ReportDataTable(DateTime timestamp, string title, string subttitle, DataSetDirection dataSetDirection = DataSetDirection.Row) : base(timestamp, ReportDataType.DataTable)
         {
             m_title = title;
             m_subtitle = subttitle;

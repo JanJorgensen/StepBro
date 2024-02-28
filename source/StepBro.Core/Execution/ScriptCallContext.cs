@@ -332,7 +332,7 @@ namespace StepBro.Core.Execution
             if (m_folderShortcuts == null)
             {
                 var commonShortcuts = ServiceManager.Global.Get<IFolderManager>();
-                m_folderShortcuts = new FolderCollection(FolderShortcutOrigin.ScriptFile, commonShortcuts, m_procedure.ParentFile.FolderShortcuts);
+                m_folderShortcuts = new FolderShortcutCollection(FolderShortcutOrigin.ScriptFile, commonShortcuts, m_procedure.ParentFile.FolderShortcuts);
             }
             return m_folderShortcuts.ListShortcuts();
         }

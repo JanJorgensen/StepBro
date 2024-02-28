@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using StepBro.Core.Data;
 using StepBro.Core.General;
 using StepBro.Core.Logging;
@@ -19,9 +20,16 @@ namespace StepBro.Core.Test.Mocks
             return this.StationProperties;
         }
 
-        public FolderConfiguration ReadFolderConfig(string configFile)
+        public FolderConfiguration ReadFolderConfig(ILogger logger, string configFile)
         {
             throw new NotImplementedException();
         }
+
+        public FolderConfiguration ReadFolderConfig(string configFile, List<Tuple<int, string>> errors)
+        {
+            throw new NotImplementedException();
+        }
+    
+        public void ResetFolderConfigurations() { }
     }
 }

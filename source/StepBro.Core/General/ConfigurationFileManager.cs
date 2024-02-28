@@ -1,24 +1,30 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
+using StepBro.Core.File;
 using StepBro.Core.Logging;
 using StepBro.Core.Tasks;
+using StepBro.ToolBarCreator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static StepBro.Core.Data.PropertyBlockDecoder;
 
 namespace StepBro.Core.General
 {
     public interface IConfigurationFileManager
     {
         PropertyBlock GetStationProperties();
-        FolderConfiguration ReadFolderConfig(string configFile);
+        FolderConfiguration ReadFolderConfig(ILogger logger, string configFile);
+        FolderConfiguration ReadFolderConfig(string configFile, List<Tuple<int, string>> errors);
+        void ResetFolderConfigurations();
     }
 
     internal class ConfigurationFileManager : ServiceBase<IConfigurationFileManager, ConfigurationFileManager>, IConfigurationFileManager
     {
         private PropertyBlock m_stationProperties = null;
+        private List<NamedData<FolderConfiguration>> m_folderConfigs = new List<NamedData<FolderConfiguration>>();
 
         public ConfigurationFileManager(out IService serviceAccess) :
             base("ConfigurationFileManager", out serviceAccess, typeof(ILogger))
@@ -63,69 +69,113 @@ namespace StepBro.Core.General
             return m_stationProperties;
         }
 
-        public FolderConfiguration ReadFolderConfig(string configFile)
+        public FolderConfiguration ReadFolderConfig(ILogger logger, string configFile)
         {
-            PropertyBlock props = null;
-            try
+            var errors = new List<Tuple<int, string>>();
+            var folderConfig = this.ReadFolderConfig(configFile, errors);
+            foreach (var e in errors)
             {
-                props = configFile.GetPropertyBlockFromFile();
-                //#if DEBUG
-                //                context.Logger.LogSystem($"Successfully read the station properties file.");
-                //#else
-                //                        context.Logger.LogSystem($"Station properties file: {stationPropFile}.");
-                //#endif
+                if (e.Item1 <= 0) logger.LogError($"Config file '{configFile}': {e.Item2}");
+                else logger.LogError($"Config file '{configFile}' line {e.Item1}: {e.Item2}");
             }
-            catch
+            return folderConfig;
+        }
+
+        public FolderConfiguration ReadFolderConfig(string configFile, List<Tuple<int, string>> errors)
+        {
+            var config = m_folderConfigs.FirstOrDefault(c => c.Name == configFile);
+            if (config.IsEmpty())
             {
-                //context.Logger.LogError($"Error reading station properties file ({stationPropFile}).");
-                return null;
+                config = new NamedData<FolderConfiguration>(configFile, null);
+                PropertyBlock props;
+                try
+                {
+                    props = configFile.GetPropertyBlockFromFile();
+                }
+                catch
+                {
+                    errors.Add(new Tuple<int, string>(-1, $"Error reading configuration file."));
+                    return null;
+                }
+                var configData = FolderConfiguration.Create(props, System.IO.Path.GetDirectoryName(configFile), errors);
+                config = new NamedData<FolderConfiguration>(configFile, configData);
+                m_folderConfigs.Add(config);
             }
-            return FolderConfiguration.Create(props);
+            return config.Value;
+        }
+
+        public void ResetFolderConfigurations()
+        {
+            m_folderConfigs.Clear();
         }
     }
 
     public class FolderConfiguration
     {
-        public FolderConfiguration(bool isSearchRoot, List<string> libFolders)
+        private string m_folder;
+        public FolderConfiguration(string folder)
         {
+            m_folder = folder;
+        }
+        public FolderConfiguration(string folder, bool isSearchRoot, List<string> libFolders)
+        {
+            m_folder = folder;
             this.IsSearchRoot = isSearchRoot;
             this.LibFolders = libFolders;
         }
-        public bool IsSearchRoot { get; private set; }
-        public List<string> LibFolders { get; private set; }
+        public string Folder { get { return m_folder; } }
+        public bool IsSearchRoot { get; private set; } = false;
+        public List<string> LibFolders { get; private set; } = null;
+        public List<FolderShortcut> Shortcuts { get; private set; } = null;
 
-        public static FolderConfiguration Create(PropertyBlock data)
+        private static PropertyBlockDecoder.Block<object, FolderConfiguration> m_decoder = null;
+
+        public static FolderConfiguration Create(PropertyBlock data, string currentPath, List<Tuple<int, string>> errors)
         {
             if (data == null) return null;
             else
             {
-                bool isRoot = false;
-                List<string> folders = new List<string>();
-
-                foreach (PropertyBlockEntry entry in data)
+                if (m_decoder == null)
                 {
-                    if (entry.BlockEntryType == PropertyBlockEntryType.Flag)
-                    {
-                        if (entry.Name == Constants.STEPBRO_FOLDER_CONFIG_FILE_ROOT)
-                        {
-                            isRoot = true;
-                            continue;
-                        }
-                    }
-                    else if (entry.BlockEntryType == PropertyBlockEntryType.Array)
-                    {
-                        if (entry.Name == Constants.STEPBRO_FOLDER_CONFIG_FILE_LIBS)
-                        {
-                            var asArray = entry as PropertyBlockArray;
-                            if (asArray.IsStringArray())
+                    m_decoder = new Block<object, FolderConfiguration>
+                        (
+                            new Flag<FolderConfiguration>(Constants.STEPBRO_FOLDER_CONFIG_FILE_ROOT, (c, f) =>
                             {
-                                folders = asArray.AsStringArray();
-                                continue;
-                            }
-                        }
-                    }
+                                string name = f.Name;
+                                if (f.HasTypeSpecified)
+                                {
+                                    return "The flag cannot have a name; only a type.";
+                                }
+                                c.IsSearchRoot = true;
+                                return null;    // No errors
+                            }),
+                            new ArrayString<FolderConfiguration>(Constants.STEPBRO_FOLDER_CONFIG_FILE_LIBS, (c, a) =>
+                            {
+                                c.LibFolders = a;
+                                return null;    // No errors
+                            }),
+                            new ValueString<FolderConfiguration>(Constants.STEPBRO_FOLDER_CONFIG_FILE_SHORTCUT, (c, v) =>
+                            {
+                                var text = v.ValueAsString();
+                                if (!v.HasTypeSpecified)
+                                {
+                                    return "The shortcut is missing a name.";
+                                }
+
+                                if (c.Shortcuts == null)
+                                {
+                                    c.Shortcuts = new List<FolderShortcut>();
+                                }
+                                var shortcut = new FolderShortcut(FolderShortcutOrigin.Configuration, v.Name, text);
+                                c.Shortcuts.Add(shortcut);
+                                return null;    // No errors
+                            })
+                        );
                 }
-                return new FolderConfiguration(isRoot, folders);
+
+                var config = new FolderConfiguration(currentPath);
+                m_decoder.DecodeData(data, config, errors);
+                return config;
             }
         }
     }
