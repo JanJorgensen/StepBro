@@ -37,6 +37,25 @@ namespace StepBroCoreTest
         }
 
         [TestMethod]
+        public void TestFunctionCallWithDoubleConversion()
+        {
+            var f = new StringBuilder();
+            f.AppendLine("namespace MyFile;");
+            f.AppendLine("function double MySub(double v) {");
+            f.AppendLine("   return v * 1.5;");
+            f.AppendLine("}");
+            f.AppendLine("double MyProcedure() {");
+            f.AppendLine("   return MySub(16);");
+            f.AppendLine("}");
+            var file = FileBuilder.ParseFile(null, f.ToString());
+            var procedure = file["MyProcedure"] as IFileProcedure;
+
+            var taskContext = ExecutionHelper.ExeContext();
+            var result = taskContext.CallProcedure(procedure);
+            Assert.AreEqual(24.0, (double)result);
+        }
+
+        [TestMethod]
         public void TestCallWithReturnValue()
         {
             var f = new StringBuilder();

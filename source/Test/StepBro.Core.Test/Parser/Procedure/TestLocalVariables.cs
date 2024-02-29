@@ -25,6 +25,12 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
+        public void TestSimpleSpecifiedTypeVariablesWithConversion()
+        {
+            Assert.AreEqual(18.0, ParseAndRun<double>("myVar", "decimal myVar = 18;"));
+        }
+
+        [TestMethod]
         public void TestSimpleConstantVarTypeVariables()
         {
             Assert.AreEqual(728L, ParseAndRun<long>("myVar", "var myVar = 728;"));

@@ -305,6 +305,7 @@ namespace StepBro.Core.Parser
 
         private SBExpressionData ResolveForGetOperation(SBExpressionData input, TypeReference targetType = null, bool reportIfUnresolved = false)
         {
+            if (input.IsError()) return input;
             var output = input;
             if (input.IsUnresolvedIdentifier)
             {
@@ -332,6 +333,11 @@ namespace StepBro.Core.Parser
                     Expression.Constant((string)input.Value));
 
                 output = new SBExpressionData(call);
+            }
+            else if (input.DataType.IsInt() && targetType != null && targetType.Equals(TypeReference.TypeDouble))
+            {
+                // Do automatic conversion from int to double.
+                output = new SBExpressionData(Expression.Convert(input.ExpressionCode, typeof(double)));
             }
             return output;
         }
