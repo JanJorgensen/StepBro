@@ -720,7 +720,13 @@ namespace StepBro.Core.Parser
                             break;
                     }
                 }
-
+                else
+                {
+                    m_expressionData.Push(
+                        new SBExpressionData(
+                            HomeType.Immediate,
+                            SBExpressionType.ExpressionError));
+                }
                 #endregion
             }
             catch (Exception e)
@@ -898,6 +904,12 @@ namespace StepBro.Core.Parser
                         {
                             suggestedAssignmentsOut.Add(new SBExpressionData(Expression.Convert(argPicker.Pick().ExpressionCode, p.ParameterType)));
                             matchScore -= 5;    // Matching a 'single' is not as good as matching the exact same type.
+                            continue;   // next parameter
+                        }
+                        else if (argPicker.Current.DataType.IsInt() && (p.ParameterType == typeof(Double) || p.ParameterType == typeof(Single)))
+                        {
+                            suggestedAssignmentsOut.Add(new SBExpressionData(Expression.Convert(argPicker.Pick().ExpressionCode, p.ParameterType)));
+                            matchScore -= 20;    // Matching an integer is not as good as matching the exact same type.
                             continue;   // next parameter
                         }
                         else
