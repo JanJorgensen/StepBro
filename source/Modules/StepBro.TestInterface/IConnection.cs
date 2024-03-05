@@ -9,6 +9,8 @@ namespace StepBro.TestInterface
 {
     public interface IConnection
     {
+        bool IsConnected { get; }
+
         bool Connect([Implicit] ICallContext context);
         bool Disconnect([Implicit] ICallContext context);
 

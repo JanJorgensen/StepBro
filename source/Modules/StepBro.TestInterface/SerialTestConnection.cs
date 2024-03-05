@@ -16,13 +16,13 @@ using static StepBro.Core.Data.LogLineData;
 namespace StepBro.TestInterface
 {
     public class SerialTestConnection :
-        AvailabilityBase, 
-        IConnection, 
-        IRemoteProcedures, 
-        INameable, 
+        AvailabilityBase,
+        IConnection,
+        IRemoteProcedures,
+        INameable,
         INamedObject,
-        ISettableFromPropertyBlock, 
-        INotifyPropertyChanged, 
+        ISettableFromPropertyBlock,
+        INotifyPropertyChanged,
         ILogLineParent,
         ITextCommandInput
     {
@@ -309,7 +309,7 @@ namespace StepBro.TestInterface
 
         public SerialTestConnection([ObjectName] string objectName = "<a SerialPort>")
         {
-            m_name= objectName;
+            m_name = objectName;
             m_instanceID = rnd.Next(1000000);
             m_newResponseDataEvent = new AutoResetEvent(false);
             SetupDebugCommands();
@@ -380,6 +380,7 @@ namespace StepBro.TestInterface
         {
             if (!m_stream.IsOpen)
             {
+                this.NotifyPropertyChanged(nameof(IsConnected));
                 //m_streamWasClosed = true;
             }
         }
@@ -397,9 +398,9 @@ namespace StepBro.TestInterface
 
         #region IConnection
 
-        public bool IsConnected()
+        public bool IsConnected
         {
-            return m_stream != null && m_stream.IsOpen && !m_receiverTask.IsFaulted;
+            get { return m_stream != null && m_stream.IsOpen && !m_receiverTask.IsFaulted; }
         }
 
         public bool Connect([Implicit] ICallContext context)
@@ -499,7 +500,7 @@ namespace StepBro.TestInterface
 
         bool ITextCommandInput.AcceptingCommands()
         {
-            return this.IsStillValid && this.IsConnected();
+            return this.IsStillValid && this.IsConnected;
         }
 
         void ITextCommandInput.ExecuteCommand(string command)
@@ -511,6 +512,25 @@ namespace StepBro.TestInterface
             }
             var commandData = new CommandData(m_mainLogger, command, this.CommandResponseTimeout, null);
             EnqueueCommand(commandData);
+        }
+
+        public void ClearSetupCommands([Implicit] ICallContext context)
+        {
+            if (context != null && context.LoggingEnabled)
+            {
+                if (m_setupCommands == null || m_setupCommands.Count == 0)
+                {
+                    context.Logger.Log("No setup commands to clear.");
+                }
+                else
+                {
+                    context.Logger.Log($"Clearing the {m_setupCommands.Count} setup commands.");
+                }
+            }
+            if (m_setupCommands != null)
+            {
+                m_setupCommands.Clear();
+            }
         }
 
         public void AddSetupCommand([Implicit] ICallContext context, string command, params object[] arguments)
@@ -533,14 +553,34 @@ namespace StepBro.TestInterface
             m_setupCommands.Add(commandString);
         }
 
+        private static int CombineHashCodes(int h1, int h2)
+        {
+            return (((h1 << 5) + h1) ^ h2);
+        }
         public string CreateSetupCommandsHash([Implicit] ICallContext context)
         {
-            var hash = (m_setupCommands != null) ? m_setupCommands.GetHashCode().ToString("X") : string.Empty;
-            if (context != null && context.LoggingEnabled)
+            if (m_setupCommands != null)
             {
-                context.Logger.Log("Hash: " + hash);
+                int hash = (m_setupCommands != null && m_setupCommands.Count >= 1) ? m_setupCommands[0].GetHashCode() : 0;
+                foreach (var s in m_setupCommands.Skip(1))
+                {
+                    hash = CombineHashCodes(hash, s.GetHashCode());
+                }
+                var hashString = hash.ToString("X");
+                if (context != null && context.LoggingEnabled)
+                {
+                    context.Logger.Log("Hash: " + hashString);
+                }
+                return hashString;
             }
-            return hash;
+            else
+            {
+                if (context != null && context.LoggingEnabled)
+                {
+                    context.Logger.Log("Cannot create hash; no commands setup created.");
+                }
+                return string.Empty;
+            }
         }
 
         public IAsyncResult SendSetupCommands([Implicit] ICallContext context)
@@ -998,7 +1038,7 @@ namespace StepBro.TestInterface
             m_currentExecutingCommand = command;
             DoSendDirect(commandstring);
         }
-        
+
         private void DoSendDirect(string text)
         {
             AddToLog(LogType.Sent, 0, text);
