@@ -172,7 +172,7 @@ namespace StepBro.Core.Execution
 
         bool ICallContext.StopRequested()
         {
-            throw new NotImplementedException();
+            return false;
         }
     }
 }

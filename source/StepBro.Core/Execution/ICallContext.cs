@@ -6,6 +6,7 @@ using StepBro.Core.File;
 using StepBro.Core.Logging;
 using StepBro.Core.Host;
 using StepBro.Core.Tasks;
+using System.Threading;
 
 namespace StepBro.Core.Execution
 {
@@ -68,5 +69,49 @@ namespace StepBro.Core.Execution
         /// </summary>
         /// <returns>Whether to stop execution.</returns>
         bool StopRequested();
+    }
+
+
+    public static class ContextExtensions
+    {
+        /// <summary>
+        /// Helper method to wait for at task to finish, while checking whether the task should be cancelled.
+        /// </summary>
+        /// <param name="context">The current call context.</param>
+        /// <param name="task">The task to await completion for.</param>
+        /// <param name="timeout">The maximum time to wait for completion, before cancelling the task.</param>
+        /// <param name="cancellation">A cancellation token source to use for cancelling the task.</param>
+        /// <returns><code>true</code> if the task did complete, and <code>false</code> if it was cancelled.</returns>
+        static public bool Await(this ICallContext context, System.Threading.Tasks.Task task, TimeSpan timeout, CancellationTokenSource cancellation)
+        {
+            var logger = (context != null) ? context.Logger : StepBro.Core.Main.Logger.RootLogger;
+            var start = DateTime.Now;
+            while (true)
+            {
+                if (task.IsCompleted) return true;
+                var stopRequested = (context != null) ? context.StopRequested() : false;
+                if (DateTime.Now - start > timeout || stopRequested)
+                {
+                    if (stopRequested)
+                    {
+                        logger.LogError("Operation stopped by user.");
+                    }
+                    else
+                    {
+                        logger.LogError("Operation timeout.");
+                    }
+                    
+                    try
+                    {
+                        cancellation.Cancel();
+                        task.Wait(cancellation.Token);
+                    }
+                    finally { }
+                    
+                    return false;
+                }
+                Thread.Sleep(TimeSpan.FromMilliseconds(50));
+            }
+        }
     }
 }
