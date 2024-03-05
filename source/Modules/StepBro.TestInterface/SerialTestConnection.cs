@@ -553,18 +553,29 @@ namespace StepBro.TestInterface
             m_setupCommands.Add(commandString);
         }
 
-        private static int CombineHashCodes(int h1, int h2)
+        private static uint CombineHashCodes(uint h1, uint h2)
         {
             return (((h1 << 5) + h1) ^ h2);
         }
+
+        private static uint GetStringHash(string input)
+        {
+            uint hash = 8376231;
+            foreach (char ch in input)
+            {
+                hash = ((((uint)ch << 5) + (uint)ch) ^ hash);
+            }
+            return hash;
+        }
+
         public string CreateSetupCommandsHash([Implicit] ICallContext context)
         {
             if (m_setupCommands != null)
             {
-                int hash = (m_setupCommands != null && m_setupCommands.Count >= 1) ? m_setupCommands[0].GetHashCode() : 0;
+                uint hash = (m_setupCommands != null && m_setupCommands.Count >= 1) ? GetStringHash(m_setupCommands[0]) : 0;
                 foreach (var s in m_setupCommands.Skip(1))
                 {
-                    hash = CombineHashCodes(hash, s.GetHashCode());
+                    hash = CombineHashCodes(hash, GetStringHash(s));
                 }
                 var hashString = hash.ToString("X");
                 if (context != null && context.LoggingEnabled)
