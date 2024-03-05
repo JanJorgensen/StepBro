@@ -25,7 +25,7 @@ namespace StepBro.Core.Parser.Mocks
 
         public FolderConfiguration ReadFolderConfig(string configFile, List<Tuple<int, string>> errors)
         {
-            throw new NotImplementedException();
+            return null; // Not implemented.
         }
 
         public void ResetFolderConfigurations() { }
