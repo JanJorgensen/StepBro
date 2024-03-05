@@ -14,14 +14,17 @@ void TestSetupCommandHash() : TestCase
     var hash1 = "";
     var hash2 = "";
     var hash3 = "";
+    var hash4 = "";
 
     hash1 = CreateSetupHash(0);
     hash2 = CreateSetupHash(1);
     hash3 = CreateSetupHash(2);
+    hash4 = CreateSetupHash(0);
 
     expect(hash1 != hash2);
     expect(hash2 != hash3);
     expect(hash1 != hash3);
+    expect(hash1 == hash4);
 }
 
 string CreateSetupHash(int option)
