@@ -1,6 +1,6 @@
 using StepBro.Streams;
 using StepBro.TestInterface;
-using @"..\scripts\TestFramework.sbs";
+using @"TestFramework.sbs";
 
 public SerialPort port = SerialPort()
 {

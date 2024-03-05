@@ -91,3 +91,6 @@ jobs:
 
     - name: Run StepBro Smoketest
       run: .\source\bin\stepbro.exe ".\test files\smoketest\smoketest.sbs" -v -e AllTests -m FormalTest --exitcode SubVerdict
+
+    - name: Run SerialTestConnection test
+      run: .\source\bin\stepbro.exe ".\test files\ModuleTests\SerialTestConnection\SerialTestConnectionTests.sbs" -v -e SerialTestConnectionOfflineTests -m FormalTest --exitcode SubVerdict

@@ -353,3 +353,4 @@ source/stepbro/Properties/launchSettings.json
 launchSettings.json
 test files/Profiling/BigCallTree.sbs
 test files/Profiling/ManyTools.sbs
+test files/ModuleTests/SerialTestConnection/SerialTestConnectionTests.user.json
