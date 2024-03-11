@@ -160,36 +160,6 @@ namespace StepBro.Streams
         protected override void SetEncoding(System.Text.Encoding encoding) { m_port.Encoding = encoding; }
         protected override System.Text.Encoding GetEncoding() { return m_port.Encoding; }
 
-        //private void Port_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
-        //{
-        //    try
-        //    {
-        //        m_dataReceivedCounter++;
-        //        if (m_binaryFifo != null)
-        //        {
-        //            m_binaryFifo.Add((byte[] buffer, int offset, int count) =>
-        //            {
-        //                return this.TickReceiveCounter(m_port.Read(buffer, offset, count));
-        //            }, m_port.BytesToRead);
-        //        }
-        //        else if (m_textualFifo != null)
-        //        {
-        //            m_textualFifo.Add((char[] buffer, int offset, int count) =>
-        //            {
-        //                return this.TickReceiveCounter(m_port.Read(buffer, offset, count));
-        //            }, m_port.BytesToRead);
-        //        }
-        //    } 
-        //    catch (InvalidOperationException ex)
-        //    {
-        //        // The port was closed while we were trying to receive data.
-        //        // This means we just throw away the data as we do not need it,
-        //        // otherwise the port would not have closed.
-        //        // We write the exception into the logger, in case the user wants to handle it from the script.
-        //        m_asyncLogger.LogError(ex.Message);
-        //    }
-        //}
-
         private void Port_ErrorReceived(object sender, System.IO.Ports.SerialErrorReceivedEventArgs e)
         {
             if (m_reportOverrun || e.EventType != System.IO.Ports.SerialError.Overrun)
