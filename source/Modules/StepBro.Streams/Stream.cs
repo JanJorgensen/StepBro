@@ -8,10 +8,6 @@ namespace StepBro.Streams
     public abstract class Stream : IDisposable
     {
         private bool m_isDisposed = false;
-        private bool m_textMode = false;
-        private bool m_lineMode = false;
-        private IReadBuffer<byte> m_binaryReadBuffer = null;
-        private IReadBuffer<char> m_textualReadBuffer = null;
 
         public void Dispose()
         {
@@ -30,61 +26,11 @@ namespace StepBro.Streams
 
         protected virtual void DoDispose() { }
 
-        public bool InTextMode
-        {
-            get { return m_textMode; }
-            set
-            {
-                if (value)
-                {
-                    if (m_textualReadBuffer == null)
-                    {
-                        this.GetTextualReadBuffer(8192);
-                    }
-                }
-                else
-                {
-                    if (m_textualReadBuffer != null)
-                    {
-                        m_textualReadBuffer = null;
-                    }
-                    m_lineMode = false;
-                }
-                m_textMode = value;
-            }
-        }
-        public bool InTextLineMode
-        {
-            get { return m_lineMode; }
-            set
-            {
-                if (value != m_lineMode)
-                {
-                    if (value)
-                    {
-                        this.InTextMode = true;
-                    }
-                    else
-                    {
-                    }
-                    m_lineMode = value;
-                }
-            }
-        }
-        public bool InBinaryMode
-        {
-            get { return !m_textMode; }
-            set
-            {
-                if (value) { this.InTextLineMode = false; }
-                m_textMode = !value;
-            }
-        }
-
         public virtual string NewLine
         {
             get; set;
-        }
+        } = "\n";
+
         /// <summary>
         /// Indicates whether the stream contains a finite amount of data (e.g. a file).
         /// </summary>
@@ -95,6 +41,8 @@ namespace StepBro.Streams
             get { return this.GetEncoding(); }
             set { this.SetEncoding(value); }
         }
+
+        public virtual int ReadTimeout { get { return 10000; } set { } }
 
         protected abstract string GetTargetIdentification();
         protected abstract void SetEncoding(System.Text.Encoding encoding);
@@ -150,40 +98,35 @@ namespace StepBro.Streams
         }
 
         public abstract void Write([Implicit] StepBro.Core.Execution.ICallContext context, string text);
-        public abstract string ReadLine([Implicit] StepBro.Core.Execution.ICallContext context, TimeSpan timeout);
+        public abstract string ReadLineDirect();
 
-        public IReadBuffer<byte> GetBinaryReadBuffer(int size)
+        public string ReadLine([Implicit] StepBro.Core.Execution.ICallContext context, TimeSpan timeout)
         {
-            if (m_binaryReadBuffer == null)
+            if (this.IsOpen)
             {
-                m_binaryReadBuffer = this.CreateBinaryReadBuffer(size);
+                var entry = DateTime.Now;
+                while (timeout != TimeSpan.MaxValue && (DateTime.Now - entry) < timeout && (context == null || context.StopRequested()))
+                {
+                    try
+                    {
+                        var line = this.ReadLineDirect();
+                        if (context != null && context.LoggingEnabled)
+                        {
+                            context.Logger.Log("ReadLine : " + StringUtils.ObjectToString(line));
+                        }
+                        return line;
+                    }
+                    catch { }
+                }
             }
-            return m_binaryReadBuffer;
-        }
-
-        protected virtual IReadBuffer<byte> CreateBinaryReadBuffer(int size)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected int TickReceiveCounter(int count)
-        {
-            return count;
-        }
-
-        public IReadBuffer<char> GetTextualReadBuffer(int size)
-        {
-            if (m_textualReadBuffer == null)
+            else
             {
-                m_textualReadBuffer = this.CreateTextualReadBuffer(size);
+                if (context != null) context.ReportError("ReadLine, but stream is not open.");
             }
-            return m_textualReadBuffer;
+            return null;
         }
 
-        protected virtual IReadBuffer<char> CreateTextualReadBuffer(int size)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract void DiscardInBuffer();
 
         // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 

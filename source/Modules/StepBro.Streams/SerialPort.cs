@@ -115,8 +115,6 @@ namespace StepBro.Streams
         private string m_objectName;
         private System.IO.Ports.SerialPort m_port;
         private long m_dataReceivedCounter = 0L;
-        private ArrayFifo<byte> m_binaryFifo = null;
-        private ArrayFifoChar m_textualFifo = null;
         private ILogger m_asyncLogger = null;
         private bool m_reportOverrun = false;
 
@@ -124,7 +122,6 @@ namespace StepBro.Streams
         {
             m_port = new System.IO.Ports.SerialPort();
             m_port.ErrorReceived += this.Port_ErrorReceived;
-            m_port.DataReceived += this.Port_DataReceived;
             m_port.Encoding = Encoding.Latin1;
             m_objectName = objectName;
             m_asyncLogger = Core.Main.GetService<ILogger>().LogEntering(m_objectName, "Create SerialPort");
@@ -152,6 +149,9 @@ namespace StepBro.Streams
 
         public override string NewLine { get { return m_port.NewLine; } set { m_port.NewLine = value; } }
 
+        public override int ReadTimeout { get { return m_port.ReadTimeout; } set { m_port.ReadTimeout = value; } }
+
+
         protected override string GetTargetIdentification()
         {
             return String.IsNullOrEmpty(this.PortName) ? "Serial Port" : this.PortName;
@@ -159,36 +159,6 @@ namespace StepBro.Streams
 
         protected override void SetEncoding(System.Text.Encoding encoding) { m_port.Encoding = encoding; }
         protected override System.Text.Encoding GetEncoding() { return m_port.Encoding; }
-
-        private void Port_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
-        {
-            try
-            {
-                m_dataReceivedCounter++;
-                if (m_binaryFifo != null)
-                {
-                    m_binaryFifo.Add((byte[] buffer, int offset, int count) =>
-                    {
-                        return this.TickReceiveCounter(m_port.Read(buffer, offset, count));
-                    }, m_port.BytesToRead);
-                }
-                else if (m_textualFifo != null)
-                {
-                    m_textualFifo.Add((char[] buffer, int offset, int count) =>
-                    {
-                        return this.TickReceiveCounter(m_port.Read(buffer, offset, count));
-                    }, m_port.BytesToRead);
-                }
-            } 
-            catch (InvalidOperationException ex)
-            {
-                // The port was closed while we were trying to receive data.
-                // This means we just throw away the data as we do not need it,
-                // otherwise the port would not have closed.
-                // We write the exception into the logger, in case the user wants to handle it from the script.
-                m_asyncLogger.LogError(ex.Message);
-            }
-        }
 
         private void Port_ErrorReceived(object sender, System.IO.Ports.SerialErrorReceivedEventArgs e)
         {
@@ -203,18 +173,6 @@ namespace StepBro.Streams
             m_port.Close();
             m_port.Dispose();
             m_port = null;
-        }
-
-        protected override IReadBuffer<byte> CreateBinaryReadBuffer(int size)
-        {
-            m_binaryFifo = new ArrayFifo<byte>(size);
-            return m_binaryFifo;
-        }
-
-        protected override IReadBuffer<char> CreateTextualReadBuffer(int size)
-        {
-            m_textualFifo = new ArrayFifoChar(size);
-            return m_textualFifo;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
@@ -255,7 +213,7 @@ namespace StepBro.Streams
                                 caption = caption.Substring(0, i);
                             var deviceIDParts = deviceID.Split(new char[] { '\\' });
 
-                            context.Logger.Log($"Available port: {portName}, \"{caption}\" by {manufacturer}. ID: {deviceIDParts[deviceIDParts.Length-1]}");
+                            context.Logger.Log($"Available port: {portName}, \"{caption}\" by {manufacturer}. ID: {deviceIDParts[deviceIDParts.Length - 1]}");
                         }
                     }
 
@@ -316,157 +274,14 @@ namespace StepBro.Streams
             }
         }
 
-        public override string ReadLine([Implicit] ICallContext context, TimeSpan timeout)
+        public override string ReadLineDirect()
         {
-            if (m_port.IsOpen)
-            {
-                var entry = DateTime.Now;
-                var timeleft = timeout;
-
-                if (m_textualFifo == null)
-                {
-                    while (m_port.BytesToRead == 0 && timeleft >= TimeSpan.Zero)
-                    {
-                        System.Threading.Thread.Sleep(20);
-                        if (timeout != TimeSpan.Zero)
-                        {
-                            timeleft = DateTime.Now.TimeTill(entry + timeout);
-                        }
-                    }
-                    if (m_port.BytesToRead > 0)
-                    {
-                        var line = m_port.ReadLine();
-                        if (context != null && context.LoggingEnabled)
-                        {
-                            context.Logger.Log("ReadLine : " + StringUtils.ObjectToString(line));
-                        }
-                        return line;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                else
-                {
-                    var newLineLen = m_port.NewLine.Length;
-                    int newLineCharsSeen = 0;
-                    var knownCount = 0;
-                    while (timeleft >= TimeSpan.Zero)
-                    {
-                        if (m_textualFifo.AwaitNewData(knownCount, timeleft))
-                        {
-                            while (knownCount < m_textualFifo.Count)
-                            {
-                                if (m_textualFifo[knownCount] == m_port.NewLine[newLineCharsSeen])
-                                {
-                                    newLineCharsSeen++;
-                                    if (newLineCharsSeen == newLineLen)
-                                    {
-                                        var line = new string(m_textualFifo.Get(0, knownCount + (1 - newLineLen), knownCount + 1));
-                                        context.Logger.Log("ReadLine : " + StringUtils.ObjectToString(line));
-                                        return line;
-                                    }
-                                }
-                                else
-                                {
-                                    newLineCharsSeen = 0;
-                                }
-                                knownCount++;
-                            }
-                            if (timeout != TimeSpan.Zero)
-                            {
-                                timeleft = DateTime.Now.TimeTill(entry - timeout);
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    if (context != null) context.ReportError("No lines read.");
-                    return null;
-                }
-            }
-            else
-            {
-                if (context != null) context.ReportError("ReadLine, but port is not open.");
-            }
-            return null;
+            return m_port.ReadLine();
         }
 
-
-        //    public override int Read(ICallContext _context, byte[] _buffer, int _offset, int _count, bool showWaitProgress)
-        //    {
-        //        EnsureOpenAndNoErrors();
-
-        //        try
-        //        {
-        //            TimeoutMethodDelegate<int> method = new TimeoutMethodDelegate<int>(_context, m_serialPort.ReadTimeout, String.Format("Reading {0} bytes", _count), showWaitProgress, new TimeoutMethodDelegate<int>.Delegate(delegate ()
-        //            {
-        //                using (AcquireNotificationLock("SerialPort.Read"))
-        //                {
-        //                    int ret = m_serialPort.Read(_buffer, _offset, _count);
-        //                    OnDataRead(_buffer, _offset, ret);
-        //                    return ret;
-        //                }
-        //            }));
-        //            return method.Run();
-        //        }
-        //        catch (TimeoutException)
-        //        {
-        //            throw new StreamException(this, new StreamTimeoutExecutionError());
-        //        }
-        //        catch (InvalidOperationException e)
-        //        {
-        //            this.SetState("Error");
-        //            m_LastEventState.SetState(e.ToString(), true);
-        //            throw new StreamException(this, new StreamNotOpenExecutionError());
-        //        }
-        //    }
-
-        //    public override void ClearReadErrors(ICallContext _context)
-        //    {
-        //        if (m_hasReceiveError)
-        //        {
-        //            m_hasReceiveError = false;
-        //            if (m_serialPort.IsOpen)
-        //            {
-        //                m_serialPort.DiscardInBuffer();
-        //                m_serialPort.DiscardOutBuffer();
-        //            }
-        //        }
-        //        m_LastEventState.Enabled = false;
-        //    }
-
-        //    public override void FlushReadBuffer(ICallContext _context)
-        //    {
-        //        EnsureOpenAndNoErrors();
-
-        //        try
-        //        {
-        //            m_serialPort.DiscardInBuffer();
-        //        }
-        //        catch (InvalidOperationException e)
-        //        {
-        //            m_LastEventState.SetState(e.ToString(), true);
-        //            throw new StreamException(this, new StreamNotOpenExecutionError());
-        //        }
-        //    }
-
-        //    public override void FlushWriteBuffer(ICallContext _context)
-        //    {
-        //        EnsureOpenAndNoErrors();
-
-        //        try
-        //        {
-        //            m_serialPort.DiscardOutBuffer();
-        //        }
-        //        catch (InvalidOperationException e)
-        //        {
-        //            m_LastEventState.SetState(e.ToString(), true);
-        //            throw new StreamException(this, new StreamNotOpenExecutionError());
-        //        }
-        //    }
+        public override void DiscardInBuffer()
+        {
+            m_port.DiscardInBuffer();
+        }
     }
 }
