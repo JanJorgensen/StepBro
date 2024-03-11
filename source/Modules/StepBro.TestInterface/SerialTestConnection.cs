@@ -284,7 +284,6 @@ namespace StepBro.TestInterface
         private readonly object m_sync = new object();
         private string m_name = null;
         private Stream m_stream = null;
-        private IReadBuffer<char> m_inputBuffer = null;
         private ILogger m_mainLogger = null;
         private LogLineData m_firstLogLine = null;
         private LogLineData m_lastLogLine = null;
@@ -371,6 +370,7 @@ namespace StepBro.TestInterface
                         m_stream.Encoding = new ASCIIEncoding();
                         m_stream.NewLine = "\r";
                         m_stream.IsOpenChanged += m_stream_IsOpenChanged;
+                        m_stream.ReadTimeout = 500;
                     }
                 }
             }
@@ -409,7 +409,6 @@ namespace StepBro.TestInterface
             {
                 if (m_receiverTask == null)
                 {
-                    m_inputBuffer = m_stream.GetTextualReadBuffer(16 * 1024);
                     m_stopReceiver = false;
                     m_receiverTask = new Task(
                         ReceiverTask,
@@ -896,11 +895,8 @@ namespace StepBro.TestInterface
 
         private void ReceiverTask()
         {
-            int knownCount = 0;
-            int index = 0;
             while (!m_stopReceiver)
             {
-                var nextWaitTime = 2000;
                 lock (m_sync)
                 {
                     if (m_currentExecutingCommand != null)
@@ -912,101 +908,64 @@ namespace StepBro.TestInterface
                             AddToLog(LogType.ReceivedError, 0, "<timeout>");
                             OnEndCommand();
                         }
-                        else if (to < 3000) nextWaitTime = (int)to;
                     }
                 }
-                if (m_inputBuffer.AwaitNewData(knownCount, nextWaitTime))
-                {
-                    knownCount = m_inputBuffer.Count;
-                    //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Handling data; " + index.ToString() + ", " + knownCount.ToString()));
-                    //if ( index > knownCount || index != j)
-                    //{
-                    //    DebugLogEntry.Register(new DebugLogEntryString(m_name + " INDEX WRONG!!"));
-                    //}
-                    while (index < knownCount)
-                    {
-                        char ch = m_inputBuffer[index];
-                        if (ch != '\n' && ch != '\r')
-                        {
-                            index++;
-                        }
-                        else
-                        {
-                            //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Line end"));
-                            if (index == 0)
-                            {
-                                m_inputBuffer.Eat(1);
-                                knownCount--;
-                                continue;
-                            }
-                            var line = m_inputBuffer.Get(0, index, index + 1);
-                            knownCount -= (index + 1);
-                            index = 0;
-                            //DebugLogEntry.Register(new DebugLogEntryString(m_name + " After Get: " + index.ToString() + ", " + knownCount.ToString()));
 
-                            var s = new string(line, 1, line.Length - 1);
-                            if (line[0] == EventLineChar)
+                string line = null;
+
+                try
+                {
+                    line = m_stream.ReadLineDirect();
+                }
+                catch { }
+                
+                if (line != null)
+                {
+                    if (line[0] == EventLineChar)
+                    {
+                        lock (m_sync)
+                        {
+                            AddToLog(LogType.ReceivedAsync, 0, new string(line));
+                        }
+                        m_events.Enqueue(line.Substring(1));
+                        while (m_events.Count > 1000)
+                        {
+                            m_events.Dequeue();     // Ensure queue buffer is not eating all memory.
+                        }
+                    }
+                    else
+                    {
+                        if (line[0] == ResponseMultiLineChar)
+                        {
+                            lock (m_sync)
                             {
-                                //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Event line received: " + s));
-                                lock (m_sync)
-                                {
-                                    AddToLog(LogType.ReceivedAsync, 0, new string(line));
-                                }
-                                m_events.Enqueue(new string(line, 1, line.Length - 1));
-                                while (m_events.Count > 1000)
-                                {
-                                    m_events.Dequeue();     // Ensure queue buffer is not eating all memory.
-                                }
+                                AddToLog(LogType.ReceivedPartial, 0, new string(line));
                             }
-                            else
+                            if (m_currentExecutingCommand != null)
                             {
-                                if (line[0] == ResponseMultiLineChar)
+                                m_responseLines.Enqueue(line.Substring(1));
+                            }
+                        }
+                        else if (line[0] == ResponseEndLineChar)
+                        {
+                            lock (m_sync)
+                            {
+                                AddToLog((line.StartsWith(ResponseErrorPrefix)) ? LogType.ReceivedError : LogType.ReceivedEnd, 0, line);
+                            }
+                            if (m_currentExecutingCommand != null)
+                            {
+                                try
                                 {
-                                    //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Multi response line received: " + s));
-                                    lock (m_sync)
-                                    {
-                                        AddToLog(LogType.ReceivedPartial, 0, new string(line));
-                                    }
-                                    if (m_currentExecutingCommand != null)
-                                    {
-                                        m_responseLines.Enqueue(s);
-                                    }
+                                    m_currentExecutingCommand.SetResult(line, m_responseLines.ToArray());
                                 }
-                                else if (line[0] == ResponseEndLineChar)
+                                finally
                                 {
-                                    var l = new string(line);
-                                    lock (m_sync)
-                                    {
-                                        AddToLog((l.StartsWith(ResponseErrorPrefix)) ? LogType.ReceivedError : LogType.ReceivedEnd, 0, l);
-                                    }
-                                    if (m_currentExecutingCommand != null)
-                                    {
-                                        //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Response line received: " + s));
-                                        try
-                                        {
-                                            m_currentExecutingCommand.SetResult(new string(line), m_responseLines.ToArray());
-                                        }
-                                        finally
-                                        {
-                                        }
-                                        OnEndCommand();
-                                    }
-                                    else
-                                    {
-                                        //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Response line received (no command active): " + s));
-                                    }
                                 }
+                                OnEndCommand();
                             }
                         }
                     }
                 }
-                //else
-                //{
-                //    if (m_currentExecutingCommand != null)
-                //    {
-                //        var timeTillTimeout = (DateTime.Now - m_currentExecutingCommand.TimeoutTime).Ticks;
-                //    }
-                //}
             }
         }
 
