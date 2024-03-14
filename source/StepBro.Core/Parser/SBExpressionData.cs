@@ -244,7 +244,10 @@ namespace StepBro.Core.Parser
 
         public static SBExpressionData CreateAwaitExpression(Expression expression, IToken token = null)
         {
-            if (expression == null) throw new ArgumentNullException();
+            if (expression == null)
+            {
+                throw new ArgumentNullException();
+            }
             return new SBExpressionData(HomeType.Immediate, SBExpressionType.AwaitExpression, null, expression, token: token);
         }
 

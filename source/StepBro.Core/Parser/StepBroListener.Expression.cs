@@ -152,7 +152,7 @@ namespace StepBro.Core.Parser
             }
             catch
             {
-                throw new NotImplementedException();
+                m_errors.InternalError(context.Start.Line, context.Start.Column, "Error parsing 'await' operation.");
                 //m_expressionData.Push(new SBExpressionData(
                 //    SBExpressionType.OperationError, "Error parsing 'await' operation.", null, context.Start));
             }
