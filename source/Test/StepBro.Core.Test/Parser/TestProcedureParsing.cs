@@ -74,6 +74,19 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(1, FileBuilder.LastInstance.Errors.ErrorCount);
         }
 
+        [TestMethod]
+        public void TestProcedureUnknownMethodCallWithAsyncMethodCall()
+        {
+            try {
+                var proc = FileBuilder.ParseProcedure("void Func(){ bool test = await testObj.DoesntExist(); }");
+            }
+            catch
+            {}
+            Assert.AreEqual("Unresolved identifier: \"testObj\".", FileBuilder.LastInstance.Errors[0].Message);
+            Assert.AreEqual("INTERNAL ERROR. Error parsing 'await' operation.", FileBuilder.LastInstance.Errors[1].Message);
+            Assert.AreEqual(2, FileBuilder.LastInstance.Errors.ErrorCount);
+        }
+
 
         public interface ISomeInterface
         {
