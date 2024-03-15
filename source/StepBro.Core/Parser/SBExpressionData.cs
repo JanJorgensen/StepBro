@@ -358,7 +358,7 @@ namespace StepBro.Core.Parser
                     }
                     break;
                 case SBExpressionType.GlobalVariableReference:
-                    throw new NotImplementedException();
+                    break;  // Maybe a global variable will always be the 'correct type'...
                 case SBExpressionType.TypeReference:
                     break;
                 case SBExpressionType.MethodReference:

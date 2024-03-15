@@ -886,7 +886,7 @@ namespace StepBro.Core.Parser
                         }
                         else if (IsParameterAssignableFromArgument(p, argPicker.Current))
                         {
-                            var a = argPicker.Pick();
+                            var a = ResolveForGetOperation(argPicker.Pick(), (TypeReference)p.ParameterType);
                             if (p.ParameterType == typeof(object))
                             {
                                 a = a.NewExpressionCode(Expression.Convert(a.ExpressionCode, typeof(object)));
@@ -1219,7 +1219,20 @@ namespace StepBro.Core.Parser
             if (parameter.ParameterType.IsByRef)
             {
                 if (argument.ReferencedType != SBExpressionType.LocalVariableReference) return false;   // TODO: report reason for rejection.
-                return (parameter.ParameterType == argument.DataType.Type);  // Whtn ByRef type must be exactly the same (I think).
+                return (parameter.ParameterType == argument.DataType.Type);  // When it's a ByRef, the type must be exactly the same (I think).
+            }
+            if (typeof(IValueContainer).IsAssignableFrom(argument.DataType.Type) && !typeof(IValueContainer).IsAssignableFrom(parameter.ParameterType))
+            {
+                if (argument.DataType.Type.IsGenericType && 
+                    argument.DataType.Type.GetGenericTypeDefinition() == typeof(IValueContainer<>) &&
+                    parameter.ParameterType.IsAssignableFrom(argument.DataType.Type.GenericTypeArguments[0]))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             return parameter.ParameterType.IsAssignableFrom(argument.DataType.Type);
         }

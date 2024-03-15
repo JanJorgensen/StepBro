@@ -145,6 +145,11 @@ namespace StepBro.Core.Data
             return false;
         }
 
+        public static bool IsContainer(this Type type)
+        {
+            return typeof(IValueContainer).IsAssignableFrom(type);
+        }
+
         public static bool IsAllGenericArgumentsKnown(this MethodInfo method, Type instance)
         {
             return false;

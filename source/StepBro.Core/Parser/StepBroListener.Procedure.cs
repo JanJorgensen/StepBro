@@ -429,7 +429,7 @@ namespace StepBro.Core.Parser
             var subStatements = m_scopeStack.Peek().GetSubStatements();
             var attributes = m_scopeStack.Peek().GetAttributes();
 
-            condition = this.ResolveForGetOperation(condition);
+            condition = this.ResolveForGetOperation(condition, TypeReference.TypeBool);
 
             if (!CheckExpressionsForErrors(context, condition))
             {
@@ -565,7 +565,7 @@ namespace StepBro.Core.Parser
 
             m_lastElementPropertyBlock = null;
 
-            condition = this.ResolveForGetOperation(condition);
+            condition = this.ResolveForGetOperation(condition, TypeReference.TypeBool);
             if (condition.IsError())
             {
                 m_scopeStack.Peek().AddStatementCode(Expression.Empty());
@@ -766,7 +766,7 @@ namespace StepBro.Core.Parser
 
             var props = whileScope.GetProperties();
 
-            condition = this.ResolveForGetOperation(condition);
+            condition = this.ResolveForGetOperation(condition, TypeReference.TypeBool);
             if (condition.IsError())
             {
                 m_scopeStack.Peek().AddStatementCode(Expression.Empty());

@@ -322,22 +322,45 @@ namespace StepBro.Core.Parser
                     }
                 }
             }
-            else if (input.IsDynamicObjectMember)
-            {
-                var getter = s_DynamicObjectGetProperty.MakeGenericMethod((targetType != null) ? targetType.Type : typeof(Object));
 
-                var call = Expression.Call(
-                    getter,
-                    m_currentProcedure?.ContextReferenceInternal,
-                    Expression.Convert(input.InstanceCode, typeof(IDynamicStepBroObject)),
-                    Expression.Constant((string)input.Value));
-
-                output = new SBExpressionData(call);
-            }
-            else if (input.DataType.IsInt() && targetType != null && targetType.Equals(TypeReference.TypeDouble))
+            if (!output.IsError() && !output.IsUnresolvedIdentifier)
             {
-                // Do automatic conversion from int to double.
-                output = new SBExpressionData(Expression.Convert(input.ExpressionCode, typeof(double)));
+                if (output.IsDynamicObjectMember)
+                {
+                    var getter = s_DynamicObjectGetProperty.MakeGenericMethod((targetType != null) ? targetType.Type : typeof(Object));
+
+                    var call = Expression.Call(
+                        getter,
+                        m_currentProcedure?.ContextReferenceInternal,
+                        Expression.Convert(output.InstanceCode, typeof(IDynamicStepBroObject)),
+                        Expression.Constant((string)output.Value));
+
+                    output = new SBExpressionData(call);
+                }
+                else if (output.DataType.Type.IsContainer() && targetType != null && !targetType.Type.IsContainer())
+                {
+                    Expression expression = output.ExpressionCode;
+                    var datatype = (TypeReference)output.DataType.Type.GenericTypeArguments[0];
+                    if (output.Value != null && output.Value is FileVariable)
+                    {
+                        datatype = ((FileVariable)output.Value).DataType;    // Get the declared type of the variable.
+                    }
+                    var getValue = Expression.Call(
+                        expression,
+                        expression.Type.GetMethod("GetTypedValue"),
+                        Expression.Constant(null, typeof(StepBro.Core.Logging.ILogger)));
+                    output = new SBExpressionData(
+                        HomeType.Immediate,
+                        SBExpressionType.Expression,
+                        datatype,
+                        getValue);//,
+                                  //result.Value /* E.g. the variable reference */ );
+                }
+                else if (output.DataType.IsInt() && targetType != null && targetType.Equals(TypeReference.TypeDouble))
+                {
+                    // Do automatic conversion from int to double.
+                    output = new SBExpressionData(Expression.Convert(output.ExpressionCode, typeof(double)));
+                }
             }
             return output;
         }
@@ -349,34 +372,11 @@ namespace StepBro.Core.Parser
             {
                 return result;
             }
-            if (result != null)
-            {
-                Expression expression = result.ExpressionCode;
-                var isContainer = typeof(IValueContainer).IsAssignableFrom(expression.Type);
-                if (isContainer && (targetType == null || !targetType.Type.IsAssignableFrom(typeof(IValueContainer))))
-                {
-                    var datatype = (TypeReference)expression.Type.GenericTypeArguments[0];
-                    if (result.Value != null && result.Value is FileVariable)
-                    {
-                        datatype = ((FileVariable)result.Value).DataType;    // Get the declared type of the variable.
-                    }
-                    var getValue = Expression.Call(
-                        expression,
-                        expression.Type.GetMethod("GetTypedValue"),
-                        Expression.Constant(null, typeof(StepBro.Core.Logging.ILogger)));
-                    result = new SBExpressionData(
-                        HomeType.Immediate,
-                        SBExpressionType.Expression,
-                        datatype,
-                        getValue);//,
-                                  //result.Value /* E.g. the variable reference */ );
-                }
-                return result;
-            }
-            else
+            if (result == null)
             {
                 throw new NotImplementedException("Must be handled somewhere else!!");
             }
+            return ResolveForGetOperation(result, targetType);
         }
 
         public override void ExitExpBinary([NotNull] SBP.ExpBinaryContext context)
