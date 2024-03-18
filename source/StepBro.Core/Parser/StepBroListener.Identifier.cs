@@ -783,6 +783,12 @@ namespace StepBro.Core.Parser
         {
             var leftType = left.DataType.Type;
             var rightString = right.Value as string;
+            bool nativeOnly = false;    // Whether to skip file elements.
+            if (rightString.StartsWith('@'))
+            {
+                nativeOnly = true;
+                rightString = rightString.Substring(1);
+            }
             if (left.DataType.DynamicType is IFileElement)
             {
                 FileElement element = left.DataType.DynamicType as FileElement;
@@ -821,13 +827,17 @@ namespace StepBro.Core.Parser
                 }
             }
 
-            var fileIdentifiers = m_file.LookupIdentifier(right.Value as string)?.Where(fe => fe is FileProcedure && CanUseTypeAsInstance(fe as FileProcedure, left.DataType)).ToList();
-            if (fileIdentifiers != null && fileIdentifiers.Count > 0)
+            List<IIdentifierInfo> fileIdentifiers = null;
+            if (!nativeOnly)
             {
-                var procedureCallReference = ResolveIfIdentifier(right, true);
-                procedureCallReference.InstanceCode = left.ExpressionCode;
-                procedureCallReference.Instance = left.Instance;
-                return procedureCallReference;
+                fileIdentifiers = m_file.LookupIdentifier(rightString)?.Where(fe => fe is FileProcedure && CanUseTypeAsInstance(fe as FileProcedure, left.DataType)).ToList();
+                if (fileIdentifiers != null && fileIdentifiers.Count > 0)
+                {
+                    var procedureCallReference = ResolveIfIdentifier(right, true);
+                    procedureCallReference.InstanceCode = left.ExpressionCode;
+                    procedureCallReference.Instance = left.Instance;
+                    return procedureCallReference;
+                }
             }
 
             foreach (var type in left.DataType.Type.SelfBasesAndInterfaces(includeBaseAndInterfaces, includeBaseAndInterfaces))

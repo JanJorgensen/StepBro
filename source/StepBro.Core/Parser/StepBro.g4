@@ -765,7 +765,7 @@ identifierOrQualified : IDENTIFIER | qualifiedName ;
 //    :   arguments classBody?
 //    ;
 
-qualifiedName : IDENTIFIER (DOT IDENTIFIER)+ ;
+qualifiedName : (IDENTIFIER | AT_IDENTIFIER) (DOT (IDENTIFIER | AT_IDENTIFIER))+ ;
 
 //typeList
 //    :   type (COMMA type)*
