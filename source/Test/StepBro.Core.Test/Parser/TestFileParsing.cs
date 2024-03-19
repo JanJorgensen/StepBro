@@ -626,13 +626,13 @@ namespace StepBroCoreTest.Parser
             f1.AppendLine("}");
             f1.AppendLine("procedure int Top()");
             f1.AppendLine("{");
-            f1.AppendLine("   myTool.Work();");
+            f1.AppendLine("   myTool.Work();");         // CALL THE PROCEDURE.
             f1.AppendLine("   return myTool.IntA;");
             f1.AppendLine("}");
             f1.AppendLine("procedure void Work(this " + typeof(DummyInstrumentClass).Name + " instrument)");
             f1.AppendLine("{");
             f1.AppendLine("   instrument.DoSomething();");
-            f1.AppendLine("   instrument.@Work();");
+            f1.AppendLine("   instrument.@Work();");    // CALL THE OBJECT METHOD.
             f1.AppendLine("}");
 
             var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
