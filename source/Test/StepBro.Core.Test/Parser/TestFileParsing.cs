@@ -611,6 +611,45 @@ namespace StepBroCoreTest.Parser
             result = taskContext.CallProcedure(procedureMid);
             Assert.AreEqual(125L, result);
         }
+
+
+        [TestMethod]
+        public void FileParsing_ProcedureExtensionCallingMethodWithSameName()
+        {
+            var f1 = new StringBuilder();
+            f1.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
+            f1.AppendLine("namespace Extensions;");
+            f1.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool = " + typeof(DummyInstrumentClass).Name);
+            f1.AppendLine("{");
+            f1.AppendLine("   BoolA: true,");
+            f1.AppendLine("   IntA:  36");
+            f1.AppendLine("}");
+            f1.AppendLine("procedure int Top()");
+            f1.AppendLine("{");
+            f1.AppendLine("   myTool.Work();");         // CALL THE PROCEDURE.
+            f1.AppendLine("   return myTool.IntA;");
+            f1.AppendLine("}");
+            f1.AppendLine("procedure void Work(this " + typeof(DummyInstrumentClass).Name + " instrument)");
+            f1.AppendLine("{");
+            f1.AppendLine("   instrument.DoSomething();");
+            f1.AppendLine("   instrument.@Work();");    // CALL THE OBJECT METHOD.
+            f1.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("topfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual("topfile.sbs", files[0].FileName);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var procedureTop = files[0].ListElements().First(p => p.Name == "Top") as IFileProcedure;
+            Assert.IsNotNull(procedureTop);
+            var toolTop = files[0].ListElements().First(p => p.Name == "myTool") as IFileElement;
+            Assert.IsNotNull(toolTop);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            var result = taskContext.CallProcedure(procedureTop);
+            Assert.AreEqual(3108L, result);
+        }
     }
 }
 

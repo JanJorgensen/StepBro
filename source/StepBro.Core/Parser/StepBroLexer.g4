@@ -246,7 +246,9 @@ TILDE : '~' ;
 
 
 // Must be defined after the keyword definitions.
-IDENTIFIER:          '@'? IdentifierOrKeyword;
+AT_IDENTIFIER : '@' IdentifierOrKeyword ;
+IDENTIFIER : IdentifierOrKeyword ;
+
 
 // Custome Lexer rules
 QUOTE :             '\'';

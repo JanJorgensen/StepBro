@@ -8,6 +8,7 @@ using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Api;
+using StepBro.Core.Execution;
 
 namespace StepBroCoreTest.Parser
 {
@@ -350,6 +351,13 @@ namespace StepBroCoreTest.Parser
         public void DoSomethingElse()
         {
             this.IntA /= 4;
+        }
+
+        public void Work([Implicit] ICallContext context)
+        {
+            if (context != null) context.Logger.Log("Work Method!");
+
+            this.IntA *= 3; 
         }
     }
 }
