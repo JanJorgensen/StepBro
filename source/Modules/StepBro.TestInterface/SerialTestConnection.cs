@@ -398,12 +398,23 @@ namespace StepBro.TestInterface
 
         #region IConnection
 
+        [Obsolete]
         public bool IsConnected
+        {
+            get { return this.IsOpen; }
+        }
+        public bool IsOpen
         {
             get { return m_stream != null && m_stream.IsOpen && !m_receiverTask.IsFaulted; }
         }
 
+        [Obsolete]
         public bool Connect([Implicit] ICallContext context)
+        {
+            return this.Open(context);
+        }
+
+        public bool Open([Implicit] ICallContext context)
         {
             if (m_stream.IsOpen || m_stream.Open(context))
             {
@@ -421,7 +432,13 @@ namespace StepBro.TestInterface
             else return false;
         }
 
+        [Obsolete]
         public bool Disconnect([Implicit] ICallContext context)
+        {
+            return this.Close(context);
+        }
+
+        public bool Close([Implicit] ICallContext context)
         {
             if (m_receiverTask != null && !m_receiverTask.IsCompleted)
             {
@@ -499,7 +516,7 @@ namespace StepBro.TestInterface
 
         bool ITextCommandInput.AcceptingCommands()
         {
-            return this.IsStillValid && this.IsConnected;
+            return this.IsStillValid && this.IsOpen;
         }
 
         void ITextCommandInput.ExecuteCommand(string command)
