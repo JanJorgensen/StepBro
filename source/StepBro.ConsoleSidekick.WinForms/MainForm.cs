@@ -1101,7 +1101,12 @@ namespace StepBro.ConsoleSidekick.WinForms
         {
             var execution = new ExecutionAccess(this, m_pipe);
             m_activeExecutions.Add(new WeakReference<ExecutionAccess>(execution));
-            var request = new RunScriptRequest(execution.ID, false, element, model, objectVariable);
+            List<Argument> arguments = null;
+            if (args != null)
+            {
+                arguments = args.Select(a => new Argument(a)).ToList();
+            }
+            var request = new RunScriptRequest(execution.ID, false, element, model, objectVariable, arguments);
             if (toolStripTextBoxExeNote.Visible)
             {
                 request.ExecutionNote = toolStripTextBoxExeNote.Text;

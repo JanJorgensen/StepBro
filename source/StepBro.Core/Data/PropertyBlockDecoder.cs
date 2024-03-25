@@ -136,17 +136,19 @@ namespace StepBro.Core.Data
             }
         }
 
-        public abstract class Array<TParent> : Element<TParent> where TParent : class
+        #region Arrays
+
+        public abstract class ArrayBase<TParent> : Element<TParent> where TParent : class
         {
-            public Array(string typeOrName) : base(typeOrName, PropertyBlockEntryType.Array)
+            public ArrayBase(string typeOrName) : base(typeOrName, PropertyBlockEntryType.Array)
             {
             }
-            public Array(string typeOrName, string altTypeOrName) : base(typeOrName, altTypeOrName, PropertyBlockEntryType.Array)
+            public ArrayBase(string typeOrName, string altTypeOrName) : base(typeOrName, altTypeOrName, PropertyBlockEntryType.Array)
             {
             }
         }
 
-        public class ArrayString<TParent> : Array<TParent> where TParent : class
+        public class ArrayString<TParent> : ArrayBase<TParent> where TParent : class
         {
             private Func<TParent, List<string>, string> m_setter;
 
@@ -169,7 +171,7 @@ namespace StepBro.Core.Data
                     var stringList = arrayEntry.Select(e => (e as PropertyBlockValue).ValueAsString()).ToList();
                     try
                     {
-                        var error = (m_setter(parent, stringList));
+                        var error = m_setter(parent, stringList);
                         if (error != null)
                         {
                             errors.Add(new Tuple<int, string>(entry.Line, "Value could not be set for \"" + entry.TypeOrName + "\"; " + error));
@@ -187,19 +189,54 @@ namespace StepBro.Core.Data
             }
         }
 
+        public class Array<TParent> : ArrayBase<TParent> where TParent : class
+        {
+            private Func<TParent, List<object>, string> m_setter;
+
+            public Array(string typeOrName, Func<TParent, List<object>, string> setter = null) : base(typeOrName)
+            {
+                m_setter = setter;
+            }
+            public Array(string typeOrName, string altTypeOrName, Func<TParent, List<object>, string> setter = null) : base(typeOrName, altTypeOrName)
+            {
+                m_setter = setter;
+            }
+
+            protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
+            {
+                if (m_setter == null) return;
+                var arrayEntry = entry as PropertyBlockArray;
+                var arguments = arrayEntry.Select(e => (e as PropertyBlockValue).Value).ToList();
+                try
+                {
+                    var error = m_setter(parent, arguments);
+                    if (error != null)
+                    {
+                        errors.Add(new Tuple<int, string>(entry.Line, "Value could not be set for \"" + entry.TypeOrName + "\"; " + error));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    errors.Add(new Tuple<int, string>(entry.Line, "Error setting value for \"" + entry.TypeOrName + "\"; " + ex.Message));
+                }
+            }
+        }
+
+        #endregion
+
         #region Values
 
-        public abstract class Value<TParent> : Element<TParent> where TParent : class
+        public abstract class ValueBase<TParent> : Element<TParent> where TParent : class
         {
-            public Value(string typeOrName) : base(typeOrName, PropertyBlockEntryType.Value)
+            public ValueBase(string typeOrName) : base(typeOrName, PropertyBlockEntryType.Value)
             {
             }
-            public Value(string typeOrName, string altTypeOrName) : base(typeOrName, altTypeOrName, PropertyBlockEntryType.Value)
+            public ValueBase(string typeOrName, string altTypeOrName) : base(typeOrName, altTypeOrName, PropertyBlockEntryType.Value)
             {
             }
         }
 
-        public class ValueString<TParent> : Value<TParent> where TParent: class
+        public class ValueString<TParent> : ValueBase<TParent> where TParent : class
         {
             private Func<TParent, PropertyBlockValue, string> m_setter;
 
@@ -220,7 +257,7 @@ namespace StepBro.Core.Data
                 {
                     try
                     {
-                        var error = (m_setter(parent, valueEntry));
+                        var error = m_setter(parent, valueEntry);
                         if (error != null)
                         {
                             errors.Add(new Tuple<int, string>(entry.Line, "Value could not be set for \"" + entry.TypeOrName + "\"; " + error));
@@ -238,7 +275,7 @@ namespace StepBro.Core.Data
             }
         }
 
-        public class ValueInt<TParent> : Value<TParent> where TParent : class
+        public class ValueInt<TParent> : ValueBase<TParent> where TParent : class
         {
             private Func<TParent, PropertyBlockValue, string> m_setter;
 
@@ -273,7 +310,7 @@ namespace StepBro.Core.Data
             }
         }
 
-        public class ValueBool<TParent> : Value<TParent> where TParent : class
+        public class ValueBool<TParent> : ValueBase<TParent> where TParent : class
         {
             private Func<TParent, PropertyBlockValue, string> m_setter;
 
@@ -304,6 +341,38 @@ namespace StepBro.Core.Data
                 else
                 {
                     errors.Add(new Tuple<int, string>(entry.Line, "Value for \"" + entry.TypeOrName + "\"should be a boolean (true or false)."));
+                }
+            }
+        }
+
+        public class Value<TParent> : ValueBase<TParent> where TParent : class
+        {
+            private Func<TParent, PropertyBlockValue, string> m_setter;
+
+            public Value(string typeOrName, Func<TParent, PropertyBlockValue, string> setter = null) : base(typeOrName)
+            {
+                m_setter = setter;
+            }
+            public Value(string typeOrName, string altTypeOrName, Func<TParent, PropertyBlockValue, string> setter = null) : base(typeOrName, altTypeOrName)
+            {
+                m_setter = setter;
+            }
+
+            protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
+            {
+                if (m_setter == null) return;
+                var valueEntry = entry as PropertyBlockValue;
+                try
+                {
+                    var error = m_setter(parent, valueEntry);
+                    if (error != null)
+                    {
+                        errors.Add(new Tuple<int, string>(entry.Line, "Value could not be set for \"" + entry.TypeOrName + "\"; " + error));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    errors.Add(new Tuple<int, string>(entry.Line, "Error setting value for \"" + entry.TypeOrName + "\"; " + ex.Message));
                 }
             }
         }

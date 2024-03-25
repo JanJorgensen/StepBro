@@ -38,6 +38,16 @@ namespace StepBro.ToolBarCreator
         object GetProperty([Implicit] ICallContext context, string property);
         IToolBarElement TryFindChildElement([Implicit] ICallContext context, string name);
         IEnumerable<IToolBarElement> GetChilds();
+        object TryGetChildProperty(string name);
+    }
+
+    public static class ToolBarSupport
+    {
+        public static string GetQualifiedName(this IToolBarElement element)
+        {
+            if (element.ParentElement == null) { return element.ElementName; }
+            else return GetQualifiedName(element.ParentElement) + "." + element.ElementName;
+        }
     }
 
     //[Public]

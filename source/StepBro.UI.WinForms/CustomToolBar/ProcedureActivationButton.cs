@@ -6,6 +6,7 @@ using StepBro.ToolBarCreator;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,13 +17,17 @@ namespace StepBro.UI.WinForms.CustomToolBar
 {
     public class ProcedureActivationButton : ToolStripMenuItem, IToolBarElement, ProcedureActivationButtonLogic.IProcedureActivationButton
     {
+        private IToolBarElement m_parent;
         private ICoreAccess m_coreAccess = null;
         private ProcedureActivationButtonLogic m_logic;
         private Color m_normalBack;
         private string m_text = "";
+        private bool m_setupFromLogic = false;
 
-        public ProcedureActivationButton(ICoreAccess coreAccess, string name) : base()
+        public ProcedureActivationButton(IToolBarElement parent, ICoreAccess coreAccess, string name) : base()
         {
+            Debug.Assert(parent != null);
+            m_parent = parent;
             m_coreAccess = coreAccess;
             m_logic = new ProcedureActivationButtonLogic(this, coreAccess);
             m_normalBack = this.BackColor;
@@ -34,7 +39,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public string Instance
         {
-            get { return m_logic.StartAction.TargetObject; }
+            get { return (m_logic.StartAction.TargetObject != null) ? m_logic.StartAction.TargetObject : (string)m_parent.TryGetChildProperty("Instance"); }
             set { m_logic.StartAction.TargetObject = value; }
         }
         public string Procedure
@@ -48,6 +53,29 @@ namespace StepBro.UI.WinForms.CustomToolBar
             set { m_logic.StartAction.Partner = value; }
         }
 
+        public object[] Arguments
+        {
+            get { return (m_logic.StartAction.Arguments != null) ? m_logic.StartAction.Arguments.ToArray() : null; }
+        }
+
+        public void AddToArguments(object value)
+        {
+            if (m_logic.StartAction.Arguments == null)
+            {
+                m_logic.StartAction.Arguments = new List<object>();
+            }
+            m_logic.StartAction.Arguments.Add(value);
+        }
+
+        public void AddToArguments(IEnumerable<object> values)
+        {
+            if (m_logic.StartAction.Arguments == null)
+            {
+                m_logic.StartAction.Arguments = new List<object>();
+            }
+            m_logic.StartAction.Arguments.AddRange(values);
+        }
+
         public void SetStoppable()
         {
             m_logic.SetStoppable();
@@ -57,92 +85,19 @@ namespace StepBro.UI.WinForms.CustomToolBar
             m_logic.SetStopOnButtonRelease();
         }
 
-        #region IToolBarElementSetup
-
-        //public void Clear()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public ICoreAccess Core { get { return m_coreAccess; } }
-
-        //public void Setup(ILogger logger, PropertyBlock definition)
-        //{
-        //    foreach (var element in definition)
-        //    {
-        //        if (!m_logic.Setup(element))
-        //        {
-        //            if (element.BlockEntryType == PropertyBlockEntryType.Value)
-        //            {
-        //                var valueField = element as PropertyBlockValue;
-        //                if (valueField.Name.Equals("Text", StringComparison.InvariantCultureIgnoreCase))
-        //                {
-        //                    m_text = valueField.ValueAsString();
-        //                    this.Text = "\u23F5 " + m_text;
-        //                }
-        //                else if (valueField.Name.Equals("Color", StringComparison.InvariantCultureIgnoreCase))
-        //                {
-        //                    var colorName = valueField.ValueAsString();
-        //                    try
-        //                    {
-        //                        Color color = (Color)(typeof(Color).GetProperty(colorName).GetValue(null));
-        //                        this.BackColor = m_normalBack = color;
-        //                    }
-        //                    catch
-        //                    {
-        //                        logger.LogError("Toolbar line " + valueField.Line + ": No color named '" + colorName + "'.");
-        //                    }
-        //                    finally { }
-        //                }
-        //                else
-        //                {
-        //                    ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
-        //                }
-        //            }
-        //            else if (element.BlockEntryType == PropertyBlockEntryType.Flag)
-        //            {
-        //                var flagField = element as PropertyBlockFlag;
-        //                {
-        //                    ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
-        //                }
-        //                //if (flagField.Name == nameof(StretchChilds))
-        //                //{
-        //                //    StretchChilds = true;
-        //                //    SizeToChilds = false;
-        //                //}
-        //                //else if (flagField.Name == nameof(SizeToChilds))
-        //                //{
-        //                //    SizeToChilds = true;
-        //                //    StretchChilds = false;
-        //                //}
-        //            }
-        //            else if (element.BlockEntryType == PropertyBlockEntryType.Block)
-        //            {
-        //                {
-        //                    ToolBar.ReportTypeUnknown(logger, element.Line, element.TypeOrName);
-        //                }
-        //                //var type = element.SpecifiedTypeName;
-        //                //if (type != null)
-        //                //{
-        //                //    var elementBlock = element as PropertyBlock;
-        //                //    if (type == nameof(Menu))
-        //                //    {
-        //                //        var menu = new Menu(m_coreAccess);
-        //                //        this.DropDownItems.Add(menu);
-        //                //        menu.Setup(element.Name, elementBlock);
-        //                //    }
-        //                //}
-        //            }
-        //        }
-        //    }
-        //}
-
-        #endregion
+        protected override void OnBackColorChanged(EventArgs e)
+        {
+            if (!m_setupFromLogic)
+            {
+                m_normalBack = this.BackColor;
+            }
+        }
 
         #region IProcedureActivationButton
 
         void IProcedureActivationButton.CommandHandler(ButtonCommand command)
         {
+            m_setupFromLogic = true;
             switch (command)
             {
                 case ButtonCommand.ModeCheckOnClick:
@@ -182,6 +137,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     break;
                 default: break;
             }
+            m_setupFromLogic = false;
         }
 
         void IProcedureActivationButton.BeginInvoke(Action action)
@@ -190,6 +146,8 @@ namespace StepBro.UI.WinForms.CustomToolBar
         }
 
         #endregion
+
+        #region Mouse and Keyboard
 
         protected override void OnClick(EventArgs e)
         {
@@ -221,11 +179,13 @@ namespace StepBro.UI.WinForms.CustomToolBar
             m_logic.CheckedChanged(this.Checked);
         }
 
+        #endregion
+
         #region IToolBarElement
 
         public uint Id => throw new NotImplementedException();
 
-        public IToolBarElement ParentElement => throw new NotImplementedException();
+        public IToolBarElement ParentElement { get { return m_parent; } }
 
         public string PropertyName => throw new NotImplementedException();
 
@@ -263,6 +223,11 @@ namespace StepBro.UI.WinForms.CustomToolBar
         public IToolBarElement TryFindChildElement([Implicit] ICallContext context, string name)
         {
             throw new NotImplementedException();
+        }
+
+        public object TryGetChildProperty(string name)
+        {
+            return null;
         }
 
         #endregion
