@@ -6,7 +6,7 @@ namespace StepBro.UI.WinForms
 {
     internal static class WinFormsPropertyBlockDecoder
     {
-        public class ValueColor<TParent> : Value<TParent> where TParent : class
+        public class ValueColor<TParent> : ValueBase<TParent> where TParent : class
         {
             private Func<TParent, Color, string> m_setter;
 

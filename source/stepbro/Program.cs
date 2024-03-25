@@ -20,6 +20,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using StepBroMain = StepBro.Core.Main;
 
 namespace StepBro.Cmd
@@ -82,6 +83,8 @@ namespace StepBro.Cmd
             string targetElement = null;
             string targetPartner = null;
             string targetObject = null;
+            List<object> targetArguments = null;
+
             ulong targetExecutionStartRequestID = 0UL;
 
             try
@@ -187,6 +190,8 @@ namespace StepBro.Cmd
                 targetElement = m_commandLineOptions.TargetElement;
                 targetObject = m_commandLineOptions.TargetInstance;
                 targetPartner = m_commandLineOptions.TargetModel;
+                targetArguments = m_commandLineOptions?.Arguments.Select((a) => StepBroMain.ParseExpression(element?.ParentFile, a)).ToList();
+
 
                 if (!String.IsNullOrEmpty(targetFile))
                 {
@@ -365,7 +370,11 @@ namespace StepBro.Cmd
                                     {
                                         var objectCommand = JsonSerializer.Deserialize<StepBro.Sidekick.Messages.ObjectCommand>(input.Item2);
 
-                                        if (commandObjectDictionary.ContainsKey(objectCommand.Object) && !String.IsNullOrEmpty(objectCommand.Command))
+                                        if (String.IsNullOrEmpty(objectCommand.Object))
+                                        {
+                                            StepBroMain.Logger.RootLogger.LogError("Missing object reference in object command.");
+                                        }
+                                        else if (commandObjectDictionary.ContainsKey(objectCommand.Object) && !String.IsNullOrEmpty(objectCommand.Command))
                                         {
                                             string name = objectCommand.Object.Split('.').Last();
                                             StepBroMain.Logger.RootLogger.LogUserAction($"Request run '{name}' command \"{objectCommand.Command}\"");
@@ -390,6 +399,11 @@ namespace StepBro.Cmd
                                         targetElement = request.Element;
                                         targetPartner = request.Partner;
                                         targetObject = request.ObjectReference;
+                                        targetArguments = null;
+                                        if (request.Arguments != null)
+                                        {
+                                            targetArguments = request.Arguments.Select((a) => a.GetValue()).ToList();
+                                        }
 
                                         string objectInstanceText = String.IsNullOrEmpty(request.ObjectReference) ? "" : (request.ObjectReference.Split('.').Last() + ".");
                                         string partnertext = String.IsNullOrEmpty(targetPartner) ? "" : (" @ " + targetPartner);
@@ -669,9 +683,6 @@ namespace StepBro.Cmd
                                     partner = null;
                                     if (element != null)
                                     {
-                                        List<object> arguments = m_commandLineOptions?.Arguments.Select(
-                                            (a) => StepBroMain.ParseExpression(element?.ParentFile, a)).ToList();
-
                                         if (!String.IsNullOrEmpty(targetPartner))
                                         {
                                             partner = element.ListPartners().First(p => String.Equals(targetPartner, p.Name, StringComparison.InvariantCultureIgnoreCase));
@@ -683,21 +694,31 @@ namespace StepBro.Cmd
                                         }
                                         else
                                         {
-                                            if (!String.IsNullOrEmpty(targetObject))
+                                            if (element is IFileProcedure)
                                             {
-                                                var theObject = objectManager.GetObjectCollection().FirstOrDefault(v => string.Equals(v.FullName, targetObject, StringComparison.InvariantCulture));
-                                                if (theObject != null)
+                                                var procedure = (IFileProcedure)element;
+
+                                                // NOTE: targetObject might be set, even if it should not be used.
+
+                                                if (!String.IsNullOrEmpty(targetObject) && procedure.IsFirstParameterThisReference)
                                                 {
-                                                    arguments.Insert(0, theObject.Object);
-                                                }
-                                                else
-                                                {
-                                                    ConsoleWriteErrorLine($"Error: Target object '{targetObject}' was not found in the list of global variables.");
-                                                    error = true;
+                                                    var theObject = objectManager.GetObjectCollection().FirstOrDefault(v => string.Equals(v.FullName, targetObject, StringComparison.InvariantCulture));
+                                                    if (theObject != null)
+                                                    {
+                                                        if (targetArguments == null)
+                                                        {
+                                                            targetArguments = new List<object>();
+                                                        }
+                                                        targetArguments.Insert(0, theObject.Object);
+                                                    }
+                                                    else
+                                                    {
+                                                        ConsoleWriteErrorLine($"Error: Target object '{targetObject}' was not found in the list of global variables.");
+                                                        error = true;
+                                                    }
                                                 }
                                             }
-
-                                            if (!(element is IFileProcedure))
+                                            else
                                             {
                                                 ConsoleWriteErrorLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
                                                 error = true;
@@ -716,7 +737,7 @@ namespace StepBro.Cmd
                                                 }
                                                 if (sidekickStarted)
                                                 {
-                                                    execution = StepBroMain.StartProcedureExecution(element, partner, arguments.ToArray());
+                                                    execution = StepBroMain.StartProcedureExecution(element, partner, targetArguments.ToArray());
                                                     if (targetExecutionStartRequestID != 0UL)
                                                     {
                                                         m_requestObjectDictionary.Add(new Tuple<ulong, object>(targetExecutionStartRequestID, execution));
@@ -726,7 +747,7 @@ namespace StepBro.Cmd
                                                 }
                                                 else
                                                 {
-                                                    execution = StepBroMain.ExecuteProcedure(element, partner, arguments.ToArray());
+                                                    execution = StepBroMain.ExecuteProcedure(element, partner, targetArguments.ToArray());
                                                 }
 
                                                 executionStarted = true;

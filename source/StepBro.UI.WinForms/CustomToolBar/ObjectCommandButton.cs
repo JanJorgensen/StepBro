@@ -6,6 +6,7 @@ using StepBro.ToolBarCreator;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,12 +16,15 @@ namespace StepBro.UI.WinForms.CustomToolBar
 {
     public class ObjectCommandButton : ToolStripMenuItem, IToolBarElement
     {
+        private IToolBarElement m_parent;
         private ICoreAccess m_coreAccess = null;
         private string m_object = null;
         private string m_command = null;
 
-        public ObjectCommandButton(ICoreAccess coreAccess, string name) : base()
+        public ObjectCommandButton(IToolBarElement parent, ICoreAccess coreAccess, string name) : base()
         {
+            Debug.Assert(parent != null);
+            m_parent = parent;
             m_coreAccess = coreAccess;
             this.Margin = new Padding(1, Margin.Top, 1, Margin.Bottom);
             this.Name = name;
@@ -29,7 +33,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public string ObjectInstance
         {
-            get { return m_object; }
+            get { return (m_object != null) ? m_object : (string)m_parent.TryGetChildProperty("Instance"); }
             set { m_object = value; }
         }
         public string ObjectCommand
@@ -40,14 +44,14 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         protected override void OnClick(EventArgs e)
         {
-            m_coreAccess.ExecuteObjectCommand(m_object, m_command);
+            m_coreAccess.ExecuteObjectCommand(this.ObjectInstance, m_command);
         }
 
         #region IToolBarElement
 
         public uint Id => throw new NotImplementedException();
 
-        public IToolBarElement ParentElement => throw new NotImplementedException();
+        public IToolBarElement ParentElement { get { return m_parent; } }
 
         public string PropertyName => throw new NotImplementedException();
 
@@ -87,7 +91,11 @@ namespace StepBro.UI.WinForms.CustomToolBar
             throw new NotImplementedException();
         }
 
-        #endregion
+        public object TryGetChildProperty(string name)
+        {
+            return null;
+        }
 
+        #endregion
     }
 }

@@ -50,11 +50,14 @@ namespace StepBro.ToolBarCreator
             var color = new PropertyBlockDecoder.ValueString<object>("Color");
             var text = new PropertyBlockDecoder.ValueString<object>("Text");
             var instance = new PropertyBlockDecoder.ValueString<object>("Instance");
+            var procedure = new PropertyBlockDecoder.ValueString<object>("Procedure", "Element");
 
             var procButton = new PropertyBlockDecoder.Block<object, object>("ProcedureActivationButton",
                 color, text, instance,
-                new PropertyBlockDecoder.ValueString<object>("Procedure"),
+                new PropertyBlockDecoder.ValueString<object>("Procedure", "Element"),
                 new PropertyBlockDecoder.ValueString<object>("Partner"),
+                new PropertyBlockDecoder.Value<object>("Arg", "Argument"),
+                new PropertyBlockDecoder.Array<object>("Args", "Arguments"),
                 new PropertyBlockDecoder.Flag<object>("Stoppable"),
                 new PropertyBlockDecoder.Flag<object>("StopOnButtonRelease")
                 );
@@ -64,7 +67,7 @@ namespace StepBro.ToolBarCreator
                 );
 
             var menu = new PropertyBlockDecoder.Block<object, object>("Menu");
-            menu.SetChilds(menu, procButton, objCmdButton);
+            menu.SetChilds(menu, procButton, objCmdButton, instance);
 
             var root = new PropertyBlockDecoder.Block<object, object>
                 (
@@ -73,7 +76,7 @@ namespace StepBro.ToolBarCreator
                     new PropertyBlockDecoder.ValueInt<object>("Priority"),
                     new PropertyBlockDecoder.Flag<object>("Separator"),
                     new PropertyBlockDecoder.Flag<object>("ColumnSeparator"),
-                    menu, procButton, objCmdButton
+                    menu, procButton, objCmdButton, instance
                 );
             root.DecodeData(data, null, errors);
         }

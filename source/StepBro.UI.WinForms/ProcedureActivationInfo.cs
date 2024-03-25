@@ -11,7 +11,7 @@ namespace StepBro.UI.WinForms
         public string Name { get; set; } = null;
         public string Partner { get; set; } = null;
         public string TargetObject { get; set; } = null;
-        //public bool FirstParameterIsSelf { get; set; } = false;
+        public List<object> Arguments { get; set; } = null;
         public bool IsUsed { get { return !string.IsNullOrEmpty(Name); } }
     }
 }

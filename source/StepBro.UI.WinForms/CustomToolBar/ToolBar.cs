@@ -3,32 +3,21 @@ using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
-using StepBro.PanelCreator;
 using StepBro.ToolBarCreator;
-using StepBro.UI.WinForms.PanelElements;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using static StepBro.Core.Data.PropertyBlockDecoder;
 using static StepBro.UI.WinForms.WinFormsPropertyBlockDecoder;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
-    public class ToolBar : ToolStrip, IMenuItemHost, StepBro.ToolBarCreator.IToolBarElement
+    public class ToolBar : ToolStrip, IMenuItemHost, IToolBarElement
     {
         private static ICoreAccess m_coreAccess = null;
         bool m_colorSet = false;
         bool m_settingDefaultColor = false;
         int m_priority = 10;
         private static PropertyBlockDecoder.Block<object, ToolBar> m_decoder = null;
+        private Dictionary<string, object> m_commonChildFields = null;
 
         public ToolBar() : base()
         {
@@ -43,8 +32,10 @@ namespace StepBro.UI.WinForms.CustomToolBar
                 new ValueColor<ProcedureActivationButton>("Color", (b, c) => { b.BackColor = c; return null; }),
                 new ValueString<ProcedureActivationButton>("Text", (b, v) => { b.Text = v.ValueAsString(); return null; }),
                 new ValueString<ProcedureActivationButton>("Instance", "Object", (b, v) => { b.Instance = v.ValueAsString(); return null; }),
-                new ValueString<ProcedureActivationButton>("Procedure", (b, v) => { b.Procedure = v.ValueAsString(); return null; }),
+                new ValueString<ProcedureActivationButton>("Procedure", "Element", (b, v) => { b.Procedure = v.ValueAsString(); return null; }),
                 new ValueString<ProcedureActivationButton>("Partner", "Model", (b, v) => { b.Partner = v.ValueAsString(); return null; }),
+                new Value<ProcedureActivationButton>("Arg", "Argument", (b, a) => { b.AddToArguments(a.Value); return null; }),
+                new PropertyBlockDecoder.Array<ProcedureActivationButton>("Args", "Arguments", (b, a) => { b.AddToArguments(a); return null; }),
                 new Flag <ProcedureActivationButton>("Stoppable", (b, f) => { b.SetStoppable(); return null; }),
                 new Flag<ProcedureActivationButton>("StopOnButtonRelease", (b, f) => { b.SetStopOnButtonRelease(); return null; })
             };
@@ -52,7 +43,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                 "ProcedureActivationButton",
                 (m, n) =>
                 {
-                    var button = new ProcedureActivationButton(m_coreAccess, n);
+                    var button = new ProcedureActivationButton(m as IToolBarElement, m_coreAccess, n);
                     m.Add(button);
                     button.Size = new Size(23, 20);
                     button.AutoSize = true;
@@ -70,7 +61,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                 "ObjectCommandButton",
                 (m, n) =>
                 {
-                    var button = new ObjectCommandButton(m_coreAccess, n);
+                    var button = new ObjectCommandButton(m as IToolBarElement, m_coreAccess, n);
                     m.Add(button);
                     button.Size = new Size(23, 20);
                     button.AutoSize = true;
@@ -80,27 +71,37 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
             var menuTitle = new ValueString<IMenu>("Text", "Title", (m, v) => { m.SetTitle(v.ValueAsString()); return null; });
 
-            var subMenu = new Block<ToolStripDropDownMenu, ToolStripMenuSubMenu>("Menu", "SubMenu", 
+            var subMenu = new Block<ToolStripDropDownMenu, ToolStripMenuSubMenu>("Menu", "SubMenu",
                 (m, n) =>
                 {
-                    var menu = new ToolStripMenuSubMenu(m_coreAccess, n);
+                    var menu = new ToolStripMenuSubMenu(m, m_coreAccess, n);
                     m.DropDownItems.Add(menu);
                     menu.Size = new Size(30, 20);
-                    menu.AutoSize = true; 
+                    menu.AutoSize = true;
                     return menu;
                 });
-            subMenu.SetChilds(menuTitle, subMenu, procButton, objCmdButton);
+            subMenu.SetChilds(
+                menuTitle, subMenu, procButton, objCmdButton,
+                new ValueString<ToolStripMenuSubMenu>("Instance", (m, v) => { m.SetChildProperty("Instance", v.ValueAsString()); return null; }),
+                new ValueString<ToolStripMenuSubMenu>("Procedure", "Element", (m, v) => { m.SetChildProperty("Element", v.ValueAsString()); return null; }),
+                new ValueString<ToolStripMenuSubMenu>("Partner", "Model", (m, v) => { m.SetChildProperty("Partner", v.ValueAsString()); return null; }),
+                new ValueString<ToolStripMenuSubMenu>("Command", (m, v) => { m.SetChildProperty("Command", v.ValueAsString()); return null; }));
 
-            var toolbarMenu = new Block<ToolBar, ToolStripDropDownMenu>("Menu", "DropDownMenu", 
+            var toolbarMenu = new Block<ToolBar, ToolStripDropDownMenu>("Menu", "DropDownMenu",
                 (t, n) =>
                 {
-                    var menu = new ToolStripDropDownMenu(m_coreAccess, n);
+                    var menu = new ToolStripDropDownMenu(t, m_coreAccess, n);
                     t.Items.Add(menu);
                     menu.Size = new Size(30, 20);
                     menu.AutoSize = true;
                     return menu;
                 });
-            toolbarMenu.SetChilds(menuTitle, subMenu, procButton, objCmdButton);
+            toolbarMenu.SetChilds(
+                menuTitle, subMenu, procButton, objCmdButton,
+                new ValueString<ToolStripDropDownMenu>("Instance", (m, v) => { m.SetChildProperty("Instance", v.ValueAsString()); return null; }),
+                new ValueString<ToolStripDropDownMenu>("Procedure", "Element", (m, v) => { m.SetChildProperty("Element", v.ValueAsString()); return null; }),
+                new ValueString<ToolStripDropDownMenu>("Partner", "Model", (m, v) => { m.SetChildProperty("Partner", v.ValueAsString()); return null; }),
+                new ValueString<ToolStripDropDownMenu>("Command", (m, v) => { m.SetChildProperty("Command", v.ValueAsString()); return null; }));
 
             m_decoder = new Block<object, ToolBar>
                 (
@@ -140,6 +141,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                         t.Items.Add(separator); t.Items.Add(separator);
                         return null;
                     }),
+                    new ValueString<ToolBar>("Instance", (t, v) => { t.SetChildProperty("Instance", v.ValueAsString()); return null; }),
                     toolbarMenu, procButton, objCmdButton
                 );
         }
@@ -166,6 +168,15 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     m_settingDefaultColor = false;
                 }
             }
+        }
+
+        private void SetChildProperty(string name, object value)
+        {
+            if (m_commonChildFields == null)
+            {
+                m_commonChildFields = new Dictionary<string, object>();
+            }
+            m_commonChildFields[name] = value;
         }
 
         public ToolBar(ICoreAccess coreAccess) : this()
@@ -269,7 +280,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public uint Id => throw new NotImplementedException();
 
-        public IToolBarElement ParentElement => throw new NotImplementedException();
+        public IToolBarElement ParentElement { get { return null; } }
 
         public string PropertyName => throw new NotImplementedException();
 
@@ -312,6 +323,15 @@ namespace StepBro.UI.WinForms.CustomToolBar
         public void Add(ToolStripMenuItem item)
         {
             this.Items.Add(item);
+        }
+
+        public object TryGetChildProperty(string name)
+        {
+            if (m_commonChildFields != null && m_commonChildFields.ContainsKey(name))
+            {
+                return m_commonChildFields[name];
+            }
+            return null;
         }
 
         #endregion

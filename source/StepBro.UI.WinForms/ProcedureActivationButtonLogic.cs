@@ -1,6 +1,7 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Tasks;
+using StepBro.ToolBarCreator;
 
 namespace StepBro.UI.WinForms
 {
@@ -30,7 +31,7 @@ namespace StepBro.UI.WinForms
             ShowWaitSymbol
         }
 
-        public interface IProcedureActivationButton
+        public interface IProcedureActivationButton : IToolBarElement
         {
             void CommandHandler(ButtonCommand command);
             void BeginInvoke(Action action);
@@ -132,7 +133,17 @@ namespace StepBro.UI.WinForms
                     this.SendCommand(ButtonCommand.ShowActive);
                     this.SendCommand(ButtonCommand.ShowStopSymbol);
                 }
-                m_execution = m_coreAccess.StartExecution(m_startProcedure.Name, m_startProcedure.Partner, m_startProcedure.TargetObject, null);
+
+                string element = m_startProcedure.Name;
+                if (element == null) { element = m_parentControl.ParentElement.TryGetChildProperty("Element") as string; }
+                string partner = m_startProcedure.Partner;
+                if (partner == null) { partner = m_parentControl.ParentElement.TryGetChildProperty("Partner") as string; }
+                string instance = m_startProcedure.TargetObject;
+                if (instance == null) { instance = m_parentControl.ParentElement.TryGetChildProperty("Instance") as string; }
+
+                List<object> arguments = m_startProcedure.Arguments;
+
+                m_execution = m_coreAccess.StartExecution(element, partner, instance, (arguments != null) ? arguments.ToArray() : null);
                 m_execution.CurrentStateChanged += Execution_CurrentStateChanged;
                 System.Diagnostics.Debug.WriteLine("StartProcedure End");
             }
