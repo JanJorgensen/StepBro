@@ -83,7 +83,7 @@ namespace StepBro.Cmd
             string targetElement = null;
             string targetPartner = null;
             string targetObject = null;
-            List<object> targetArguments = null;
+            List<object> targetArguments = new List<object>();
 
             ulong targetExecutionStartRequestID = 0UL;
 
@@ -399,7 +399,7 @@ namespace StepBro.Cmd
                                         targetElement = request.Element;
                                         targetPartner = request.Partner;
                                         targetObject = request.ObjectReference;
-                                        targetArguments = null;
+                                        targetArguments = new List<object>();
                                         if (request.Arguments != null)
                                         {
                                             targetArguments = request.Arguments.Select((a) => a.GetValue()).ToList();
@@ -705,10 +705,6 @@ namespace StepBro.Cmd
                                                     var theObject = objectManager.GetObjectCollection().FirstOrDefault(v => string.Equals(v.FullName, targetObject, StringComparison.InvariantCulture));
                                                     if (theObject != null)
                                                     {
-                                                        if (targetArguments == null)
-                                                        {
-                                                            targetArguments = new List<object>();
-                                                        }
                                                         targetArguments.Insert(0, theObject.Object);
                                                     }
                                                     else
