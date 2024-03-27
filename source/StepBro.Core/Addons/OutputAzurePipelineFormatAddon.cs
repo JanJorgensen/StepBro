@@ -145,7 +145,7 @@ namespace StepBro.Core.Addons
                                     {
                                         if (sec.Item1 != null)
                                         {
-                                            m_writer.WriteLine(indent.Peek() + "##[section] " + sec.Item1.Header);
+                                            m_writer.WriteLine("##[section]" + indent.Peek() + sec.Item1.Header);
                                         }
                                         else
                                         {
