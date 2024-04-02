@@ -1,0 +1,64 @@
+\doxysection{Step\+Bro.\+CAN.\+Channel Class Reference}
+\hypertarget{class_step_bro_1_1_c_a_n_1_1_channel}{}\label{class_step_bro_1_1_c_a_n_1_1_channel}\index{StepBro.CAN.Channel@{StepBro.CAN.Channel}}
+Inheritance diagram for Step\+Bro.\+CAN.\+Channel\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_c_a_n_1_1_channel}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_a511a943f2c1ff63a275f8dbf63e40bb9}\label{class_step_bro_1_1_c_a_n_1_1_channel_a511a943f2c1ff63a275f8dbf63e40bb9} 
+bool {\bfseries Close} ()
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_ac8590527590c76deb1f5a83f0918e3df}\label{class_step_bro_1_1_c_a_n_1_1_channel_ac8590527590c76deb1f5a83f0918e3df} 
+ICANMessage {\bfseries Create\+Message} (uint id, byte\mbox{[}$\,$\mbox{]} data)
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_a30e223fbc949ce7d20df2a15515e890b}\label{class_step_bro_1_1_c_a_n_1_1_channel_a30e223fbc949ce7d20df2a15515e890b} 
+ICANMessage {\bfseries Create\+Message} (CANMessage\+Type type, uint id, byte\mbox{[}$\,$\mbox{]} data)
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_a78667c9432c72ecf07ac931e52251619}\label{class_step_bro_1_1_c_a_n_1_1_channel_a78667c9432c72ecf07ac931e52251619} 
+void {\bfseries Flush} ()
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_a494de303d2c77979f7f5c34d09e1951b}\label{class_step_bro_1_1_c_a_n_1_1_channel_a494de303d2c77979f7f5c34d09e1951b} 
+ICANMessage {\bfseries Get\+Received} ()
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_aebface3ba00cd37e754195e3f5c12573}\label{class_step_bro_1_1_c_a_n_1_1_channel_aebface3ba00cd37e754195e3f5c12573} 
+bool {\bfseries Open} ()
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_adb753d73b6b99f7fb00c2d77a414f7fb}\label{class_step_bro_1_1_c_a_n_1_1_channel_adb753d73b6b99f7fb00c2d77a414f7fb} 
+void {\bfseries Reset\+Errors} ()
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_adc66a665b0c46bcc1d561abe303efac0}\label{class_step_bro_1_1_c_a_n_1_1_channel_adc66a665b0c46bcc1d561abe303efac0} 
+bool {\bfseries Send} (ICANMessage message)
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_adbfbd566bcb04dc02f76504a8e0247c4}\label{class_step_bro_1_1_c_a_n_1_1_channel_adbfbd566bcb04dc02f76504a8e0247c4} 
+ICANMessage {\bfseries Send} (uint id, byte\mbox{[}$\,$\mbox{]} data)
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_a1505a1fbb4ec8fdbce85605541902c11}\label{class_step_bro_1_1_c_a_n_1_1_channel_a1505a1fbb4ec8fdbce85605541902c11} 
+ICANMessage {\bfseries Send} (CANMessage\+Type type, uint id, byte\mbox{[}$\,$\mbox{]} data)
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_ab71d341d3316ced984fa54d420863140}\label{class_step_bro_1_1_c_a_n_1_1_channel_ab71d341d3316ced984fa54d420863140} 
+void {\bfseries Setup} (CANBaudrate baudrate, CANChannel\+Mode mode, Time\+Span transmit\+Timeout)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_a3add0f79e40536f7f417504e0a4e0ca2}\label{class_step_bro_1_1_c_a_n_1_1_channel_a3add0f79e40536f7f417504e0a4e0ca2} 
+ICANAdapter {\bfseries Adapter}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_a6337c7076c339cf88558905ea0105a4a}\label{class_step_bro_1_1_c_a_n_1_1_channel_a6337c7076c339cf88558905ea0105a4a} 
+string {\bfseries Error\+Status}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_a670d62e1f2a341f2ebeb55cdbbd7487f}\label{class_step_bro_1_1_c_a_n_1_1_channel_a670d62e1f2a341f2ebeb55cdbbd7487f} 
+bool {\bfseries Is\+Open}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_channel_abe4b4792d4fbd071ac893e7a3f718423}\label{class_step_bro_1_1_c_a_n_1_1_channel_abe4b4792d4fbd071ac893e7a3f718423} 
+string {\bfseries Last\+Operation\+Status}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Modules/\+Step\+Bro.\+CAN/Channel.\+cs\end{DoxyCompactItemize}

@@ -1,0 +1,66 @@
+\doxysection{Step\+Bro.\+Core.\+File.\+Folder\+Shortcut\+Collection Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection}{}\label{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection}\index{StepBro.Core.File.FolderShortcutCollection@{StepBro.Core.File.FolderShortcutCollection}}
+Inheritance diagram for Step\+Bro.\+Core.\+File.\+Folder\+Shortcut\+Collection\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_a72a84bd8bffedb29b60d7387807384cc}\label{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_a72a84bd8bffedb29b60d7387807384cc} 
+{\bfseries Folder\+Shortcut\+Collection} (Folder\+Shortcut\+Origin origin, params \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcuts_source}{IFolder\+Shortcuts\+Source}}\mbox{[}$\,$\mbox{]} collections)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_affb9fdec512123a2427caf2163dd928e}\label{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_affb9fdec512123a2427caf2163dd928e} 
+void {\bfseries Add\+Source} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcuts_source}{IFolder\+Shortcuts\+Source}} source)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_ada89681414a7cc4df2e14efa29c593a6}\label{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_ada89681414a7cc4df2e14efa29c593a6} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcut}{IFolder\+Shortcut}} {\bfseries Add\+Shortcut} (string name, string path, bool is\+Resolved=false)
+\item 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcut}{IFolder\+Shortcut}} $>$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_a077ccc99bde09bd43b61ec5b50a2904c}{List\+Shortcuts}} ()
+\begin{DoxyCompactList}\small\item\em The list of folder shortcuts defined in the environment (OS), the host application, the configuration and the current script file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcut}{IFolder\+Shortcut}} $>$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcuts_source_a61afb4ec996cabe10d0c634c17eb1ca8}{List\+Shortcuts}} ()
+\begin{DoxyCompactList}\small\item\em The list of folder shortcuts defined in the environment (OS), the host application, the configuration and the current script file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_ac1d1179c4bfa075927d547a4c3148a21}\label{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_ac1d1179c4bfa075927d547a4c3148a21} 
+static IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcut}{IFolder\+Shortcut}} $>$ {\bfseries List\+Shortcuts} (params \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcuts_source}{IFolder\+Shortcuts\+Source}}\mbox{[}$\,$\mbox{]} sources)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_a835017d08ae4afc8c1d6f50aadaac356}\label{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_a835017d08ae4afc8c1d6f50aadaac356} 
+Folder\+Shortcut\+Origin {\bfseries Origin}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_a9d9b9eb7b37f2b08cf85215adb998293}\label{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_a9d9b9eb7b37f2b08cf85215adb998293} 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcut}{IFolder\+Shortcut}} $>$ {\bfseries Shortcuts}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_a077ccc99bde09bd43b61ec5b50a2904c}\label{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection_a077ccc99bde09bd43b61ec5b50a2904c} 
+\index{StepBro.Core.File.FolderShortcutCollection@{StepBro.Core.File.FolderShortcutCollection}!ListShortcuts@{ListShortcuts}}
+\index{ListShortcuts@{ListShortcuts}!StepBro.Core.File.FolderShortcutCollection@{StepBro.Core.File.FolderShortcutCollection}}
+\doxysubsubsection{\texorpdfstring{ListShortcuts()}{ListShortcuts()}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcut}{IFolder\+Shortcut}} $>$ Step\+Bro.\+Core.\+File.\+Folder\+Shortcut\+Collection.\+List\+Shortcuts (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+The list of folder shortcuts defined in the environment (OS), the host application, the configuration and the current script file. 
+
+\begin{DoxyReturn}{Returns}
+An enumeration of the available shortcuts.
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcuts_source_a61afb4ec996cabe10d0c634c17eb1ca8}{Step\+Bro.\+Core.\+File.\+IFolder\+Shortcuts\+Source}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+File/File\+Reference.\+cs\end{DoxyCompactItemize}

@@ -1,0 +1,64 @@
+\doxysection{Step\+Bro.\+Core.\+General Namespace Reference}
+\hypertarget{namespace_step_bro_1_1_core_1_1_general}{}\label{namespace_step_bro_1_1_core_1_1_general}\index{StepBro.Core.General@{StepBro.Core.General}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_command_line_parser}{Command\+Line\+Parser}}
+\item 
+class {\bfseries Configuration\+File\+Manager}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_core_commandline_options}{Core\+Commandline\+Options}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_dynamic_method_not_found_exception}{Dynamic\+Method\+Not\+Found\+Exception}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_dynamic_property_not_found_exception}{Dynamic\+Property\+Not\+Found\+Exception}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_file_already_loaded_exception}{File\+Already\+Loaded\+Exception}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_folder_configuration}{Folder\+Configuration}}
+\item 
+class {\bfseries Host\+Application\+Action\+Queue}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_configuration_file_manager}{IConfiguration\+File\+Manager}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_host_application_action_queue}{IHost\+Application\+Action\+Queue}}
+\item 
+interface {\bfseries IInternal\+Dispose}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager}{ILoaded\+Files\+Manager}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_script_disposable}{IScript\+Disposable}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system}{IText\+File\+System}}
+\begin{DoxyCompactList}\small\item\em Abstract file system interface, for listing and opening textual files (typicaly script files, data files and configuration files). \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base}{Loaded\+File\+Base}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_event_args}{Loaded\+File\+Event\+Args}}
+\item 
+class {\bfseries Loaded\+Files\+Manager}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_operation_not_allowed_exception}{Operation\+Not\+Allowed\+Exception}}
+\item 
+class {\bfseries Text\+File\+System}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{namespace_step_bro_1_1_core_1_1_general_a92f842f633cb8973e6895fc51557bb27}\label{namespace_step_bro_1_1_core_1_1_general_a92f842f633cb8973e6895fc51557bb27} 
+enum {\bfseries Loaded\+File\+Type} \{ \newline
+{\bfseries Unknown}
+, {\bfseries Step\+Bro\+Script}
+, {\bfseries Clear\+Text}
+, {\bfseries CSharp}
+, \newline
+{\bfseries Python}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{namespace_step_bro_1_1_core_1_1_general_a38e38d019325adefae2b652518603892}\label{namespace_step_bro_1_1_core_1_1_general_a38e38d019325adefae2b652518603892} 
+delegate void {\bfseries Loaded\+File\+Event\+Handler} (object sender, \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_event_args}{Loaded\+File\+Event\+Args}} args)
+\end{DoxyCompactItemize}

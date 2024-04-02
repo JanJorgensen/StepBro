@@ -1,0 +1,141 @@
+\doxysection{Step\+Bro.\+Core.\+Execution Namespace Reference}
+\hypertarget{namespace_step_bro_1_1_core_1_1_execution}{}\label{namespace_step_bro_1_1_core_1_1_execution}\index{StepBro.Core.Execution@{StepBro.Core.Execution}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_execution_1_1_action_queue}{Action\+Queue}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_execution_1_1_alt_manager}{Alt\+Manager}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_execution_1_1_argument_list}{Argument\+List}}
+\item 
+class {\bfseries Call\+Context}
+\item 
+class {\bfseries Context\+Extensions}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_execution_1_1_execution_error}{Execution\+Error}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_execution_1_1_execution_failure}{Execution\+Failure}}
+\item 
+class {\bfseries Execution\+Helper\+Methods}
+\item 
+class {\bfseries Execution\+Result}
+\item 
+class {\bfseries Execution\+Scope\+Status\+Updater}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_execution_1_1_expect_error}{Expect\+Error}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_execution_1_1_expect_failed}{Expect\+Failed}}
+\item 
+class {\bfseries Function\+Call\+Context\+Wrapper}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_await_action}{IAwait\+Action}}
+\begin{DoxyCompactList}\small\item\em Feedback interface for methods or tasks that awaits some specific event. \end{DoxyCompactList}\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}}
+\begin{DoxyCompactList}\small\item\em Context interface to allow code module methods to access functionality from the script execution and the \doxylink{namespace_step_bro}{Step\+Bro} system. \end{DoxyCompactList}\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_result}{IExecution\+Result}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status}{IExecution\+Scope\+Status}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update}{IExecution\+Scope\+Status\+Update}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_state_button}{IExecution\+State\+Button}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_function_reference}{IFunction\+Reference}}
+\begin{DoxyCompactList}\small\item\em Interface used by the parser to distinguish between procedures and functions. \end{DoxyCompactList}\item 
+interface {\bfseries IProcedure\+Reference}
+\begin{DoxyCompactList}\small\item\em Generic interface for a procedure reference object. \end{DoxyCompactList}\item 
+interface {\bfseries IProcedure\+This}
+\item 
+interface {\bfseries IScript\+Call\+Context}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_script_execution}{IScript\+Execution}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_script_execution_manager}{IScript\+Execution\+Manager}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_execution_1_1_named_argument}{Named\+Argument}}
+\item 
+class {\bfseries Request\+Early\+Exit\+Exception}
+\item 
+class {\bfseries Script\+Call\+Context}
+\item 
+class {\bfseries Script\+Execution\+Manager}
+\item 
+class {\bfseries Script\+Execution\+Task}
+\item 
+class {\bfseries Script\+Task\+Context}
+\item 
+class {\bfseries Script\+Utils}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_execution_1_1_unhandled_exception_in_script_exception}{Unhandled\+Exception\+In\+Script\+Exception}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778d}{Call\+Entry}} \{ \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778dad27357b5abc9c78c469e94ee8e56af81}{First\+Call}}
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778da05925cbab55056259a4575e6e782277a}{First\+In\+Execution}}
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778dab4398696d19c00984876cbc39e0aeef6}{Subsequent}}
+ \}
+\begin{DoxyCompactList}\small\item\em Enumerates different states of the script executing the current method call. \end{DoxyCompactList}\item 
+\Hypertarget{namespace_step_bro_1_1_core_1_1_execution_a9892b0fe4e5cf98c49e7434ec507b336}\label{namespace_step_bro_1_1_core_1_1_execution_a9892b0fe4e5cf98c49e7434ec507b336} 
+enum {\bfseries Attention\+Color} \{ {\bfseries Normal}
+, {\bfseries Warning}
+, {\bfseries Error}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+delegate bool \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_execution_aec05845d8635ece726581650fbc6f776}{State\+Button\+Action}} (bool activated)
+\begin{DoxyCompactList}\small\item\em Delegate type for state buttons. \end{DoxyCompactList}\item 
+\Hypertarget{namespace_step_bro_1_1_core_1_1_execution_add36e2d4f77691a2005bf9b7da2872b4}\label{namespace_step_bro_1_1_core_1_1_execution_add36e2d4f77691a2005bf9b7da2872b4} 
+delegate void {\bfseries Runtime\+Error\+Listener} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_procedure}{IFile\+Procedure}} procedure, int line, \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_error_i_d}{Error\+ID}} error, string description, Exception exception)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778d}\label{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778d} 
+\index{StepBro.Core.Execution@{StepBro.Core.Execution}!CallEntry@{CallEntry}}
+\index{CallEntry@{CallEntry}!StepBro.Core.Execution@{StepBro.Core.Execution}}
+\doxysubsubsection{\texorpdfstring{CallEntry}{CallEntry}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778d}{Step\+Bro.\+Core.\+Execution.\+Call\+Entry}}}
+
+
+
+Enumerates different states of the script executing the current method call. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FirstCall@{FirstCall}!StepBro.Core.Execution@{StepBro.Core.Execution}}\index{StepBro.Core.Execution@{StepBro.Core.Execution}!FirstCall@{FirstCall}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778dad27357b5abc9c78c469e94ee8e56af81}\label{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778dad27357b5abc9c78c469e94ee8e56af81} 
+First\+Call&The first call after definition or after opening the host application. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FirstInExecution@{FirstInExecution}!StepBro.Core.Execution@{StepBro.Core.Execution}}\index{StepBro.Core.Execution@{StepBro.Core.Execution}!FirstInExecution@{FirstInExecution}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778da05925cbab55056259a4575e6e782277a}\label{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778da05925cbab55056259a4575e6e782277a} 
+First\+In\+Execution&First call after script execution start. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Subsequent@{Subsequent}!StepBro.Core.Execution@{StepBro.Core.Execution}}\index{StepBro.Core.Execution@{StepBro.Core.Execution}!Subsequent@{Subsequent}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778dab4398696d19c00984876cbc39e0aeef6}\label{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778dab4398696d19c00984876cbc39e0aeef6} 
+Subsequent&Called more than once. \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespace_step_bro_1_1_core_1_1_execution_aec05845d8635ece726581650fbc6f776}\label{namespace_step_bro_1_1_core_1_1_execution_aec05845d8635ece726581650fbc6f776} 
+\index{StepBro.Core.Execution@{StepBro.Core.Execution}!StateButtonAction@{StateButtonAction}}
+\index{StateButtonAction@{StateButtonAction}!StepBro.Core.Execution@{StepBro.Core.Execution}}
+\doxysubsubsection{\texorpdfstring{StateButtonAction()}{StateButtonAction()}}
+{\footnotesize\ttfamily delegate bool Step\+Bro.\+Core.\+Execution.\+State\+Button\+Action (\begin{DoxyParamCaption}\item[{bool}]{activated }\end{DoxyParamCaption})}
+
+
+
+Delegate type for state buttons. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em activated} & Whether the button is being activated (true) or released (false).\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether the button should be shown in pushed state.
+\end{DoxyReturn}

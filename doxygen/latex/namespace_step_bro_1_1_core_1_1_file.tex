@@ -1,0 +1,76 @@
+\doxysection{Step\+Bro.\+Core.\+File Namespace Reference}
+\hypertarget{namespace_step_bro_1_1_core_1_1_file}{}\label{namespace_step_bro_1_1_core_1_1_file}\index{StepBro.Core.File@{StepBro.Core.File}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_file_1_1_code_file_writer}{Code\+File\+Writer}}
+\item 
+class {\bfseries File\+Reference\+Utils}
+\item 
+class {\bfseries Folder\+Manager}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut}{Folder\+Shortcut}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcut_collection}{Folder\+Shortcut\+Collection}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_file_1_1_folder_shortcuts_from_delegate}{Folder\+Shortcuts\+From\+Delegate}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_manager}{IFolder\+Manager}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcut}{IFolder\+Shortcut}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcuts_source}{IFolder\+Shortcuts\+Source}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{namespace_step_bro_1_1_core_1_1_file_ae755440fa3c6d157d54e17b9553c2b8d}\label{namespace_step_bro_1_1_core_1_1_file_ae755440fa3c6d157d54e17b9553c2b8d} 
+enum {\bfseries Folder\+Shortcut\+Origin} \{ \newline
+{\bfseries Root}
+, {\bfseries Environment}
+, {\bfseries Host\+Application}
+, {\bfseries Configuration}
+, \newline
+{\bfseries User}
+, {\bfseries Project}
+, {\bfseries Script\+File}
+ \}
+\item 
+enum \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5}{Save\+Option}} \{ \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5a1cd6cdc1f76fe7400e2ece21c2ec4d6a}{Save\+To\+Existing}}
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5a6da0a942dabad19b528789185e90f0a8}{Save\+As\+Copy}}
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5a904a8304056d77e4547744781b7ceb50}{Rename}}
+ \}
+\begin{DoxyCompactList}\small\item\em Options for a save operation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{namespace_step_bro_1_1_core_1_1_file_a39d25faccd8a4a3f1ac22c61e8979e95}\label{namespace_step_bro_1_1_core_1_1_file_a39d25faccd8a4a3f1ac22c61e8979e95} 
+delegate IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcut}{IFolder\+Shortcut}} $>$ {\bfseries Folder\+Shortcuts\+Delegate} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5}\label{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5} 
+\index{StepBro.Core.File@{StepBro.Core.File}!SaveOption@{SaveOption}}
+\index{SaveOption@{SaveOption}!StepBro.Core.File@{StepBro.Core.File}}
+\doxysubsubsection{\texorpdfstring{SaveOption}{SaveOption}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5}{Step\+Bro.\+Core.\+File.\+Save\+Option}}}
+
+
+
+Options for a save operation. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SaveToExisting@{SaveToExisting}!StepBro.Core.File@{StepBro.Core.File}}\index{StepBro.Core.File@{StepBro.Core.File}!SaveToExisting@{SaveToExisting}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5a1cd6cdc1f76fe7400e2ece21c2ec4d6a}\label{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5a1cd6cdc1f76fe7400e2ece21c2ec4d6a} 
+Save\+To\+Existing&Saving new file content to the existing file. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SaveAsCopy@{SaveAsCopy}!StepBro.Core.File@{StepBro.Core.File}}\index{StepBro.Core.File@{StepBro.Core.File}!SaveAsCopy@{SaveAsCopy}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5a6da0a942dabad19b528789185e90f0a8}\label{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5a6da0a942dabad19b528789185e90f0a8} 
+Save\+As\+Copy&Save the new file content to a new file and keep the existing file opened and unchanged. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Rename@{Rename}!StepBro.Core.File@{StepBro.Core.File}}\index{StepBro.Core.File@{StepBro.Core.File}!Rename@{Rename}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5a904a8304056d77e4547744781b7ceb50}\label{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5a904a8304056d77e4547744781b7ceb50} 
+Rename&Save the new content to the existing file and rename the file. \\
+\hline
+
+\end{DoxyEnumFields}

@@ -1,0 +1,86 @@
+\doxysection{Step\+Bro.\+Core.\+General.\+IText\+File\+System Interface Reference}
+\hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system}{}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system}\index{StepBro.Core.General.ITextFileSystem@{StepBro.Core.General.ITextFileSystem}}
+
+
+Abstract file system interface, for listing and opening textual files (typicaly script files, data files and configuration files).  
+
+
+
+
+Inherited by Step\+Bro.\+Core.\+General.\+Text\+File\+System, and Step\+Bro.\+Core.\+Test.\+Mocks.\+Text\+File\+System\+Mock.
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system_a367226808a78bc2e1cea4d907b59921a}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system_a367226808a78bc2e1cea4d907b59921a} 
+IEnumerable$<$ string $>$ {\bfseries List\+Files} (string path)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system_a21b41f3898bd1e6d9484614b3e7f8744}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system_a21b41f3898bd1e6d9484614b3e7f8744} 
+IEnumerable$<$ string $>$ {\bfseries List\+Folders} (string path)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system_abb2162dc2c071993990bbd34304738f6}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system_abb2162dc2c071993990bbd34304738f6} 
+Date\+Time {\bfseries Get\+File\+Change\+Time} (string path)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system_a222b5172b3bb21c563b92206a154312b}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system_a222b5172b3bb21c563b92206a154312b} 
+Stream\+Reader {\bfseries Open\+File\+Stream} (string path)
+\item 
+string \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system_a84e8cf9b56bf353e6e78e539fde7eb78}{Search\+File}} (string startpath, string name, \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcuts_source}{IFolder\+Shortcuts\+Source}} shortcuts=null)
+\begin{DoxyCompactList}\small\item\em Search for the specified file based on the specified search path. The search will continue in the base path folders all down to the root folder, or until a config file (Step\+Bro.\+Core.\+Api.\+Constants.\+STEPBRO\+\_\+\+FOLDER\+\_\+\+CONFIG\+\_\+\+FILE) is found with the root flaq set (Step\+Bro.\+Core.\+Api.\+Constants.\+FOLDER\+\_\+\+CONFIG\+\_\+\+FILE\+\_\+\+ROOT\+\_\+\+FLAG);. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system_a99e11cbf2deae00e29bdf9024577d2a2}{File\+Exists}} (string path)
+\begin{DoxyCompactList}\small\item\em Determines whether the specified file exists. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Abstract file system interface, for listing and opening textual files (typicaly script files, data files and configuration files). 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system_a99e11cbf2deae00e29bdf9024577d2a2}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system_a99e11cbf2deae00e29bdf9024577d2a2} 
+\index{StepBro.Core.General.ITextFileSystem@{StepBro.Core.General.ITextFileSystem}!FileExists@{FileExists}}
+\index{FileExists@{FileExists}!StepBro.Core.General.ITextFileSystem@{StepBro.Core.General.ITextFileSystem}}
+\doxysubsubsection{\texorpdfstring{FileExists()}{FileExists()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+General.\+IText\+File\+System.\+File\+Exists (\begin{DoxyParamCaption}\item[{string}]{path }\end{DoxyParamCaption})}
+
+
+
+Determines whether the specified file exists. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em path} & The file to check.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if the caller has the required permissions and path contains the name of an existing file; otherwise, false.
+\end{DoxyReturn}
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system_a84e8cf9b56bf353e6e78e539fde7eb78}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_text_file_system_a84e8cf9b56bf353e6e78e539fde7eb78} 
+\index{StepBro.Core.General.ITextFileSystem@{StepBro.Core.General.ITextFileSystem}!SearchFile@{SearchFile}}
+\index{SearchFile@{SearchFile}!StepBro.Core.General.ITextFileSystem@{StepBro.Core.General.ITextFileSystem}}
+\doxysubsubsection{\texorpdfstring{SearchFile()}{SearchFile()}}
+{\footnotesize\ttfamily string Step\+Bro.\+Core.\+General.\+IText\+File\+System.\+Search\+File (\begin{DoxyParamCaption}\item[{string}]{startpath,  }\item[{string}]{name,  }\item[{\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcuts_source}{IFolder\+Shortcuts\+Source}}}]{shortcuts = {\ttfamily null} }\end{DoxyParamCaption})}
+
+
+
+Search for the specified file based on the specified search path. The search will continue in the base path folders all down to the root folder, or until a config file (Step\+Bro.\+Core.\+Api.\+Constants.\+STEPBRO\+\_\+\+FOLDER\+\_\+\+CONFIG\+\_\+\+FILE) is found with the root flaq set (Step\+Bro.\+Core.\+Api.\+Constants.\+FOLDER\+\_\+\+CONFIG\+\_\+\+FILE\+\_\+\+ROOT\+\_\+\+FLAG);. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em startpath} & The base path where the search starts.\\
+\hline
+{\em name} & The name of the file to find.\\
+\hline
+{\em shortcuts} & Interface to a folder shortcut source.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The full path of the found file, or 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{null}}
+
+\end{DoxyCode}
+ if no matching file was found.
+\end{DoxyReturn}
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+General/Text\+File\+System.\+cs\end{DoxyCompactItemize}

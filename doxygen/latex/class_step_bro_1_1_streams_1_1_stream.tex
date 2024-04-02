@@ -1,0 +1,82 @@
+\doxysection{Step\+Bro.\+Streams.\+Stream Class Reference}
+\hypertarget{class_step_bro_1_1_streams_1_1_stream}{}\label{class_step_bro_1_1_streams_1_1_stream}\index{StepBro.Streams.Stream@{StepBro.Streams.Stream}}
+Inheritance diagram for Step\+Bro.\+Streams.\+Stream\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_step_bro_1_1_streams_1_1_stream}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_ae82633ad246ae7609412562aa9e3e001}\label{class_step_bro_1_1_streams_1_1_stream_ae82633ad246ae7609412562aa9e3e001} 
+void {\bfseries Dispose} ()
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a84209dafbb128dcbedb61d723b56b480}\label{class_step_bro_1_1_streams_1_1_stream_a84209dafbb128dcbedb61d723b56b480} 
+bool {\bfseries Open} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context)
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a79aabc83b144be632d49e1bd3438b459}\label{class_step_bro_1_1_streams_1_1_stream_a79aabc83b144be632d49e1bd3438b459} 
+void {\bfseries Close} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context)
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a830e06ca9d44d75707b109dbfdba703a}\label{class_step_bro_1_1_streams_1_1_stream_a830e06ca9d44d75707b109dbfdba703a} 
+abstract void {\bfseries Write} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context, string text)
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a4de0c68d1aa57d4434b2ead096c2fded}\label{class_step_bro_1_1_streams_1_1_stream_a4de0c68d1aa57d4434b2ead096c2fded} 
+abstract string {\bfseries Read\+Line\+Direct} ()
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a726f3f33d934df7602ffbcc0698c7e64}\label{class_step_bro_1_1_streams_1_1_stream_a726f3f33d934df7602ffbcc0698c7e64} 
+string {\bfseries Read\+Line} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context, Time\+Span timeout)
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_af6490889e9c094d138555db41afd2183}\label{class_step_bro_1_1_streams_1_1_stream_af6490889e9c094d138555db41afd2183} 
+abstract void {\bfseries Discard\+In\+Buffer} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a87010fda5494cd50ca46240bf1ccdaa6}\label{class_step_bro_1_1_streams_1_1_stream_a87010fda5494cd50ca46240bf1ccdaa6} 
+virtual void {\bfseries Do\+Dispose} ()
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a90e4a13d3cf635b9e900b97d1ad8b55e}\label{class_step_bro_1_1_streams_1_1_stream_a90e4a13d3cf635b9e900b97d1ad8b55e} 
+abstract string {\bfseries Get\+Target\+Identification} ()
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a1f32d142eca824b9dd5d32b4c8af443f}\label{class_step_bro_1_1_streams_1_1_stream_a1f32d142eca824b9dd5d32b4c8af443f} 
+abstract void {\bfseries Set\+Encoding} (System.\+Text.\+Encoding encoding)
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a354ae6bbfefaec57c13b32e4a92afb3e}\label{class_step_bro_1_1_streams_1_1_stream_a354ae6bbfefaec57c13b32e4a92afb3e} 
+abstract System.\+Text.\+Encoding {\bfseries Get\+Encoding} ()
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_aac8f78c80ca413bdba08b82ea35d162a}\label{class_step_bro_1_1_streams_1_1_stream_aac8f78c80ca413bdba08b82ea35d162a} 
+abstract bool {\bfseries Do\+Open} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context)
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a771ff16efbda9a3aa80fb786155f8a53}\label{class_step_bro_1_1_streams_1_1_stream_a771ff16efbda9a3aa80fb786155f8a53} 
+abstract void {\bfseries Do\+Close} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_adbd7fe759a142ad55591a4e48341b69f}\label{class_step_bro_1_1_streams_1_1_stream_adbd7fe759a142ad55591a4e48341b69f} 
+virtual string {\bfseries New\+Line} = \"{}\textbackslash{}n\"{}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a9a74ae8b0e8171e453172e09f670a9d7}\label{class_step_bro_1_1_streams_1_1_stream_a9a74ae8b0e8171e453172e09f670a9d7} 
+virtual bool {\bfseries Is\+Finite\+Stream}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates whether the stream contains a finite amount of data (e.\+g. a file). \end{DoxyCompactList}\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_ae0a3a730f930e2427d342cf49eaa0c9d}\label{class_step_bro_1_1_streams_1_1_stream_ae0a3a730f930e2427d342cf49eaa0c9d} 
+System.\+Text.\+Encoding {\bfseries Encoding}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a4a35a5f3bbf56514bd4417a95762ea92}\label{class_step_bro_1_1_streams_1_1_stream_a4a35a5f3bbf56514bd4417a95762ea92} 
+virtual int {\bfseries Read\+Timeout}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a919317490115db8539c80b9109e5c28a}\label{class_step_bro_1_1_streams_1_1_stream_a919317490115db8539c80b9109e5c28a} 
+abstract bool {\bfseries Is\+Open}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_ab30e4d5c35d989c9b9e13e81c806c261}\label{class_step_bro_1_1_streams_1_1_stream_ab30e4d5c35d989c9b9e13e81c806c261} 
+Event\+Handler {\bfseries Is\+Open\+Changed}
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Modules/\+Step\+Bro.\+Streams/Stream.\+cs\end{DoxyCompactItemize}

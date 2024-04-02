@@ -1,0 +1,225 @@
+\doxysection{Step\+Bro\+Core\+Test.\+Mocks.\+Execution\+Scope\+Status\+Updater\+Mock Class Reference}
+\hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock}{}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock}\index{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}}
+Inheritance diagram for Step\+Bro\+Core\+Test.\+Mocks.\+Execution\+Scope\+Status\+Updater\+Mock\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.326870cm]{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_aa43d9cbde750e0b5dde6c5c73091f014}{Add\+Action\+Button}} (string title, State\+Button\+Action activation\+Action)
+\item 
+void \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a42a9dd804e55e8576bbc961ff3252e9a}{Clear\+Sublevels}} ()
+\begin{DoxyCompactList}\small\item\em Cleanup the current status level by recursively removing all sub-\/status levels. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update}{IExecution\+Scope\+Status\+Update}} \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_ad3c45953ac334edb03b262c96a97eccb}{Create\+Progress\+Reporter}} (string text=\"{}\"{}, Time\+Span expected\+Time=default(Time\+Span), long progress\+Max=-\/1L, Func$<$ long, string $>$ progress\+Formatter=null)
+\begin{DoxyCompactList}\small\item\em Creates a sub-\/task in the status reporting. \end{DoxyCompactList}\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a1b44a31d767f56c344bb1fcfead24369}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a1b44a31d767f56c344bb1fcfead24369} 
+void {\bfseries Dispose} ()
+\item 
+void \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a0b0ca7dac1f759fcda2febe3b4bf5a67}{Progress\+Alive\+Signal}} ()
+\begin{DoxyCompactList}\small\item\em Indicates the current running task is still alive. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a51a085a436f3a65861afd70c54c4367b}{Update\+Status}} (string text=null, long progress=-\/1)
+\begin{DoxyCompactList}\small\item\em Sets the status text for the context. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_ac0ac226b12b424c001785bddbadb85f3}{Progress\+Setup}} (long start, long length, Func$<$ long, string $>$ to\+Text)
+\item 
+void \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a411c5fcdc4acc92baad142ea6555e400}{Set\+Progress\+Color}} (Attention\+Color color)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update_af1724b5b9a9d089f58ca05805f5f2e37}{Clear\+Sublevels}} ()
+\begin{DoxyCompactList}\small\item\em Cleanup the current status level by recursively removing all sub-\/status levels. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update}{IExecution\+Scope\+Status\+Update}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update_aee16559d0cff4223359e0188de9ebe8c}{Create\+Progress\+Reporter}} (string text=\"{}\"{}, Time\+Span expected\+Time=default(Time\+Span), long progress\+Max=-\/1, Func$<$ long, string $>$ progress\+Formatter=null)
+\begin{DoxyCompactList}\small\item\em Creates a sub-\/task in the status reporting. \end{DoxyCompactList}\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update_a6a71985184e35b54b33f96e433002a15}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update_a6a71985184e35b54b33f96e433002a15} 
+void {\bfseries Add\+Action\+Button} (string title, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_execution_aec05845d8635ece726581650fbc6f776}{State\+Button\+Action}} activation\+Action)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update_a4044539bd1cfd8a9e5627e999a8fab1e}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update_a4044539bd1cfd8a9e5627e999a8fab1e} 
+void {\bfseries Set\+Progress\+Color} (Attention\+Color color)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_af732e12dfea6ded5a4e8e01563c5cb62}\label{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_af732e12dfea6ded5a4e8e01563c5cb62} 
+void {\bfseries Progress\+Setup} (long start, long length, Func$<$ long, string $>$ to\+Text)
+\item 
+void \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_af3d1c75d16c6ff1036ad6dc787a03f6b}{Update\+Status}} (string text=null, long progress=-\/1)
+\begin{DoxyCompactList}\small\item\em Sets the status text for the context. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_a3d19eb95902f53b2947a2ef722f3dc77}{Progress\+Alive\+Signal}} ()
+\begin{DoxyCompactList}\small\item\em Indicates the current running task is still alive. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a691e6a2931d36169657312e8e6805eef}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a691e6a2931d36169657312e8e6805eef} 
+int {\bfseries m\+\_\+dispose\+Count} = 0
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a6e341edf4af9349581d1a834870a3b32}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a6e341edf4af9349581d1a834870a3b32} 
+\mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock}{Execution\+Scope\+Status\+Updater\+Mock}} {\bfseries m\+\_\+child} = null
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a30bb6cfaaf7729123995d275738bdfc2}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a30bb6cfaaf7729123995d275738bdfc2} 
+string {\bfseries m\+\_\+text} = null
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a7cdff6a223d89306a6b4e9f17cfab527}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a7cdff6a223d89306a6b4e9f17cfab527} 
+Time\+Span {\bfseries m\+\_\+expected\+Time} = default(Time\+Span)
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_aa09fc22a801908121067da18c88c6c26}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_aa09fc22a801908121067da18c88c6c26} 
+long {\bfseries m\+\_\+progress\+Max} = -\/1
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_af3b7a7d94cef53ce28cec3da3540e037}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_af3b7a7d94cef53ce28cec3da3540e037} 
+long {\bfseries m\+\_\+progress} = -\/1
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a22cacb07d3fd1c99a8d70f56628b26e8}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a22cacb07d3fd1c99a8d70f56628b26e8} 
+long {\bfseries m\+\_\+progress\+Poke\+Count} = 0
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_add3c2661f512b2b62e8b93be206f25c9}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_add3c2661f512b2b62e8b93be206f25c9} 
+Func$<$ long, string $>$ {\bfseries m\+\_\+progress\+Formatter} = null
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_abba1b465c5042bac1f0029a18f18f7c3}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_abba1b465c5042bac1f0029a18f18f7c3} 
+List$<$ Tuple$<$ string, Func$<$ bool, bool $>$ $>$ $>$ {\bfseries m\+\_\+buttons} = new List$<$Tuple$<$string, Func$<$bool,bool$>$$>$$>$()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a31fecbafa8aa03ef8fe4b8a819429937}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a31fecbafa8aa03ef8fe4b8a819429937} 
+Attention\+Color {\bfseries Progress\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_ab3b38ecbdb4ba23ce179ac691313f6b5}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_ab3b38ecbdb4ba23ce179ac691313f6b5} 
+bool {\bfseries Pause\+Requested}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a8bd61454747fba57118b62636b55502f}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a8bd61454747fba57118b62636b55502f} 
+Event\+Handler {\bfseries Expected\+Time\+Exceeded}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_af140c9f3bdbd24d841d3d977a25b756f}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_af140c9f3bdbd24d841d3d977a25b756f} 
+Event\+Handler {\bfseries Disposed}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_aa43d9cbde750e0b5dde6c5c73091f014}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_aa43d9cbde750e0b5dde6c5c73091f014} 
+\index{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}!AddActionButton@{AddActionButton}}
+\index{AddActionButton@{AddActionButton}!StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}}
+\doxysubsubsection{\texorpdfstring{AddActionButton()}{AddActionButton()}}
+{\footnotesize\ttfamily void Step\+Bro\+Core\+Test.\+Mocks.\+Execution\+Scope\+Status\+Updater\+Mock.\+Add\+Action\+Button (\begin{DoxyParamCaption}\item[{string}]{title,  }\item[{State\+Button\+Action}]{activation\+Action }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update}{Step\+Bro.\+Core.\+Execution.\+IExecution\+Scope\+Status\+Update}}.
+
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a42a9dd804e55e8576bbc961ff3252e9a}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a42a9dd804e55e8576bbc961ff3252e9a} 
+\index{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}!ClearSublevels@{ClearSublevels}}
+\index{ClearSublevels@{ClearSublevels}!StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}}
+\doxysubsubsection{\texorpdfstring{ClearSublevels()}{ClearSublevels()}}
+{\footnotesize\ttfamily void Step\+Bro\+Core\+Test.\+Mocks.\+Execution\+Scope\+Status\+Updater\+Mock.\+Clear\+Sublevels (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Cleanup the current status level by recursively removing all sub-\/status levels. 
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update_af1724b5b9a9d089f58ca05805f5f2e37}{Step\+Bro.\+Core.\+Execution.\+IExecution\+Scope\+Status\+Update}}.
+
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_ad3c45953ac334edb03b262c96a97eccb}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_ad3c45953ac334edb03b262c96a97eccb} 
+\index{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}!CreateProgressReporter@{CreateProgressReporter}}
+\index{CreateProgressReporter@{CreateProgressReporter}!StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}}
+\doxysubsubsection{\texorpdfstring{CreateProgressReporter()}{CreateProgressReporter()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update}{IExecution\+Scope\+Status\+Update}} Step\+Bro\+Core\+Test.\+Mocks.\+Execution\+Scope\+Status\+Updater\+Mock.\+Create\+Progress\+Reporter (\begin{DoxyParamCaption}\item[{string}]{text = {\ttfamily \"{}\"{}},  }\item[{Time\+Span}]{expected\+Time = {\ttfamily default(TimeSpan)},  }\item[{long}]{progress\+Max = {\ttfamily -\/1L},  }\item[{Func$<$ long, string $>$}]{progress\+Formatter = {\ttfamily null} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Creates a sub-\/task in the status reporting. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em text} & \\
+\hline
+{\em max\+Time} & \\
+\hline
+{\em progress\+Max} & \\
+\hline
+{\em progress\+Formatter} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{using}\ (ITaskStatusUpdate\ reporter\ =\ CreateProgressReporter(\textcolor{stringliteral}{"{}Sending\ data"{}},\ TimeSpan.FromSeconds(20),\ dataSize))}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ stream.SendNextChunk();}
+\DoxyCodeLine{\ \ \ \ reporter.UpdateStatus(stream.TotalBytesSent);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update_aee16559d0cff4223359e0188de9ebe8c}{Step\+Bro.\+Core.\+Execution.\+IExecution\+Scope\+Status\+Update}}.
+
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a0b0ca7dac1f759fcda2febe3b4bf5a67}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a0b0ca7dac1f759fcda2febe3b4bf5a67} 
+\index{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}!ProgressAliveSignal@{ProgressAliveSignal}}
+\index{ProgressAliveSignal@{ProgressAliveSignal}!StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}}
+\doxysubsubsection{\texorpdfstring{ProgressAliveSignal()}{ProgressAliveSignal()}}
+{\footnotesize\ttfamily void Step\+Bro\+Core\+Test.\+Mocks.\+Execution\+Scope\+Status\+Updater\+Mock.\+Progress\+Alive\+Signal (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Indicates the current running task is still alive. 
+
+remarks\texorpdfstring{$>$}{>}The status text is not changed.
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_a3d19eb95902f53b2947a2ef722f3dc77}{Step\+Bro.\+Core.\+Tasks.\+ITask\+State\+Reporting}}.
+
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_ac0ac226b12b424c001785bddbadb85f3}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_ac0ac226b12b424c001785bddbadb85f3} 
+\index{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}!ProgressSetup@{ProgressSetup}}
+\index{ProgressSetup@{ProgressSetup}!StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}}
+\doxysubsubsection{\texorpdfstring{ProgressSetup()}{ProgressSetup()}}
+{\footnotesize\ttfamily void Step\+Bro\+Core\+Test.\+Mocks.\+Execution\+Scope\+Status\+Updater\+Mock.\+Progress\+Setup (\begin{DoxyParamCaption}\item[{long}]{start,  }\item[{long}]{length,  }\item[{Func$<$ long, string $>$}]{to\+Text }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting}{Step\+Bro.\+Core.\+Tasks.\+ITask\+State\+Reporting}}.
+
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a411c5fcdc4acc92baad142ea6555e400}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a411c5fcdc4acc92baad142ea6555e400} 
+\index{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}!SetProgressColor@{SetProgressColor}}
+\index{SetProgressColor@{SetProgressColor}!StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}}
+\doxysubsubsection{\texorpdfstring{SetProgressColor()}{SetProgressColor()}}
+{\footnotesize\ttfamily void Step\+Bro\+Core\+Test.\+Mocks.\+Execution\+Scope\+Status\+Updater\+Mock.\+Set\+Progress\+Color (\begin{DoxyParamCaption}\item[{Attention\+Color}]{color }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update}{Step\+Bro.\+Core.\+Execution.\+IExecution\+Scope\+Status\+Update}}.
+
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a51a085a436f3a65861afd70c54c4367b}\label{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a51a085a436f3a65861afd70c54c4367b} 
+\index{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}!UpdateStatus@{UpdateStatus}}
+\index{UpdateStatus@{UpdateStatus}!StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock@{StepBroCoreTest.Mocks.ExecutionScopeStatusUpdaterMock}}
+\doxysubsubsection{\texorpdfstring{UpdateStatus()}{UpdateStatus()}}
+{\footnotesize\ttfamily void Step\+Bro\+Core\+Test.\+Mocks.\+Execution\+Scope\+Status\+Updater\+Mock.\+Update\+Status (\begin{DoxyParamCaption}\item[{string}]{text = {\ttfamily null},  }\item[{long}]{progress = {\ttfamily -\/1} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Sets the status text for the context. 
+
+If progress is set, the progress will be closed.
+
+
+\begin{DoxyParams}{Parameters}
+{\em text} & State text to show to the user.\\
+\hline
+{\em progress} & Current progress value.\\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_af3d1c75d16c6ff1036ad6dc787a03f6b}{Step\+Bro.\+Core.\+Tasks.\+ITask\+State\+Reporting}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Test/\+Step\+Bro.\+Core.\+Test/\+Mocks/Execution\+Scope\+Status\+Updater\+Mock.\+cs\end{DoxyCompactItemize}

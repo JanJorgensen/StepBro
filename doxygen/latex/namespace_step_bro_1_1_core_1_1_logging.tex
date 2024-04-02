@@ -1,0 +1,81 @@
+\doxysection{Step\+Bro.\+Core.\+Logging Namespace Reference}
+\hypertarget{namespace_step_bro_1_1_core_1_1_logging}{}\label{namespace_step_bro_1_1_core_1_1_logging}\index{StepBro.Core.Logging@{StepBro.Core.Logging}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_logging_1_1_debug_log_entry}{Debug\+Log\+Entry}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_logging_1_1_debug_log_entry_string}{Debug\+Log\+Entry\+String}}
+\item 
+class {\bfseries Debug\+Log\+Utils}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_log_entry}{ILog\+Entry}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{ILogger\+Scope}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_log_history}{ILog\+History}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_log_walker}{ILog\+Walker}}
+\item 
+interface {\bfseries IProtected\+Logger}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_system_debugging_state}{ISystem\+Debugging\+State}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_logging_1_1_log_entry}{Log\+Entry}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_logging_1_1_logger}{Logger}}
+\item 
+class {\bfseries Logger\+Scope}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_logging_1_1_log_storage}{Log\+Storage}}
+\item 
+class {\bfseries Unique\+Integer}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06}{Context\+Log\+Option}} \{ \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06a87aa5010736e49e768cb4567f91eaed9}{Force\+Always}}
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06a960b44c579bc2f6818d2daaf9e4c16f0}{Normal}}
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06a04b5183d23d88a61209e7cf57d66abeb}{Debug\+Only}}
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06ab9f5c797ebbf55adccdd8539a65a0241}{Disabled}}
+ \}
+\begin{DoxyCompactList}\small\item\em Enumerates the different logging options to set for a procedure and for a procedure call. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{namespace_step_bro_1_1_core_1_1_logging_a55504fdeaa45a80365c173d810923e47}\label{namespace_step_bro_1_1_core_1_1_logging_a55504fdeaa45a80365c173d810923e47} 
+delegate string {\bfseries Logger\+Dynamic\+Location\+Source} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06}\label{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06} 
+\index{StepBro.Core.Logging@{StepBro.Core.Logging}!ContextLogOption@{ContextLogOption}}
+\index{ContextLogOption@{ContextLogOption}!StepBro.Core.Logging@{StepBro.Core.Logging}}
+\doxysubsubsection{\texorpdfstring{ContextLogOption}{ContextLogOption}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06}{Step\+Bro.\+Core.\+Logging.\+Context\+Log\+Option}}}
+
+
+
+Enumerates the different logging options to set for a procedure and for a procedure call. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ForceAlways@{ForceAlways}!StepBro.Core.Logging@{StepBro.Core.Logging}}\index{StepBro.Core.Logging@{StepBro.Core.Logging}!ForceAlways@{ForceAlways}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06a87aa5010736e49e768cb4567f91eaed9}\label{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06a87aa5010736e49e768cb4567f91eaed9} 
+Force\+Always&Force the Normal option even if the caller or the entity is set to Debug\+Only. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Normal@{Normal}!StepBro.Core.Logging@{StepBro.Core.Logging}}\index{StepBro.Core.Logging@{StepBro.Core.Logging}!Normal@{Normal}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06a960b44c579bc2f6818d2daaf9e4c16f0}\label{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06a960b44c579bc2f6818d2daaf9e4c16f0} 
+Normal&Normal logging enabled and debug-\/logging is only done when the execution is in debug mode. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DebugOnly@{DebugOnly}!StepBro.Core.Logging@{StepBro.Core.Logging}}\index{StepBro.Core.Logging@{StepBro.Core.Logging}!DebugOnly@{DebugOnly}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06a04b5183d23d88a61209e7cf57d66abeb}\label{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06a04b5183d23d88a61209e7cf57d66abeb} 
+Debug\+Only&The normal logging is only done when the execution is in debug mode. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Disabled@{Disabled}!StepBro.Core.Logging@{StepBro.Core.Logging}}\index{StepBro.Core.Logging@{StepBro.Core.Logging}!Disabled@{Disabled}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06ab9f5c797ebbf55adccdd8539a65a0241}\label{namespace_step_bro_1_1_core_1_1_logging_a5d43ad81226128e5b6f747a561e6cf06ab9f5c797ebbf55adccdd8539a65a0241} 
+Disabled&No logging should be done; not even when debugging. \\
+\hline
+
+\end{DoxyEnumFields}

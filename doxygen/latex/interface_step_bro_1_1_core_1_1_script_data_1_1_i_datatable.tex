@@ -1,0 +1,81 @@
+\doxysection{Step\+Bro.\+Core.\+Script\+Data.\+IDatatable Interface Reference}
+\hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable}{}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable}\index{StepBro.Core.ScriptData.IDatatable@{StepBro.Core.ScriptData.IDatatable}}
+Inheritance diagram for Step\+Bro.\+Core.\+Script\+Data.\+IDatatable\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_a35683a393ae1085dc09a7a38e1d2e84c}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_a35683a393ae1085dc09a7a38e1d2e84c} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_column}{IDatatable\+Column}} {\bfseries Get\+Column} (long index)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_aeb0f21639c091c729d4bf82b870316f2}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_aeb0f21639c091c729d4bf82b870316f2} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_cell}{IDatatable\+Cell}} {\bfseries Get\+Cell} (long column, long row)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_a4b45fa0eb46d2447ced4be8c175927fd}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_a4b45fa0eb46d2447ced4be8c175927fd} 
+void {\bfseries Add\+Row} (object\mbox{[}$\,$\mbox{]} cell\+Data)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_ad5853a396af85b4ba37a03ec34f3dced}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_ad5853a396af85b4ba37a03ec34f3dced} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_row}{IDatatable\+Row}} {\bfseries Get\+Row} (long index)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{Step\+Bro.\+Core.\+Script\+Data.\+IFile\+Element}}}
+\begin{DoxyCompactItemize}
+\item 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_partner}{IPartner}} $>$ {\bfseries List\+Partners} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_adc9430a47a222177b9b149669abc7f04}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_adc9430a47a222177b9b149669abc7f04} 
+long {\bfseries Column\+Count}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_a512f3405ed5e265cec7455fe870b4ea0}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_a512f3405ed5e265cec7455fe870b4ea0} 
+long {\bfseries Row\+Count}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{Step\+Bro.\+Core.\+Script\+Data.\+IFile\+Element}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file}{IScript\+File}} {\bfseries Parent\+File}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+int {\bfseries Line}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{IFile\+Element}} {\bfseries Base\+Element}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{IFile\+Element}} {\bfseries Parent\+Element}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894}{File\+Element\+Type}} {\bfseries Element\+Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Summary}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Doc\+Reference}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+int {\bfseries Unique\+ID}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Access\+Modifier {\bfseries Access\+Level}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_identifier_info}{Step\+Bro.\+Core.\+Data.\+IIdentifier\+Info}}}
+\begin{DoxyCompactItemize}
+\item 
+string {\bfseries Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Full\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_data_a1007a83f4c84fb18d5823591c53e71d2}{Identifier\+Type}} {\bfseries Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_type_reference}{Type\+Reference}} {\bfseries Data\+Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+object {\bfseries Reference}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_inheritable}{Step\+Bro.\+Core.\+Data.\+IInheritable}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_inheritable}{IInheritable}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_inheritable_a03b962fed1c61d3d60838813209bb5c2}{Base}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets reference to the object inherited from. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Script\+Data/IDatatable.\+cs\end{DoxyCompactItemize}

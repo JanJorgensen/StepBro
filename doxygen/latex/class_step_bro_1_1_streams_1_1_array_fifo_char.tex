@@ -1,0 +1,65 @@
+\doxysection{Step\+Bro.\+Streams.\+Array\+Fifo\+Char Class Reference}
+\hypertarget{class_step_bro_1_1_streams_1_1_array_fifo_char}{}\label{class_step_bro_1_1_streams_1_1_array_fifo_char}\index{StepBro.Streams.ArrayFifoChar@{StepBro.Streams.ArrayFifoChar}}
+Inheritance diagram for Step\+Bro.\+Streams.\+Array\+Fifo\+Char\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_streams_1_1_array_fifo_char}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_array_fifo_char_a9c6b022c485951d5dddf311c0e0c60be}\label{class_step_bro_1_1_streams_1_1_array_fifo_char_a9c6b022c485951d5dddf311c0e0c60be} 
+{\bfseries Array\+Fifo\+Char} (int size=16384)
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_array_fifo_char_a5f3d811a365b1e5d8cb1356d2dc10e59}\label{class_step_bro_1_1_streams_1_1_array_fifo_char_a5f3d811a365b1e5d8cb1356d2dc10e59} 
+override string {\bfseries Data\+To\+String} (char\mbox{[}$\,$\mbox{]} block, int start, int length)
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_array_fifo_char_a8db2f1eeb372edc031c4a3e8850e31b9}\label{class_step_bro_1_1_streams_1_1_array_fifo_char_a8db2f1eeb372edc031c4a3e8850e31b9} 
+override string {\bfseries Value\+String} (char value)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo}{Step\+Bro.\+Core.\+Data.\+Array\+Fifo$<$ char $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Array\+Fifo} (int size=16 \texorpdfstring{$\ast$}{*}1024)
+\item 
+void {\bfseries Setup} (int size)
+\item 
+void {\bfseries Add} (T\mbox{[}$\,$\mbox{]} block, int start, int length)
+\item 
+void {\bfseries Add} (Func$<$ T\mbox{[}$\,$\mbox{]}, int, int, int $>$ getter, int length)
+\item 
+virtual string {\bfseries Data\+To\+String} (T\mbox{[}$\,$\mbox{]} block, int start, int length)
+\item 
+virtual string {\bfseries Value\+String} (T value)
+\item 
+bool {\bfseries Await\+New\+Data} (int known\+Count, int timeout=0)
+\item 
+bool {\bfseries Await\+New\+Data} (int known\+Count, Time\+Span timeout)
+\item 
+void {\bfseries Eat} (int length)
+\item 
+void {\bfseries Get} (int index, int length, int total, T\mbox{[}$\,$\mbox{]} targetbuffer, int targetindex)
+\item 
+T\mbox{[}$\,$\mbox{]} {\bfseries Get} (int index, int length, int total)
+\item 
+T\mbox{[}$\,$\mbox{]} {\bfseries Get} (int length)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo}{Step\+Bro.\+Core.\+Data.\+Array\+Fifo$<$ char $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual void {\bfseries On\+Data\+Pulled} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo}{Step\+Bro.\+Core.\+Data.\+Array\+Fifo$<$ char $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+int {\bfseries Count}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+T {\bfseries this\mbox{[}int index\mbox{]}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Modules/\+Step\+Bro.\+Streams/Serial\+Port.\+cs\end{DoxyCompactItemize}

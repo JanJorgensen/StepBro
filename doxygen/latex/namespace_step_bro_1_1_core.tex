@@ -1,0 +1,48 @@
+\doxysection{Step\+Bro.\+Core Namespace Reference}
+\hypertarget{namespace_step_bro_1_1_core}{}\label{namespace_step_bro_1_1_core}\index{StepBro.Core@{StepBro.Core}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_report}{Data\+Report}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_i_service}{IService}}
+\item 
+class {\bfseries Main}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_report_data}{Report\+Data}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_report_data_table}{Report\+Data\+Table}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_service_base}{Service\+Base}}
+\begin{DoxyCompactList}\small\item\em Base class for a service. This class encapsulates the service housekeeping, to ensure users cannot directly start or stop the service. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_service_manager}{Service\+Manager}}
+\item 
+class {\bfseries Task\+Context\+Dummy}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{namespace_step_bro_1_1_core_a2d83056c735fee301b0a1b89ade48a3e}\label{namespace_step_bro_1_1_core_a2d83056c735fee301b0a1b89ade48a3e} 
+enum {\bfseries Report\+Data\+Type} \{ \newline
+{\bfseries Section}
+, {\bfseries Text\+Line}
+, {\bfseries Expect\+Result}
+, {\bfseries Simple\+Measurement}
+, \newline
+{\bfseries Data\+Table}
+, {\bfseries Test\+Summary}
+, {\bfseries Exception}
+ \}
+\item 
+\Hypertarget{namespace_step_bro_1_1_core_af7813dac9fb408c59ea5d56160d0d24d}\label{namespace_step_bro_1_1_core_af7813dac9fb408c59ea5d56160d0d24d} 
+enum {\bfseries Service\+State} \{ \newline
+{\bfseries Initial}
+, {\bfseries Initialized}
+, {\bfseries Started}
+, {\bfseries Stopped}
+, \newline
+{\bfseries Init\+Failed}
+, {\bfseries Start\+Failed}
+, {\bfseries Stop\+Failed}
+ \}
+\end{DoxyCompactItemize}

@@ -1,0 +1,74 @@
+\doxysection{Step\+Bro.\+Core.\+Data.\+Object\+Monitor Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_data_1_1_object_monitor}{}\label{class_step_bro_1_1_core_1_1_data_1_1_object_monitor}\index{StepBro.Core.Data.ObjectMonitor@{StepBro.Core.Data.ObjectMonitor}}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_adf9f17339d85a7ab730cd65f92de5e37}\label{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_adf9f17339d85a7ab730cd65f92de5e37} 
+enum {\bfseries State} \{ \newline
+{\bfseries Target\+Active}
+, {\bfseries Target\+Disposing}
+, {\bfseries Target\+Disposed}
+, {\bfseries Target\+Void}
+, \newline
+{\bfseries Monitor\+Disposed}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_abccf50ab1ecbb5956497ab198eb3b9db}\label{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_abccf50ab1ecbb5956497ab198eb3b9db} 
+void {\bfseries Update\+State} ()
+\item 
+T \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_a3978565ae115c833d5ab385dd3ee8589}{Try\+Get\+Target\+Object$<$ T $>$}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_a7187bb58be45aecd960a351eabf7749d}\label{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_a7187bb58be45aecd960a351eabf7749d} 
+virtual void {\bfseries On\+Monitor\+Dispose} ()
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_abb10ed6cc425bedc8a1bc3e7e1e77a4f}\label{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_abb10ed6cc425bedc8a1bc3e7e1e77a4f} 
+virtual string {\bfseries Get\+Type\+String} (object target)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_a0e1a68ef60e87e954ede597449ae7625}\label{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_a0e1a68ef60e87e954ede597449ae7625} 
+virtual string {\bfseries Get\+State\+String} (object target)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_a0db98c7eb8d80bfb7d1a2722a8c4f59f}\label{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_a0db98c7eb8d80bfb7d1a2722a8c4f59f} 
+State {\bfseries Current\+State}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_ac292a87366415ac863146ff926520a77}\label{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_ac292a87366415ac863146ff926520a77} 
+string {\bfseries Type\+String}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_a0dc3bbe9e8912bd57093f24e4e55d52e}\label{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_a0dc3bbe9e8912bd57093f24e4e55d52e} 
+string {\bfseries Last\+Target\+State}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_af6d7244f64f16adc2c960577d91eede9}\label{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_af6d7244f64f16adc2c960577d91eede9} 
+Event\+Handler {\bfseries State\+Changed}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_a560712b16e8bba38717506ba92010171}\label{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_a560712b16e8bba38717506ba92010171} 
+Event\+Handler {\bfseries Last\+Target\+State\+Changed}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_a3978565ae115c833d5ab385dd3ee8589}\label{class_step_bro_1_1_core_1_1_data_1_1_object_monitor_a3978565ae115c833d5ab385dd3ee8589} 
+\index{StepBro.Core.Data.ObjectMonitor@{StepBro.Core.Data.ObjectMonitor}!TryGetTargetObject$<$ T $>$@{TryGetTargetObject$<$ T $>$}}
+\index{TryGetTargetObject$<$ T $>$@{TryGetTargetObject$<$ T $>$}!StepBro.Core.Data.ObjectMonitor@{StepBro.Core.Data.ObjectMonitor}}
+\doxysubsubsection{\texorpdfstring{TryGetTargetObject$<$ T $>$()}{TryGetTargetObject< T >()}}
+{\footnotesize\ttfamily T Step\+Bro.\+Core.\+Data.\+Object\+Monitor.\+Try\+Get\+Target\+Object$<$ T $>$ (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{Desc}
+\item[Type Constraints]\begin{description}
+\item[{\em T} : {\em class}]\end{description}
+\end{Desc}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Data/Object\+Monitor.\+cs\end{DoxyCompactItemize}

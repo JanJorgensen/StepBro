@@ -1,0 +1,30 @@
+\doxysection{Peak.\+Can.\+Basic.\+TPCANMsg\+FD Struct Reference}
+\hypertarget{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_msg_f_d}{}\label{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_msg_f_d}\index{Peak.Can.Basic.TPCANMsgFD@{Peak.Can.Basic.TPCANMsgFD}}
+
+
+Represents a PCAN message from a FD capable hardware.  
+
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_msg_f_d_aa5552941b7d999941195b6f4d2953ecd}\label{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_msg_f_d_aa5552941b7d999941195b6f4d2953ecd} 
+uint {\bfseries ID}
+\begin{DoxyCompactList}\small\item\em 11/29-\/bit message identifier \end{DoxyCompactList}\item 
+\Hypertarget{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_msg_f_d_a10766a9a9fd84e0417c2e0abb5955a4b}\label{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_msg_f_d_a10766a9a9fd84e0417c2e0abb5955a4b} 
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eab}{TPCANMessage\+Type}} {\bfseries MSGTYPE}
+\begin{DoxyCompactList}\small\item\em Type of the message. \end{DoxyCompactList}\item 
+\Hypertarget{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_msg_f_d_a9ccb2d318fa38ba95218e2fab2d80969}\label{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_msg_f_d_a9ccb2d318fa38ba95218e2fab2d80969} 
+byte {\bfseries DLC}
+\begin{DoxyCompactList}\small\item\em Data Length Code of the message (0..15) \end{DoxyCompactList}\item 
+\Hypertarget{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_msg_f_d_abaf928b6df2b34955f7534396db634e4}\label{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_msg_f_d_abaf928b6df2b34955f7534396db634e4} 
+byte\mbox{[}$\,$\mbox{]} {\bfseries DATA}
+\begin{DoxyCompactList}\small\item\em Data of the message (DATA\mbox{[}0\mbox{]}..DATA\mbox{[}63\mbox{]}) \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Represents a PCAN message from a FD capable hardware. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Plugins/\+Step\+Bro.\+Peak\+CANPlugin/PCANBasic.\+cs\end{DoxyCompactItemize}

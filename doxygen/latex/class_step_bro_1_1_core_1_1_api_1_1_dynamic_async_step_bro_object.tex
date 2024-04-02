@@ -1,0 +1,96 @@
+\doxysection{Step\+Bro.\+Core.\+Api.\+Dynamic\+Async\+Step\+Bro\+Object Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object}{}\label{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object}\index{StepBro.Core.Api.DynamicAsyncStepBroObject@{StepBro.Core.Api.DynamicAsyncStepBroObject}}
+Inheritance diagram for Step\+Bro.\+Core.\+Api.\+Dynamic\+Async\+Step\+Bro\+Object\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.683706cm]{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_api_ac6f8665d31d30b36bbd94476a526c70f}{Dynamic\+Support}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_a0ab886f3e3d705b1b2306a695db92d0e}{Has\+Property}} (string name, out Type type, out bool is\+Read\+Only)
+\item 
+virtual \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ object $>$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_a8850df9c748ea6f6954715694e17627f}{Try\+Get\+Property}} (string name)
+\item 
+virtual \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ bool $>$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_a84186cd5f77e6fceb197d0e30d8b5296}{Try\+Set\+Property}} (string name, object value)
+\item 
+virtual \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_api_ac6f8665d31d30b36bbd94476a526c70f}{Dynamic\+Support}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_ae507820022692293529e511c60dda795}{Has\+Method}} (string name, out \mbox{\hyperlink{struct_step_bro_1_1_core_1_1_data_1_1_named_data}{Named\+Data}}$<$ Type $>$\mbox{[}$\,$\mbox{]} parameters, out Type return\+Type)
+\item 
+virtual \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ object $>$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_aa0eb9945cc208141b248979568f3368b}{Try\+Invoke\+Method}} (string name, object\mbox{[}$\,$\mbox{]} args)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object_aa587d38d010113ebb4788d9fb017f403}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object_aa587d38d010113ebb4788d9fb017f403} 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_api_ac6f8665d31d30b36bbd94476a526c70f}{Dynamic\+Support}} {\bfseries Has\+Property} (string name, out Type type, out bool is\+Read\+Only)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object_a7ad69eb59a7d338693bea1360b5fd825}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object_a7ad69eb59a7d338693bea1360b5fd825} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ object $>$ {\bfseries Try\+Get\+Property} (string name)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object_ab76d638188a9718d637a0375401d28b7}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object_ab76d638188a9718d637a0375401d28b7} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ bool $>$ {\bfseries Try\+Set\+Property} (string name, object value)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object_a7f5f0b98bb9e47887d84480f77a7334f}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object_a7f5f0b98bb9e47887d84480f77a7334f} 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_api_ac6f8665d31d30b36bbd94476a526c70f}{Dynamic\+Support}} {\bfseries Has\+Method} (string name, out \mbox{\hyperlink{struct_step_bro_1_1_core_1_1_data_1_1_named_data}{Named\+Data}}$<$ Type $>$\mbox{[}$\,$\mbox{]} parameters, out Type return\+Type)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object_a5c1d19b236a5c8a89a0916a0b99f53ba}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object_a5c1d19b236a5c8a89a0916a0b99f53ba} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ object $>$ {\bfseries Try\+Invoke\+Method} (string name, object\mbox{[}$\,$\mbox{]} args)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_ae507820022692293529e511c60dda795}\label{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_ae507820022692293529e511c60dda795} 
+\index{StepBro.Core.Api.DynamicAsyncStepBroObject@{StepBro.Core.Api.DynamicAsyncStepBroObject}!HasMethod@{HasMethod}}
+\index{HasMethod@{HasMethod}!StepBro.Core.Api.DynamicAsyncStepBroObject@{StepBro.Core.Api.DynamicAsyncStepBroObject}}
+\doxysubsubsection{\texorpdfstring{HasMethod()}{HasMethod()}}
+{\footnotesize\ttfamily virtual \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_api_ac6f8665d31d30b36bbd94476a526c70f}{Dynamic\+Support}} Step\+Bro.\+Core.\+Api.\+Dynamic\+Async\+Step\+Bro\+Object.\+Has\+Method (\begin{DoxyParamCaption}\item[{string}]{name,  }\item[{out \mbox{\hyperlink{struct_step_bro_1_1_core_1_1_data_1_1_named_data}{Named\+Data}}$<$ Type $>$\mbox{[}$\,$\mbox{]}}]{parameters,  }\item[{out Type}]{return\+Type }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object}{Step\+Bro.\+Core.\+Api.\+IDynamic\+Async\+Step\+Bro\+Object}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_a0ab886f3e3d705b1b2306a695db92d0e}\label{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_a0ab886f3e3d705b1b2306a695db92d0e} 
+\index{StepBro.Core.Api.DynamicAsyncStepBroObject@{StepBro.Core.Api.DynamicAsyncStepBroObject}!HasProperty@{HasProperty}}
+\index{HasProperty@{HasProperty}!StepBro.Core.Api.DynamicAsyncStepBroObject@{StepBro.Core.Api.DynamicAsyncStepBroObject}}
+\doxysubsubsection{\texorpdfstring{HasProperty()}{HasProperty()}}
+{\footnotesize\ttfamily virtual \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_api_ac6f8665d31d30b36bbd94476a526c70f}{Dynamic\+Support}} Step\+Bro.\+Core.\+Api.\+Dynamic\+Async\+Step\+Bro\+Object.\+Has\+Property (\begin{DoxyParamCaption}\item[{string}]{name,  }\item[{out Type}]{type,  }\item[{out bool}]{is\+Read\+Only }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object}{Step\+Bro.\+Core.\+Api.\+IDynamic\+Async\+Step\+Bro\+Object}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_a8850df9c748ea6f6954715694e17627f}\label{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_a8850df9c748ea6f6954715694e17627f} 
+\index{StepBro.Core.Api.DynamicAsyncStepBroObject@{StepBro.Core.Api.DynamicAsyncStepBroObject}!TryGetProperty@{TryGetProperty}}
+\index{TryGetProperty@{TryGetProperty}!StepBro.Core.Api.DynamicAsyncStepBroObject@{StepBro.Core.Api.DynamicAsyncStepBroObject}}
+\doxysubsubsection{\texorpdfstring{TryGetProperty()}{TryGetProperty()}}
+{\footnotesize\ttfamily virtual \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ object $>$ Step\+Bro.\+Core.\+Api.\+Dynamic\+Async\+Step\+Bro\+Object.\+Try\+Get\+Property (\begin{DoxyParamCaption}\item[{string}]{name }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object}{Step\+Bro.\+Core.\+Api.\+IDynamic\+Async\+Step\+Bro\+Object}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_aa0eb9945cc208141b248979568f3368b}\label{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_aa0eb9945cc208141b248979568f3368b} 
+\index{StepBro.Core.Api.DynamicAsyncStepBroObject@{StepBro.Core.Api.DynamicAsyncStepBroObject}!TryInvokeMethod@{TryInvokeMethod}}
+\index{TryInvokeMethod@{TryInvokeMethod}!StepBro.Core.Api.DynamicAsyncStepBroObject@{StepBro.Core.Api.DynamicAsyncStepBroObject}}
+\doxysubsubsection{\texorpdfstring{TryInvokeMethod()}{TryInvokeMethod()}}
+{\footnotesize\ttfamily virtual \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ object $>$ Step\+Bro.\+Core.\+Api.\+Dynamic\+Async\+Step\+Bro\+Object.\+Try\+Invoke\+Method (\begin{DoxyParamCaption}\item[{string}]{name,  }\item[{object\mbox{[}$\,$\mbox{]}}]{args }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object}{Step\+Bro.\+Core.\+Api.\+IDynamic\+Async\+Step\+Bro\+Object}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_a84186cd5f77e6fceb197d0e30d8b5296}\label{class_step_bro_1_1_core_1_1_api_1_1_dynamic_async_step_bro_object_a84186cd5f77e6fceb197d0e30d8b5296} 
+\index{StepBro.Core.Api.DynamicAsyncStepBroObject@{StepBro.Core.Api.DynamicAsyncStepBroObject}!TrySetProperty@{TrySetProperty}}
+\index{TrySetProperty@{TrySetProperty}!StepBro.Core.Api.DynamicAsyncStepBroObject@{StepBro.Core.Api.DynamicAsyncStepBroObject}}
+\doxysubsubsection{\texorpdfstring{TrySetProperty()}{TrySetProperty()}}
+{\footnotesize\ttfamily virtual \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ bool $>$ Step\+Bro.\+Core.\+Api.\+Dynamic\+Async\+Step\+Bro\+Object.\+Try\+Set\+Property (\begin{DoxyParamCaption}\item[{string}]{name,  }\item[{object}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_async_step_bro_object}{Step\+Bro.\+Core.\+Api.\+IDynamic\+Async\+Step\+Bro\+Object}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Api/Dynamic\+Async\+Step\+Bro\+Object.\+cs\end{DoxyCompactItemize}

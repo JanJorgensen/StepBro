@@ -1,0 +1,52 @@
+\doxysection{Step\+Bro.\+Test\+Interface.\+IConnection Interface Reference}
+\hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection}{}\label{interface_step_bro_1_1_test_interface_1_1_i_connection}\index{StepBro.TestInterface.IConnection@{StepBro.TestInterface.IConnection}}
+Inheritance diagram for Step\+Bro.\+Test\+Interface.\+IConnection\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{interface_step_bro_1_1_test_interface_1_1_i_connection}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_a3e50f58c97c4b4befdb6004073b814b5}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_a3e50f58c97c4b4befdb6004073b814b5} 
+bool {\bfseries Connect} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_a4fd497157d1f6bf56eef8313ef50ea11}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_a4fd497157d1f6bf56eef8313ef50ea11} 
+bool {\bfseries Disconnect} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_af7579a17edeea47f04755ec4ce9727dc}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_af7579a17edeea47f04755ec4ce9727dc} 
+bool {\bfseries Open} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_a3283a225087b80470fee7813dc2a38a2}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_a3283a225087b80470fee7813dc2a38a2} 
+bool {\bfseries Close} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_a08af56ae95a4cb4bd4962d44ab284a77}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_a08af56ae95a4cb4bd4962d44ab284a77} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ bool $>$ {\bfseries Update\+Interface\+Data} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context=null)
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_aa24154b2019b600bfa5800782e087b58}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_aa24154b2019b600bfa5800782e087b58} 
+IEnumerable$<$ string $>$ {\bfseries List\+Available\+Profiles} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_a94eac37405e08ecf9008d477925b0291}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_a94eac37405e08ecf9008d477925b0291} 
+bool {\bfseries Set\+Profile} (string profile, string accesskey=\"{}\"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_ac937c9403bb72a9396daabce5e3d7a17}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_ac937c9403bb72a9396daabce5e3d7a17} 
+bool {\bfseries Is\+Connected}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_a4c7758b03077e554b6487500c1fc3fc3}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_a4c7758b03077e554b6487500c1fc3fc3} 
+bool {\bfseries Is\+Open}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_afe4510a968194ee2e0b469144e0024dc}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_afe4510a968194ee2e0b469144e0024dc} 
+\mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_parameters_access}{IParameters\+Access}} {\bfseries Parameters}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_ac66c8bd9c02da2f59a7107293c6eac37}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_ac66c8bd9c02da2f59a7107293c6eac37} 
+\mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_remote_procedures}{IRemote\+Procedures}} {\bfseries Remote\+Procedures}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Modules/\+Step\+Bro.\+Test\+Interface/IConnection.\+cs\end{DoxyCompactItemize}

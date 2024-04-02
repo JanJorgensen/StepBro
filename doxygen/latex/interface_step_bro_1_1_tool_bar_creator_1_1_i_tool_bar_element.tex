@@ -1,0 +1,123 @@
+\doxysection{Step\+Bro.\+Tool\+Bar\+Creator.\+ITool\+Bar\+Element Interface Reference}
+\hypertarget{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element}{}\label{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element}\index{StepBro.ToolBarCreator.IToolBarElement@{StepBro.ToolBarCreator.IToolBarElement}}
+Inheritance diagram for Step\+Bro.\+Tool\+Bar\+Creator.\+ITool\+Bar\+Element\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=1.157025cm]{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a66cedab89ab693f53f92063825953b7d}\label{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a66cedab89ab693f53f92063825953b7d} 
+bool {\bfseries Set\+Value} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, object value)
+\item 
+\Hypertarget{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_aae8412ac30f3bcfea5b1d1cd8f7335f7}\label{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_aae8412ac30f3bcfea5b1d1cd8f7335f7} 
+object {\bfseries Get\+Value} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+\Hypertarget{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_ac6e34f4173f48bb49bc7fd0c34baa68d}\label{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_ac6e34f4173f48bb49bc7fd0c34baa68d} 
+void {\bfseries Set\+Property} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string property, object value)
+\item 
+\Hypertarget{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_ac1b80af73a8a53cc6f69cf5335af0cc4}\label{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_ac1b80af73a8a53cc6f69cf5335af0cc4} 
+object {\bfseries Get\+Property} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string property)
+\item 
+\Hypertarget{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a554178b4624e60f0fa2f37b50dd30353}\label{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a554178b4624e60f0fa2f37b50dd30353} 
+\mbox{\hyperlink{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element}{ITool\+Bar\+Element}} {\bfseries Try\+Find\+Child\+Element} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string name)
+\item 
+\Hypertarget{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_acc5dd6949a01f7ee984a3224a6db97c4}\label{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_acc5dd6949a01f7ee984a3224a6db97c4} 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element}{ITool\+Bar\+Element}} $>$ {\bfseries Get\+Childs} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a6b38448bc83a8a8db0eaff39123060ba}\label{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a6b38448bc83a8a8db0eaff39123060ba} 
+object {\bfseries Try\+Get\+Child\+Property} (string name)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+uint \mbox{\hyperlink{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a107a09c859ce11410672a73ee42be3b3}{Id}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets the unique id of the toolbar element. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element}{ITool\+Bar\+Element}} \mbox{\hyperlink{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a0770b9fb7877f48be9fd54cd7534606b}{Parent\+Element}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Reference to the parent element;. \end{DoxyCompactList}\item 
+string \mbox{\hyperlink{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_aa73f64048b69597570132d63c35e78f5}{Property\+Name}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em The name of the parent toolbar\textquotesingle{}s property that holds this element. \end{DoxyCompactList}\item 
+string \mbox{\hyperlink{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a83fc44867cf8d6709cbbd8835fe127e1}{Element\+Name}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em The logical name of this element. \end{DoxyCompactList}\item 
+string \mbox{\hyperlink{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_aeeee7a2514477e1767345a04dbd6f367}{Element\+Type}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em The name of the element type. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a83fc44867cf8d6709cbbd8835fe127e1}\label{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a83fc44867cf8d6709cbbd8835fe127e1} 
+\index{StepBro.ToolBarCreator.IToolBarElement@{StepBro.ToolBarCreator.IToolBarElement}!ElementName@{ElementName}}
+\index{ElementName@{ElementName}!StepBro.ToolBarCreator.IToolBarElement@{StepBro.ToolBarCreator.IToolBarElement}}
+\doxysubsubsection{\texorpdfstring{ElementName}{ElementName}}
+{\footnotesize\ttfamily string Step\+Bro.\+Tool\+Bar\+Creator.\+ITool\+Bar\+Element.\+Element\+Name\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+The logical name of this element. 
+
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_object_command_button_a20b2c254cd60f157cf29a766356aaa07}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Object\+Command\+Button}}, \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_procedure_activation_button_a354be5a62f8206b8343512f91f067fa3}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Procedure\+Activation\+Button}}, and \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_tool_bar_ad1665caf116b01879c59ffa95502a6af}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Tool\+Bar}}.
+
+\Hypertarget{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_aeeee7a2514477e1767345a04dbd6f367}\label{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_aeeee7a2514477e1767345a04dbd6f367} 
+\index{StepBro.ToolBarCreator.IToolBarElement@{StepBro.ToolBarCreator.IToolBarElement}!ElementType@{ElementType}}
+\index{ElementType@{ElementType}!StepBro.ToolBarCreator.IToolBarElement@{StepBro.ToolBarCreator.IToolBarElement}}
+\doxysubsubsection{\texorpdfstring{ElementType}{ElementType}}
+{\footnotesize\ttfamily string Step\+Bro.\+Tool\+Bar\+Creator.\+ITool\+Bar\+Element.\+Element\+Type\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+The name of the element type. 
+
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_object_command_button_a9de6d097da0076047679c2029d92dcd9}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Object\+Command\+Button}}, \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_procedure_activation_button_a3f92cc890b72332b404db5b4fc780a69}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Procedure\+Activation\+Button}}, and \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_tool_bar_aa026679a84a2bc8206c9f4eff322662f}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Tool\+Bar}}.
+
+\Hypertarget{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a107a09c859ce11410672a73ee42be3b3}\label{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a107a09c859ce11410672a73ee42be3b3} 
+\index{StepBro.ToolBarCreator.IToolBarElement@{StepBro.ToolBarCreator.IToolBarElement}!Id@{Id}}
+\index{Id@{Id}!StepBro.ToolBarCreator.IToolBarElement@{StepBro.ToolBarCreator.IToolBarElement}}
+\doxysubsubsection{\texorpdfstring{Id}{Id}}
+{\footnotesize\ttfamily uint Step\+Bro.\+Tool\+Bar\+Creator.\+ITool\+Bar\+Element.\+Id\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Gets the unique id of the toolbar element. 
+
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_object_command_button_ad134e78937a7e66d63ed43ba8043634c}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Object\+Command\+Button}}, \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_procedure_activation_button_a8330410fdf3710e01f96e8d5f2e0a589}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Procedure\+Activation\+Button}}, and \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_tool_bar_ab8970f213633d700ea314ffd28bd60fe}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Tool\+Bar}}.
+
+\Hypertarget{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a0770b9fb7877f48be9fd54cd7534606b}\label{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_a0770b9fb7877f48be9fd54cd7534606b} 
+\index{StepBro.ToolBarCreator.IToolBarElement@{StepBro.ToolBarCreator.IToolBarElement}!ParentElement@{ParentElement}}
+\index{ParentElement@{ParentElement}!StepBro.ToolBarCreator.IToolBarElement@{StepBro.ToolBarCreator.IToolBarElement}}
+\doxysubsubsection{\texorpdfstring{ParentElement}{ParentElement}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element}{ITool\+Bar\+Element}} Step\+Bro.\+Tool\+Bar\+Creator.\+ITool\+Bar\+Element.\+Parent\+Element\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Reference to the parent element;. 
+
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_object_command_button_a57e7a37a67d80cc2fdc3b3f836653201}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Object\+Command\+Button}}, \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_procedure_activation_button_a13bbf604552c28be4a5b9514de2af7c3}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Procedure\+Activation\+Button}}, and \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_tool_bar_a3d62a560c8b4104772c546c1196495fa}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Tool\+Bar}}.
+
+\Hypertarget{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_aa73f64048b69597570132d63c35e78f5}\label{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element_aa73f64048b69597570132d63c35e78f5} 
+\index{StepBro.ToolBarCreator.IToolBarElement@{StepBro.ToolBarCreator.IToolBarElement}!PropertyName@{PropertyName}}
+\index{PropertyName@{PropertyName}!StepBro.ToolBarCreator.IToolBarElement@{StepBro.ToolBarCreator.IToolBarElement}}
+\doxysubsubsection{\texorpdfstring{PropertyName}{PropertyName}}
+{\footnotesize\ttfamily string Step\+Bro.\+Tool\+Bar\+Creator.\+ITool\+Bar\+Element.\+Property\+Name\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+The name of the parent toolbar\textquotesingle{}s property that holds this element. 
+
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_object_command_button_a47c93e0a88af5f8739cf4f9689fb200b}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Object\+Command\+Button}}, \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_procedure_activation_button_aa48820fcae3aaa3ceac0ff2d06b90757}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Procedure\+Activation\+Button}}, and \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_win_forms_1_1_custom_tool_bar_1_1_tool_bar_ad4a97718e93e9f6a5a0d1e785bbceeb5}{Step\+Bro.\+UI.\+Win\+Forms.\+Custom\+Tool\+Bar.\+Tool\+Bar}}.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Host/\+Tool\+Bar\+Creator/Tool\+Bar\+Element.\+cs\end{DoxyCompactItemize}

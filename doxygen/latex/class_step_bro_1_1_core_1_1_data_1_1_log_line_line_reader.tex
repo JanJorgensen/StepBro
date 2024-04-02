@@ -1,0 +1,209 @@
+\doxysection{Step\+Bro.\+Core.\+Data.\+Log\+Line\+Line\+Reader Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader}{}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader}\index{StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}}
+Inheritance diagram for Step\+Bro.\+Core.\+Data.\+Log\+Line\+Line\+Reader\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_ac10b94ae9921f83516b096399d8de68b}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_ac10b94ae9921f83516b096399d8de68b} 
+{\bfseries Log\+Line\+Line\+Reader} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{INameable}} source, \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_data}{Log\+Line\+Data}} first, object sync)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_afd143603fff4c7f4684a7072f36bd2dc}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_afd143603fff4c7f4684a7072f36bd2dc} 
+void {\bfseries Notify\+New} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_data}{Log\+Line\+Data}} entry)
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a1daa45b83695974890abc71a45bbe5b1}{Next}} ()
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a9eb5f27296d526ee956d9e5cc0080aed}{Next\+Unless\+New\+Entry}} ()
+\item 
+void \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a3961e1782ab1edcecad53e84d9a24ce5}{Flush}} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} stop\+At=null)
+\item 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} $>$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_ab9ac4c29ad3502962b2033f5c8730580}{Peak}} ()
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a2f7ad3262a31dace1a4d88a7090a2759}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a2f7ad3262a31dace1a4d88a7090a2759} 
+IEnumerator$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} $>$ {\bfseries Get\+Enumerator} ()
+\item 
+void \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_aebeb79e38488137b8407900756371e7f}{Debug\+Dump}} ()
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a3185cb5fb4b8be2d114f58f02176875c}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a3185cb5fb4b8be2d114f58f02176875c} 
+bool {\bfseries Next} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a4808af657c5ba22068548a8645d2c931}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a4808af657c5ba22068548a8645d2c931} 
+bool {\bfseries Next\+Unless\+New\+Entry} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a43f0c3fdd3a9d6c5a8e8008a39962c77}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a43f0c3fdd3a9d6c5a8e8008a39962c77} 
+void {\bfseries Flush} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} stop\+At=null)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a2284b4006515f128380b9515f4f92d9e}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a2284b4006515f128380b9515f4f92d9e} 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} $>$ {\bfseries Peak} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_ab5a471edfe2941c865adf3541085e033}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_ab5a471edfe2941c865adf3541085e033} 
+void {\bfseries Debug\+Dump} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a66d02a61f6d139d49992a753f5cc57fb}{Lines\+Have\+Timestamp}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_ac60419fd55c2f06ac0bc58616bba67b7}{Has\+More}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+object \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a6ebf5a40f06eb4011cd7a42d7be020c4}{Sync}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Date\+Time \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a68de62f1057694f9363c0f6c37841650}{Latest\+Time\+Stamp}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_adcda5388edeed7a60660e5cead75f24e}{Current}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{INameable}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a09e85f2f62a351f1959c2341d14fa4aa}{Source}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{INameable}} {\bfseries Source}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+object {\bfseries Sync}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} {\bfseries Current}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Date\+Time {\bfseries Latest\+Time\+Stamp}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool {\bfseries Lines\+Have\+Timestamp}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool {\bfseries Has\+More}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_ac1efadc319dd48bfc11cbfefb4bfafdc}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_ac1efadc319dd48bfc11cbfefb4bfafdc} 
+Event\+Handler {\bfseries Lines\+Added}
+\end{DoxyCompactItemize}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler {\bfseries Lines\+Added}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_aebeb79e38488137b8407900756371e7f}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_aebeb79e38488137b8407900756371e7f} 
+\index{StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}!DebugDump@{DebugDump}}
+\index{DebugDump@{DebugDump}!StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}}
+\doxysubsubsection{\texorpdfstring{DebugDump()}{DebugDump()}}
+{\footnotesize\ttfamily void Step\+Bro.\+Core.\+Data.\+Log\+Line\+Line\+Reader.\+Debug\+Dump (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a3961e1782ab1edcecad53e84d9a24ce5}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a3961e1782ab1edcecad53e84d9a24ce5} 
+\index{StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}!Flush@{Flush}}
+\index{Flush@{Flush}!StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}}
+\doxysubsubsection{\texorpdfstring{Flush()}{Flush()}}
+{\footnotesize\ttfamily void Step\+Bro.\+Core.\+Data.\+Log\+Line\+Line\+Reader.\+Flush (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}}}]{stop\+At = {\ttfamily null} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a1daa45b83695974890abc71a45bbe5b1}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a1daa45b83695974890abc71a45bbe5b1} 
+\index{StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}!Next@{Next}}
+\index{Next@{Next}!StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}}
+\doxysubsubsection{\texorpdfstring{Next()}{Next()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+Data.\+Log\+Line\+Line\+Reader.\+Next (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a9eb5f27296d526ee956d9e5cc0080aed}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a9eb5f27296d526ee956d9e5cc0080aed} 
+\index{StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}!NextUnlessNewEntry@{NextUnlessNewEntry}}
+\index{NextUnlessNewEntry@{NextUnlessNewEntry}!StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}}
+\doxysubsubsection{\texorpdfstring{NextUnlessNewEntry()}{NextUnlessNewEntry()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+Data.\+Log\+Line\+Line\+Reader.\+Next\+Unless\+New\+Entry (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_ab9ac4c29ad3502962b2033f5c8730580}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_ab9ac4c29ad3502962b2033f5c8730580} 
+\index{StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}!Peak@{Peak}}
+\index{Peak@{Peak}!StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}}
+\doxysubsubsection{\texorpdfstring{Peak()}{Peak()}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} $>$ Step\+Bro.\+Core.\+Data.\+Log\+Line\+Line\+Reader.\+Peak (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_adcda5388edeed7a60660e5cead75f24e}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_adcda5388edeed7a60660e5cead75f24e} 
+\index{StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}!Current@{Current}}
+\index{Current@{Current}!StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}}
+\doxysubsubsection{\texorpdfstring{Current}{Current}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} Step\+Bro.\+Core.\+Data.\+Log\+Line\+Line\+Reader.\+Current\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_ac60419fd55c2f06ac0bc58616bba67b7}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_ac60419fd55c2f06ac0bc58616bba67b7} 
+\index{StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}!HasMore@{HasMore}}
+\index{HasMore@{HasMore}!StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}}
+\doxysubsubsection{\texorpdfstring{HasMore}{HasMore}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+Data.\+Log\+Line\+Line\+Reader.\+Has\+More\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a68de62f1057694f9363c0f6c37841650}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a68de62f1057694f9363c0f6c37841650} 
+\index{StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}!LatestTimeStamp@{LatestTimeStamp}}
+\index{LatestTimeStamp@{LatestTimeStamp}!StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}}
+\doxysubsubsection{\texorpdfstring{LatestTimeStamp}{LatestTimeStamp}}
+{\footnotesize\ttfamily Date\+Time Step\+Bro.\+Core.\+Data.\+Log\+Line\+Line\+Reader.\+Latest\+Time\+Stamp\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a66d02a61f6d139d49992a753f5cc57fb}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a66d02a61f6d139d49992a753f5cc57fb} 
+\index{StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}!LinesHaveTimestamp@{LinesHaveTimestamp}}
+\index{LinesHaveTimestamp@{LinesHaveTimestamp}!StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}}
+\doxysubsubsection{\texorpdfstring{LinesHaveTimestamp}{LinesHaveTimestamp}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+Data.\+Log\+Line\+Line\+Reader.\+Lines\+Have\+Timestamp\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a09e85f2f62a351f1959c2341d14fa4aa}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a09e85f2f62a351f1959c2341d14fa4aa} 
+\index{StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}!Source@{Source}}
+\index{Source@{Source}!StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}}
+\doxysubsubsection{\texorpdfstring{Source}{Source}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{INameable}} Step\+Bro.\+Core.\+Data.\+Log\+Line\+Line\+Reader.\+Source\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a6ebf5a40f06eb4011cd7a42d7be020c4}\label{class_step_bro_1_1_core_1_1_data_1_1_log_line_line_reader_a6ebf5a40f06eb4011cd7a42d7be020c4} 
+\index{StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}!Sync@{Sync}}
+\index{Sync@{Sync}!StepBro.Core.Data.LogLineLineReader@{StepBro.Core.Data.LogLineLineReader}}
+\doxysubsubsection{\texorpdfstring{Sync}{Sync}}
+{\footnotesize\ttfamily object Step\+Bro.\+Core.\+Data.\+Log\+Line\+Line\+Reader.\+Sync\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Data/Log\+Line\+Line\+Reader.\+cs\end{DoxyCompactItemize}

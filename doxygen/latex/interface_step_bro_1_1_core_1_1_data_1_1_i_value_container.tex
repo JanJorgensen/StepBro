@@ -1,0 +1,228 @@
+\doxysection{Step\+Bro.\+Core.\+Data.\+IValue\+Container\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Interface Template Reference}
+\hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container}{}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container}\index{StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}}
+
+
+General interface for an object containing a single value.  
+
+
+Inheritance diagram for Step\+Bro.\+Core.\+Data.\+IValue\+Container\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=4.930818cm]{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+object \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a30929924d4d32db463ffb22701a42bcb}{Get\+Value}} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} logger=null)
+\begin{DoxyCompactList}\small\item\em Gets the value of the container\+: \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a1118fc1195d8cc2295a894bd50459c3f}{Set\+Value}} (object value, \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} logger=null)
+\begin{DoxyCompactList}\small\item\em Sets the value of the container. \end{DoxyCompactList}\item 
+T \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a3ec2bd6af7e710febae4e7e140c7eaeb}{Get\+Typed\+Value}} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} logger=null)
+\begin{DoxyCompactList}\small\item\em Gets the value of the container. \end{DoxyCompactList}\item 
+T \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_aa2141a8cf9af09b357075de731a5d8a0}{Modify}} (Value\+Container\+Modifier$<$ T $>$ modifier, \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} logger=null)
+\begin{DoxyCompactList}\small\item\em Modifies the value of the container with the specifed modifier function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a88f050c278b8f7fa781cb6c344a5ea76}{Unique\+ID}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em An integer value identifying the container, used in storages for lookup identification. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a93962a1f539f84f17e5b187c47329e84}{Is\+Readonly}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Whether the value of the container is readonly. \end{DoxyCompactList}\item 
+Access\+Modifier \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a916a538cbec20de0a7378ed8c0997d59}{Access\+Protection}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates the general access level of the container. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_identifier_info}{Step\+Bro.\+Core.\+Data.\+IIdentifier\+Info}}}
+\begin{DoxyCompactItemize}
+\item 
+string {\bfseries Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Full\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_data_a1007a83f4c84fb18d5823591c53e71d2}{Identifier\+Type}} {\bfseries Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_type_reference}{Type\+Reference}} {\bfseries Data\+Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+object {\bfseries Reference}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_object_container}{Step\+Bro.\+Core.\+Data.\+IObject\+Container}}}
+\begin{DoxyCompactItemize}
+\item 
+string {\bfseries Full\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em The fully qualified name of the container/object. \end{DoxyCompactList}\item 
+object {\bfseries Object}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets the container object reference. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_availability}{Step\+Bro.\+Core.\+Data.\+IAvailability}}}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bfseries Is\+Still\+Valid}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_object_container}{Step\+Bro.\+Core.\+Data.\+IObject\+Container}}}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler {\bfseries Object\+Replaced}
+\begin{DoxyCompactList}\small\item\em Notifies when the container has been assigned another object. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_availability}{Step\+Bro.\+Core.\+Data.\+IAvailability}}}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler {\bfseries Disposed}
+\end{DoxyCompactItemize}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_disposing}{Step\+Bro.\+Core.\+Data.\+IDisposing}}}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler {\bfseries Disposing}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+General interface for an object containing a single value. 
+
+General generic interface for an object containing a single value.
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & The type of the container value.\\
+\hline
+\end{DoxyTemplParams}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a3ec2bd6af7e710febae4e7e140c7eaeb}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a3ec2bd6af7e710febae4e7e140c7eaeb} 
+\index{StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}!GetTypedValue@{GetTypedValue}}
+\index{GetTypedValue@{GetTypedValue}!StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{GetTypedValue()}{GetTypedValue()}}
+{\footnotesize\ttfamily T \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container}{Step\+Bro.\+Core.\+Data.\+IValue\+Container}}$<$ T $>$.Get\+Typed\+Value (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}}}]{logger = {\ttfamily null} }\end{DoxyParamCaption})}
+
+
+
+Gets the value of the container. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em logger} & Interface for logging the container access.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Container value.
+\end{DoxyReturn}
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_variable_container_afa6af6d4ef564e8002daf6647e829155}{Step\+Bro.\+Core.\+Data.\+Variable\+Container$<$ T $>$}}.
+
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a30929924d4d32db463ffb22701a42bcb}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a30929924d4d32db463ffb22701a42bcb} 
+\index{StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}!GetValue@{GetValue}}
+\index{GetValue@{GetValue}!StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{GetValue()}{GetValue()}}
+{\footnotesize\ttfamily object \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container}{Step\+Bro.\+Core.\+Data.\+IValue\+Container}}$<$ T $>$.Get\+Value (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}}}]{logger = {\ttfamily null} }\end{DoxyParamCaption})}
+
+
+
+Gets the value of the container\+: 
+
+
+\begin{DoxyParams}{Parameters}
+{\em logger} & Interface for logging the container access.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Container value.
+\end{DoxyReturn}
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_variable_container_a1bfc9f3cbb050611b798a899857ab4e3}{Step\+Bro.\+Core.\+Data.\+Variable\+Container$<$ T $>$}}.
+
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_aa2141a8cf9af09b357075de731a5d8a0}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_aa2141a8cf9af09b357075de731a5d8a0} 
+\index{StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}!Modify@{Modify}}
+\index{Modify@{Modify}!StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Modify()}{Modify()}}
+{\footnotesize\ttfamily T \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container}{Step\+Bro.\+Core.\+Data.\+IValue\+Container}}$<$ T $>$.Modify (\begin{DoxyParamCaption}\item[{Value\+Container\+Modifier$<$ T $>$}]{modifier,  }\item[{\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}}}]{logger = {\ttfamily null} }\end{DoxyParamCaption})}
+
+
+
+Modifies the value of the container with the specifed modifier function. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em modifier} & Delegate to a modifier function.\\
+\hline
+{\em logger} & Interface for logging the container value modification.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The output value of the modifier, which can be different from the new value of the container.
+\end{DoxyReturn}
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_variable_container_adf82f65b99a0c14e82d4bd3f75a41b17}{Step\+Bro.\+Core.\+Data.\+Variable\+Container$<$ T $>$}}.
+
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a1118fc1195d8cc2295a894bd50459c3f}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a1118fc1195d8cc2295a894bd50459c3f} 
+\index{StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}!SetValue@{SetValue}}
+\index{SetValue@{SetValue}!StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{SetValue()}{SetValue()}}
+{\footnotesize\ttfamily void \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container}{Step\+Bro.\+Core.\+Data.\+IValue\+Container}}$<$ T $>$.Set\+Value (\begin{DoxyParamCaption}\item[{object}]{value,  }\item[{\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}}}]{logger = {\ttfamily null} }\end{DoxyParamCaption})}
+
+
+
+Sets the value of the container. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em value} & New value.\\
+\hline
+{\em logger} & Interface for logging the container access.\\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_variable_container_a425320b55b53f154d8d23dfeaa2b962b}{Step\+Bro.\+Core.\+Data.\+Variable\+Container$<$ T $>$}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a916a538cbec20de0a7378ed8c0997d59}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a916a538cbec20de0a7378ed8c0997d59} 
+\index{StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}!AccessProtection@{AccessProtection}}
+\index{AccessProtection@{AccessProtection}!StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{AccessProtection}{AccessProtection}}
+{\footnotesize\ttfamily Access\+Modifier \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container}{Step\+Bro.\+Core.\+Data.\+IValue\+Container}}$<$ T $>$.Access\+Protection\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Indicates the general access level of the container. 
+
+The container does not check or use this value itself.
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_variable_container_a82b38a2c630875b2b52a450f5048fbdd}{Step\+Bro.\+Core.\+Data.\+Variable\+Container$<$ T $>$}}.
+
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a93962a1f539f84f17e5b187c47329e84}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a93962a1f539f84f17e5b187c47329e84} 
+\index{StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}!IsReadonly@{IsReadonly}}
+\index{IsReadonly@{IsReadonly}!StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{IsReadonly}{IsReadonly}}
+{\footnotesize\ttfamily bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container}{Step\+Bro.\+Core.\+Data.\+IValue\+Container}}$<$ T $>$.Is\+Readonly\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Whether the value of the container is readonly. 
+
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_variable_container_a8fb2a1d2dbf9cd4b96aa3692ec2cc088}{Step\+Bro.\+Core.\+Data.\+Variable\+Container$<$ T $>$}}.
+
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a88f050c278b8f7fa781cb6c344a5ea76}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container_a88f050c278b8f7fa781cb6c344a5ea76} 
+\index{StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}!UniqueID@{UniqueID}}
+\index{UniqueID@{UniqueID}!StepBro.Core.Data.IValueContainer$<$ T $>$@{StepBro.Core.Data.IValueContainer$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{UniqueID}{UniqueID}}
+{\footnotesize\ttfamily int \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_value_container}{Step\+Bro.\+Core.\+Data.\+IValue\+Container}}$<$ T $>$.Unique\+ID\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+An integer value identifying the container, used in storages for lookup identification. 
+
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_variable_container_ace220aacfca6583b766cdeada494ba0d}{Step\+Bro.\+Core.\+Data.\+Variable\+Container$<$ T $>$}}.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Data/IValue\+Container.\+cs\end{DoxyCompactItemize}

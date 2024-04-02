@@ -1,0 +1,107 @@
+\doxysection{Step\+Bro.\+Core.\+Data\+Report Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_data_report}{}\label{class_step_bro_1_1_core_1_1_data_report}\index{StepBro.Core.DataReport@{StepBro.Core.DataReport}}
+Inheritance diagram for Step\+Bro.\+Core.\+Data\+Report\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=4.000000cm]{class_step_bro_1_1_core_1_1_data_report}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_aa571ee744383faa504246a0d67679486}\label{class_step_bro_1_1_core_1_1_data_report_aa571ee744383faa504246a0d67679486} 
+{\bfseries Data\+Report} (string type, string title)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_afb15428b365a36b53da9af868da158eb}\label{class_step_bro_1_1_core_1_1_data_report_afb15428b365a36b53da9af868da158eb} 
+IEnumerable$<$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_report_1_1_report_group}{Report\+Group}} $>$ {\bfseries List\+Groups} ()
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a18d7ab480947337164b8823e5bbf072c}\label{class_step_bro_1_1_core_1_1_data_report_a18d7ab480947337164b8823e5bbf072c} 
+IEnumerable$<$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_report_data}{Report\+Data}} $>$ {\bfseries List\+Data} ()
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_ace5eb74abb9ce257f7f0357121d84771}\label{class_step_bro_1_1_core_1_1_data_report_ace5eb74abb9ce257f7f0357121d84771} 
+void {\bfseries Add\+Data} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, \mbox{\hyperlink{class_step_bro_1_1_core_1_1_report_data}{Report\+Data}} data)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a941b29871001d75ca2d262cd405e11ac}\label{class_step_bro_1_1_core_1_1_data_report_a941b29871001d75ca2d262cd405e11ac} 
+void {\bfseries Start\+Group} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string name, string description=null)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a3e6a8e0d977df527b100557dd93bbb3c}\label{class_step_bro_1_1_core_1_1_data_report_a3e6a8e0d977df527b100557dd93bbb3c} 
+void {\bfseries Add\+Section} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string header, string subheader=\"{}\"{})
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a9e0611eb342df4ca91b0289b076f305a}\label{class_step_bro_1_1_core_1_1_data_report_a9e0611eb342df4ca91b0289b076f305a} 
+void {\bfseries Add\+Unhandled\+Exeception} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, Exception ex, string\mbox{[}$\,$\mbox{]} script\+Callstack)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a1a7e714f3e8a66fc3fcf566e44470837}\label{class_step_bro_1_1_core_1_1_data_report_a1a7e714f3e8a66fc3fcf566e44470837} 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_report_1_1_report_test_summary}{Report\+Test\+Summary}} {\bfseries Create\+Test\+Summary} ()
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a437293469b21dbea20c0be4b2887941d}\label{class_step_bro_1_1_core_1_1_data_report_a437293469b21dbea20c0be4b2887941d} 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_report_data_table}{Report\+Data\+Table}} {\bfseries Create\+Data\+Table} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string title, string subttitle, Report\+Data\+Table.\+Data\+Set\+Direction data\+Set\+Direction)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a8c8a557317abf5e8c200775ed6f568b3}\label{class_step_bro_1_1_core_1_1_data_report_a8c8a557317abf5e8c200775ed6f568b3} 
+void {\bfseries Add\+Measurement} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string id, string instance, string unit, object value)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a6484731b28417ae865502ad70cf78398}\label{class_step_bro_1_1_core_1_1_data_report_a6484731b28417ae865502ad70cf78398} 
+void {\bfseries Dump\+To\+Log} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a51e9701e894cf40ca900b33fd729aab2}\label{class_step_bro_1_1_core_1_1_data_report_a51e9701e894cf40ca900b33fd729aab2} 
+void {\bfseries Close} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a568c5db14f36373ee9eb47d8198563d0}\label{class_step_bro_1_1_core_1_1_data_report_a568c5db14f36373ee9eb47d8198563d0} 
+void {\bfseries Dispose} ()
+\item 
+void \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_report_a454566df407acc3c4986b94f5d5ccbcd}{Dispose}} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_script_disposable_a088d7f447ecf0a338affc6d41baad54c}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_script_disposable_a088d7f447ecf0a338affc6d41baad54c} 
+void {\bfseries Dispose} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_ac91821d2e9a9c62251645f3e4fece789}\label{class_step_bro_1_1_core_1_1_data_report_ac91821d2e9a9c62251645f3e4fece789} 
+static void {\bfseries Add\+Measurement} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_report}{Data\+Report}} report, string id, string instance, string unit, object value)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a578efaa2873d94c8354aaeb98a0cf523}\label{class_step_bro_1_1_core_1_1_data_report_a578efaa2873d94c8354aaeb98a0cf523} 
+string {\bfseries Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_af202bd72d4b7ffe29e2415287a1772b4}\label{class_step_bro_1_1_core_1_1_data_report_af202bd72d4b7ffe29e2415287a1772b4} 
+string {\bfseries Title}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a0d1e7cbb8a8e19d9a1dee9132050e386}\label{class_step_bro_1_1_core_1_1_data_report_a0d1e7cbb8a8e19d9a1dee9132050e386} 
+long {\bfseries Group\+Count}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a1d937b6a646029b1811d82f0319be595}\label{class_step_bro_1_1_core_1_1_data_report_a1d937b6a646029b1811d82f0319be595} 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_report_1_1_report_test_summary}{Report\+Test\+Summary}} {\bfseries Summary}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a239c2bf92101d0e48f00e3bd5e7c6430}\label{class_step_bro_1_1_core_1_1_data_report_a239c2bf92101d0e48f00e3bd5e7c6430} 
+Event\+Handler {\bfseries Disposing}
+\end{DoxyCompactItemize}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_disposing}{Step\+Bro.\+Core.\+Data.\+IDisposing}}}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler {\bfseries Disposing}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_data_report_a454566df407acc3c4986b94f5d5ccbcd}\label{class_step_bro_1_1_core_1_1_data_report_a454566df407acc3c4986b94f5d5ccbcd} 
+\index{StepBro.Core.DataReport@{StepBro.Core.DataReport}!Dispose@{Dispose}}
+\index{Dispose@{Dispose}!StepBro.Core.DataReport@{StepBro.Core.DataReport}}
+\doxysubsubsection{\texorpdfstring{Dispose()}{Dispose()}}
+{\footnotesize\ttfamily void Step\+Bro.\+Core.\+Data\+Report.\+Dispose (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}}}]{context }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_script_disposable}{Step\+Bro.\+Core.\+General.\+IScript\+Disposable}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Data/\+Report/Data\+Report.\+cs\end{DoxyCompactItemize}

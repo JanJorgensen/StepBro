@@ -1,0 +1,98 @@
+\doxysection{Step\+Bro.\+Core.\+Host.\+Host\+Access\+Base\texorpdfstring{$<$}{<} TThis \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_host_1_1_host_access_base}{}\label{class_step_bro_1_1_core_1_1_host_1_1_host_access_base}\index{StepBro.Core.Host.HostAccessBase$<$ TThis $>$@{StepBro.Core.Host.HostAccessBase$<$ TThis $>$}}
+Inheritance diagram for Step\+Bro.\+Core.\+Host.\+Host\+Access\+Base\texorpdfstring{$<$}{<} TThis \texorpdfstring{$>$}{>}\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_core_1_1_host_1_1_host_access_base}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+abstract IEnumerable$<$ \mbox{\hyperlink{struct_step_bro_1_1_core_1_1_data_1_1_named_data}{Named\+Data}}$<$ object $>$ $>$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_host_1_1_host_access_base_a4595bc3d8091275e7824b4ee6dd12728}{List\+Host\+Code\+Module\+Instances}} ()
+\item 
+abstract IEnumerable$<$ Type $>$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_host_1_1_host_access_base_a3c3ba78dad83af5c476e18330b99b827}{List\+Host\+Code\+Module\+Types}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_service_base}{Step\+Bro.\+Core.\+Service\+Base$<$ IHost, TThis $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Service\+Base} (string name, out \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_i_service}{IService}} service\+Access, params Type\mbox{[}$\,$\mbox{]} dependencies)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_host_1_1_i_host_ac7e7ce643d44c9d7593048558660100a}\label{interface_step_bro_1_1_core_1_1_host_1_1_i_host_ac7e7ce643d44c9d7593048558660100a} 
+IEnumerable$<$ Type $>$ {\bfseries List\+Host\+Code\+Module\+Types} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_host_1_1_i_host_a62082685a5a4ced7a2b1c0f9c3e3ff33}\label{interface_step_bro_1_1_core_1_1_host_1_1_i_host_a62082685a5a4ced7a2b1c0f9c3e3ff33} 
+IEnumerable$<$ \mbox{\hyperlink{struct_step_bro_1_1_core_1_1_data_1_1_named_data}{Named\+Data}}$<$ object $>$ $>$ {\bfseries List\+Host\+Code\+Module\+Instances} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_host_1_1_host_access_base_a6f84e641e03eb5b5c35750f8493e33ac}\label{class_step_bro_1_1_core_1_1_host_1_1_host_access_base_a6f84e641e03eb5b5c35750f8493e33ac} 
+{\bfseries Host\+Access\+Base} (string name, out \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_i_service}{IService}} service\+Access, params Type\mbox{[}$\,$\mbox{]} dependencies)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_service_base}{Step\+Bro.\+Core.\+Service\+Base$<$ IHost, TThis $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Service\+Base} ()
+\begin{DoxyCompactList}\small\item\em Constructor for using when the derived object is not actually used as a service. \end{DoxyCompactList}\item 
+virtual void {\bfseries Initialize} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_service_manager}{Service\+Manager}} manager, \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context}{ITask\+Context}} context)
+\item 
+virtual void {\bfseries Start} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_service_manager}{Service\+Manager}} manager, \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context}{ITask\+Context}} context)
+\item 
+virtual void {\bfseries Stop} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_service_manager}{Service\+Manager}} manager, \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context}{ITask\+Context}} context)
+\item 
+void {\bfseries Expect\+Service\+Started} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+abstract Host\+Type \mbox{\hyperlink{class_step_bro_1_1_core_1_1_host_1_1_host_access_base_a6cf72465dcd9ff9372589960081ab1f3}{Type}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_host_1_1_i_host}{Step\+Bro.\+Core.\+Host.\+IHost}}}
+\begin{DoxyCompactItemize}
+\item 
+Host\+Type {\bfseries Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_host_1_1_host_access_base_a4595bc3d8091275e7824b4ee6dd12728}\label{class_step_bro_1_1_core_1_1_host_1_1_host_access_base_a4595bc3d8091275e7824b4ee6dd12728} 
+\index{StepBro.Core.Host.HostAccessBase$<$ TThis $>$@{StepBro.Core.Host.HostAccessBase$<$ TThis $>$}!ListHostCodeModuleInstances@{ListHostCodeModuleInstances}}
+\index{ListHostCodeModuleInstances@{ListHostCodeModuleInstances}!StepBro.Core.Host.HostAccessBase$<$ TThis $>$@{StepBro.Core.Host.HostAccessBase$<$ TThis $>$}}
+\doxysubsubsection{\texorpdfstring{ListHostCodeModuleInstances()}{ListHostCodeModuleInstances()}}
+{\footnotesize\ttfamily abstract IEnumerable$<$ \mbox{\hyperlink{struct_step_bro_1_1_core_1_1_data_1_1_named_data}{Named\+Data}}$<$ object $>$ $>$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_host_1_1_host_access_base}{Step\+Bro.\+Core.\+Host.\+Host\+Access\+Base}}$<$ TThis $>$.List\+Host\+Code\+Module\+Instances (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_host_1_1_i_host}{Step\+Bro.\+Core.\+Host.\+IHost}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_host_1_1_host_access_base_a3c3ba78dad83af5c476e18330b99b827}\label{class_step_bro_1_1_core_1_1_host_1_1_host_access_base_a3c3ba78dad83af5c476e18330b99b827} 
+\index{StepBro.Core.Host.HostAccessBase$<$ TThis $>$@{StepBro.Core.Host.HostAccessBase$<$ TThis $>$}!ListHostCodeModuleTypes@{ListHostCodeModuleTypes}}
+\index{ListHostCodeModuleTypes@{ListHostCodeModuleTypes}!StepBro.Core.Host.HostAccessBase$<$ TThis $>$@{StepBro.Core.Host.HostAccessBase$<$ TThis $>$}}
+\doxysubsubsection{\texorpdfstring{ListHostCodeModuleTypes()}{ListHostCodeModuleTypes()}}
+{\footnotesize\ttfamily abstract IEnumerable$<$ Type $>$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_host_1_1_host_access_base}{Step\+Bro.\+Core.\+Host.\+Host\+Access\+Base}}$<$ TThis $>$.List\+Host\+Code\+Module\+Types (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_host_1_1_i_host}{Step\+Bro.\+Core.\+Host.\+IHost}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_host_1_1_host_access_base_a6cf72465dcd9ff9372589960081ab1f3}\label{class_step_bro_1_1_core_1_1_host_1_1_host_access_base_a6cf72465dcd9ff9372589960081ab1f3} 
+\index{StepBro.Core.Host.HostAccessBase$<$ TThis $>$@{StepBro.Core.Host.HostAccessBase$<$ TThis $>$}!Type@{Type}}
+\index{Type@{Type}!StepBro.Core.Host.HostAccessBase$<$ TThis $>$@{StepBro.Core.Host.HostAccessBase$<$ TThis $>$}}
+\doxysubsubsection{\texorpdfstring{Type}{Type}}
+{\footnotesize\ttfamily abstract Host\+Type \mbox{\hyperlink{class_step_bro_1_1_core_1_1_host_1_1_host_access_base}{Step\+Bro.\+Core.\+Host.\+Host\+Access\+Base}}$<$ TThis $>$.Type\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_host_1_1_i_host}{Step\+Bro.\+Core.\+Host.\+IHost}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Host/Host\+Access.\+cs\end{DoxyCompactItemize}

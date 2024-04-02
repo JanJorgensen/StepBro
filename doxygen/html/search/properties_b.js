@@ -1,0 +1,8 @@
+var searchData=
+[
+  ['name_0',['Name',['../class_step_bro_1_1_workbench_1_1_tree_node_model.html#a089262fe60c8a14dc9b933468101b615',1,'StepBro.Workbench.TreeNodeModel.Name'],['../class_fast_colored_text_box_n_s_1_1_bookmark.html#aaff9c6d67dc3cb1425573825b09102d4',1,'FastColoredTextBoxNS.Bookmark.Name']]],
+  ['notifydocumentoutlineupdated_1',['NotifyDocumentOutlineUpdated',['../class_step_bro_1_1_workbench_1_1_document_data.html#a3ea5a118bc2634d0e58df48ebd47b7f7',1,'StepBro::Workbench::DocumentData']]],
+  ['notifysearchaction_2',['NotifySearchAction',['../class_step_bro_1_1_workbench_1_1_document_data.html#ade4a6d56695c0f2844bb126e78f54599',1,'StepBro::Workbench::DocumentData']]],
+  ['number_3',['Number',['../interface_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_i_step_bro_classification_type_provider.html#a738f465940af306c12f97c21b459d839',1,'StepBro.UI.SyntaxEditorSupport.IStepBroClassificationTypeProvider.Number'],['../class_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_step_bro_classification_type_provider.html#a7ea46d66f72e0822253a8b7d024a41c2',1,'StepBro.UI.SyntaxEditorSupport.StepBroClassificationTypeProvider.Number'],['../interface_step_bro_1_1_core_1_1_parser_1_1_i_syntax_editor_step_bro_classification_type_provider.html#a44949663d9b8757facf953fb946691ab',1,'StepBro.Core.Parser.ISyntaxEditorStepBroClassificationTypeProvider.Number'],['../class_step_bro_1_1_core_1_1_parser_1_1_syntax_editor_step_bro_classification_type_provider.html#a6c9a33278bea56026e9498da93b44aea',1,'StepBro.Core.Parser.SyntaxEditorStepBroClassificationTypeProvider.Number']]],
+  ['numberstyle_4',['NumberStyle',['../class_fast_colored_text_box_n_s_1_1_syntax_highlighter.html#a1327189ffedf3629dc0e646d9dd71a68',1,'FastColoredTextBoxNS::SyntaxHighlighter']]]
+];

@@ -1,0 +1,78 @@
+\doxysection{Step\+Bro.\+UI.\+Panels.\+ICustom\+Panel\+Manager Interface Reference}
+\hypertarget{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager}{}\label{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager}\index{StepBro.UI.Panels.ICustomPanelManager@{StepBro.UI.Panels.ICustomPanelManager}}
+
+
+Inherited by Step\+Bro.\+UI.\+Panels.\+Custom\+Panel\+Manager.
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+IEnumerable$<$ \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_panels_1_1_custom_panel_type}{Custom\+Panel\+Type}} $>$ \mbox{\hyperlink{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_aebb004db2ff123b97e839fda6f132a58}{List\+Panel\+Types}} ()
+\begin{DoxyCompactList}\small\item\em List all the registered panel types. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_panels_1_1_custom_panel_type}{Custom\+Panel\+Type}} \mbox{\hyperlink{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_ab1261e9e35e234cfb6f736f0b2ded090}{Find\+Panel\+Type}} (string name)
+\begin{DoxyCompactList}\small\item\em Searches through the list of known panels, to find the panel with the specified name. \end{DoxyCompactList}\item 
+\Hypertarget{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_a34f136e7132403c0d7185d43d320993e}\label{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_a34f136e7132403c0d7185d43d320993e} 
+Panel\+Creation\+Option {\bfseries Get\+Panel\+Creation\+Option} (\mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_panels_1_1_custom_panel_type}{Custom\+Panel\+Type}} type, object @object=null)
+\item 
+\Hypertarget{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_ac875d882bd3580cd27904a662657066f}\label{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_ac875d882bd3580cd27904a662657066f} 
+\mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_panels_1_1_custom_panel_instance_data}{Custom\+Panel\+Instance\+Data}} {\bfseries Create\+Static\+Panel} (string type)
+\item 
+\Hypertarget{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_a904546323234f69f7468ad9dc4dce073}\label{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_a904546323234f69f7468ad9dc4dce073} 
+\mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_panels_1_1_custom_panel_instance_data}{Custom\+Panel\+Instance\+Data}} {\bfseries Create\+Static\+Panel} (\mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_panels_1_1_custom_panel_type}{Custom\+Panel\+Type}} type)
+\item 
+\Hypertarget{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_a59eaee6aca0fa881b21cfa887e5557c7}\label{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_a59eaee6aca0fa881b21cfa887e5557c7} 
+\mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_panels_1_1_custom_panel_instance_data}{Custom\+Panel\+Instance\+Data}} {\bfseries Create\+Object\+Panel} (string type, string object\+Reference)
+\item 
+\Hypertarget{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_a8c1fb4380279850aadb2744ca6a7738b}\label{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_a8c1fb4380279850aadb2744ca6a7738b} 
+\mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_panels_1_1_custom_panel_instance_data}{Custom\+Panel\+Instance\+Data}} {\bfseries Create\+Object\+Panel} (\mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_panels_1_1_custom_panel_type}{Custom\+Panel\+Type}} type, string object\+Reference)
+\item 
+\Hypertarget{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_a5728467ff09eb7dce68098094fb0510a}\label{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_a5728467ff09eb7dce68098094fb0510a} 
+\mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_panels_1_1_custom_panel_instance_data}{Custom\+Panel\+Instance\+Data}} {\bfseries Create\+Object\+Panel} (\mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_panels_1_1_custom_panel_type}{Custom\+Panel\+Type}} type, \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_object_container}{IObject\+Container}} container)
+\item 
+\Hypertarget{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_a6bd2d2b662a6deb6ac91edf6a9847a8f}\label{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_a6bd2d2b662a6deb6ac91edf6a9847a8f} 
+IEnumerable$<$ \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_panels_1_1_custom_panel_instance_data}{Custom\+Panel\+Instance\+Data}} $>$ {\bfseries List\+Created\+Panels} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_ab1261e9e35e234cfb6f736f0b2ded090}\label{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_ab1261e9e35e234cfb6f736f0b2ded090} 
+\index{StepBro.UI.Panels.ICustomPanelManager@{StepBro.UI.Panels.ICustomPanelManager}!FindPanelType@{FindPanelType}}
+\index{FindPanelType@{FindPanelType}!StepBro.UI.Panels.ICustomPanelManager@{StepBro.UI.Panels.ICustomPanelManager}}
+\doxysubsubsection{\texorpdfstring{FindPanelType()}{FindPanelType()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_panels_1_1_custom_panel_type}{Custom\+Panel\+Type}} Step\+Bro.\+UI.\+Panels.\+ICustom\+Panel\+Manager.\+Find\+Panel\+Type (\begin{DoxyParamCaption}\item[{string}]{name }\end{DoxyParamCaption})}
+
+
+
+Searches through the list of known panels, to find the panel with the specified name. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & The name of the panel.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Information object for the found panel type, or 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keyword}{null}}
+
+\end{DoxyCode}
+ if not found.
+\end{DoxyReturn}
+\Hypertarget{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_aebb004db2ff123b97e839fda6f132a58}\label{interface_step_bro_1_1_u_i_1_1_panels_1_1_i_custom_panel_manager_aebb004db2ff123b97e839fda6f132a58} 
+\index{StepBro.UI.Panels.ICustomPanelManager@{StepBro.UI.Panels.ICustomPanelManager}!ListPanelTypes@{ListPanelTypes}}
+\index{ListPanelTypes@{ListPanelTypes}!StepBro.UI.Panels.ICustomPanelManager@{StepBro.UI.Panels.ICustomPanelManager}}
+\doxysubsubsection{\texorpdfstring{ListPanelTypes()}{ListPanelTypes()}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_panels_1_1_custom_panel_type}{Custom\+Panel\+Type}} $>$ Step\+Bro.\+UI.\+Panels.\+ICustom\+Panel\+Manager.\+List\+Panel\+Types (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+List all the registered panel types. 
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+UI/\+Panels/ICustom\+Panel\+Manager.\+cs\end{DoxyCompactItemize}

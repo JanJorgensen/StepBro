@@ -1,0 +1,315 @@
+\doxysection{Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter Class Reference}
+\hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter}{}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter}\index{StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}}
+
+
+An adapter that can provide an item\textquotesingle{}s hierarchy and visual state data for usage in a Tree\+List\+Box. This default implementation is intended to specifically adapt Tree\+Node\+Model and is geared for high-\/performance due to the various get/set method overrides instead of using bindings for updates.  
+
+
+Inheritance diagram for Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a72cea570fe6a23d3c8ac719f40a21cfc}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a72cea570fe6a23d3c8ac719f40a21cfc} 
+{\bfseries Default\+Tree\+List\+Box\+Item\+Adapter} ()
+\begin{DoxyCompactList}\small\item\em Initializes a new instance of the Default\+Tree\+List\+Box\+Item\+Adapter class. \end{DoxyCompactList}\item 
+override IEnumerable \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a056798cec9bbd7f0dde9ed44134cf5a8}{Get\+Children}} (Tree\+List\+Box owner\+Control, object item)
+\begin{DoxyCompactList}\small\item\em Returns an IEnumerable that will be used to provide child items for the specified parent item. \end{DoxyCompactList}\item 
+override bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_ac485cd9eb574cc561dd873850d79ab5b}{Get\+Is\+Draggable}} (Tree\+List\+Box owner\+Control, object item)
+\begin{DoxyCompactList}\small\item\em Returns whether the specified item is draggable. \end{DoxyCompactList}\item 
+override bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a8ce592ca62dc352eda3075c04a52199d}{Get\+Is\+Editable}} (Tree\+List\+Box owner\+Control, object item)
+\begin{DoxyCompactList}\small\item\em Returns whether the specified item is editable. \end{DoxyCompactList}\item 
+override bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a1a04c3497a09c822b54154cdf90cdaf3}{Get\+Is\+Editing}} (Tree\+List\+Box owner\+Control, object item)
+\begin{DoxyCompactList}\small\item\em Returns whether the specified item is currently being edited. \end{DoxyCompactList}\item 
+override bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_afeadf55e7bfb398cd9f4ab83f668adb9}{Get\+Is\+Expanded}} (Tree\+List\+Box owner\+Control, object item)
+\begin{DoxyCompactList}\small\item\em Returns whether the specified item is expanded. \end{DoxyCompactList}\item 
+override bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a826d5a47b1984d45e8336caa02ce147a}{Get\+Is\+Loading}} (Tree\+List\+Box owner\+Control, object item)
+\begin{DoxyCompactList}\small\item\em Returns whether the specified item is currently loading children asynchronously. \end{DoxyCompactList}\item 
+override bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_ab614970acbe8e0a5896b8d1d559049c0}{Get\+Is\+Selectable}} (Tree\+List\+Box owner\+Control, object item)
+\begin{DoxyCompactList}\small\item\em Returns whether the specified item is capable of being selected. \end{DoxyCompactList}\item 
+override bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a180076706bc33730d22d31d6818a05be}{Get\+Is\+Selected}} (Tree\+List\+Box owner\+Control, object item)
+\begin{DoxyCompactList}\small\item\em Returns whether the specified item is selected. \end{DoxyCompactList}\item 
+override string \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a7e72a8b386ca6da21e27e2f08a96a5fc}{Get\+Path}} (Tree\+List\+Box owner\+Control, object item)
+\begin{DoxyCompactList}\small\item\em Returns the item\textquotesingle{}s string path. \end{DoxyCompactList}\item 
+override string \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_abca93e28a38dafbaa46edbeaeebce0b9}{Get\+Search\+Text}} (Tree\+List\+Box owner\+Control, object item)
+\begin{DoxyCompactList}\small\item\em Returns the item\textquotesingle{}s text by which to match when searching. \end{DoxyCompactList}\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a7ca4941244a74e0703cb9851778f8b0c}{Set\+Is\+Editing}} (Tree\+List\+Box owner\+Control, object item, bool value)
+\begin{DoxyCompactList}\small\item\em Sets whether the specified item is currently being edited. \end{DoxyCompactList}\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_abbf5905f40a111a16a42c6218f647ae4}{Set\+Is\+Expanded}} (Tree\+List\+Box owner\+Control, object item, bool value)
+\begin{DoxyCompactList}\small\item\em Sets whether the specified item is expanded. \end{DoxyCompactList}\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_ad6f6856e578308813fc3e74520df92a2}{Set\+Is\+Selected}} (Tree\+List\+Box owner\+Control, object item, bool value)
+\begin{DoxyCompactList}\small\item\em Sets whether the specified item is selected. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+An adapter that can provide an item\textquotesingle{}s hierarchy and visual state data for usage in a Tree\+List\+Box. This default implementation is intended to specifically adapt Tree\+Node\+Model and is geared for high-\/performance due to the various get/set method overrides instead of using bindings for updates. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a056798cec9bbd7f0dde9ed44134cf5a8}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a056798cec9bbd7f0dde9ed44134cf5a8} 
+\index{StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}!GetChildren@{GetChildren}}
+\index{GetChildren@{GetChildren}!StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}}
+\doxysubsubsection{\texorpdfstring{GetChildren()}{GetChildren()}}
+{\footnotesize\ttfamily override IEnumerable Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter.\+Get\+Children (\begin{DoxyParamCaption}\item[{Tree\+List\+Box}]{owner\+Control,  }\item[{object}]{item }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns an IEnumerable that will be used to provide child items for the specified parent item. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner\+Control} & The owner control.\\
+\hline
+{\em item} & The item to examine.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An IEnumerable that will be used to provide child items for the specified parent item.
+\end{DoxyReturn}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_ac485cd9eb574cc561dd873850d79ab5b}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_ac485cd9eb574cc561dd873850d79ab5b} 
+\index{StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}!GetIsDraggable@{GetIsDraggable}}
+\index{GetIsDraggable@{GetIsDraggable}!StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}}
+\doxysubsubsection{\texorpdfstring{GetIsDraggable()}{GetIsDraggable()}}
+{\footnotesize\ttfamily override bool Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter.\+Get\+Is\+Draggable (\begin{DoxyParamCaption}\item[{Tree\+List\+Box}]{owner\+Control,  }\item[{object}]{item }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns whether the specified item is draggable. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner\+Control} & The owner control.\\
+\hline
+{\em item} & The item to examine.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily true} if the specified item is draggable; otherwise, {\ttfamily false}. 
+\end{DoxyReturn}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a8ce592ca62dc352eda3075c04a52199d}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a8ce592ca62dc352eda3075c04a52199d} 
+\index{StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}!GetIsEditable@{GetIsEditable}}
+\index{GetIsEditable@{GetIsEditable}!StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}}
+\doxysubsubsection{\texorpdfstring{GetIsEditable()}{GetIsEditable()}}
+{\footnotesize\ttfamily override bool Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter.\+Get\+Is\+Editable (\begin{DoxyParamCaption}\item[{Tree\+List\+Box}]{owner\+Control,  }\item[{object}]{item }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns whether the specified item is editable. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner\+Control} & The owner control.\\
+\hline
+{\em item} & The item to examine.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily true} if the specified item is editable; otherwise, {\ttfamily false}. 
+\end{DoxyReturn}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a1a04c3497a09c822b54154cdf90cdaf3}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a1a04c3497a09c822b54154cdf90cdaf3} 
+\index{StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}!GetIsEditing@{GetIsEditing}}
+\index{GetIsEditing@{GetIsEditing}!StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}}
+\doxysubsubsection{\texorpdfstring{GetIsEditing()}{GetIsEditing()}}
+{\footnotesize\ttfamily override bool Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter.\+Get\+Is\+Editing (\begin{DoxyParamCaption}\item[{Tree\+List\+Box}]{owner\+Control,  }\item[{object}]{item }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns whether the specified item is currently being edited. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner\+Control} & The owner control.\\
+\hline
+{\em item} & The item to examine.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily true} if the specified item is currently being edited; otherwise, {\ttfamily false}. 
+\end{DoxyReturn}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_afeadf55e7bfb398cd9f4ab83f668adb9}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_afeadf55e7bfb398cd9f4ab83f668adb9} 
+\index{StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}!GetIsExpanded@{GetIsExpanded}}
+\index{GetIsExpanded@{GetIsExpanded}!StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}}
+\doxysubsubsection{\texorpdfstring{GetIsExpanded()}{GetIsExpanded()}}
+{\footnotesize\ttfamily override bool Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter.\+Get\+Is\+Expanded (\begin{DoxyParamCaption}\item[{Tree\+List\+Box}]{owner\+Control,  }\item[{object}]{item }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns whether the specified item is expanded. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner\+Control} & The owner control.\\
+\hline
+{\em item} & The item to examine.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily true} if the specified item is expanded; otherwise, {\ttfamily false}. 
+\end{DoxyReturn}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a826d5a47b1984d45e8336caa02ce147a}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a826d5a47b1984d45e8336caa02ce147a} 
+\index{StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}!GetIsLoading@{GetIsLoading}}
+\index{GetIsLoading@{GetIsLoading}!StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}}
+\doxysubsubsection{\texorpdfstring{GetIsLoading()}{GetIsLoading()}}
+{\footnotesize\ttfamily override bool Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter.\+Get\+Is\+Loading (\begin{DoxyParamCaption}\item[{Tree\+List\+Box}]{owner\+Control,  }\item[{object}]{item }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns whether the specified item is currently loading children asynchronously. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner\+Control} & The owner control.\\
+\hline
+{\em item} & The item to examine.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily true} if the specified item is currently loading children asynchronously; otherwise, {\ttfamily false}. 
+\end{DoxyReturn}
+
+
+The Is\+Loading\+Binding binding property can be set for a pure XAML-\/based implementation of this method. Please note that bindings aren\textquotesingle{}t as performant as code, so for large trees or if you see performance issues, it is recommended to override this method instead with custom logic to retrieve the appropriate value. \Hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_ab614970acbe8e0a5896b8d1d559049c0}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_ab614970acbe8e0a5896b8d1d559049c0} 
+\index{StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}!GetIsSelectable@{GetIsSelectable}}
+\index{GetIsSelectable@{GetIsSelectable}!StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}}
+\doxysubsubsection{\texorpdfstring{GetIsSelectable()}{GetIsSelectable()}}
+{\footnotesize\ttfamily override bool Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter.\+Get\+Is\+Selectable (\begin{DoxyParamCaption}\item[{Tree\+List\+Box}]{owner\+Control,  }\item[{object}]{item }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns whether the specified item is capable of being selected. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner\+Control} & The owner control.\\
+\hline
+{\em item} & The item to examine.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily true} if the specified item is capable of being selected; otherwise, {\ttfamily false}. 
+\end{DoxyReturn}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a180076706bc33730d22d31d6818a05be}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a180076706bc33730d22d31d6818a05be} 
+\index{StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}!GetIsSelected@{GetIsSelected}}
+\index{GetIsSelected@{GetIsSelected}!StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}}
+\doxysubsubsection{\texorpdfstring{GetIsSelected()}{GetIsSelected()}}
+{\footnotesize\ttfamily override bool Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter.\+Get\+Is\+Selected (\begin{DoxyParamCaption}\item[{Tree\+List\+Box}]{owner\+Control,  }\item[{object}]{item }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns whether the specified item is selected. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner\+Control} & The owner control.\\
+\hline
+{\em item} & The item to examine.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily true} if the specified item is selected; otherwise, {\ttfamily false}. 
+\end{DoxyReturn}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a7e72a8b386ca6da21e27e2f08a96a5fc}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a7e72a8b386ca6da21e27e2f08a96a5fc} 
+\index{StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}!GetPath@{GetPath}}
+\index{GetPath@{GetPath}!StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}}
+\doxysubsubsection{\texorpdfstring{GetPath()}{GetPath()}}
+{\footnotesize\ttfamily override string Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter.\+Get\+Path (\begin{DoxyParamCaption}\item[{Tree\+List\+Box}]{owner\+Control,  }\item[{object}]{item }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the item\textquotesingle{}s string path. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner\+Control} & The owner control.\\
+\hline
+{\em item} & The item to examine.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The item\textquotesingle{}s string path.
+\end{DoxyReturn}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_abca93e28a38dafbaa46edbeaeebce0b9}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_abca93e28a38dafbaa46edbeaeebce0b9} 
+\index{StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}!GetSearchText@{GetSearchText}}
+\index{GetSearchText@{GetSearchText}!StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}}
+\doxysubsubsection{\texorpdfstring{GetSearchText()}{GetSearchText()}}
+{\footnotesize\ttfamily override string Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter.\+Get\+Search\+Text (\begin{DoxyParamCaption}\item[{Tree\+List\+Box}]{owner\+Control,  }\item[{object}]{item }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the item\textquotesingle{}s text by which to match when searching. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner\+Control} & The owner control.\\
+\hline
+{\em item} & The item to examine.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The item\textquotesingle{}s string search text.
+\end{DoxyReturn}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a7ca4941244a74e0703cb9851778f8b0c}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_a7ca4941244a74e0703cb9851778f8b0c} 
+\index{StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}!SetIsEditing@{SetIsEditing}}
+\index{SetIsEditing@{SetIsEditing}!StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}}
+\doxysubsubsection{\texorpdfstring{SetIsEditing()}{SetIsEditing()}}
+{\footnotesize\ttfamily override void Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter.\+Set\+Is\+Editing (\begin{DoxyParamCaption}\item[{Tree\+List\+Box}]{owner\+Control,  }\item[{object}]{item,  }\item[{bool}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Sets whether the specified item is currently being edited. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner\+Control} & The owner control.\\
+\hline
+{\em item} & The item to update.\\
+\hline
+{\em value} & The new value.\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_abbf5905f40a111a16a42c6218f647ae4}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_abbf5905f40a111a16a42c6218f647ae4} 
+\index{StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}!SetIsExpanded@{SetIsExpanded}}
+\index{SetIsExpanded@{SetIsExpanded}!StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}}
+\doxysubsubsection{\texorpdfstring{SetIsExpanded()}{SetIsExpanded()}}
+{\footnotesize\ttfamily override void Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter.\+Set\+Is\+Expanded (\begin{DoxyParamCaption}\item[{Tree\+List\+Box}]{owner\+Control,  }\item[{object}]{item,  }\item[{bool}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Sets whether the specified item is expanded. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner\+Control} & The owner control.\\
+\hline
+{\em item} & The item to update.\\
+\hline
+{\em value} & The new value.\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_ad6f6856e578308813fc3e74520df92a2}\label{class_step_bro_1_1_workbench_1_1_default_tree_list_box_item_adapter_ad6f6856e578308813fc3e74520df92a2} 
+\index{StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}!SetIsSelected@{SetIsSelected}}
+\index{SetIsSelected@{SetIsSelected}!StepBro.Workbench.DefaultTreeListBoxItemAdapter@{StepBro.Workbench.DefaultTreeListBoxItemAdapter}}
+\doxysubsubsection{\texorpdfstring{SetIsSelected()}{SetIsSelected()}}
+{\footnotesize\ttfamily override void Step\+Bro.\+Workbench.\+Default\+Tree\+List\+Box\+Item\+Adapter.\+Set\+Is\+Selected (\begin{DoxyParamCaption}\item[{Tree\+List\+Box}]{owner\+Control,  }\item[{object}]{item,  }\item[{bool}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Sets whether the specified item is selected. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em owner\+Control} & The owner control.\\
+\hline
+{\em item} & The item to update.\\
+\hline
+{\em value} & The new value.\\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Workbench.\+WPF/Default\+Tree\+List\+Box\+Item\+Adapter.\+cs\end{DoxyCompactItemize}

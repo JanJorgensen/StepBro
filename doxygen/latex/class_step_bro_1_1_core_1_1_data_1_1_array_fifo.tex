@@ -1,0 +1,148 @@
+\doxysection{Step\+Bro.\+Core.\+Data.\+Array\+Fifo\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo}{}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo}\index{StepBro.Core.Data.ArrayFifo$<$ T $>$@{StepBro.Core.Data.ArrayFifo$<$ T $>$}}
+Inheritance diagram for Step\+Bro.\+Core.\+Data.\+Array\+Fifo\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>}\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_core_1_1_data_1_1_array_fifo}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a2e77e47aa4a435fd42cb3ba8f03183e9}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a2e77e47aa4a435fd42cb3ba8f03183e9} 
+{\bfseries Array\+Fifo} (int size=16 \texorpdfstring{$\ast$}{*}1024)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a032b569bc1771d3c2b35973d27f06efb}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a032b569bc1771d3c2b35973d27f06efb} 
+void {\bfseries Setup} (int size)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_aa2963dd5398f90c50d2baab3fa2e95cb}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_aa2963dd5398f90c50d2baab3fa2e95cb} 
+void {\bfseries Add} (T\mbox{[}$\,$\mbox{]} block, int start, int length)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_aa252bf27eb372618731c8cbbc2372f56}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_aa252bf27eb372618731c8cbbc2372f56} 
+virtual string {\bfseries Data\+To\+String} (T\mbox{[}$\,$\mbox{]} block, int start, int length)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_ae6a6b3bd3712fd85bff26ca690318bf9}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_ae6a6b3bd3712fd85bff26ca690318bf9} 
+virtual string {\bfseries Value\+String} (T value)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a300ce6fed063238db8a29e59600de817}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a300ce6fed063238db8a29e59600de817} 
+void {\bfseries Add} (Func$<$ T\mbox{[}$\,$\mbox{]}, int, int, int $>$ getter, int length)
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a0ebb47f4d99e4854a8e98a0d39afed4c}{Await\+New\+Data}} (int known\+Count, int timeout=0)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a3a6f3725b7463ff91d26ee874167dfba}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a3a6f3725b7463ff91d26ee874167dfba} 
+bool {\bfseries Await\+New\+Data} (int known\+Count, Time\+Span timeout)
+\item 
+void \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a796909ed83340456df65055cf5d07747}{Eat}} (int length)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a45e0e29d5b4ccef009490ca14c2fb85c}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a45e0e29d5b4ccef009490ca14c2fb85c} 
+void {\bfseries Get} (int index, int length, int total, T\mbox{[}$\,$\mbox{]} targetbuffer, int targetindex)
+\item 
+T\mbox{[}$\,$\mbox{]} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a7c65ece1b36c95dd84a1d849fdb82812}{Get}} (int index, int length, int total)
+\item 
+T\mbox{[}$\,$\mbox{]} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_aed4131fa231cf2e2d8e81059976e22d8}{Get}} (int length)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer_a327799cafb063a4ec91f8c5a324ed723}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer_a327799cafb063a4ec91f8c5a324ed723} 
+void {\bfseries Eat} (int length)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer_a5f7d2100cd7b8c97879f748066fbcfb9}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer_a5f7d2100cd7b8c97879f748066fbcfb9} 
+T\mbox{[}$\,$\mbox{]} {\bfseries Get} (int index, int length, int total)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer_ad4149209624476c8ce5039a36b4fc644}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer_ad4149209624476c8ce5039a36b4fc644} 
+T\mbox{[}$\,$\mbox{]} {\bfseries Get} (int length)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer_ae5bd053a7ac2a806973913c4e8efa0ed}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer_ae5bd053a7ac2a806973913c4e8efa0ed} 
+bool {\bfseries Await\+New\+Data} (int known\+Count, int timeout=0)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a657eb62a0cd0d373b1213ace84848e9c}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a657eb62a0cd0d373b1213ace84848e9c} 
+virtual void {\bfseries On\+Data\+Pulled} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_afd367f5c6288168aa4882aa4fa60ba5f}{Count}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+T \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a9294e410e1929c8277711dba7211e06a}{this\mbox{[}int index\mbox{]}}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer}{Step\+Bro.\+Core.\+Data.\+IRead\+Buffer$<$ T $>$}}}
+\begin{DoxyCompactItemize}
+\item 
+int {\bfseries Count}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+T {\bfseries this\mbox{[}int index\mbox{]}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a0ebb47f4d99e4854a8e98a0d39afed4c}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a0ebb47f4d99e4854a8e98a0d39afed4c} 
+\index{StepBro.Core.Data.ArrayFifo$<$ T $>$@{StepBro.Core.Data.ArrayFifo$<$ T $>$}!AwaitNewData@{AwaitNewData}}
+\index{AwaitNewData@{AwaitNewData}!StepBro.Core.Data.ArrayFifo$<$ T $>$@{StepBro.Core.Data.ArrayFifo$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{AwaitNewData()}{AwaitNewData()}}
+{\footnotesize\ttfamily bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo}{Step\+Bro.\+Core.\+Data.\+Array\+Fifo}}$<$ T $>$.Await\+New\+Data (\begin{DoxyParamCaption}\item[{int}]{known\+Count,  }\item[{int}]{timeout = {\ttfamily 0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer}{Step\+Bro.\+Core.\+Data.\+IRead\+Buffer$<$ T $>$}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a796909ed83340456df65055cf5d07747}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a796909ed83340456df65055cf5d07747} 
+\index{StepBro.Core.Data.ArrayFifo$<$ T $>$@{StepBro.Core.Data.ArrayFifo$<$ T $>$}!Eat@{Eat}}
+\index{Eat@{Eat}!StepBro.Core.Data.ArrayFifo$<$ T $>$@{StepBro.Core.Data.ArrayFifo$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Eat()}{Eat()}}
+{\footnotesize\ttfamily void \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo}{Step\+Bro.\+Core.\+Data.\+Array\+Fifo}}$<$ T $>$.Eat (\begin{DoxyParamCaption}\item[{int}]{length }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer}{Step\+Bro.\+Core.\+Data.\+IRead\+Buffer$<$ T $>$}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a7c65ece1b36c95dd84a1d849fdb82812}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a7c65ece1b36c95dd84a1d849fdb82812} 
+\index{StepBro.Core.Data.ArrayFifo$<$ T $>$@{StepBro.Core.Data.ArrayFifo$<$ T $>$}!Get@{Get}}
+\index{Get@{Get}!StepBro.Core.Data.ArrayFifo$<$ T $>$@{StepBro.Core.Data.ArrayFifo$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Get()}{Get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily T\mbox{[}$\,$\mbox{]} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo}{Step\+Bro.\+Core.\+Data.\+Array\+Fifo}}$<$ T $>$.Get (\begin{DoxyParamCaption}\item[{int}]{index,  }\item[{int}]{length,  }\item[{int}]{total }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer}{Step\+Bro.\+Core.\+Data.\+IRead\+Buffer$<$ T $>$}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_aed4131fa231cf2e2d8e81059976e22d8}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_aed4131fa231cf2e2d8e81059976e22d8} 
+\index{StepBro.Core.Data.ArrayFifo$<$ T $>$@{StepBro.Core.Data.ArrayFifo$<$ T $>$}!Get@{Get}}
+\index{Get@{Get}!StepBro.Core.Data.ArrayFifo$<$ T $>$@{StepBro.Core.Data.ArrayFifo$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Get()}{Get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily T\mbox{[}$\,$\mbox{]} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo}{Step\+Bro.\+Core.\+Data.\+Array\+Fifo}}$<$ T $>$.Get (\begin{DoxyParamCaption}\item[{int}]{length }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer}{Step\+Bro.\+Core.\+Data.\+IRead\+Buffer$<$ T $>$}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_afd367f5c6288168aa4882aa4fa60ba5f}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_afd367f5c6288168aa4882aa4fa60ba5f} 
+\index{StepBro.Core.Data.ArrayFifo$<$ T $>$@{StepBro.Core.Data.ArrayFifo$<$ T $>$}!Count@{Count}}
+\index{Count@{Count}!StepBro.Core.Data.ArrayFifo$<$ T $>$@{StepBro.Core.Data.ArrayFifo$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{Count}{Count}}
+{\footnotesize\ttfamily int \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo}{Step\+Bro.\+Core.\+Data.\+Array\+Fifo}}$<$ T $>$.Count\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer}{Step\+Bro.\+Core.\+Data.\+IRead\+Buffer$<$ T $>$}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a9294e410e1929c8277711dba7211e06a}\label{class_step_bro_1_1_core_1_1_data_1_1_array_fifo_a9294e410e1929c8277711dba7211e06a} 
+\index{StepBro.Core.Data.ArrayFifo$<$ T $>$@{StepBro.Core.Data.ArrayFifo$<$ T $>$}!this\mbox{[}int index\mbox{]}@{this[int index]}}
+\index{this\mbox{[}int index\mbox{]}@{this[int index]}!StepBro.Core.Data.ArrayFifo$<$ T $>$@{StepBro.Core.Data.ArrayFifo$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{this[int index]}{this[int index]}}
+{\footnotesize\ttfamily T \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_array_fifo}{Step\+Bro.\+Core.\+Data.\+Array\+Fifo}}$<$ T $>$.this\mbox{[}int index\mbox{]}\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_read_buffer}{Step\+Bro.\+Core.\+Data.\+IRead\+Buffer$<$ T $>$}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Data/Array\+Fifo.\+cs\end{DoxyCompactItemize}

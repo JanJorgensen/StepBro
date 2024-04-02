@@ -1,0 +1,698 @@
+\doxysection{Peak.\+Can.\+Basic Namespace Reference}
+\hypertarget{namespace_peak_1_1_can_1_1_basic}{}\label{namespace_peak_1_1_can_1_1_basic}\index{Peak.Can.Basic@{Peak.Can.Basic}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class {\bfseries PCANBasic}
+\begin{DoxyCompactList}\small\item\em PCAN-\/\+Basic API class implementation. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_msg}{TPCANMsg}}
+\begin{DoxyCompactList}\small\item\em Represents a PCAN message. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_msg_f_d}{TPCANMsg\+FD}}
+\begin{DoxyCompactList}\small\item\em Represents a PCAN message from a FD capable hardware. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_timestamp}{TPCANTimestamp}}
+\begin{DoxyCompactList}\small\item\em Represents a timestamp of a received PCAN message. Total Microseconds = micros + 1000 \texorpdfstring{$\ast$}{*} millis + 0x100000000 \texorpdfstring{$\ast$}{*} 1000 \texorpdfstring{$\ast$}{*} millis\+\_\+overflow. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{namespace_peak_1_1_can_1_1_basic_a06ca222fc1b641d2cf2d07892c7b48d5}\label{namespace_peak_1_1_can_1_1_basic_a06ca222fc1b641d2cf2d07892c7b48d5} 
+using {\bfseries TPCANHandle} = System.\+UInt16
+\item 
+\Hypertarget{namespace_peak_1_1_can_1_1_basic_a79aa38d33acffe3ef9cec610ac596177}\label{namespace_peak_1_1_can_1_1_basic_a79aa38d33acffe3ef9cec610ac596177} 
+using {\bfseries TPCANBitrate\+FD} = System.\+String
+\item 
+\Hypertarget{namespace_peak_1_1_can_1_1_basic_a5c190536e5fe81d8816329fd46819d70}\label{namespace_peak_1_1_can_1_1_basic_a5c190536e5fe81d8816329fd46819d70} 
+using {\bfseries TPCANTimestamp\+FD} = System.\+UInt64
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229}{TPCANStatus}} \+: uint \{ \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a2c79de8c3c803e28879027585651bcb8}{PCAN\+\_\+\+ERROR\+\_\+\+OK}} = 0x00000
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229aad5b8eb951274531c331736c9f107987}{PCAN\+\_\+\+ERROR\+\_\+\+XMTFULL}} = 0x00001
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229ad3eb0475cb6e11b7f329801d265c3d00}{PCAN\+\_\+\+ERROR\+\_\+\+OVERRUN}} = 0x00002
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229add0141df15306cc2be21192c045f2a7c}{PCAN\+\_\+\+ERROR\+\_\+\+BUSLIGHT}} = 0x00004
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a29cfe99fd423cb01f7fbaef282af40eb}{PCAN\+\_\+\+ERROR\+\_\+\+BUSHEAVY}} = 0x00008
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229aab9ae32d0e3b14fc4cfc3cdde45e81a0}{PCAN\+\_\+\+ERROR\+\_\+\+BUSWARNING}} = PCAN\+\_\+\+ERROR\+\_\+\+BUSHEAVY
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a94c0a3a3e3a4be91b16fa649d9b2db85}{PCAN\+\_\+\+ERROR\+\_\+\+BUSPASSIVE}} = 0x40000
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229aa13f32e7def8842fd3c8ce79b8e911cc}{PCAN\+\_\+\+ERROR\+\_\+\+BUSOFF}} = 0x00010
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a175e1edb39f36ac3f3ae147b869b95b8}{PCAN\+\_\+\+ERROR\+\_\+\+ANYBUSERR}} = (PCAN\+\_\+\+ERROR\+\_\+\+BUSWARNING \texorpdfstring{$\vert$}{|} PCAN\+\_\+\+ERROR\+\_\+\+BUSLIGHT \texorpdfstring{$\vert$}{|} PCAN\+\_\+\+ERROR\+\_\+\+BUSHEAVY \texorpdfstring{$\vert$}{|} PCAN\+\_\+\+ERROR\+\_\+\+BUSOFF \texorpdfstring{$\vert$}{|} PCAN\+\_\+\+ERROR\+\_\+\+BUSPASSIVE)
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a5845dbf5361f135e7f69f4436e7d9ba3}{PCAN\+\_\+\+ERROR\+\_\+\+QRCVEMPTY}} = 0x00020
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229ad028296298edd58427810cdbd3f6cc8e}{PCAN\+\_\+\+ERROR\+\_\+\+QOVERRUN}} = 0x00040
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a35b76f689a0af97cf05e7f192ac5754e}{PCAN\+\_\+\+ERROR\+\_\+\+QXMTFULL}} = 0x00080
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a2c747a737f53d0c4185cf66af67aae3b}{PCAN\+\_\+\+ERROR\+\_\+\+REGTEST}} = 0x00100
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229aa0178af304cca0951fddeb265d122377}{PCAN\+\_\+\+ERROR\+\_\+\+NODRIVER}} = 0x00200
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229adc333fbf260911e90b3e235d66e1688c}{PCAN\+\_\+\+ERROR\+\_\+\+HWINUSE}} = 0x00400
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229afe02db4068797e27b6c9bde7f64e6964}{PCAN\+\_\+\+ERROR\+\_\+\+NETINUSE}} = 0x00800
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229ab67f4d4747da0902282f664d2db64e60}{PCAN\+\_\+\+ERROR\+\_\+\+ILLHW}} = 0x01400
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a0d66f59927f3518f666519193213d6c2}{PCAN\+\_\+\+ERROR\+\_\+\+ILLNET}} = 0x01800
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229ab77c021e21919add498d0c9c507a5348}{PCAN\+\_\+\+ERROR\+\_\+\+ILLCLIENT}} = 0x01\+C00
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a97541ad34b649b9ad1cc9ef4dbc5bb0d}{PCAN\+\_\+\+ERROR\+\_\+\+ILLHANDLE}} = (PCAN\+\_\+\+ERROR\+\_\+\+ILLHW \texorpdfstring{$\vert$}{|} PCAN\+\_\+\+ERROR\+\_\+\+ILLNET \texorpdfstring{$\vert$}{|} PCAN\+\_\+\+ERROR\+\_\+\+ILLCLIENT)
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a3721bab134227b4520cd98151a7e1ff7}{PCAN\+\_\+\+ERROR\+\_\+\+RESOURCE}} = 0x02000
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a5a52d575141b861680ddffbd0cae22a4}{PCAN\+\_\+\+ERROR\+\_\+\+ILLPARAMTYPE}} = 0x04000
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a368a35be85239439d769be17cc3ce6f0}{PCAN\+\_\+\+ERROR\+\_\+\+ILLPARAMVAL}} = 0x08000
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a35fec126d7e0d45f2ad6fd7d8f2eab8f}{PCAN\+\_\+\+ERROR\+\_\+\+UNKNOWN}} = 0x10000
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a0e8a0ee7138f4b426a029b5b9bd9867e}{PCAN\+\_\+\+ERROR\+\_\+\+ILLDATA}} = 0x20000
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a809333e857ce5daea088d0ec6de92ce1}{PCAN\+\_\+\+ERROR\+\_\+\+CAUTION}} = 0x2000000
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a362d0b8b0ef6c0544af2ce877a7562d3}{PCAN\+\_\+\+ERROR\+\_\+\+INITIALIZE}} = 0x4000000
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a769f2400e70e5c9d35dd9c35760c1606}{PCAN\+\_\+\+ERROR\+\_\+\+ILLOPERATION}} = 0x8000000
+ \}
+\begin{DoxyCompactList}\small\item\em Represents a PCAN status/error code. \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dab}{TPCANDevice}} \+: byte \{ \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabab6959d9ca1c11f925cc5e41bc5ae2664}{PCAN\+\_\+\+NONE}} = 0
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabac49182d456c3adf175b9c9fdf1ffe195}{PCAN\+\_\+\+PEAKCAN}} = 1
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0daba89315030ce6e9fff84bcae344332f157}{PCAN\+\_\+\+ISA}} = 2
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabab20ba3f36c88eff1946fbb7b6492176f}{PCAN\+\_\+\+DNG}} = 3
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabac2326303ba4783db9c95742d174af53a}{PCAN\+\_\+\+PCI}} = 4
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0daba81312e3812e668c9fe11ca5c6e605c52}{PCAN\+\_\+\+USB}} = 5
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0daba7eebdb678e7dc9d29f8f83c9f526d546}{PCAN\+\_\+\+PCC}} = 6
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabaec159ce1f016a7c7490691bf976bd58e}{PCAN\+\_\+\+VIRTUAL}} = 7
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabaf32a840d9c042fd97c2090c5f8009f0e}{PCAN\+\_\+\+LAN}} = 8
+ \}
+\begin{DoxyCompactList}\small\item\em Represents a PCAN device. \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061e}{TPCANParameter}} \+: byte \{ \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea687bd890fbafcfe7c3239a7a17708df0}{PCAN\+\_\+\+DEVICE\+\_\+\+NUMBER}} = 1
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eac34836076ea2c0156b94144042799758}{PCAN\+\_\+5\+VOLTS\+\_\+\+POWER}} = 2
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea86f13a9a632dc5f94ce22fd09613483f}{PCAN\+\_\+\+RECEIVE\+\_\+\+EVENT}} = 3
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea5fcba1fed849817f65383783c026a289}{PCAN\+\_\+\+MESSAGE\+\_\+\+FILTER}} = 4
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea8b5ecfffe550b3e61fae0c84c7503fec}{PCAN\+\_\+\+API\+\_\+\+VERSION}} = 5
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea2ccd217b3f8665798745d93e812d1ce0}{PCAN\+\_\+\+CHANNEL\+\_\+\+VERSION}} = 6
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea7b58d47f78582076b94715457dc0b24f}{PCAN\+\_\+\+BUSOFF\+\_\+\+AUTORESET}} = 7
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea39dceadea71918cf246d558af828ded5}{PCAN\+\_\+\+LISTEN\+\_\+\+ONLY}} = 8
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaae18ad4747b9ea9154f678e159d1c017}{PCAN\+\_\+\+LOG\+\_\+\+LOCATION}} = 9
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaaed1e95fd583411c08f3430d315e3c53}{PCAN\+\_\+\+LOG\+\_\+\+STATUS}} = 10
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea56a67880f877dcb255a1314f8960d7fb}{PCAN\+\_\+\+LOG\+\_\+\+CONFIGURE}} = 11
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaa9271521568d0b392c0a67cb7fbf87c2}{PCAN\+\_\+\+LOG\+\_\+\+TEXT}} = 12
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea83d2f741371ef65172131a391cdc113c}{PCAN\+\_\+\+CHANNEL\+\_\+\+CONDITION}} = 13
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea839d78605ce8abab63e0aa1cd5a8e4ba}{PCAN\+\_\+\+HARDWARE\+\_\+\+NAME}} = 14
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea499c450d1d1d07775ef96022f9a4121e}{PCAN\+\_\+\+RECEIVE\+\_\+\+STATUS}} = 15
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaf0b5478a556f9c6446c6d077ad7fa147}{PCAN\+\_\+\+CONTROLLER\+\_\+\+NUMBER}} = 16
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea6506a2c9d7c34a318888052aac7d14e9}{PCAN\+\_\+\+TRACE\+\_\+\+LOCATION}} = 17
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea03201543755d394abc60fb8ba1bce804}{PCAN\+\_\+\+TRACE\+\_\+\+STATUS}} = 18
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eab41465a11982c06fe45a1dbc7b0ccbf5}{PCAN\+\_\+\+TRACE\+\_\+\+SIZE}} = 19
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea882df269a647e291926131721065cab6}{PCAN\+\_\+\+TRACE\+\_\+\+CONFIGURE}} = 20
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea556f46ea0aaa6c002726732cfc9cf9fa}{PCAN\+\_\+\+CHANNEL\+\_\+\+IDENTIFYING}} = 21
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea014f02a2f032353c9a4927ab09b528e2}{PCAN\+\_\+\+CHANNEL\+\_\+\+FEATURES}} = 22
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea7bb7f0f861152d7252e32edd294631df}{PCAN\+\_\+\+BITRATE\+\_\+\+ADAPTING}} = 23
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea9b975ef752168529051b8c165eaf8866}{PCAN\+\_\+\+BITRATE\+\_\+\+INFO}} = 24
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea7b59267f27c032de1be53250b4a3940a}{PCAN\+\_\+\+BITRATE\+\_\+\+INFO\+\_\+\+FD}} = 25
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaaab95cf5e6cb2b4994aa572f1b276416}{PCAN\+\_\+\+BUSSPEED\+\_\+\+NOMINAL}} = 26
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea2b25aa299029a5cf39337cdf4c6f4c29}{PCAN\+\_\+\+BUSSPEED\+\_\+\+DATA}} = 27
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea7143a83ed76457ab5f45f28b07533abc}{PCAN\+\_\+\+IP\+\_\+\+ADDRESS}} = 28
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea92e19461a8fac8190cae72ab06481b9c}{PCAN\+\_\+\+LAN\+\_\+\+SERVICE\+\_\+\+STATUS}} = 29
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eafd853c6d76a0b66c86f96450b663e2a5}{PCAN\+\_\+\+ALLOW\+\_\+\+STATUS\+\_\+\+FRAMES}} = 30
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea628a19af2bd5a8632b4a58adcfdc727f}{PCAN\+\_\+\+ALLOW\+\_\+\+RTR\+\_\+\+FRAMES}} = 31
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea00d04eec14101f23a0dbe8b7238f17c0}{PCAN\+\_\+\+ALLOW\+\_\+\+ERROR\+\_\+\+FRAMES}} = 32
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea56bad6269fd7871bc34c1f1e5c66d9d8}{PCAN\+\_\+\+INTERFRAME\+\_\+\+DELAY}} = 33
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea80f87c95ed1532b45ab888814e6a8a8d}{PCAN\+\_\+\+ACCEPTANCE\+\_\+\+FILTER\+\_\+11\+BIT}} = 34
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eac63aa55489586125c12b95528443f91a}{PCAN\+\_\+\+ACCEPTANCE\+\_\+\+FILTER\+\_\+29\+BIT}} = 35
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaa5aef7eb1ab8aab12700f3c7735074ed}{PCAN\+\_\+\+IO\+\_\+\+DIGITAL\+\_\+\+CONFIGURATION}} = 36
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaab080bd42c0444c7c3eb0efd892cd0cf}{PCAN\+\_\+\+IO\+\_\+\+DIGITAL\+\_\+\+VALUE}} = 37
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea4081b564c30a7a50cdec38c98376ae62}{PCAN\+\_\+\+IO\+\_\+\+DIGITAL\+\_\+\+SET}} = 38
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea9b6cc0e7a73af6f3d035c5eb161d2812}{PCAN\+\_\+\+IO\+\_\+\+DIGITAL\+\_\+\+CLEAR}} = 39
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea1d599bb296e10cc5b79eb38f8d565ff8}{PCAN\+\_\+\+IO\+\_\+\+ANALOG\+\_\+\+VALUE}} = 40
+ \}
+\begin{DoxyCompactList}\small\item\em Represents a PCAN parameter to be read or set. \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eab}{TPCANMessage\+Type}} \+: byte \{ \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eabac2e5b484d23b79fcc94c5d889a0b7ceb}{PCAN\+\_\+\+MESSAGE\+\_\+\+STANDARD}} = 0x00
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eabaf87800d870a60272539f0ff856dcd7bc}{PCAN\+\_\+\+MESSAGE\+\_\+\+RTR}} = 0x01
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba8798a00a4dcf5bc69a9c4f7b0edb484d}{PCAN\+\_\+\+MESSAGE\+\_\+\+EXTENDED}} = 0x02
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eabad01afd1ab475cac6c503341133f52408}{PCAN\+\_\+\+MESSAGE\+\_\+\+FD}} = 0x04
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba4ec85f3ef58802e41c0200babbce7f6b}{PCAN\+\_\+\+MESSAGE\+\_\+\+BRS}} = 0x08
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba6eb5187fdfd3d6da39ef3d4d5b741c94}{PCAN\+\_\+\+MESSAGE\+\_\+\+ESI}} = 0x10
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba6538f4b0c3371411d2ac0886284644c7}{PCAN\+\_\+\+MESSAGE\+\_\+\+ERRFRAME}} = 0x40
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba9c0118affdc8d1d9aff976b04322b5db}{PCAN\+\_\+\+MESSAGE\+\_\+\+STATUS}} = 0x80
+ \}
+\begin{DoxyCompactList}\small\item\em Represents the type of a PCAN message. \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a8ec3e9d24dbd13e965cfc05a921a569d}{TPCANMode}} \+: byte \{ \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a8ec3e9d24dbd13e965cfc05a921a569dae9250680ca5f00259bc5be5a8f28ee86}{PCAN\+\_\+\+MODE\+\_\+\+STANDARD}} = TPCANMessage\+Type.\+PCAN\+\_\+\+MESSAGE\+\_\+\+STANDARD
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a8ec3e9d24dbd13e965cfc05a921a569da81320f24971e012582ad50d0224d6ffc}{PCAN\+\_\+\+MODE\+\_\+\+EXTENDED}} = TPCANMessage\+Type.\+PCAN\+\_\+\+MESSAGE\+\_\+\+EXTENDED
+ \}
+\begin{DoxyCompactList}\small\item\em Represents a PCAN filter mode. \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3}{TPCANBaudrate}} \+: ushort \{ \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a2988f336f0ff4be070169dfe2400231e}{PCAN\+\_\+\+BAUD\+\_\+1M}} = 0x0014
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3ab175b76e0295dfb6494c2ef4a0eef2ae}{PCAN\+\_\+\+BAUD\+\_\+800K}} = 0x0016
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a72223570f795af20a5b994317afac26d}{PCAN\+\_\+\+BAUD\+\_\+500K}} = 0x001C
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a517dbdc27e87bcd40dce7a333fda9c98}{PCAN\+\_\+\+BAUD\+\_\+250K}} = 0x011C
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a5188f5ee1d44a2fd2be3c80226325008}{PCAN\+\_\+\+BAUD\+\_\+125K}} = 0x031C
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a56b428ee78884c05647857d516c3f3d3}{PCAN\+\_\+\+BAUD\+\_\+100K}} = 0x432F
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a418d0eb36612ec81c6308b71734538c5}{PCAN\+\_\+\+BAUD\+\_\+95K}} = 0x\+C34E
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a7f0196ac69943f00f212ac0b7ce17f54}{PCAN\+\_\+\+BAUD\+\_\+83K}} = 0x852B
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a8f4d57a22629b84bd00a280d31602ac2}{PCAN\+\_\+\+BAUD\+\_\+50K}} = 0x472F
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3ae4ef6791cad8b85671d528d17c602e2e}{PCAN\+\_\+\+BAUD\+\_\+47K}} = 0x1414
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3ae20ddd716012a52c3a1c1b6401afa23a}{PCAN\+\_\+\+BAUD\+\_\+33K}} = 0x8\+B2F
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3ad1f740b406d59f7198a2cb5a9461c6d4}{PCAN\+\_\+\+BAUD\+\_\+20K}} = 0x532F
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3aef5b56bca9ac38a664e7dec212bf155c}{PCAN\+\_\+\+BAUD\+\_\+10K}} = 0x672F
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a338a85508baa1d9b088960a4e9faab7e}{PCAN\+\_\+\+BAUD\+\_\+5K}} = 0x7\+F7F
+ \}
+\begin{DoxyCompactList}\small\item\em Represents a PCAN Baud rate register value. \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1}{TPCANType}} \+: byte \{ \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1aeb1c44bb0c705e3ede8c836602831d4f}{PCAN\+\_\+\+TYPE\+\_\+\+ISA}} = 0x01
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1aee5d4c78dd0a1ed6ea7f335231ef35f5}{PCAN\+\_\+\+TYPE\+\_\+\+ISA\+\_\+\+SJA}} = 0x09
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1a7e4a554fbb38d0913e9178b3ece6c6d5}{PCAN\+\_\+\+TYPE\+\_\+\+ISA\+\_\+\+PHYTEC}} = 0x04
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1a7f4dd092e4411a88d9481a3fbf49f665}{PCAN\+\_\+\+TYPE\+\_\+\+DNG}} = 0x02
+, \newline
+\mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1aa12a04da66063a2597fc2ac5a0cc0069}{PCAN\+\_\+\+TYPE\+\_\+\+DNG\+\_\+\+EPP}} = 0x03
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1a9e141234b923a5b34b462b1115476355}{PCAN\+\_\+\+TYPE\+\_\+\+DNG\+\_\+\+SJA}} = 0x05
+, \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1a86ee4a9a724866669666fbf0a2b3b513}{PCAN\+\_\+\+TYPE\+\_\+\+DNG\+\_\+\+SJA\+\_\+\+EPP}} = 0x06
+ \}
+\begin{DoxyCompactList}\small\item\em Represents the type of PCAN (non plug and play) hardware to be initialized. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3} 
+\index{Peak.Can.Basic@{Peak.Can.Basic}!TPCANBaudrate@{TPCANBaudrate}}
+\index{TPCANBaudrate@{TPCANBaudrate}!Peak.Can.Basic@{Peak.Can.Basic}}
+\doxysubsubsection{\texorpdfstring{TPCANBaudrate}{TPCANBaudrate}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3}{Peak.\+Can.\+Basic.\+TPCANBaudrate}} \+: ushort}
+
+
+
+Represents a PCAN Baud rate register value. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BAUD\_1M@{PCAN\_BAUD\_1M}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BAUD\_1M@{PCAN\_BAUD\_1M}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a2988f336f0ff4be070169dfe2400231e}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a2988f336f0ff4be070169dfe2400231e} 
+PCAN\+\_\+\+BAUD\+\_\+1M&1 MBit/s \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BAUD\_800K@{PCAN\_BAUD\_800K}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BAUD\_800K@{PCAN\_BAUD\_800K}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3ab175b76e0295dfb6494c2ef4a0eef2ae}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3ab175b76e0295dfb6494c2ef4a0eef2ae} 
+PCAN\+\_\+\+BAUD\+\_\+800K&800 KBit/s \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BAUD\_500K@{PCAN\_BAUD\_500K}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BAUD\_500K@{PCAN\_BAUD\_500K}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a72223570f795af20a5b994317afac26d}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a72223570f795af20a5b994317afac26d} 
+PCAN\+\_\+\+BAUD\+\_\+500K&500 k\+Bit/s \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BAUD\_250K@{PCAN\_BAUD\_250K}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BAUD\_250K@{PCAN\_BAUD\_250K}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a517dbdc27e87bcd40dce7a333fda9c98}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a517dbdc27e87bcd40dce7a333fda9c98} 
+PCAN\+\_\+\+BAUD\+\_\+250K&250 k\+Bit/s \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BAUD\_125K@{PCAN\_BAUD\_125K}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BAUD\_125K@{PCAN\_BAUD\_125K}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a5188f5ee1d44a2fd2be3c80226325008}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a5188f5ee1d44a2fd2be3c80226325008} 
+PCAN\+\_\+\+BAUD\+\_\+125K&125 k\+Bit/s \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BAUD\_100K@{PCAN\_BAUD\_100K}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BAUD\_100K@{PCAN\_BAUD\_100K}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a56b428ee78884c05647857d516c3f3d3}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a56b428ee78884c05647857d516c3f3d3} 
+PCAN\+\_\+\+BAUD\+\_\+100K&100 k\+Bit/s \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BAUD\_95K@{PCAN\_BAUD\_95K}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BAUD\_95K@{PCAN\_BAUD\_95K}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a418d0eb36612ec81c6308b71734538c5}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a418d0eb36612ec81c6308b71734538c5} 
+PCAN\+\_\+\+BAUD\+\_\+95K&95,238 KBit/s \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BAUD\_83K@{PCAN\_BAUD\_83K}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BAUD\_83K@{PCAN\_BAUD\_83K}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a7f0196ac69943f00f212ac0b7ce17f54}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a7f0196ac69943f00f212ac0b7ce17f54} 
+PCAN\+\_\+\+BAUD\+\_\+83K&83,333 KBit/s \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BAUD\_50K@{PCAN\_BAUD\_50K}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BAUD\_50K@{PCAN\_BAUD\_50K}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a8f4d57a22629b84bd00a280d31602ac2}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a8f4d57a22629b84bd00a280d31602ac2} 
+PCAN\+\_\+\+BAUD\+\_\+50K&50 k\+Bit/s \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BAUD\_47K@{PCAN\_BAUD\_47K}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BAUD\_47K@{PCAN\_BAUD\_47K}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3ae4ef6791cad8b85671d528d17c602e2e}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3ae4ef6791cad8b85671d528d17c602e2e} 
+PCAN\+\_\+\+BAUD\+\_\+47K&47,619 KBit/s \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BAUD\_33K@{PCAN\_BAUD\_33K}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BAUD\_33K@{PCAN\_BAUD\_33K}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3ae20ddd716012a52c3a1c1b6401afa23a}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3ae20ddd716012a52c3a1c1b6401afa23a} 
+PCAN\+\_\+\+BAUD\+\_\+33K&33,333 KBit/s \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BAUD\_20K@{PCAN\_BAUD\_20K}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BAUD\_20K@{PCAN\_BAUD\_20K}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3ad1f740b406d59f7198a2cb5a9461c6d4}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3ad1f740b406d59f7198a2cb5a9461c6d4} 
+PCAN\+\_\+\+BAUD\+\_\+20K&20 k\+Bit/s \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BAUD\_10K@{PCAN\_BAUD\_10K}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BAUD\_10K@{PCAN\_BAUD\_10K}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3aef5b56bca9ac38a664e7dec212bf155c}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3aef5b56bca9ac38a664e7dec212bf155c} 
+PCAN\+\_\+\+BAUD\+\_\+10K&10 k\+Bit/s \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BAUD\_5K@{PCAN\_BAUD\_5K}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BAUD\_5K@{PCAN\_BAUD\_5K}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a338a85508baa1d9b088960a4e9faab7e}\label{namespace_peak_1_1_can_1_1_basic_a6d8171a33df166e787b8fb83e0dd78f3a338a85508baa1d9b088960a4e9faab7e} 
+PCAN\+\_\+\+BAUD\+\_\+5K&5 k\+Bit/s \\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dab}\label{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dab} 
+\index{Peak.Can.Basic@{Peak.Can.Basic}!TPCANDevice@{TPCANDevice}}
+\index{TPCANDevice@{TPCANDevice}!Peak.Can.Basic@{Peak.Can.Basic}}
+\doxysubsubsection{\texorpdfstring{TPCANDevice}{TPCANDevice}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dab}{Peak.\+Can.\+Basic.\+TPCANDevice}} \+: byte}
+
+
+
+Represents a PCAN device. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_NONE@{PCAN\_NONE}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_NONE@{PCAN\_NONE}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabab6959d9ca1c11f925cc5e41bc5ae2664}\label{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabab6959d9ca1c11f925cc5e41bc5ae2664} 
+PCAN\+\_\+\+NONE&Undefined, unknown or not selected PCAN device value. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_PEAKCAN@{PCAN\_PEAKCAN}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_PEAKCAN@{PCAN\_PEAKCAN}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabac49182d456c3adf175b9c9fdf1ffe195}\label{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabac49182d456c3adf175b9c9fdf1ffe195} 
+PCAN\+\_\+\+PEAKCAN&PCAN Non-\/\+Plug and Play devices. NOT USED WITHIN PCAN-\/\+Basic API. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ISA@{PCAN\_ISA}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ISA@{PCAN\_ISA}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0daba89315030ce6e9fff84bcae344332f157}\label{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0daba89315030ce6e9fff84bcae344332f157} 
+PCAN\+\_\+\+ISA&PCAN-\/\+ISA, PCAN-\/\+PC/104, and PCAN-\/\+PC/104-\/\+Plus. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_DNG@{PCAN\_DNG}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_DNG@{PCAN\_DNG}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabab20ba3f36c88eff1946fbb7b6492176f}\label{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabab20ba3f36c88eff1946fbb7b6492176f} 
+PCAN\+\_\+\+DNG&PCAN-\/\+Dongle. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_PCI@{PCAN\_PCI}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_PCI@{PCAN\_PCI}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabac2326303ba4783db9c95742d174af53a}\label{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabac2326303ba4783db9c95742d174af53a} 
+PCAN\+\_\+\+PCI&PCAN-\/\+PCI, PCAN-\/c\+PCI, PCAN-\/mini\+PCI, and PCAN-\/\+PCI Express. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_USB@{PCAN\_USB}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_USB@{PCAN\_USB}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0daba81312e3812e668c9fe11ca5c6e605c52}\label{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0daba81312e3812e668c9fe11ca5c6e605c52} 
+PCAN\+\_\+\+USB&PCAN-\/\+USB and PCAN-\/\+USB Pro. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_PCC@{PCAN\_PCC}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_PCC@{PCAN\_PCC}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0daba7eebdb678e7dc9d29f8f83c9f526d546}\label{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0daba7eebdb678e7dc9d29f8f83c9f526d546} 
+PCAN\+\_\+\+PCC&PCAN-\/\+PC Card. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_VIRTUAL@{PCAN\_VIRTUAL}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_VIRTUAL@{PCAN\_VIRTUAL}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabaec159ce1f016a7c7490691bf976bd58e}\label{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabaec159ce1f016a7c7490691bf976bd58e} 
+PCAN\+\_\+\+VIRTUAL&PCAN Virtual hardware. NOT USED WITHIN PCAN-\/\+Basic API. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_LAN@{PCAN\_LAN}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_LAN@{PCAN\_LAN}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabaf32a840d9c042fd97c2090c5f8009f0e}\label{namespace_peak_1_1_can_1_1_basic_aab58cd300927df2b14d4a558194e0dabaf32a840d9c042fd97c2090c5f8009f0e} 
+PCAN\+\_\+\+LAN&PCAN Gateway devices. \\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eab}\label{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eab} 
+\index{Peak.Can.Basic@{Peak.Can.Basic}!TPCANMessageType@{TPCANMessageType}}
+\index{TPCANMessageType@{TPCANMessageType}!Peak.Can.Basic@{Peak.Can.Basic}}
+\doxysubsubsection{\texorpdfstring{TPCANMessageType}{TPCANMessageType}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eab}{Peak.\+Can.\+Basic.\+TPCANMessage\+Type}} \+: byte}
+
+
+
+Represents the type of a PCAN message. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_MESSAGE\_STANDARD@{PCAN\_MESSAGE\_STANDARD}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_MESSAGE\_STANDARD@{PCAN\_MESSAGE\_STANDARD}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eabac2e5b484d23b79fcc94c5d889a0b7ceb}\label{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eabac2e5b484d23b79fcc94c5d889a0b7ceb} 
+PCAN\+\_\+\+MESSAGE\+\_\+\+STANDARD&The PCAN message is a CAN Standard Frame (11-\/bit identifier) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_MESSAGE\_RTR@{PCAN\_MESSAGE\_RTR}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_MESSAGE\_RTR@{PCAN\_MESSAGE\_RTR}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eabaf87800d870a60272539f0ff856dcd7bc}\label{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eabaf87800d870a60272539f0ff856dcd7bc} 
+PCAN\+\_\+\+MESSAGE\+\_\+\+RTR&The PCAN message is a CAN Remote-\/\+Transfer-\/\+Request Frame. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_MESSAGE\_EXTENDED@{PCAN\_MESSAGE\_EXTENDED}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_MESSAGE\_EXTENDED@{PCAN\_MESSAGE\_EXTENDED}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba8798a00a4dcf5bc69a9c4f7b0edb484d}\label{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba8798a00a4dcf5bc69a9c4f7b0edb484d} 
+PCAN\+\_\+\+MESSAGE\+\_\+\+EXTENDED&The PCAN message is a CAN Extended Frame (29-\/bit identifier) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_MESSAGE\_FD@{PCAN\_MESSAGE\_FD}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_MESSAGE\_FD@{PCAN\_MESSAGE\_FD}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eabad01afd1ab475cac6c503341133f52408}\label{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eabad01afd1ab475cac6c503341133f52408} 
+PCAN\+\_\+\+MESSAGE\+\_\+\+FD&The PCAN message represents a FD frame in terms of CiA Specs. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_MESSAGE\_BRS@{PCAN\_MESSAGE\_BRS}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_MESSAGE\_BRS@{PCAN\_MESSAGE\_BRS}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba4ec85f3ef58802e41c0200babbce7f6b}\label{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba4ec85f3ef58802e41c0200babbce7f6b} 
+PCAN\+\_\+\+MESSAGE\+\_\+\+BRS&The PCAN message represents a FD bit rate switch (CAN data at a higher bit rate) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_MESSAGE\_ESI@{PCAN\_MESSAGE\_ESI}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_MESSAGE\_ESI@{PCAN\_MESSAGE\_ESI}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba6eb5187fdfd3d6da39ef3d4d5b741c94}\label{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba6eb5187fdfd3d6da39ef3d4d5b741c94} 
+PCAN\+\_\+\+MESSAGE\+\_\+\+ESI&The PCAN message represents a FD error state indicator(\+CAN FD transmitter was error active) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_MESSAGE\_ERRFRAME@{PCAN\_MESSAGE\_ERRFRAME}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_MESSAGE\_ERRFRAME@{PCAN\_MESSAGE\_ERRFRAME}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba6538f4b0c3371411d2ac0886284644c7}\label{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba6538f4b0c3371411d2ac0886284644c7} 
+PCAN\+\_\+\+MESSAGE\+\_\+\+ERRFRAME&The PCAN message represents an error frame. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_MESSAGE\_STATUS@{PCAN\_MESSAGE\_STATUS}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_MESSAGE\_STATUS@{PCAN\_MESSAGE\_STATUS}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba9c0118affdc8d1d9aff976b04322b5db}\label{namespace_peak_1_1_can_1_1_basic_a140f759fcc04c8f8c440577d941b7eaba9c0118affdc8d1d9aff976b04322b5db} 
+PCAN\+\_\+\+MESSAGE\+\_\+\+STATUS&The PCAN message represents a PCAN status message. \\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{namespace_peak_1_1_can_1_1_basic_a8ec3e9d24dbd13e965cfc05a921a569d}\label{namespace_peak_1_1_can_1_1_basic_a8ec3e9d24dbd13e965cfc05a921a569d} 
+\index{Peak.Can.Basic@{Peak.Can.Basic}!TPCANMode@{TPCANMode}}
+\index{TPCANMode@{TPCANMode}!Peak.Can.Basic@{Peak.Can.Basic}}
+\doxysubsubsection{\texorpdfstring{TPCANMode}{TPCANMode}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a8ec3e9d24dbd13e965cfc05a921a569d}{Peak.\+Can.\+Basic.\+TPCANMode}} \+: byte}
+
+
+
+Represents a PCAN filter mode. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_MODE\_STANDARD@{PCAN\_MODE\_STANDARD}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_MODE\_STANDARD@{PCAN\_MODE\_STANDARD}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a8ec3e9d24dbd13e965cfc05a921a569dae9250680ca5f00259bc5be5a8f28ee86}\label{namespace_peak_1_1_can_1_1_basic_a8ec3e9d24dbd13e965cfc05a921a569dae9250680ca5f00259bc5be5a8f28ee86} 
+PCAN\+\_\+\+MODE\+\_\+\+STANDARD&Mode is Standard (11-\/bit identifier) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_MODE\_EXTENDED@{PCAN\_MODE\_EXTENDED}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_MODE\_EXTENDED@{PCAN\_MODE\_EXTENDED}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a8ec3e9d24dbd13e965cfc05a921a569da81320f24971e012582ad50d0224d6ffc}\label{namespace_peak_1_1_can_1_1_basic_a8ec3e9d24dbd13e965cfc05a921a569da81320f24971e012582ad50d0224d6ffc} 
+PCAN\+\_\+\+MODE\+\_\+\+EXTENDED&Mode is Extended (29-\/bit identifier) \\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061e}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061e} 
+\index{Peak.Can.Basic@{Peak.Can.Basic}!TPCANParameter@{TPCANParameter}}
+\index{TPCANParameter@{TPCANParameter}!Peak.Can.Basic@{Peak.Can.Basic}}
+\doxysubsubsection{\texorpdfstring{TPCANParameter}{TPCANParameter}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061e}{Peak.\+Can.\+Basic.\+TPCANParameter}} \+: byte}
+
+
+
+Represents a PCAN parameter to be read or set. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_DEVICE\_NUMBER@{PCAN\_DEVICE\_NUMBER}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_DEVICE\_NUMBER@{PCAN\_DEVICE\_NUMBER}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea687bd890fbafcfe7c3239a7a17708df0}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea687bd890fbafcfe7c3239a7a17708df0} 
+PCAN\+\_\+\+DEVICE\+\_\+\+NUMBER&PCAN-\/\+USB device number parameter. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_5VOLTS\_POWER@{PCAN\_5VOLTS\_POWER}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_5VOLTS\_POWER@{PCAN\_5VOLTS\_POWER}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eac34836076ea2c0156b94144042799758}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eac34836076ea2c0156b94144042799758} 
+PCAN\+\_\+5\+VOLTS\+\_\+\+POWER&PCAN-\/\+PC Card 5-\/Volt power parameter. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_RECEIVE\_EVENT@{PCAN\_RECEIVE\_EVENT}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_RECEIVE\_EVENT@{PCAN\_RECEIVE\_EVENT}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea86f13a9a632dc5f94ce22fd09613483f}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea86f13a9a632dc5f94ce22fd09613483f} 
+PCAN\+\_\+\+RECEIVE\+\_\+\+EVENT&PCAN receive event handler parameter. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_MESSAGE\_FILTER@{PCAN\_MESSAGE\_FILTER}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_MESSAGE\_FILTER@{PCAN\_MESSAGE\_FILTER}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea5fcba1fed849817f65383783c026a289}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea5fcba1fed849817f65383783c026a289} 
+PCAN\+\_\+\+MESSAGE\+\_\+\+FILTER&PCAN message filter parameter. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_API\_VERSION@{PCAN\_API\_VERSION}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_API\_VERSION@{PCAN\_API\_VERSION}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea8b5ecfffe550b3e61fae0c84c7503fec}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea8b5ecfffe550b3e61fae0c84c7503fec} 
+PCAN\+\_\+\+API\+\_\+\+VERSION&PCAN-\/\+Basic API version parameter. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_CHANNEL\_VERSION@{PCAN\_CHANNEL\_VERSION}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_CHANNEL\_VERSION@{PCAN\_CHANNEL\_VERSION}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea2ccd217b3f8665798745d93e812d1ce0}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea2ccd217b3f8665798745d93e812d1ce0} 
+PCAN\+\_\+\+CHANNEL\+\_\+\+VERSION&PCAN device channel version parameter. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BUSOFF\_AUTORESET@{PCAN\_BUSOFF\_AUTORESET}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BUSOFF\_AUTORESET@{PCAN\_BUSOFF\_AUTORESET}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea7b58d47f78582076b94715457dc0b24f}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea7b58d47f78582076b94715457dc0b24f} 
+PCAN\+\_\+\+BUSOFF\+\_\+\+AUTORESET&PCAN Reset-\/\+On-\/\+Busoff parameter. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_LISTEN\_ONLY@{PCAN\_LISTEN\_ONLY}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_LISTEN\_ONLY@{PCAN\_LISTEN\_ONLY}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea39dceadea71918cf246d558af828ded5}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea39dceadea71918cf246d558af828ded5} 
+PCAN\+\_\+\+LISTEN\+\_\+\+ONLY&PCAN Listen-\/\+Only parameter. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_LOG\_LOCATION@{PCAN\_LOG\_LOCATION}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_LOG\_LOCATION@{PCAN\_LOG\_LOCATION}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaae18ad4747b9ea9154f678e159d1c017}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaae18ad4747b9ea9154f678e159d1c017} 
+PCAN\+\_\+\+LOG\+\_\+\+LOCATION&Directory path for log files. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_LOG\_STATUS@{PCAN\_LOG\_STATUS}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_LOG\_STATUS@{PCAN\_LOG\_STATUS}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaaed1e95fd583411c08f3430d315e3c53}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaaed1e95fd583411c08f3430d315e3c53} 
+PCAN\+\_\+\+LOG\+\_\+\+STATUS&Debug-\/\+Log activation status. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_LOG\_CONFIGURE@{PCAN\_LOG\_CONFIGURE}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_LOG\_CONFIGURE@{PCAN\_LOG\_CONFIGURE}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea56a67880f877dcb255a1314f8960d7fb}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea56a67880f877dcb255a1314f8960d7fb} 
+PCAN\+\_\+\+LOG\+\_\+\+CONFIGURE&Configuration of the debugged information (LOG\+\_\+\+FUNCTION\+\_\+\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_LOG\_TEXT@{PCAN\_LOG\_TEXT}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_LOG\_TEXT@{PCAN\_LOG\_TEXT}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaa9271521568d0b392c0a67cb7fbf87c2}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaa9271521568d0b392c0a67cb7fbf87c2} 
+PCAN\+\_\+\+LOG\+\_\+\+TEXT&Custom insertion of text into the log file. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_CHANNEL\_CONDITION@{PCAN\_CHANNEL\_CONDITION}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_CHANNEL\_CONDITION@{PCAN\_CHANNEL\_CONDITION}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea83d2f741371ef65172131a391cdc113c}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea83d2f741371ef65172131a391cdc113c} 
+PCAN\+\_\+\+CHANNEL\+\_\+\+CONDITION&Availability status of a PCAN-\/\+Channel. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_HARDWARE\_NAME@{PCAN\_HARDWARE\_NAME}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_HARDWARE\_NAME@{PCAN\_HARDWARE\_NAME}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea839d78605ce8abab63e0aa1cd5a8e4ba}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea839d78605ce8abab63e0aa1cd5a8e4ba} 
+PCAN\+\_\+\+HARDWARE\+\_\+\+NAME&PCAN hardware name parameter. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_RECEIVE\_STATUS@{PCAN\_RECEIVE\_STATUS}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_RECEIVE\_STATUS@{PCAN\_RECEIVE\_STATUS}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea499c450d1d1d07775ef96022f9a4121e}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea499c450d1d1d07775ef96022f9a4121e} 
+PCAN\+\_\+\+RECEIVE\+\_\+\+STATUS&Message reception status of a PCAN-\/\+Channel. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_CONTROLLER\_NUMBER@{PCAN\_CONTROLLER\_NUMBER}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_CONTROLLER\_NUMBER@{PCAN\_CONTROLLER\_NUMBER}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaf0b5478a556f9c6446c6d077ad7fa147}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaf0b5478a556f9c6446c6d077ad7fa147} 
+PCAN\+\_\+\+CONTROLLER\+\_\+\+NUMBER&CAN-\/\+Controller number of a PCAN-\/\+Channel. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_TRACE\_LOCATION@{PCAN\_TRACE\_LOCATION}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_TRACE\_LOCATION@{PCAN\_TRACE\_LOCATION}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea6506a2c9d7c34a318888052aac7d14e9}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea6506a2c9d7c34a318888052aac7d14e9} 
+PCAN\+\_\+\+TRACE\+\_\+\+LOCATION&Directory path for PCAN trace files. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_TRACE\_STATUS@{PCAN\_TRACE\_STATUS}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_TRACE\_STATUS@{PCAN\_TRACE\_STATUS}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea03201543755d394abc60fb8ba1bce804}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea03201543755d394abc60fb8ba1bce804} 
+PCAN\+\_\+\+TRACE\+\_\+\+STATUS&CAN tracing activation status. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_TRACE\_SIZE@{PCAN\_TRACE\_SIZE}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_TRACE\_SIZE@{PCAN\_TRACE\_SIZE}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eab41465a11982c06fe45a1dbc7b0ccbf5}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eab41465a11982c06fe45a1dbc7b0ccbf5} 
+PCAN\+\_\+\+TRACE\+\_\+\+SIZE&Configuration of the maximum file size of a CAN trace. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_TRACE\_CONFIGURE@{PCAN\_TRACE\_CONFIGURE}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_TRACE\_CONFIGURE@{PCAN\_TRACE\_CONFIGURE}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea882df269a647e291926131721065cab6}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea882df269a647e291926131721065cab6} 
+PCAN\+\_\+\+TRACE\+\_\+\+CONFIGURE&Configuration of the trace file storing mode (TRACE\+\_\+\+FILE\+\_\+\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_CHANNEL\_IDENTIFYING@{PCAN\_CHANNEL\_IDENTIFYING}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_CHANNEL\_IDENTIFYING@{PCAN\_CHANNEL\_IDENTIFYING}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea556f46ea0aaa6c002726732cfc9cf9fa}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea556f46ea0aaa6c002726732cfc9cf9fa} 
+PCAN\+\_\+\+CHANNEL\+\_\+\+IDENTIFYING&Physical identification of a USB based PCAN-\/\+Channel by blinking its associated LED. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_CHANNEL\_FEATURES@{PCAN\_CHANNEL\_FEATURES}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_CHANNEL\_FEATURES@{PCAN\_CHANNEL\_FEATURES}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea014f02a2f032353c9a4927ab09b528e2}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea014f02a2f032353c9a4927ab09b528e2} 
+PCAN\+\_\+\+CHANNEL\+\_\+\+FEATURES&Capabilities of a PCAN device (FEATURE\+\_\+\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BITRATE\_ADAPTING@{PCAN\_BITRATE\_ADAPTING}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BITRATE\_ADAPTING@{PCAN\_BITRATE\_ADAPTING}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea7bb7f0f861152d7252e32edd294631df}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea7bb7f0f861152d7252e32edd294631df} 
+PCAN\+\_\+\+BITRATE\+\_\+\+ADAPTING&Using of an existing bit rate (PCAN-\/\+View connected to a channel) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BITRATE\_INFO@{PCAN\_BITRATE\_INFO}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BITRATE\_INFO@{PCAN\_BITRATE\_INFO}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea9b975ef752168529051b8c165eaf8866}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea9b975ef752168529051b8c165eaf8866} 
+PCAN\+\_\+\+BITRATE\+\_\+\+INFO&Configured bit rate as Btr0\+Btr1 value. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BITRATE\_INFO\_FD@{PCAN\_BITRATE\_INFO\_FD}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BITRATE\_INFO\_FD@{PCAN\_BITRATE\_INFO\_FD}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea7b59267f27c032de1be53250b4a3940a}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea7b59267f27c032de1be53250b4a3940a} 
+PCAN\+\_\+\+BITRATE\+\_\+\+INFO\+\_\+\+FD&Configured bit rate as TPCANBitrate\+FD string. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BUSSPEED\_NOMINAL@{PCAN\_BUSSPEED\_NOMINAL}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BUSSPEED\_NOMINAL@{PCAN\_BUSSPEED\_NOMINAL}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaaab95cf5e6cb2b4994aa572f1b276416}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaaab95cf5e6cb2b4994aa572f1b276416} 
+PCAN\+\_\+\+BUSSPEED\+\_\+\+NOMINAL&Configured nominal CAN Bus speed as Bits per seconds. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_BUSSPEED\_DATA@{PCAN\_BUSSPEED\_DATA}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_BUSSPEED\_DATA@{PCAN\_BUSSPEED\_DATA}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea2b25aa299029a5cf39337cdf4c6f4c29}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea2b25aa299029a5cf39337cdf4c6f4c29} 
+PCAN\+\_\+\+BUSSPEED\+\_\+\+DATA&Configured CAN data speed as Bits per seconds. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_IP\_ADDRESS@{PCAN\_IP\_ADDRESS}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_IP\_ADDRESS@{PCAN\_IP\_ADDRESS}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea7143a83ed76457ab5f45f28b07533abc}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea7143a83ed76457ab5f45f28b07533abc} 
+PCAN\+\_\+\+IP\+\_\+\+ADDRESS&Remote address of a LAN channel as string in IPv4 format. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_LAN\_SERVICE\_STATUS@{PCAN\_LAN\_SERVICE\_STATUS}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_LAN\_SERVICE\_STATUS@{PCAN\_LAN\_SERVICE\_STATUS}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea92e19461a8fac8190cae72ab06481b9c}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea92e19461a8fac8190cae72ab06481b9c} 
+PCAN\+\_\+\+LAN\+\_\+\+SERVICE\+\_\+\+STATUS&Status of the Virtual PCAN-\/\+Gateway Service. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ALLOW\_STATUS\_FRAMES@{PCAN\_ALLOW\_STATUS\_FRAMES}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ALLOW\_STATUS\_FRAMES@{PCAN\_ALLOW\_STATUS\_FRAMES}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eafd853c6d76a0b66c86f96450b663e2a5}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eafd853c6d76a0b66c86f96450b663e2a5} 
+PCAN\+\_\+\+ALLOW\+\_\+\+STATUS\+\_\+\+FRAMES&Status messages reception status within a PCAN-\/\+Channel. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ALLOW\_RTR\_FRAMES@{PCAN\_ALLOW\_RTR\_FRAMES}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ALLOW\_RTR\_FRAMES@{PCAN\_ALLOW\_RTR\_FRAMES}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea628a19af2bd5a8632b4a58adcfdc727f}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea628a19af2bd5a8632b4a58adcfdc727f} 
+PCAN\+\_\+\+ALLOW\+\_\+\+RTR\+\_\+\+FRAMES&RTR messages reception status within a PCAN-\/\+Channel. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ALLOW\_ERROR\_FRAMES@{PCAN\_ALLOW\_ERROR\_FRAMES}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ALLOW\_ERROR\_FRAMES@{PCAN\_ALLOW\_ERROR\_FRAMES}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea00d04eec14101f23a0dbe8b7238f17c0}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea00d04eec14101f23a0dbe8b7238f17c0} 
+PCAN\+\_\+\+ALLOW\+\_\+\+ERROR\+\_\+\+FRAMES&Error messages reception status within a PCAN-\/\+Channel. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_INTERFRAME\_DELAY@{PCAN\_INTERFRAME\_DELAY}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_INTERFRAME\_DELAY@{PCAN\_INTERFRAME\_DELAY}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea56bad6269fd7871bc34c1f1e5c66d9d8}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea56bad6269fd7871bc34c1f1e5c66d9d8} 
+PCAN\+\_\+\+INTERFRAME\+\_\+\+DELAY&Delay, in microseconds, between sending frames. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ACCEPTANCE\_FILTER\_11BIT@{PCAN\_ACCEPTANCE\_FILTER\_11BIT}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ACCEPTANCE\_FILTER\_11BIT@{PCAN\_ACCEPTANCE\_FILTER\_11BIT}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea80f87c95ed1532b45ab888814e6a8a8d}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea80f87c95ed1532b45ab888814e6a8a8d} 
+PCAN\+\_\+\+ACCEPTANCE\+\_\+\+FILTER\+\_\+11\+BIT&Filter over code and mask patterns for 11-\/Bit messages. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ACCEPTANCE\_FILTER\_29BIT@{PCAN\_ACCEPTANCE\_FILTER\_29BIT}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ACCEPTANCE\_FILTER\_29BIT@{PCAN\_ACCEPTANCE\_FILTER\_29BIT}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eac63aa55489586125c12b95528443f91a}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eac63aa55489586125c12b95528443f91a} 
+PCAN\+\_\+\+ACCEPTANCE\+\_\+\+FILTER\+\_\+29\+BIT&Filter over code and mask patterns for 29-\/Bit messages. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_IO\_DIGITAL\_CONFIGURATION@{PCAN\_IO\_DIGITAL\_CONFIGURATION}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_IO\_DIGITAL\_CONFIGURATION@{PCAN\_IO\_DIGITAL\_CONFIGURATION}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaa5aef7eb1ab8aab12700f3c7735074ed}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaa5aef7eb1ab8aab12700f3c7735074ed} 
+PCAN\+\_\+\+IO\+\_\+\+DIGITAL\+\_\+\+CONFIGURATION&Output mode of 32 digital I/O pin of a PCAN-\/\+USB Chip. 1\+: Output-\/\+Active 0 \+: Output Inactive. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_IO\_DIGITAL\_VALUE@{PCAN\_IO\_DIGITAL\_VALUE}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_IO\_DIGITAL\_VALUE@{PCAN\_IO\_DIGITAL\_VALUE}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaab080bd42c0444c7c3eb0efd892cd0cf}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061eaab080bd42c0444c7c3eb0efd892cd0cf} 
+PCAN\+\_\+\+IO\+\_\+\+DIGITAL\+\_\+\+VALUE&Value assigned to a 32 digital I/O pins of a PCAN-\/\+USB Chip. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_IO\_DIGITAL\_SET@{PCAN\_IO\_DIGITAL\_SET}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_IO\_DIGITAL\_SET@{PCAN\_IO\_DIGITAL\_SET}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea4081b564c30a7a50cdec38c98376ae62}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea4081b564c30a7a50cdec38c98376ae62} 
+PCAN\+\_\+\+IO\+\_\+\+DIGITAL\+\_\+\+SET&Value assigned to a 32 digital I/O pins of a PCAN-\/\+USB Chip -\/ Multiple digital I/O pins to 1 = High. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_IO\_DIGITAL\_CLEAR@{PCAN\_IO\_DIGITAL\_CLEAR}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_IO\_DIGITAL\_CLEAR@{PCAN\_IO\_DIGITAL\_CLEAR}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea9b6cc0e7a73af6f3d035c5eb161d2812}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea9b6cc0e7a73af6f3d035c5eb161d2812} 
+PCAN\+\_\+\+IO\+\_\+\+DIGITAL\+\_\+\+CLEAR&Clear multiple digital I/O pins to 0. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_IO\_ANALOG\_VALUE@{PCAN\_IO\_ANALOG\_VALUE}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_IO\_ANALOG\_VALUE@{PCAN\_IO\_ANALOG\_VALUE}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea1d599bb296e10cc5b79eb38f8d565ff8}\label{namespace_peak_1_1_can_1_1_basic_a7dda1bac1ce821f2f96818f41a14061ea1d599bb296e10cc5b79eb38f8d565ff8} 
+PCAN\+\_\+\+IO\+\_\+\+ANALOG\+\_\+\+VALUE&Get value of a single analog input pin. \\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229} 
+\index{Peak.Can.Basic@{Peak.Can.Basic}!TPCANStatus@{TPCANStatus}}
+\index{TPCANStatus@{TPCANStatus}!Peak.Can.Basic@{Peak.Can.Basic}}
+\doxysubsubsection{\texorpdfstring{TPCANStatus}{TPCANStatus}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229}{Peak.\+Can.\+Basic.\+TPCANStatus}} \+: uint}
+
+
+
+Represents a PCAN status/error code. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_OK@{PCAN\_ERROR\_OK}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_OK@{PCAN\_ERROR\_OK}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a2c79de8c3c803e28879027585651bcb8}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a2c79de8c3c803e28879027585651bcb8} 
+PCAN\+\_\+\+ERROR\+\_\+\+OK&No error. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_XMTFULL@{PCAN\_ERROR\_XMTFULL}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_XMTFULL@{PCAN\_ERROR\_XMTFULL}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229aad5b8eb951274531c331736c9f107987}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229aad5b8eb951274531c331736c9f107987} 
+PCAN\+\_\+\+ERROR\+\_\+\+XMTFULL&Transmit buffer in CAN controller is full. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_OVERRUN@{PCAN\_ERROR\_OVERRUN}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_OVERRUN@{PCAN\_ERROR\_OVERRUN}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229ad3eb0475cb6e11b7f329801d265c3d00}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229ad3eb0475cb6e11b7f329801d265c3d00} 
+PCAN\+\_\+\+ERROR\+\_\+\+OVERRUN&CAN controller was read too late ~\newline
+ \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_BUSLIGHT@{PCAN\_ERROR\_BUSLIGHT}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_BUSLIGHT@{PCAN\_ERROR\_BUSLIGHT}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229add0141df15306cc2be21192c045f2a7c}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229add0141df15306cc2be21192c045f2a7c} 
+PCAN\+\_\+\+ERROR\+\_\+\+BUSLIGHT&Bus error\+: an error counter reached the \textquotesingle{}light\textquotesingle{} limit. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_BUSHEAVY@{PCAN\_ERROR\_BUSHEAVY}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_BUSHEAVY@{PCAN\_ERROR\_BUSHEAVY}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a29cfe99fd423cb01f7fbaef282af40eb}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a29cfe99fd423cb01f7fbaef282af40eb} 
+PCAN\+\_\+\+ERROR\+\_\+\+BUSHEAVY&Bus error\+: an error counter reached the \textquotesingle{}heavy\textquotesingle{} limit. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_BUSWARNING@{PCAN\_ERROR\_BUSWARNING}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_BUSWARNING@{PCAN\_ERROR\_BUSWARNING}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229aab9ae32d0e3b14fc4cfc3cdde45e81a0}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229aab9ae32d0e3b14fc4cfc3cdde45e81a0} 
+PCAN\+\_\+\+ERROR\+\_\+\+BUSWARNING&Bus error\+: an error counter reached the \textquotesingle{}warning\textquotesingle{} limit. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_BUSPASSIVE@{PCAN\_ERROR\_BUSPASSIVE}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_BUSPASSIVE@{PCAN\_ERROR\_BUSPASSIVE}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a94c0a3a3e3a4be91b16fa649d9b2db85}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a94c0a3a3e3a4be91b16fa649d9b2db85} 
+PCAN\+\_\+\+ERROR\+\_\+\+BUSPASSIVE&Bus error\+: the CAN controller is error passive. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_BUSOFF@{PCAN\_ERROR\_BUSOFF}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_BUSOFF@{PCAN\_ERROR\_BUSOFF}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229aa13f32e7def8842fd3c8ce79b8e911cc}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229aa13f32e7def8842fd3c8ce79b8e911cc} 
+PCAN\+\_\+\+ERROR\+\_\+\+BUSOFF&Bus error\+: the CAN controller is in bus-\/off state. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_ANYBUSERR@{PCAN\_ERROR\_ANYBUSERR}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_ANYBUSERR@{PCAN\_ERROR\_ANYBUSERR}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a175e1edb39f36ac3f3ae147b869b95b8}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a175e1edb39f36ac3f3ae147b869b95b8} 
+PCAN\+\_\+\+ERROR\+\_\+\+ANYBUSERR&Mask for all bus errors. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_QRCVEMPTY@{PCAN\_ERROR\_QRCVEMPTY}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_QRCVEMPTY@{PCAN\_ERROR\_QRCVEMPTY}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a5845dbf5361f135e7f69f4436e7d9ba3}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a5845dbf5361f135e7f69f4436e7d9ba3} 
+PCAN\+\_\+\+ERROR\+\_\+\+QRCVEMPTY&Receive queue is empty. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_QOVERRUN@{PCAN\_ERROR\_QOVERRUN}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_QOVERRUN@{PCAN\_ERROR\_QOVERRUN}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229ad028296298edd58427810cdbd3f6cc8e}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229ad028296298edd58427810cdbd3f6cc8e} 
+PCAN\+\_\+\+ERROR\+\_\+\+QOVERRUN&Receive queue was read too late. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_QXMTFULL@{PCAN\_ERROR\_QXMTFULL}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_QXMTFULL@{PCAN\_ERROR\_QXMTFULL}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a35b76f689a0af97cf05e7f192ac5754e}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a35b76f689a0af97cf05e7f192ac5754e} 
+PCAN\+\_\+\+ERROR\+\_\+\+QXMTFULL&Transmit queue is full. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_REGTEST@{PCAN\_ERROR\_REGTEST}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_REGTEST@{PCAN\_ERROR\_REGTEST}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a2c747a737f53d0c4185cf66af67aae3b}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a2c747a737f53d0c4185cf66af67aae3b} 
+PCAN\+\_\+\+ERROR\+\_\+\+REGTEST&Test of the CAN controller hardware registers failed (no hardware found) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_NODRIVER@{PCAN\_ERROR\_NODRIVER}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_NODRIVER@{PCAN\_ERROR\_NODRIVER}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229aa0178af304cca0951fddeb265d122377}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229aa0178af304cca0951fddeb265d122377} 
+PCAN\+\_\+\+ERROR\+\_\+\+NODRIVER&Driver not loaded. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_HWINUSE@{PCAN\_ERROR\_HWINUSE}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_HWINUSE@{PCAN\_ERROR\_HWINUSE}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229adc333fbf260911e90b3e235d66e1688c}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229adc333fbf260911e90b3e235d66e1688c} 
+PCAN\+\_\+\+ERROR\+\_\+\+HWINUSE&Hardware already in use by a Net. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_NETINUSE@{PCAN\_ERROR\_NETINUSE}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_NETINUSE@{PCAN\_ERROR\_NETINUSE}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229afe02db4068797e27b6c9bde7f64e6964}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229afe02db4068797e27b6c9bde7f64e6964} 
+PCAN\+\_\+\+ERROR\+\_\+\+NETINUSE&A Client is already connected to the Net. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_ILLHW@{PCAN\_ERROR\_ILLHW}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_ILLHW@{PCAN\_ERROR\_ILLHW}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229ab67f4d4747da0902282f664d2db64e60}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229ab67f4d4747da0902282f664d2db64e60} 
+PCAN\+\_\+\+ERROR\+\_\+\+ILLHW&Hardware handle is invalid. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_ILLNET@{PCAN\_ERROR\_ILLNET}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_ILLNET@{PCAN\_ERROR\_ILLNET}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a0d66f59927f3518f666519193213d6c2}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a0d66f59927f3518f666519193213d6c2} 
+PCAN\+\_\+\+ERROR\+\_\+\+ILLNET&Net handle is invalid. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_ILLCLIENT@{PCAN\_ERROR\_ILLCLIENT}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_ILLCLIENT@{PCAN\_ERROR\_ILLCLIENT}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229ab77c021e21919add498d0c9c507a5348}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229ab77c021e21919add498d0c9c507a5348} 
+PCAN\+\_\+\+ERROR\+\_\+\+ILLCLIENT&Client handle is invalid. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_ILLHANDLE@{PCAN\_ERROR\_ILLHANDLE}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_ILLHANDLE@{PCAN\_ERROR\_ILLHANDLE}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a97541ad34b649b9ad1cc9ef4dbc5bb0d}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a97541ad34b649b9ad1cc9ef4dbc5bb0d} 
+PCAN\+\_\+\+ERROR\+\_\+\+ILLHANDLE&Mask for all handle errors. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_RESOURCE@{PCAN\_ERROR\_RESOURCE}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_RESOURCE@{PCAN\_ERROR\_RESOURCE}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a3721bab134227b4520cd98151a7e1ff7}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a3721bab134227b4520cd98151a7e1ff7} 
+PCAN\+\_\+\+ERROR\+\_\+\+RESOURCE&Resource (FIFO, Client, timeout) cannot be created. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_ILLPARAMTYPE@{PCAN\_ERROR\_ILLPARAMTYPE}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_ILLPARAMTYPE@{PCAN\_ERROR\_ILLPARAMTYPE}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a5a52d575141b861680ddffbd0cae22a4}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a5a52d575141b861680ddffbd0cae22a4} 
+PCAN\+\_\+\+ERROR\+\_\+\+ILLPARAMTYPE&Invalid parameter. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_ILLPARAMVAL@{PCAN\_ERROR\_ILLPARAMVAL}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_ILLPARAMVAL@{PCAN\_ERROR\_ILLPARAMVAL}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a368a35be85239439d769be17cc3ce6f0}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a368a35be85239439d769be17cc3ce6f0} 
+PCAN\+\_\+\+ERROR\+\_\+\+ILLPARAMVAL&Invalid parameter value. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_UNKNOWN@{PCAN\_ERROR\_UNKNOWN}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_UNKNOWN@{PCAN\_ERROR\_UNKNOWN}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a35fec126d7e0d45f2ad6fd7d8f2eab8f}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a35fec126d7e0d45f2ad6fd7d8f2eab8f} 
+PCAN\+\_\+\+ERROR\+\_\+\+UNKNOWN&Unknown error. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_ILLDATA@{PCAN\_ERROR\_ILLDATA}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_ILLDATA@{PCAN\_ERROR\_ILLDATA}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a0e8a0ee7138f4b426a029b5b9bd9867e}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a0e8a0ee7138f4b426a029b5b9bd9867e} 
+PCAN\+\_\+\+ERROR\+\_\+\+ILLDATA&Invalid data, function, or action. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_CAUTION@{PCAN\_ERROR\_CAUTION}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_CAUTION@{PCAN\_ERROR\_CAUTION}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a809333e857ce5daea088d0ec6de92ce1}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a809333e857ce5daea088d0ec6de92ce1} 
+PCAN\+\_\+\+ERROR\+\_\+\+CAUTION&An operation was successfully carried out, however, irregularities were registered. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_INITIALIZE@{PCAN\_ERROR\_INITIALIZE}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_INITIALIZE@{PCAN\_ERROR\_INITIALIZE}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a362d0b8b0ef6c0544af2ce877a7562d3}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a362d0b8b0ef6c0544af2ce877a7562d3} 
+PCAN\+\_\+\+ERROR\+\_\+\+INITIALIZE&Channel is not initialized. Value was changed from 0x40000 to 0x4000000\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_ERROR\_ILLOPERATION@{PCAN\_ERROR\_ILLOPERATION}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_ERROR\_ILLOPERATION@{PCAN\_ERROR\_ILLOPERATION}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a769f2400e70e5c9d35dd9c35760c1606}\label{namespace_peak_1_1_can_1_1_basic_a491d763422cada0f8d9abbeed6c09229a769f2400e70e5c9d35dd9c35760c1606} 
+PCAN\+\_\+\+ERROR\+\_\+\+ILLOPERATION&Invalid operation. Value was changed from 0x80000 to 0x8000000\\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1}\label{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1} 
+\index{Peak.Can.Basic@{Peak.Can.Basic}!TPCANType@{TPCANType}}
+\index{TPCANType@{TPCANType}!Peak.Can.Basic@{Peak.Can.Basic}}
+\doxysubsubsection{\texorpdfstring{TPCANType}{TPCANType}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1}{Peak.\+Can.\+Basic.\+TPCANType}} \+: byte}
+
+
+
+Represents the type of PCAN (non plug and play) hardware to be initialized. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_TYPE\_ISA@{PCAN\_TYPE\_ISA}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_TYPE\_ISA@{PCAN\_TYPE\_ISA}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1aeb1c44bb0c705e3ede8c836602831d4f}\label{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1aeb1c44bb0c705e3ede8c836602831d4f} 
+PCAN\+\_\+\+TYPE\+\_\+\+ISA&PCAN-\/\+ISA 82C200. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_TYPE\_ISA\_SJA@{PCAN\_TYPE\_ISA\_SJA}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_TYPE\_ISA\_SJA@{PCAN\_TYPE\_ISA\_SJA}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1aee5d4c78dd0a1ed6ea7f335231ef35f5}\label{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1aee5d4c78dd0a1ed6ea7f335231ef35f5} 
+PCAN\+\_\+\+TYPE\+\_\+\+ISA\+\_\+\+SJA&PCAN-\/\+ISA SJA1000. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_TYPE\_ISA\_PHYTEC@{PCAN\_TYPE\_ISA\_PHYTEC}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_TYPE\_ISA\_PHYTEC@{PCAN\_TYPE\_ISA\_PHYTEC}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1a7e4a554fbb38d0913e9178b3ece6c6d5}\label{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1a7e4a554fbb38d0913e9178b3ece6c6d5} 
+PCAN\+\_\+\+TYPE\+\_\+\+ISA\+\_\+\+PHYTEC&PHYTEC ISA. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_TYPE\_DNG@{PCAN\_TYPE\_DNG}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_TYPE\_DNG@{PCAN\_TYPE\_DNG}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1a7f4dd092e4411a88d9481a3fbf49f665}\label{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1a7f4dd092e4411a88d9481a3fbf49f665} 
+PCAN\+\_\+\+TYPE\+\_\+\+DNG&PCAN-\/\+Dongle 82C200. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_TYPE\_DNG\_EPP@{PCAN\_TYPE\_DNG\_EPP}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_TYPE\_DNG\_EPP@{PCAN\_TYPE\_DNG\_EPP}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1aa12a04da66063a2597fc2ac5a0cc0069}\label{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1aa12a04da66063a2597fc2ac5a0cc0069} 
+PCAN\+\_\+\+TYPE\+\_\+\+DNG\+\_\+\+EPP&PCAN-\/\+Dongle EPP 82C200. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_TYPE\_DNG\_SJA@{PCAN\_TYPE\_DNG\_SJA}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_TYPE\_DNG\_SJA@{PCAN\_TYPE\_DNG\_SJA}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1a9e141234b923a5b34b462b1115476355}\label{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1a9e141234b923a5b34b462b1115476355} 
+PCAN\+\_\+\+TYPE\+\_\+\+DNG\+\_\+\+SJA&PCAN-\/\+Dongle SJA1000. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PCAN\_TYPE\_DNG\_SJA\_EPP@{PCAN\_TYPE\_DNG\_SJA\_EPP}!Peak.Can.Basic@{Peak.Can.Basic}}\index{Peak.Can.Basic@{Peak.Can.Basic}!PCAN\_TYPE\_DNG\_SJA\_EPP@{PCAN\_TYPE\_DNG\_SJA\_EPP}}}\Hypertarget{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1a86ee4a9a724866669666fbf0a2b3b513}\label{namespace_peak_1_1_can_1_1_basic_a1194552c3d01b05fbea2334cd41e8eb1a86ee4a9a724866669666fbf0a2b3b513} 
+PCAN\+\_\+\+TYPE\+\_\+\+DNG\+\_\+\+SJA\+\_\+\+EPP&PCAN-\/\+Dongle EPP SJA1000. \\
+\hline
+
+\end{DoxyEnumFields}

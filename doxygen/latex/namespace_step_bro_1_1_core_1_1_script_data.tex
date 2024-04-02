@@ -1,0 +1,131 @@
+\doxysection{Step\+Bro.\+Core.\+Script\+Data Namespace Reference}
+\hypertarget{namespace_step_bro_1_1_core_1_1_script_data}{}\label{namespace_step_bro_1_1_core_1_1_script_data}\index{StepBro.Core.ScriptData@{StepBro.Core.ScriptData}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class {\bfseries File\+Datatable}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element}{File\+Element}}
+\item 
+class {\bfseries File\+Element\+Override}
+\item 
+class {\bfseries File\+Element\+Partner}
+\item 
+class {\bfseries File\+Element\+Type\+Def}
+\item 
+class {\bfseries File\+Element\+Using\+Alias}
+\item 
+class {\bfseries File\+Procedure}
+\item 
+class {\bfseries File\+Test\+List}
+\item 
+class {\bfseries File\+Variable}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable}{IDatatable}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_cell}{IDatatable\+Cell}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_column}{IDatatable\+Column}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_datatable_row}{IDatatable\+Row}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{IFile\+Element}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_procedure}{IFile\+Procedure}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_partner}{IPartner}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file}{IScript\+File}}
+\begin{DoxyCompactList}\small\item\em Interface to an object containing information about a specific script file. \end{DoxyCompactList}\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_property}{IScript\+Property}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_property_collection}{IScript\+Property\+Collection}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_test_list}{ITest\+List}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_test_list_entry}{ITest\+List\+Entry}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_test_list_entry_test_case}{ITest\+List\+Entry\+Test\+Case}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_test_list_entry_test_list}{ITest\+List\+Entry\+Test\+List}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_test_list_iterator}{ITest\+List\+Iterator}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_no_columns_defined_exception}{No\+Columns\+Defined\+Exception}}
+\item 
+class {\bfseries Script\+File}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_using_data}{Using\+Data}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894}{File\+Element\+Type}} \{ \newline
+{\bfseries Using}
+, {\bfseries Namespace}
+, {\bfseries Enum\+Declaration}
+, {\bfseries Procedure\+Declaration}
+, \newline
+{\bfseries File\+Variable}
+, {\bfseries Test\+List}
+, {\bfseries Datatable}
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894a6da8e67225fdcfa78c3ea5dc3154b849}{Override}}
+, \newline
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894ad48e0d4689ad692f867af172e92b7e97}{Type\+Def}}
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894a87ff01597b0802970e148ea3c38ad599}{Using\+Alias}}
+ \}
+\item 
+enum \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_script_data_a5a8fb7408a3bf0c5909e7ea00565f7b4}{Procedure\+Flags}} \{ \newline
+{\bfseries None} = 0
+, {\bfseries Is\+Function} = 0x01
+, {\bfseries Continue\+On\+Fail} = 0x02
+, {\bfseries Goto\+Cleanup\+On\+Fail} = 0x04
+, \newline
+{\bfseries Goto\+Cleanup\+On\+Error} = 0x08
+, {\bfseries Separate\+State\+Level} = 0x10
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_script_data_a5a8fb7408a3bf0c5909e7ea00565f7b4af00553b33bc16f8435445d134920e83b}{No\+Sub\+Result\+Inheritance}} = 0x20
+, {\bfseries Free\+Parameters} = 0x40
+ \}
+\item 
+\Hypertarget{namespace_step_bro_1_1_core_1_1_script_data_ab5ac871cc134b2c700c432a9dd0a8155}\label{namespace_step_bro_1_1_core_1_1_script_data_ab5ac871cc134b2c700c432a9dd0a8155} 
+enum {\bfseries Test\+List\+Entry\+Type} \{ {\bfseries Unresolved}
+, {\bfseries Unknown}
+, {\bfseries Test\+Case}
+, {\bfseries Test\+List}
+ \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894}\label{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894} 
+\index{StepBro.Core.ScriptData@{StepBro.Core.ScriptData}!FileElementType@{FileElementType}}
+\index{FileElementType@{FileElementType}!StepBro.Core.ScriptData@{StepBro.Core.ScriptData}}
+\doxysubsubsection{\texorpdfstring{FileElementType}{FileElementType}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894}{Step\+Bro.\+Core.\+Script\+Data.\+File\+Element\+Type}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Override@{Override}!StepBro.Core.ScriptData@{StepBro.Core.ScriptData}}\index{StepBro.Core.ScriptData@{StepBro.Core.ScriptData}!Override@{Override}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894a6da8e67225fdcfa78c3ea5dc3154b849}\label{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894a6da8e67225fdcfa78c3ea5dc3154b849} 
+Override&The element is an \textquotesingle{}overrider\textquotesingle{} for another file element, and therefore will not be directly accessible itself during execution. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TypeDef@{TypeDef}!StepBro.Core.ScriptData@{StepBro.Core.ScriptData}}\index{StepBro.Core.ScriptData@{StepBro.Core.ScriptData}!TypeDef@{TypeDef}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894ad48e0d4689ad692f867af172e92b7e97}\label{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894ad48e0d4689ad692f867af172e92b7e97} 
+Type\+Def&A \textquotesingle{}type definition\textquotesingle{} that defines a named type from another data type. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{UsingAlias@{UsingAlias}!StepBro.Core.ScriptData@{StepBro.Core.ScriptData}}\index{StepBro.Core.ScriptData@{StepBro.Core.ScriptData}!UsingAlias@{UsingAlias}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894a87ff01597b0802970e148ea3c38ad599}\label{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894a87ff01597b0802970e148ea3c38ad599} 
+Using\+Alias&An alias definition that defines an alias for a data type. \\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{namespace_step_bro_1_1_core_1_1_script_data_a5a8fb7408a3bf0c5909e7ea00565f7b4}\label{namespace_step_bro_1_1_core_1_1_script_data_a5a8fb7408a3bf0c5909e7ea00565f7b4} 
+\index{StepBro.Core.ScriptData@{StepBro.Core.ScriptData}!ProcedureFlags@{ProcedureFlags}}
+\index{ProcedureFlags@{ProcedureFlags}!StepBro.Core.ScriptData@{StepBro.Core.ScriptData}}
+\doxysubsubsection{\texorpdfstring{ProcedureFlags}{ProcedureFlags}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_script_data_a5a8fb7408a3bf0c5909e7ea00565f7b4}{Step\+Bro.\+Core.\+Script\+Data.\+Procedure\+Flags}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NoSubResultInheritance@{NoSubResultInheritance}!StepBro.Core.ScriptData@{StepBro.Core.ScriptData}}\index{StepBro.Core.ScriptData@{StepBro.Core.ScriptData}!NoSubResultInheritance@{NoSubResultInheritance}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_script_data_a5a8fb7408a3bf0c5909e7ea00565f7b4af00553b33bc16f8435445d134920e83b}\label{namespace_step_bro_1_1_core_1_1_script_data_a5a8fb7408a3bf0c5909e7ea00565f7b4af00553b33bc16f8435445d134920e83b} 
+No\+Sub\+Result\+Inheritance&The result from called sub-\/procedures will not affect procedure result directly. \\
+\hline
+
+\end{DoxyEnumFields}

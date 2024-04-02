@@ -1,0 +1,154 @@
+\doxysection{Step\+Bro.\+UI.\+Controls.\+Execution\+Target\+Completion\+Provider Class Reference}
+\hypertarget{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider}{}\label{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider}\index{StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}}
+
+
+A provider that can handle requests for display of an Intelli\+Prompt completion list.  
+
+
+Inheritance diagram for Step\+Bro.\+UI.\+Controls.\+Execution\+Target\+Completion\+Provider\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=1.661721cm]{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+override bool \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a5167aa9477a2b49f5acfe4361f3ee901}{Request\+Session}} (IEditor\+View view, bool can\+Commit\+Without\+Popup)
+\begin{DoxyCompactList}\small\item\em Requests that an ICompletion\+Session be opened for the specified IEditor\+View. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a80df3bff88f0d8628ee2bd725dc00b54}{On\+Document\+Text\+Changed}} (Syntax\+Editor editor, Editor\+Snapshot\+Changed\+Event\+Args e)
+\begin{DoxyCompactList}\small\item\em Occurs after a text change occurs to an IEditor\+Document that uses this language. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a0ced6f6ec1dd22ad36bd3eb122977ceb}{On\+Document\+Text\+Changing}} (Syntax\+Editor editor, Editor\+Snapshot\+Changing\+Event\+Args e)
+\begin{DoxyCompactList}\small\item\em Occurs before a text change occurs to an IEditor\+Document that uses this language. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a0d0ba3bfa372e9b2230b639b412e0211}{Can\+Highlight\+Matched\+Text}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a7c56a44324c4a47584b4fd31352c6636}{Is\+Case\+Sensitive}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets a value indicating case sensitivity. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a728df05c7e8d8310443dddcb37f1706e}{Requires\+Exact}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets a value requiring exact matches. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a2c3967c745bdef0873ff2b11976c2579}{Use\+Acronyms}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets a value indicating whether to use acronyms. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a096ac54afda2e58b2dac596afa15eaa8}{Use\+Shorthand}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets a value indicating whether to use shorthand. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A provider that can handle requests for display of an Intelli\+Prompt completion list. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a80df3bff88f0d8628ee2bd725dc00b54}\label{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a80df3bff88f0d8628ee2bd725dc00b54} 
+\index{StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}!OnDocumentTextChanged@{OnDocumentTextChanged}}
+\index{OnDocumentTextChanged@{OnDocumentTextChanged}!StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}}
+\doxysubsubsection{\texorpdfstring{OnDocumentTextChanged()}{OnDocumentTextChanged()}}
+{\footnotesize\ttfamily virtual void Step\+Bro.\+UI.\+Controls.\+Execution\+Target\+Completion\+Provider.\+On\+Document\+Text\+Changed (\begin{DoxyParamCaption}\item[{Syntax\+Editor}]{editor,  }\item[{Editor\+Snapshot\+Changed\+Event\+Args}]{e }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Occurs after a text change occurs to an IEditor\+Document that uses this language. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em editor} & The Syntax\+Editor whose IEditor\+Document is changed.\\
+\hline
+{\em e} & The {\ttfamily Editor\+Snapshot\+Changed\+Event\+Args} that contains the event data.\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a0ced6f6ec1dd22ad36bd3eb122977ceb}\label{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a0ced6f6ec1dd22ad36bd3eb122977ceb} 
+\index{StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}!OnDocumentTextChanging@{OnDocumentTextChanging}}
+\index{OnDocumentTextChanging@{OnDocumentTextChanging}!StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}}
+\doxysubsubsection{\texorpdfstring{OnDocumentTextChanging()}{OnDocumentTextChanging()}}
+{\footnotesize\ttfamily virtual void Step\+Bro.\+UI.\+Controls.\+Execution\+Target\+Completion\+Provider.\+On\+Document\+Text\+Changing (\begin{DoxyParamCaption}\item[{Syntax\+Editor}]{editor,  }\item[{Editor\+Snapshot\+Changing\+Event\+Args}]{e }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Occurs before a text change occurs to an IEditor\+Document that uses this language. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em editor} & The Syntax\+Editor whose IEditor\+Document that is changing.\\
+\hline
+{\em e} & The {\ttfamily Editor\+Snapshot\+Changing\+Event\+Args} that contains the event data.\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a5167aa9477a2b49f5acfe4361f3ee901}\label{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a5167aa9477a2b49f5acfe4361f3ee901} 
+\index{StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}!RequestSession@{RequestSession}}
+\index{RequestSession@{RequestSession}!StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}}
+\doxysubsubsection{\texorpdfstring{RequestSession()}{RequestSession()}}
+{\footnotesize\ttfamily override bool Step\+Bro.\+UI.\+Controls.\+Execution\+Target\+Completion\+Provider.\+Request\+Session (\begin{DoxyParamCaption}\item[{IEditor\+View}]{view,  }\item[{bool}]{can\+Commit\+Without\+Popup }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Requests that an ICompletion\+Session be opened for the specified IEditor\+View. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em view} & The IEditor\+View that will host the session.\\
+\hline
+{\em can\+Commit\+Without\+Popup} & Whether the session can immediately commit if a single match is made when the session is opened, commonly known as \"{}complete word\"{} functionality.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+{\ttfamily true} if a session was opened; otherwise, {\ttfamily false}. 
+\end{DoxyReturn}
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a0d0ba3bfa372e9b2230b639b412e0211}\label{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a0d0ba3bfa372e9b2230b639b412e0211} 
+\index{StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}!CanHighlightMatchedText@{CanHighlightMatchedText}}
+\index{CanHighlightMatchedText@{CanHighlightMatchedText}!StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}}
+\doxysubsubsection{\texorpdfstring{CanHighlightMatchedText}{CanHighlightMatchedText}}
+{\footnotesize\ttfamily bool Step\+Bro.\+UI.\+Controls.\+Execution\+Target\+Completion\+Provider.\+Can\+Highlight\+Matched\+Text\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+Gets or sets whether list items show possible matched characters in a highlight color.
+
+{\ttfamily true} if list items show possible matched characters in a highlight color; otherwise, {\ttfamily false}. \Hypertarget{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a7c56a44324c4a47584b4fd31352c6636}\label{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a7c56a44324c4a47584b4fd31352c6636} 
+\index{StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}!IsCaseSensitive@{IsCaseSensitive}}
+\index{IsCaseSensitive@{IsCaseSensitive}!StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}}
+\doxysubsubsection{\texorpdfstring{IsCaseSensitive}{IsCaseSensitive}}
+{\footnotesize\ttfamily bool Step\+Bro.\+UI.\+Controls.\+Execution\+Target\+Completion\+Provider.\+Is\+Case\+Sensitive\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets a value indicating case sensitivity. 
+
+{\ttfamily true} if case sensitive; otherwise, {\ttfamily false}. \Hypertarget{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a728df05c7e8d8310443dddcb37f1706e}\label{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a728df05c7e8d8310443dddcb37f1706e} 
+\index{StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}!RequiresExact@{RequiresExact}}
+\index{RequiresExact@{RequiresExact}!StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}}
+\doxysubsubsection{\texorpdfstring{RequiresExact}{RequiresExact}}
+{\footnotesize\ttfamily bool Step\+Bro.\+UI.\+Controls.\+Execution\+Target\+Completion\+Provider.\+Requires\+Exact\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets a value requiring exact matches. 
+
+{\ttfamily true} if requiring exact matches; otherwise, {\ttfamily false}.\Hypertarget{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a2c3967c745bdef0873ff2b11976c2579}\label{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a2c3967c745bdef0873ff2b11976c2579} 
+\index{StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}!UseAcronyms@{UseAcronyms}}
+\index{UseAcronyms@{UseAcronyms}!StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}}
+\doxysubsubsection{\texorpdfstring{UseAcronyms}{UseAcronyms}}
+{\footnotesize\ttfamily bool Step\+Bro.\+UI.\+Controls.\+Execution\+Target\+Completion\+Provider.\+Use\+Acronyms\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets a value indicating whether to use acronyms. 
+
+{\ttfamily true} if acronyms are to be used; otherwise, {\ttfamily false}.\Hypertarget{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a096ac54afda2e58b2dac596afa15eaa8}\label{class_step_bro_1_1_u_i_1_1_controls_1_1_execution_target_completion_provider_a096ac54afda2e58b2dac596afa15eaa8} 
+\index{StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}!UseShorthand@{UseShorthand}}
+\index{UseShorthand@{UseShorthand}!StepBro.UI.Controls.ExecutionTargetCompletionProvider@{StepBro.UI.Controls.ExecutionTargetCompletionProvider}}
+\doxysubsubsection{\texorpdfstring{UseShorthand}{UseShorthand}}
+{\footnotesize\ttfamily bool Step\+Bro.\+UI.\+Controls.\+Execution\+Target\+Completion\+Provider.\+Use\+Shorthand\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets a value indicating whether to use shorthand. 
+
+{\ttfamily true} if shorthand is to be used; otherwise, {\ttfamily false}.
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+UI/\+Controls/Execution\+Target\+Completion\+Provider.\+cs\end{DoxyCompactItemize}

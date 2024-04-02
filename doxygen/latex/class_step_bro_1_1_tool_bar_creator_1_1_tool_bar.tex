@@ -1,0 +1,164 @@
+\doxysection{Step\+Bro.\+Tool\+Bar\+Creator.\+Tool\+Bar Class Reference}
+\hypertarget{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar}{}\label{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar}\index{StepBro.ToolBarCreator.ToolBar@{StepBro.ToolBarCreator.ToolBar}}
+Inheritance diagram for Step\+Bro.\+Tool\+Bar\+Creator.\+Tool\+Bar\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=1.944444cm]{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a04ee8a383b181ece75a1f1cbf034cd56}{Pre\+Scan\+Data}} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block}{Property\+Block}} data, List$<$ Tuple$<$ int, string $>$ $>$ errors)
+\item 
+void \mbox{\hyperlink{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a33124bf78dd3074f54a61afe2edf172b}{Setup}} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} logger, \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block}{Property\+Block}} data)
+\item 
+\Hypertarget{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a1dc7841f63e71b67b3ea54eda377deed}\label{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a1dc7841f63e71b67b3ea54eda377deed} 
+void {\bfseries Set\+Tool\+Bar\+Reference} (\mbox{\hyperlink{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element}{ITool\+Bar\+Element}} panel)
+\item 
+override \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_api_ac6f8665d31d30b36bbd94476a526c70f}{Dynamic\+Support}} \mbox{\hyperlink{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a2a7df6977a31c51f61878c94ec51e4ff}{Has\+Property}} (string name, out Type type, out bool is\+Read\+Only)
+\item 
+override object \mbox{\hyperlink{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a9c2f94ad2436df4082e85061f4010afd}{Get\+Property}} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string name)
+\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_aaa43edec4f508651a7a03d3009cadad0}{Set\+Property}} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string name, object value)
+\item 
+\Hypertarget{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a6d4b6e32856137cb8f2e08cc516fd912}\label{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a6d4b6e32856137cb8f2e08cc516fd912} 
+void {\bfseries Dump\+Panel\+Elements} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_api_1_1_dynamic_step_bro_object}{Step\+Bro.\+Core.\+Api.\+Dynamic\+Step\+Bro\+Object}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_api_ac6f8665d31d30b36bbd94476a526c70f}{Dynamic\+Support}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_api_1_1_dynamic_step_bro_object_a2392aa6177159483da719f8a163bc19d}{Has\+Property}} (string name, out Type type, out bool is\+Read\+Only)
+\item 
+virtual object \mbox{\hyperlink{class_step_bro_1_1_core_1_1_api_1_1_dynamic_step_bro_object_a728f0903e908e7e9184786d909652a20}{Get\+Property}} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string name)
+\item 
+virtual void \mbox{\hyperlink{class_step_bro_1_1_core_1_1_api_1_1_dynamic_step_bro_object_afd7cba224f3f2b81585ca969f4539685}{Set\+Property}} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string name, object value)
+\item 
+virtual \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_api_ac6f8665d31d30b36bbd94476a526c70f}{Dynamic\+Support}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_api_1_1_dynamic_step_bro_object_ad5fcecc2d73638991324e4c2f99b9d4e}{Has\+Method}} (string name, out \mbox{\hyperlink{struct_step_bro_1_1_core_1_1_data_1_1_named_data}{Named\+Data}}$<$ Type $>$\mbox{[}$\,$\mbox{]} parameters, out Type return\+Type)
+\item 
+virtual object \mbox{\hyperlink{class_step_bro_1_1_core_1_1_api_1_1_dynamic_step_bro_object_a7e4df325be9b8da4a84240968d9869a5}{Invoke\+Method}} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string name, object\mbox{[}$\,$\mbox{]} args)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_step_bro_object_a53054f81386c725723edac9396d649a6}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_step_bro_object_a53054f81386c725723edac9396d649a6} 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_api_ac6f8665d31d30b36bbd94476a526c70f}{Dynamic\+Support}} {\bfseries Has\+Property} (string name, out Type type, out bool is\+Read\+Only)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_step_bro_object_a2204c2f6372a2ed9f722855099c8c396}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_step_bro_object_a2204c2f6372a2ed9f722855099c8c396} 
+object {\bfseries Get\+Property} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string name)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_step_bro_object_a17b2bfb322631b19915896ba8ad7fda8}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_step_bro_object_a17b2bfb322631b19915896ba8ad7fda8} 
+void {\bfseries Set\+Property} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string name, object value)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_step_bro_object_a390bcdf1c789b4c8c42b47938b59d086}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_step_bro_object_a390bcdf1c789b4c8c42b47938b59d086} 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_api_ac6f8665d31d30b36bbd94476a526c70f}{Dynamic\+Support}} {\bfseries Has\+Method} (string name, out \mbox{\hyperlink{struct_step_bro_1_1_core_1_1_data_1_1_named_data}{Named\+Data}}$<$ Type $>$\mbox{[}$\,$\mbox{]} parameters, out Type return\+Type)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_step_bro_object_acc961073c6ffa2d257ddc1e0c86a9ac0}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_dynamic_step_bro_object_acc961073c6ffa2d257ddc1e0c86a9ac0} 
+object {\bfseries Invoke\+Method} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string name, object\mbox{[}$\,$\mbox{]} args)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_settable_from_property_block_ab9921eed055d46a2eba83ead9ca87177}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_settable_from_property_block_ab9921eed055d46a2eba83ead9ca87177} 
+void {\bfseries Pre\+Scan\+Data} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block}{Property\+Block}} data, List$<$ Tuple$<$ int, string $>$ $>$ errors)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_settable_from_property_block_ab545d6367b4c526a743a32d97abf5be7}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_settable_from_property_block_ab545d6367b4c526a743a32d97abf5be7} 
+void {\bfseries Setup} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} logger, \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block}{Property\+Block}} data)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_aa75d3a0a61d6102267f854195b678fc7}\label{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_aa75d3a0a61d6102267f854195b678fc7} 
+static string\mbox{[}$\,$\mbox{]} {\bfseries Toolbar\+Element\+Types} ()
+\item 
+\Hypertarget{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a9e95b24e5f867279cb4840d4ae98fccc}\label{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a9e95b24e5f867279cb4840d4ae98fccc} 
+static string\mbox{[}$\,$\mbox{]} {\bfseries Toolbar\+Properties\+And\+Flags} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+string \mbox{\hyperlink{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a8dfc8928826b0871b5ce022045bd1021}{Name}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_aff0e24e12a86c2d4381f742004dc37a3}\label{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_aff0e24e12a86c2d4381f742004dc37a3} 
+string {\bfseries Title}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a988c2962974e49513d491dd295658899}\label{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a988c2962974e49513d491dd295658899} 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block}{Property\+Block}} {\bfseries Definition}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_abc94e40e75cba4d6c163ea2ed2e96b27}\label{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_abc94e40e75cba4d6c163ea2ed2e96b27} 
+\mbox{\hyperlink{interface_step_bro_1_1_tool_bar_creator_1_1_i_tool_bar_element}{ITool\+Bar\+Element}} {\bfseries Main\+Panel\+Element}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{Step\+Bro.\+Core.\+Data.\+INameable}}}
+\begin{DoxyCompactItemize}
+\item 
+string {\bfseries Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a9c2f94ad2436df4082e85061f4010afd}\label{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a9c2f94ad2436df4082e85061f4010afd} 
+\index{StepBro.ToolBarCreator.ToolBar@{StepBro.ToolBarCreator.ToolBar}!GetProperty@{GetProperty}}
+\index{GetProperty@{GetProperty}!StepBro.ToolBarCreator.ToolBar@{StepBro.ToolBarCreator.ToolBar}}
+\doxysubsubsection{\texorpdfstring{GetProperty()}{GetProperty()}}
+{\footnotesize\ttfamily override object Step\+Bro.\+Tool\+Bar\+Creator.\+Tool\+Bar.\+Get\+Property (\begin{DoxyParamCaption}\item[{\mbox{[}\+Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}}}]{context,  }\item[{string}]{name }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_api_1_1_dynamic_step_bro_object}{Step\+Bro.\+Core.\+Api.\+Dynamic\+Step\+Bro\+Object}}.
+
+\Hypertarget{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a2a7df6977a31c51f61878c94ec51e4ff}\label{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a2a7df6977a31c51f61878c94ec51e4ff} 
+\index{StepBro.ToolBarCreator.ToolBar@{StepBro.ToolBarCreator.ToolBar}!HasProperty@{HasProperty}}
+\index{HasProperty@{HasProperty}!StepBro.ToolBarCreator.ToolBar@{StepBro.ToolBarCreator.ToolBar}}
+\doxysubsubsection{\texorpdfstring{HasProperty()}{HasProperty()}}
+{\footnotesize\ttfamily override \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_api_ac6f8665d31d30b36bbd94476a526c70f}{Dynamic\+Support}} Step\+Bro.\+Tool\+Bar\+Creator.\+Tool\+Bar.\+Has\+Property (\begin{DoxyParamCaption}\item[{string}]{name,  }\item[{out Type}]{type,  }\item[{out bool}]{is\+Read\+Only }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_api_1_1_dynamic_step_bro_object}{Step\+Bro.\+Core.\+Api.\+Dynamic\+Step\+Bro\+Object}}.
+
+\Hypertarget{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a04ee8a383b181ece75a1f1cbf034cd56}\label{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a04ee8a383b181ece75a1f1cbf034cd56} 
+\index{StepBro.ToolBarCreator.ToolBar@{StepBro.ToolBarCreator.ToolBar}!PreScanData@{PreScanData}}
+\index{PreScanData@{PreScanData}!StepBro.ToolBarCreator.ToolBar@{StepBro.ToolBarCreator.ToolBar}}
+\doxysubsubsection{\texorpdfstring{PreScanData()}{PreScanData()}}
+{\footnotesize\ttfamily void Step\+Bro.\+Tool\+Bar\+Creator.\+Tool\+Bar.\+Pre\+Scan\+Data (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block}{Property\+Block}}}]{data,  }\item[{List$<$ Tuple$<$ int, string $>$ $>$}]{errors }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_settable_from_property_block}{Step\+Bro.\+Core.\+Data.\+ISettable\+From\+Property\+Block}}.
+
+\Hypertarget{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_aaa43edec4f508651a7a03d3009cadad0}\label{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_aaa43edec4f508651a7a03d3009cadad0} 
+\index{StepBro.ToolBarCreator.ToolBar@{StepBro.ToolBarCreator.ToolBar}!SetProperty@{SetProperty}}
+\index{SetProperty@{SetProperty}!StepBro.ToolBarCreator.ToolBar@{StepBro.ToolBarCreator.ToolBar}}
+\doxysubsubsection{\texorpdfstring{SetProperty()}{SetProperty()}}
+{\footnotesize\ttfamily override void Step\+Bro.\+Tool\+Bar\+Creator.\+Tool\+Bar.\+Set\+Property (\begin{DoxyParamCaption}\item[{\mbox{[}\+Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}}}]{context,  }\item[{string}]{name,  }\item[{object}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_api_1_1_dynamic_step_bro_object}{Step\+Bro.\+Core.\+Api.\+Dynamic\+Step\+Bro\+Object}}.
+
+\Hypertarget{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a33124bf78dd3074f54a61afe2edf172b}\label{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a33124bf78dd3074f54a61afe2edf172b} 
+\index{StepBro.ToolBarCreator.ToolBar@{StepBro.ToolBarCreator.ToolBar}!Setup@{Setup}}
+\index{Setup@{Setup}!StepBro.ToolBarCreator.ToolBar@{StepBro.ToolBarCreator.ToolBar}}
+\doxysubsubsection{\texorpdfstring{Setup()}{Setup()}}
+{\footnotesize\ttfamily void Step\+Bro.\+Tool\+Bar\+Creator.\+Tool\+Bar.\+Setup (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}}}]{logger,  }\item[{\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block}{Property\+Block}}}]{data }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_settable_from_property_block}{Step\+Bro.\+Core.\+Data.\+ISettable\+From\+Property\+Block}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a8dfc8928826b0871b5ce022045bd1021}\label{class_step_bro_1_1_tool_bar_creator_1_1_tool_bar_a8dfc8928826b0871b5ce022045bd1021} 
+\index{StepBro.ToolBarCreator.ToolBar@{StepBro.ToolBarCreator.ToolBar}!Name@{Name}}
+\index{Name@{Name}!StepBro.ToolBarCreator.ToolBar@{StepBro.ToolBarCreator.ToolBar}}
+\doxysubsubsection{\texorpdfstring{Name}{Name}}
+{\footnotesize\ttfamily string Step\+Bro.\+Tool\+Bar\+Creator.\+Tool\+Bar.\+Name\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{Step\+Bro.\+Core.\+Data.\+INameable}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Host/\+Tool\+Bar\+Creator/Tool\+Bar.\+cs\end{DoxyCompactItemize}

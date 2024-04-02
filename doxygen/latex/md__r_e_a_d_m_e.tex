@@ -1,0 +1,59 @@
+\chapter{Step\+Bro}
+\hypertarget{md__r_e_a_d_m_e}{}\label{md__r_e_a_d_m_e}\index{StepBro@{StepBro}}
+\label{md__r_e_a_d_m_e_autotoc_md7}%
+\Hypertarget{md__r_e_a_d_m_e_autotoc_md7}%
+ Step\+Bro is a .NET8 based automation framework especially for\+:
+\begin{DoxyItemize}
+\item automated system testing (both desktop and embedded system testing),
+\item application scripting and
+\item workbench instrument automation
+\end{DoxyItemize}
+
+The intension is to make it easy to write highly readable test scripts with as low overhead as possible.
+
+The inspiration sources are C\#, CS-\/\+Script, TTCN-\/3, python, Robot framework and Seq\+Zap.
+
+Step\+Bro is both a language definition and a runtime system.
+
+Scripts can be opened and executed with the {\bfseries{stepbro.\+exe}} console application. Plans are to create {\bfseries{Visual Studio Code}} extensions for editing, execution, debugging and more. The (not finished yet) WPF application, {\bfseries{Step\+Bro Workbench}}, is an integreted development/test environment that gives a highly interactive experience.
+
+When executing scripts, an execution log is automatically created without having to add any statements in the script procedures. This eases the script writing and makes the scripts shorter and easier to read and maintain. Additional data can easily be added to the log by inserting simple {\itshape log} statements.\hypertarget{md__r_e_a_d_m_e_autotoc_md8}{}\doxysection{\texorpdfstring{The Step\+Bro script language}{The StepBro script language}}\label{md__r_e_a_d_m_e_autotoc_md8}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{/*\ My\ first\ StepBro\ script,\ not\ made\ to\ impress.\ */}
+\DoxyCodeLine{}
+\DoxyCodeLine{procedure\ void\ main()}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ \ log\ ("{}Hello\ World!"{});}
+\DoxyCodeLine{\}\ }
+
+\end{DoxyCode}
+
+
+The Step\+Bro language is not a general purpose programming language, but a specialized language for automation. Some of the characteristics are\+:
+\begin{DoxyItemize}
+\item Procedure centralized
+\begin{DoxyItemize}
+\item Procedure inheritance can be used to define common behaviour in a procedure, and reused by other procedures.
+\item A procedure can be defined to be an \textquotesingle{}extension procedure\textquotesingle{} (like C\# extension methods).
+\item Procedures can have some associated \"{}helper procedures\"{}, much like a class in other languages can have class functions/methods.
+\item Procedures defined as \textquotesingle{}function\textquotesingle{} can be used in expressions, to e.\+g. do calculations or generate data, without writing anything to the log.
+\item Special procedure statements ease the script development\+:
+\begin{DoxyItemize}
+\item {\itshape log} and {\itshape report} statements used to add additional documentation of results and actions during execution.
+\item {\itshape expect} statements, to set the script verdict from the expected behaviour of whats being tested.
+\item {\itshape step} statements, to divide a procedure into logical high-\/level steps.
+\item {\itshape await} statements, to make the script wait for an asynchronous response or event to occur.
+\end{DoxyItemize}
+\end{DoxyItemize}
+\item Scripts can use .net components defined in the .net framework itself and in any custom (or 3rd party) class libraries.
+\item Statement and expression syntax is almost identical to C\# syntax.
+\item Numeric constant values can be specified with SI metric prefixes (as 12K, 500m)
+\item Timespan values can easily be specified as e.\+g. 50s, 1500ms, @0\+:10.\+500 or @199\+:23\+:59\+:59
+\item File element named \textquotesingle{}testlist\textquotesingle{} can be used to define test suites.
+\end{DoxyItemize}
+
+If interested, please have a look at the files in the examples/scripts folder.\hypertarget{md__r_e_a_d_m_e_autotoc_md9}{}\doxysection{\texorpdfstring{Step\+Bro Runtime System}{StepBro Runtime System}}\label{md__r_e_a_d_m_e_autotoc_md9}
+Step\+Bro compiles the script files into binary code using LINQ expressions, and not into .net assemblies. Technically, that means Step\+Bro does not have to deal with application domains, and can re-\/build changed scripts without drawbacks.
+
+The compilation happens automatically when starting a script execution with the console application. 

@@ -1,0 +1,27 @@
+\doxysection{Peak.\+Can.\+Basic.\+TPCANTimestamp Struct Reference}
+\hypertarget{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_timestamp}{}\label{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_timestamp}\index{Peak.Can.Basic.TPCANTimestamp@{Peak.Can.Basic.TPCANTimestamp}}
+
+
+Represents a timestamp of a received PCAN message. Total Microseconds = micros + 1000 \texorpdfstring{$\ast$}{*} millis + 0x100000000 \texorpdfstring{$\ast$}{*} 1000 \texorpdfstring{$\ast$}{*} millis\+\_\+overflow.  
+
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_timestamp_acbe8579b5965d033c4c29c8f7c95e6f4}\label{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_timestamp_acbe8579b5965d033c4c29c8f7c95e6f4} 
+uint {\bfseries millis}
+\begin{DoxyCompactList}\small\item\em Base-\/value\+: milliseconds\+: 0.. 2\texorpdfstring{$^\wedge$}{\string^}32-\/1. \end{DoxyCompactList}\item 
+\Hypertarget{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_timestamp_aed96c6b5d860019b8f2b124cf822c9c8}\label{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_timestamp_aed96c6b5d860019b8f2b124cf822c9c8} 
+ushort {\bfseries millis\+\_\+overflow}
+\begin{DoxyCompactList}\small\item\em Roll-\/arounds of millis. \end{DoxyCompactList}\item 
+\Hypertarget{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_timestamp_a84f23807925f0c2fa38ae29f6013012f}\label{struct_peak_1_1_can_1_1_basic_1_1_t_p_c_a_n_timestamp_a84f23807925f0c2fa38ae29f6013012f} 
+ushort {\bfseries micros}
+\begin{DoxyCompactList}\small\item\em Microseconds\+: 0..999. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Represents a timestamp of a received PCAN message. Total Microseconds = micros + 1000 \texorpdfstring{$\ast$}{*} millis + 0x100000000 \texorpdfstring{$\ast$}{*} 1000 \texorpdfstring{$\ast$}{*} millis\+\_\+overflow. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Plugins/\+Step\+Bro.\+Peak\+CANPlugin/PCANBasic.\+cs\end{DoxyCompactItemize}

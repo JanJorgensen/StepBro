@@ -1,0 +1,80 @@
+\doxysection{Step\+Bro.\+Core.\+Addons.\+Output\+Console\+With\+Colors\+Addon.\+Text\+To\+Console\+Formatter Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_addons_1_1_output_console_with_colors_addon_1_1_text_to_console_formatter}{}\label{class_step_bro_1_1_core_1_1_addons_1_1_output_console_with_colors_addon_1_1_text_to_console_formatter}\index{StepBro.Core.Addons.OutputConsoleWithColorsAddon.TextToConsoleFormatter@{StepBro.Core.Addons.OutputConsoleWithColorsAddon.TextToConsoleFormatter}}
+Inheritance diagram for Step\+Bro.\+Core.\+Addons.\+Output\+Console\+With\+Colors\+Addon.\+Text\+To\+Console\+Formatter\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=1.191489cm]{class_step_bro_1_1_core_1_1_addons_1_1_output_console_with_colors_addon_1_1_text_to_console_formatter}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_addons_1_1_output_console_with_colors_addon_1_1_text_to_console_formatter_a51b90bff2cd30b74feab2c0393561e98}{Write\+Log\+Entry}} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_logging_1_1_log_entry}{Log\+Entry}} entry, Date\+Time zero)
+\begin{DoxyCompactList}\small\item\em Creates a cleartext representation for a specified log entry. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_step_bro_1_1_core_1_1_addons_1_1_output_console_with_colors_addon_1_1_text_to_console_formatter_a842ce97121c5ea6bdfaed011319e0a59}{Write\+Report}} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_report}{Data\+Report}} report)
+\begin{DoxyCompactList}\small\item\em Create a complete textual report. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_addons_1_1_i_output_formatter_af60b518252e1c3f5cbf56dcf13cf7973}{Write\+Log\+Entry}} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_logging_1_1_log_entry}{Log\+Entry}} entry, Date\+Time zero)
+\begin{DoxyCompactList}\small\item\em Creates a cleartext representation for a specified log entry. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_addons_1_1_i_output_formatter_a90310a7a7613d925cfe86d95d9a5c7dd}{Write\+Report}} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_report}{Data\+Report}} report)
+\begin{DoxyCompactList}\small\item\em Create a complete textual report. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_addons_1_1_i_text_writer_ae8f06e374befd0529cb3973c78386d5b}\label{interface_step_bro_1_1_core_1_1_addons_1_1_i_text_writer_ae8f06e374befd0529cb3973c78386d5b} 
+void {\bfseries Write} (string text)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_addons_1_1_i_text_writer_a53107fde92925ff24a963290a746d1c1}\label{interface_step_bro_1_1_core_1_1_addons_1_1_i_text_writer_a53107fde92925ff24a963290a746d1c1} 
+void {\bfseries Write\+Line} (string text)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_addons_1_1_output_console_with_colors_addon_1_1_text_to_console_formatter_a51b90bff2cd30b74feab2c0393561e98}\label{class_step_bro_1_1_core_1_1_addons_1_1_output_console_with_colors_addon_1_1_text_to_console_formatter_a51b90bff2cd30b74feab2c0393561e98} 
+\index{StepBro.Core.Addons.OutputConsoleWithColorsAddon.TextToConsoleFormatter@{StepBro.Core.Addons.OutputConsoleWithColorsAddon.TextToConsoleFormatter}!WriteLogEntry@{WriteLogEntry}}
+\index{WriteLogEntry@{WriteLogEntry}!StepBro.Core.Addons.OutputConsoleWithColorsAddon.TextToConsoleFormatter@{StepBro.Core.Addons.OutputConsoleWithColorsAddon.TextToConsoleFormatter}}
+\doxysubsubsection{\texorpdfstring{WriteLogEntry()}{WriteLogEntry()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+Addons.\+Output\+Console\+With\+Colors\+Addon.\+Text\+To\+Console\+Formatter.\+Write\+Log\+Entry (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_step_bro_1_1_core_1_1_logging_1_1_log_entry}{Log\+Entry}}}]{entry,  }\item[{Date\+Time}]{zero }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Creates a cleartext representation for a specified log entry. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em entry} & The log entry to create a textual representation for.\\
+\hline
+{\em zero} & The start time for the returned relatime time stamp.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether the entry was actually printed.
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_addons_1_1_i_output_formatter_af60b518252e1c3f5cbf56dcf13cf7973}{Step\+Bro.\+Core.\+Addons.\+IOutput\+Formatter}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_addons_1_1_output_console_with_colors_addon_1_1_text_to_console_formatter_a842ce97121c5ea6bdfaed011319e0a59}\label{class_step_bro_1_1_core_1_1_addons_1_1_output_console_with_colors_addon_1_1_text_to_console_formatter_a842ce97121c5ea6bdfaed011319e0a59} 
+\index{StepBro.Core.Addons.OutputConsoleWithColorsAddon.TextToConsoleFormatter@{StepBro.Core.Addons.OutputConsoleWithColorsAddon.TextToConsoleFormatter}!WriteReport@{WriteReport}}
+\index{WriteReport@{WriteReport}!StepBro.Core.Addons.OutputConsoleWithColorsAddon.TextToConsoleFormatter@{StepBro.Core.Addons.OutputConsoleWithColorsAddon.TextToConsoleFormatter}}
+\doxysubsubsection{\texorpdfstring{WriteReport()}{WriteReport()}}
+{\footnotesize\ttfamily void Step\+Bro.\+Core.\+Addons.\+Output\+Console\+With\+Colors\+Addon.\+Text\+To\+Console\+Formatter.\+Write\+Report (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_report}{Data\+Report}}}]{report }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Create a complete textual report. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em report} & The report data.\\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_addons_1_1_i_output_formatter_a90310a7a7613d925cfe86d95d9a5c7dd}{Step\+Bro.\+Core.\+Addons.\+IOutput\+Formatter}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Addons/Output\+Console\+With\+Colors\+Addon.\+cs\end{DoxyCompactItemize}
