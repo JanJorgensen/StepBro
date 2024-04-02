@@ -108,11 +108,19 @@ namespace StepBro.Core.ScriptData
             }
             internal set
             {
-                // Assume not the same element.
-                System.Diagnostics.Debug.Assert(value != null && !object.ReferenceEquals(value, this));
-                // Assume not both override elements or elements are from different files.
-                System.Diagnostics.Debug.Assert(this.ElementType != FileElementType.Override || value.ElementType != FileElementType.Override || !Object.ReferenceEquals(m_parentFile, value.ParentFile));
-                m_baseElement = value;
+                // Value can be null if the value the element is overriding has not been defined.
+                // This is for example the case when we have a Device with a specific name, but that name is not defined in the station properties file
+                // and we override that with an element that is defined in the station properties file. (Check issue #172)
+                // Note: This only makes the error message not be an internal error, it does not make it possible to create an
+                //       element with an element that is not defined.
+                if (value != null)
+                {
+                    // Assume not the same element.
+                    System.Diagnostics.Debug.Assert(!object.ReferenceEquals(value, this));
+                    // Assume not both override elements or elements are from different files.
+                    System.Diagnostics.Debug.Assert(this.ElementType != FileElementType.Override || value.ElementType != FileElementType.Override || !Object.ReferenceEquals(m_parentFile, value.ParentFile));
+                    m_baseElement = value;
+                }
             }
         }
 
