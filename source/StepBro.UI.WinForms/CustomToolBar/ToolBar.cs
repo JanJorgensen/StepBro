@@ -276,23 +276,29 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
+        public void Add(ToolStripMenuItem item)
+        {
+            this.Items.Add(item);
+        }
+
         #region IToolBarElement
 
         public uint Id => throw new NotImplementedException();
 
         public IToolBarElement ParentElement { get { return null; } }
 
-        public string PropertyName => throw new NotImplementedException();
+        public string ElementName { get { return this.Name; } }
 
-        public string ElementName => throw new NotImplementedException();
-
-        public string ElementType => throw new NotImplementedException();
+        public string ElementType { get { return "ToolBar"; } }
 
         public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
 
         public IEnumerable<IToolBarElement> GetChilds()
         {
-            throw new NotImplementedException();
+            foreach (ToolStripItem item in this.Items)
+            {
+                if (item is IToolBarElement) yield return item as IToolBarElement;
+            }
         }
 
         public object GetProperty([Implicit] ICallContext context, string property)
@@ -318,11 +324,6 @@ namespace StepBro.UI.WinForms.CustomToolBar
         public IToolBarElement TryFindChildElement([Implicit] ICallContext context, string name)
         {
             throw new NotImplementedException();
-        }
-
-        public void Add(ToolStripMenuItem item)
-        {
-            this.Items.Add(item);
         }
 
         public object TryGetChildProperty(string name)

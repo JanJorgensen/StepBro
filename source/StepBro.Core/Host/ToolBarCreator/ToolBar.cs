@@ -101,7 +101,7 @@ namespace StepBro.ToolBarCreator
             var first = nameparts[0];
             foreach (var child in element.GetChilds())
             {
-                if (String.Equals(child.ElementName, first, StringComparison.InvariantCulture) || String.Equals(child.PropertyName, first, StringComparison.InvariantCulture))
+                if (String.Equals(child.ElementName, first, StringComparison.InvariantCulture))
                 {
                     if (nameparts.Length > 1)
                     {
