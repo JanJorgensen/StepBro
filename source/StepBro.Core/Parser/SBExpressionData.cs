@@ -244,7 +244,10 @@ namespace StepBro.Core.Parser
 
         public static SBExpressionData CreateAwaitExpression(Expression expression, IToken token = null)
         {
-            if (expression == null) throw new ArgumentNullException();
+            if (expression == null)
+            {
+                throw new ArgumentNullException();
+            }
             return new SBExpressionData(HomeType.Immediate, SBExpressionType.AwaitExpression, null, expression, token: token);
         }
 
@@ -355,7 +358,7 @@ namespace StepBro.Core.Parser
                     }
                     break;
                 case SBExpressionType.GlobalVariableReference:
-                    throw new NotImplementedException();
+                    break;  // Maybe a global variable will always be the 'correct type'...
                 case SBExpressionType.TypeReference:
                     break;
                 case SBExpressionType.MethodReference:

@@ -12,6 +12,7 @@ using System.Reflection;
 using StepBro.Core.Tasks;
 using StepBro.Core.Execution;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using StepBro.Core.Host;
 
 namespace StepBro.UI.WinForms.Test
 {
@@ -23,7 +24,7 @@ namespace StepBro.UI.WinForms.Test
             {
             }
 
-            public override bool IsWPFApplication { get { return false; } }
+            public override HostType Type { get { return HostType.WinForms; } }
 
             public override IEnumerable<NamedData<object>> ListHostCodeModuleInstances()
             {

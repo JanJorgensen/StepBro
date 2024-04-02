@@ -13,13 +13,20 @@ compilationUnit : fileProperties? usingDeclarations namespaceDeclaration? fileEl
 
 fileProperties : elementPropertyblock ;
 
-usingDeclarations : usingDeclaration* ;
+usingDeclarations : usingDeclarationCheck* ;
+
+usingDeclarationCheck
+    :   usingDeclaration
+    |   namespaceErroneousDeclaration usingDeclaration
+    ;
 
 usingDeclaration 
     :   PUBLIC? USING identifierOrQualified SEMICOLON                   # UsingDeclarationWithIdentifier
     |   PUBLIC? USING typedefName ASSIGNMENT typedefType SEMICOLON      # TypeAlias
     |   PUBLIC? USING (REGULAR_STRING | VERBATIUM_STRING) SEMICOLON     # UsingDeclarationWithPath
     ;
+
+namespaceErroneousDeclaration : namespaceDeclaration ;
 
 namespace : identifierOrQualified ;
 
@@ -552,15 +559,19 @@ elementPropertyList : propertyblockStatementList ;
 statementPropertyblock : propertyblock ;
 statementPropertyList : propertyblockStatementList ;
 
-propertyblock :	OPEN_BRACE propertyblockStatementList? CLOSE_BRACE ;
+propertyblock :	OPEN_BRACE propertyblockStatementList? propertyBlockCommaTooMuch? CLOSE_BRACE ;
 
-propertyblockStatementList : propertyblockStatement (COMMA propertyblockStatement)* ;
+propertyBlockCommaTooMuch : COMMA ;
+
+propertyblockStatementList : propertyblockStatement ((COMMA propertyblockStatement) | propertyblockStatementMissingCommaSeparation)* ;
     
 propertyblockStatement
     :	propertyblockStatementEvent
     |	propertyblockStatementNamed
     |	propertyblockStatementValueIdentifierOnly						// Short form of 'Identifier = true' or '<some property> = Identifier'
     ;
+
+propertyblockStatementMissingCommaSeparation : propertyblockStatement ;
 
 propertyblockStatementNamed 
     :	(   (propertyblockStatementTypeSpecifier propertyblockStatementTypeSpecifier propertyblockStatementTypeSpecifier propertyblockStatementNameSpecifier) | 
@@ -585,15 +596,17 @@ propertyblockStatementEvent
     |	ON identifierOrQualified COLON identifierOrQualified ASSIGNMENT expression	# propertyblockEventAssignment
     ;
 
-propertyblockArray : OPEN_BRACKET propertyblockArrayEntryList? CLOSE_BRACKET ;
+propertyblockArray : OPEN_BRACKET propertyblockArrayEntryList? propertyBlockCommaTooMuch? CLOSE_BRACKET ;
 
-propertyblockArrayEntryList : propertyblockArrayEntry (COMMA propertyblockArrayEntry)* ;
+propertyblockArrayEntryList : propertyblockArrayEntry ((COMMA propertyblockArrayEntry) | propertyblockArrayEntryMissingCommaSeparation)* ;
 
 propertyblockArrayEntry
     :	propertyblock			# propertyblockArrayEntryPropertyBlock
     |	propertyblockArray		# propertyblockArrayEntryArray
     |	primaryOrQualified		# propertyblockArrayEntryPrimary
     ;
+
+propertyblockArrayEntryMissingCommaSeparation : propertyblockArrayEntry ;
 
 propertyblockStatementValueNormal : primaryOrQualified ;
 
@@ -752,7 +765,7 @@ identifierOrQualified : IDENTIFIER | qualifiedName ;
 //    :   arguments classBody?
 //    ;
 
-qualifiedName : IDENTIFIER (DOT IDENTIFIER)+ ;
+qualifiedName : (IDENTIFIER | AT_IDENTIFIER) (DOT (IDENTIFIER | AT_IDENTIFIER))+ ;
 
 //typeList
 //    :   type (COMMA type)*

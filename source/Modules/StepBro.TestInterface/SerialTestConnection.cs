@@ -16,13 +16,13 @@ using static StepBro.Core.Data.LogLineData;
 namespace StepBro.TestInterface
 {
     public class SerialTestConnection :
-        AvailabilityBase, 
-        IConnection, 
-        IRemoteProcedures, 
-        INameable, 
+        AvailabilityBase,
+        IConnection,
+        IRemoteProcedures,
+        INameable,
         INamedObject,
-        ISettableFromPropertyBlock, 
-        INotifyPropertyChanged, 
+        ISettableFromPropertyBlock,
+        INotifyPropertyChanged,
         ILogLineParent,
         ITextCommandInput
     {
@@ -284,7 +284,6 @@ namespace StepBro.TestInterface
         private readonly object m_sync = new object();
         private string m_name = null;
         private Stream m_stream = null;
-        private IReadBuffer<char> m_inputBuffer = null;
         private ILogger m_mainLogger = null;
         private LogLineData m_firstLogLine = null;
         private LogLineData m_lastLogLine = null;
@@ -309,11 +308,11 @@ namespace StepBro.TestInterface
 
         public SerialTestConnection([ObjectName] string objectName = "<a SerialPort>")
         {
-            m_name= objectName;
+            m_name = objectName;
             m_instanceID = rnd.Next(1000000);
             m_newResponseDataEvent = new AutoResetEvent(false);
             SetupDebugCommands();
-            m_mainLogger = StepBro.Core.Main.RootLogger;
+            m_mainLogger = StepBro.Core.Main.RootLogger.CreateSubLocation(m_name);
         }
 
         protected override void DoDispose(bool disposing)
@@ -335,6 +334,7 @@ namespace StepBro.TestInterface
                 if (String.IsNullOrWhiteSpace(value)) throw new ArgumentException();
                 if (m_name != null) throw new InvalidOperationException("The object is already named.");
                 m_name = value;
+                m_mainLogger = StepBro.Core.Main.RootLogger.CreateSubLocation(m_name);  // Create new scope.
             }
         }
 
@@ -370,6 +370,7 @@ namespace StepBro.TestInterface
                         m_stream.Encoding = new ASCIIEncoding();
                         m_stream.NewLine = "\r";
                         m_stream.IsOpenChanged += m_stream_IsOpenChanged;
+                        m_stream.ReadTimeout = 500;
                     }
                 }
             }
@@ -379,6 +380,7 @@ namespace StepBro.TestInterface
         {
             if (!m_stream.IsOpen)
             {
+                this.NotifyPropertyChanged(nameof(IsConnected));
                 //m_streamWasClosed = true;
             }
         }
@@ -396,18 +398,28 @@ namespace StepBro.TestInterface
 
         #region IConnection
 
-        public bool IsConnected()
+        [Obsolete]
+        public bool IsConnected
         {
-            return m_stream != null && m_stream.IsOpen && !m_receiverTask.IsFaulted;
+            get { return this.IsOpen; }
+        }
+        public bool IsOpen
+        {
+            get { return m_stream != null && m_stream.IsOpen && !m_receiverTask.IsFaulted; }
         }
 
+        [Obsolete]
         public bool Connect([Implicit] ICallContext context)
+        {
+            return this.Open(context);
+        }
+
+        public bool Open([Implicit] ICallContext context)
         {
             if (m_stream.IsOpen || m_stream.Open(context))
             {
                 if (m_receiverTask == null)
                 {
-                    m_inputBuffer = m_stream.GetTextualReadBuffer(16 * 1024);
                     m_stopReceiver = false;
                     m_receiverTask = new Task(
                         ReceiverTask,
@@ -420,7 +432,13 @@ namespace StepBro.TestInterface
             else return false;
         }
 
+        [Obsolete]
         public bool Disconnect([Implicit] ICallContext context)
+        {
+            return this.Close(context);
+        }
+
+        public bool Close([Implicit] ICallContext context)
         {
             if (m_receiverTask != null && !m_receiverTask.IsCompleted)
             {
@@ -498,7 +516,7 @@ namespace StepBro.TestInterface
 
         bool ITextCommandInput.AcceptingCommands()
         {
-            return this.IsStillValid && this.IsConnected();
+            return this.IsStillValid && this.IsOpen;
         }
 
         void ITextCommandInput.ExecuteCommand(string command)
@@ -510,6 +528,25 @@ namespace StepBro.TestInterface
             }
             var commandData = new CommandData(m_mainLogger, command, this.CommandResponseTimeout, null);
             EnqueueCommand(commandData);
+        }
+
+        public void ClearSetupCommands([Implicit] ICallContext context)
+        {
+            if (context != null && context.LoggingEnabled)
+            {
+                if (m_setupCommands == null || m_setupCommands.Count == 0)
+                {
+                    context.Logger.Log("No setup commands to clear.");
+                }
+                else
+                {
+                    context.Logger.Log($"Clearing the {m_setupCommands.Count} setup commands.");
+                }
+            }
+            if (m_setupCommands != null)
+            {
+                m_setupCommands.Clear();
+            }
         }
 
         public void AddSetupCommand([Implicit] ICallContext context, string command, params object[] arguments)
@@ -532,14 +569,45 @@ namespace StepBro.TestInterface
             m_setupCommands.Add(commandString);
         }
 
-        public string CreateSetupCommandsHash([Implicit] ICallContext context)
+        private static uint CombineHashCodes(uint h1, uint h2)
         {
-            var hash = (m_setupCommands != null) ? m_setupCommands.GetHashCode().ToString("X") : string.Empty;
-            if (context != null && context.LoggingEnabled)
+            return (((h1 << 5) + h1) ^ h2);
+        }
+
+        private static uint GetStringHash(string input)
+        {
+            uint hash = 8376231;
+            foreach (char ch in input)
             {
-                context.Logger.Log("Hash: " + hash);
+                hash = ((((uint)ch << 5) + (uint)ch) ^ hash);
             }
             return hash;
+        }
+
+        public string CreateSetupCommandsHash([Implicit] ICallContext context)
+        {
+            if (m_setupCommands != null)
+            {
+                uint hash = (m_setupCommands != null && m_setupCommands.Count >= 1) ? GetStringHash(m_setupCommands[0]) : 0;
+                foreach (var s in m_setupCommands.Skip(1))
+                {
+                    hash = CombineHashCodes(hash, GetStringHash(s));
+                }
+                var hashString = hash.ToString("X");
+                if (context != null && context.LoggingEnabled)
+                {
+                    context.Logger.Log("Hash: " + hashString);
+                }
+                return hashString;
+            }
+            else
+            {
+                if (context != null && context.LoggingEnabled)
+                {
+                    context.Logger.Log("Cannot create hash; no commands setup created.");
+                }
+                return string.Empty;
+            }
         }
 
         public IAsyncResult SendSetupCommands([Implicit] ICallContext context)
@@ -804,7 +872,11 @@ namespace StepBro.TestInterface
                     case LogType.ReceivedEnd:
                     case LogType.ReceivedPartial:
                     case LogType.ReceivedError:
-                        if (m_currentExecutingCommand != null)
+                        if (m_mainLogger != null)
+                        {
+                            m_mainLogger.LogAsync("Received: " + text);
+                        }
+                        else if (m_currentExecutingCommand != null)
                         {
                             var logger = m_currentExecutingCommand?.Logger;
                             if (logger != null)
@@ -816,7 +888,7 @@ namespace StepBro.TestInterface
                     case LogType.ReceivedAsync:
                         if (m_mainLogger != null)
                         {
-                            m_mainLogger.LogAsync("Event: " + text);
+                            m_mainLogger.LogAsync("Event:    " + text);
                         }
                         if (m_asyncLogLineReader != null)
                         {
@@ -840,11 +912,8 @@ namespace StepBro.TestInterface
 
         private void ReceiverTask()
         {
-            int knownCount = 0;
-            int index = 0;
             while (!m_stopReceiver)
             {
-                var nextWaitTime = 2000;
                 lock (m_sync)
                 {
                     if (m_currentExecutingCommand != null)
@@ -856,101 +925,64 @@ namespace StepBro.TestInterface
                             AddToLog(LogType.ReceivedError, 0, "<timeout>");
                             OnEndCommand();
                         }
-                        else if (to < 3000) nextWaitTime = (int)to;
                     }
                 }
-                if (m_inputBuffer.AwaitNewData(knownCount, nextWaitTime))
-                {
-                    knownCount = m_inputBuffer.Count;
-                    //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Handling data; " + index.ToString() + ", " + knownCount.ToString()));
-                    //if ( index > knownCount || index != j)
-                    //{
-                    //    DebugLogEntry.Register(new DebugLogEntryString(m_name + " INDEX WRONG!!"));
-                    //}
-                    while (index < knownCount)
-                    {
-                        char ch = m_inputBuffer[index];
-                        if (ch != '\n' && ch != '\r')
-                        {
-                            index++;
-                        }
-                        else
-                        {
-                            //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Line end"));
-                            if (index == 0)
-                            {
-                                m_inputBuffer.Eat(1);
-                                knownCount--;
-                                continue;
-                            }
-                            var line = m_inputBuffer.Get(0, index, index + 1);
-                            knownCount -= (index + 1);
-                            index = 0;
-                            //DebugLogEntry.Register(new DebugLogEntryString(m_name + " After Get: " + index.ToString() + ", " + knownCount.ToString()));
 
-                            var s = new string(line, 1, line.Length - 1);
-                            if (line[0] == EventLineChar)
+                string line = null;
+
+                try
+                {
+                    line = m_stream.ReadLineDirect();
+                }
+                catch { }
+                
+                if (line != null)
+                {
+                    if (line[0] == EventLineChar)
+                    {
+                        lock (m_sync)
+                        {
+                            AddToLog(LogType.ReceivedAsync, 0, new string(line));
+                        }
+                        m_events.Enqueue(line.Substring(1));
+                        while (m_events.Count > 1000)
+                        {
+                            m_events.Dequeue();     // Ensure queue buffer is not eating all memory.
+                        }
+                    }
+                    else
+                    {
+                        if (line[0] == ResponseMultiLineChar)
+                        {
+                            lock (m_sync)
                             {
-                                //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Event line received: " + s));
-                                lock (m_sync)
-                                {
-                                    AddToLog(LogType.ReceivedAsync, 0, new string(line));
-                                }
-                                m_events.Enqueue(new string(line, 1, line.Length - 1));
-                                while (m_events.Count > 1000)
-                                {
-                                    m_events.Dequeue();     // Ensure queue buffer is not eating all memory.
-                                }
+                                AddToLog(LogType.ReceivedPartial, 0, new string(line));
                             }
-                            else
+                            if (m_currentExecutingCommand != null)
                             {
-                                if (line[0] == ResponseMultiLineChar)
+                                m_responseLines.Enqueue(line.Substring(1));
+                            }
+                        }
+                        else if (line[0] == ResponseEndLineChar)
+                        {
+                            lock (m_sync)
+                            {
+                                AddToLog((line.StartsWith(ResponseErrorPrefix)) ? LogType.ReceivedError : LogType.ReceivedEnd, 0, line);
+                            }
+                            if (m_currentExecutingCommand != null)
+                            {
+                                try
                                 {
-                                    //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Multi response line received: " + s));
-                                    lock (m_sync)
-                                    {
-                                        AddToLog(LogType.ReceivedPartial, 0, new string(line));
-                                    }
-                                    if (m_currentExecutingCommand != null)
-                                    {
-                                        m_responseLines.Enqueue(s);
-                                    }
+                                    m_currentExecutingCommand.SetResult(line, m_responseLines.ToArray());
                                 }
-                                else if (line[0] == ResponseEndLineChar)
+                                finally
                                 {
-                                    var l = new string(line);
-                                    lock (m_sync)
-                                    {
-                                        AddToLog((l.StartsWith(ResponseErrorPrefix)) ? LogType.ReceivedError : LogType.ReceivedEnd, 0, l);
-                                    }
-                                    if (m_currentExecutingCommand != null)
-                                    {
-                                        //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Response line received: " + s));
-                                        try
-                                        {
-                                            m_currentExecutingCommand.SetResult(new string(line), m_responseLines.ToArray());
-                                        }
-                                        finally
-                                        {
-                                        }
-                                        OnEndCommand();
-                                    }
-                                    else
-                                    {
-                                        //DebugLogEntry.Register(new DebugLogEntryString(m_name + " Response line received (no command active): " + s));
-                                    }
                                 }
+                                OnEndCommand();
                             }
                         }
                     }
                 }
-                //else
-                //{
-                //    if (m_currentExecutingCommand != null)
-                //    {
-                //        var timeTillTimeout = (DateTime.Now - m_currentExecutingCommand.TimeoutTime).Ticks;
-                //    }
-                //}
             }
         }
 
@@ -989,10 +1021,11 @@ namespace StepBro.TestInterface
             m_loopbackAnswers?.TryGetValue(commandstring, out commandstring);
             if (m_nextResponse != null) commandstring = m_nextResponse;
             if (command.Logger != null) command.Logger.LogDetail("Send: " + commandstring);
+            else if (m_mainLogger != null) m_mainLogger.LogAsync("Send: " + commandstring);
             m_currentExecutingCommand = command;
             DoSendDirect(commandstring);
         }
-        
+
         private void DoSendDirect(string text)
         {
             AddToLog(LogType.Sent, 0, text);
@@ -1035,6 +1068,10 @@ namespace StepBro.TestInterface
             //m_remoteProcedures.Add(new RemoteProcedureInfo("Liza", 23, "Minelli", typeof(bool)));
             //m_remoteProcedures.Add(new RemoteProcedureInfo("Bananas", 24, "List of lot sizes.", typeof(List<long>)));
             //m_remoteProcedures.Add(new RemoteProcedureInfo("Apples", 25, "List of names.", typeof(List<string>)));
+        }
+
+        public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+        {
         }
 
         public void Setup(ILogger logger, PropertyBlock properties)

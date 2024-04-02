@@ -104,6 +104,11 @@ namespace StepBro.Core.Data
             return (m_dynamicType != null) && (m_dynamicType is UsingAlias);
         }
 
+        public bool IsInt()
+        {
+            return (m_dynamicType == null) && (m_type == typeof(Int64) || m_type == typeof(Int32) || m_type == typeof(Int16) || m_type == typeof(SByte) || m_type == typeof(UInt64) || m_type == typeof(UInt32) || m_type == typeof(Byte));
+        }
+
         public override int GetHashCode()
         {
             return (this.DynamicType != null) ? this.Type.GetHashCode() ^ this.DynamicType.GetHashCode() : this.Type.GetHashCode();

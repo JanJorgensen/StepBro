@@ -1,103 +1,103 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.Logging;
 using StepBro.ToolBarCreator;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using static StepBro.UI.WinForms.ProcedureActivationButtonLogic;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
-    public class ProcedureActivationButton : ToolStripMenuItem, IToolBarElement, IToolBarElementSetup, ProcedureActivationButtonLogic.IProcedureActivationButton
+    public class ProcedureActivationButton : ToolStripMenuItem, IToolBarElement, ProcedureActivationButtonLogic.IProcedureActivationButton
     {
+        private IToolBarElement m_parent;
         private ICoreAccess m_coreAccess = null;
         private ProcedureActivationButtonLogic m_logic;
         private Color m_normalBack;
+        private string m_text = "";
+        private bool m_setupFromLogic = false;
 
-        public ProcedureActivationButton(ICoreAccess coreAccess) : base()
+        public ProcedureActivationButton(IToolBarElement parent, ICoreAccess coreAccess, string name) : base()
         {
+            Debug.Assert(parent != null);
+            m_parent = parent;
             m_coreAccess = coreAccess;
             m_logic = new ProcedureActivationButtonLogic(this, coreAccess);
             m_normalBack = this.BackColor;
             this.Margin = new Padding(1, Margin.Top, 1, Margin.Bottom);
+            this.Name = name;
+            m_text = name;
+            this.Text = "\u23F5 " + m_text;   // Just the default text.
         }
 
-        #region IToolBarElementSetup
-
-        public void Clear()
+        public string Instance
         {
-            throw new NotImplementedException();
+            get { return (m_logic.StartAction.TargetObject != null) ? m_logic.StartAction.TargetObject : (string)m_parent.TryGetChildProperty("Instance"); }
+            set { m_logic.StartAction.TargetObject = value; }
+        }
+        public string Procedure
+        {
+            get { return m_logic.StartAction.Name; }
+            set { m_logic.StartAction.Name = value; }
+        }
+        public string Partner
+        {
+            get { return m_logic.StartAction.Partner; }
+            set { m_logic.StartAction.Partner = value; }
         }
 
-        public ICoreAccess Core { get { return m_coreAccess; } }
-
-        public void Setup(PropertyBlock definition)
+        public object[] Arguments
         {
-            this.Name = definition.Name;
-            this.Text = definition.Name;   // Just the default text.
-            foreach (var element in definition)
+            get { return (m_logic.StartAction.Arguments != null) ? m_logic.StartAction.Arguments.ToArray() : null; }
+        }
+
+        public void AddToArguments(object value)
+        {
+            if (m_logic.StartAction.Arguments == null)
             {
-                if (!m_logic.Setup(element))
-                {
-                    if (element.BlockEntryType == PropertyBlockEntryType.Value)
-                    {
-                        var valueField = element as PropertyBlockValue;
-                        if (valueField.Name.Equals("Text", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            this.Text = valueField.ValueAsString();
-                        }
-                        else if (valueField.Name.Equals("Color", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            try
-                            {
-                                Color color = (Color)(typeof(Color).GetProperty(valueField.ValueAsString()).GetValue(null));
-                                this.BackColor = m_normalBack = color;
-                            }
-                            finally { }
-                        }
-                    }
-                    else if (element.BlockEntryType == PropertyBlockEntryType.Flag)
-                    {
-                        var flagField = element as PropertyBlockFlag;
-                        //if (flagField.Name == nameof(StretchChilds))
-                        //{
-                        //    StretchChilds = true;
-                        //    SizeToChilds = false;
-                        //}
-                        //else if (flagField.Name == nameof(SizeToChilds))
-                        //{
-                        //    SizeToChilds = true;
-                        //    StretchChilds = false;
-                        //}
-                    }
-                    else if (element.BlockEntryType == PropertyBlockEntryType.Block)
-                    {
-                        //var type = element.SpecifiedTypeName;
-                        //if (type != null)
-                        //{
-                        //    var elementBlock = element as PropertyBlock;
-                        //    if (type == nameof(Menu))
-                        //    {
-                        //        var menu = new Menu(m_coreAccess);
-                        //        this.DropDownItems.Add(menu);
-                        //        menu.Setup(element.Name, elementBlock);
-                        //    }
-                        //}
-                    }
-                }
+                m_logic.StartAction.Arguments = new List<object>();
+            }
+            m_logic.StartAction.Arguments.Add(value);
+        }
+
+        public void AddToArguments(IEnumerable<object> values)
+        {
+            if (m_logic.StartAction.Arguments == null)
+            {
+                m_logic.StartAction.Arguments = new List<object>();
+            }
+            m_logic.StartAction.Arguments.AddRange(values);
+        }
+
+        public void SetStoppable()
+        {
+            m_logic.SetStoppable();
+        }
+        public void SetStopOnButtonRelease()
+        {
+            m_logic.SetStopOnButtonRelease();
+        }
+
+        protected override void OnBackColorChanged(EventArgs e)
+        {
+            if (!m_setupFromLogic)
+            {
+                m_normalBack = this.BackColor;
             }
         }
-
-        #endregion
 
         #region IProcedureActivationButton
 
         void IProcedureActivationButton.CommandHandler(ButtonCommand command)
         {
+            m_setupFromLogic = true;
             switch (command)
             {
                 case ButtonCommand.ModeCheckOnClick:
@@ -120,11 +120,24 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     break;
                 case ButtonCommand.ShowNormal:
                     this.BackColor = m_normalBack;
+                    this.Text = "\u23F5 " + m_text;
                     break;
                 case ButtonCommand.ShowAwaitingExecutionEnd:
                     this.BackColor = Color.Red;
+                    this.Text = "\u231B " + m_text;
                     break;
+                case ButtonCommand.ShowPlaySymbol:
+                    this.Text = "\u23F5 " + m_text;
+                    break;
+                case ButtonCommand.ShowStopSymbol:
+                    this.Text = "\u23F9 " + m_text;
+                    break;
+                case ButtonCommand.ShowWaitSymbol:
+                    this.Text = "\u231B " + m_text;
+                    break;
+                default: break;
             }
+            m_setupFromLogic = false;
         }
 
         void IProcedureActivationButton.BeginInvoke(Action action)
@@ -133,6 +146,8 @@ namespace StepBro.UI.WinForms.CustomToolBar
         }
 
         #endregion
+
+        #region Mouse and Keyboard
 
         protected override void OnClick(EventArgs e)
         {
@@ -164,11 +179,13 @@ namespace StepBro.UI.WinForms.CustomToolBar
             m_logic.CheckedChanged(this.Checked);
         }
 
+        #endregion
+
         #region IToolBarElement
 
         public uint Id => throw new NotImplementedException();
 
-        public IToolBarElement ParentElement => throw new NotImplementedException();
+        public IToolBarElement ParentElement { get { return m_parent; } }
 
         public string PropertyName => throw new NotImplementedException();
 
@@ -176,7 +193,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public string ElementType => throw new NotImplementedException();
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
 
         public IEnumerable<IToolBarElement> GetChilds()
         {
@@ -206,6 +223,11 @@ namespace StepBro.UI.WinForms.CustomToolBar
         public IToolBarElement TryFindChildElement([Implicit] ICallContext context, string name)
         {
             throw new NotImplementedException();
+        }
+
+        public object TryGetChildProperty(string name)
+        {
+            return null;
         }
 
         #endregion

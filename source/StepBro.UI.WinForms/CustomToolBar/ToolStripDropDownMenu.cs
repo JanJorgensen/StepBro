@@ -1,53 +1,49 @@
 ﻿using StepBro.Core.Api;
-using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.ToolBarCreator;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
-    internal class ToolStripDropDownMenu : ToolStripDropDownButton, IToolBarElement, IToolBarElementSetup
+    internal class ToolStripDropDownMenu : ToolStripDropDownButton, IToolBarElement, IMenu, IMenuItemHost
     {
+        private IToolBarElement m_parent;
         private ICoreAccess m_coreAccess = null;
-        private MenuLogic m_menuLogic = null;
+        private Dictionary<string, object> m_commonChildFields = null;
 
-        public ToolStripDropDownMenu(ICoreAccess coreAccess) : base()
+        public ToolStripDropDownMenu(IToolBarElement parent, ICoreAccess coreAccess, string name) : base()
         {
+            m_parent = parent;
             m_coreAccess = coreAccess;
-            m_menuLogic = new MenuLogic(this, coreAccess);
             this.Margin = new Padding(1, Margin.Top, 1, Margin.Bottom);
+            this.Name = name;
+            this.Text = name;
         }
 
-        #region IToolBarElementSetup
-
-        public void Clear()
+        internal void SetChildProperty(string name, object value)
         {
-            foreach (IToolBarElementSetup item in this.DropDownItems)
+            if (m_commonChildFields == null)
             {
-                item.Clear();
+                m_commonChildFields = new Dictionary<string, object>();
             }
-            this.DropDownItems.Clear();
+            m_commonChildFields[name] = value;
         }
 
-        public ICoreAccess Core { get { return m_coreAccess; } }
-
-        public void Setup(PropertyBlock definition)
+        public void SetTitle(string title)
         {
-            m_menuLogic.Setup(definition);
+            this.Text = title;
         }
 
-        #endregion
+        public void Add(ToolStripMenuItem item)
+        {
+            this.DropDownItems.Add(item);
+        }
 
         #region IToolBarElement
 
         public uint Id => throw new NotImplementedException();
 
-        public IToolBarElement ParentElement => throw new NotImplementedException();
+        public IToolBarElement ParentElement { get { return m_parent; } }
 
         public string PropertyName => throw new NotImplementedException();
 
@@ -55,7 +51,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public string ElementType => throw new NotImplementedException();
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
 
         public IEnumerable<IToolBarElement> GetChilds()
         {
@@ -85,6 +81,15 @@ namespace StepBro.UI.WinForms.CustomToolBar
         public IToolBarElement TryFindChildElement([Implicit] ICallContext context, string name)
         {
             throw new NotImplementedException();
+        }
+
+        public object TryGetChildProperty(string name)
+        {
+            if (m_commonChildFields != null && m_commonChildFields.ContainsKey(name))
+            {
+                return m_commonChildFields[name];
+            }
+            return m_parent.TryGetChildProperty(name);
         }
 
         #endregion

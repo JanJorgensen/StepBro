@@ -1,10 +1,12 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.Logging;
 using StepBro.ToolBarCreator;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,91 +14,44 @@ using static StepBro.UI.WinForms.ProcedureActivationButtonLogic;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
-    public class ObjectCommandButton : ToolStripMenuItem, IToolBarElement, IToolBarElementSetup
+    public class ObjectCommandButton : ToolStripMenuItem, IToolBarElement
     {
+        private IToolBarElement m_parent;
         private ICoreAccess m_coreAccess = null;
         private string m_object = null;
         private string m_command = null;
 
-        public ObjectCommandButton(ICoreAccess coreAccess) : base()
+        public ObjectCommandButton(IToolBarElement parent, ICoreAccess coreAccess, string name) : base()
         {
+            Debug.Assert(parent != null);
+            m_parent = parent;
             m_coreAccess = coreAccess;
             this.Margin = new Padding(1, Margin.Top, 1, Margin.Bottom);
+            this.Name = name;
+            this.Text = name;   // Just the default text.
         }
 
-        #region IToolBarElementSetup
-
-        public void Clear()
+        public string ObjectInstance
         {
-            throw new NotImplementedException();
+            get { return (m_object != null) ? m_object : (string)m_parent.TryGetChildProperty("Instance"); }
+            set { m_object = value; }
         }
-
-        public ICoreAccess Core { get { return m_coreAccess; } }
-
-        public void Setup(PropertyBlock definition)
+        public string ObjectCommand
         {
-            this.Name = definition.Name;
-            this.Text = definition.Name;   // Just the default text.
-            foreach (var element in definition)
-            {
-                if (element.BlockEntryType == PropertyBlockEntryType.Value)
-                {
-                    var valueField = element as PropertyBlockValue;
-                    if (valueField.Name.Equals("Instance", StringComparison.InvariantCultureIgnoreCase) || valueField.Name.Equals("Object", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        m_object = valueField.ValueAsString();
-                    }
-                    else if (valueField.Name.Equals("Command", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        m_command = valueField.ValueAsString();
-                    }
-                    else if (valueField.Name.Equals("Text", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        this.Text = valueField.ValueAsString();
-                    }
-                    else if (valueField.Name.Equals("Color", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        try
-                        {
-                            Color color = (Color)(typeof(Color).GetProperty(valueField.ValueAsString()).GetValue(null));
-                            this.BackColor = color;
-                        }
-                        finally { }
-                    }
-                }
-                else if (element.BlockEntryType == PropertyBlockEntryType.Flag)
-                {
-                    var flagField = element as PropertyBlockFlag;
-                }
-                else if (element.BlockEntryType == PropertyBlockEntryType.Block)
-                {
-                    //var type = element.SpecifiedTypeName;
-                    //if (type != null)
-                    //{
-                    //    var elementBlock = element as PropertyBlock;
-                    //    if (type == nameof(Menu))
-                    //    {
-                    //        var menu = new Menu(m_coreAccess);
-                    //        this.DropDownItems.Add(menu);
-                    //        menu.Setup(element.Name, elementBlock);
-                    //    }
-                    //}
-                }
-            }
+            get { return m_command; }
+            set { m_command = value; }
         }
-
-        #endregion
 
         protected override void OnClick(EventArgs e)
         {
-            m_coreAccess.ExecuteObjectCommand(m_object, m_command);
+            m_coreAccess.ExecuteObjectCommand(this.ObjectInstance, m_command);
         }
 
         #region IToolBarElement
 
         public uint Id => throw new NotImplementedException();
 
-        public IToolBarElement ParentElement => throw new NotImplementedException();
+        public IToolBarElement ParentElement { get { return m_parent; } }
 
         public string PropertyName => throw new NotImplementedException();
 
@@ -104,7 +59,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public string ElementType => throw new NotImplementedException();
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
 
         public IEnumerable<IToolBarElement> GetChilds()
         {
@@ -136,7 +91,11 @@ namespace StepBro.UI.WinForms.CustomToolBar
             throw new NotImplementedException();
         }
 
-        #endregion
+        public object TryGetChildProperty(string name)
+        {
+            return null;
+        }
 
+        #endregion
     }
 }

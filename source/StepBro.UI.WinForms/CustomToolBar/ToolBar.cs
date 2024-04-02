@@ -2,32 +2,148 @@
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
-using StepBro.PanelCreator;
+using StepBro.Core.Logging;
 using StepBro.ToolBarCreator;
-using StepBro.UI.WinForms.PanelElements;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using static StepBro.Core.Data.PropertyBlockDecoder;
+using static StepBro.UI.WinForms.WinFormsPropertyBlockDecoder;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
-    public class ToolBar : ToolStrip, StepBro.ToolBarCreator.IToolBarElement, IToolBarElementSetup
+    public class ToolBar : ToolStrip, IMenuItemHost, IToolBarElement
     {
-        private ICoreAccess m_coreAccess = null;
+        private static ICoreAccess m_coreAccess = null;
         bool m_colorSet = false;
         bool m_settingDefaultColor = false;
-        //private static List<ColumnSeparator> g_columns = new List<ColumnSeparator>();
+        int m_priority = 10;
+        private static PropertyBlockDecoder.Block<object, ToolBar> m_decoder = null;
+        private Dictionary<string, object> m_commonChildFields = null;
 
         public ToolBar() : base()
         {
             this.GripStyle = ToolStripGripStyle.Hidden;
             this.AutoSize = false;
             this.Height = 26;
+        }
+
+        private static void SetupDataDecoder()
+        {
+            var procButtonElements = new Element[] {
+                new ValueColor<ProcedureActivationButton>("Color", (b, c) => { b.BackColor = c; return null; }),
+                new ValueString<ProcedureActivationButton>("Text", (b, v) => { b.Text = v.ValueAsString(); return null; }),
+                new ValueString<ProcedureActivationButton>("Instance", "Object", (b, v) => { b.Instance = v.ValueAsString(); return null; }),
+                new ValueString<ProcedureActivationButton>("Procedure", "Element", (b, v) => { b.Procedure = v.ValueAsString(); return null; }),
+                new ValueString<ProcedureActivationButton>("Partner", "Model", (b, v) => { b.Partner = v.ValueAsString(); return null; }),
+                new Value<ProcedureActivationButton>("Arg", "Argument", (b, a) => { b.AddToArguments(a.Value); return null; }),
+                new PropertyBlockDecoder.Array<ProcedureActivationButton>("Args", "Arguments", (b, a) => { b.AddToArguments(a); return null; }),
+                new Flag <ProcedureActivationButton>("Stoppable", (b, f) => { b.SetStoppable(); return null; }),
+                new Flag<ProcedureActivationButton>("StopOnButtonRelease", (b, f) => { b.SetStopOnButtonRelease(); return null; })
+            };
+            var procButton = new Block<IMenuItemHost, ProcedureActivationButton>(
+                "ProcedureActivationButton",
+                (m, n) =>
+                {
+                    var button = new ProcedureActivationButton(m as IToolBarElement, m_coreAccess, n);
+                    m.Add(button);
+                    button.Size = new Size(23, 20);
+                    button.AutoSize = true;
+                    return button;
+                },
+                procButtonElements);
+
+            var objCmdButtonElements = new Element[] {
+                new ValueColor<ObjectCommandButton>("Color", (b, c) => { b.BackColor = c; return null; }),
+                new ValueString<ObjectCommandButton>("Text", (b, v) => { b.Text = v.ValueAsString(); return null; }),
+                new ValueString<ObjectCommandButton>("Instance", (b, v) => { b.ObjectInstance = v.ValueAsString(); return null; }),
+                new ValueString<ObjectCommandButton>("Command", (b, v) => { b.ObjectCommand = v.ValueAsString(); return null; })
+            };
+            var objCmdButton = new Block<IMenuItemHost, ObjectCommandButton>(
+                "ObjectCommandButton",
+                (m, n) =>
+                {
+                    var button = new ObjectCommandButton(m as IToolBarElement, m_coreAccess, n);
+                    m.Add(button);
+                    button.Size = new Size(23, 20);
+                    button.AutoSize = true;
+                    return button;
+                },
+                objCmdButtonElements);
+
+            var menuTitle = new ValueString<IMenu>("Text", "Title", (m, v) => { m.SetTitle(v.ValueAsString()); return null; });
+
+            var subMenu = new Block<ToolStripDropDownMenu, ToolStripMenuSubMenu>("Menu", "SubMenu",
+                (m, n) =>
+                {
+                    var menu = new ToolStripMenuSubMenu(m, m_coreAccess, n);
+                    m.DropDownItems.Add(menu);
+                    menu.Size = new Size(30, 20);
+                    menu.AutoSize = true;
+                    return menu;
+                });
+            subMenu.SetChilds(
+                menuTitle, subMenu, procButton, objCmdButton,
+                new ValueString<ToolStripMenuSubMenu>("Instance", (m, v) => { m.SetChildProperty("Instance", v.ValueAsString()); return null; }),
+                new ValueString<ToolStripMenuSubMenu>("Procedure", "Element", (m, v) => { m.SetChildProperty("Element", v.ValueAsString()); return null; }),
+                new ValueString<ToolStripMenuSubMenu>("Partner", "Model", (m, v) => { m.SetChildProperty("Partner", v.ValueAsString()); return null; }),
+                new ValueString<ToolStripMenuSubMenu>("Command", (m, v) => { m.SetChildProperty("Command", v.ValueAsString()); return null; }));
+
+            var toolbarMenu = new Block<ToolBar, ToolStripDropDownMenu>("Menu", "DropDownMenu",
+                (t, n) =>
+                {
+                    var menu = new ToolStripDropDownMenu(t, m_coreAccess, n);
+                    t.Items.Add(menu);
+                    menu.Size = new Size(30, 20);
+                    menu.AutoSize = true;
+                    return menu;
+                });
+            toolbarMenu.SetChilds(
+                menuTitle, subMenu, procButton, objCmdButton,
+                new ValueString<ToolStripDropDownMenu>("Instance", (m, v) => { m.SetChildProperty("Instance", v.ValueAsString()); return null; }),
+                new ValueString<ToolStripDropDownMenu>("Procedure", "Element", (m, v) => { m.SetChildProperty("Element", v.ValueAsString()); return null; }),
+                new ValueString<ToolStripDropDownMenu>("Partner", "Model", (m, v) => { m.SetChildProperty("Partner", v.ValueAsString()); return null; }),
+                new ValueString<ToolStripDropDownMenu>("Command", (m, v) => { m.SetChildProperty("Command", v.ValueAsString()); return null; }));
+
+            m_decoder = new Block<object, ToolBar>
+                (
+                    new ValueString<ToolBar>("Label", (t, v) =>
+                        {
+                            var text = v.ValueAsString();
+                            Label label;
+                            if (v.HasTypeSpecified)
+                            {
+                                label = new Label(v.Name);
+                            }
+                            else
+                            {
+                                label = new Label("label" + text.Replace(" ", "_").Replace(".", "Dot"));
+                            }
+                            label.Text = text;
+                            t.Items.Add(label);
+                            return null;    // No errors
+                        }),
+                    new ValueColor<ToolBar>("Color", (t, c) => { t.BackColor = c; return null; }),
+                    new ValueInt<ToolBar>("Priority", (t, v) => { t.Priority = Convert.ToInt32(v.Value); return null; }),
+                    new Flag<ToolBar>("Separator", (t, f) =>
+                    {
+                        var separator = new Separator("Separator");
+                        t.Items.Add(separator);
+                        return null;
+                    }),
+                    new Flag<ToolBar>("ColumnSeparator", (t, f) =>
+                    {
+                        string name = f.Name;
+                        if (!f.HasTypeSpecified)
+                        {
+                            int index = t.Items.Cast<ToolStripItem>().Count(i => i is ColumnSeparator);
+                            name = "column" + index;
+                        }
+                        var separator = new ColumnSeparator(name);
+                        t.Items.Add(separator); t.Items.Add(separator);
+                        return null;
+                    }),
+                    new ValueString<ToolBar>("Instance", (t, v) => { t.SetChildProperty("Instance", v.ValueAsString()); return null; }),
+                    toolbarMenu, procButton, objCmdButton
+                );
         }
 
         protected override void OnBackColorChanged(EventArgs e)
@@ -38,6 +154,8 @@ namespace StepBro.UI.WinForms.CustomToolBar
                 m_colorSet = true;
             }
         }
+
+        public int Priority { get { return m_priority; } set { m_priority = value; } }
 
         public new Color DefaultBackColor
         {
@@ -52,6 +170,15 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
+        private void SetChildProperty(string name, object value)
+        {
+            if (m_commonChildFields == null)
+            {
+                m_commonChildFields = new Dictionary<string, object>();
+            }
+            m_commonChildFields[name] = value;
+        }
+
         public ToolBar(ICoreAccess coreAccess) : this()
         {
             m_coreAccess = coreAccess;
@@ -62,12 +189,12 @@ namespace StepBro.UI.WinForms.CustomToolBar
             m_coreAccess = coreAccess;
         }
 
-        public void Setup(string name, PropertyBlock definition)
+        public void Setup(ILogger logger, string name, PropertyBlock definition)
         {
             this.Text = name.Split(".").Last();
-            this.Name = name.Replace(' ', '_').Replace(".", "Dot");
+            this.Name = name;
             this.Tag = name;
-            this.Setup(definition);
+            this.Setup(logger, definition);
         }
 
         public IEnumerable<ColumnSeparator> ListColumns()
@@ -115,144 +242,45 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
-        #region IToolBarElementSetup
-
         public void Clear()
         {
-            foreach (IToolBarElementSetup item in this.Items)
-            {
-                item.Clear();
-            }
+            //foreach (IToolBarElementSetup item in this.Items)
+            //{
+            //    item.Clear();
+            //}
             this.Items.Clear();
         }
         public ICoreAccess Core { get { return m_coreAccess; } }
 
-        public void Setup(PropertyBlock definition)
+        public void Setup(ILogger logger, PropertyBlock definition)
         {
             this.Items.Clear();
-            foreach (var element in definition)
+            var errors = new List<Tuple<int, string>>();
+            if (m_decoder == null)
             {
-                if (element.BlockEntryType == PropertyBlockEntryType.Value)
-                {
-                    var valueField = element as PropertyBlockValue;
-                    if (valueField.Name == "Color")
-                    {
-                        try
-                        {
-                            Color color = (Color)(typeof(Color).GetProperty(valueField.ValueAsString()).GetValue(null));
-                            this.BackColor = color;
-                        }
-                        finally { }
-                    }
-                    else if (valueField.TypeOrName == "Label")
-                    {
-                        if (valueField.IsStringOrIdentifier)
-                        {
-                            var text = valueField.ValueAsString();
-                            Label label;
-                            if (valueField.HasTypeSpecified)
-                            {
-                                label = new Label(valueField.Name);
-                            }
-                            else
-                            {
-                                label = new Label("label" + text.Replace(" ", "_").Replace(".", "Dot"));
-                            }
-                            label.Text = text;
-                            this.Items.Add(label);
-                        }
-                    }
-                }
-                else if (element.BlockEntryType == PropertyBlockEntryType.Flag)
-                {
-                    var flagField = element as PropertyBlockFlag;
-                    if (element.Name == nameof(Separator))
-                    {
-                        var separator = new Separator("Separator");
-                        this.Items.Add(separator);
-                    }
-                    else if (element.TypeOrName == nameof(ColumnSeparator))
-                    {
-                        string name = element.Name;
-                        if (!element.HasTypeSpecified)
-                        {
-                            int index = this.Items.Cast<ToolStripItem>().Count(i => i is ColumnSeparator);
-                            name = "column" + index;
-                        }
-                        var separator = new ColumnSeparator(element.Name);
-                        this.Items.Add(separator);
-                    }
-                }
-                else if (element.BlockEntryType == PropertyBlockEntryType.Block)
-                {
-                    var elementBlock = element as PropertyBlock;
-                    var type = element.SpecifiedTypeName;
-                    if (type != null)
-                    {
-                        if (type == "Menu")
-                        {
-                            var menu = new ToolStripDropDownMenu(m_coreAccess);
-                            this.Items.Add(menu);
-                            menu.Size = new Size(30, 20);
-                            menu.AutoSize = true;
-                            menu.Setup(elementBlock);
-                        }
-                        else if (type == nameof(ProcedureActivationButton))
-                        {
-                            var button = new ProcedureActivationButton(m_coreAccess);
-                            this.Items.Add(button);
-                            button.Size = new Size(23, 20);
-                            button.AutoSize = true;
-                            button.Setup(elementBlock);
-                        }
-                        else if (type == nameof(ObjectCommandButton))
-                        {
-                            var button = new ObjectCommandButton(m_coreAccess);
-                            this.Items.Add(button);
-                            button.Size = new Size(23, 20);
-                            button.AutoSize = true;
-                            button.Setup(elementBlock);
-                        }
-                        else if (type == nameof(Separator))
-                        {
-                            var separator = new Separator(element.Name);
-                            this.Items.Add(separator);
-                            separator.Setup(elementBlock);
-                        }
-                        else if (type == nameof(ColumnSeparator))
-                        {
-                            var separator = new ColumnSeparator(element.Name);
-                            this.Items.Add(separator);
-                            separator.Setup(elementBlock);
-                        }
-                    }
-                    else
-                    {
-                        if (element.Name == nameof(Separator))
-                        {
-                            var separator = new Separator("Separator");
-                            this.Items.Add(separator);
-                            separator.Setup(elementBlock);
-                        }
-                        else if (element.Name == nameof(ColumnSeparator))
-                        {
-                            int index = this.Items.Cast<ToolStripItem>().Count(i => i is ColumnSeparator);
-                            var separator = new ColumnSeparator("column" + index);
-                            this.Items.Add(separator);
-                            separator.Setup(elementBlock);
-                        }
-                    }
-                }
+                SetupDataDecoder();
+            }
+            m_decoder.DecodeData(definition, this, errors);
+
+            foreach (var error in errors)
+            {
+                logger.LogError($"Toolbar '{this.Name}' line " + error.Item1 + ": " + error.Item2);
             }
         }
 
-        #endregion
+        public static void ReportTypeUnknown(ILogger logger, int line, string type)
+        {
+            if (logger != null)
+            {
+                logger.LogError("Toolbar definition line " + line + ", unknown type: \"" + type + "\".");
+            }
+        }
 
         #region IToolBarElement
 
         public uint Id => throw new NotImplementedException();
 
-        public IToolBarElement ParentElement => throw new NotImplementedException();
+        public IToolBarElement ParentElement { get { return null; } }
 
         public string PropertyName => throw new NotImplementedException();
 
@@ -260,7 +288,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public string ElementType => throw new NotImplementedException();
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
 
         public IEnumerable<IToolBarElement> GetChilds()
         {
@@ -290,6 +318,20 @@ namespace StepBro.UI.WinForms.CustomToolBar
         public IToolBarElement TryFindChildElement([Implicit] ICallContext context, string name)
         {
             throw new NotImplementedException();
+        }
+
+        public void Add(ToolStripMenuItem item)
+        {
+            this.Items.Add(item);
+        }
+
+        public object TryGetChildProperty(string name)
+        {
+            if (m_commonChildFields != null && m_commonChildFields.ContainsKey(name))
+            {
+                return m_commonChildFields[name];
+            }
+            return null;
         }
 
         #endregion

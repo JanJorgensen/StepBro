@@ -1,0 +1,77 @@
+using StepBro.Streams;
+using StepBro.TestInterface;
+using "TestFramework.sbs";
+
+public SerialTestConnection connection = SerialTestConnection(){}
+
+public testlist SerialTestConnectionOfflineTests : TestSuite
+{
+    * TestSetupCommandHash
+}
+
+void TestSetupCommandHash() : TestCase
+{
+    var hash1 = "";
+    var hash2 = "";
+    var hash3 = "";
+    var hash4 = "";
+
+    hash1 = CreateSetupHash(0);
+    hash2 = CreateSetupHash(1);
+    hash3 = CreateSetupHash(2);
+    hash4 = CreateSetupHash(0);
+
+    expect(hash1 != hash2);
+    expect(hash2 != hash3);
+    expect(hash1 != hash3);
+    expect(hash1 == hash4);
+}
+
+string CreateSetupHash(int option)
+{
+    connection.ClearSetupCommands();
+
+    connection.AddSetupCommand("Anders asta 726");
+    connection.AddSetupCommand("Bent berit true");
+    connection.AddSetupCommand("Christian cristina \"klm\"");
+    connection.AddSetupCommand("Dennis");
+    connection.AddSetupCommand("Erik emma forward");
+    connection.AddSetupCommand("Frederik 10");
+    connection.AddSetupCommand("Gehrt gitte gavmild");
+    connection.AddSetupCommand("Henrik Hajdi");
+    connection.AddSetupCommand("Ivan 30 40 60");
+    connection.AddSetupCommand("Janse janice jylland");
+    connection.AddSetupCommand("Kjeld 2");
+    connection.AddSetupCommand("Lars");
+    connection.AddSetupCommand("Mogens minna 4");
+    if (option == 1)
+    {
+        connection.AddSetupCommand("Niels.Noller.Nix.Now 72");
+    }
+    else
+    {
+        connection.AddSetupCommand("Niels.Noller.Nix.Now 73");
+    }
+    connection.AddSetupCommand("Olsen olga 17");
+    connection.AddSetupCommand("Peter pia pilfinger");
+    if (option == 2)
+    {
+        connection.AddSetupCommand("Quist kuvert");
+    }
+    else
+    {
+        connection.AddSetupCommand("Qvist kuvert");
+    }
+    connection.AddSetupCommand("Rasser true 1000");
+    connection.AddSetupCommand("Steffen spade spiller");
+    connection.AddSetupCommand("Toby thin thing");
+    connection.AddSetupCommand("Uller.Close 40");
+    connection.AddSetupCommand("Victor Rhino");
+    connection.AddSetupCommand("Wolfenstein 3 Dee");
+    connection.AddSetupCommand("Xylofon");
+    connection.AddSetupCommand("Ypperste 3.14");
+    connection.AddSetupCommand("Zebra Zanadu");
+
+    var hash = connection.CreateSetupCommandsHash();
+    return hash;
+}

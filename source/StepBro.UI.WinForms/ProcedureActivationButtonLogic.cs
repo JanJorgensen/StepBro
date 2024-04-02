@@ -1,6 +1,7 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Tasks;
+using StepBro.ToolBarCreator;
 
 namespace StepBro.UI.WinForms
 {
@@ -11,8 +12,8 @@ namespace StepBro.UI.WinForms
         private enum Mode { ActivateOnClick = 0, ClickToStop, RunWhilePushed }
         private Mode m_mode = Mode.ActivateOnClick;
         private ProcedureActivationInfo m_startProcedure;
-        private ProcedureActivationInfo m_stopProcedure;
-        private ProcedureActivationInfo m_enabledCheckProcedure;
+        //private ProcedureActivationInfo m_stopProcedure;
+        //private ProcedureActivationInfo m_enabledCheckProcedure;
         private IExecutionAccess m_execution = null;
 
         public enum ButtonCommand
@@ -24,15 +25,40 @@ namespace StepBro.UI.WinForms
             SetUnchecked,
             ShowActive,
             ShowNormal,
-            ShowAwaitingExecutionEnd
+            ShowAwaitingExecutionEnd,
+            ShowPlaySymbol,
+            ShowStopSymbol,
+            ShowWaitSymbol
         }
 
-        public interface IProcedureActivationButton
+        public interface IProcedureActivationButton : IToolBarElement
         {
             void CommandHandler(ButtonCommand command);
             void BeginInvoke(Action action);
         }
 
+        public void SetStoppable()
+        {
+            m_mode = Mode.ClickToStop;
+            this.SendCommand(ButtonCommand.ModeCheckOnClick);
+        }
+        public void SetStopOnButtonRelease()
+        {
+            m_mode = Mode.RunWhilePushed;
+        }
+
+        public bool HasStartAction { get { return m_startProcedure != null; } }
+        public ProcedureActivationInfo StartAction
+        {
+            get
+            {
+                if (m_startProcedure == null)
+                {
+                    m_startProcedure = new ProcedureActivationInfo();
+                }
+                return m_startProcedure;
+            }
+        }
 
         public ProcedureActivationButtonLogic(IProcedureActivationButton parentControl, ICoreAccess coreAccess)
         {
@@ -94,7 +120,7 @@ namespace StepBro.UI.WinForms
             m_parentControl.CommandHandler(command);
         }
 
-        private void StartProcedure()
+        private void DoStartProcedure()
         {
             if (m_startProcedure != null && !String.IsNullOrEmpty(m_startProcedure.Name))
             {
@@ -105,14 +131,25 @@ namespace StepBro.UI.WinForms
                 else if (m_mode == Mode.ClickToStop)
                 {
                     this.SendCommand(ButtonCommand.ShowActive);
+                    this.SendCommand(ButtonCommand.ShowStopSymbol);
                 }
-                m_execution = m_coreAccess.StartExecution(m_startProcedure.Name, m_startProcedure.Partner, m_startProcedure.TargetObject, null);
+
+                string element = m_startProcedure.Name;
+                if (element == null) { element = m_parentControl.ParentElement.TryGetChildProperty("Element") as string; }
+                string partner = m_startProcedure.Partner;
+                if (partner == null) { partner = m_parentControl.ParentElement.TryGetChildProperty("Partner") as string; }
+                string instance = m_startProcedure.TargetObject;
+                if (instance == null) { instance = m_parentControl.ParentElement.TryGetChildProperty("Instance") as string; }
+
+                List<object> arguments = m_startProcedure.Arguments;
+
+                m_execution = m_coreAccess.StartExecution(element, partner, instance, (arguments != null) ? arguments.ToArray() : null);
                 m_execution.CurrentStateChanged += Execution_CurrentStateChanged;
                 System.Diagnostics.Debug.WriteLine("StartProcedure End");
             }
         }
 
-        private void StopProcedure()
+        private void DoStopProcedure()
         {
             if (m_execution != null && !m_execution.State.HasEnded())
             {
@@ -140,10 +177,7 @@ namespace StepBro.UI.WinForms
                     m_execution.CurrentStateChanged -= Execution_CurrentStateChanged;
                     m_execution = null;
                     this.SendCommand(ButtonCommand.Enable);
-                    if (m_mode == Mode.ClickToStop)
-                    {
-                        this.SendCommand(ButtonCommand.ShowNormal);
-                    }
+                    this.SendCommand(ButtonCommand.ShowNormal);
                 }
             }
         }
@@ -152,7 +186,7 @@ namespace StepBro.UI.WinForms
         {
             if (m_mode == Mode.ActivateOnClick)
             {
-                this.StartProcedure();
+                this.DoStartProcedure();
             }
         }
 
@@ -160,7 +194,7 @@ namespace StepBro.UI.WinForms
         {
             if (m_mode == Mode.RunWhilePushed)
             {
-                this.StartProcedure();
+                this.DoStartProcedure();
             }
         }
 
@@ -168,7 +202,7 @@ namespace StepBro.UI.WinForms
         {
             if (m_mode == Mode.RunWhilePushed)
             {
-                this.StopProcedure();
+                this.DoStopProcedure();
             }
         }
 
@@ -176,11 +210,11 @@ namespace StepBro.UI.WinForms
         {
             if (@checked)
             {
-                this.StartProcedure();
+                this.DoStartProcedure();
             }
             else
             {
-                this.StopProcedure();
+                this.DoStopProcedure();
             }
         }
     }

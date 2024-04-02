@@ -26,6 +26,8 @@ namespace StepBro.Core.Parser
         private readonly ScriptFile m_file = null;
         public static readonly AccessModifier DefaultAccess = AccessModifier.Public;
         private static FileBuilder m_lastInstance = null;
+        private static StepBroListener m_lastListener = null;
+        private static ErrorCollector m_lastErrors = null;
 
         internal FileBuilder(AntlrInputStream code, IAddonManager addons = null, ScriptFile file = null)
         {
@@ -48,6 +50,8 @@ namespace StepBro.Core.Parser
 
         public static ServiceManager.IServiceManagerAdministration LastServiceManager { get; internal set; }
         public static FileBuilder LastInstance { get { return m_lastInstance; } }
+        internal static StepBroListener LastListener { get { return m_lastListener; } }
+        internal static ErrorCollector LastErrors { get { return m_lastErrors; } }
 
         internal static FileBuilder Create(string content, Type typeUsing = null, Type[] typeNamespaces = null)
         {
@@ -193,76 +197,76 @@ namespace StepBro.Core.Parser
             ITokenSource lexer = new Grammar.StepBroLexer(new AntlrInputStream(content));
             ITokenStream tokens = new CommonTokenStream(lexer);
             var parser = new SBP(tokens);
-            ErrorCollector errors = (file != null) ? file.Errors as ErrorCollector : new ErrorCollector(null, false);
-            parser.AddErrorListener(errors);
+            m_lastErrors = (file != null) ? file.Errors as ErrorCollector : new ErrorCollector(null, false);
+            parser.AddErrorListener(m_lastErrors);
             parser.BuildParseTree = true;
-            StepBroListener listener = new StepBroListener(errors, null, file ?? new ScriptFile());
-            listener.PrepareForExpressionParsing("StepBroFileBuilder.ParsePrimary");
+            m_lastListener = new StepBroListener(m_lastErrors, null, file ?? new ScriptFile());
+            m_lastListener.PrepareForExpressionParsing("StepBroFileBuilder.ParsePrimary");
             var context = parser.primary();
 
             ParseTreeWalker walker = new ParseTreeWalker();
-            walker.Walk(listener, context);
+            walker.Walk(m_lastListener, context);
 
-            if (errors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
+            if (m_lastErrors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
 
-            return listener.GetExpressionResult();
+            return m_lastListener.GetExpressionResult();
         }
 
         internal static Data.PropertyBlock ParsePropertyBlock(string content)
         {
-            ErrorCollector errors = new ErrorCollector(null);
+            m_lastErrors = new ErrorCollector(null);
             ITokenSource lexer = new Grammar.StepBroLexer(new AntlrInputStream(content));
             ITokenStream tokens = new CommonTokenStream(lexer);
             var parser = new SBP(tokens);
-            parser.AddErrorListener(errors);
+            parser.AddErrorListener(m_lastErrors);
             parser.BuildParseTree = true;
-            StepBroListener listener = new StepBroListener(errors);
+            m_lastListener = new StepBroListener(m_lastErrors);
             var context = parser.elementPropertyblock();
 
             ParseTreeWalker walker = new ParseTreeWalker();
-            walker.Walk(listener, context);
+            walker.Walk(m_lastListener, context);
 
-            if (errors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
+            if (m_lastErrors.ErrorCount > 0) throw new ParsingErrorException("PARSING ERRORS");
 
-            return listener.PopPropertyBlockData();
+            return m_lastListener.PopPropertyBlockData();
         }
 
         internal static IDatatable ParseDatatable(string content)
         {
-            ErrorCollector errors = new ErrorCollector(null);
+            m_lastErrors = new ErrorCollector(null);
             ITokenSource lexer = new Grammar.StepBroLexer(new AntlrInputStream(content));
             ITokenStream tokens = new CommonTokenStream(lexer);
             var parser = new SBP(tokens);
-            parser.AddErrorListener(errors);
+            parser.AddErrorListener(m_lastErrors);
             parser.BuildParseTree = true;
-            StepBroListener listener = new StepBroListener(errors);
+            m_lastListener = new StepBroListener(m_lastErrors);
             var context = parser.datatableOnly();
 
             ParseTreeWalker walker = new ParseTreeWalker();
-            walker.Walk(listener, context);
+            walker.Walk(m_lastListener, context);
 
-            if (errors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
+            if (m_lastErrors.ErrorCount > 0) throw new ParsingErrorException("PARSING ERRORS");
 
-            return listener.GetLastDatatable();
+            return m_lastListener.GetLastDatatable();
         }
 
         internal static List<Tuple<string, TypeReference, object>> ParseDatatableRow(string content)
         {
-            ErrorCollector errors = new ErrorCollector(null);
+            m_lastErrors = new ErrorCollector(null);
             ITokenSource lexer = new Grammar.StepBroLexer(new AntlrInputStream(content));
             ITokenStream tokens = new CommonTokenStream(lexer);
             var parser = new SBP(tokens);
-            parser.AddErrorListener(errors);
+            parser.AddErrorListener(m_lastErrors);
             parser.BuildParseTree = true;
-            StepBroListener listener = new StepBroListener(errors);
+            m_lastListener = new StepBroListener(m_lastErrors);
             var context = parser.datatableRow();
 
             ParseTreeWalker walker = new ParseTreeWalker();
-            walker.Walk(listener, context);
+            walker.Walk(m_lastListener, context);
 
-            if (errors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
+            if (m_lastErrors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
 
-            return listener.GetLastDatatableRow();
+            return m_lastListener.GetLastDatatableRow();
         }
 
         internal static void ParseKeywordProcedureCall(string content)
@@ -499,16 +503,24 @@ namespace StepBro.Core.Parser
             var addons = services.Get<IAddonManager>();
             var filesManager = services.Get<ILoadedFilesManager>();
             var shortcutsManager = ServiceManager.Global.Get<IFolderManager>();
+            var configFileManager = ServiceManager.Global.Get<IConfigurationFileManager>();
+
+            configFileManager.ResetFolderConfigurations();
 
             var filesToParse = new List<ScriptFile>();
-            if (topfile != null)
+            if (topfile == null)
             {
-                filesToParse.Add(topfile as ScriptFile);
+                topfile = filesManager.TopScriptFile as ScriptFile;
             }
-            else
+            filesToParse.Add(topfile as ScriptFile);
+
+            object parserUser = new object();
+            var filesInTreeBeforeParsing = ((ScriptFile)topfile).ListResolvedFileUsings(false, true).Append(topfile as ScriptFile).Distinct().ToList();
+            foreach (var file in filesInTreeBeforeParsing)
             {
-                filesToParse.Add(filesManager.TopScriptFile as ScriptFile);
+                file.RegisterDependant(parserUser);
             }
+
             var fileListeners = new Dictionary<ScriptFile, StepBroListener>();
             var fileContexts = new Dictionary<ScriptFile, SBP.CompilationUnitContext>();
             var namespaceFiles = new Dictionary<string, IdentifierInfo>();
@@ -520,6 +532,7 @@ namespace StepBro.Core.Parser
             while (fileParsingStack.Count > 0)
             {
                 var file = fileParsingStack.Dequeue();
+                file.ResetBeforeParsing();
                 file.MarkForTypeScanning();
                 ITokenSource lexer = new Grammar.StepBroLexer(file.GetParserFileStream(services.Get<ITextFileSystem>()));
                 ITokenStream tokens = new CommonTokenStream(lexer);
@@ -576,7 +589,7 @@ namespace StepBro.Core.Parser
                 }
 
                 file.ResolveFileUsings(
-                    fu =>
+                    (fu, line) =>
                     {
                         string basefolder = Path.GetDirectoryName(file.GetFullPath());
                         var fuName = Path.GetFileName(fu);
@@ -607,9 +620,21 @@ namespace StepBro.Core.Parser
                         {
                             string error = null;
                             string path = shortcutsManager.ListShortcuts().ResolveShortcutPath(fu, ref error);
-                            if (System.IO.File.Exists(path))
+                            if (String.IsNullOrEmpty(path))
                             {
-                                foundMatchingFile = path;
+                                string errorText = ".";
+                                if (!String.IsNullOrEmpty(error))
+                                {
+                                    errorText = "; " + error;
+                                }
+                                file.ErrorsInternal.SymanticError(line, -1, false, $"Parsing '{file.FileName}': Unable to resolve using path \"{fu}\"{errorText}");
+                            }
+                            else
+                            {
+                                if (System.IO.File.Exists(path))
+                                {
+                                    foundMatchingFile = path;
+                                }
                             }
                         }
                         else if (fu.Contains("\\") || fu.Contains("/"))     // It's a relative or absolute path
@@ -632,6 +657,47 @@ namespace StepBro.Core.Parser
                                     break;
                                 }
 
+                                var cfgFile = Path.GetFullPath(Path.Combine(basefolder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
+                                if (System.IO.File.Exists(cfgFile))
+                                {
+                                    var folderConfig = file.TryOpenFolderConfiguration(configFileManager, line, cfgFile);
+
+
+                                    //var errors = new List<Tuple<int, string>>();
+                                    //var folderConfig = configFileManager.ReadFolderConfig(cfgFile, errors);
+
+                                    //if (errors.Count > 0)
+                                    //{
+                                    //    var errortext = "";
+                                    //    foreach (var e in errors)
+                                    //    {
+                                    //        if (e.Item1 <= 0) errortext = $"Config file '{cfgFile}': {e.Item2}";
+                                    //        else errortext = $"Config file '{cfgFile}' line {e.Item1}: {e.Item2}";
+                                    //    }
+
+                                    //    file.ErrorsInternal.ConfigError(line, 0, errortext);
+                                    //}
+
+                                    if (folderConfig != null)
+                                    {
+                                        //file.AddFolderConfig(folderConfig);
+
+                                        foreach (var lib in folderConfig.LibFolders)
+                                        {
+                                            path = Path.GetFullPath(Path.Combine(basefolder, lib, fu));
+                                            if (System.IO.File.Exists(path))
+                                            {
+                                                foundMatchingFile = path;
+                                                break;
+                                            }
+                                        }
+                                        if (folderConfig.IsSearchRoot)
+                                        {
+                                            break;  // Don't search deeper now.
+                                        }
+                                    }
+                                }
+
                                 // Not found yet; try the parent folder.
                                 basefolder = Path.GetDirectoryName(basefolder);
                             }
@@ -640,10 +706,10 @@ namespace StepBro.Core.Parser
                         if (foundMatchingFile != null)
                         {
                             // Load and add file to fileParsingStack
-                            object dummyUser = new object();    // The parser will set the current scriptfile as a dependant.
-                            if (Main.LoadScriptFile(user: dummyUser, filepath: foundMatchingFile) is ScriptFile loadedFile)
+                            if (Main.LoadScriptFile(parserUser, filepath: foundMatchingFile) is ScriptFile loadedFile)
                             {
-                                loadedFile.UnregisterDependant(dummyUser);
+                                // Note: The parser will set the current scriptfile as a dependant.
+
                                 fileParsingStack.Enqueue(loadedFile);
                                 filesToParse.Add(loadedFile);
                                 return loadedFile;
@@ -696,6 +762,31 @@ namespace StepBro.Core.Parser
                 );
 
             }
+
+            foreach (var file in filesToParse)
+            {
+                if (!file.AllFolderConfigsRead)
+                {
+                    string basefolder = Path.GetDirectoryName(file.GetFullPath());
+
+                    while (basefolder != Path.GetPathRoot(basefolder))
+                    {
+                        var cfgFile = Path.GetFullPath(Path.Combine(basefolder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
+                        if (System.IO.File.Exists(cfgFile))
+                        {
+                            var folderConfig = file.TryOpenFolderConfiguration(configFileManager, -1, cfgFile);
+                            if (folderConfig != null && folderConfig.IsSearchRoot)
+                            {
+                                break;  // Don't search deeper now.
+                            }
+                        }
+
+                        // Not found yet; try the parent folder.
+                        basefolder = Path.GetDirectoryName(basefolder);
+                    }
+                }
+            }
+
             #endregion
 
             //===================================================//
@@ -735,7 +826,7 @@ namespace StepBro.Core.Parser
                 {
                     foreach (var element in fileScanData.TopElement.Childs)
                     {
-                        var firstPropFlag = (element.PropertyFlags != null) ? element.PropertyFlags[0] : null; 
+                        var firstPropFlag = (element.PropertyFlags != null) ? element.PropertyFlags[0] : null;
                         var accessModifier = (element.Modifiers != null && element.Modifiers.Count > 0) ? (AccessModifier)Enum.Parse(typeof(AccessModifier), element.Modifiers[0], true) : DefaultAccess;
                         switch (element.Type)
                         {
@@ -777,14 +868,14 @@ namespace StepBro.Core.Parser
                                 break;
                             case FileElementType.Override:
                                 {
-                                    var overrider = new FileElementOverride(file, element.Line, null, file.Namespace, element.Name);
+                                    var overrider = file.CreateOrGetOverrideElement(element.Line, element.Name);
                                     overrider.SetAsType(element.AsType);
                                     file.AddElement(overrider);
                                 }
                                 break;
                             case FileElementType.TypeDef:
                                 {
-                                    var typedef = new FileElementTypeDef(file, element.Line, file.Namespace, element.Name);
+                                    var typedef = file.CreateOrGetTypeDefElement(element.Line, element.Name);
                                     typedef.SetDeclaration(element.DataType);
                                     file.AddElement(typedef);
                                 }
@@ -826,7 +917,7 @@ namespace StepBro.Core.Parser
                 file.UpdateRootIdentifiers();
             }
 
-            var numberItemsToParse = (signaturesToParseNow.Count > 0 ) ? int.MaxValue - 1 : 0;
+            var numberItemsToParse = (signaturesToParseNow.Count > 0) ? int.MaxValue - 1 : 0;
             var numberUnparsedItemsBefore = int.MaxValue;
             var signaturesToParseAgain = new List<Tuple<FileElement, StepBroListener>>();
             // Continue parsing signatures until no more elements can be resolved
@@ -912,12 +1003,30 @@ namespace StepBro.Core.Parser
                         file.LastSuccessfulParsing = file.LastParsing;
                     }
                 }
+#if DEBUG
+                // Dump the id's of all the elements
+                foreach (var file in filesToParse)
+                {
+                    foreach (var element in file.ListElements())
+                    {
+                        System.Diagnostics.Debug.WriteLine(file.FileName + ": " + element.UniqueID.ToString() + " " + element.Name);
+                    }
+                }
+#endif
             }
             finally
             {
+                foreach (var file in filesInTreeBeforeParsing)
+                {
+                    file.UnregisterDependant(parserUser);
+                }
                 foreach (var file in filesToParse)
                 {
                     file.DisposeFileStream();
+                    if (file.IsDependantOf(parserUser))
+                    {
+                        file.UnregisterDependant(parserUser);
+                    }
                 }
             }
             #endregion

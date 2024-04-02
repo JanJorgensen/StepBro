@@ -233,6 +233,15 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual("{ ak = [ 3, 2, 1, 0, 300, 320 ] }", block3.GetTestString());
         }
 
+        [TestMethod]
+        public void TestPropertyCommaAtTheEnd()
+        {
+            var block1 = FileBuilder.ParsePropertyBlock("{ ak = 4, am = true, ad = 20 }");
+            Assert.AreEqual(0, FileBuilder.LastErrors.WarningCount);
+            block1 = FileBuilder.ParsePropertyBlock("{ ak = 4, am = true, ad = 20, }");
+            Assert.AreEqual(1, FileBuilder.LastErrors.WarningCount);
+        }
+
         #region Utils
         private void AssertBlockWithOneValue(PropertyBlock block, string name, object expected)
         {

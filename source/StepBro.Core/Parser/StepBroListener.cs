@@ -121,6 +121,11 @@ namespace StepBro.Core.Parser
             }
         }
 
+        public override void EnterNamespaceErroneousDeclaration([NotNull] SBP.NamespaceErroneousDeclarationContext context)
+        {
+            m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Namespace should be declared after the last \"using\" statement.");
+        }
+
         public override void EnterNamespace([NotNull] SBP.NamespaceContext context)
         {
             this.PrepareForExpressionParsing("namespace");
@@ -713,7 +718,7 @@ namespace StepBro.Core.Parser
 
         public override void EnterFileElementOverride([NotNull] SBP.FileElementOverrideContext context)
         {
-            m_currentFileElement = new FileElementOverride(m_file, context.Start.Line, null, m_currentNamespace, "");
+            m_currentFileElement = new FileElementOverride(m_file, context.Start.Line, null, "");
         }
 
         public override void ExitFileElementOverride([NotNull] SBP.FileElementOverrideContext context)

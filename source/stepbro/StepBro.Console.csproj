@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>stepbro</AssemblyName>
     <RootNamespace>StepBro</RootNamespace>
     <OutputPath>..\bin</OutputPath>
@@ -15,7 +15,7 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <Platforms>AnyCPU</Platforms>
-    <Version>0.2.16</Version>
+    <Version>0.2.21</Version>
     <Company>SchmutStein</Company>
   </PropertyGroup>
 
@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Modules\StepBro.TestInterface\StepBro.TestInterface.csproj" />
     <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
   </ItemGroup>
 

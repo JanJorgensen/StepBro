@@ -12,12 +12,12 @@ namespace StepBroCoreTest
     [TestClass]
     public class TestFolderShortcuts
     {
-        FolderCollection m_collection = null;
+        FolderShortcutCollection m_collection = null;
 
         [TestInitialize]
         public void Setup()
         {
-            m_collection = new FolderCollection(FolderShortcutOrigin.HostApplication);
+            m_collection = new FolderShortcutCollection(FolderShortcutOrigin.HostApplication);
             m_collection.AddShortcut("Anna", @"C:\temp");
             m_collection.AddShortcut("Betina", @"[Anna]");
             m_collection.AddShortcut("Christina", @"[Anna]\sub");

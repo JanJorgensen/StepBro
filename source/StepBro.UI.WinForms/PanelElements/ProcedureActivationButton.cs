@@ -17,8 +17,8 @@ namespace StepBro.UI.WinForms.PanelElements
     {
         private enum Mode { ActivateOnClick = 0, ClickToStop, RunWhilePushed }
         private ProcedureActivationInfo m_startProcedure;
-        private ProcedureActivationInfo m_stopProcedure;
-        private ProcedureActivationInfo m_enabledCheckProcedure;
+        //private ProcedureActivationInfo m_stopProcedure;
+        //private ProcedureActivationInfo m_enabledCheckProcedure;
         private Mode m_mode = Mode.ActivateOnClick;
         private IExecutionAccess m_execution = null;
         private Color m_buttonColorNormal = Color.White;

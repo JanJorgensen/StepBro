@@ -24,7 +24,12 @@ namespace StepBro.Core.Data
 
         public override SerializablePropertyBlockEntry CloneForSerialization()
         {
-            return new SerializablePropertyBlockFlag() { Name = this.Name, SpecifiedType = this.SpecifiedTypeName };
+            return new SerializablePropertyBlockFlag()
+            {
+                Name = this.Name,
+                Line = this.Line,
+                SpecifiedType = this.SpecifiedTypeName
+            };
         }
     }
 }

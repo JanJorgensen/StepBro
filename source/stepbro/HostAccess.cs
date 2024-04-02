@@ -16,7 +16,7 @@ namespace StepBro.Cmd
         {
         }
 
-        public override bool IsWPFApplication { get { return false; } }
+        public override HostType Type { get { return HostType.Console; } }
 
         public override IEnumerable<NamedData<object>> ListHostCodeModuleInstances()
         {

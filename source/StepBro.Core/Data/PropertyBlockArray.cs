@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommandLine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -158,9 +159,27 @@ namespace StepBro.Core.Data
             return new SerializablePropertyBlockArray()
             {
                 Name = this.Name,
+                Line = this.Line,
                 SpecifiedType = this.SpecifiedTypeName,
                 Entries = m_entries.Select(e => e.CloneForSerialization()).ToArray()
             };
+        }
+    }
+
+    public static class PropertyBlockArraySupport
+    {
+        public static bool IsStringArray(this PropertyBlockArray array)
+        {
+            foreach (var item in array)
+            {
+                if (item.BlockEntryType != PropertyBlockEntryType.Value) return false;
+                if (!(item as PropertyBlockValue).IsStringOrIdentifier) return false;
+            }
+            return true;
+        }
+        public static List<string> AsStringArray(this PropertyBlockArray array)
+        {
+            return array.Cast<PropertyBlockEntry>().Select(e => (e as PropertyBlockValue).ValueAsString()).ToList();
         }
     }
 }

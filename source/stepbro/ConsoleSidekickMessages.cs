@@ -14,14 +14,19 @@ namespace StepBro.Sidekick.Messages
 
     public class Argument
     {
+        public Argument() { }
+
         public Argument(object value)
         {
             if (value == null) throw new ArgumentNullException("value");
-            if (value is string) { this.Type = "string"; this.Value = value as string; }
-            if (value is long) { this.Type = "int"; this.Value = value.ToString(); }
-            if (value is bool) { this.Type = "bool"; this.Value = value.ToString(); }
-            if (value is Identifier) { this.Type = "identifier"; this.Value = ((Identifier)value).Name; }
-            throw new ArgumentException("value");
+            else if (value is string) { this.Type = "string"; this.Value = value as string; }
+            else if (value is long || value is int) { this.Type = "int"; this.Value = value.ToString(); }
+            else if (value is bool) { this.Type = "bool"; this.Value = value.ToString(); }
+            else if (value is Identifier) { this.Type = "identifier"; this.Value = ((Identifier)value).Name; }
+            else 
+            {
+                throw new ArgumentException("value");
+            }
         }
         public string Type { get; set; } = null;
         public string Value { get; set; } = null;
@@ -48,6 +53,13 @@ namespace StepBro.Sidekick.Messages
         ExecutionStopped,
         GetPanelDefinitions,
         GetObjectExtraData
+    }
+
+    public class Log
+    {
+        public enum Type { Normal, Error }
+        public Type LogType { get; set;} = Type.Normal;
+        public string Text { get; set; }
     }
 
     public class CommandObjectsList
@@ -154,17 +166,6 @@ namespace StepBro.Sidekick.Messages
     //    public string[] Partners { get; set; }
     //}
 
-    public class ObjectCommand
-    {
-        public ObjectCommand(string @object, string command)
-        {
-            this.Object = @object;
-            this.Command = command;
-        }
-        public string Object { get; set; }
-        public string Command { get; set; }
-    }
-
     public class RequestOrResponse
     {
         public RequestOrResponse()
@@ -176,6 +177,18 @@ namespace StepBro.Sidekick.Messages
             this.RequestID = id;
         }
         public ulong RequestID { get; set; }
+        public string ExecutionNote { get; set; } = null;
+    }
+
+    public class ObjectCommand : RequestOrResponse
+    {
+        public ObjectCommand(string @object, string command)
+        {
+            this.Object = @object;
+            this.Command = command;
+        }
+        public string Object { get; set; }
+        public string Command { get; set; }
     }
 
     public class ReleaseRequest : RequestOrResponse
@@ -187,19 +200,19 @@ namespace StepBro.Sidekick.Messages
 
     public class RunScriptRequest : RequestOrResponse
     {
-        public RunScriptRequest(ulong requestID, bool silent, string element, string partner, string objectReference, Argument[] arguments = null) : base(requestID)
+        public RunScriptRequest(ulong requestID, bool silent, string element, string partner, string objectReference, List<Argument> arguments = null) : base(requestID)
         {
             this.Silent = silent;
             this.Element = element;
             this.Partner = partner;
             this.ObjectReference = objectReference;
-            this.Arguments = arguments;
+            this.Arguments = (arguments != null) ? arguments.ToList() : null;
         }
         public bool Silent { get; set; }
         public string Element { get; set; }
         public string Partner { get; set; }
         public string ObjectReference { get; set; }
-        public Argument[] Arguments { get; set; }
+        public List<Argument> Arguments { get; set; } = null;
     }
 
     public class StopExecutionRequest : RequestOrResponse

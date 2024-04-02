@@ -125,13 +125,14 @@ namespace StepBro.Core.Data
         public string Name { get; set; } = null;
         [JsonPropertyOrder(1)]
         public string SpecifiedType { get; set; } = null;
+        public int Line { get; set; } = -1;
         public abstract PropertyBlockEntry CloneAsPropertyBlockEntry();
     }
     public class SerializablePropertyBlockFlag : SerializablePropertyBlockEntry
     {
         public override PropertyBlockEntry CloneAsPropertyBlockEntry()
         {
-            var data = new PropertyBlockFlag(-1, this.Name);
+            var data = new PropertyBlockFlag(this.Line, this.Name);
             data.SpecifiedTypeName = SpecifiedType;
             return data;
         }
@@ -140,7 +141,7 @@ namespace StepBro.Core.Data
     {
         public override PropertyBlockEntry CloneAsPropertyBlockEntry()
         {
-            var data = new PropertyBlockValue(-1, this.Name, null);
+            var data = new PropertyBlockValue(this.Line, this.Name, null);
             data.SpecifiedTypeName = SpecifiedType;
             return data;
         }
@@ -152,7 +153,7 @@ namespace StepBro.Core.Data
 
         public override PropertyBlockEntry CloneAsPropertyBlockEntry()
         {
-            var data = new PropertyBlockValue(-1, this.Name, this.Value);
+            var data = new PropertyBlockValue(this.Line, this.Name, this.Value);
             data.SpecifiedTypeName = SpecifiedType;
             return data;
         }
@@ -164,7 +165,7 @@ namespace StepBro.Core.Data
 
         public override PropertyBlockEntry CloneAsPropertyBlockEntry()
         {
-            var data = new PropertyBlockValue(-1, this.Name, this.Value);
+            var data = new PropertyBlockValue(this.Line, this.Name, this.Value);
             data.SpecifiedTypeName = SpecifiedType;
             return data;
         }
@@ -176,7 +177,7 @@ namespace StepBro.Core.Data
 
         public override PropertyBlockEntry CloneAsPropertyBlockEntry()
         {
-            var data = new PropertyBlockValue(-1, this.Name, this.Value);
+            var data = new PropertyBlockValue(this.Line, this.Name, this.Value);
             data.SpecifiedTypeName = SpecifiedType;
             return data;
         }
@@ -188,7 +189,7 @@ namespace StepBro.Core.Data
 
         public override PropertyBlockEntry CloneAsPropertyBlockEntry()
         {
-            var data = new PropertyBlockValue(-1, this.Name, (Identifier)this.Value);
+            var data = new PropertyBlockValue(this.Line, this.Name, (Identifier)this.Value);
             data.SpecifiedTypeName = SpecifiedType;
             return data;
         }
@@ -200,7 +201,7 @@ namespace StepBro.Core.Data
 
         public override PropertyBlockEntry CloneAsPropertyBlockEntry()
         {
-            var block = new PropertyBlock(-1, this.Name);
+            var block = new PropertyBlock(this.Line, this.Name);
             block.SpecifiedTypeName = SpecifiedType;
             block.AddRange(this.Entries.Select(e => e.CloneAsPropertyBlockEntry()));
             return block;
@@ -213,7 +214,7 @@ namespace StepBro.Core.Data
 
         public override PropertyBlockEntry CloneAsPropertyBlockEntry()
         {
-            var block = new PropertyBlockArray(-1, this.Name);
+            var block = new PropertyBlockArray(this.Line, this.Name);
             block.SpecifiedTypeName = SpecifiedType;
             block.AddRange(this.Entries.Select(e => e.CloneAsPropertyBlockEntry()));
             return block;
@@ -226,7 +227,7 @@ namespace StepBro.Core.Data
 
         public override PropertyBlockEntry CloneAsPropertyBlockEntry()
         {
-            var data = new PropertyBlockEvent(-1, this.Name, this.Verdict);
+            var data = new PropertyBlockEvent(this.Line, this.Name, this.Verdict);
             data.SpecifiedTypeName = SpecifiedType;
             return data;
         }

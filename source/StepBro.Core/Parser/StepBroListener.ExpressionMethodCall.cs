@@ -160,7 +160,7 @@ namespace StepBro.Core.Parser
                         return;
 
                     case SBExpressionType.Identifier:
-                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"\"{left.ToString()}\" is unresolved.");
+                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"\"{(string)(left.Value)}\" is unresolved.");
                         return;
 
                     case SBExpressionType.Expression:
@@ -720,7 +720,13 @@ namespace StepBro.Core.Parser
                             break;
                     }
                 }
-
+                else
+                {
+                    m_expressionData.Push(
+                        new SBExpressionData(
+                            HomeType.Immediate,
+                            SBExpressionType.ExpressionError));
+                }
                 #endregion
             }
             catch (Exception e)
@@ -880,7 +886,7 @@ namespace StepBro.Core.Parser
                         }
                         else if (IsParameterAssignableFromArgument(p, argPicker.Current))
                         {
-                            var a = argPicker.Pick();
+                            var a = ResolveForGetOperation(argPicker.Pick(), (TypeReference)p.ParameterType);
                             if (p.ParameterType == typeof(object))
                             {
                                 a = a.NewExpressionCode(Expression.Convert(a.ExpressionCode, typeof(object)));
@@ -898,6 +904,12 @@ namespace StepBro.Core.Parser
                         {
                             suggestedAssignmentsOut.Add(new SBExpressionData(Expression.Convert(argPicker.Pick().ExpressionCode, p.ParameterType)));
                             matchScore -= 5;    // Matching a 'single' is not as good as matching the exact same type.
+                            continue;   // next parameter
+                        }
+                        else if (argPicker.Current.DataType.IsInt() && (p.ParameterType == typeof(Double) || p.ParameterType == typeof(Single)))
+                        {
+                            suggestedAssignmentsOut.Add(new SBExpressionData(Expression.Convert(argPicker.Pick().ExpressionCode, p.ParameterType)));
+                            matchScore -= 20;    // Matching an integer is not as good as matching the exact same type.
                             continue;   // next parameter
                         }
                         else
@@ -1207,7 +1219,20 @@ namespace StepBro.Core.Parser
             if (parameter.ParameterType.IsByRef)
             {
                 if (argument.ReferencedType != SBExpressionType.LocalVariableReference) return false;   // TODO: report reason for rejection.
-                return (parameter.ParameterType == argument.DataType.Type);  // Whtn ByRef type must be exactly the same (I think).
+                return (parameter.ParameterType == argument.DataType.Type);  // When it's a ByRef, the type must be exactly the same (I think).
+            }
+            if (typeof(IValueContainer).IsAssignableFrom(argument.DataType.Type) && !typeof(IValueContainer).IsAssignableFrom(parameter.ParameterType))
+            {
+                if (argument.DataType.Type.IsGenericType && 
+                    argument.DataType.Type.GetGenericTypeDefinition() == typeof(IValueContainer<>) &&
+                    parameter.ParameterType.IsAssignableFrom(argument.DataType.Type.GenericTypeArguments[0]))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             return parameter.ParameterType.IsAssignableFrom(argument.DataType.Type);
         }

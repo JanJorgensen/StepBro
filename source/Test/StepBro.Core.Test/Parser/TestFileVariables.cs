@@ -8,6 +8,7 @@ using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Api;
+using StepBro.Core.Execution;
 
 namespace StepBroCoreTest.Parser
 {
@@ -182,6 +183,39 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(19L, result);
         }
 
+        [TestMethod]
+        public void TestFileVariableUsedAsArgument()
+        {
+            var f = new StringBuilder();
+            f.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");
+            f.AppendLine("namespace ObjectUsing;");
+            f.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool = " + typeof(DummyInstrumentClass).Name + "{}");
+            f.AppendLine("procedure void Proc(" + typeof(DummyInstrumentClass).Name + " a)");
+            f.AppendLine("{");
+            f.AppendLine("}");
+            f.AppendLine("procedure void ProcWithCall()");
+            f.AppendLine("{");
+            f.AppendLine("   Proc(myTool);");
+            f.AppendLine("}");
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f.ToString()));
+
+            Assert.AreEqual("ObjectUsing", files[0].Namespace);
+
+            var variable = files[0].ListElements().First(p => p.Name == "myTool") as FileVariable;
+            Assert.IsNotNull(variable);
+            var variableObject = variable.VariableOwnerAccess.Container.GetValue() as INameable;
+            Assert.IsNotNull(variableObject);
+            Assert.AreEqual("myTool", variableObject.Name);
+
+            var procedure = files[0].ListElements().First(p => p.Name == "ProcWithCall") as IFileProcedure;
+            var taskContext = ExecutionHelper.ExeContext();
+            var result = taskContext.CallProcedure(procedure);
+            //Assert.AreEqual(44L, result);
+        }
+
+
+
         internal IFileProcedure CreateTestFile(string returnStatement)
         {
             var f = new StringBuilder();
@@ -252,6 +286,10 @@ namespace StepBroCoreTest.Parser
             this.IntA = valueA;
         }
 
+        public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+        {
+        }
+
         public void Setup(ILogger logger, PropertyBlock data)
         {
             bool errors = false;
@@ -313,6 +351,13 @@ namespace StepBroCoreTest.Parser
         public void DoSomethingElse()
         {
             this.IntA /= 4;
+        }
+
+        public void Work([Implicit] ICallContext context)
+        {
+            if (context != null) context.Logger.Log("Work Method!");
+
+            this.IntA *= 3; 
         }
     }
 }

@@ -190,8 +190,10 @@ namespace StepBro.Core.Execution
         {
             var internalContext = (context is ScriptCallContext) ? context as ScriptCallContext : (context as CallContext).ParentContext as ScriptCallContext;
             var report = internalContext.TryGetReport();
-
-            DataReport.AddMeasurement(context, report, id, instance, unit, value);
+            if (report != null)
+            {
+                DataReport.AddMeasurement(context, report, id, instance, unit, value);
+            }
         }
 
         [Public]

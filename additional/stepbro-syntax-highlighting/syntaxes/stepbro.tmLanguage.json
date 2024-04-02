@@ -40,27 +40,35 @@
             [
                 {
                     "name": "keyword.control.stepbro",
-                    "match": "\\b(if|while|for|return)\\b"
+                    "match": "\\b(if|while|for|return|else)\\b"
                 },
                 {
                     "name": "keyword.other.types.stepbro",
-                    "match": "\\b(bool|void|testlist|int|string|type|namespace)\\b"
+                    "match": "\\b(bool|void|testlist|int|integer|decimal|verdict|datetime|timespan|string|type|namespace|var|double|object)\\b"
                 },
                 {
                     "name": "keyword.other.step.stepbro",
-                    "match": "step"
+                    "match": "\\b(step)\\b"
                 },
                 {
                     "name": "keyword.other.using.stepbro",
-                    "match": "using"
+                    "match": "\\b([public ]*using)\\b"
                 },
                 {
                     "name": "keyword.other.stepbro",
                     "match": "\\b(true|false|override|this)\\b"
                 },
                 {
-                    "name": "keyword.control.partner.stepbro",
-                    "match": "partner"
+                    "name": "keyword.other.partner.stepbro",
+                    "match": "\\b(partner)\\b"
+                },
+                {
+                    "name": "entity.other.attribute-name.await.stepbro",
+                    "match": "\\b(await)\\b"
+                },
+                {
+                    "name": "keyword.other.as.stepbro",
+                    "match": "\\b(as)\\b"
                 }
             ]
         },
@@ -84,7 +92,7 @@
             [
                 {
                     "name": "entity.name.function.stepbro",
-                    "match": "procedure"
+                    "match": "\\b(procedure|function)\\b"
                 },
                 {
                     "name": "keyword.other.protection.stepbro",
@@ -96,7 +104,7 @@
                 },
                 {
                     "name": "entity.name.function.inherited.stepbro",
-                    "match": "(?<=procedure .*:[ ]*)[a-zA-Z][a-zA-Z0-9]*"
+                    "match": "(?<=(procedure|function) .*:[ ]*)[a-zA-Z][a-zA-Z0-9]*"
                 },
                 {
                     "name": "entity.name.function.override.stepbro",
@@ -149,7 +157,7 @@
             [
                 {
                     "name": "support.type.built-in.object-name.stepbro",
-                    "match": "(?<=(public|private)) (?!procedure)[a-zA-Z][a-zA-Z0-9]*"
+                    "match": "(?<=(public|private)) (?!(procedure|function))[a-zA-Z][a-zA-Z0-9]*"
                 },
                 {
                     "name": "support.type.argument.stepbro",
@@ -158,6 +166,10 @@
                 {
                     "name": "support.type.argument.stepbro",
                     "match": "(?<=(\\(.*,[ ]*(this)*[ ]*))[a-zA-Z][a-zA-Z0-9]*[ ]+(?![^a-zA-Z])"
+                },
+                {
+                    "name": "support.type.definition.stepbro",
+                    "match": "([a-zA-Z][a-zA-Z0-9]*)[ ]+(?=[a-zA-Z][a-zA-Z0-9]*[ ]*\\=)"
                 }
             ]
         },
@@ -191,11 +203,15 @@
             [
                 {
                     "name": "support.type.built-in.object-name.stepbro",
-                    "match": "(?<=(type)) [a-zA-Z][a-zA-Z0-9]*"
+                    "match": "(?<=(type))[ ]+[a-zA-Z][a-zA-Z0-9]*"
                 },
                 {
                     "name": "support.type.built-in.object-name.stepbro",
                     "match": "(?<=(type [a-zA-Z][a-zA-Z0-9]*[ ]*:))[ ]*[a-zA-Z][a-zA-Z0-9]*"
+                },
+                {
+                    "name": "support.type.override.built-in.object-name.stepbro",
+                    "match": "(?<=(override [a-zA-Z][a-zA-Z0-9]*[ ]+as))[ ]+[a-zA-Z][a-zA-Z0-9]*"
                 }
             ]
         },

@@ -20,12 +20,20 @@ namespace StepBro.Core.ScriptData
         private string m_summary;
         private string m_docReference;
         private static int g_nextID = 1000;
-        private readonly int m_uid = g_nextID++;
+        protected readonly int m_uid = g_nextID++;
         protected PropertyBlock m_propertyBlock = null;
         private readonly List<IPartner> m_partners = new List<IPartner>();
 
         public FileElement(IScriptFile file, int line, IFileElement parentElement, string @namespace, string name, AccessModifier access, FileElementType type)
         {
+            //System.Diagnostics.Debug.WriteLine(
+            //    "~~~~~~~~ FILE ELEMENT " +
+            //    type.ToString().ToUpper() + ": " +
+            //    m_uid.ToString() + " " +
+            //    ((file != null) ? file.FileName : "<no file>") + " - " +
+            //    (String.IsNullOrEmpty(@namespace) ? "" : @namespace) + " " +
+            //    name);
+
             m_parentFile = file;
             m_line = line;
             m_baseElement = null;
@@ -100,11 +108,19 @@ namespace StepBro.Core.ScriptData
             }
             internal set
             {
-                // Assume not the same element.
-                System.Diagnostics.Debug.Assert(value != null && !object.ReferenceEquals(value, this));
-                // Assume not both override elements or elements are from different files.
-                System.Diagnostics.Debug.Assert(this.ElementType != FileElementType.Override || value.ElementType != FileElementType.Override || !Object.ReferenceEquals(m_parentFile, value.ParentFile));
-                m_baseElement = value;
+                // Value can be null if the value the element is overriding has not been defined.
+                // This is for example the case when we have a Device with a specific name, but that name is not defined in the station properties file
+                // and we override that with an element that is defined in the station properties file. (Check issue #172)
+                // Note: This only makes the error message not be an internal error, it does not make it possible to create an
+                //       element with an element that is not defined.
+                if (value != null)
+                {
+                    // Assume not the same element.
+                    System.Diagnostics.Debug.Assert(!object.ReferenceEquals(value, this));
+                    // Assume not both override elements or elements are from different files.
+                    System.Diagnostics.Debug.Assert(this.ElementType != FileElementType.Override || value.ElementType != FileElementType.Override || !Object.ReferenceEquals(m_parentFile, value.ParentFile));
+                    m_baseElement = value;
+                }
             }
         }
 

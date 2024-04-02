@@ -14,9 +14,5 @@ namespace StepBro.UI.WinForms.CustomToolBar
             this.Name = name;
             this.Margin = new Padding(1, 0, 1, 0);
         }
-
-        public void Setup(PropertyBlock definition)
-        {
-        }
     }
 }

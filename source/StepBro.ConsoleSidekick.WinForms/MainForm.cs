@@ -11,7 +11,7 @@ using System.Text.Json.Serialization;
 
 namespace StepBro.ConsoleSidekick.WinForms
 {
-    public partial class MainForm : Form, ICoreAccess
+    public partial class MainForm : Form, ICoreAccess, ILogger
     {
         private Control m_topControl = null;
         private nint m_consoleWindow = 0;
@@ -122,6 +122,7 @@ namespace StepBro.ConsoleSidekick.WinForms
         {
             InitializeComponent();
             toolStripButtonRunCommand.Text = "\u23F5";
+            //toolStripButtonRunCommand.Text = "\u25B6";
             toolStripButtonStopScriptExecution.Text = "\u23F9";
             toolStripButtonAddShortcut.Text = "\u2795";
             toolStripDropDownButtonMainMenu.Text = "\u2630";
@@ -584,7 +585,7 @@ namespace StepBro.ConsoleSidekick.WinForms
             shortcut.Name = "toolStripMenuCommand" + text.Replace(".", "Dot");
             shortcut.Size = new Size(182, 22);
             shortcut.Margin = new Padding(1, shortcut.Margin.Top, 1, shortcut.Margin.Bottom);
-            shortcut.BackColor= Color.Lavender;
+            shortcut.BackColor = Color.Lavender;
             shortcut.ToolTipText = null; // $"Run " + target;
             shortcut.Tag = m_userShortcutItemTag;
             shortcut.Click += ObjectCommandExecutionEntry_ShortcutClick;
@@ -888,13 +889,13 @@ namespace StepBro.ConsoleSidekick.WinForms
                 toolStripComboBoxTool.Enabled = true;
                 toolStripComboBoxToolCommand.Enabled = true;
                 toolStripComboBoxTool.SelectedIndex = selection;
+                toolStripComboBoxTool.SelectionLength = 0;
             }
             else
             {
                 toolStripComboBoxTool.Enabled = false;
                 toolStripComboBoxToolCommand.Enabled = false;
             }
-            toolStripComboBoxTool.SelectionLength = 0;
 
             #endregion
 
@@ -941,7 +942,7 @@ namespace StepBro.ConsoleSidekick.WinForms
                     }
                     newToolBarList.Add(new Tuple<string, UI.WinForms.CustomToolBar.ToolBar>(toolbarVar.FullName, toolBar));
 
-                    toolBar.Setup(toolbarVar.FullName, toolbarVar.ToolBarDefinition.CloneAsPropertyBlockEntry() as PropertyBlock);
+                    toolBar.Setup(this, toolbarVar.FullName, toolbarVar.ToolBarDefinition.CloneAsPropertyBlockEntry() as PropertyBlock);
                 }
 
                 //if (m_panelsDialog == null)
@@ -965,6 +966,7 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             this.Controls.Clear();
             m_customToolStrips = newToolBarList.ToList();
+            m_customToolStrips.Sort((l, r) => r.Item2.Priority.CompareTo(l.Item2.Priority));
             m_customToolStrips.Reverse();
             int tabIndex = m_customToolStrips.Count;
             foreach (var tbData in m_customToolStrips)
@@ -1099,7 +1101,17 @@ namespace StepBro.ConsoleSidekick.WinForms
         {
             var execution = new ExecutionAccess(this, m_pipe);
             m_activeExecutions.Add(new WeakReference<ExecutionAccess>(execution));
-            m_pipe.Send(new RunScriptRequest(execution.ID, false, element, model, objectVariable));
+            List<Argument> arguments = null;
+            if (args != null)
+            {
+                arguments = args.Select(a => new Argument(a)).ToList();
+            }
+            var request = new RunScriptRequest(execution.ID, false, element, model, objectVariable, arguments);
+            if (toolStripTextBoxExeNote.Visible)
+            {
+                request.ExecutionNote = toolStripTextBoxExeNote.Text;
+            }
+            m_pipe.Send(request);
             return execution;
         }
 
@@ -1114,6 +1126,7 @@ namespace StepBro.ConsoleSidekick.WinForms
         {
             private MainForm m_parent;
             private SideKickPipe m_pipe;
+            private TaskExecutionState m_state = TaskExecutionState.StartRequested;
             private bool m_active = true;
 
             public ExecutionAccess(MainForm parent, SideKickPipe pipe)
@@ -1153,7 +1166,14 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             #region IExecutionAccess
 
-            public TaskExecutionState State { get; set; } = TaskExecutionState.StartRequested;
+            public TaskExecutionState State
+            {
+                get { return m_state; }
+                private set
+                {
+                    m_state = value;
+                }
+            }
 
             public object ReturnValue { get; set; }
 
@@ -1183,5 +1203,71 @@ namespace StepBro.ConsoleSidekick.WinForms
         private void toolStripMenuItemDeleteAllShortcuts_Click(object sender, EventArgs e)
         {
         }
+
+        private void toolStripMenuItemExeNoteInput_CheckedChanged(object sender, EventArgs e)
+        {
+            toolStripTextBoxExeNote.Visible = toolStripMenuItemExeNoteInput.Checked;
+            SetExtraFieldsSeparatorVisibility();
+        }
+
+        private void SetExtraFieldsSeparatorVisibility()
+        {
+            toolStripSeparatorExtraFields.Visible = toolStripTextBoxExeNote.Visible;
+        }
+
+        #region ILogger
+
+        bool ILogger.IsDebugging { get { return false; } }
+
+        string ILogger.Location { get { return "Sidekick"; } }
+
+        ILoggerScope ILogger.LogEntering(string location, string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        ILoggerScope ILogger.CreateSubLocation(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        ILogEntry ILogger.Log(string text)
+        {
+            var log = new Log() { LogType = Log.Type.Normal, Text = text };
+            m_pipe.Send(log);
+            System.Diagnostics.Debug.WriteLine("ILogger.LogError: " + text);
+            return null;
+        }
+
+        void ILogger.LogDetail(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ILogger.LogAsync(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ILogger.LogError(string text)
+        {
+            var log = new Log() { LogType = Log.Type.Error, Text = text };
+            m_pipe.Send(log);
+            System.Diagnostics.Debug.WriteLine("ILogger.LogError: " + text);
+        }
+
+        void ILogger.LogUserAction(string text)
+        {
+            var log = new Log() { LogType = Log.Type.Normal, Text = text };
+            m_pipe.Send(log);
+            System.Diagnostics.Debug.WriteLine("ILogger.LogError: " + text);
+        }
+
+        void ILogger.LogSystem(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
     }
 }

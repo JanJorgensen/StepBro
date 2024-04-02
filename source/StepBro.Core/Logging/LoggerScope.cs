@@ -6,17 +6,19 @@ namespace StepBro.Core.Logging
     {
         private enum DisposeOption
         {
-            PublicDisposal, 
-            ProtectedDisposal, 
-            NoDisposal, 
+            PublicDisposal,
+            ProtectedDisposal,
+            NoDisposal,
             DisposedOrEnded
         }
+        private static LoggerScope m_root = null;
         private Logger m_logger;
         private readonly LogEntry m_scopeStartEntry;
         private DisposeOption m_disposeOption;
         private int m_threadID = -1;
         private string m_location;
         private LoggerDynamicLocationSource m_dynamicLocation;
+        private bool m_errorsLogged = false;
 
         internal LoggerScope(Logger logger, LogEntry scopeStartEntry, bool disposeProtected = false, LoggerDynamicLocationSource dynamicLocation = null) : base()
         {
@@ -39,6 +41,8 @@ namespace StepBro.Core.Logging
 
         internal LoggerScope(Logger logger, LogEntry scopeStartEntry, out IService service) : base("LoggerRootScope", out service)
         {
+            //if (m_root != null) throw new InvalidOperationException("A root logger is already created!");
+            m_root = this;
             m_logger = logger;
             m_scopeStartEntry = scopeStartEntry;
             m_disposeOption = DisposeOption.ProtectedDisposal;
@@ -126,6 +130,7 @@ namespace StepBro.Core.Logging
 
         public void LogError(string text)
         {
+            m_errorsLogged = true;
             this.Log(LogEntry.Type.Error, text);
         }
 
@@ -168,51 +173,6 @@ namespace StepBro.Core.Logging
             get { return m_scopeStartEntry; }
         }
 
-        //private class ProtectedLogger : ILogger
-        //{
-        //    private Logger m_scope;
-        //    public ProtectedLogger(Logger scope)
-        //    {
-        //        m_scope = scope;
-        //    }
-
-        //    public bool IsDebugging
-        //    {
-        //        get
-        //        {
-        //            return m_scope.IsDebugging;
-        //        }
-        //    }
-
-        //    public void Log(string location, string text)
-        //    {
-        //        m_scope.Log(location, text);
-        //    }
-
-        //    public void LogDetail(string location, string text)
-        //    {
-        //        m_scope.Log(location, text);
-        //    }
-
-        //    public ILoggerScope LogEntering(string location, string text)
-        //    {
-        //        return m_scope.LogEntering(location, text);
-        //    }
-
-        //    public void LogError(string location, string text)
-        //    {
-        //        m_scope.LogError(location, text);
-        //    }
-
-        //    public void LogSystem(string location, string text)
-        //    {
-        //        m_scope.LogSystem(location, text);
-        //    }
-
-        //    public void LogUserAction(string location, string text)
-        //    {
-        //        m_scope.LogUserAction(location, text);
-        //    }
-        //}
+        public bool ErrorsLogged { get { return m_errorsLogged; } }
     }
 }

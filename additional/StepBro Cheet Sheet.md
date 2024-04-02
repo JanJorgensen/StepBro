@@ -221,7 +221,8 @@ for ( int i = 0 ; i < 40 ; i++ )
 while ( i < 10K ) :
     Title: "Awaiting the thing to happen"       // Added to the log and shown in UI while looping.
     Timeout: 30s,                               // Looping breaks after time has elapsed.
-    Break: "I saw it!",                         // User option for manually breaking loop.
+    Stoppable,                                  // The loop will break if the user wish to stup the script execution.
+    Break: "I saw it!",                         // User option for manually breaking the loop.
     Break: "Error",                             // Another break option.
     CountVar: i                                 // Variable that counts the loop iterations.
 {

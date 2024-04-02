@@ -4,6 +4,7 @@ using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using StepBro.PanelCreator.DummyUI;
 using System;
+using System.Collections.Generic;
 
 namespace StepBro.PanelCreator
 {
@@ -34,6 +35,10 @@ namespace StepBro.PanelCreator
             {
                 m_title = value;
             }
+        }
+
+        public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+        {
         }
 
         public void Setup(ILogger logger, PropertyBlock data)

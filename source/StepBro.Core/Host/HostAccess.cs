@@ -14,7 +14,7 @@ namespace StepBro.Core.Host
         protected HostAccessBase(string name, out IService serviceAccess, params Type[] dependencies) :
             base(name, out serviceAccess, dependencies)
         { }
-        public abstract bool IsWPFApplication { get; }
+        public abstract HostType Type { get; }
         public abstract IEnumerable<NamedData<object>> ListHostCodeModuleInstances();
 
         public abstract IEnumerable<Type> ListHostCodeModuleTypes();
