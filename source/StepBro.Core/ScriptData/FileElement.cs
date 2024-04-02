@@ -112,7 +112,7 @@ namespace StepBro.Core.ScriptData
                 // This is for example the case when we have a Device with a specific name, but that name is not defined in the station properties file
                 // and we override that with an element that is defined in the station properties file. (Check issue #172)
                 // Note: This only makes the error message not be an internal error, it does not make it possible to create an
-                //       element without all necessary fields defined.
+                //       element with an element that is not defined.
                 if (value != null)
                 {
                     // Assume not the same element.
