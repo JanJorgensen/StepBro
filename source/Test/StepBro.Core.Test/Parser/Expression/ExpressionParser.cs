@@ -22,18 +22,14 @@ namespace StepBroCoreTest.Parser
 
         internal static SBExpressionData Parse(string expression)
         {
-            var builder = FileBuilder.ParseExpression(
-                null, new Type[] { typeof(ExpressionParser) },
-                expression);
+            var builder = FileBuilder.ParseExpression(null, [typeof(ExpressionParser)], expression);
             Assert.AreEqual(0, builder.Errors.ErrorCount);
             return builder.Listener.GetExpressionResult();
         }
 
         internal static IErrorCollector ParseError(string expression)
         {
-            var builder = FileBuilder.ParseExpression(
-                null, new Type[] { typeof(ExpressionParser) },
-                expression);
+            var builder = FileBuilder.ParseExpression(null, [typeof(ExpressionParser)], expression);
             return builder.Errors;
         }
 
