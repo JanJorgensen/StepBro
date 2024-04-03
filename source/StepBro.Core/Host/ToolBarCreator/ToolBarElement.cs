@@ -21,10 +21,6 @@ namespace StepBro.ToolBarCreator
         /// </summary>
         IToolBarElement ParentElement { get; }
         /// <summary>
-        /// The name of the parent toolbar's property that holds this element. 
-        /// </summary>
-        string PropertyName { get; }
-        /// <summary>
         /// The logical name of this element.
         /// </summary>
         string ElementName { get; }

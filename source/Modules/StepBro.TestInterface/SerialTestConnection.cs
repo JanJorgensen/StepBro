@@ -936,7 +936,7 @@ namespace StepBro.TestInterface
                 }
                 catch { }
                 
-                if (line != null)
+                if (line != null && line.Length > 0)
                 {
                     if (line[0] == EventLineChar)
                     {

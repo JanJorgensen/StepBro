@@ -254,6 +254,23 @@ namespace StepBro.Core.Parser
             }
         }
 
+        public override void ExitExpSelect([NotNull] SBP.ExpSelectContext context)
+        {
+            var val2 = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var val1 = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var exp = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), targetType: TypeReference.TypeBool, reportIfUnresolved: true).NarrowGetValueType();
+            if (CheckExpressionsForErrors(context, exp, val1, val2))
+            {
+                // TODO: Add some try-catch around this to catch exceptions and report errors.
+
+                m_expressionData.Push(
+                    new SBExpressionData(Expression.Condition(
+                        exp.ExpressionCode, 
+                        val1.ExpressionCode, 
+                        val2.ExpressionCode)));
+            }
+        }
+
         internal Expression MakeAwaitOperation(Expression input, Antlr4.Runtime.ParserRuleContext context, bool expectAwaitable, Type assignmentType)
         {
             var t = input.Type;
@@ -381,7 +398,6 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpBinary([NotNull] SBP.ExpBinaryContext context)
         {
-            var ctxt = context.GetText();
             var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
             var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
             if (CheckExpressionsForErrors(context, first, last))
