@@ -282,47 +282,50 @@ namespace StepBro.Core.Execution
 
             var peaker = reader.Peak();
 
-            ILineReaderEntry last = null;
-            do
+            lock(reader.Sync)
             {
-                if (timeout != default)
+                ILineReaderEntry last = null;
+                do
                 {
-                    lock (reader.Sync)
+                    if (timeout != default)
                     {
-                        if (reader.Current == null)
+                        lock (reader.Sync)
                         {
-                            Monitor.Wait(reader.Sync, 50);
-                        }
-                    }
-                }
-
-                foreach (var entry in peaker)
-                {
-                    // If the entry time was not set, because the reader was empty
-                    // we set it to the first entry in the reader.
-                    if (referenceTime == DateTime.MinValue && reader.LinesHaveTimestamp)
-                    {
-                        referenceTime = entry.Timestamp;
-                        if (limitTime != DateTime.MaxValue)
-                        {
-                            limitTime = referenceTime + limit;
+                            if (reader.Current == null)
+                            {
+                                Monitor.Wait(reader.Sync, 50);
+                            }
                         }
                     }
 
-                    var result = comparer(entry.Text);
-                    if (result != null && (!reader.LinesHaveTimestamp || entry.Timestamp.TimeTill(limitTime) > TimeSpan.Zero))
+                    foreach (var entry in peaker)
                     {
-                        reader.Flush(entry);
-                        return result;
-                    }
-                    last = entry;
-                }
-            } while (DateTime.Now.TimeTill(timeoutTime) > TimeSpan.Zero);
+                        // If the entry time was not set, because the reader was empty
+                        // we set it to the first entry in the reader.
+                        if (referenceTime == DateTime.MinValue && reader.LinesHaveTimestamp)
+                        {
+                            referenceTime = entry.Timestamp;
+                            if (limitTime != DateTime.MaxValue)
+                            {
+                                limitTime = referenceTime + limit;
+                            }
+                        }
 
-            if (flushIfNotFound)
-            {
-                reader.Flush(last);     // First flush until the last seen entry
-                reader.Next();          // ... then also flush the last seen.
+                        var result = comparer(entry.Text);
+                        if (result != null && (!reader.LinesHaveTimestamp || entry.Timestamp.TimeTill(limitTime) > TimeSpan.Zero))
+                        {
+                            reader.Flush(entry);
+                            return result;
+                        }
+                        last = entry;
+                    }
+                } while (DateTime.Now.TimeTill(timeoutTime) > TimeSpan.Zero);
+
+                if (flushIfNotFound)
+                {
+                    reader.Flush(last);     // First flush until the last seen entry
+                    reader.Next();          // ... then also flush the last seen.
+                }
             }
 
             return null;
@@ -360,7 +363,7 @@ namespace StepBro.Core.Execution
                 }
 
                 // We look for the string we want to find
-                var result = reader.Find(null, comparer, true);
+                var result = reader.Find(context, comparer, true);
 
                 // If the string was found
                 if (result != null)

@@ -159,17 +159,15 @@ namespace StepBro.Core.Data
 
         public void Flush(ILineReaderEntry stopAt = null)
         {
-            if (stopAt != null)
+            lock (m_sync)
             {
-                lock (m_sync)
+                if (stopAt != null)
                 {
+
                     m_entry = (LogLineData)stopAt;
                     m_latestTimestamp = m_entry.Timestamp;
                 }
-            }
-            else
-            {
-                lock (m_sync)
+                else
                 {
                     // This timestamp can be significantly off with real-time
                     // but as we get rid of every other entry, there is no better
