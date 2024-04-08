@@ -347,11 +347,9 @@ namespace StepBro.Core.Execution
 
             // As the purpose of Await is to wait for something in real time, we use DateTime.Now as our entry time
             DateTime entry = DateTime.Now;
-            if (context != null && context.LoggingEnabled) context.Logger.Log("Entry-time: \"" + entry + "\"");
 
             // The latest time the timestamp is allowed to be
             DateTime to = (timeout == TimeSpan.MaxValue) ? DateTime.MaxValue : entry + timeout;
-            if (context != null && context.LoggingEnabled) context.Logger.Log("To: \"" + to + "\"");
 
             //bool sleep = false;
             do
