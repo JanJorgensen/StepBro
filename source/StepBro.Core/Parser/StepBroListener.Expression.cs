@@ -410,9 +410,10 @@ namespace StepBro.Core.Parser
                     {
                         if (m_isSimpleExpectWithValue)
                         {
-                            var t = first.DataType.Type;
-                            var valueSaver = s_SaveExpectValueText.MakeGenericMethod(t);
-                            first = new SBExpressionData(Expression.Call(valueSaver, m_currentProcedure.ContextReferenceInternal, first.ExpressionCode));
+                            var valueSaverFirst = s_SaveExpectValueText.MakeGenericMethod(first.DataType.Type);
+                            var valueSaverLast = s_SaveExpectValueText.MakeGenericMethod(last.DataType.Type);
+                            first = new SBExpressionData(Expression.Call(valueSaverFirst, m_currentProcedure.ContextReferenceInternal, first.ExpressionCode, Expression.Constant("Left"), Expression.Constant(true)));
+                            last = new SBExpressionData(Expression.Call(valueSaverLast, m_currentProcedure.ContextReferenceInternal, last.ExpressionCode, Expression.Constant("Right"), Expression.Constant(false)));
                         }
                         var result = op.Resolve(this, first, last);
                         System.Diagnostics.Debug.Assert(result != null);
@@ -506,9 +507,12 @@ namespace StepBro.Core.Parser
             {
                 if (m_isSimpleExpectWithValue)
                 {
-                    var t = middle.DataType.Type;
-                    var valueSaver = s_SaveExpectValueText.MakeGenericMethod(t);
-                    middle = new SBExpressionData(Expression.Call(valueSaver, m_currentProcedure.ContextReferenceInternal, middle.ExpressionCode));
+                    var valueSaverFirst = s_SaveExpectValueText.MakeGenericMethod(first.DataType.Type);
+                    var valueSaverMiddle = s_SaveExpectValueText.MakeGenericMethod(middle.DataType.Type);
+                    var valueSaverLast = s_SaveExpectValueText.MakeGenericMethod(last.DataType.Type);
+                    first = new SBExpressionData(Expression.Call(valueSaverFirst, m_currentProcedure.ContextReferenceInternal, first.ExpressionCode, Expression.Constant("Left"), Expression.Constant(true)));
+                    middle = new SBExpressionData(Expression.Call(valueSaverMiddle, m_currentProcedure.ContextReferenceInternal, middle.ExpressionCode, Expression.Constant("Middle"), Expression.Constant(false)));
+                    last = new SBExpressionData(Expression.Call(valueSaverLast, m_currentProcedure.ContextReferenceInternal, last.ExpressionCode, Expression.Constant("Right"), Expression.Constant(false)));
                 }
 
                 var op1 = context.op1.Type;

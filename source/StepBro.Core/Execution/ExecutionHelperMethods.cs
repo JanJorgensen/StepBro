@@ -862,26 +862,21 @@ namespace StepBro.Core.Execution
         /// </summary>
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="value">Input value</param>
+        /// <param name="resetString">Whether to reset the string</param>
         /// <returns>Input value directly.</returns>
-        public static T SaveExpectValueText<T>(IScriptCallContext context, T value)
+        public static T SaveExpectValueText<T>(IScriptCallContext context, T value, string position, bool resetString)
         {
-            return SaveExpectValueText(context, value, true);
-        }
-
-        /// <summary>
-        /// Helper method to save the value for an expect statement, and then just return the value itself.
-        /// </summary>
-        /// <typeparam name="T">The type of the value.</typeparam>
-        /// <param name="value">Input value</param>
-        /// <param name="resetString">Reset Expect Value String</param>
-        /// <returns>Input value directly.</returns>
-        private static T SaveExpectValueText<T>(IScriptCallContext context, T value, bool resetString)
-        {
-            if (resetString == true)
+            if (resetString)
             {
                 context.ExpectStatementValue = "";
             }
-            context.ExpectStatementValue += StringUtils.ObjectToString(value, false);
+
+            if (context.ExpectStatementValue != "")
+            {
+                context.ExpectStatementValue += ", ";
+            }
+
+            context.ExpectStatementValue += position + ": " + StringUtils.ObjectToString(value, false);
             return value;
         }
 
