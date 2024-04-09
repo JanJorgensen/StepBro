@@ -523,7 +523,7 @@ namespace StepBro.Core.Parser
                     if (middle.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
                     {
                         var valueSaverMiddle = s_SaveExpectValueText.MakeGenericMethod(middle.DataType.Type);
-                        middle = new SBExpressionData(Expression.Call(valueSaverMiddle, m_currentProcedure.ContextReferenceInternal, middle.ExpressionCode, Expression.Constant("MIddle"), Expression.Constant(false)));
+                        middle = new SBExpressionData(Expression.Call(valueSaverMiddle, m_currentProcedure.ContextReferenceInternal, middle.ExpressionCode, Expression.Constant("Middle"), Expression.Constant(false)));
                     }
 
                     if (last.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
