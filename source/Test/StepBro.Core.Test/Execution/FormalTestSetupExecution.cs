@@ -361,6 +361,119 @@ namespace StepBroCoreTest.Execution
         }
 
         [TestMethod]
+        public void TestSetupWithBaseTypesWithBetweenExpect()
+        {
+            var f = new StringBuilder();
+            f.AppendLine("procedure void TestCaseBase() :");
+            f.AppendLine("    FreeParameters,");
+            f.AppendLine("    partner Setup : TestCaseBaseSetup,");
+            f.AppendLine("    partner Cleanup : TestCaseBaseCleanup;");
+            f.AppendLine("procedure void SpecialTestCaseBase() : TestCaseBase,");
+            f.AppendLine("    partner override Setup : SpecialSetup;");
+
+            f.AppendLine("procedure void TestCaseBaseSetup(this TestCaseBase testcase){ log (\"Doing setup for \" + testcase.Name); }");
+            f.AppendLine("procedure void TestCaseBaseCleanup(this TestCaseBase testcase){ log (\"Doing cleanup for \" + testcase.Name); }");
+            f.AppendLine("procedure void SpecialSetup(this TestCaseBase testcase) : TestCaseBaseSetup { log (\"Doing special setup for \" + testcase.Name); }");
+
+            f.AppendLine("procedure void FirstTestCase() : TestCaseBase { expect (3 < 5 < 9); }");
+            f.AppendLine("procedure void SecondTestCase() : TestCaseBase { expect (4 > 7); }");
+            f.AppendLine("procedure void ThirdTestCase() : SpecialTestCaseBase { expect (5 < 7 <= 8); }");
+
+            f.AppendLine("testlist TestSuiteBase :");
+            f.AppendLine("    partner FormalTest : TestSuiteFormalTestExecution;");
+            f.AppendLine("testlist AllTests : TestSuiteBase");
+            f.AppendLine("{");
+            f.AppendLine("   * FirstTestCase");
+            f.AppendLine("   * SecondTestCase");
+            f.AppendLine("   * ThirdTestCase");
+            f.AppendLine("}");
+
+            f.AppendLine("procedure void TestSuiteFormalTestExecution(this TestSuiteBase suite) : NoSubResultInheritance");
+            f.AppendLine("{");
+            f.AppendLine("   var iterator = suite.GetProcedureIterator();");
+            f.AppendLine("   var summary = CreateTestSummary();");
+            f.AppendLine("   while (iterator.GetNext())");
+            f.AppendLine("   {");
+            f.AppendLine("      log (\"Starting Test: \" + iterator.Procedure.Name);");
+            f.AppendLine("      TestCaseBase testcase = iterator.Procedure as TestCaseBase;");
+            f.AppendLine("      testcase.Setup();");
+            f.AppendLine("      iterator.Procedure( iterator.Arguments );");
+            f.AppendLine("      summary.AddResult(testcase.Name, this.LastCallResult);");
+            f.AppendLine("      testcase.Cleanup();");
+            f.AppendLine("   }");
+            f.AppendLine("   log (\"Fails: \" + summary.CountSubFails());");
+            f.AppendLine("}");
+
+            f.AppendLine("procedure void ExecuteAllTests()");
+            f.AppendLine("{");
+            f.AppendLine("   AllTests.FormalTest();");  // 
+            f.AppendLine("}");
+
+            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile.tss", f.ToString()))[0];
+
+            Assert.AreEqual(2, file.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
+            var list = file["AllTests"] as ITestList;
+            Assert.AreEqual("AllTests", list.Name);
+            Assert.AreEqual(3, list.EntryCount);
+            Assert.AreEqual("FirstTestCase", list[0].ReferenceName);
+            Assert.AreEqual("SecondTestCase", list[1].ReferenceName);
+            Assert.AreEqual("ThirdTestCase", list[2].ReferenceName);
+            Assert.AreSame(file["FirstTestCase"], list[0].Reference);
+            Assert.AreSame(file["SecondTestCase"], list[1].Reference);
+            Assert.AreSame(file["ThirdTestCase"], list[2].Reference);
+            Assert.AreEqual("FirstTestCase", list[0].Reference.Name);
+            Assert.AreEqual("SecondTestCase", list[1].Reference.Name);
+            Assert.AreEqual("ThirdTestCase", list[2].Reference.Name);
+            Assert.AreSame(list, list[0].Home);
+            Assert.AreSame(list, list[1].Home);
+            Assert.AreSame(list, list[2].Home);
+
+            var procedure = file.ListElements().First(p => p.Name == "ExecuteAllTests") as IFileProcedure;
+
+            var taskContext = ExecutionHelper.ExeContext();
+            taskContext.CallProcedure(procedure);
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - myfile.ExecuteAllTests - <no arguments>");
+            log.ExpectNext("2 - Pre - 38 myfile.TestSuiteFormalTestExecution - <no arguments>");
+            log.ExpectNext("3 - Normal - 27 Log - Starting Test: FirstTestCase");
+            log.ExpectNext("3 - Pre - 29 myfile.TestCaseBaseSetup - <no arguments>");
+            log.ExpectNext("4 - Normal - 7 Log - Doing setup for FirstTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - 30 <DYNAMIC CALL> myfile.FirstTestCase - ( (<empty>) )");
+            log.ExpectNext("4 - Normal - 10 - EXPECT: 3 < 5 < 9; Left: 3, Middle: 5, Right: 9; Verdict: Pass");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - 32 myfile.TestCaseBaseCleanup - <no arguments>");
+            log.ExpectNext("4 - Normal - 8 Log - Doing cleanup for FirstTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Normal - 27 Log - Starting Test: SecondTestCase");
+            log.ExpectNext("3 - Pre - 29 myfile.TestCaseBaseSetup - <no arguments>");
+            log.ExpectNext("4 - Normal - 7 Log - Doing setup for SecondTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - 30 <DYNAMIC CALL> myfile.SecondTestCase - ( (<empty>) )");
+            log.ExpectNext("4 - Error - 11 - EXPECT: 4 > 7; Left: 4, Right: 7; Verdict: Fail");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - 32 myfile.TestCaseBaseCleanup - <no arguments>");
+            log.ExpectNext("4 - Normal - 8 Log - Doing cleanup for SecondTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Normal - 27 Log - Starting Test: ThirdTestCase");
+            log.ExpectNext("3 - Pre - 29 myfile.SpecialSetup - <no arguments>");
+            log.ExpectNext("4 - Normal - 9 Log - Doing special setup for ThirdTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - 30 <DYNAMIC CALL> myfile.ThirdTestCase - ( (<empty>) )");
+            log.ExpectNext("4 - Normal - 12 - EXPECT: 5 < 7 <= 8; Left: 5, Middle: 7, Right: 8; Verdict: Pass");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - 32 myfile.TestCaseBaseCleanup - <no arguments>");
+            log.ExpectNext("4 - Normal - 8 Log - Doing cleanup for ThirdTestCase");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Normal - 34 Log - Fails: 1");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
+
+        [TestMethod]
         public void TestSetupCleanWithFrameworkFile()
         {
             var f = new StringBuilder();

@@ -872,7 +872,7 @@ namespace StepBro.Core.Execution
                 context.ExpectStatementValue = "";
             }
 
-            if (String.IsNullOrEmpty(context.ExpectStatementValue))
+            if (!String.IsNullOrEmpty(context.ExpectStatementValue))
             {
                 context.ExpectStatementValue += ", ";
             }
