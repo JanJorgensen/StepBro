@@ -14,7 +14,6 @@
 
   <ItemGroup>
     <Compile Include="..\stepbro\ConsoleSidekickMessages.cs" Link="ConsoleSidekickMessages.cs" />
-    <Compile Include="..\stepbro\SideKickPipes.cs" Link="SideKickPipes.cs" />
   </ItemGroup>
 
   <ItemGroup>
