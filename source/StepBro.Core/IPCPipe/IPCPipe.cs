@@ -7,9 +7,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 
-namespace StepBro.Core.IPCPipe
+namespace StepBro.Core.IPC
 {
-    public class IPCPipe : IDisposable
+    public class Pipe : IDisposable
     {
         private PipeStream m_pipe = null;
         private StreamString m_stream = null;
@@ -44,7 +44,7 @@ namespace StepBro.Core.IPCPipe
         //    Console.WriteLine("\nServer threads exhausted, exiting.");
         //}
 
-        private IPCPipe(string id, PipeStream pipe)
+        private Pipe(string id, PipeStream pipe)
         {
             m_pipe = pipe;
         }
@@ -77,35 +77,35 @@ namespace StepBro.Core.IPCPipe
             }
         }
 
-        private static IPCPipe Create(string id, PipeStream pipe, ParameterizedThreadStart threadFunction)
+        private static Pipe Create(string id, PipeStream pipe, ParameterizedThreadStart threadFunction)
         {
-            var instance = new IPCPipe(id, pipe);
+            var instance = new Pipe(id, pipe);
             instance.m_thread = new Thread(threadFunction);
             instance.m_received = new ConcurrentQueue<Tuple<string, string>>();
             return instance;
         }
 
-        public static IPCPipe StartServer(string pipeName, string id)
+        public static Pipe StartServer(string pipeName, string id)
         {
             var pipeServer = new NamedPipeServerStream(pipeName + id, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-            var pipe = IPCPipe.Create(id, pipeServer, ServerThread);
+            var pipe = Pipe.Create(id, pipeServer, ServerThread);
             pipe.m_disposeEvent = new ManualResetEvent(false);
             pipe.m_continue = true;
             pipe.m_thread.Start(pipe);
             return pipe;
         }
 
-        public static IPCPipe StartClient(string pipeName, string id)
+        public static Pipe StartClient(string pipeName, string id)
         {
             var pipeClient = new NamedPipeClientStream(".", pipeName + id, PipeDirection.InOut, PipeOptions.Asynchronous, TokenImpersonationLevel.None);
-            var pipe = IPCPipe.Create(id, pipeClient, ReceiverThread);
+            var pipe = Pipe.Create(id, pipeClient, ReceiverThread);
             pipeClient.Connect();
             pipe.m_stream = new StreamString(pipeClient);
             var firstString = pipe.m_stream.ReadString();
             if (firstString == "StepBro is it")
             {
                 pipe.m_continueReceiving = true;
-                System.Diagnostics.Trace.WriteLine("### IPCPipe starting client");
+                System.Diagnostics.Trace.WriteLine("### Pipe starting client");
                 pipe.m_thread.Start(pipe);
                 return pipe;
             }
@@ -145,7 +145,7 @@ namespace StepBro.Core.IPCPipe
 
         private static void ServerThread(object data)
         {
-            var instance = data as IPCPipe;
+            var instance = data as Pipe;
             var pipeStream = (instance.m_pipe as NamedPipeServerStream);
 
             int threadId = Thread.CurrentThread.ManagedThreadId;
@@ -161,11 +161,11 @@ namespace StepBro.Core.IPCPipe
                         {
                             pipeStream.EndWaitForConnection(ar);
 
-                            System.Diagnostics.Trace.WriteLine("### IPCPipe server connect");
+                            System.Diagnostics.Trace.WriteLine("### Pipe server connect");
                         }
                         catch (Exception ex)
                         {
-                            System.Diagnostics.Trace.WriteLine("### IPCPipe server connect exception");
+                            System.Diagnostics.Trace.WriteLine("### Pipe server connect exception");
                             connectException = ex;
                         }
                         connectEvent.Set();
@@ -195,23 +195,23 @@ namespace StepBro.Core.IPCPipe
 
         private static void ReceiverThread(object data)
         {
-            var instance = data as IPCPipe;
+            var instance = data as Pipe;
             //instance.m_pipe.ReadTimeout = 1000;
-            System.Diagnostics.Trace.WriteLine("### IPCPipe receiver thread started");
+            System.Diagnostics.Trace.WriteLine("### Pipe receiver thread started");
             try
             {
                 while (instance.m_continueReceiving)
                 {
-                    System.Diagnostics.Trace.WriteLine("### IPCPipe receiver: ReadString");
+                    System.Diagnostics.Trace.WriteLine("### Pipe receiver: ReadString");
                     var s = instance.m_stream.ReadString();
                     if (s == null)
                     {
-                        System.Diagnostics.Trace.WriteLine("### IPCPipe Received nothing");
+                        System.Diagnostics.Trace.WriteLine("### Pipe Received nothing");
                         instance.m_continueReceiving = false;
                     }
                     else
                     {
-                        System.Diagnostics.Trace.WriteLine("### IPCPipe Received: " + s);
+                        System.Diagnostics.Trace.WriteLine("### Pipe Received: " + s);
                         var colonIndex = s.IndexOf(':');
                         if (colonIndex > 0)
                         {
@@ -228,7 +228,7 @@ namespace StepBro.Core.IPCPipe
             }
             finally
             {
-                System.Diagnostics.Trace.WriteLine("### IPCPipe stopping receiver");
+                System.Diagnostics.Trace.WriteLine("### Pipe stopping receiver");
             }
         }
     }

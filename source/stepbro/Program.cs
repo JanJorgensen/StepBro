@@ -6,7 +6,7 @@ using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.File;
 using StepBro.Core.General;
-using StepBro.Core.IPCPipe;
+using StepBro.Core.IPC;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
@@ -60,7 +60,7 @@ namespace StepBro.Cmd
         private static List<Tuple<bool, string>> m_bufferedOutput = new List<Tuple<bool, string>>();
         private static Mode m_mode = Mode.DryRun;
         private static Queue<StateOrCommand> m_next = new Queue<StateOrCommand>();
-        private static IPCPipe m_sideKickPipe = null;
+        private static Pipe m_sideKickPipe = null;
         private static bool sidekickStarted = false;
         private static ILoggerScope m_sidekickLogger = null;
         private static List<Tuple<ulong, object>> m_requestObjectDictionary = new List<Tuple<ulong, object>>();
@@ -247,7 +247,7 @@ namespace StepBro.Cmd
                     var folder = Path.GetDirectoryName(path);
 
                     string pipename = hThis.ToString("X");
-                    m_sideKickPipe = IPCPipe.StartServer("StepBroConsoleSidekick", pipename);
+                    m_sideKickPipe = Pipe.StartServer("StepBroConsoleSidekick", pipename);
                     var sidekick = new System.Diagnostics.Process();
                     sidekick.StartInfo.FileName = Path.Combine(folder, "StepBro.Sidekick.exe");
                     sidekick.StartInfo.Arguments = pipename;
