@@ -410,9 +410,17 @@ namespace StepBro.Core.Parser
                     {
                         if (m_isSimpleExpectWithValue)
                         {
-                            var t = first.DataType.Type;
-                            var valueSaver = s_SaveExpectValueText.MakeGenericMethod(t);
-                            first = new SBExpressionData(Expression.Call(valueSaver, m_currentProcedure.ContextReferenceInternal, first.ExpressionCode));
+                            if (first.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
+                            {
+                                var valueSaverFirst = s_SaveExpectValueText.MakeGenericMethod(first.DataType.Type);
+                                first = new SBExpressionData(Expression.Call(valueSaverFirst, m_currentProcedure.ContextReferenceInternal, first.ExpressionCode, Expression.Constant("Left"), Expression.Constant(true)));
+                            }
+                            
+                            if (last.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
+                            {
+                                var valueSaverLast = s_SaveExpectValueText.MakeGenericMethod(last.DataType.Type);
+                                last = new SBExpressionData(Expression.Call(valueSaverLast, m_currentProcedure.ContextReferenceInternal, last.ExpressionCode, Expression.Constant("Right"), Expression.Constant(false)));
+                            }
                         }
                         var result = op.Resolve(this, first, last);
                         System.Diagnostics.Debug.Assert(result != null);
@@ -506,9 +514,23 @@ namespace StepBro.Core.Parser
             {
                 if (m_isSimpleExpectWithValue)
                 {
-                    var t = middle.DataType.Type;
-                    var valueSaver = s_SaveExpectValueText.MakeGenericMethod(t);
-                    middle = new SBExpressionData(Expression.Call(valueSaver, m_currentProcedure.ContextReferenceInternal, middle.ExpressionCode));
+                    if (first.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
+                    {
+                        var valueSaverFirst = s_SaveExpectValueText.MakeGenericMethod(first.DataType.Type);
+                        first = new SBExpressionData(Expression.Call(valueSaverFirst, m_currentProcedure.ContextReferenceInternal, first.ExpressionCode, Expression.Constant("Left"), Expression.Constant(true)));
+                    }
+
+                    if (middle.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
+                    {
+                        var valueSaverMiddle = s_SaveExpectValueText.MakeGenericMethod(middle.DataType.Type);
+                        middle = new SBExpressionData(Expression.Call(valueSaverMiddle, m_currentProcedure.ContextReferenceInternal, middle.ExpressionCode, Expression.Constant("Middle"), Expression.Constant(false)));
+                    }
+
+                    if (last.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
+                    {
+                        var valueSaverLast = s_SaveExpectValueText.MakeGenericMethod(last.DataType.Type);
+                        last = new SBExpressionData(Expression.Call(valueSaverLast, m_currentProcedure.ContextReferenceInternal, last.ExpressionCode, Expression.Constant("Right"), Expression.Constant(false)));
+                    }
                 }
 
                 var op1 = context.op1.Type;

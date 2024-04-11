@@ -862,10 +862,22 @@ namespace StepBro.Core.Execution
         /// </summary>
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="value">Input value</param>
+        /// <param name="position">Left, Middle, or Center</param>
+        /// <param name="resetString">Whether to reset the string</param>
         /// <returns>Input value directly.</returns>
-        public static T SaveExpectValueText<T>(IScriptCallContext context, T value)
+        public static T SaveExpectValueText<T>(IScriptCallContext context, T value, string position, bool resetString)
         {
-            context.ExpectStatementValue = StringUtils.ObjectToString(value, false);
+            if (resetString)
+            {
+                context.ExpectStatementValue = "";
+            }
+
+            if (!String.IsNullOrEmpty(context.ExpectStatementValue))
+            {
+                context.ExpectStatementValue += ", ";
+            }
+
+            context.ExpectStatementValue += position + ": " + StringUtils.ObjectToString(value, false);
             return value;
         }
 
