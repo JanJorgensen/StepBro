@@ -426,11 +426,11 @@ namespace StepBro.Core.Execution
             {
                 if (String.IsNullOrEmpty(title))
                 {
-                    resultDescription = $"EXPECT: {expected}; Value: {actual}, Verdict: {verdict}";
+                    resultDescription = $"EXPECT: {expected}; {actual}; Verdict: {verdict}";
                 }
                 else
                 {
-                    resultDescription = $"EXPECT {title}: {expected}; Value: {actual}, Verdict: {verdict}";
+                    resultDescription = $"EXPECT {title}: {expected}; {actual}; Verdict: {verdict}";
                 }
             }
             else
