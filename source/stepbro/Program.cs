@@ -63,6 +63,9 @@ namespace StepBro.Cmd
         private static Pipe m_sideKickPipe = null;
         private static bool sidekickStarted = false;
         private static ILoggerScope m_sidekickLogger = null;
+        private static Pipe m_executionHelperPipe = null;
+        private static bool executionHelperStarted = false;
+        private static ILoggerScope m_executionHelperLogger = null;
         private static List<Tuple<ulong, object>> m_requestObjectDictionary = new List<Tuple<ulong, object>>();
 
         private static int Main(string[] args)
