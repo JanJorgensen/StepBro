@@ -63,9 +63,6 @@ namespace StepBro.Cmd
         private static Pipe m_sideKickPipe = null;
         private static bool sidekickStarted = false;
         private static ILoggerScope m_sidekickLogger = null;
-        private static Pipe m_executionHelperPipe = null;
-        private static bool executionHelperStarted = false;
-        private static ILoggerScope m_executionHelperLogger = null;
         private static List<Tuple<ulong, object>> m_requestObjectDictionary = new List<Tuple<ulong, object>>();
 
         private static int Main(string[] args)
@@ -269,46 +266,6 @@ namespace StepBro.Cmd
                         StartLogDumpTask();
 
                         m_mode = Mode.WorkbenchWithSidekick;
-                    }
-                }
-
-                if (retval == 0 && m_commandLineOptions.ExecutionHelper)
-                {
-                    closeEventHandler = (sender, e) =>
-                    {
-                        m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.Close);
-                        Thread.Sleep(1000);     // Leave some time for the execution helper application to receive the command.
-                    };
-
-                    m_executionHelperLogger = StepBroMain.Logger.RootLogger.CreateSubLocation("ExecutionHelper");
-
-                    AppDomain.CurrentDomain.ProcessExit += closeEventHandler;
-
-                    var hThis = GetConsoleWindow();
-
-                    string path = Assembly.GetExecutingAssembly().Location;
-                    var folder = Path.GetDirectoryName(path);
-
-                    string pipename = hThis.ToString("X");
-                    m_executionHelperPipe = Pipe.StartServer("StepBroExecutionHelper", pipename);
-                    var executionHelper = new System.Diagnostics.Process();
-                    executionHelper.StartInfo.FileName = Path.Combine(folder, "StepBro.ExecutionHelper.exe");
-                    executionHelper.StartInfo.Arguments = pipename;
-                    executionHelperStarted = executionHelper.Start();
-
-                    if (executionHelperStarted)
-                    {
-                        commandObjectDictionary = new Dictionary<string, ITextCommandInput>();
-
-                        while (!m_executionHelperPipe.IsConnected())
-                        {
-                            System.Threading.Thread.Sleep(200);
-                            // TODO: Timeout
-                        }
-
-                        StartLogDumpTask();
-
-                        // m_mode = Mode.ExecutionHelper; // Don't know if needed for ExecutionHelper
                     }
                 }
 
