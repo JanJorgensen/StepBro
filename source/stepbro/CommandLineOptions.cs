@@ -41,5 +41,8 @@ namespace StepBro.Cmd
 
         [Option("sidekick", Default = false, HelpText = "Opens a sidekick window for interactive command input and script execution.")]
         public bool Sidekick { get; set; } = false;
+
+        [Option("execution_helper", Default = false, HelpText = "Opens Execution Helper, used to keep track of stepbro test execution.")]
+        public bool ExecutionHelper { get; set; } = false;
     }
 }
