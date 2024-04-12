@@ -28,9 +28,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.Process", "Modules\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.ConsoleSidekick.WinForms", "StepBro.ConsoleSidekick.WinForms\StepBro.ConsoleSidekick.WinForms.csproj", "{BA51266B-421E-46ED-BB1F-E5FE1CE6793C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.UI.WinForms", "StepBro.UI.WinForms\StepBro.UI.WinForms.csproj", "{B3CEA6DA-9C18-43A1-9A17-1686FFBA6518}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.UI.WinForms", "StepBro.UI.WinForms\StepBro.UI.WinForms.csproj", "{B3CEA6DA-9C18-43A1-9A17-1686FFBA6518}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.UI.WinForms.Test", "Test\StepBro.UI.WinForms.Test\StepBro.UI.WinForms.Test.csproj", "{1A86C629-F134-4F14-A710-A20D97C6EB9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.UI.WinForms.Test", "Test\StepBro.UI.WinForms.Test\StepBro.UI.WinForms.Test.csproj", "{1A86C629-F134-4F14-A710-A20D97C6EB9E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.ExecutionHelper", "StepBro.ExecutionHelper\StepBro.ExecutionHelper.csproj", "{B6562C94-8AD9-4132-A204-3000A2F083E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,6 +86,10 @@ Global
 		{1A86C629-F134-4F14-A710-A20D97C6EB9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A86C629-F134-4F14-A710-A20D97C6EB9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A86C629-F134-4F14-A710-A20D97C6EB9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6562C94-8AD9-4132-A204-3000A2F083E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6562C94-8AD9-4132-A204-3000A2F083E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6562C94-8AD9-4132-A204-3000A2F083E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6562C94-8AD9-4132-A204-3000A2F083E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
