@@ -9,39 +9,11 @@ namespace StepBro.ExecutionHelper
         private nint m_consoleWindow = 0;
         private Pipe m_pipe = null;
         private bool m_closeRequested = false;
-        private nint m_testCounter = 0;
+        private int m_testCounter = 0;
 
         public MainForm()
         {
             InitializeComponent();
-        }
-
-        private void timerMasterPull_Tick(object sender, EventArgs e)
-        {
-            Tuple<string, string> received;
-            while (m_pipe != null && (received = m_pipe.TryGetReceived()) != null)
-            {
-                if (received.Item1 == nameof(ShortCommand))
-                {
-                    var cmd = JsonSerializer.Deserialize<ShortCommand>(received.Item2);
-                    if (cmd == ShortCommand.Close)
-                    {
-                        m_closeRequested = true;
-                        m_pipe.Send(cmd); // Send back, to continue the closing process.
-                        Thread.Sleep(100);
-                        m_pipe.Dispose();
-                        this.Close();
-                    }
-                    else if (cmd == ShortCommand.IncrementTestCounter)
-                    {
-                        m_testCounter++;
-                    }
-                    else if (cmd == ShortCommand.GetTestCounter)
-                    {
-                        m_pipe.Send(new SendTestCounter(m_testCounter));
-                    }
-                }
-            }
         }
 
         protected override void OnLoad(EventArgs e)
@@ -63,6 +35,35 @@ namespace StepBro.ExecutionHelper
                 return;
             }
             // m_forceResize = true;
+        }
+
+        private void timerMasterPull_Tick(object sender, EventArgs e)
+        {
+            Tuple<string, string> received;
+            while (m_pipe != null && (received = m_pipe.TryGetReceived()) != null)
+            {
+                if (received.Item1 == nameof(ShortCommand))
+                {
+                    var cmd = JsonSerializer.Deserialize<ShortCommand>(received.Item2);
+                    if (cmd == ShortCommand.Close)
+                    {
+                        m_closeRequested = true;
+                        m_pipe.Send(cmd); // Send back, to continue the closing process.
+                        Thread.Sleep(100);
+                        m_pipe.Dispose();
+                        this.Close();
+                    }
+                    else if (cmd == ShortCommand.IncrementTestCounter)
+                    {
+                        m_testCounter++;
+                        textBoxTestCounter.Text = m_testCounter.ToString();
+                    }
+                    else if (cmd == ShortCommand.GetTestCounter)
+                    {
+                        m_pipe.Send(new SendTestCounter(m_testCounter));
+                    }
+                }
+            }
         }
     }
 }

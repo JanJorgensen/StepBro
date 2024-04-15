@@ -28,19 +28,39 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
+            textBoxTestCounter = new TextBox();
+            timerMasterPull = new System.Windows.Forms.Timer(components);
             SuspendLayout();
+            // 
+            // textBoxTestCounter
+            // 
+            textBoxTestCounter.Location = new Point(12, 12);
+            textBoxTestCounter.Name = "textBoxTestCounter";
+            textBoxTestCounter.Size = new Size(150, 31);
+            textBoxTestCounter.TabIndex = 0;
+            // 
+            // timerMasterPull
+            // 
+            timerMasterPull.Enabled = true;
+            timerMasterPull.Tick += timerMasterPull_Tick;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(144F, 144F);
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(800, 450);
+            Controls.Add(textBoxTestCounter);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Name = "MainForm";
             Text = "StepBro Execution Helper";
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
+
+        private TextBox textBoxTestCounter;
+        private System.Windows.Forms.Timer timerMasterPull;
     }
 }

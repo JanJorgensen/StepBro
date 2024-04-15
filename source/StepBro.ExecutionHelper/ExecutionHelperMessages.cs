@@ -20,11 +20,11 @@ namespace StepBro.ExecutionHelper.Messages
 
     public class SendTestCounter
     {
-        public SendTestCounter(nint testCounter)
+        public SendTestCounter(int testCounter)
         {
             TestCounter = testCounter;
         }
 
-        public nint TestCounter { get; set; }
+        public int TestCounter { get; set; }
     }
 }

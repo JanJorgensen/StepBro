@@ -36,7 +36,7 @@ namespace StepBro.ExecutionHelper
             string pipename = hThis.ToString("X");
             m_executionHelperPipe = Pipe.StartServer("StepBroExecutionHelper", pipename);
             var executionHelper = new System.Diagnostics.Process();
-            executionHelper.StartInfo.FileName = Path.Combine(folder, "StepBro.ExecutionHelper.exe");
+            executionHelper.StartInfo.FileName = Path.Combine(folder, "../StepBro.ExecutionHelper.exe"); //../ because ExecutionHelper is in the main bin folder and this is the Modules folder
             executionHelper.StartInfo.Arguments = pipename;
             m_executionHelperStarted = executionHelper.Start();
 
@@ -90,7 +90,7 @@ namespace StepBro.ExecutionHelper
             if (input.Item1 == nameof(StepBro.ExecutionHelper.Messages.SendTestCounter))
             {
                 var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.SendTestCounter>(input.Item2);
-                testCounter = (int)data.TestCounter;
+                testCounter = data.TestCounter;
             }
 
             return testCounter;
