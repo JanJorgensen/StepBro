@@ -79,7 +79,6 @@ namespace StepBro.ExecutionHelper
                         if (m_variables[data.VariableName] is long v)
                         {
                             m_variables[data.VariableName] = ++v;
-                            textBoxTestCounter.Text = m_variables[data.VariableName].ToString(); // TODO: Remove this as it is for testing purposes
                         }
                     }
                 }
