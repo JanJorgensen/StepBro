@@ -48,6 +48,18 @@ namespace StepBro.ExecutionHelper.Messages
         public string VariableName { get; set; }
     }
 
+    public class SetVariable
+    {
+        public SetVariable(string variableName, object value)
+        {
+            this.VariableName = variableName;
+            this.Value = value;
+        }
+
+        public string VariableName { get; set; }
+        public object Value { get; set; }
+    }
+
     public class SendVariable
     {
         public SendVariable(string variableName, object variable)

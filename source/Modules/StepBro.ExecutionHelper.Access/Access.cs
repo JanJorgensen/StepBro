@@ -82,6 +82,16 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
+        public bool SetVariable(string variableName, object value)
+        {
+            bool result = true;
+
+            // TODO: Error checking
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SetVariable(variableName, value));
+
+            return result;
+        }
+
         public object GetVariable(string variableName)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.GetVariable(variableName));

@@ -76,12 +76,17 @@ namespace StepBro.ExecutionHelper
                     var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.IncrementVariable>(received.Item2);
                     if (data != null)
                     {
-                        if(m_variables[data.VariableName] is long v)
+                        if (m_variables[data.VariableName] is long v)
                         {
                             m_variables[data.VariableName] = ++v;
                             textBoxTestCounter.Text = m_variables[data.VariableName].ToString(); // TODO: Remove this as it is for testing purposes
                         }
                     }
+                }
+                else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.SetVariable))
+                {
+                    var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.SetVariable>(received.Item2);
+                    m_variables[data.VariableName] = data.Value;
                 }
                 else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.GetVariable))
                 {
