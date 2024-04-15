@@ -13,6 +13,18 @@ namespace StepBro.ExecutionHelper.Messages
     public enum ShortCommand
     {
         None,
-        Close
+        Close,
+        IncrementTestCounter,
+        GetTestCounter
+    }
+
+    public class SendTestCounter
+    {
+        public SendTestCounter(nint testCounter)
+        {
+            TestCounter = testCounter;
+        }
+
+        public nint TestCounter { get; set; }
     }
 }
