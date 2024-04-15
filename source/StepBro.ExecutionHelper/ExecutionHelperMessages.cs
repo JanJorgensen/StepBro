@@ -13,18 +13,50 @@ namespace StepBro.ExecutionHelper.Messages
     public enum ShortCommand
     {
         None,
-        Close,
-        IncrementTestCounter,
-        GetTestCounter
+        Close
     }
 
-    public class SendTestCounter
+    public class CreateVariable
     {
-        public SendTestCounter(int testCounter)
+        public CreateVariable(string variableName, object initialValue)
         {
-            TestCounter = testCounter;
+            this.VariableName = variableName;
+            this.InitialValue = initialValue;
         }
 
-        public int TestCounter { get; set; }
+        public string VariableName { get; set; }
+        public object InitialValue { get; set; }
+    }
+
+    public class IncrementVariable
+    {
+        public IncrementVariable(string variableName)
+        {
+            this.VariableName = variableName;
+        }
+
+        public string VariableName { get; set; }
+    }
+
+    public class GetVariable
+    {
+        public GetVariable(string variableName)
+        {
+            this.VariableName = variableName;
+        }
+
+        public string VariableName { get; set; }
+    }
+
+    public class SendVariable
+    {
+        public SendVariable(string variableName, object variable)
+        {
+            this.VariableName = variableName;
+            this.Variable = variable;
+        }
+
+        public string VariableName { get; set; }
+        public object Variable { get; set; }
     }
 }

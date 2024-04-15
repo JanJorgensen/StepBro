@@ -7,9 +7,9 @@ namespace StepBro.ExecutionHelper
     public partial class MainForm : Form
     {
         private nint m_consoleWindow = 0;
-        private Pipe m_pipe = null;
+        private Pipe? m_pipe = null;
         private bool m_closeRequested = false;
-        private int m_testCounter = 0;
+        private Dictionary<string, object> m_variables = new Dictionary<string, object>();
 
         public MainForm()
         {
@@ -19,7 +19,6 @@ namespace StepBro.ExecutionHelper
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            // m_topControl = this.TopLevelControl;
 
             System.Diagnostics.Trace.WriteLine("Execution Helper STARTING!!");
 
@@ -34,7 +33,6 @@ namespace StepBro.ExecutionHelper
             {
                 return;
             }
-            // m_forceResize = true;
         }
 
         private void timerMasterPull_Tick(object sender, EventArgs e)
@@ -53,14 +51,44 @@ namespace StepBro.ExecutionHelper
                         m_pipe.Dispose();
                         this.Close();
                     }
-                    else if (cmd == ShortCommand.IncrementTestCounter)
+                }
+                else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateVariable))
+                {
+                    var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.CreateVariable>(received.Item2);
+                    if (data != null)
                     {
-                        m_testCounter++;
-                        textBoxTestCounter.Text = m_testCounter.ToString();
+                        if (data.InitialValue is System.Text.Json.JsonElement v && v.ValueKind == JsonValueKind.Number)
+                        {
+                            // It is some sort of number, so we save it as a long like StepBro uses
+                            long initialValue = 0;
+                            Int64.TryParse(data.InitialValue.ToString(), out initialValue);
+                            m_variables.TryAdd(data.VariableName, initialValue);
+                        }
+                        else
+                        {
+                            // It is not a number so we assume the user knows what they are doing
+                            m_variables.TryAdd(data.VariableName, data.InitialValue);
+                        }
                     }
-                    else if (cmd == ShortCommand.GetTestCounter)
+                }
+                else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.IncrementVariable))
+                {
+                    var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.IncrementVariable>(received.Item2);
+                    if (data != null)
                     {
-                        m_pipe.Send(new SendTestCounter(m_testCounter));
+                        if(m_variables[data.VariableName] is long v)
+                        {
+                            m_variables[data.VariableName] = ++v;
+                            textBoxTestCounter.Text = m_variables[data.VariableName].ToString(); // TODO: Remove this as it is for testing purposes
+                        }
+                    }
+                }
+                else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.GetVariable))
+                {
+                    var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.GetVariable>(received.Item2);
+                    if (data != null)
+                    {
+                        m_pipe.Send(new SendVariable(data.VariableName, m_variables[data.VariableName]));
                     }
                 }
             }

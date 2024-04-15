@@ -62,21 +62,31 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
-        public bool IncrementTestCounter()
+        public bool CreateVariable(string variableName, object initialValue)
         {
             bool result = true;
 
             // TODO: Error checking
-            m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.IncrementTestCounter);
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.CreateVariable(variableName, initialValue));
 
             return result;
         }
 
-        public int GetTestCounter()
+        public bool IncrementVariable(string variableName)
         {
-            m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.GetTestCounter);
+            bool result = true;
 
-            int testCounter = 0;
+            // TODO: Error checking
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.IncrementVariable(variableName));
+
+            return result;
+        }
+
+        public object GetVariable(string variableName)
+        {
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.GetVariable(variableName));
+
+            object variable = 0;
 
             // TODO: Timeout
             var input = m_executionHelperPipe.TryGetReceived();
@@ -87,13 +97,35 @@ namespace StepBro.ExecutionHelper
                 input = m_executionHelperPipe.TryGetReceived();
             }
 
-            if (input.Item1 == nameof(StepBro.ExecutionHelper.Messages.SendTestCounter))
+            if (input.Item1 == nameof(StepBro.ExecutionHelper.Messages.SendVariable))
             {
-                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.SendTestCounter>(input.Item2);
-                testCounter = data.TestCounter;
+                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.SendVariable>(input.Item2);
+                variable = data.Variable;
             }
 
-            return testCounter;
+            if (variable is JsonElement v)
+            {
+                switch(v.ValueKind)
+                {
+                    case JsonValueKind.String:
+                        variable = variable.ToString(); break;
+                    case JsonValueKind.Number:
+                        long longVariable = 0;
+                        Int64.TryParse(variable.ToString(), out longVariable);
+                        variable = longVariable;
+                        break;
+                    case JsonValueKind.True:
+                        variable = true;
+                        break;
+                    case JsonValueKind.False:
+                        variable = false;
+                        break;
+                    default:
+                        throw new Exception("Variable of kind: " + v.ValueKind.ToString() + " is not supported yet!");
+                }
+            }
+
+            return variable;
         }
 
         [DllImport("kernel32.dll")]
