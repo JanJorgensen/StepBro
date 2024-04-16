@@ -36,10 +36,12 @@ namespace StepBro.ExecutionHelper
             string path = Assembly.GetExecutingAssembly().Location;
             var folder = Path.GetDirectoryName(path);
 
-            // TODO: Check if it is already running and connect to it instead
-            var executionHelper = new System.Diagnostics.Process();
-            executionHelper.StartInfo.FileName = Path.Combine(folder, "../StepBro.ExecutionHelper.exe"); //../ because ExecutionHelper is in the main bin folder and this is the Modules folder
-            m_executionHelperStarted = executionHelper.Start();
+            if (System.Diagnostics.Process.GetProcessesByName("StepBro.ExecutionHelper.exe").Length == 0)
+            {
+                var executionHelper = new System.Diagnostics.Process();
+                executionHelper.StartInfo.FileName = Path.Combine(folder, "../StepBro.ExecutionHelper.exe"); //../ because ExecutionHelper is in the main bin folder and this is the Modules folder
+                m_executionHelperStarted = executionHelper.Start();
+            }
             
             m_executionHelperPipe = Pipe.StartClient("StepBroExecutionHelper", "1998");
 
