@@ -13,7 +13,6 @@ namespace StepBro.ExecutionHelper
         private Pipe m_executionHelperPipe = null;
         bool m_executionHelperStarted = false;
         bool m_closeWhenExecutionHelperCloses = false;
-        EventHandler<Tuple<string, string>> receivedDataEventHandler = null;
 
         private void ReceivedData(Tuple<string, string> message)
         {
@@ -46,12 +45,10 @@ namespace StepBro.ExecutionHelper
             executionHelper.StartInfo.Arguments = pipename;
             m_executionHelperStarted = executionHelper.Start();
 
-            receivedDataEventHandler = (sender, e) =>
+            Pipe.ReceivedData += (sender, e) =>
             {
                 ReceivedData(e);
             };
-
-            Pipe.ReceivedData += receivedDataEventHandler;
 
             if (m_executionHelperStarted)
             {
@@ -102,14 +99,18 @@ namespace StepBro.ExecutionHelper
             object variable = -1;
 
             int timeoutMs = 2500;
-            var input = m_executionHelperPipe.TryGetReceived();
-            while (input == null)
+            Tuple<string, string> input = null;
+            do
             {
+                input = m_executionHelperPipe.TryGetReceived();
+                if (input != null)
+                {
+                    break;
+                }
                 // Wait
                 Thread.Sleep(1);
                 timeoutMs--;
-                input = m_executionHelperPipe.TryGetReceived();
-            }
+            } while (timeoutMs > 0);
 
             if (input.Item1 == nameof(StepBro.ExecutionHelper.Messages.SendVariable))
             {
