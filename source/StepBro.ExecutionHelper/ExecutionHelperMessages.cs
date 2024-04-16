@@ -17,16 +17,16 @@ namespace StepBro.ExecutionHelper.Messages
         Acknowledge
     }
 
-    public class CreateVariable
+    public class CreateOrSetVariable
     {
-        public CreateVariable(string variableName, object initialValue)
+        public CreateOrSetVariable(string variableName, object value)
         {
             this.VariableName = variableName;
-            this.InitialValue = initialValue;
+            this.Value = value;
         }
 
         public string VariableName { get; set; }
-        public object InitialValue { get; set; }
+        public object Value { get; set; }
     }
 
     public class IncrementVariable
@@ -47,18 +47,6 @@ namespace StepBro.ExecutionHelper.Messages
         }
 
         public string VariableName { get; set; }
-    }
-
-    public class SetVariable
-    {
-        public SetVariable(string variableName, object value)
-        {
-            this.VariableName = variableName;
-            this.Value = value;
-        }
-
-        public string VariableName { get; set; }
-        public object Value { get; set; }
     }
 
     public class SendVariable

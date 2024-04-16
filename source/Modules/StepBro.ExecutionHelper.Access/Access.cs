@@ -68,9 +68,9 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
-        public bool CreateVariable(string variableName, object initialValue)
+        public bool CreateOrSetVariable(string variableName, object value)
         {
-            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.CreateVariable(variableName, initialValue));
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.CreateOrSetVariable(variableName, value));
 
             bool result = WaitForAcknowledge();
             return result;
@@ -79,14 +79,6 @@ namespace StepBro.ExecutionHelper
         public bool IncrementVariable(string variableName)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.IncrementVariable(variableName));
-
-            bool result = WaitForAcknowledge();
-            return result;
-        }
-
-        public bool SetVariable(string variableName, object value)
-        {
-            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SetVariable(variableName, value));
 
             bool result = WaitForAcknowledge();
             return result;

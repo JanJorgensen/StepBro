@@ -59,22 +59,28 @@ namespace StepBro.ExecutionHelper
                     this.Close();
                 }
             }
-            else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateVariable))
+            else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateOrSetVariable))
             {
-                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.CreateVariable>(received.Item2);
+                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.CreateOrSetVariable>(received.Item2);
                 if (data != null)
                 {
-                    if (data.InitialValue is System.Text.Json.JsonElement v && v.ValueKind == JsonValueKind.Number)
+                    bool alreadyExists = m_variables.ContainsKey(data.VariableName);
+                    bool isNumberKind = data.Value is System.Text.Json.JsonElement v && v.ValueKind == JsonValueKind.Number;
+                    if (alreadyExists)
+                    {
+                        m_variables[data.VariableName] = data.Value;
+                    }
+                    else if (isNumberKind)
                     {
                         // It is some sort of number, so we save it as a long like StepBro uses
-                        long initialValue = 0;
-                        Int64.TryParse(data.InitialValue.ToString(), out initialValue);
-                        m_variables.TryAdd(data.VariableName, initialValue);
+                        long value = 0;
+                        Int64.TryParse(data.Value.ToString(), out value);
+                        m_variables.TryAdd(data.VariableName, value);
                     }
                     else
                     {
                         // It is not a number so we assume the user knows what they are doing
-                        m_variables.TryAdd(data.VariableName, data.InitialValue);
+                        m_variables.TryAdd(data.VariableName, data.Value);
                     }
                     m_pipe!.Send(ShortCommand.Acknowledge);
                 }
@@ -89,15 +95,6 @@ namespace StepBro.ExecutionHelper
                         m_variables[data.VariableName] = ++v;
                         m_pipe!.Send(ShortCommand.Acknowledge);
                     }
-                }
-            }
-            else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.SetVariable))
-            {
-                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.SetVariable>(received.Item2);
-                if (data != null && m_variables.ContainsKey(data.VariableName))
-                {
-                    m_variables[data.VariableName] = data.Value;
-                    m_pipe!.Send(ShortCommand.Acknowledge);
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.GetVariable))
