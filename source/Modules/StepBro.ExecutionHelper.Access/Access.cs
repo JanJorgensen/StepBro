@@ -158,6 +158,14 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
+        public bool Close()
+        {
+            m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.Close);
+
+            m_executionHelperPipe.Dispose();
+            return true;
+        }
+
         bool WaitForAcknowledge()
         {
             bool result = false;

@@ -39,8 +39,11 @@ namespace StepBro.ExecutionHelper
 
             formCloseEventHandler = (sender, e) =>
             {
-                m_pipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.Close);
-                Thread.Sleep(1000);     // Leave some time for the execution helper application to receive the command.
+                if (m_pipe.IsConnected())
+                {
+                    m_pipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.Close);
+                    Thread.Sleep(1000);     // Leave some time for the execution helper application to receive the command.
+                }
             };
 
             FormClosing += formCloseEventHandler;
@@ -57,8 +60,7 @@ namespace StepBro.ExecutionHelper
                     if (cmd == ShortCommand.Close)
                     {
                         m_closeRequested = true;
-                        m_pipe.Send(cmd); // Send back, to continue the closing process.
-                        Thread.Sleep(100);
+                        m_pipe.Send(cmd);
                         m_pipe.Dispose();
                         this.Close();
                     }
