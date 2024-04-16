@@ -31,7 +31,7 @@ namespace StepBro.ExecutionHelper
             {
                 if (m_pipe.IsConnected() && !m_closeRequested)
                 {
-                    m_pipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.Close);
+                    m_pipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.CloseApplication);
                     Thread.Sleep(1000);
                 }
             };
@@ -51,7 +51,7 @@ namespace StepBro.ExecutionHelper
             if (received.Item1 == nameof(ShortCommand))
             {
                 var cmd = JsonSerializer.Deserialize<ShortCommand>(received.Item2);
-                if (cmd == ShortCommand.Close)
+                if (cmd == ShortCommand.CloseApplication)
                 {
                     m_closeRequested = true;
                     m_pipe!.Send(cmd);

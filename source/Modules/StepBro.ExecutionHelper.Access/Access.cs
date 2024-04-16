@@ -19,7 +19,7 @@ namespace StepBro.ExecutionHelper
             if (message.Item1 == nameof(StepBro.ExecutionHelper.Messages.ShortCommand))
             {
                 var cmd = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.ShortCommand>(message.Item2);
-                if (cmd == StepBro.ExecutionHelper.Messages.ShortCommand.Close && m_closeWhenExecutionHelperCloses)
+                if (cmd == StepBro.ExecutionHelper.Messages.ShortCommand.CloseApplication && m_closeWhenExecutionHelperCloses)
                 {
                     Thread.Sleep(100);
                     // m_executionHelperPipe.Dispose();
@@ -151,9 +151,9 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
-        public bool Close()
+        public bool CloseApplication()
         {
-            m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.Close);
+            m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.CloseApplication);
 
             m_executionHelperPipe.Dispose();
             return true;

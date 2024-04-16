@@ -13,7 +13,8 @@ namespace StepBro.ExecutionHelper.Messages
     public enum ShortCommand
     {
         None,
-        Close,
+        CloseApplication,
+        CloseConnection,
         Acknowledge
     }
 
