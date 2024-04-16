@@ -2,6 +2,7 @@
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
+using StepBro.Core.ScriptData;
 using StepBro.PanelCreator.DummyUI;
 using System;
 using System.Collections.Generic;
@@ -45,7 +46,7 @@ namespace StepBro.ToolBarCreator
             return new string[] { "Color" };
         }
 
-        public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+        public void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors)
         {
             var color = new PropertyBlockDecoder.ValueString<object>("Color");
             var text = new PropertyBlockDecoder.ValueString<object>("Text");
@@ -81,7 +82,7 @@ namespace StepBro.ToolBarCreator
             root.DecodeData(data, null, errors);
         }
 
-        public void Setup(ILogger logger, PropertyBlock data)
+        public void Setup(IScriptFile file, ILogger logger, PropertyBlock data)
         {
             m_definition = data;
         }

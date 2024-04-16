@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Logging;
+using StepBro.Core.ScriptData;
 using System;
 using System.Collections.Generic;
 
@@ -21,7 +22,7 @@ namespace StepBro.Core.Data
         Dictionary<string,object> Tags { get; set; }
     }
 
-    public delegate bool VariableContainerAction(IValueContainerOwnerAccess container, ILogger logger);
+    public delegate bool VariableContainerAction(IScriptFile file, IValueContainerOwnerAccess container, ILogger logger);
 
     public class VariableContainer<T> : AvailabilityBase, IValueContainer<T>, IValueContainerRich, IObjectContainer, INameable
     {

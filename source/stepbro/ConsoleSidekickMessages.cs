@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Data;
+using StepBro.Core.Data.SerializationHelp;
 using StepBro.Core.Logging;
 using StepBro.Core.Tasks;
 using System;
@@ -8,36 +9,6 @@ using System.Text.Json.Serialization;
 
 namespace StepBro.Sidekick.Messages
 {
-
-    public class Argument
-    {
-        public Argument() { }
-
-        public Argument(object value)
-        {
-            if (value == null) throw new ArgumentNullException("value");
-            else if (value is string) { this.Type = "string"; this.Value = value as string; }
-            else if (value is long || value is int) { this.Type = "int"; this.Value = value.ToString(); }
-            else if (value is bool) { this.Type = "bool"; this.Value = value.ToString(); }
-            else if (value is Identifier) { this.Type = "identifier"; this.Value = ((Identifier)value).Name; }
-            else 
-            {
-                throw new ArgumentException("value");
-            }
-        }
-        public string Type { get; set; } = null;
-        public string Value { get; set; } = null;
-
-        public object GetValue()
-        {
-            if (this.Type == "int") return Convert.ToInt64(Value);
-            if (this.Type == "string") return Value;
-            if (this.Type == "bool") return Convert.ToBoolean(Value);
-            if (this.Type == "identifier") return new Identifier(Value);
-            throw new NotImplementedException();
-        }
-    }
-
     public enum ShortCommand
     {
         None,
@@ -115,7 +86,7 @@ namespace StepBro.Sidekick.Messages
     public class Partner
     {
         public string Name { get; set; }
-        public string ProcedureType { get; set; }
+        public string ProcedureReference { get; set; }
     }
     public class Variable : Element
     {
@@ -197,7 +168,7 @@ namespace StepBro.Sidekick.Messages
 
     public class RunScriptRequest : RequestOrResponse
     {
-        public RunScriptRequest(ulong requestID, bool silent, string element, string partner, string objectReference, List<Argument> arguments = null) : base(requestID)
+        public RunScriptRequest(ulong requestID, bool silent, string element, string partner, string objectReference, List<TypedValue> arguments = null) : base(requestID)
         {
             this.Silent = silent;
             this.Element = element;
@@ -209,7 +180,7 @@ namespace StepBro.Sidekick.Messages
         public string Element { get; set; }
         public string Partner { get; set; }
         public string ObjectReference { get; set; }
-        public List<Argument> Arguments { get; set; } = null;
+        public List<TypedValue> Arguments { get; set; } = null;
     }
 
     public class StopExecutionRequest : RequestOrResponse

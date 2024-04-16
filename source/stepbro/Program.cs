@@ -571,7 +571,7 @@ namespace StepBro.Cmd
                                                     {
                                                         var partnerData = new StepBro.Sidekick.Messages.Partner();
                                                         partnerData.Name = p.Name;
-                                                        partnerData.ProcedureType = p.ProcedureName;
+                                                        partnerData.ProcedureReference = p.ProcedureReference.FullName;
                                                         elementPartners.Add(partnerData);
                                                     }
                                                     elementData.Partners = elementPartners.ToArray();

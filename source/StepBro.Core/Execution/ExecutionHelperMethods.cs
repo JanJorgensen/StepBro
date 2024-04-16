@@ -894,7 +894,7 @@ namespace StepBro.Core.Execution
             }
         }
 
-        public static void SetupObjectWithPropertyBlock(ILogger logger, IValueContainerOwnerAccess containerOwner)
+        public static void SetupObjectWithPropertyBlock(IScriptFile file, ILogger logger, IValueContainerOwnerAccess containerOwner)
         {
             if (containerOwner != null && (containerOwner.Tags != null))
             {
@@ -904,7 +904,7 @@ namespace StepBro.Core.Execution
                     object props;
                     if (containerOwner.Tags.TryGetValue(ScriptFile.VARIABLE_CUSTOM_PROPS_TAG, out props) && props is PropertyBlock)
                     {
-                        @object.Setup(logger, props as PropertyBlock);
+                        @object.Setup(file, logger, props as PropertyBlock);
                     }
                 }
             }
