@@ -12,6 +12,7 @@ namespace StepBro.ExecutionHelper
     {
         private Pipe m_executionHelperPipe = null;
         bool m_executionHelperStarted = false;
+        bool m_closeWhenExecutionHelperCloses = false;
         EventHandler<Tuple<string, string>> receivedDataEventHandler = null;
 
         private void ReceivedData(Tuple<string, string> message)
@@ -19,7 +20,7 @@ namespace StepBro.ExecutionHelper
             if (message.Item1 == nameof(StepBro.ExecutionHelper.Messages.ShortCommand))
             {
                 var cmd = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.ShortCommand>(message.Item2);
-                if (cmd == StepBro.ExecutionHelper.Messages.ShortCommand.Close)
+                if (cmd == StepBro.ExecutionHelper.Messages.ShortCommand.Close && m_closeWhenExecutionHelperCloses)
                 {
                     Thread.Sleep(100);
                     // m_executionHelperPipe.Dispose();
@@ -28,8 +29,9 @@ namespace StepBro.ExecutionHelper
             }
         }
 
-        public bool CreateExecutionHelper()
+        public bool CreateExecutionHelper(bool closeWhenExecutionHelperCloses = false)
         {
+            m_closeWhenExecutionHelperCloses = closeWhenExecutionHelperCloses;
             bool result = true;
 
             var hThis = GetConsoleWindow();
