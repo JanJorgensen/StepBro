@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 namespace StepBro.Sidekick.Messages
 {
 
-    public class Argument
+    public class TypedValue
     {
-        public Argument() { }
+        public TypedValue() { }
 
-        public Argument(object value)
+        public TypedValue(object value)
         {
             if (value == null) throw new ArgumentNullException("value");
             else if (value is string) { this.Type = "string"; this.Value = value as string; }
@@ -118,7 +118,7 @@ namespace StepBro.Sidekick.Messages
     public class Partner
     {
         public string Name { get; set; }
-        public string ProcedureType { get; set; }
+        public string ProcedureReference { get; set; }
     }
     public class Variable : Element
     {
@@ -200,7 +200,7 @@ namespace StepBro.Sidekick.Messages
 
     public class RunScriptRequest : RequestOrResponse
     {
-        public RunScriptRequest(ulong requestID, bool silent, string element, string partner, string objectReference, List<Argument> arguments = null) : base(requestID)
+        public RunScriptRequest(ulong requestID, bool silent, string element, string partner, string objectReference, List<TypedValue> arguments = null) : base(requestID)
         {
             this.Silent = silent;
             this.Element = element;
@@ -212,7 +212,7 @@ namespace StepBro.Sidekick.Messages
         public string Element { get; set; }
         public string Partner { get; set; }
         public string ObjectReference { get; set; }
-        public List<Argument> Arguments { get; set; } = null;
+        public List<TypedValue> Arguments { get; set; } = null;
     }
 
     public class StopExecutionRequest : RequestOrResponse

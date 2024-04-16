@@ -750,7 +750,7 @@ namespace StepBro.ConsoleSidekick.WinForms
                                     procedureExecutionOptionMenu.Name = "toolStripMenuProcedure" + procedure.Name + "Dot" + partner.Name;
                                     procedureExecutionOptionMenu.Text = procedure.Name + "." + partner.Name;
                                     procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}' partner '{partner.Name}'";
-                                    var partnerProcedure = procedures.FirstOrDefault(p => p.FullName == partner.ProcedureType);
+                                    var partnerProcedure = allProcedures.FirstOrDefault(p => p.FullName == partner.ProcedureReference);
                                     if (partnerProcedure == null ||
                                         (partnerProcedure.Parameters != null && partnerProcedure.Parameters.Length > ((partnerProcedure.FirstParameterIsInstanceReference) ? 1 : 0)))   // TODO: Check whether that first parameter is the parent procedure.
                                     {
@@ -1101,10 +1101,10 @@ namespace StepBro.ConsoleSidekick.WinForms
         {
             var execution = new ExecutionAccess(this, m_pipe);
             m_activeExecutions.Add(new WeakReference<ExecutionAccess>(execution));
-            List<Argument> arguments = null;
+            List<TypedValue> arguments = null;
             if (args != null)
             {
-                arguments = args.Select(a => new Argument(a)).ToList();
+                arguments = args.Select(a => new TypedValue(a)).ToList();
             }
             var request = new RunScriptRequest(execution.ID, false, element, model, objectVariable, arguments);
             if (toolStripTextBoxExeNote.Visible)
