@@ -2,6 +2,7 @@ using StepBro.Core.IPC;
 using StepBro.ExecutionHelper.Messages;
 using System.Text;
 using System.Text.Json;
+using System.Windows.Forms;
 
 namespace StepBro.ExecutionHelper
 {
@@ -9,6 +10,7 @@ namespace StepBro.ExecutionHelper
     {
         private nint m_consoleWindow = 0;
         private Pipe? m_pipe = null;
+        FormClosingEventHandler? formCloseEventHandler = null;
         private bool m_closeRequested = false;
         private Dictionary<string, object> m_variables = new Dictionary<string, object>();
 
@@ -34,6 +36,14 @@ namespace StepBro.ExecutionHelper
             {
                 return;
             }
+
+            formCloseEventHandler = (sender, e) =>
+            {
+                m_pipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.Close);
+                Thread.Sleep(1000);     // Leave some time for the execution helper application to receive the command.
+            };
+
+            FormClosing += formCloseEventHandler;
         }
 
         private void timerMasterPull_Tick(object sender, EventArgs e)

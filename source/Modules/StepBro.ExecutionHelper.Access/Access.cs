@@ -10,29 +10,27 @@ namespace StepBro.ExecutionHelper
 {
     public class Access
     {
-        EventHandler closeEventHandler = null;
-        ConsoleCancelEventHandler consoleCloseEventHandler = null;
         private Pipe m_executionHelperPipe = null;
         bool m_executionHelperStarted = false;
+        EventHandler<Tuple<string, string>> receivedDataEventHandler = null;
+
+        private void ReceivedData(Tuple<string, string> message)
+        {
+            if (message.Item1 == nameof(StepBro.ExecutionHelper.Messages.ShortCommand))
+            {
+                var cmd = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.ShortCommand>(message.Item2);
+                if (cmd == StepBro.ExecutionHelper.Messages.ShortCommand.Close)
+                {
+                    Thread.Sleep(100);
+                    // m_executionHelperPipe.Dispose();
+                    System.Environment.Exit(0); // Close the application gracefully
+                }
+            }
+        }
 
         public bool CreateExecutionHelper()
         {
             bool result = true;
-
-            closeEventHandler = (sender, e) =>
-            {
-                m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.Close);
-                Thread.Sleep(1000);     // Leave some time for the execution helper application to receive the command.
-            };
-
-            consoleCloseEventHandler = (sender, e) =>
-            {
-                m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.Close);
-                Thread.Sleep(1000);     // Leave some time for the execution helper application to receive the command.
-            };
-
-            Console.CancelKeyPress += consoleCloseEventHandler;
-            AppDomain.CurrentDomain.ProcessExit += closeEventHandler;
 
             var hThis = GetConsoleWindow();
 
@@ -45,6 +43,13 @@ namespace StepBro.ExecutionHelper
             executionHelper.StartInfo.FileName = Path.Combine(folder, "../StepBro.ExecutionHelper.exe"); //../ because ExecutionHelper is in the main bin folder and this is the Modules folder
             executionHelper.StartInfo.Arguments = pipename;
             m_executionHelperStarted = executionHelper.Start();
+
+            receivedDataEventHandler = (sender, e) =>
+            {
+                ReceivedData(e);
+            };
+
+            Pipe.ReceivedData += receivedDataEventHandler;
 
             if (m_executionHelperStarted)
             {

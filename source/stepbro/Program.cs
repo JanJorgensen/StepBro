@@ -74,6 +74,7 @@ namespace StepBro.Cmd
             DataReport createdReport = null;
             Dictionary<string, ITextCommandInput> commandObjectDictionary = null;
             EventHandler closeEventHandler = null;
+            ConsoleCancelEventHandler consoleCancelEventHandler = null;
             IFileElement element = null;
             IPartner partner = null;
             IScriptExecution execution = null;
@@ -237,8 +238,15 @@ namespace StepBro.Cmd
                         Thread.Sleep(1000);     // Leave some time for the sidekick application to receive the command.
                     };
 
+                    consoleCancelEventHandler = (sender, e) =>
+                    {
+                        m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.Close);
+                        Thread.Sleep(1000);     // Leave some time for the execution helper application to receive the command.
+                    };
+                    
                     m_sidekickLogger = StepBroMain.Logger.RootLogger.CreateSubLocation("SideKick");
 
+                    Console.CancelKeyPress += consoleCancelEventHandler;
                     AppDomain.CurrentDomain.ProcessExit += closeEventHandler;
 
                     var hThis = GetConsoleWindow();
@@ -929,6 +937,7 @@ namespace StepBro.Cmd
             if (m_commandLineOptions.Sidekick)
             {
                 AppDomain.CurrentDomain.ProcessExit -= closeEventHandler;
+                Console.CancelKeyPress -= consoleCancelEventHandler;
             }
 
             m_activitiesRunning = false;
