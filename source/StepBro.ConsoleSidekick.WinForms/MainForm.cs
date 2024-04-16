@@ -1,6 +1,7 @@
 using CommandLine;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
+using StepBro.Core.Data.SerializationHelp;
 using StepBro.Core.Logging;
 using StepBro.Core.Tasks;
 using StepBro.Sidekick.Messages;
