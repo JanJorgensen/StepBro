@@ -13,7 +13,8 @@ namespace StepBro.ExecutionHelper.Messages
     public enum ShortCommand
     {
         None,
-        Close
+        Close,
+        Acknowledge
     }
 
     public class CreateVariable
@@ -70,5 +71,25 @@ namespace StepBro.ExecutionHelper.Messages
 
         public string VariableName { get; set; }
         public object Variable { get; set; }
+    }
+
+    public class SaveFile
+    {
+        public SaveFile(string fileName)
+        {
+            this.FileName = fileName;
+        }
+
+        public string FileName { get; set; }
+    }
+
+    public class LoadFile
+    {
+        public LoadFile(string fileName)
+        {
+            this.FileName = fileName;
+        }
+
+        public string FileName { get; set; }
     }
 }

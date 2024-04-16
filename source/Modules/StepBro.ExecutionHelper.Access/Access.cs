@@ -11,6 +11,7 @@ namespace StepBro.ExecutionHelper
     public class Access
     {
         EventHandler closeEventHandler = null;
+        ConsoleCancelEventHandler consoleCloseEventHandler = null;
         private Pipe m_executionHelperPipe = null;
         bool m_executionHelperStarted = false;
 
@@ -24,8 +25,13 @@ namespace StepBro.ExecutionHelper
                 Thread.Sleep(1000);     // Leave some time for the execution helper application to receive the command.
             };
 
-            // m_sidekickLogger = StepBroMain.Logger.RootLogger.CreateSubLocation("SideKick");
+            consoleCloseEventHandler = (sender, e) =>
+            {
+                m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.Close);
+                Thread.Sleep(1000);     // Leave some time for the execution helper application to receive the command.
+            };
 
+            Console.CancelKeyPress += consoleCloseEventHandler;
             AppDomain.CurrentDomain.ProcessExit += closeEventHandler;
 
             var hThis = GetConsoleWindow();
@@ -42,17 +48,13 @@ namespace StepBro.ExecutionHelper
 
             if (m_executionHelperStarted)
             {
-                // commandObjectDictionary = new Dictionary<string, ITextCommandInput>();
-
-                while (!m_executionHelperPipe.IsConnected())
+                int timeoutMs = 2500;
+                while (!m_executionHelperPipe.IsConnected() && timeoutMs > 0)
                 {
-                    System.Threading.Thread.Sleep(200);
-                    // TODO: Timeout
+                    int waitTimeMs = 200;
+                    System.Threading.Thread.Sleep(waitTimeMs);
+                    timeoutMs -= waitTimeMs;
                 }
-
-                // StartLogDumpTask();
-
-                // m_mode = Mode.WorkbenchWithSidekick;
             }
             else
             {
@@ -64,31 +66,25 @@ namespace StepBro.ExecutionHelper
 
         public bool CreateVariable(string variableName, object initialValue)
         {
-            bool result = true;
-
-            // TODO: Error checking
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.CreateVariable(variableName, initialValue));
 
+            bool result = WaitForAcknowledge();
             return result;
         }
 
         public bool IncrementVariable(string variableName)
         {
-            bool result = true;
-
-            // TODO: Error checking
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.IncrementVariable(variableName));
 
+            bool result = WaitForAcknowledge();
             return result;
         }
 
         public bool SetVariable(string variableName, object value)
         {
-            bool result = true;
-
-            // TODO: Error checking
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SetVariable(variableName, value));
 
+            bool result = WaitForAcknowledge();
             return result;
         }
 
@@ -96,14 +92,15 @@ namespace StepBro.ExecutionHelper
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.GetVariable(variableName));
 
-            object variable = 0;
+            object variable = -1;
 
-            // TODO: Timeout
+            int timeoutMs = 2500;
             var input = m_executionHelperPipe.TryGetReceived();
             while (input == null)
             {
                 // Wait
                 Thread.Sleep(1);
+                timeoutMs--;
                 input = m_executionHelperPipe.TryGetReceived();
             }
 
@@ -136,6 +133,48 @@ namespace StepBro.ExecutionHelper
             }
 
             return variable;
+        }
+
+        public bool SaveFile(string fileName)
+        {
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SaveFile(fileName));
+
+            bool result = WaitForAcknowledge();
+            return result;
+        }
+
+        public bool LoadFile(string fileName)
+        {
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.LoadFile(fileName));
+
+            bool result = WaitForAcknowledge();
+            return result;
+        }
+
+        bool WaitForAcknowledge()
+        {
+            bool result = false;
+
+            var input = m_executionHelperPipe.TryGetReceived();
+            int timeoutMs = 2500;
+            while (input == null && timeoutMs > 0)
+            {
+                // Wait
+                Thread.Sleep(1);
+                timeoutMs--;
+                input = m_executionHelperPipe.TryGetReceived();
+            }
+
+            if (input.Item1 == nameof(StepBro.ExecutionHelper.Messages.ShortCommand))
+            {
+                var cmd = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.ShortCommand>(input.Item2);
+                if (cmd == StepBro.ExecutionHelper.Messages.ShortCommand.Acknowledge)
+                {
+                    result = true;
+                }
+            }
+
+            return result;
         }
 
         [DllImport("kernel32.dll")]
