@@ -191,7 +191,7 @@ namespace StepBro.Core.IPC
                         //Console.WriteLine("ERROR: {0}", ex.Message);
                     }
                 }
-                pipeStream.Close();
+                pipeStream.Dispose();
             }
         }
 
