@@ -11,7 +11,6 @@ namespace StepBro.ExecutionHelper
     public class Access
     {
         private Pipe m_executionHelperPipe = null;
-        bool m_executionHelperStarted = false;
         bool m_closeWhenExecutionHelperCloses = false;
 
         private void ReceivedData(Tuple<string, string> message)
@@ -40,7 +39,11 @@ namespace StepBro.ExecutionHelper
             {
                 var executionHelper = new System.Diagnostics.Process();
                 executionHelper.StartInfo.FileName = Path.Combine(folder, "../StepBro.ExecutionHelper.exe"); //../ because ExecutionHelper is in the main bin folder and this is the Modules folder
-                m_executionHelperStarted = executionHelper.Start();
+                var m_executionHelperStarted = executionHelper.Start();
+                if (!m_executionHelperStarted)
+                {
+                    result = false;
+                }
             }
             
             m_executionHelperPipe = Pipe.StartClient("StepBroExecutionHelper", "1998");
@@ -50,7 +53,7 @@ namespace StepBro.ExecutionHelper
                 ReceivedData(e);
             };
 
-            if (m_executionHelperStarted)
+            if (result)
             {
                 int timeoutMs = 2500;
                 while (!m_executionHelperPipe.IsConnected() && timeoutMs > 0)
@@ -59,10 +62,7 @@ namespace StepBro.ExecutionHelper
                     System.Threading.Thread.Sleep(waitTimeMs);
                     timeoutMs -= waitTimeMs;
                 }
-            }
-            else
-            {
-                result = false;
+                result = timeoutMs > 0;
             }
 
             return result;
@@ -173,13 +173,19 @@ namespace StepBro.ExecutionHelper
                 input = m_executionHelperPipe.TryGetReceived();
             }
 
-            if (input.Item1 == nameof(StepBro.ExecutionHelper.Messages.ShortCommand))
+            result = timeoutMs > 0;
+
+            if (result && input.Item1 == nameof(StepBro.ExecutionHelper.Messages.ShortCommand))
             {
                 var cmd = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.ShortCommand>(input.Item2);
                 if (cmd == StepBro.ExecutionHelper.Messages.ShortCommand.Acknowledge)
                 {
                     result = true;
                 }
+            }
+            else
+            {
+                result = false;
             }
 
             return result;
