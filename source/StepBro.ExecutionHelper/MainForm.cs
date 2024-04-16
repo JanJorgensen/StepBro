@@ -13,6 +13,7 @@ namespace StepBro.ExecutionHelper
         FormClosingEventHandler? formCloseEventHandler = null;
         private bool m_closeRequested = false;
         private Dictionary<string, object> m_variables = new Dictionary<string, object>();
+        EventHandler<Tuple<string, string>>? receivedDataEventHandler = null;
 
         public MainForm()
         {
@@ -39,143 +40,146 @@ namespace StepBro.ExecutionHelper
 
             formCloseEventHandler = (sender, e) =>
             {
-                if (m_pipe.IsConnected())
+                if (m_pipe.IsConnected() && !m_closeRequested)
                 {
                     m_pipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.Close);
-                    Thread.Sleep(1000);     // Leave some time for the execution helper application to receive the command.
+                    Thread.Sleep(1000);
                 }
             };
 
             FormClosing += formCloseEventHandler;
+
+            receivedDataEventHandler = (sender, e) =>
+            {
+                ReceivedData(e);
+            };
+
+            Pipe.ReceivedData += receivedDataEventHandler;
         }
 
-        private void timerMasterPull_Tick(object sender, EventArgs e)
+        private void ReceivedData(Tuple<string, string> received)
         {
-            Tuple<string, string> received;
-            while (m_pipe != null && (received = m_pipe.TryGetReceived()) != null)
+            if (received.Item1 == nameof(ShortCommand))
             {
-                if (received.Item1 == nameof(ShortCommand))
+                var cmd = JsonSerializer.Deserialize<ShortCommand>(received.Item2);
+                if (cmd == ShortCommand.Close)
                 {
-                    var cmd = JsonSerializer.Deserialize<ShortCommand>(received.Item2);
-                    if (cmd == ShortCommand.Close)
+                    m_closeRequested = true;
+                    m_pipe!.Send(cmd);
+                    Pipe.ReceivedData -= receivedDataEventHandler;
+                    this.Close();
+                }
+            }
+            else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateVariable))
+            {
+                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.CreateVariable>(received.Item2);
+                if (data != null)
+                {
+                    if (data.InitialValue is System.Text.Json.JsonElement v && v.ValueKind == JsonValueKind.Number)
                     {
-                        m_closeRequested = true;
-                        m_pipe.Send(cmd);
-                        m_pipe.Dispose();
-                        this.Close();
+                        // It is some sort of number, so we save it as a long like StepBro uses
+                        long initialValue = 0;
+                        Int64.TryParse(data.InitialValue.ToString(), out initialValue);
+                        m_variables.TryAdd(data.VariableName, initialValue);
+                    }
+                    else
+                    {
+                        // It is not a number so we assume the user knows what they are doing
+                        m_variables.TryAdd(data.VariableName, data.InitialValue);
+                    }
+                    m_pipe!.Send(ShortCommand.Acknowledge);
+                }
+            }
+            else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.IncrementVariable))
+            {
+                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.IncrementVariable>(received.Item2);
+                if (data != null && m_variables.ContainsKey(data.VariableName))
+                {
+                    if (m_variables[data.VariableName] is long v)
+                    {
+                        m_variables[data.VariableName] = ++v;
+                        m_pipe!.Send(ShortCommand.Acknowledge);
                     }
                 }
-                else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateVariable))
+            }
+            else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.SetVariable))
+            {
+                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.SetVariable>(received.Item2);
+                if (data != null && m_variables.ContainsKey(data.VariableName))
                 {
-                    var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.CreateVariable>(received.Item2);
-                    if (data != null)
-                    {
-                        if (data.InitialValue is System.Text.Json.JsonElement v && v.ValueKind == JsonValueKind.Number)
-                        {
-                            // It is some sort of number, so we save it as a long like StepBro uses
-                            long initialValue = 0;
-                            Int64.TryParse(data.InitialValue.ToString(), out initialValue);
-                            m_variables.TryAdd(data.VariableName, initialValue);
-                        }
-                        else
-                        {
-                            // It is not a number so we assume the user knows what they are doing
-                            m_variables.TryAdd(data.VariableName, data.InitialValue);
-                        }
-                        m_pipe.Send(ShortCommand.Acknowledge);
-                    }
+                    m_variables[data.VariableName] = data.Value;
+                    m_pipe!.Send(ShortCommand.Acknowledge);
                 }
-                else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.IncrementVariable))
+            }
+            else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.GetVariable))
+            {
+                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.GetVariable>(received.Item2);
+                if (data != null)
                 {
-                    var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.IncrementVariable>(received.Item2);
-                    if (data != null && m_variables.ContainsKey(data.VariableName))
-                    {
-                        if (m_variables[data.VariableName] is long v)
-                        {
-                            m_variables[data.VariableName] = ++v;
-                            m_pipe.Send(ShortCommand.Acknowledge);
-                        }
-                    }
+                    m_pipe!.Send(new SendVariable(data.VariableName, m_variables[data.VariableName]));
                 }
-                else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.SetVariable))
+            }
+            else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.SaveFile))
+            {
+                string dataToSave = JsonSerializer.Serialize<Dictionary<string, object>>(m_variables);
+
+                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.SaveFile>(received.Item2);
+                if (data != null)
                 {
-                    var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.SetVariable>(received.Item2);
-                    if (data != null && m_variables.ContainsKey(data.VariableName))
+                    string fileName = data.FileName;
+                    if (File.Exists(fileName))
                     {
-                        m_variables[data.VariableName] = data.Value;
-                        m_pipe.Send(ShortCommand.Acknowledge);
+                        if (File.Exists("backup_" + fileName))
+                        {
+                            File.Delete("backup_" + fileName);
+                        }
+
+                        // We rename the old file to a backup in case we crash during writing
+                        // the new file or in case we accidentally save two files with the same name
+                        File.Move(fileName, "backup_" + fileName);
                     }
+
+                    using (FileStream fs = File.Create(fileName))
+                    {
+                        var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
+                        fs.Write(dataInFile, 0, dataInFile.Length);
+                    }
+
+                    m_pipe!.Send(ShortCommand.Acknowledge);
                 }
-                else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.GetVariable))
+            }
+            else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.LoadFile))
+            {
+                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.LoadFile>(received.Item2);
+                if (data != null)
                 {
-                    var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.GetVariable>(received.Item2);
-                    if (data != null)
+                    string fileName = data.FileName;
+                    string loadedData = "";
+
+                    using (FileStream fs = File.Open(fileName, FileMode.Open, FileAccess.Read))
                     {
-                        m_pipe.Send(new SendVariable(data.VariableName, m_variables[data.VariableName]));
-                    }
-                }
-                else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.SaveFile))
-                {
-                    string dataToSave = JsonSerializer.Serialize<Dictionary<string, object>>(m_variables);
+                        byte[] b = new byte[1024];
+                        UTF8Encoding temp = new UTF8Encoding(true);
 
-                    var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.SaveFile>(received.Item2);
-                    if (data != null)
+                        while (fs.Read(b, 0, b.Length) > 0)
+                        {
+                            loadedData += temp.GetString(b);
+                        }
+
+                        int firstIndexOfNull = loadedData.IndexOf('\0');
+                        loadedData = loadedData.Substring(0, firstIndexOfNull);
+                    }
+
+                    if (!String.IsNullOrEmpty(loadedData))
                     {
-                        string fileName = data.FileName;
-                        if (File.Exists(fileName))
+                        Dictionary<string, object>? loadedVariables = JsonSerializer.Deserialize<Dictionary<string, object>>(loadedData);
+                        if (loadedVariables != null)
                         {
-                            if (File.Exists("backup_" + fileName))
-                            {
-                                File.Delete("backup_" + fileName);
-                            }
-
-                            // We rename the old file to a backup in case we crash during writing
-                            // the new file or in case we accidentally save two files with the same name
-                            File.Move(fileName, "backup_" + fileName);
+                            m_variables = loadedVariables;
                         }
-
-                        using (FileStream fs = File.Create(fileName))
-                        {
-                            var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
-                            fs.Write(dataInFile, 0, dataInFile.Length);
-                        }
-
-                        m_pipe.Send(ShortCommand.Acknowledge);
                     }
-                }
-                else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.LoadFile))
-                {
-                    var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.LoadFile>(received.Item2);
-                    if (data != null)
-                    {
-                        string fileName = data.FileName;
-                        string loadedData = "";
 
-                        using (FileStream fs = File.Open(fileName, FileMode.Open, FileAccess.Read))
-                        {
-                            byte[] b = new byte[1024];
-                            UTF8Encoding temp = new UTF8Encoding(true);
-
-                            while (fs.Read(b, 0, b.Length) > 0)
-                            {
-                                loadedData += temp.GetString(b);
-                            }
-
-                            int firstIndexOfNull = loadedData.IndexOf('\0');
-                            loadedData = loadedData.Substring(0, firstIndexOfNull);
-                        }
-
-                        if (!String.IsNullOrEmpty(loadedData))
-                        {
-                            Dictionary<string, object>? loadedVariables = JsonSerializer.Deserialize<Dictionary<string, object>>(loadedData);
-                            if (loadedVariables != null)
-                            {
-                                m_variables = loadedVariables;
-                            }
-                        }
-
-                        m_pipe.Send(ShortCommand.Acknowledge);
-                    }
+                    m_pipe!.Send(ShortCommand.Acknowledge);
                 }
             }
         }
