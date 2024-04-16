@@ -33,17 +33,15 @@ namespace StepBro.ExecutionHelper
             m_closeWhenExecutionHelperCloses = closeWhenExecutionHelperCloses;
             bool result = true;
 
-            var hThis = GetConsoleWindow();
-
             string path = Assembly.GetExecutingAssembly().Location;
             var folder = Path.GetDirectoryName(path);
 
-            string pipename = hThis.ToString("X");
-            m_executionHelperPipe = Pipe.StartServer("StepBroExecutionHelper", pipename);
+            // TODO: Check if it is already running and connect to it instead
             var executionHelper = new System.Diagnostics.Process();
             executionHelper.StartInfo.FileName = Path.Combine(folder, "../StepBro.ExecutionHelper.exe"); //../ because ExecutionHelper is in the main bin folder and this is the Modules folder
-            executionHelper.StartInfo.Arguments = pipename;
             m_executionHelperStarted = executionHelper.Start();
+            
+            m_executionHelperPipe = Pipe.StartClient("StepBroExecutionHelper", "1998");
 
             Pipe.ReceivedData += (sender, e) =>
             {
@@ -192,8 +190,5 @@ namespace StepBro.ExecutionHelper
 
             return result;
         }
-
-        [DllImport("kernel32.dll")]
-        static extern IntPtr GetConsoleWindow();
     }
 }

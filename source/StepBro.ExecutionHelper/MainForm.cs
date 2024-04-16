@@ -8,7 +8,6 @@ namespace StepBro.ExecutionHelper
 {
     public partial class MainForm : Form
     {
-        private nint m_consoleWindow = 0;
         private Pipe? m_pipe = null;
         FormClosingEventHandler? formCloseEventHandler = null;
         private bool m_closeRequested = false;
@@ -26,17 +25,7 @@ namespace StepBro.ExecutionHelper
 
             System.Diagnostics.Trace.WriteLine("Execution Helper STARTING!!");
 
-            string[] args = Environment.GetCommandLineArgs();
-
-            if (args.Length == 2)
-            {
-                m_consoleWindow = nint.Parse(args[1], System.Globalization.NumberStyles.HexNumber);
-                m_pipe = Pipe.StartClient("StepBroExecutionHelper", args[1]);
-            }
-            else
-            {
-                return;
-            }
+            m_pipe = Pipe.StartServer("StepBroExecutionHelper", "1998");
 
             formCloseEventHandler = (sender, e) =>
             {
