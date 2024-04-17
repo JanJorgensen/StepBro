@@ -10,6 +10,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Configurations>Debug;Release;DebugAll;ReleaseAll</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
