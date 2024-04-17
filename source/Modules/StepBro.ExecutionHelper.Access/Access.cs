@@ -1,4 +1,5 @@
-﻿using StepBro.Core.IPC;
+﻿using StepBro.Core.Data;
+using StepBro.Core.IPC;
 using System;
 using System.IO;
 using System.Reflection;
@@ -8,10 +9,14 @@ using System.Threading;
 
 namespace StepBro.ExecutionHelper
 {
-    public class Access
+    public class Access : INameable
     {
         private Pipe m_executionHelperPipe = null;
-        bool m_closeWhenExecutionHelperCloses = false;
+        private bool m_closeWhenExecutionHelperCloses = false;
+
+        public string Name { get; set; } = null;
+        public string Prefix { get; set; } = null;
+
 
         private void ReceivedData(Tuple<string, string> message)
         {
@@ -29,6 +34,12 @@ namespace StepBro.ExecutionHelper
 
         public bool CreateExecutionHelper(bool closeWhenExecutionHelperCloses = false)
         {
+            // If constructor with no arguments were used, we use the name of the instance instead
+            if (Prefix == null)
+            {
+                Prefix = Name;
+            }
+
             m_closeWhenExecutionHelperCloses = closeWhenExecutionHelperCloses;
             bool result = true;
 
@@ -70,7 +81,7 @@ namespace StepBro.ExecutionHelper
 
         public bool CreateOrSetVariable(string variableName, object value)
         {
-            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.CreateOrSetVariable(variableName, value));
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.CreateOrSetVariable(Prefix + variableName, value));
 
             bool result = WaitForAcknowledge();
             return result;
@@ -78,7 +89,7 @@ namespace StepBro.ExecutionHelper
 
         public bool IncrementVariable(string variableName)
         {
-            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.IncrementVariable(variableName));
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.IncrementVariable(Prefix + variableName));
 
             bool result = WaitForAcknowledge();
             return result;
@@ -86,7 +97,7 @@ namespace StepBro.ExecutionHelper
 
         public object GetVariable(string variableName)
         {
-            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.GetVariable(variableName));
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.GetVariable(Prefix + variableName));
 
             object variable = -1;
 
@@ -137,7 +148,7 @@ namespace StepBro.ExecutionHelper
 
         public bool SaveFile(string fileName)
         {
-            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SaveFile(fileName));
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SaveFile(Prefix + fileName));
 
             bool result = WaitForAcknowledge();
             return result;
@@ -145,7 +156,7 @@ namespace StepBro.ExecutionHelper
 
         public bool LoadFile(string fileName)
         {
-            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.LoadFile(fileName));
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.LoadFile(Prefix + fileName));
 
             bool result = WaitForAcknowledge();
             return result;

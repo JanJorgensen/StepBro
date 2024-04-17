@@ -81,4 +81,14 @@ namespace StepBro.ExecutionHelper.Messages
 
         public string FileName { get; set; }
     }
+
+    public class SetRunOnStartup
+    {
+        public SetRunOnStartup(string command)
+        {
+            this.Command = command;
+        }
+
+        public string Command { get; set; }
+    }
 }
