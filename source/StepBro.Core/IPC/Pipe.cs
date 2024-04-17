@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.IO;
 using System.IO.Pipes;
+using System.IO;
 using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 
-namespace StepBro
+namespace StepBro.Core.IPC
 {
-    public class SideKickPipe : IDisposable
+    public class Pipe : IDisposable
     {
         private PipeStream m_pipe = null;
         private StreamString m_stream = null;
@@ -22,6 +19,8 @@ namespace StepBro
         private bool m_continueReceiving = false;
         private ConcurrentQueue<Tuple<string, string>> m_received = null;
         private ManualResetEvent m_disposeEvent = null;
+
+        public static EventHandler<Tuple<string, string>> ReceivedData { get; set; }
 
         //public static void MyMainFunctionality()
         //{
@@ -47,7 +46,7 @@ namespace StepBro
         //    Console.WriteLine("\nServer threads exhausted, exiting.");
         //}
 
-        private SideKickPipe(string id, PipeStream pipe)
+        private Pipe(string id, PipeStream pipe)
         {
             m_pipe = pipe;
         }
@@ -56,7 +55,7 @@ namespace StepBro
         {
             if (!m_disposed)
             {
-                System.Diagnostics.Trace.WriteLine("Sidekick pipe dispose!!");
+                System.Diagnostics.Trace.WriteLine("IPC pipe dispose!!");
 
                 m_continueReceiving = false;
                 m_continue = false;
@@ -71,7 +70,7 @@ namespace StepBro
                     m_thread.Join();
                     m_thread = null;
                 }
-                System.Diagnostics.Trace.WriteLine("Sidekick thread stopped");
+                System.Diagnostics.Trace.WriteLine("IPC thread stopped");
                 if (m_pipe != null)
                 {
                     m_pipe.Close();
@@ -80,35 +79,35 @@ namespace StepBro
             }
         }
 
-        private static SideKickPipe Create(string id, PipeStream pipe, ParameterizedThreadStart threadFunction)
+        private static Pipe Create(string id, PipeStream pipe, ParameterizedThreadStart threadFunction)
         {
-            var instance = new SideKickPipe(id, pipe);
+            var instance = new Pipe(id, pipe);
             instance.m_thread = new Thread(threadFunction);
             instance.m_received = new ConcurrentQueue<Tuple<string, string>>();
             return instance;
         }
 
-        public static SideKickPipe StartServer(string id)
+        public static Pipe StartServer(string pipeName, string id)
         {
-            var pipeServer = new NamedPipeServerStream("StepBroConsoleSidekick" + id, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-            var pipe = SideKickPipe.Create(id, pipeServer, ServerThread);
+            var pipeServer = new NamedPipeServerStream(pipeName + id, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+            var pipe = Pipe.Create(id, pipeServer, ServerThread);
             pipe.m_disposeEvent = new ManualResetEvent(false);
             pipe.m_continue = true;
             pipe.m_thread.Start(pipe);
             return pipe;
         }
 
-        public static SideKickPipe StartClient(string id)
+        public static Pipe StartClient(string pipeName, string id)
         {
-            var pipeClient = new NamedPipeClientStream(".", "StepBroConsoleSidekick" + id, PipeDirection.InOut, PipeOptions.Asynchronous, TokenImpersonationLevel.None);
-            var pipe = SideKickPipe.Create(id, pipeClient, ReceiverThread);
+            var pipeClient = new NamedPipeClientStream(".", pipeName + id, PipeDirection.InOut, PipeOptions.Asynchronous, TokenImpersonationLevel.None);
+            var pipe = Pipe.Create(id, pipeClient, ReceiverThread);
             pipeClient.Connect();
             pipe.m_stream = new StreamString(pipeClient);
             var firstString = pipe.m_stream.ReadString();
             if (firstString == "StepBro is it")
             {
                 pipe.m_continueReceiving = true;
-                System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE starting client");
+                System.Diagnostics.Trace.WriteLine("### Pipe starting client");
                 pipe.m_thread.Start(pipe);
                 return pipe;
             }
@@ -148,7 +147,7 @@ namespace StepBro
 
         private static void ServerThread(object data)
         {
-            var instance = data as SideKickPipe;
+            var instance = data as Pipe;
             var pipeStream = (instance.m_pipe as NamedPipeServerStream);
 
             int threadId = Thread.CurrentThread.ManagedThreadId;
@@ -164,11 +163,11 @@ namespace StepBro
                         {
                             pipeStream.EndWaitForConnection(ar);
 
-                            System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE server connect");
+                            System.Diagnostics.Trace.WriteLine("### Pipe server connect");
                         }
                         catch (Exception ex)
                         {
-                            System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE server connect exception");
+                            System.Diagnostics.Trace.WriteLine("### Pipe server connect exception");
                             connectException = ex;
                         }
                         connectEvent.Set();
@@ -192,29 +191,29 @@ namespace StepBro
                         //Console.WriteLine("ERROR: {0}", ex.Message);
                     }
                 }
-                pipeStream.Close();
+                pipeStream.Dispose();
             }
         }
 
         private static void ReceiverThread(object data)
         {
-            var instance = data as SideKickPipe;
+            var instance = data as Pipe;
             //instance.m_pipe.ReadTimeout = 1000;
-            System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE receiver thread started");
+            System.Diagnostics.Trace.WriteLine("### Pipe receiver thread started");
             try
             {
                 while (instance.m_continueReceiving)
                 {
-                    System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE receiver: ReadString");
+                    System.Diagnostics.Trace.WriteLine("### Pipe receiver: ReadString");
                     var s = instance.m_stream.ReadString();
                     if (s == null)
                     {
-                        System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE Received nothing");
+                        System.Diagnostics.Trace.WriteLine("### Pipe Received nothing");
                         instance.m_continueReceiving = false;
                     }
                     else
                     {
-                        System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE Received: " + s);
+                        System.Diagnostics.Trace.WriteLine("### Pipe Received: " + s);
                         var colonIndex = s.IndexOf(':');
                         if (colonIndex > 0)
                         {
@@ -225,13 +224,18 @@ namespace StepBro
                                 instance.m_continueReceiving = false;
                                 instance.Send(s);   // Return the close-request to the other side.
                             }
+
+                            if (ReceivedData != null)
+                            {
+                                ReceivedData.Invoke(null, message);
+                            }
                         }
                     }
                 }
             }
             finally
             {
-                System.Diagnostics.Trace.WriteLine("### SIDEKICKPIPE stopping receiver");
+                System.Diagnostics.Trace.WriteLine("### Pipe stopping receiver");
             }
         }
     }

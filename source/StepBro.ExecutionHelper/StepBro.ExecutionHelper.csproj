@@ -2,24 +2,19 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
-    <AssemblyName>StepBro.Sidekick</AssemblyName>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <AssemblyName>StepBro.ExecutionHelper</AssemblyName>
     <OutputPath>..\bin</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Configurations>Debug;Release;DebugAll;ReleaseAll</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\stepbro\ConsoleSidekickMessages.cs" Link="ConsoleSidekickMessages.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
-    <ProjectReference Include="..\StepBro.UI.WinForms\StepBro.UI.WinForms.csproj" />
   </ItemGroup>
 
 </Project>
