@@ -44,6 +44,36 @@ namespace StepBro.ExecutionHelper
             };
 
             Pipe.ReceivedData += receivedDataEventHandler;
+
+            RunOnStartup();
+        }
+
+        private void RunOnStartup()
+        {
+            string fileName = "CommandToRunOnStartup.sbd";
+            string loadedData = "";
+
+            if (File.Exists(fileName))
+            {
+                using (FileStream fs = File.Open(fileName, FileMode.Open, FileAccess.Read))
+                {
+                    byte[] b = new byte[1024];
+                    UTF8Encoding temp = new UTF8Encoding(true);
+
+                    while (fs.Read(b, 0, b.Length) > 0)
+                    {
+                        loadedData += temp.GetString(b);
+                    }
+
+                    int firstIndexOfNull = loadedData.IndexOf('\0');
+                    loadedData = loadedData.Substring(0, firstIndexOfNull);
+                }
+
+                if (!String.IsNullOrEmpty(loadedData))
+                {
+                    // TODO: Run the command - Remember to do sanity checking, possibly by deserializing into an object that has the specific parameters we look for, i.e. filename, testlist, model, print_report etc.
+                }
+            }
         }
 
         private void ReceivedData(Tuple<string, string> received)
@@ -166,6 +196,32 @@ namespace StepBro.ExecutionHelper
                     }
 
                     m_pipe!.Send(ShortCommand.Acknowledge);
+                }
+            }
+            else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.SetCommandRunOnStartup))
+            {
+                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.SetCommandRunOnStartup>(received.Item2);
+                if (data != null)
+                {
+                    string dataToSave = JsonSerializer.Serialize<string>(data.Command);
+                    string fileName = "CommandToRunOnStartup.sbd";
+                    if (File.Exists(fileName))
+                    {
+                        if (File.Exists("backup_" + fileName))
+                        {
+                            File.Delete("backup_" + fileName);
+                        }
+
+                        // We rename the old file to a backup in case we crash during writing
+                        // the new file or in case we accidentally save two files with the same name
+                        File.Move(fileName, "backup_" + fileName);
+                    }
+
+                    using (FileStream fs = File.Create(fileName))
+                    {
+                        var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
+                        fs.Write(dataInFile, 0, dataInFile.Length);
+                    }
                 }
             }
         }

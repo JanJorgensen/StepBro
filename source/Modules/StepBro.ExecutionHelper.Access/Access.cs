@@ -162,6 +162,14 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
+        public bool SetCommandRunOnStartup(string command)
+        {
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SetCommandRunOnStartup(command));
+
+            bool result = WaitForAcknowledge();
+            return result;
+        }
+
         public bool CloseApplication()
         {
             m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.CloseApplication);
