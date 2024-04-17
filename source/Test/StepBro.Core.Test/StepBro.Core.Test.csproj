@@ -9,6 +9,7 @@
     <RootNamespace>StepBro.Core.Test</RootNamespace>
     <AssemblyName>StepBro.Core.Test</AssemblyName>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <Configurations>Debug;Release;DebugAll;ReleaseAll</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
