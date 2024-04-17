@@ -112,6 +112,7 @@ namespace StepBro.ExecutionHelper
                         // It is not a number so we assume the user knows what they are doing
                         m_variables.TryAdd(data.VariableName, data.Value);
                     }
+
                     m_pipe!.Send(ShortCommand.Acknowledge);
                 }
             }
@@ -143,23 +144,7 @@ namespace StepBro.ExecutionHelper
                 if (data != null)
                 {
                     string fileName = data.FileName;
-                    if (File.Exists(fileName))
-                    {
-                        if (File.Exists("backup_" + fileName))
-                        {
-                            File.Delete("backup_" + fileName);
-                        }
-
-                        // We rename the old file to a backup in case we crash during writing
-                        // the new file or in case we accidentally save two files with the same name
-                        File.Move(fileName, "backup_" + fileName);
-                    }
-
-                    using (FileStream fs = File.Create(fileName))
-                    {
-                        var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
-                        fs.Write(dataInFile, 0, dataInFile.Length);
-                    }
+                    SaveFile(fileName, dataToSave);
 
                     m_pipe!.Send(ShortCommand.Acknowledge);
                 }
@@ -223,6 +208,27 @@ namespace StepBro.ExecutionHelper
                         fs.Write(dataInFile, 0, dataInFile.Length);
                     }
                 }
+            }
+        }
+
+        private void SaveFile(string fileName, string dataToSave)
+        {
+            if (File.Exists(fileName))
+            {
+                if (File.Exists("backup_" + fileName))
+                {
+                    File.Delete("backup_" + fileName);
+                }
+
+                // We rename the old file to a backup in case we crash during writing
+                // the new file or in case we accidentally save two files with the same name
+                File.Move(fileName, "backup_" + fileName);
+            }
+
+            using (FileStream fs = File.Create(fileName))
+            {
+                var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
+                fs.Write(dataInFile, 0, dataInFile.Length);
             }
         }
     }
