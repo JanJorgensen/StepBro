@@ -52,7 +52,7 @@ namespace StepBro.VISA
                     // Handled elsewhere
                     break;
                 case nameof(VISABridge.Messages.Received):
-                    // TODO: Handle Received
+                    // Handled elsewhere
                     break;
                 case nameof(VISABridge.Messages.Send):
                     // Should not happen
@@ -119,21 +119,62 @@ namespace StepBro.VISA
         {
             m_visaPipe.Send(new VISABridge.Messages.Send(command));
             m_visaPipe.Send(VISABridge.Messages.ShortCommand.Receive);
-            return "";
-            //return m_instrument.Query(command);
+
+            int timeoutMs = 2500;
+            Tuple<string, string> input = null;
+            do
+            {
+                input = m_visaPipe.TryGetReceived();
+                if (input != null)
+                {
+                    break;
+                }
+                // Wait
+                Thread.Sleep(1);
+                timeoutMs--;
+            } while (timeoutMs > 0);
+
+            string received = null;
+            if (input.Item1 == nameof(VISABridge.Messages.Received))
+            {
+                var data = System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2);
+                received = data.Line;
+            }
+
+            return received;
         }
 
         public void Write([Implicit] ICallContext context, string command)
         {
             m_visaPipe.Send(new VISABridge.Messages.Send(command));
-            //m_instrument.Write(command);
         }
 
         public string Read([Implicit] ICallContext context)
         {
             m_visaPipe.Send(VISABridge.Messages.ShortCommand.Receive);
-            return "";
-            //return m_instrument.Read();
+
+            int timeoutMs = 2500;
+            Tuple<string, string> input = null;
+            do
+            {
+                input = m_visaPipe.TryGetReceived();
+                if (input != null)
+                {
+                    break;
+                }
+                // Wait
+                Thread.Sleep(1);
+                timeoutMs--;
+            } while (timeoutMs > 0);
+
+            string received = null;
+            if (input.Item1 == nameof(VISABridge.Messages.Received))
+            {
+                var data = System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2);
+                received = data.Line;
+            }
+
+            return received;
         }
 
         public string[] ListAvailableResources()
