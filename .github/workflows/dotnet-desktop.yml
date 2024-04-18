@@ -94,3 +94,6 @@ jobs:
 
     - name: Run SerialTestConnection test
       run: .\source\bin\stepbro.exe ".\test files\ModuleTests\SerialTestConnection\SerialTestConnectionTests.sbs" -v -e SerialTestConnectionOfflineTests -m FormalTest --exitcode SubVerdict
+
+    - name: Run ExecutionHelper test
+      run: .\source\bin\stepbro.exe ".\test files\ModuleTests\ExecutionHelper\ExecutionHelperTests.sbs" -v -e ExecutionHelperTests -m FormalTest --exitcode SubVerdict
