@@ -142,6 +142,10 @@ namespace StepBro.VISA
                     received = data.Line;
                 }
             }
+            else
+            {
+                received = "Session is not open.";
+            }
 
             return received;
         }
@@ -181,6 +185,10 @@ namespace StepBro.VISA
                     received = data.Line;
                 }
             }
+            else
+            {
+                received = "Session is not open.";
+            }
 
             return received;
         }
@@ -212,6 +220,10 @@ namespace StepBro.VISA
                     var data = System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.ConnectedInstruments>(input.Item2);
                     instruments = data.Instruments;
                 }
+            }
+            else
+            {
+                instruments = ["Session is not open."];
             }
 
             return instruments;
