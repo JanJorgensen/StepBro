@@ -40,7 +40,6 @@ namespace StepBro.VISA
                             break;
                     }
                     break;
-                    break;
                 case nameof(VISABridge.Messages.OpenSession):
 
                     break;
