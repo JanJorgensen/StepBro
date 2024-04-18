@@ -8,6 +8,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
@@ -25,7 +26,21 @@ namespace StepBro.VISABridge
             switch(received.Item1)
             {
                 case nameof(ShortCommand):
+                    switch(JsonSerializer.Deserialize<ShortCommand>(received.Item2))
+                    {
+                        case ShortCommand.None:
 
+                            break;
+                        case ShortCommand.GetInstrumentList:
+
+                            break;
+                        case ShortCommand.SessionClosed:
+
+                            break;
+                        case ShortCommand.Receive:
+
+                            break;
+                    }
                     break;
                 case nameof(OpenSession):
 

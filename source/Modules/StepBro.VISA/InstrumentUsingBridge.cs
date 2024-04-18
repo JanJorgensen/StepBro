@@ -24,7 +24,22 @@ namespace StepBro.VISA
             switch (received.Item1)
             {
                 case nameof(VISABridge.Messages.ShortCommand):
+                    switch (System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.ShortCommand>(received.Item2))
+                    {
+                        case VISABridge.Messages.ShortCommand.None:
 
+                            break;
+                        case VISABridge.Messages.ShortCommand.GetInstrumentList:
+
+                            break;
+                        case VISABridge.Messages.ShortCommand.SessionClosed:
+
+                            break;
+                        case VISABridge.Messages.ShortCommand.Receive:
+
+                            break;
+                    }
+                    break;
                     break;
                 case nameof(VISABridge.Messages.OpenSession):
 
