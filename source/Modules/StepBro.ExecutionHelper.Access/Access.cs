@@ -59,7 +59,7 @@ namespace StepBro.ExecutionHelper
             
             m_executionHelperPipe = Pipe.StartClient("StepBroExecutionHelper", "1998");
 
-            Pipe.ReceivedData += (sender, e) =>
+            m_executionHelperPipe.ReceivedData += (sender, e) =>
             {
                 ReceivedData(e);
             };

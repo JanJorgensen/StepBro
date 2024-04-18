@@ -163,7 +163,7 @@ namespace StepBro.VISABridge
 
             m_pipe = Pipe.StartClient("StepBroVisaPipe", "1234");
 
-            Pipe.ReceivedData += (_, eventArgs) =>
+            m_pipe.ReceivedData += (_, eventArgs) =>
             {
                 ReceivedData(eventArgs);
             };

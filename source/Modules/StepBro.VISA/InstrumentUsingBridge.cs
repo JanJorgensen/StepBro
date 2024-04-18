@@ -48,7 +48,7 @@ namespace StepBro.VISA
             bridge.StartInfo.Arguments = "--automate";
             var started = bridge.Start();
 
-            Pipe.ReceivedData += (sender, e) =>
+            m_visaPipe.ReceivedData += (sender, e) =>
             {
                 ReceivedData(e);
             };
