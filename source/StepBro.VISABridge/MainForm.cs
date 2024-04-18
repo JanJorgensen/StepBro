@@ -1,5 +1,6 @@
 ﻿using NationalInstruments.Visa;
 using StepBro.Core.IPC;
+using StepBro.VISABridge.Messages;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,7 +22,30 @@ namespace StepBro.VISABridge
 
         private void ReceivedData(Tuple<string, string> received)
         {
+            switch(received.Item1)
+            {
+                case nameof(ShortCommand):
 
+                    break;
+                case nameof(OpenSession):
+
+                    break;
+                case nameof(CloseSession):
+
+                    break;
+                case nameof(ConnectedInstruments):
+
+                    break;
+                case nameof(Received):
+
+                    break;
+                case nameof(Send):
+
+                    break;
+                case nameof(SessionOpened):
+
+                    break;
+            }
         }
 
         public MainForm()

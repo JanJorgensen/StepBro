@@ -19,9 +19,32 @@ namespace StepBro.VISA
         private string m_name = "instrument";
         private Pipe m_visaPipe = null;
 
-        private void ReceivedData(Tuple<string, string> message)
+        private void ReceivedData(Tuple<string, string> received)
         {
+            switch (received.Item1)
+            {
+                case nameof(VISABridge.Messages.ShortCommand):
 
+                    break;
+                case nameof(VISABridge.Messages.OpenSession):
+
+                    break;
+                case nameof(VISABridge.Messages.CloseSession):
+
+                    break;
+                case nameof(VISABridge.Messages.ConnectedInstruments):
+
+                    break;
+                case nameof(VISABridge.Messages.Received):
+
+                    break;
+                case nameof(VISABridge.Messages.Send):
+
+                    break;
+                case nameof(VISABridge.Messages.SessionOpened):
+
+                    break;
+            }
         }
 
         public string Resource
