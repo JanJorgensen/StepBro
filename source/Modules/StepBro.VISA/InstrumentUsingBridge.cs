@@ -1,6 +1,7 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.IPC;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
@@ -16,6 +17,12 @@ namespace StepBro.VISA
     {
         private string m_resource = "";
         private string m_name = "instrument";
+        private Pipe m_visaPipe = null;
+
+        private void ReceivedData(Tuple<string, string> message)
+        {
+
+        }
 
         public string Resource
         {
@@ -31,15 +38,32 @@ namespace StepBro.VISA
 
         public bool Open([Implicit] ICallContext context = null)
         {
+            m_visaPipe = Pipe.StartServer("StepBroVisaPipe", "1234");
+
             string path = Assembly.GetExecutingAssembly().Location;
             var folder = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path), ".."));
 
-            //string pipename = hThis.ToString("X");
-            //m_sideKickPipe = SideKickPipe.StartServer(pipename);
             var bridge = new System.Diagnostics.Process();
             bridge.StartInfo.FileName = Path.Combine(folder, "StepBro.VISABridge.exe");
             bridge.StartInfo.Arguments = "--automate";
             var started = bridge.Start();
+
+            Pipe.ReceivedData += (sender, e) =>
+            {
+                ReceivedData(e);
+            };
+
+            if (started)
+            {
+                int timeoutMs = 2500;
+                while (!m_visaPipe.IsConnected() && timeoutMs > 0)
+                {
+                    int waitTimeMs = 200;
+                    System.Threading.Thread.Sleep(waitTimeMs);
+                    timeoutMs -= waitTimeMs;
+                }
+                started = timeoutMs > 0;
+            }
 
             return started;
         }

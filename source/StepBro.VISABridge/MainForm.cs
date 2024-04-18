@@ -1,4 +1,5 @@
 ﻿using NationalInstruments.Visa;
+using StepBro.Core.IPC;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,6 +17,12 @@ namespace StepBro.VISABridge
     {
         private string m_lastResourceString = "";
         private MessageBasedSession m_session = null;
+        private Pipe m_pipe = null;
+
+        private void ReceivedData(Tuple<string, string> received)
+        {
+
+        }
 
         public MainForm()
         {
@@ -153,6 +160,13 @@ namespace StepBro.VISABridge
         private void MainForm_Load(object sender, EventArgs e)
         {
             string[] args = Environment.GetCommandLineArgs();
+
+            m_pipe = Pipe.StartClient("StepBroVisaPipe", "1234");
+
+            Pipe.ReceivedData += (_, eventArgs) =>
+            {
+                ReceivedData(eventArgs);
+            };
 
             if (args.Length == 2)
             {
