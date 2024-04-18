@@ -1,0 +1,62 @@
+using System;
+using StepBro.ExecutionHelper.Access;
+using "TestFramework.sbs";
+
+public StepBro.ExecutionHelper.Access access = StepBro.ExecutionHelper.Access(){}
+
+testlist ExecutionHelperTests : TestSuite
+{
+    * ExecutionHelperTest
+}
+
+void ExecutionHelperTest() : TestCase
+{
+    bool result = access.CreateExecutionHelper();
+    expect(result == true);
+
+    result = access.CreateVariable("TestCounter", 0);
+    expect(result == true);
+
+    result = access.IncrementVariable("TestCounter");
+    expect(result == true);
+
+    result = access.IncrementVariable("TestCounter");
+    expect(result == true);
+
+    int testCounter = (int)access.GetVariable("TestCounter");
+    expect(testCounter == 2);
+
+    result = access.CreateVariable("TestBool", true);
+    expect(result == true);
+
+    bool testBool = (bool)access.GetVariable("TestBool");
+    expect(testBool == true);
+
+    result = access.SetVariable("TestBool", false);
+    expect(result == true);
+    
+    testBool = (bool)access.GetVariable("TestBool");
+    expect(testBool == false);
+
+    result = access.CreateVariable("TestString", "Test!");
+    expect(result == true);
+
+    string testString = (string)access.GetVariable("TestString");
+    expect(testString == "Test!");
+
+    result = access.SaveFile("TestData.sbd");
+    expect(result == true);
+
+    result = access.SetVariable("TestCounter", 17);
+    expect(result == true);
+
+    testCounter = (int)access.GetVariable("TestCounter");
+    expect(testCounter == 17);
+
+    result = access.LoadFile("TestData.sbd");
+    testCounter = (int)access.GetVariable("TestCounter");
+    expect(testCounter == 2);
+
+    result = access.Close();
+    expect(result == true);
+}

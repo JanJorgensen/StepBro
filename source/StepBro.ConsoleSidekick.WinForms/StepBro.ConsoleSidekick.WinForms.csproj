@@ -10,11 +10,11 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Configurations>Debug;Release;DebugAll;ReleaseAll</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="..\stepbro\ConsoleSidekickMessages.cs" Link="ConsoleSidekickMessages.cs" />
-    <Compile Include="..\stepbro\SideKickPipes.cs" Link="SideKickPipes.cs" />
   </ItemGroup>
 
   <ItemGroup>

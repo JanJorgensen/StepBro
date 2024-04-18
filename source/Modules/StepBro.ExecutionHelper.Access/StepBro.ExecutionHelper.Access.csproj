@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <AssemblyName>StepBro.ExecutionHelper.Access</AssemblyName>
+        <RootNamespace>StepBro.ExecutionHelper.Access</RootNamespace>
+        <OutputPath>..\..\bin\Modules</OutputPath>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+        <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+        <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\..\CommonVersion.cs" Link="CommonVersion.cs" />
+        <Compile Include="..\..\StepBro.ExecutionHelper\ExecutionHelperMessages.cs" Link="ExecutionHelperMessages.cs" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\..\StepBro.Core\StepBro.Core.csproj">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </ProjectReference>
+    </ItemGroup>
+</Project>

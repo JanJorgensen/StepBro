@@ -1,6 +1,8 @@
 using CommandLine;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
+using StepBro.Core.IPC;
+using StepBro.Core.Data.SerializationHelp;
 using StepBro.Core.Logging;
 using StepBro.Core.Tasks;
 using StepBro.Sidekick.Messages;
@@ -19,7 +21,7 @@ namespace StepBro.ConsoleSidekick.WinForms
         private bool m_forceResize = false;
         private bool m_moveToTop = true;
         private bool m_closeRequestedByConsole = false;
-        private SideKickPipe m_pipe = null;
+        private Pipe m_pipe = null;
         private Rect m_lastConsolePosition = new Rect();
         private IExecutionAccess m_executingScript = null;
         private PanelsDialog m_panelsDialog = null;
@@ -142,7 +144,7 @@ namespace StepBro.ConsoleSidekick.WinForms
             if (args.Length == 2)
             {
                 m_consoleWindow = nint.Parse(args[1], System.Globalization.NumberStyles.HexNumber);
-                m_pipe = SideKickPipe.StartClient(args[1]);
+                m_pipe = Pipe.StartClient("StepBroConsoleSidekick", args[1]);
             }
             else
             {
@@ -750,7 +752,7 @@ namespace StepBro.ConsoleSidekick.WinForms
                                     procedureExecutionOptionMenu.Name = "toolStripMenuProcedure" + procedure.Name + "Dot" + partner.Name;
                                     procedureExecutionOptionMenu.Text = procedure.Name + "." + partner.Name;
                                     procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}' partner '{partner.Name}'";
-                                    var partnerProcedure = procedures.FirstOrDefault(p => p.FullName == partner.ProcedureType);
+                                    var partnerProcedure = allProcedures.FirstOrDefault(p => p.FullName == partner.ProcedureReference);
                                     if (partnerProcedure == null ||
                                         (partnerProcedure.Parameters != null && partnerProcedure.Parameters.Length > ((partnerProcedure.FirstParameterIsInstanceReference) ? 1 : 0)))   // TODO: Check whether that first parameter is the parent procedure.
                                     {
@@ -1101,10 +1103,10 @@ namespace StepBro.ConsoleSidekick.WinForms
         {
             var execution = new ExecutionAccess(this, m_pipe);
             m_activeExecutions.Add(new WeakReference<ExecutionAccess>(execution));
-            List<Argument> arguments = null;
+            List<TypedValue> arguments = null;
             if (args != null)
             {
-                arguments = args.Select(a => new Argument(a)).ToList();
+                arguments = args.Select(a => new TypedValue(a)).ToList();
             }
             var request = new RunScriptRequest(execution.ID, false, element, model, objectVariable, arguments);
             if (toolStripTextBoxExeNote.Visible)
@@ -1125,11 +1127,11 @@ namespace StepBro.ConsoleSidekick.WinForms
         private class ExecutionAccess : IExecutionAccess, IDisposing
         {
             private MainForm m_parent;
-            private SideKickPipe m_pipe;
+            private Pipe m_pipe;
             private TaskExecutionState m_state = TaskExecutionState.StartRequested;
             private bool m_active = true;
 
-            public ExecutionAccess(MainForm parent, SideKickPipe pipe)
+            public ExecutionAccess(MainForm parent, Pipe pipe)
             {
                 m_parent = parent;
                 m_pipe = pipe;

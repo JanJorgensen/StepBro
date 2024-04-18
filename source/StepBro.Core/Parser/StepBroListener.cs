@@ -306,6 +306,7 @@ namespace StepBro.Core.Parser
                 {
                     LabelTarget returnLabel = Expression.Label(typeof(bool));
 
+                    var parameterFile = Expression.Parameter(typeof(IScriptFile), "file");
                     var parameterContainer = Expression.Parameter(typeof(IValueContainerOwnerAccess), "container");
                     var parameterLogger = Expression.Parameter(typeof(ILogger), "logger");
 
@@ -319,6 +320,7 @@ namespace StepBro.Core.Parser
                         Expression.Block(
                             callSetValue,
                             Expression.Label(returnLabel, Expression.Constant(true))),
+                        parameterFile,
                         parameterContainer,
                         parameterLogger);
 
@@ -359,6 +361,7 @@ namespace StepBro.Core.Parser
             {
                 LabelTarget returnLabel = Expression.Label(typeof(bool));
 
+                var parameterScriptFile = Expression.Parameter(typeof(IScriptFile), "file");
                 var parameterContainer = Expression.Parameter(typeof(IValueContainerOwnerAccess), "container");
                 var parameterLogger = Expression.Parameter(typeof(ILogger), "logger");
 
@@ -373,6 +376,7 @@ namespace StepBro.Core.Parser
                     Expression.Block(
                         callSetValue,
                         Expression.Label(returnLabel, Expression.Constant(true))),
+                    parameterScriptFile,
                     parameterContainer,
                     parameterLogger);
 
@@ -567,6 +571,7 @@ namespace StepBro.Core.Parser
                 try
                 {
                     LabelTarget returnLabel = Expression.Label(typeof(bool));
+                    var parameterScriptFile = Expression.Parameter(typeof(IScriptFile), "file");
                     var parameterContainer = Expression.Parameter(typeof(IValueContainerOwnerAccess), "container");
                     var parameterLogger = Expression.Parameter(typeof(ILogger), "logger");
                     var getContainerReference = Expression.Property(
@@ -587,7 +592,7 @@ namespace StepBro.Core.Parser
                         var setterHelper = typeof(ExecutionHelperMethods).GetMethod(
                             nameof(ExecutionHelperMethods.SetupObjectWithPropertyBlock));
 
-                        var propertyBlockSetter = Expression.Call(setterHelper, parameterLogger, parameterContainer);
+                        var propertyBlockSetter = Expression.Call(setterHelper, parameterScriptFile, parameterLogger, parameterContainer);
                         expressions.Add(propertyBlockSetter);
                     }
 
@@ -596,6 +601,7 @@ namespace StepBro.Core.Parser
                     var lambdaExpr = Expression.Lambda(
                         typeof(VariableContainerAction),
                         Expression.Block(new ParameterExpression[] { objectReference }, expressions),
+                        parameterScriptFile,
                         parameterContainer,
                         parameterLogger);
                     var @delegate = lambdaExpr.Compile();
