@@ -6,10 +6,6 @@ using System.Threading.Tasks;
 
 namespace StepBro.ExecutionHelper.Messages
 {
-    internal class ExecutionHelperMessages
-    {
-    }
-
     public enum ShortCommand
     {
         None,
