@@ -29,36 +29,41 @@ namespace StepBro.VISABridge
                     switch(JsonSerializer.Deserialize<ShortCommand>(received.Item2))
                     {
                         case ShortCommand.None:
-
+                            // Should not happen
                             break;
                         case ShortCommand.GetInstrumentList:
+                            // TODO: Handle Get Instrument List
 
                             break;
                         case ShortCommand.SessionClosed:
-
+                            // Should not happen
                             break;
                         case ShortCommand.Receive:
+                            // TODO: Handle Receive
 
                             break;
                     }
                     break;
                 case nameof(OpenSession):
+                    // TODO: Handle Open Session
 
                     break;
                 case nameof(CloseSession):
+                    // TODO: Handle Close Session
 
                     break;
                 case nameof(ConnectedInstruments):
-
+                    // Should not happen
                     break;
                 case nameof(Received):
-
+                    // Should not happen
                     break;
                 case nameof(Send):
+                    // TODO: Handle Send
 
                     break;
                 case nameof(SessionOpened):
-
+                    // Should not happen
                     break;
             }
         }

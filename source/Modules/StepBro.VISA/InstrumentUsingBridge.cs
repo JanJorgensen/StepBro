@@ -27,35 +27,38 @@ namespace StepBro.VISA
                     switch (System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.ShortCommand>(received.Item2))
                     {
                         case VISABridge.Messages.ShortCommand.None:
-
+                            // Should not happen
                             break;
                         case VISABridge.Messages.ShortCommand.GetInstrumentList:
-
+                            // Should not happen
                             break;
                         case VISABridge.Messages.ShortCommand.SessionClosed:
+                            // TODO: Handle session closed
 
                             break;
                         case VISABridge.Messages.ShortCommand.Receive:
-
+                            // Should not happen
                             break;
                     }
                     break;
                 case nameof(VISABridge.Messages.OpenSession):
-
+                    // Should not happen
                     break;
                 case nameof(VISABridge.Messages.CloseSession):
-
+                    // Should not happen
                     break;
                 case nameof(VISABridge.Messages.ConnectedInstruments):
+                    // TODO: Handle Connected Instruments
 
                     break;
                 case nameof(VISABridge.Messages.Received):
-
+                    // TODO: Handle Received
                     break;
                 case nameof(VISABridge.Messages.Send):
-
+                    // Should not happen
                     break;
                 case nameof(VISABridge.Messages.SessionOpened):
+                    // TODO: Handle Session Opened
 
                     break;
             }
