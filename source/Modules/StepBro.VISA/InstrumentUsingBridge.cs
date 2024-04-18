@@ -105,14 +105,14 @@ namespace StepBro.VISA
                 started = timeoutMs > 0;
             }
 
-            m_visaPipe.Send(new VISABridge.Messages.OpenSession("TODO"));
+            m_visaPipe.Send(new VISABridge.Messages.OpenSession(m_resource));
 
             return started;
         }
 
         public void Close([Implicit] ICallContext context = null)
         {
-            m_visaPipe.Send(new VISABridge.Messages.CloseSession("TODO"));
+            m_visaPipe.Send(new VISABridge.Messages.CloseSession(m_resource));
         }
 
         public string Query([Implicit] ICallContext context, string command)
