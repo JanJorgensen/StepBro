@@ -39,18 +39,27 @@ namespace StepBro.VISABridge
                             // Should not happen
                             break;
                         case ShortCommand.Receive:
-                            // TODO: Handle Receive
-
+                            byte[] readData = m_session.RawIO.Read();
+                            m_pipe.Send(new Received(new UTF8Encoding(true).GetString(readData)));
                             break;
                     }
                     break;
                 case nameof(OpenSession):
-                    // TODO: Handle Open Session
-
+                    var openSessionData = JsonSerializer.Deserialize<OpenSession>(received.Item2);
+                    if (m_lastResourceString != null)
+                    {
+                        m_lastResourceString = openSessionData.Resource;
+                        Open();
+                    }
                     break;
                 case nameof(CloseSession):
-                    // TODO: Handle Close Session
-
+                    var closeSessionData = JsonSerializer.Deserialize<CloseSession>(received.Item2);
+                    if (m_lastResourceString.Equals(closeSessionData.Resource))
+                    {
+                        m_session.Dispose();
+                        m_session = null;
+                        m_lastResourceString = null;
+                    }
                     break;
                 case nameof(ConnectedInstruments):
                     // Should not happen
@@ -59,8 +68,8 @@ namespace StepBro.VISABridge
                     // Should not happen
                     break;
                 case nameof(Send):
-                    // TODO: Handle Send
-
+                    var sendData = JsonSerializer.Deserialize<Send>(received.Item2);
+                    m_session.RawIO.Write(sendData.Request);
                     break;
                 case nameof(SessionOpened):
                     // Should not happen
@@ -72,6 +81,22 @@ namespace StepBro.VISABridge
         {
             InitializeComponent();
             SetupControlState();
+        }
+
+        private void Open()
+        {
+            using (SelectResource sr = new SelectResource())
+            {
+                if (m_lastResourceString != null)
+                {
+                    sr.ResourceName = m_lastResourceString;
+                }
+                m_lastResourceString = sr.ResourceName;
+                using (var rmSession = new ResourceManager())
+                {
+                    m_session = (MessageBasedSession)rmSession.Open(sr.ResourceName);
+                }
+            }
         }
 
         private void SetupControlState()
