@@ -2,6 +2,7 @@
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
+using StepBro.Core.ScriptData;
 using StepBro.PanelCreator.DummyUI;
 using System;
 using System.Collections.Generic;
@@ -37,11 +38,11 @@ namespace StepBro.PanelCreator
             }
         }
 
-        public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+        public void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors)
         {
         }
 
-        public void Setup(ILogger logger, PropertyBlock data)
+        public void Setup(IScriptFile file, ILogger logger, PropertyBlock data)
         {
             var mainPanel = data.TryGetElement(MainElementName);
             if (mainPanel != null)

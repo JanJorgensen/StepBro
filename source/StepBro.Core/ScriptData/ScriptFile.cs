@@ -500,7 +500,7 @@ namespace StepBro.Core.ScriptData
                 if (!v.VariableOwnerAccess.DataCreated)
                 {
                     logger?.Log("Variable " + v.VariableOwnerAccess.Container.Name + " - Create data");
-                    v.VariableOwnerAccess.DataCreator?.Invoke(v.VariableOwnerAccess, logger);
+                    v.VariableOwnerAccess.DataCreator?.Invoke(this, v.VariableOwnerAccess, logger);
                     var obj = v.VariableOwnerAccess.Container.GetValue();
                     if (obj != null && obj is INameable && (obj as INameable).Name == null)
                     {
@@ -519,7 +519,7 @@ namespace StepBro.Core.ScriptData
                             var errors = new List<Tuple<int, string>>();
                             try
                             {
-                                ((ISettableFromPropertyBlock)obj).PreScanData(props as PropertyBlock, errors);
+                                ((ISettableFromPropertyBlock)obj).PreScanData(this, props as PropertyBlock, errors);
 
                                 foreach (var e in errors)
                                 {
@@ -561,8 +561,8 @@ namespace StepBro.Core.ScriptData
                         logger.Log("Variable " + v.VariableOwnerAccess.Container.Name + " init: " + text);
                     }
                     var logWrapper = new VariableSetupLoggerWrapper(v, logger);
-                    v.VariableOwnerAccess.DataResetter?.Invoke(v.VariableOwnerAccess, logWrapper);
-                    v.VariableOwnerAccess.DataInitializer?.Invoke(v.VariableOwnerAccess, logWrapper);
+                    v.VariableOwnerAccess.DataResetter?.Invoke(this, v.VariableOwnerAccess, logWrapper);
+                    v.VariableOwnerAccess.DataInitializer?.Invoke(this, v.VariableOwnerAccess, logWrapper);
                 }
             }
         }

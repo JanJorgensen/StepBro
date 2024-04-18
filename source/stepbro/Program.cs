@@ -6,6 +6,7 @@ using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.File;
 using StepBro.Core.General;
+using StepBro.Core.IPC;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
@@ -20,7 +21,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using StepBroMain = StepBro.Core.Main;
 
 namespace StepBro.Cmd
@@ -60,7 +60,7 @@ namespace StepBro.Cmd
         private static List<Tuple<bool, string>> m_bufferedOutput = new List<Tuple<bool, string>>();
         private static Mode m_mode = Mode.DryRun;
         private static Queue<StateOrCommand> m_next = new Queue<StateOrCommand>();
-        private static SideKickPipe m_sideKickPipe = null;
+        private static Pipe m_sideKickPipe = null;
         private static bool sidekickStarted = false;
         private static ILoggerScope m_sidekickLogger = null;
         private static List<Tuple<ulong, object>> m_requestObjectDictionary = new List<Tuple<ulong, object>>();
@@ -74,6 +74,7 @@ namespace StepBro.Cmd
             DataReport createdReport = null;
             Dictionary<string, ITextCommandInput> commandObjectDictionary = null;
             EventHandler closeEventHandler = null;
+            ConsoleCancelEventHandler consoleCancelEventHandler = null;
             IFileElement element = null;
             IPartner partner = null;
             IScriptExecution execution = null;
@@ -237,8 +238,15 @@ namespace StepBro.Cmd
                         Thread.Sleep(1000);     // Leave some time for the sidekick application to receive the command.
                     };
 
+                    consoleCancelEventHandler = (sender, e) =>
+                    {
+                        m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.Close);
+                        Thread.Sleep(1000);     // Leave some time for the execution helper application to receive the command.
+                    };
+                    
                     m_sidekickLogger = StepBroMain.Logger.RootLogger.CreateSubLocation("SideKick");
 
+                    Console.CancelKeyPress += consoleCancelEventHandler;
                     AppDomain.CurrentDomain.ProcessExit += closeEventHandler;
 
                     var hThis = GetConsoleWindow();
@@ -247,7 +255,7 @@ namespace StepBro.Cmd
                     var folder = Path.GetDirectoryName(path);
 
                     string pipename = hThis.ToString("X");
-                    m_sideKickPipe = SideKickPipe.StartServer(pipename);
+                    m_sideKickPipe = Pipe.StartServer("StepBroConsoleSidekick", pipename);
                     var sidekick = new System.Diagnostics.Process();
                     sidekick.StartInfo.FileName = Path.Combine(folder, "StepBro.Sidekick.exe");
                     sidekick.StartInfo.Arguments = pipename;
@@ -563,7 +571,7 @@ namespace StepBro.Cmd
                                                     {
                                                         var partnerData = new StepBro.Sidekick.Messages.Partner();
                                                         partnerData.Name = p.Name;
-                                                        partnerData.ProcedureType = p.ProcedureName;
+                                                        partnerData.ProcedureReference = p.ProcedureReference.FullName;
                                                         elementPartners.Add(partnerData);
                                                     }
                                                     elementData.Partners = elementPartners.ToArray();
@@ -929,6 +937,7 @@ namespace StepBro.Cmd
             if (m_commandLineOptions.Sidekick)
             {
                 AppDomain.CurrentDomain.ProcessExit -= closeEventHandler;
+                Console.CancelKeyPress -= consoleCancelEventHandler;
             }
 
             m_activitiesRunning = false;

@@ -11,9 +11,14 @@ namespace StepBro.Core.Data
     {
         public abstract class Element
         {
-            public string TypeOrName { get; private set; }
+            public string TypeOrName { get; private set; } = null;
             public string AlternativeTypeOrName { get; private set; } = null;
             public PropertyBlockEntryType EntryType { get; private set; }
+
+            public Element(PropertyBlockEntryType type)
+            {
+                this.EntryType = type;
+            }
 
             public Element(string typeOrName, PropertyBlockEntryType type)
             {
@@ -30,7 +35,13 @@ namespace StepBro.Core.Data
 
             public bool TryDecode(PropertyBlockEntry entry, object parent, List<Tuple<int, string>> errors)
             {
-                if (entry.BlockEntryType == this.EntryType && (entry.TypeOrName == this.TypeOrName || (this.AlternativeTypeOrName != null && entry.TypeOrName == this.AlternativeTypeOrName)))
+                if (    entry.BlockEntryType == this.EntryType && 
+                        (
+                            String.IsNullOrEmpty(this.TypeOrName) ||
+                            entry.TypeOrName == this.TypeOrName || 
+                            (this.AlternativeTypeOrName != null && entry.TypeOrName == this.AlternativeTypeOrName)
+                        )
+                   )
                 {
                     this.TryCreateOrSet(parent, entry, errors);
                     return true;    // There might be errors, but name and type did match.
@@ -44,6 +55,10 @@ namespace StepBro.Core.Data
 
         public abstract class Element<TParent> : Element where TParent : class
         {
+            public Element(PropertyBlockEntryType type) : base(type)
+            {
+            }
+
             public Element(string typeOrName, PropertyBlockEntryType type) : base(typeOrName, type)
             {
             }
@@ -86,14 +101,14 @@ namespace StepBro.Core.Data
                 m_childs = childs;
             }
             public Block(Func<TParent, string, TThis> creator, params Element[] childs) :
-                this("<root>", creator, childs)
+                this(null, creator, childs)
             { }
 
             public Block(string name, params Element[] childs) :
                 this(name, null, childs)
             { }
             public Block(params Element[] childs) :
-                this("<root>", null, childs)
+                this(null, null, childs)
             { }
 
             public void SetChilds(params Element[] childs)
@@ -228,6 +243,9 @@ namespace StepBro.Core.Data
 
         public abstract class ValueBase<TParent> : Element<TParent> where TParent : class
         {
+            public ValueBase() : base(PropertyBlockEntryType.Value)
+            {
+            }
             public ValueBase(string typeOrName) : base(typeOrName, PropertyBlockEntryType.Value)
             {
             }
@@ -349,6 +367,10 @@ namespace StepBro.Core.Data
         {
             private Func<TParent, PropertyBlockValue, string> m_setter;
 
+            public Value(Func<TParent, PropertyBlockValue, string> setter = null) : base()
+            {
+                m_setter = setter;
+            }
             public Value(string typeOrName, Func<TParent, PropertyBlockValue, string> setter = null) : base(typeOrName)
             {
                 m_setter = setter;
