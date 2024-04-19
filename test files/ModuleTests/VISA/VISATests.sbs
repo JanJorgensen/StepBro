@@ -17,7 +17,8 @@ void VISATestCase() : TestCase
     bool result = instrument.Open();
     expect(result == true);
 
-    
+    string strResult = instrument.Query("IDN?");
+    expect(strResult == "Something");
 
     instrument.Close();
 }
