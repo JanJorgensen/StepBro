@@ -197,7 +197,7 @@ namespace StepBro.VISA
             return received;
         }
 
-        public string[] ListAvailableResources()
+        public string[] ListAvailableResources([Implicit] ICallContext context)
         {
             string[] instruments = null;
 
