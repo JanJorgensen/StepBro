@@ -17,8 +17,8 @@ void VISATestCase() : TestCase
     bool result = instrument.Open();
     expect(result == true);
 
-    string strResult = instrument.Query("IDN?");
-    expect(strResult == "Something");
+    string strResult = instrument.Query("*IDN?");
+    expect(strResult == "Keysight Technologies,34461A,MY60074269,A.03.03-03.15-03.03-00.52-04-03\n");
 
     instrument.Close();
 }
