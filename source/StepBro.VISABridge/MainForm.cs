@@ -230,7 +230,7 @@ namespace StepBro.VISABridge
         {
             string[] args = Environment.GetCommandLineArgs();
 
-            m_pipe = Pipe.StartClient("StepBroVisaPipe", "1234");
+            m_pipe = Pipe.StartServer("StepBroVisaPipe", "1234");
 
             m_pipe.ReceivedData += (_, eventArgs) =>
             {

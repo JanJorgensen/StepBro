@@ -77,7 +77,7 @@ namespace StepBro.VISA
 
         public bool Open([Implicit] ICallContext context = null)
         {
-            m_visaPipe = Pipe.StartServer("StepBroVisaPipe", "1234");
+            m_visaPipe = Pipe.StartClient("StepBroVisaPipe", "1234");
 
             string path = Assembly.GetExecutingAssembly().Location;
             var folder = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path), ".."));
