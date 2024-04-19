@@ -1,0 +1,23 @@
+using System;
+using StepBro.VISA;
+using "TestFramework.sbs";
+
+public StepBro.VISA.Instrument instrument = StepBro.VISA.Instrument()
+{
+    Resource = "USB0::0x2A8D::0x1301::MY60074269::INSTR"
+}
+
+testlist TestVISA : TestSuite
+{
+    * VISATestCase
+}
+
+void VISATestCase() : TestCase
+{
+    bool result = instrument.Open();
+    expect(result == true);
+
+    
+
+    instrument.Close();
+}

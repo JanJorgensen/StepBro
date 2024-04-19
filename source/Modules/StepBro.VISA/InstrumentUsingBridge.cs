@@ -123,6 +123,11 @@ namespace StepBro.VISA
                 timeoutMs--;
             } while (timeoutMs > 0);
 
+            if (timeoutMs <= 0)
+            {
+                started = false;
+            }
+
             if (input.Item1 != nameof(VISABridge.Messages.SessionOpened))
             {
                 context.ReportError("Received different message than SessionOpened.");
