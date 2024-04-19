@@ -35,7 +35,7 @@ namespace StepBro.VISA
                             // Should not happen
                             break;
                         case VISABridge.Messages.ShortCommand.SessionClosed:
-                            m_sessionOpened = false;
+                            // Handled elsewhere
                             break;
                         case VISABridge.Messages.ShortCommand.Receive:
                             // Should not happen
@@ -58,7 +58,7 @@ namespace StepBro.VISA
                     // Should not happen
                     break;
                 case nameof(VISABridge.Messages.SessionOpened):
-                    m_sessionOpened = true;
+                    // Handled elsewhere
                     break;
             }
         }
@@ -82,19 +82,22 @@ namespace StepBro.VISA
             string path = Assembly.GetExecutingAssembly().Location;
             var folder = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path), ".."));
 
-            var bridge = new System.Diagnostics.Process();
-            bridge.StartInfo.FileName = Path.Combine(folder, "StepBro.VISABridge.exe");
-            bridge.StartInfo.Arguments = "--automate";
-            var started = bridge.Start();
+            bool started = false;
+            if (System.Diagnostics.Process.GetProcessesByName("StepBro.VISABridge").Length == 0)
+            {
+                var bridge = new System.Diagnostics.Process();
+                bridge.StartInfo.FileName = Path.Combine(folder, "StepBro.VISABridge.exe");
+                started = bridge.Start();
+            }
 
             m_visaPipe.ReceivedData += (sender, e) =>
             {
                 ReceivedData(e);
             };
 
+            int timeoutMs = 2500;
             if (started)
             {
-                int timeoutMs = 2500;
                 while (!m_visaPipe.IsConnected() && timeoutMs > 0)
                 {
                     int waitTimeMs = 200;
@@ -106,12 +109,66 @@ namespace StepBro.VISA
 
             m_visaPipe.Send(new VISABridge.Messages.OpenSession(m_resource));
 
+            timeoutMs = 2500;
+            Tuple<string, string> input = null;
+            do
+            {
+                input = m_visaPipe.TryGetReceived();
+                if (input != null)
+                {
+                    break;
+                }
+                // Wait
+                Thread.Sleep(1);
+                timeoutMs--;
+            } while (timeoutMs > 0);
+
+            if (input.Item1 != nameof(VISABridge.Messages.SessionOpened))
+            {
+                context.ReportError("Received different message than SessionOpened.");
+            }
+            else
+            {
+                m_sessionOpened = true;
+            }
+
             return started;
         }
 
         public void Close([Implicit] ICallContext context = null)
         {
             m_visaPipe.Send(new VISABridge.Messages.CloseSession(m_resource));
+
+            int timeoutMs = 2500;
+            Tuple<string, string> input = null;
+            do
+            {
+                input = m_visaPipe.TryGetReceived();
+                if (input != null)
+                {
+                    break;
+                }
+                // Wait
+                Thread.Sleep(1);
+                timeoutMs--;
+            } while (timeoutMs > 0);
+
+            if (input.Item1 == nameof(VISABridge.Messages.ShortCommand))
+            {
+                var cmd = System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.ShortCommand>(input.Item2);
+                if (cmd != VISABridge.Messages.ShortCommand.SessionClosed)
+                {
+                    context.ReportError("Received different message than SessionClosed.");
+                }
+                else
+                {
+                    m_sessionOpened = false;
+                }
+            }
+            else
+            {
+                context.ReportError("Received different message than SessionClosed.");
+            }
         }
 
         public string Query([Implicit] ICallContext context, string command)
