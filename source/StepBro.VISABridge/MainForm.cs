@@ -51,6 +51,7 @@ namespace StepBro.VISABridge
                         m_lastResourceString = openSessionData.Resource;
                         Open();
                     }
+                    m_pipe.Send(new SessionOpened(m_lastResourceString, 0));
                     break;
                 case nameof(CloseSession):
                     var closeSessionData = JsonSerializer.Deserialize<CloseSession>(received.Item2);
@@ -60,6 +61,7 @@ namespace StepBro.VISABridge
                         m_session = null;
                         m_lastResourceString = null;
                     }
+                    m_pipe.Send(ShortCommand.SessionClosed);
                     break;
                 case nameof(ConnectedInstruments):
                     // Should not happen

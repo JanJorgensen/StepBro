@@ -77,18 +77,19 @@ namespace StepBro.VISA
 
         public bool Open([Implicit] ICallContext context = null)
         {
-            m_visaPipe = Pipe.StartClient("StepBroVisaPipe", "1234");
-
             string path = Assembly.GetExecutingAssembly().Location;
             var folder = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path), ".."));
 
-            bool started = false;
+            bool started = true;
             if (System.Diagnostics.Process.GetProcessesByName("StepBro.VISABridge").Length == 0)
             {
                 var bridge = new System.Diagnostics.Process();
                 bridge.StartInfo.FileName = Path.Combine(folder, "StepBro.VISABridge.exe");
+                bridge.StartInfo.Arguments = "--automate";
                 started = bridge.Start();
             }
+
+            m_visaPipe = Pipe.StartClient("StepBroVisaPipe", "1234");
 
             m_visaPipe.ReceivedData += (sender, e) =>
             {
