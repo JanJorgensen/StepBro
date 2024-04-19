@@ -25,7 +25,7 @@ namespace StepBro.ExecutionHelper
 
             System.Diagnostics.Trace.WriteLine("Execution Helper STARTING!!");
 
-            m_pipe = Pipe.StartServer("StepBroExecutionHelper", "1998");
+            m_pipe = Pipe.StartServer("StepBroExecutionHelper", null);
 
             formCloseEventHandler = (sender, e) =>
             {
@@ -43,7 +43,7 @@ namespace StepBro.ExecutionHelper
                 ReceivedData(e);
             };
 
-            Pipe.ReceivedData += receivedDataEventHandler;
+            m_pipe.ReceivedData += receivedDataEventHandler;
 
             RunOnStartup();
         }
@@ -85,7 +85,7 @@ namespace StepBro.ExecutionHelper
                 {
                     m_closeRequested = true;
                     m_pipe!.Send(cmd);
-                    Pipe.ReceivedData -= receivedDataEventHandler;
+                    m_pipe.ReceivedData -= receivedDataEventHandler;
                     this.Close();
                 }
             }

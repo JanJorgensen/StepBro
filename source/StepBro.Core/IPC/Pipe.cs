@@ -20,7 +20,7 @@ namespace StepBro.Core.IPC
         private ConcurrentQueue<Tuple<string, string>> m_received = null;
         private ManualResetEvent m_disposeEvent = null;
 
-        public static EventHandler<Tuple<string, string>> ReceivedData { get; set; }
+        public EventHandler<Tuple<string, string>> ReceivedData { get; set; }
 
         //public static void MyMainFunctionality()
         //{
@@ -225,9 +225,9 @@ namespace StepBro.Core.IPC
                                 instance.Send(s);   // Return the close-request to the other side.
                             }
 
-                            if (ReceivedData != null)
+                            if (instance.ReceivedData != null)
                             {
-                                ReceivedData.Invoke(null, message);
+                                instance.ReceivedData.Invoke(null, message);
                             }
                         }
                     }
