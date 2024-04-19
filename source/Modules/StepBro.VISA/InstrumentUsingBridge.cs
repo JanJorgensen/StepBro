@@ -144,7 +144,7 @@ namespace StepBro.VISA
             }
             else
             {
-                received = "Session is not open.";
+                context.ReportError("Session is not open.");
             }
 
             return received;
@@ -155,6 +155,10 @@ namespace StepBro.VISA
             if (m_sessionOpened)
             {
                 m_visaPipe.Send(new VISABridge.Messages.Send(command));
+            }
+            else
+            {
+                context.ReportError("Session is not open.");
             }
         }
 
@@ -187,7 +191,7 @@ namespace StepBro.VISA
             }
             else
             {
-                received = "Session is not open.";
+                context.ReportError("Session is not open.");
             }
 
             return received;
@@ -223,7 +227,7 @@ namespace StepBro.VISA
             }
             else
             {
-                instruments = ["Session is not open."];
+                context.ReportError("Session is not open.");
             }
 
             return instruments;
