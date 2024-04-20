@@ -53,7 +53,7 @@ namespace StepBro.StateMachine
         {
             foreach (var v in m_variables)
             {
-                yield return new NamedData<object>(v.Name, v.Value);
+                yield return new NamedData<object>(v.Name, v.Value.Item2);
             }
         }
 
@@ -136,11 +136,29 @@ namespace StepBro.StateMachine
                         }
                         else if (v.SpecifiedTypeName == "datetime")
                         {
-                            m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(DateTime), v.Value)));
+                            DateTime value = DateTime.MinValue;
+                            if (v.Value.GetType() == typeof(Identifier) && ((Identifier)v.Value).Name.Equals("default"))
+                            {
+                                value = DateTime.MinValue;
+                            }
+                            else
+                            {
+                                return "Not implemented: value for datetime.";
+                            }
+                            m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(DateTime), value)));
                         }
                         else if (v.SpecifiedTypeName == "timespan")
                         {
-                            m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(TimeSpan), v.Value)));
+                            TimeSpan value = TimeSpan.Zero;
+                            if (v.Value.GetType() == typeof(Identifier) && ((Identifier)v.Value).Name.Equals("default"))
+                            {
+                                value = TimeSpan.Zero;
+                            }
+                            else
+                            {
+                                return "Not implemented: value for datetime.";
+                            }
+                            m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(TimeSpan), value)));
                         }
                         else
                         {
@@ -172,7 +190,7 @@ namespace StepBro.StateMachine
                         if (parameters.Length != 3 ||
                             parameters[0].Value.Type != typeof(IStateMachine) ||
                             parameters[1].Value.Type != typeof(Event) ||
-                            parameters[2].Value.Type != typeof(object) ||
+                            parameters[2].Value.Type != typeof(EventData) ||
                             proc.ReturnType.Type != typeof(void))
                         {
                             logger.LogError("Procedure '" + name + "' does not have the correct parameters.");
@@ -184,7 +202,7 @@ namespace StepBro.StateMachine
                     }
                     else
                     {
-                        logger.LogError("No state procedure found. Looking for: void " + name + "(IStateMachine context, Event machineEvent, object data)");
+                        logger.LogError("No state procedure found. Looking for: void " + name + "(IStateMachine context, Event machineEvent, EventData data)");
                     }
                 }
             }

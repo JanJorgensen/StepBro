@@ -13,7 +13,7 @@ namespace StepBro.StateMachine
     {
         string Name { get; }
         void ChangeState([Implicit] ICallContext context, Identifier state);
-        void StartPollTimer([Implicit] ICallContext context, TimeSpan time);
+        void StartPollTimer([Implicit] ICallContext context, TimeSpan time, bool currentStateOnly);
         void StartTimer([Implicit] ICallContext context, string name, TimeSpan time, bool repeating, bool currentStateOnly);
         void StartTimer([Implicit] ICallContext context, string name, DateTime time, bool currentStateOnly);
         void StopTimer([Implicit] ICallContext context, string name);
