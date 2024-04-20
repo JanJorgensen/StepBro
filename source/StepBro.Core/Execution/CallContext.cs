@@ -172,7 +172,7 @@ namespace StepBro.Core.Execution
 
         bool ICallContext.StopRequested()
         {
-            return false;
+            return m_parentScriptContext.StopRequested();
         }
     }
 }

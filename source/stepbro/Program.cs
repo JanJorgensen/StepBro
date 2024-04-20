@@ -422,6 +422,7 @@ namespace StepBro.Cmd
                                     }
                                     else if (input.Item1 == nameof(StepBro.Sidekick.Messages.StopExecutionRequest))
                                     {
+                                        StepBroMain.Logger.RootLogger.LogUserAction("Execution stop requested by user");
                                         var request = JsonSerializer.Deserialize<StepBro.Sidekick.Messages.StopExecutionRequest>(input.Item2);
                                         var reqistration = m_requestObjectDictionary.FirstOrDefault(r => r.Item1 == request.RequestID);
                                         if (reqistration != null)
