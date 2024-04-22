@@ -9,7 +9,6 @@ namespace StepBro.ExecutionHelper
     public partial class MainForm : Form
     {
         private Pipe? m_pipe = null;
-        FormClosingEventHandler? formCloseEventHandler = null;
         private bool m_closeRequested = false;
         private Dictionary<string, object> m_variables = new Dictionary<string, object>();
         EventHandler<Tuple<string, string>>? receivedDataEventHandler = null;
@@ -27,16 +26,15 @@ namespace StepBro.ExecutionHelper
 
             m_pipe = Pipe.StartServer("StepBroExecutionHelper", null);
 
-            formCloseEventHandler = (sender, e) =>
+            FormClosing += (sender, e) =>
             {
                 if (m_pipe.IsConnected() && !m_closeRequested)
                 {
                     m_pipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.CloseApplication);
                     Thread.Sleep(1000);
                 }
+                m_pipe.Dispose();
             };
-
-            FormClosing += formCloseEventHandler;
 
             receivedDataEventHandler = (sender, e) =>
             {

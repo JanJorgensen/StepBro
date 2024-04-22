@@ -4,7 +4,8 @@ using "TestFramework.sbs";
 
 public StepBro.VISA.Instrument instrument = StepBro.VISA.Instrument()
 {
-    Resource = "USB0::0x2A8D::0x1301::MY60074269::INSTR"
+    Resource = "TCPIP0::A-34461A-00000.local::inst0::INSTR" // Ethernet
+    // Resource = "USB0::0x2A8D::0x1301::MY60074269::INSTR" // USB
 }
 
 testlist TestVISA : TestSuite
