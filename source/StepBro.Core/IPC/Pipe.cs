@@ -78,6 +78,10 @@ namespace StepBro.Core.IPC
                     m_pipe.Dispose();
                     m_pipe = null;
                 }
+                if (m_stream != null)
+                {
+                    m_stream = null;
+                }
             }
         }
 
@@ -200,6 +204,8 @@ namespace StepBro.Core.IPC
                 pipeStream.Dispose();
                 if (instance.m_continue)
                 {
+                    instance.m_stream = null;
+                    instance.m_continueReceiving = false;
                     instance.m_pipe = new NamedPipeServerStream(instance.m_pipeName + instance.m_id, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
                     pipeStream = (instance.m_pipe as NamedPipeServerStream);
                 }
