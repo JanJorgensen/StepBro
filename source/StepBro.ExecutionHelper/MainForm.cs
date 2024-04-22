@@ -33,7 +33,10 @@ namespace StepBro.ExecutionHelper
                     Thread.Sleep(1000);
                 }
 
-                m_pipe.Dispose();
+                if (!m_closeRequested)
+                {
+                    m_pipe.Dispose();
+                }
             };
 
             m_pipe.ReceivedData += (sender, e) =>
@@ -81,7 +84,6 @@ namespace StepBro.ExecutionHelper
                 {
                     m_closeRequested = true;
                     m_pipe!.Send(cmd);
-                    m_pipe.ReceivedData -= receivedDataEventHandler;
                     this.Close();
                 }
             }
