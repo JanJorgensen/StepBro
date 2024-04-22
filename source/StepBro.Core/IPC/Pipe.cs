@@ -19,6 +19,8 @@ namespace StepBro.Core.IPC
         private bool m_continueReceiving = false;
         private ConcurrentQueue<Tuple<string, string>> m_received = null;
         private ManualResetEvent m_disposeEvent = null;
+        private string m_pipeName;
+        private string m_id;
 
         public EventHandler<Tuple<string, string>> ReceivedData { get; set; }
 
@@ -73,7 +75,7 @@ namespace StepBro.Core.IPC
                 System.Diagnostics.Trace.WriteLine("IPC thread stopped");
                 if (m_pipe != null)
                 {
-                    m_pipe.Close();
+                    m_pipe.Dispose();
                     m_pipe = null;
                 }
             }
@@ -91,6 +93,8 @@ namespace StepBro.Core.IPC
         {
             var pipeServer = new NamedPipeServerStream(pipeName + id, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
             var pipe = Pipe.Create(id, pipeServer, ServerThread);
+            pipe.m_pipeName = pipeName;
+            pipe.m_id = id;
             pipe.m_disposeEvent = new ManualResetEvent(false);
             pipe.m_continue = true;
             pipe.m_thread.Start(pipe);
@@ -102,6 +106,8 @@ namespace StepBro.Core.IPC
             var pipeClient = new NamedPipeClientStream(".", pipeName + id, PipeDirection.InOut, PipeOptions.Asynchronous, TokenImpersonationLevel.None);
             var pipe = Pipe.Create(id, pipeClient, ReceiverThread);
             pipeClient.Connect();
+            pipe.m_pipeName = pipeName;
+            pipe.m_id = id;
             pipe.m_stream = new StreamString(pipeClient);
             var firstString = pipe.m_stream.ReadString();
             if (firstString == "StepBro is it")
@@ -192,6 +198,11 @@ namespace StepBro.Core.IPC
                     }
                 }
                 pipeStream.Dispose();
+                if (instance.m_continue)
+                {
+                    instance.m_pipe = new NamedPipeServerStream(instance.m_pipeName + instance.m_id, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+                    pipeStream = (instance.m_pipe as NamedPipeServerStream);
+                }
             }
         }
 

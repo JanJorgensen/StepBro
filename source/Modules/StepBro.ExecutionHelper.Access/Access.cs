@@ -201,6 +201,10 @@ namespace StepBro.ExecutionHelper
                 {
                     result = true;
                 }
+                else
+                {
+                    result = false;
+                }
             }
             else
             {

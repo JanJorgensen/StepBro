@@ -94,7 +94,13 @@ namespace StepBro.ExecutionHelper
                 {
                     bool alreadyExists = m_variables.ContainsKey(data.VariableName);
                     bool isNumberKind = data.Value is System.Text.Json.JsonElement v && v.ValueKind == JsonValueKind.Number;
-                    if (alreadyExists)
+                    if (alreadyExists && isNumberKind)
+                    {
+                        long value = 0;
+                        Int64.TryParse(data.Value.ToString(), out value);
+                        m_variables[data.VariableName] = value;
+                    }
+                    else if (alreadyExists)
                     {
                         m_variables[data.VariableName] = data.Value;
                     }
