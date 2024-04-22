@@ -11,7 +11,6 @@ namespace StepBro.ExecutionHelper
         private Pipe? m_pipe = null;
         private bool m_closeRequested = false;
         private Dictionary<string, object> m_variables = new Dictionary<string, object>();
-        EventHandler<Tuple<string, string>>? receivedDataEventHandler = null;
 
         public MainForm()
         {
@@ -33,15 +32,14 @@ namespace StepBro.ExecutionHelper
                     m_pipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.CloseApplication);
                     Thread.Sleep(1000);
                 }
+
                 m_pipe.Dispose();
             };
 
-            receivedDataEventHandler = (sender, e) =>
+            m_pipe.ReceivedData += (sender, e) =>
             {
                 ReceivedData(e);
             };
-
-            m_pipe.ReceivedData += receivedDataEventHandler;
 
             RunOnStartup();
         }
