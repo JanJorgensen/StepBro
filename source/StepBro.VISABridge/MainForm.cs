@@ -17,7 +17,7 @@ namespace StepBro.VISABridge
 {
     public partial class MainForm : Form
     {
-        private string m_lastResourceString = "";
+        private string m_lastResourceString = null;
         private MessageBasedSession m_session = null;
         private Pipe m_pipe = null;
 
@@ -46,7 +46,7 @@ namespace StepBro.VISABridge
                     break;
                 case nameof(OpenSession):
                     var openSessionData = JsonSerializer.Deserialize<OpenSession>(received.Item2);
-                    if (m_lastResourceString != null)
+                    if (!String.IsNullOrEmpty(openSessionData.Resource))
                     {
                         m_lastResourceString = openSessionData.Resource;
                         Open();
@@ -89,7 +89,7 @@ namespace StepBro.VISABridge
         {
             using (SelectResource sr = new SelectResource())
             {
-                if (m_lastResourceString != null)
+                if (!String.IsNullOrEmpty(m_lastResourceString))
                 {
                     sr.ResourceName = m_lastResourceString;
                 }
