@@ -84,7 +84,11 @@ namespace StepBro.ExecutionHelper
                 {
                     m_closeRequested = true;
                     m_pipe!.Dispose();
-                    System.Environment.Exit(0); // Close the application gracefully
+                    this.BeginInvoke((MethodInvoker)delegate
+                    {
+                        // close the form on the forms thread
+                        this.Close();
+                    });
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateOrSetVariable))
