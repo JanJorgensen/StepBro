@@ -84,7 +84,7 @@ namespace StepBro.ExecutionHelper
                 {
                     m_closeRequested = true;
                     m_pipe!.Dispose();
-                    this.Close();
+                    System.Environment.Exit(0); // Close the application gracefully
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateOrSetVariable))

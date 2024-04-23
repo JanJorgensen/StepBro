@@ -57,6 +57,6 @@ void ExecutionHelperTest() : TestCase
     testCounter = (int)access.GetVariable("TestCounter");
     expect(testCounter == 2);
 
-    //result = access.CloseApplication();
-    //expect(result == true);
+    result = access.CloseApplication();
+    expect(result == true);
 }
