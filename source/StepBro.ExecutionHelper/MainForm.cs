@@ -83,7 +83,7 @@ namespace StepBro.ExecutionHelper
                 if (cmd == ShortCommand.CloseApplication)
                 {
                     m_closeRequested = true;
-                    m_pipe!.Send(cmd);
+                    m_pipe!.Dispose();
                     this.Close();
                 }
             }

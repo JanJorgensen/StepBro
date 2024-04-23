@@ -68,7 +68,7 @@ namespace StepBro.Core.IPC
                 }
                 m_disposed = true;
 
-                if (m_thread != null && m_thread.IsAlive)
+                if (m_thread != null && m_thread.IsAlive && m_thread != Thread.CurrentThread)
                 {
                     m_thread.Join();
                     m_thread = null;
@@ -183,23 +183,24 @@ namespace StepBro.Core.IPC
                         }
                         connectEvent.Set();
                     }, null);
-                WaitHandle.WaitAny(new WaitHandle[] { connectEvent, instance.m_disposeEvent });
-
-                if (instance.m_continue)
+                if(WaitHandle.WaitAny(new WaitHandle[] { connectEvent, instance.m_disposeEvent }, 1000) != WaitHandle.WaitTimeout)
                 {
-                    try
+                    if (instance.m_continue)
                     {
-                        instance.m_stream = new StreamString(instance.m_pipe);
-                        instance.m_stream.WriteString("StepBro is it");
+                        try
+                        {
+                            instance.m_stream = new StreamString(instance.m_pipe);
+                            instance.m_stream.WriteString("StepBro is it");
 
-                        instance.m_continueReceiving = true;
-                        ReceiverThread(instance);
-                    }
-                    // Catch the IOException that is raised if the pipe is broken
-                    // or disconnected.
-                    catch (IOException)
-                    {
-                        //Console.WriteLine("ERROR: {0}", ex.Message);
+                            instance.m_continueReceiving = true;
+                            ReceiverThread(instance);
+                        }
+                        // Catch the IOException that is raised if the pipe is broken
+                        // or disconnected.
+                        catch (IOException)
+                        {
+                            //Console.WriteLine("ERROR: {0}", ex.Message);
+                        }
                     }
                 }
                 pipeStream.Dispose();
