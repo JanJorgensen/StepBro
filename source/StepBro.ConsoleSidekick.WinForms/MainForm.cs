@@ -622,7 +622,6 @@ namespace StepBro.ConsoleSidekick.WinForms
                     if (cmd == ShortCommand.Close)
                     {
                         m_closeRequestedByConsole = true;
-                        m_pipe.Send(cmd);   // Send back, to make console continue the closing process.
                         Thread.Sleep(100);
                         m_pipe.Dispose();
                         this.Close();

@@ -114,7 +114,7 @@ namespace StepBro.Core.IPC
             pipe.m_pipeName = pipeName;
             pipe.m_id = id;
             pipe.m_stream = new StreamString(pipeClient);
-            var firstString = pipe.m_stream.ReadString();
+            var firstString = pipe.m_stream.ReadString(15000);
             if (firstString == "StepBro is it")
             {
                 pipe.m_continueReceiving = true;
@@ -228,7 +228,6 @@ namespace StepBro.Core.IPC
                     if (s == null)
                     {
                         System.Diagnostics.Trace.WriteLine("### Pipe Received nothing");
-                        instance.m_continueReceiving = false;
                     }
                     else
                     {
@@ -265,6 +264,8 @@ namespace StepBro.Core.IPC
         private Stream ioStream;
         private UnicodeEncoding streamEncoding;
         private object sendSync = new object();
+        private string m_lastReadString = null;
+        private Task<string> m_readTask = null;
 
         public StreamString(Stream ioStream)
         {
@@ -282,7 +283,8 @@ namespace StepBro.Core.IPC
                 int len = (b1 * 256) + b2;
                 byte[] inBuffer = new byte[len];
                 ioStream.Read(inBuffer, 0, len);
-                return streamEncoding.GetString(inBuffer);
+                m_lastReadString = streamEncoding.GetString(inBuffer);
+                return m_lastReadString;
             }
             else
             {
@@ -292,13 +294,32 @@ namespace StepBro.Core.IPC
 
         public string ReadString(int timeout = 1000)
         {
-            Task<string> readTask = new Task<string>(ReadStringDelegate);
-            readTask.Start();
-            bool result = readTask.Wait(timeout);
+            // If a previous ReadString has run to completion we want that string instead of try to get a new string
+            if (m_lastReadString != null)
+            {
+                var stringToReturn = m_lastReadString;
+                m_lastReadString = null;
+                return stringToReturn;
+            }
+
+            // If the read task is running from last time we were in ReadString, we let it continue
+            if (m_readTask == null || m_readTask.Status != TaskStatus.Running)
+            {
+                m_readTask = new Task<string>(ReadStringDelegate);
+                m_readTask.Start();
+            }
+
+            // Wait for the task to finish up (Within the timeout)
+            bool result = m_readTask.Wait(timeout);
+
+            // If the task has completed within the timeout, we reset the read string return the result
             if (result)
             {
-                return readTask.Result;
+                m_lastReadString = null;
+                return m_readTask.Result;
             }
+
+            // If the task has not finished yet we return null
             return null;
         }
 

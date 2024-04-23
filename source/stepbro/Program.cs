@@ -124,6 +124,14 @@ namespace StepBro.Cmd
                 Console.BackgroundColor = back; Console.ForegroundColor = fore;
                 Console.WriteLine();
                 Console.WriteLine();
+
+                AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
+                {
+                    if (m_sideKickPipe.IsConnected())
+                    {
+                        m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.Close);
+                    }
+                };
             }
             else if (m_commandLineOptions.Verbose)
             {
