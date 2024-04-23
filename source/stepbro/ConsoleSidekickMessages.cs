@@ -20,7 +20,8 @@ namespace StepBro.Sidekick.Messages
         ExecutionStarted,
         ExecutionStopped,
         GetPanelDefinitions,
-        GetObjectExtraData
+        GetObjectExtraData,
+        RequestExecutionStateStackUpdate
     }
 
     public class Log
@@ -197,5 +198,26 @@ namespace StepBro.Sidekick.Messages
             this.State = state;
         }
         public TaskExecutionState State { get; set; }
+    }
+
+    public class ButtonState
+    {
+        public ulong ID { get; set; }
+        public string Text { get; set; }
+        public bool CheckedOrPressed { get; set; }
+    }
+
+    public class ExecutionLevelData
+    {
+        public ulong ID { get; set; }
+        public int Level { get; set; }
+        public string Text { get; set; }
+        public List<ButtonState> Buttons { get; set; }
+    }
+
+    public class ExecutionStackInfo
+    {
+        public int LevelsShown { get; set; }
+        public List<ExecutionLevelData> UpdatedLevelData { get; set; }
     }
 }

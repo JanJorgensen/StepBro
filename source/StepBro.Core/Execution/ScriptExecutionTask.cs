@@ -133,6 +133,7 @@ namespace StepBro.Core.Execution
             m_returnValue = m_taskContext.CallProcedure(m_targetProcedure as IFileProcedure, m_arguments);
             this.SetState((m_taskContext.ExecutionExeception == null) ? TaskExecutionState.Ended : TaskExecutionState.EndedByException);
             m_end = DateTime.Now;
+            m_statusUpdateRoot.Dispose();
             logger.LogExit("Script execution ended. " + m_taskContext.Result.ResultText(m_returnValue));
         }
 
