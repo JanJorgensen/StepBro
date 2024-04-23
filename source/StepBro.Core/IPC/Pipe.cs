@@ -131,7 +131,7 @@ namespace StepBro.Core.IPC
 
         public bool IsConnected()
         {
-            return !m_disposed && m_stream != null;
+            return !m_disposed && m_stream != null && m_pipe.IsConnected;
         }
 
         public Tuple<string, string> TryGetReceived()
@@ -183,7 +183,7 @@ namespace StepBro.Core.IPC
                         }
                         connectEvent.Set();
                     }, null);
-                if(WaitHandle.WaitAny(new WaitHandle[] { connectEvent, instance.m_disposeEvent }, 1000) != WaitHandle.WaitTimeout)
+                if (WaitHandle.WaitAny(new WaitHandle[] { connectEvent, instance.m_disposeEvent }, 1000) != WaitHandle.WaitTimeout)
                 {
                     if (instance.m_continue)
                     {
@@ -228,6 +228,10 @@ namespace StepBro.Core.IPC
                     if (s == null)
                     {
                         System.Diagnostics.Trace.WriteLine("### Pipe Received nothing");
+                        if (!instance.IsConnected())
+                        {
+                            instance.m_continueReceiving = false;
+                        }
                     }
                     else
                     {
