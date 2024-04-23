@@ -33,7 +33,7 @@ namespace StepBro.ExecutionHelper
                     Thread.Sleep(1000);
                 }
 
-                if (!m_closeRequested)
+                if (!m_closeRequested) // If close is requested, then m_pipe is already disposed at this point
                 {
                     m_pipe.Dispose();
                 }
