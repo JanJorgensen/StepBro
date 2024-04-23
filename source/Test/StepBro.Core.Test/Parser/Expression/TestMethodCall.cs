@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using StepBroCoreTest.Data;
 using static StepBroCoreTest.Data.DummyClass;
 using static StepBroCoreTest.Parser.ExpressionParser;
+using StepBro.Core.Execution;
 
 namespace StepBroCoreTest.Parser
 {
@@ -299,6 +300,27 @@ namespace StepBroCoreTest.Parser
                 "var value = rnd.Next(0, 100);",
                 false));
         }
+
+        [TestMethod]
+        public void TestIntegerReturnValueAutoConvert()
+        {
+            var proc = FileBuilder.ParseProcedure(typeof(DummyClass),
+                "int Func()",
+                "{",
+                    "int i = DummyClass.MethodStaticLongToInt(14);",
+                    "expect(i == 14);",
+                    "i = DummyClass.MethodStaticLongToInt(17);",
+                    "expect(i == 17);",
+                    "return i;",
+                "}");
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            var result = proc.Call();
+            Assert.IsTrue(ScriptTaskContext.LastContext.Result.Verdict <= StepBro.Core.Data.Verdict.Pass);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(17L, (long)result);
+        }
+
 
         [TestMethod]
         public void TestOutVariableIntSuccess()
