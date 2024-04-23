@@ -89,11 +89,19 @@ namespace StepBro.VISA
                 started = bridge.Start();
             }
 
-            m_visaPipe = Pipe.StartClient("StepBroVisaPipe", null);
+            m_visaPipe = Pipe.StartClient("StepBroVisaPipe", null, Thread.CurrentThread);
 
             m_visaPipe.ReceivedData += (sender, e) =>
             {
                 ReceivedData(e);
+            };
+
+            AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
+            {
+                if (m_visaPipe.IsConnected())
+                {
+                    m_visaPipe.Dispose();
+                }
             };
 
             int timeoutMs = 2500;

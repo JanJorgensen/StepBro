@@ -267,7 +267,7 @@ namespace StepBro.Cmd
                     var folder = Path.GetDirectoryName(path);
 
                     string pipename = hThis.ToString("X");
-                    m_sideKickPipe = Pipe.StartServer("StepBroConsoleSidekick", pipename);
+                    m_sideKickPipe = Pipe.StartServer("StepBroConsoleSidekick", pipename, Thread.CurrentThread);
                     var sidekick = new System.Diagnostics.Process();
                     sidekick.StartInfo.FileName = Path.Combine(folder, "StepBro.Sidekick.exe");
                     sidekick.StartInfo.Arguments = pipename;

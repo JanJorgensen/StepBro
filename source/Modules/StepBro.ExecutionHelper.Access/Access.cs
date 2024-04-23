@@ -57,11 +57,19 @@ namespace StepBro.ExecutionHelper
                 }
             }
             
-            m_executionHelperPipe = Pipe.StartClient("StepBroExecutionHelper", null);
+            m_executionHelperPipe = Pipe.StartClient("StepBroExecutionHelper", null, Thread.CurrentThread);
 
             m_executionHelperPipe.ReceivedData += (sender, e) =>
             {
                 ReceivedData(e);
+            };
+
+            AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
+            {
+                if (m_executionHelperPipe.IsConnected())
+                {
+                    m_executionHelperPipe.Dispose();
+                }
             };
 
             if (result)

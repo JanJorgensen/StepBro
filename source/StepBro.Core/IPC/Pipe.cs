@@ -14,6 +14,7 @@ namespace StepBro.Core.IPC
     {
         private PipeStream m_pipe = null;
         private StreamString m_stream = null;
+        private Thread m_mainThread = null;
         private Thread m_thread = null;
         private bool m_disposed = false;
         private bool m_continue = false;
@@ -94,10 +95,11 @@ namespace StepBro.Core.IPC
             return instance;
         }
 
-        public static Pipe StartServer(string pipeName, string id)
+        public static Pipe StartServer(string pipeName, string id, Thread mainThread)
         {
             var pipeServer = new NamedPipeServerStream(pipeName + id, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
             var pipe = Pipe.Create(id, pipeServer, ServerThread);
+            pipe.m_mainThread = mainThread;
             pipe.m_pipeName = pipeName;
             pipe.m_id = id;
             pipe.m_disposeEvent = new ManualResetEvent(false);
@@ -106,11 +108,12 @@ namespace StepBro.Core.IPC
             return pipe;
         }
 
-        public static Pipe StartClient(string pipeName, string id)
+        public static Pipe StartClient(string pipeName, string id, Thread mainThread)
         {
             var pipeClient = new NamedPipeClientStream(".", pipeName + id, PipeDirection.InOut, PipeOptions.Asynchronous, TokenImpersonationLevel.None);
             var pipe = Pipe.Create(id, pipeClient, ReceiverThread);
             pipeClient.Connect();
+            pipe.m_mainThread = mainThread;
             pipe.m_pipeName = pipeName;
             pipe.m_id = id;
             pipe.m_stream = new StreamString(pipeClient);
@@ -228,7 +231,7 @@ namespace StepBro.Core.IPC
                     if (s == null)
                     {
                         System.Diagnostics.Trace.WriteLine("### Pipe Received nothing");
-                        if (!instance.IsConnected())
+                        if (!instance.IsConnected() || (instance.m_mainThread.ThreadState & ThreadState.Stopped) == ThreadState.Stopped)
                         {
                             instance.m_continueReceiving = false;
                         }

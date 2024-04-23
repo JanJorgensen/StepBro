@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
@@ -237,7 +238,7 @@ namespace StepBro.VISABridge
                 m_pipe.Dispose();
             };
 
-            m_pipe = Pipe.StartServer("StepBroVisaPipe", null);
+            m_pipe = Pipe.StartServer("StepBroVisaPipe", null, Thread.CurrentThread);
 
             m_pipe.ReceivedData += (_, eventArgs) =>
             {

@@ -150,7 +150,7 @@ namespace StepBro.ConsoleSidekick.WinForms
             if (args.Length == 2)
             {
                 m_consoleWindow = nint.Parse(args[1], System.Globalization.NumberStyles.HexNumber);
-                m_pipe = Pipe.StartClient("StepBroConsoleSidekick", args[1]);
+                m_pipe = Pipe.StartClient("StepBroConsoleSidekick", args[1], Thread.CurrentThread);
             }
             else
             {
