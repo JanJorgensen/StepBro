@@ -71,6 +71,7 @@ namespace StepBro.Core.Execution
         private long m_progressMax;
         private readonly Func<long, string> m_progressFormatter;
         private AttentionColor m_progressColor = AttentionColor.Normal;
+        private IDisposable m_uiTag = null;
 
         private ObservableCollection<IExecutionStateButton> m_buttons = new ObservableCollection<IExecutionStateButton>();
         private ReadOnlyObservableCollection<IExecutionStateButton> m_buttonsReadOnly = null;
@@ -99,19 +100,6 @@ namespace StepBro.Core.Execution
             stateStack.Add(this);
         }
 
-        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
-        {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         public ExecutionScopeStatusUpdater GetUpmostChild()
         {
             if (m_child != null) return m_child.GetUpmostChild();
@@ -122,6 +110,8 @@ namespace StepBro.Core.Execution
         {
             if (!m_isDisposed)
             {
+                m_uiTag?.Dispose();
+                m_uiTag = null;
                 this.ClearSublevels();
                 if (m_parent != null)
                 {
@@ -281,6 +271,8 @@ namespace StepBro.Core.Execution
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public IDisposable UITag { get { return m_uiTag; } set { m_uiTag = value; } }
 
         #endregion
     }

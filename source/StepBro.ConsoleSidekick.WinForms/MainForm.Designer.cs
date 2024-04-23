@@ -39,6 +39,7 @@
             toolStripMenuItemDeleteShortcut = new ToolStripMenuItem();
             toolStripMenuItemDeleteAllShortcuts = new ToolStripMenuItem();
             toolStripMenuItemView = new ToolStripMenuItem();
+            toolStripMenuItemShownToolbars = new ToolStripMenuItem();
             toolStripMenuItemExeNoteInput = new ToolStripMenuItem();
             toolStripSeparator1 = new ToolStripSeparator();
             toolStripMenuItemExit = new ToolStripMenuItem();
@@ -114,10 +115,19 @@
             // 
             // toolStripMenuItemView
             // 
-            toolStripMenuItemView.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemExeNoteInput });
+            toolStripMenuItemView.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemShownToolbars, toolStripMenuItemExeNoteInput });
             toolStripMenuItemView.Name = "toolStripMenuItemView";
             toolStripMenuItemView.Size = new Size(180, 22);
             toolStripMenuItemView.Text = "View";
+            toolStripMenuItemView.DropDownOpening += toolStripMenuItemView_DropDownOpening;
+            // 
+            // toolStripMenuItemShownToolbars
+            // 
+            toolStripMenuItemShownToolbars.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripMenuItemShownToolbars.Name = "toolStripMenuItemShownToolbars";
+            toolStripMenuItemShownToolbars.Size = new Size(186, 22);
+            toolStripMenuItemShownToolbars.Text = "Shown Toolbars";
+            toolStripMenuItemShownToolbars.DropDownOpening += toolStripMenuItemShownToolbars_DropDownOpening;
             // 
             // toolStripMenuItemExeNoteInput
             // 
@@ -272,5 +282,6 @@
         private ToolStripMenuItem toolStripMenuItemExeNoteInput;
         private ToolStripSeparator toolStripSeparatorExtraFields;
         private ToolStripTextBox toolStripTextBoxExeNote;
+        private ToolStripMenuItem toolStripMenuItemShownToolbars;
     }
 }

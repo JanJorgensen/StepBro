@@ -15,7 +15,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
         private static ICoreAccess m_coreAccess = null;
         bool m_colorSet = false;
         bool m_settingDefaultColor = false;
-        int m_priority = 10;
+        int m_index = 1000;
         private static PropertyBlockDecoder.Block<object, ToolBar> m_decoder = null;
         private Dictionary<string, object> m_commonChildFields = null;
 
@@ -25,6 +25,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             this.AutoSize = false;
             this.Height = 26;
         }
+
 
         private static void SetupDataDecoder()
         {
@@ -122,7 +123,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                             return null;    // No errors
                         }),
                     new ValueColor<ToolBar>("Color", (t, c) => { t.BackColor = c; return null; }),
-                    new ValueInt<ToolBar>("Priority", (t, v) => { t.Priority = Convert.ToInt32(v.Value); return null; }),
+                    new ValueInt<ToolBar>("Index", (t, v) => { t.Index = Convert.ToInt32(v.Value); return null; }),
                     new Flag<ToolBar>("Separator", (t, f) =>
                     {
                         var separator = new Separator("Separator");
@@ -155,7 +156,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
-        public int Priority { get { return m_priority; } set { m_priority = value; } }
+        public int Index { get { return m_index; } set { m_index = value; } }
 
         public new Color DefaultBackColor
         {
