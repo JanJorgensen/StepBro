@@ -6,6 +6,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace StepBro.Core.IPC
 {
@@ -270,10 +271,11 @@ namespace StepBro.Core.IPC
             streamEncoding = new UnicodeEncoding();
         }
 
-        public string ReadString()
+        public string ReadStringDelegate()
         {
             var b1 = ioStream.ReadByte();
             var b2 = ioStream.ReadByte();
+
             if (b1 >= 0 && b2 >= 0)
             {
                 int len = (b1 * 256) + b2;
@@ -285,6 +287,18 @@ namespace StepBro.Core.IPC
             {
                 return null;
             }
+        }
+
+        public string ReadString(int timeout = 1000)
+        {
+            Task<string> readTask = new Task<string>(ReadStringDelegate);
+            readTask.Start();
+            bool result = readTask.Wait(timeout);
+            if (result)
+            {
+                return readTask.Result;
+            }
+            return null;
         }
 
         public int WriteString(string outString)
