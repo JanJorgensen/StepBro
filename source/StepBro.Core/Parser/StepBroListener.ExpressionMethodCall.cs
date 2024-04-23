@@ -694,6 +694,7 @@ namespace StepBro.Core.Parser
                                     }
                                     if (m_callAssignmentTarget != null)
                                     {
+                                        callMethod = SBExpressionData.NarrowGetValueTypeByConverting(callMethod, callMethod.Type); 
                                         callMethod = Expression.Assign(m_callAssignmentTarget.ExpressionCode, callMethod);
                                     }
 
