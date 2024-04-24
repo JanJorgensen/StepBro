@@ -96,14 +96,6 @@ namespace StepBro.VISA
                 ReceivedData(e);
             };
 
-            AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
-            {
-                if (m_visaPipe.IsConnected())
-                {
-                    m_visaPipe.Dispose();
-                }
-            };
-
             int timeoutMs = 2500;
             if (started)
             {

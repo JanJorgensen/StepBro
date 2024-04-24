@@ -62,14 +62,6 @@ namespace StepBro.ExecutionHelper
                 ReceivedData(e);
             };
 
-            AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
-            {
-                if (m_executionHelperPipe.IsConnected())
-                {
-                    m_executionHelperPipe.Dispose();
-                }
-            };
-
             if (result)
             {
                 int timeoutMs = 2500;
