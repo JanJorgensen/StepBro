@@ -1,4 +1,6 @@
-﻿using StepBro.Core.Data;
+﻿using StepBro.Core.Api;
+using StepBro.Core.Data;
+using StepBro.Core.Execution;
 using StepBro.Core.IPC;
 using System;
 using System.IO;
@@ -13,6 +15,7 @@ namespace StepBro.ExecutionHelper
     {
         private Pipe m_executionHelperPipe = null;
         private bool m_closeWhenExecutionHelperCloses = false;
+        private EventHandler m_executionHelperClosedEventHandler = null;
 
         public string Name { get; set; } = null;
         public string Prefix { get; set; } = null;
@@ -30,7 +33,7 @@ namespace StepBro.ExecutionHelper
             }
         }
 
-        public bool CreateExecutionHelper(bool closeWhenExecutionHelperCloses = false)
+        public bool CreateExecutionHelper([Implicit] ICallContext context = null, bool closeWhenExecutionHelperCloses = false)
         {
             // If constructor with no arguments were used, we use the name of the instance instead
             if (Prefix == null)
@@ -61,6 +64,13 @@ namespace StepBro.ExecutionHelper
             {
                 ReceivedData(e);
             };
+
+            m_executionHelperClosedEventHandler = (sender, e) =>
+            {
+                context.Logger.LogError("VISA closed unexpectedly");
+            };
+
+            m_executionHelperPipe.OnConnectionClosed += m_executionHelperClosedEventHandler;
 
             if (result)
             {
@@ -170,6 +180,7 @@ namespace StepBro.ExecutionHelper
 
         public bool CloseApplication()
         {
+            m_executionHelperPipe.OnConnectionClosed -= m_executionHelperClosedEventHandler;
             m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.CloseApplication);
 
             m_executionHelperPipe.Dispose();
@@ -214,6 +225,7 @@ namespace StepBro.ExecutionHelper
 
         public void Dispose()
         {
+            m_executionHelperPipe.OnConnectionClosed -= m_executionHelperClosedEventHandler;
             if (m_executionHelperPipe.IsConnected())
             {
                 m_executionHelperPipe.Dispose();

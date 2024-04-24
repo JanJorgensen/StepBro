@@ -20,6 +20,7 @@ namespace StepBro.VISA
         private string m_name = "instrument";
         private Pipe m_visaPipe = null;
         private bool m_sessionOpened = false;
+        private EventHandler m_visaClosedEventHandler = null;
 
         private void ReceivedData(Tuple<string, string> received)
         {
@@ -95,6 +96,13 @@ namespace StepBro.VISA
             {
                 ReceivedData(e);
             };
+
+            m_visaClosedEventHandler = (sender, e) =>
+            {
+                context.Logger.LogError("VISA closed unexpectedly");
+            };
+
+            m_visaPipe.OnConnectionClosed += m_visaClosedEventHandler;
 
             int timeoutMs = 2500;
             if (started)
@@ -298,6 +306,7 @@ namespace StepBro.VISA
 
         public void Dispose()
         {
+            m_visaPipe.OnConnectionClosed -= m_visaClosedEventHandler;
             if (m_visaPipe.IsConnected())
             {
                 m_visaPipe.Dispose();
