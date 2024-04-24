@@ -25,9 +25,7 @@ namespace StepBro.ExecutionHelper
                 var cmd = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.ShortCommand>(message.Item2);
                 if (cmd == StepBro.ExecutionHelper.Messages.ShortCommand.CloseApplication && m_closeWhenExecutionHelperCloses)
                 {
-                    Thread.Sleep(100);
-                    // m_executionHelperPipe.Dispose();
-                    System.Environment.Exit(0);
+                    m_executionHelperPipe.Dispose();
                 }
             }
         }
