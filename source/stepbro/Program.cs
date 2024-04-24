@@ -124,6 +124,14 @@ namespace StepBro.Cmd
                 Console.BackgroundColor = back; Console.ForegroundColor = fore;
                 Console.WriteLine();
                 Console.WriteLine();
+
+                AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
+                {
+                    if (m_sideKickPipe.IsConnected())
+                    {
+                        m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.Close);
+                    }
+                };
             }
             else if (m_commandLineOptions.Verbose)
             {
@@ -938,6 +946,15 @@ namespace StepBro.Cmd
                 ConsoleWriteErrorLine($"Error: {ex.GetType().Name}, {ex.Message}");
                 retval = -1;
             }
+            finally
+            {
+                if (m_sideKickPipe != null)
+                {
+                    m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.Close);
+                    m_sideKickPipe.Dispose();
+                }
+            }
+
             Trace.WriteLine("StepBro ended command loop");
 
 
@@ -994,12 +1011,6 @@ namespace StepBro.Cmd
             {
                 DebugLogUtils.DumpToFile();
                 ConsoleWriteLine($"Internal Debug Log saved in {DebugLogUtils.DumpFilePath}");
-            }
-
-            if (m_sideKickPipe != null)
-            {
-                m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.Close);
-                m_sideKickPipe.Dispose();
             }
 
             StepBroMain.Deinitialize();

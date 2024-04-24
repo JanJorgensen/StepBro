@@ -6,6 +6,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace StepBro.Core.IPC
 {
@@ -19,8 +20,12 @@ namespace StepBro.Core.IPC
         private bool m_continueReceiving = false;
         private ConcurrentQueue<Tuple<string, string>> m_received = null;
         private ManualResetEvent m_disposeEvent = null;
+        private string m_pipeName;
+        private string m_id;
 
         public EventHandler<Tuple<string, string>> ReceivedData { get; set; }
+        public EventHandler OnConnectionClosed { get; set; }
+        public EventHandler OnServerClosed { get; set; }
 
         //public static void MyMainFunctionality()
         //{
@@ -65,7 +70,7 @@ namespace StepBro.Core.IPC
                 }
                 m_disposed = true;
 
-                if (m_thread != null && m_thread.IsAlive)
+                if (m_thread != null && m_thread.IsAlive && m_thread != Thread.CurrentThread)
                 {
                     m_thread.Join();
                     m_thread = null;
@@ -73,8 +78,12 @@ namespace StepBro.Core.IPC
                 System.Diagnostics.Trace.WriteLine("IPC thread stopped");
                 if (m_pipe != null)
                 {
-                    m_pipe.Close();
+                    m_pipe.Dispose();
                     m_pipe = null;
+                }
+                if (m_stream != null)
+                {
+                    m_stream = null;
                 }
             }
         }
@@ -91,6 +100,8 @@ namespace StepBro.Core.IPC
         {
             var pipeServer = new NamedPipeServerStream(pipeName + id, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
             var pipe = Pipe.Create(id, pipeServer, ServerThread);
+            pipe.m_pipeName = pipeName;
+            pipe.m_id = id;
             pipe.m_disposeEvent = new ManualResetEvent(false);
             pipe.m_continue = true;
             pipe.m_thread.Start(pipe);
@@ -102,8 +113,10 @@ namespace StepBro.Core.IPC
             var pipeClient = new NamedPipeClientStream(".", pipeName + id, PipeDirection.InOut, PipeOptions.Asynchronous, TokenImpersonationLevel.None);
             var pipe = Pipe.Create(id, pipeClient, ReceiverThread);
             pipeClient.Connect();
+            pipe.m_pipeName = pipeName;
+            pipe.m_id = id;
             pipe.m_stream = new StreamString(pipeClient);
-            var firstString = pipe.m_stream.ReadString();
+            var firstString = pipe.m_stream.ReadString(15000);
             if (firstString == "StepBro is it")
             {
                 pipe.m_continueReceiving = true;
@@ -120,7 +133,7 @@ namespace StepBro.Core.IPC
 
         public bool IsConnected()
         {
-            return !m_disposed && m_stream != null;
+            return !m_disposed && m_stream != null && m_pipe.IsConnected;
         }
 
         public Tuple<string, string> TryGetReceived()
@@ -152,46 +165,64 @@ namespace StepBro.Core.IPC
 
             int threadId = Thread.CurrentThread.ManagedThreadId;
 
-            while (instance.m_continue)
+            try
             {
-                Exception connectException = null;
-                AutoResetEvent connectEvent = new AutoResetEvent(false);
-                pipeStream.BeginWaitForConnection(
-                    ar =>
-                    {
-                        try
-                        {
-                            pipeStream.EndWaitForConnection(ar);
-
-                            System.Diagnostics.Trace.WriteLine("### Pipe server connect");
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Trace.WriteLine("### Pipe server connect exception");
-                            connectException = ex;
-                        }
-                        connectEvent.Set();
-                    }, null);
-                WaitHandle.WaitAny(new WaitHandle[] { connectEvent, instance.m_disposeEvent });
-
-                if (instance.m_continue)
+                while (instance.m_continue)
                 {
-                    try
-                    {
-                        instance.m_stream = new StreamString(instance.m_pipe);
-                        instance.m_stream.WriteString("StepBro is it");
+                    Exception connectException = null;
+                    AutoResetEvent connectEvent = new AutoResetEvent(false);
+                    pipeStream.BeginWaitForConnection(
+                        ar =>
+                        {
+                            try
+                            {
+                                pipeStream.EndWaitForConnection(ar);
 
-                        instance.m_continueReceiving = true;
-                        ReceiverThread(instance);
-                    }
-                    // Catch the IOException that is raised if the pipe is broken
-                    // or disconnected.
-                    catch (IOException)
+                                System.Diagnostics.Trace.WriteLine("### Pipe server connect");
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Trace.WriteLine("### Pipe server connect exception");
+                                connectException = ex;
+                            }
+                            connectEvent.Set();
+                        }, null);
+                    if (WaitHandle.WaitAny(new WaitHandle[] { connectEvent, instance.m_disposeEvent }, 1000) != WaitHandle.WaitTimeout)
                     {
-                        //Console.WriteLine("ERROR: {0}", ex.Message);
+                        if (instance.m_continue)
+                        {
+                            try
+                            {
+                                instance.m_stream = new StreamString(instance.m_pipe);
+                                instance.m_stream.WriteString("StepBro is it");
+
+                                instance.m_continueReceiving = true;
+                                ReceiverThread(instance);
+                            }
+                            // Catch the IOException that is raised if the pipe is broken
+                            // or disconnected.
+                            catch (IOException)
+                            {
+                                //Console.WriteLine("ERROR: {0}", ex.Message);
+                            }
+                        }
+                    }
+                    pipeStream.Dispose();
+                    if (instance.m_continue)
+                    {
+                        instance.m_stream = null;
+                        instance.m_continueReceiving = false;
+                        instance.m_pipe = new NamedPipeServerStream(instance.m_pipeName + instance.m_id, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+                        pipeStream = (instance.m_pipe as NamedPipeServerStream);
                     }
                 }
-                pipeStream.Dispose();
+            }
+            finally
+            {
+                if (instance.OnServerClosed != null)
+                {
+                    instance.OnServerClosed.Invoke(null, null);
+                }
             }
         }
 
@@ -209,7 +240,11 @@ namespace StepBro.Core.IPC
                     if (s == null)
                     {
                         System.Diagnostics.Trace.WriteLine("### Pipe Received nothing");
-                        instance.m_continueReceiving = false;
+                        // If the instance is no longer connected we stop receiving data
+                        if (!instance.IsConnected())
+                        {
+                            instance.m_continueReceiving = false;
+                        }
                     }
                     else
                     {
@@ -235,6 +270,10 @@ namespace StepBro.Core.IPC
             }
             finally
             {
+                if (instance.OnConnectionClosed != null)
+                {
+                    instance.OnConnectionClosed.Invoke(null, null);
+                }
                 System.Diagnostics.Trace.WriteLine("### Pipe stopping receiver");
             }
         }
@@ -246,6 +285,8 @@ namespace StepBro.Core.IPC
         private Stream ioStream;
         private UnicodeEncoding streamEncoding;
         private object sendSync = new object();
+        private string m_lastReadString = null;
+        private Task<string> m_readTask = null;
 
         public StreamString(Stream ioStream)
         {
@@ -253,21 +294,54 @@ namespace StepBro.Core.IPC
             streamEncoding = new UnicodeEncoding();
         }
 
-        public string ReadString()
+        public string ReadStringDelegate()
         {
             var b1 = ioStream.ReadByte();
             var b2 = ioStream.ReadByte();
+
             if (b1 >= 0 && b2 >= 0)
             {
                 int len = (b1 * 256) + b2;
                 byte[] inBuffer = new byte[len];
                 ioStream.Read(inBuffer, 0, len);
-                return streamEncoding.GetString(inBuffer);
+                m_lastReadString = streamEncoding.GetString(inBuffer);
+                return m_lastReadString;
             }
             else
             {
                 return null;
             }
+        }
+
+        public string ReadString(int timeout = 1000)
+        {
+            // If a previous ReadString has run to completion we want that string instead of try to get a new string
+            if (m_lastReadString != null)
+            {
+                var stringToReturn = m_lastReadString;
+                m_lastReadString = null;
+                return stringToReturn;
+            }
+
+            // If the read task is running from last time we were in ReadString, we let it continue
+            if (m_readTask == null || m_readTask.Status != TaskStatus.Running)
+            {
+                m_readTask = new Task<string>(ReadStringDelegate);
+                m_readTask.Start();
+            }
+
+            // Wait for the task to finish up (Within the timeout)
+            bool result = m_readTask.Wait(timeout);
+
+            // If the task has completed within the timeout, we reset the read string return the result
+            if (result)
+            {
+                m_lastReadString = null;
+                return m_readTask.Result;
+            }
+
+            // If the task has not finished yet we return null
+            return null;
         }
 
         public int WriteString(string outString)

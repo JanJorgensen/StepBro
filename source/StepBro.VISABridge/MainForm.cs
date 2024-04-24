@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
@@ -17,7 +18,7 @@ namespace StepBro.VISABridge
 {
     public partial class MainForm : Form
     {
-        private string m_lastResourceString = "";
+        private string m_lastResourceString = null;
         private MessageBasedSession m_session = null;
         private Pipe m_pipe = null;
 
@@ -46,7 +47,7 @@ namespace StepBro.VISABridge
                     break;
                 case nameof(OpenSession):
                     var openSessionData = JsonSerializer.Deserialize<OpenSession>(received.Item2);
-                    if (m_lastResourceString != null)
+                    if (!String.IsNullOrEmpty(openSessionData.Resource))
                     {
                         m_lastResourceString = openSessionData.Resource;
                         Open();
@@ -85,11 +86,21 @@ namespace StepBro.VISABridge
             SetupControlState();
         }
 
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+
+            if (m_pipe != null)
+            {
+                m_pipe.Dispose();
+            }
+        }
+
         private void Open()
         {
             using (SelectResource sr = new SelectResource())
             {
-                if (m_lastResourceString != null)
+                if (!String.IsNullOrEmpty(m_lastResourceString))
                 {
                     sr.ResourceName = m_lastResourceString;
                 }

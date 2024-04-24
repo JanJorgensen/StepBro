@@ -240,14 +240,14 @@ namespace StepBro.Streams
 
         protected override void DoClose(StepBro.Core.Execution.ICallContext context)
         {
-            if (m_port.IsOpen)
+            if (m_port != null && m_port.IsOpen)
             {
                 m_port.Close();
                 m_reportOverrun = false;
             }
         }
 
-        public override bool IsOpen { get { return m_port.IsOpen; } }
+        public override bool IsOpen { get { return m_port != null && m_port.IsOpen; } }
 
         public override void Write([Implicit] StepBro.Core.Execution.ICallContext context, string text)
         {

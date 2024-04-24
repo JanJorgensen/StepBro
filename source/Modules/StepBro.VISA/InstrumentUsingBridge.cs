@@ -14,12 +14,13 @@ using System.Threading.Tasks;
 
 namespace StepBro.VISA
 {
-    public class Instrument : INameable, INamedObject
+    public class Instrument : INameable, INamedObject, IDisposable
     {
         private string m_resource = "";
         private string m_name = "instrument";
         private Pipe m_visaPipe = null;
         private bool m_sessionOpened = false;
+        private EventHandler m_visaClosedEventHandler = null;
 
         private void ReceivedData(Tuple<string, string> received)
         {
@@ -95,6 +96,13 @@ namespace StepBro.VISA
             {
                 ReceivedData(e);
             };
+
+            m_visaClosedEventHandler = (sender, e) =>
+            {
+                context.Logger.LogError("VISA closed unexpectedly");
+            };
+
+            m_visaPipe.OnConnectionClosed += m_visaClosedEventHandler;
 
             int timeoutMs = 2500;
             if (started)
@@ -294,6 +302,15 @@ namespace StepBro.VISA
             }
 
             return instruments;
+        }
+
+        public void Dispose()
+        {
+            m_visaPipe.OnConnectionClosed -= m_visaClosedEventHandler;
+            if (m_visaPipe.IsConnected())
+            {
+                m_visaPipe.Dispose();
+            }
         }
     }
 }

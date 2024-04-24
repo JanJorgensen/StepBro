@@ -4,7 +4,9 @@ using "TestFramework.sbs";
 
 public StepBro.VISA.Instrument instrument = StepBro.VISA.Instrument()
 {
-    Resource = "USB0::0x2A8D::0x1301::MY60074269::INSTR"
+    // Resource = "TCPIP0::A-34461A-00000.local::inst0::INSTR" // Ethernet
+    // Resource = "USB0::0x2A8D::0x1301::MY60074269::INSTR" // USB - Original Instrument
+    Resource = "USB0::0x2A8D::0xB318::MY56391274::INSTR"
 }
 
 testlist TestVISA : TestSuite
@@ -18,7 +20,8 @@ void VISATestCase() : TestCase
     expect(result == true);
 
     string strResult = instrument.Query("*IDN?");
-    expect(strResult == "Keysight Technologies,34461A,MY60074269,A.03.03-03.15-03.03-00.52-04-03\n");
+    // expect(strResult == "Keysight Technologies,34461A,MY60074269,A.03.03-03.15-03.03-00.52-04-03\n");
+    expect(strResult == "Keysight Technologies,34450A,MY56391274,01.02-01.00\n");
 
     instrument.Close();
 }
