@@ -24,9 +24,9 @@ namespace StepBro.Core.Data
             {
                 foreach (var container in host.ListObjectContainers())
                 {
-                    if (container.Object != null && container.Object is IDisposable c)
+                    if (container.Object is IDisposable v)
                     {
-                        c.Dispose();
+                        v.Dispose();
                     }
                 }
             }
