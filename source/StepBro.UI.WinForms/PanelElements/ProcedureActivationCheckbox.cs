@@ -14,8 +14,8 @@ namespace StepBro.UI.WinForms.PanelElements
     public partial class ProcedureActivationCheckbox : PanelElementBase
     {
         //private ProcedureActivationInfo m_changeProcedure;
-        private ProcedureActivationInfo m_setProcedure;
-        private ProcedureActivationInfo m_resetProcedure;
+        private ActivationInfo m_setProcedure;
+        private ActivationInfo m_resetProcedure;
         //private ProcedureActivationInfo m_enabledCheckProcedure;
 
         public ProcedureActivationCheckbox()
@@ -40,17 +40,17 @@ namespace StepBro.UI.WinForms.PanelElements
                     {
                         if (m_setProcedure == null)
                         {
-                            m_setProcedure = new ProcedureActivationInfo();
+                            m_setProcedure = new ActivationInfo();
                         }
-                        m_setProcedure.Name = valueField.ValueAsString();
+                        m_setProcedure.FileElementName = valueField.ValueAsString();
                     }
                     else if (valueField.Name == "Deactivate")
                     {
                         if (m_resetProcedure == null)
                         {
-                            m_resetProcedure = new ProcedureActivationInfo();
+                            m_resetProcedure = new ActivationInfo();
                         }
-                        m_resetProcedure.Name = valueField.ValueAsString();
+                        m_resetProcedure.FileElementName = valueField.ValueAsString();
                     }
                 }
                 else if (field.BlockEntryType == PropertyBlockEntryType.Flag)

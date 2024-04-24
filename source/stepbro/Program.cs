@@ -1,4 +1,4 @@
-﻿//#define STOP_BEFORE_PARSING
+﻿#define STOP_BEFORE_PARSING
 using StepBro.Core;
 using StepBro.Core.Addons;
 using StepBro.Core.Api;

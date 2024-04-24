@@ -26,49 +26,63 @@ namespace StepBro.UI.WinForms.CustomToolBar
             this.Height = 26;
         }
 
+        public ToolBar(ICoreAccess coreAccess) : this()
+        {
+            m_coreAccess = coreAccess;
+        }
+
+        public void SetCoreAccess(ICoreAccess coreAccess)
+        {
+            m_coreAccess = coreAccess;
+        }
+
+        public void Setup(ILogger logger, string name, PropertyBlock definition)
+        {
+            this.Text = name.Split(".").Last();
+            this.Name = name;
+            this.Tag = name;
+            this.Setup(logger, definition);
+        }
 
         private static void SetupDataDecoder()
         {
-            var procButtonElements = new Element[] {
-                new ValueColor<ProcedureActivationButton>("Color", (b, c) => { b.BackColor = c; return null; }),
-                new ValueString<ProcedureActivationButton>("Text", (b, v) => { b.Text = v.ValueAsString(); return null; }),
-                new ValueString<ProcedureActivationButton>("Instance", "Object", (b, v) => { b.Instance = v.ValueAsString(); return null; }),
-                new ValueString<ProcedureActivationButton>("Procedure", "Element", (b, v) => { b.Procedure = v.ValueAsString(); return null; }),
-                new ValueString<ProcedureActivationButton>("Partner", "Model", (b, v) => { b.Partner = v.ValueAsString(); return null; }),
-                new Value<ProcedureActivationButton>("Arg", "Argument", (b, a) => { b.AddToArguments(a.Value); return null; }),
-                new PropertyBlockDecoder.Array<ProcedureActivationButton>("Args", "Arguments", (b, a) => { b.AddToArguments(a); return null; }),
-                new Flag <ProcedureActivationButton>("Stoppable", (b, f) => { b.SetStoppable(); return null; }),
-                new Flag<ProcedureActivationButton>("StopOnButtonRelease", (b, f) => { b.SetStopOnButtonRelease(); return null; })
+            var buttonElements = new Element[] {
+                new ValueColor<Button>("Color", (b, c) => { b.BackColor = c; return null; }),
+                new ValueString<Button>("Text", (b, v) => { b.Text = v.ValueAsString(); return null; }),
+                new ValueString<Button>("Instance", "Object", (b, v) => { b.Instance = v.ValueAsString(); return null; }),
+                new ValueString<Button>("Procedure", "Element", (b, v) => { b.Procedure = v.ValueAsString(); return null; }),
+                new ValueString<Button>("Partner", "Model", (b, v) => { b.Partner = v.ValueAsString(); return null; }),
+                new Value<Button>("Arg", "Argument", (b, a) => { b.AddToArguments(a.Value); return null; }),
+                new PropertyBlockDecoder.Array<Button>("Args", "Arguments", (b, a) => { b.AddToArguments(a); return null; }),
+                new Flag <Button>("Stoppable", (b, f) => { b.SetStoppable(); return null; }),
+                new Flag<Button>("StopOnButtonRelease", (b, f) => { b.SetStopOnButtonRelease(); return null; }),
+                new ValueString<Button>("Command", (b, v) => { b.ObjectCommand = v.ValueAsString(); return null; }),
+                new Flag<Button>("CheckOnClick", (b, f) => { b.SetCheckOnClick(); return null; })
             };
-            var procButton = new Block<IMenuItemHost, ProcedureActivationButton>(
-                "ProcedureActivationButton",
+            var procButton = new Block<IMenuItemHost, Button>(
+                "Button", /* TODO: Remove when all scripts are using "Button" instead. */ "ProcedureActivationButton",
                 (m, n) =>
                 {
-                    var button = new ProcedureActivationButton(m as IToolBarElement, m_coreAccess, n);
+                    var button = new Button(m as IToolBarElement, m_coreAccess, n);
                     m.Add(button);
                     button.Size = new Size(23, 20);
                     button.AutoSize = true;
                     return button;
                 },
-                procButtonElements);
+                buttonElements);
 
-            var objCmdButtonElements = new Element[] {
-                new ValueColor<ObjectCommandButton>("Color", (b, c) => { b.BackColor = c; return null; }),
-                new ValueString<ObjectCommandButton>("Text", (b, v) => { b.Text = v.ValueAsString(); return null; }),
-                new ValueString<ObjectCommandButton>("Instance", (b, v) => { b.ObjectInstance = v.ValueAsString(); return null; }),
-                new ValueString<ObjectCommandButton>("Command", (b, v) => { b.ObjectCommand = v.ValueAsString(); return null; })
-            };
-            var objCmdButton = new Block<IMenuItemHost, ObjectCommandButton>(
+            // TODO: Remove when all scripts are using "Button" instead.
+            var objCmdButton = new Block<IMenuItemHost, Button>(
                 "ObjectCommandButton",
                 (m, n) =>
                 {
-                    var button = new ObjectCommandButton(m as IToolBarElement, m_coreAccess, n);
+                    var button = new Button(m as IToolBarElement, m_coreAccess, n);
                     m.Add(button);
                     button.Size = new Size(23, 20);
                     button.AutoSize = true;
                     return button;
                 },
-                objCmdButtonElements);
+                buttonElements);
 
             var menuTitle = new ValueString<IMenu>("Text", "Title", (m, v) => { m.SetTitle(v.ValueAsString()); return null; });
 
@@ -178,24 +192,6 @@ namespace StepBro.UI.WinForms.CustomToolBar
                 m_commonChildFields = new Dictionary<string, object>();
             }
             m_commonChildFields[name] = value;
-        }
-
-        public ToolBar(ICoreAccess coreAccess) : this()
-        {
-            m_coreAccess = coreAccess;
-        }
-
-        public void SetCoreAccess(ICoreAccess coreAccess)
-        {
-            m_coreAccess = coreAccess;
-        }
-
-        public void Setup(ILogger logger, string name, PropertyBlock definition)
-        {
-            this.Text = name.Split(".").Last();
-            this.Name = name;
-            this.Tag = name;
-            this.Setup(logger, definition);
         }
 
         public IEnumerable<ColumnSeparator> ListColumns()

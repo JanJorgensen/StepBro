@@ -333,6 +333,7 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void ExecuteCommand(string instance, string command)
         {
+            // TODO: Show MessageBox with error message.
             m_pipe.Send(new ObjectCommand(instance, command));
         }
 
