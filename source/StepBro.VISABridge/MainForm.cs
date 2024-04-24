@@ -86,6 +86,16 @@ namespace StepBro.VISABridge
             SetupControlState();
         }
 
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+
+            if (m_pipe != null)
+            {
+                m_pipe.Dispose();
+            }
+        }
+
         private void Open()
         {
             using (SelectResource sr = new SelectResource())
@@ -232,11 +242,6 @@ namespace StepBro.VISABridge
         private void MainForm_Load(object sender, EventArgs e)
         {
             string[] args = Environment.GetCommandLineArgs();
-
-            FormClosing += (s, evt) =>
-            {
-                m_pipe.Dispose();
-            };
 
             m_pipe = Pipe.StartServer("StepBroVisaPipe", null);
 

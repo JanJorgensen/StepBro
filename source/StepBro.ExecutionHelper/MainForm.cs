@@ -17,15 +17,11 @@ namespace StepBro.ExecutionHelper
             InitializeComponent();
         }
 
-        protected override void OnLoad(EventArgs e)
+        protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            base.OnLoad(e);
+            base.OnFormClosing(e);
 
-            System.Diagnostics.Trace.WriteLine("Execution Helper STARTING!!");
-
-            m_pipe = Pipe.StartServer("StepBroExecutionHelper", null);
-
-            FormClosing += (sender, e) =>
+            if (m_pipe != null)
             {
                 if (m_pipe.IsConnected() && !m_closeRequested)
                 {
@@ -34,7 +30,16 @@ namespace StepBro.ExecutionHelper
                 }
 
                 m_pipe.Dispose();
-            };
+            }
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            System.Diagnostics.Trace.WriteLine("Execution Helper STARTING!!");
+
+            m_pipe = Pipe.StartServer("StepBroExecutionHelper", null);
 
             m_pipe.ReceivedData += (sender, e) =>
             {
