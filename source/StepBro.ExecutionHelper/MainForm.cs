@@ -33,10 +33,7 @@ namespace StepBro.ExecutionHelper
                     Thread.Sleep(1000);
                 }
 
-                if (!m_closeRequested) // If close is requested, then m_pipe is already disposed at this point
-                {
-                    m_pipe.Dispose();
-                }
+                m_pipe.Dispose();
             };
 
             m_pipe.ReceivedData += (sender, e) =>
@@ -83,7 +80,6 @@ namespace StepBro.ExecutionHelper
                 if (cmd == ShortCommand.CloseApplication)
                 {
                     m_closeRequested = true;
-                    m_pipe!.Dispose();
                     this.BeginInvoke((MethodInvoker)delegate
                     {
                         // close the form on the forms thread
