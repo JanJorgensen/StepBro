@@ -219,7 +219,10 @@ namespace StepBro.Core.IPC
             }
             finally
             {
-                instance.OnServerClosed.Invoke(null, null);
+                if (instance.OnServerClosed != null)
+                {
+                    instance.OnServerClosed.Invoke(null, null);
+                }
             }
         }
 
@@ -237,6 +240,7 @@ namespace StepBro.Core.IPC
                     if (s == null)
                     {
                         System.Diagnostics.Trace.WriteLine("### Pipe Received nothing");
+                        // If the instance is no longer connected we stop receiving data
                         if (!instance.IsConnected())
                         {
                             instance.m_continueReceiving = false;
@@ -266,7 +270,10 @@ namespace StepBro.Core.IPC
             }
             finally
             {
-                instance.OnConnectionClosed.Invoke(null, null);
+                if (instance.OnConnectionClosed != null)
+                {
+                    instance.OnConnectionClosed.Invoke(null, null);
+                }
                 System.Diagnostics.Trace.WriteLine("### Pipe stopping receiver");
             }
         }

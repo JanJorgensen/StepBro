@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StepBro.Core.Tasks;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -16,6 +17,20 @@ namespace StepBro.Core.Data
         }
 
         public event EventHandler ObjectListChanged;
+
+        protected override void Stop(ServiceManager manager, ITaskContext context)
+        {
+            foreach (var host in m_hosts)
+            {
+                foreach (var container in host.ListObjectContainers())
+                {
+                    if (container.Object != null && container.Object is IDisposable c)
+                    {
+                        c.Dispose();
+                    }
+                }
+            }
+        }
 
         public void RegisterObjectHost(IObjectHost host)
         {

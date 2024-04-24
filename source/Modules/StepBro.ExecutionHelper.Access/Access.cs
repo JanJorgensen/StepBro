@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace StepBro.ExecutionHelper
 {
-    public class Access : INameable
+    public class Access : INameable, IDisposable
     {
         private Pipe m_executionHelperPipe = null;
         private bool m_closeWhenExecutionHelperCloses = false;
@@ -27,7 +27,7 @@ namespace StepBro.ExecutionHelper
                 {
                     Thread.Sleep(100);
                     // m_executionHelperPipe.Dispose();
-                    System.Environment.Exit(0); // Close the application gracefully
+                    System.Environment.Exit(0);
                 }
             }
         }
@@ -220,6 +220,14 @@ namespace StepBro.ExecutionHelper
             }
 
             return result;
+        }
+
+        public void Dispose()
+        {
+            if (m_executionHelperPipe.IsConnected())
+            {
+                m_executionHelperPipe.Dispose();
+            }
         }
     }
 }
