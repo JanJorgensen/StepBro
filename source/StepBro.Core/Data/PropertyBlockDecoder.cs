@@ -101,14 +101,17 @@ namespace StepBro.Core.Data
                 m_childs = childs;
             }
             public Block(Func<TParent, string, TThis> creator, params Element[] childs) :
-                this(null, creator, childs)
+                this((string)null, creator, childs)
             { }
 
             public Block(string name, params Element[] childs) :
-                this(name, null, childs)
+                this(name, (string)null, null, childs)
+            { }
+            public Block(string name, string altName, params Element[] childs) :
+                this(name, altName, null, childs)
             { }
             public Block(params Element[] childs) :
-                this(null, null, childs)
+                this((string)null, (string)null, null, childs)
             { }
 
             public void SetChilds(params Element[] childs)

@@ -11,25 +11,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static StepBro.UI.WinForms.ProcedureActivationButtonLogic;
+using static StepBro.UI.WinForms.ButtonLogic;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
-    public class ProcedureActivationButton : ToolStripMenuItem, IToolBarElement, ProcedureActivationButtonLogic.IProcedureActivationButton
+    public class Button : ToolStripMenuItem, IToolBarElement, ButtonLogic.IButton
     {
         private IToolBarElement m_parent;
         private ICoreAccess m_coreAccess = null;
-        private ProcedureActivationButtonLogic m_logic;
+        private ButtonLogic m_logic;
         private Color m_normalBack;
         private string m_text = "";
         private bool m_setupFromLogic = false;
 
-        public ProcedureActivationButton(IToolBarElement parent, ICoreAccess coreAccess, string name) : base()
+        public Button(IToolBarElement parent, ICoreAccess coreAccess, string name) : base()
         {
             Debug.Assert(parent != null);
             m_parent = parent;
             m_coreAccess = coreAccess;
-            m_logic = new ProcedureActivationButtonLogic(this, coreAccess);
+            m_logic = new ButtonLogic(this, coreAccess);
             m_normalBack = this.BackColor;
             this.Margin = new Padding(1, Margin.Top, 1, Margin.Bottom);
             this.Name = name;
@@ -40,17 +40,22 @@ namespace StepBro.UI.WinForms.CustomToolBar
         public string Instance
         {
             get { return (m_logic.StartAction.TargetObject != null) ? m_logic.StartAction.TargetObject : (string)m_parent.TryGetChildProperty("Instance"); }
-            set { m_logic.StartAction.TargetObject = value; }
+            set { m_logic.StartAction.TargetObject = value; m_logic.UpdateMode(); }
         }
         public string Procedure
         {
-            get { return m_logic.StartAction.Name; }
-            set { m_logic.StartAction.Name = value; }
+            get { return m_logic.StartAction.FileElementName; }
+            set { m_logic.StartAction.FileElementName = value; m_logic.UpdateMode(); }
         }
         public string Partner
         {
             get { return m_logic.StartAction.Partner; }
-            set { m_logic.StartAction.Partner = value; }
+            set { m_logic.StartAction.Partner = value; m_logic.UpdateMode(); }
+        }
+        public string ObjectCommand
+        {
+            get { return m_logic.StartAction.ObjectCommand; }
+            set { m_logic.StartAction.ObjectCommand = value; m_logic.UpdateMode(); }
         }
 
         public object[] Arguments
@@ -65,6 +70,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                 m_logic.StartAction.Arguments = new List<object>();
             }
             m_logic.StartAction.Arguments.Add(value);
+            m_logic.UpdateMode();
         }
 
         public void AddToArguments(IEnumerable<object> values)
@@ -74,6 +80,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                 m_logic.StartAction.Arguments = new List<object>();
             }
             m_logic.StartAction.Arguments.AddRange(values);
+            m_logic.UpdateMode();
         }
 
         public void SetStoppable()
@@ -83,6 +90,11 @@ namespace StepBro.UI.WinForms.CustomToolBar
         public void SetStopOnButtonRelease()
         {
             m_logic.SetStopOnButtonRelease();
+        }
+
+        public void SetCheckOnClick()
+        {
+            m_logic.SetCheckOnClick();
         }
 
         protected override void OnBackColorChanged(EventArgs e)
@@ -95,7 +107,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         #region IProcedureActivationButton
 
-        void IProcedureActivationButton.CommandHandler(ButtonCommand command)
+        void IButton.CommandHandler(ButtonCommand command)
         {
             m_setupFromLogic = true;
             switch (command)
@@ -140,7 +152,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             m_setupFromLogic = false;
         }
 
-        void IProcedureActivationButton.BeginInvoke(Action action)
+        void IButton.BeginInvoke(Action action)
         {
             this.Parent.BeginInvoke(action);
         }

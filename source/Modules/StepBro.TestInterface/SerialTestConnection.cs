@@ -318,8 +318,8 @@ namespace StepBro.TestInterface
 
         protected override void DoDispose(bool disposing)
         {
-            Disconnect(null);
-            Stream = null;
+            this.Close(null);
+            this.Stream = null;
             if (m_asyncLogLineReader != null)
             {
                 m_asyncLogLineReader = null;
