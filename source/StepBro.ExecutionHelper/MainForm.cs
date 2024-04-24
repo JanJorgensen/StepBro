@@ -23,7 +23,7 @@ namespace StepBro.ExecutionHelper
 
             System.Diagnostics.Trace.WriteLine("Execution Helper STARTING!!");
 
-            m_pipe = Pipe.StartServer("StepBroExecutionHelper", null, Thread.CurrentThread);
+            m_pipe = Pipe.StartServer("StepBroExecutionHelper", null);
 
             FormClosing += (sender, e) =>
             {

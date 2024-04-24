@@ -238,7 +238,7 @@ namespace StepBro.VISABridge
                 m_pipe.Dispose();
             };
 
-            m_pipe = Pipe.StartServer("StepBroVisaPipe", null, Thread.CurrentThread);
+            m_pipe = Pipe.StartServer("StepBroVisaPipe", null);
 
             m_pipe.ReceivedData += (_, eventArgs) =>
             {

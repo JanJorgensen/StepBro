@@ -14,7 +14,6 @@ namespace StepBro.Core.IPC
     {
         private PipeStream m_pipe = null;
         private StreamString m_stream = null;
-        private Thread m_mainThread = null;
         private Thread m_thread = null;
         private bool m_disposed = false;
         private bool m_continue = false;
@@ -25,6 +24,8 @@ namespace StepBro.Core.IPC
         private string m_id;
 
         public EventHandler<Tuple<string, string>> ReceivedData { get; set; }
+        public EventHandler OnConnectionClosed { get; set; }
+        public EventHandler OnServerClosed { get; set; }
 
         //public static void MyMainFunctionality()
         //{
@@ -95,11 +96,10 @@ namespace StepBro.Core.IPC
             return instance;
         }
 
-        public static Pipe StartServer(string pipeName, string id, Thread mainThread)
+        public static Pipe StartServer(string pipeName, string id)
         {
             var pipeServer = new NamedPipeServerStream(pipeName + id, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
             var pipe = Pipe.Create(id, pipeServer, ServerThread);
-            pipe.m_mainThread = mainThread;
             pipe.m_pipeName = pipeName;
             pipe.m_id = id;
             pipe.m_disposeEvent = new ManualResetEvent(false);
@@ -108,12 +108,11 @@ namespace StepBro.Core.IPC
             return pipe;
         }
 
-        public static Pipe StartClient(string pipeName, string id, Thread mainThread)
+        public static Pipe StartClient(string pipeName, string id)
         {
             var pipeClient = new NamedPipeClientStream(".", pipeName + id, PipeDirection.InOut, PipeOptions.Asynchronous, TokenImpersonationLevel.None);
             var pipe = Pipe.Create(id, pipeClient, ReceiverThread);
             pipeClient.Connect();
-            pipe.m_mainThread = mainThread;
             pipe.m_pipeName = pipeName;
             pipe.m_id = id;
             pipe.m_stream = new StreamString(pipeClient);
@@ -166,54 +165,61 @@ namespace StepBro.Core.IPC
 
             int threadId = Thread.CurrentThread.ManagedThreadId;
 
-            while (instance.m_continue)
+            try
             {
-                Exception connectException = null;
-                AutoResetEvent connectEvent = new AutoResetEvent(false);
-                pipeStream.BeginWaitForConnection(
-                    ar =>
-                    {
-                        try
-                        {
-                            pipeStream.EndWaitForConnection(ar);
-
-                            System.Diagnostics.Trace.WriteLine("### Pipe server connect");
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Trace.WriteLine("### Pipe server connect exception");
-                            connectException = ex;
-                        }
-                        connectEvent.Set();
-                    }, null);
-                if (WaitHandle.WaitAny(new WaitHandle[] { connectEvent, instance.m_disposeEvent }, 1000) != WaitHandle.WaitTimeout)
+                while (instance.m_continue)
                 {
-                    if (instance.m_continue)
-                    {
-                        try
+                    Exception connectException = null;
+                    AutoResetEvent connectEvent = new AutoResetEvent(false);
+                    pipeStream.BeginWaitForConnection(
+                        ar =>
                         {
-                            instance.m_stream = new StreamString(instance.m_pipe);
-                            instance.m_stream.WriteString("StepBro is it");
+                            try
+                            {
+                                pipeStream.EndWaitForConnection(ar);
 
-                            instance.m_continueReceiving = true;
-                            ReceiverThread(instance);
-                        }
-                        // Catch the IOException that is raised if the pipe is broken
-                        // or disconnected.
-                        catch (IOException)
+                                System.Diagnostics.Trace.WriteLine("### Pipe server connect");
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Trace.WriteLine("### Pipe server connect exception");
+                                connectException = ex;
+                            }
+                            connectEvent.Set();
+                        }, null);
+                    if (WaitHandle.WaitAny(new WaitHandle[] { connectEvent, instance.m_disposeEvent }, 1000) != WaitHandle.WaitTimeout)
+                    {
+                        if (instance.m_continue)
                         {
-                            //Console.WriteLine("ERROR: {0}", ex.Message);
+                            try
+                            {
+                                instance.m_stream = new StreamString(instance.m_pipe);
+                                instance.m_stream.WriteString("StepBro is it");
+
+                                instance.m_continueReceiving = true;
+                                ReceiverThread(instance);
+                            }
+                            // Catch the IOException that is raised if the pipe is broken
+                            // or disconnected.
+                            catch (IOException)
+                            {
+                                //Console.WriteLine("ERROR: {0}", ex.Message);
+                            }
                         }
                     }
+                    pipeStream.Dispose();
+                    if (instance.m_continue)
+                    {
+                        instance.m_stream = null;
+                        instance.m_continueReceiving = false;
+                        instance.m_pipe = new NamedPipeServerStream(instance.m_pipeName + instance.m_id, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+                        pipeStream = (instance.m_pipe as NamedPipeServerStream);
+                    }
                 }
-                pipeStream.Dispose();
-                if (instance.m_continue)
-                {
-                    instance.m_stream = null;
-                    instance.m_continueReceiving = false;
-                    instance.m_pipe = new NamedPipeServerStream(instance.m_pipeName + instance.m_id, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-                    pipeStream = (instance.m_pipe as NamedPipeServerStream);
-                }
+            }
+            finally
+            {
+                instance.OnServerClosed.Invoke(null, null);
             }
         }
 
@@ -231,7 +237,7 @@ namespace StepBro.Core.IPC
                     if (s == null)
                     {
                         System.Diagnostics.Trace.WriteLine("### Pipe Received nothing");
-                        if (!instance.IsConnected() || (instance.m_mainThread.ThreadState & ThreadState.Stopped) == ThreadState.Stopped)
+                        if (!instance.IsConnected())
                         {
                             instance.m_continueReceiving = false;
                         }
@@ -260,6 +266,7 @@ namespace StepBro.Core.IPC
             }
             finally
             {
+                instance.OnConnectionClosed.Invoke(null, null);
                 System.Diagnostics.Trace.WriteLine("### Pipe stopping receiver");
             }
         }

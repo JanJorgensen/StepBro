@@ -89,7 +89,7 @@ namespace StepBro.VISA
                 started = bridge.Start();
             }
 
-            m_visaPipe = Pipe.StartClient("StepBroVisaPipe", null, Thread.CurrentThread);
+            m_visaPipe = Pipe.StartClient("StepBroVisaPipe", null);
 
             m_visaPipe.ReceivedData += (sender, e) =>
             {

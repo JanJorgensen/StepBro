@@ -150,7 +150,16 @@ namespace StepBro.ConsoleSidekick.WinForms
             if (args.Length == 2)
             {
                 m_consoleWindow = nint.Parse(args[1], System.Globalization.NumberStyles.HexNumber);
-                m_pipe = Pipe.StartClient("StepBroConsoleSidekick", args[1], Thread.CurrentThread);
+                m_pipe = Pipe.StartClient("StepBroConsoleSidekick", args[1]);
+                m_pipe.OnConnectionClosed += (sender, e) =>
+                {
+                    m_closeRequestedByConsole = true; // We consider a connection closed to be a request by console
+                    this.BeginInvoke((MethodInvoker)delegate
+                    {
+                        // close the form on the forms thread
+                        this.Close();
+                    });
+                };
             }
             else
             {
@@ -216,7 +225,10 @@ namespace StepBro.ConsoleSidekick.WinForms
             else
             {
                 System.Diagnostics.Trace.WriteLine("Sidekick base.OnFormClosing() - requesting console app");
-                m_pipe.Send(ShortCommand.RequestClose);
+                if (m_pipe.IsConnected())
+                {
+                    m_pipe.Send(ShortCommand.RequestClose);
+                }
                 e.Cancel = true;    // Don't close; wait for close request from console.
             }
             System.Diagnostics.Trace.WriteLine("Sidekick closing end");

@@ -57,7 +57,7 @@ namespace StepBro.ExecutionHelper
                 }
             }
             
-            m_executionHelperPipe = Pipe.StartClient("StepBroExecutionHelper", null, Thread.CurrentThread);
+            m_executionHelperPipe = Pipe.StartClient("StepBroExecutionHelper", null);
 
             m_executionHelperPipe.ReceivedData += (sender, e) =>
             {

@@ -267,7 +267,7 @@ namespace StepBro.Cmd
                     var folder = Path.GetDirectoryName(path);
 
                     string pipename = hThis.ToString("X");
-                    m_sideKickPipe = Pipe.StartServer("StepBroConsoleSidekick", pipename, Thread.CurrentThread);
+                    m_sideKickPipe = Pipe.StartServer("StepBroConsoleSidekick", pipename);
                     var sidekick = new System.Diagnostics.Process();
                     sidekick.StartInfo.FileName = Path.Combine(folder, "StepBro.Sidekick.exe");
                     sidekick.StartInfo.Arguments = pipename;
@@ -946,6 +946,15 @@ namespace StepBro.Cmd
                 ConsoleWriteErrorLine($"Error: {ex.GetType().Name}, {ex.Message}");
                 retval = -1;
             }
+            finally
+            {
+                if (m_sideKickPipe != null)
+                {
+                    m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.Close);
+                    m_sideKickPipe.Dispose();
+                }
+            }
+
             Trace.WriteLine("StepBro ended command loop");
 
 
@@ -1002,12 +1011,6 @@ namespace StepBro.Cmd
             {
                 DebugLogUtils.DumpToFile();
                 ConsoleWriteLine($"Internal Debug Log saved in {DebugLogUtils.DumpFilePath}");
-            }
-
-            if (m_sideKickPipe != null)
-            {
-                m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.Close);
-                m_sideKickPipe.Dispose();
             }
 
             StepBroMain.Deinitialize();
