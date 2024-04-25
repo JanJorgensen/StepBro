@@ -163,13 +163,14 @@ namespace StepBro.StateMachine
 
             public void StartPollTimer([Implicit] ICallContext context, TimeSpan time, bool currentStateOnly)
             {
-                var timer = new Timer(m_instance, "poll", DateTime.Now + time);
+                var timer = new Timer(m_instance, "poll", DateTime.UtcNow + time);
                 timer.IntervalTime = time;
                 if (currentStateOnly)
                 {
                     timer.CurrentStateOnly = true;
                     timer.StateTransitionIndex = m_instance.StateTransitionNumber;
                 }
+                m_executor.AddTimer(timer);
             }
 
             public void StartTimer([Implicit] ICallContext context, string name, TimeSpan time, bool repeating, bool currentStateOnly)
@@ -342,6 +343,7 @@ namespace StepBro.StateMachine
             /////////////////// NOW HANDLE THE NEXT EVENT /////////////////// 
 
             var entryTime = DateTime.UtcNow;
+            System.Diagnostics.Debug.WriteLine("AwaitNextEvent at " + entryTime.ToLongTimeString());
 
             while (true)
             { // We might be looping, waiting for a timer.
@@ -351,7 +353,7 @@ namespace StepBro.StateMachine
                 // Check timers. Note that these timers use UTC time, to stay out of trouble with daylight saving.
                 while (m_nextTimer != null && m_nextTimer.Time <= now)
                 {
-                    System.Diagnostics.Debug.WriteLine("AwaitNextEvent timer expiry!");
+                    System.Diagnostics.Debug.WriteLine("AwaitNextEvent timer expiry! - " + m_nextTimer.Instance.Name + " timer " + m_nextTimer.Name);
                     var t = m_nextTimer;
                     m_nextTimer = m_nextTimer.Next;
 
