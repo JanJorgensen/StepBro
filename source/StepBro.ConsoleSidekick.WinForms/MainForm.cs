@@ -147,6 +147,8 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             string[] args = Environment.GetCommandLineArgs();
 
+            //MessageBox.Show("Say when ...", "Waiting");
+
             if (args.Length == 2)
             {
                 m_consoleWindow = nint.Parse(args[1], System.Globalization.NumberStyles.HexNumber);

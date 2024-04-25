@@ -298,10 +298,12 @@ namespace StepBro.Core.IPC
         {
             var b1 = ioStream.ReadByte();
             var b2 = ioStream.ReadByte();
+            var b3 = ioStream.ReadByte();
+            var b4 = ioStream.ReadByte();
 
-            if (b1 >= 0 && b2 >= 0)
+            if (b1 >= 0 && b2 >= 0 && b3 >= 0 && b3 >= 0)
             {
-                int len = (b1 * 256) + b2;
+                int len = (b1 * 0x1000000) + (b2 * 0x10000) + (b3 * 0x100) + b4;
                 byte[] inBuffer = new byte[len];
                 ioStream.Read(inBuffer, 0, len);
                 m_lastReadString = streamEncoding.GetString(inBuffer);
@@ -343,24 +345,22 @@ namespace StepBro.Core.IPC
             // If the task has not finished yet we return null
             return null;
         }
-
+         
         public int WriteString(string outString)
         {
             byte[] outBuffer = streamEncoding.GetBytes(outString);
             int len = outBuffer.Length;
-            if (len > UInt16.MaxValue)
-            {
-                len = (int)UInt16.MaxValue;
-            }
             lock (sendSync)
             {
-                ioStream.WriteByte((byte)(len / 256));
-                ioStream.WriteByte((byte)(len & 255));
+                ioStream.WriteByte((byte)((len >> 24) & 0xFF));
+                ioStream.WriteByte((byte)((len >> 16) & 0xFF));
+                ioStream.WriteByte((byte)((len >> 8) & 0xFF));
+                ioStream.WriteByte((byte)(len & 0xFF));
                 ioStream.Write(outBuffer, 0, len);
                 ioStream.Flush();
             }
 
-            return outBuffer.Length + 2;
+            return outBuffer.Length + 4;
         }
     }
 }

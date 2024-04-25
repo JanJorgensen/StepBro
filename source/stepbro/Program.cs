@@ -1,4 +1,5 @@
 ﻿//#define STOP_BEFORE_PARSING
+//#define STOP_BEFORE_SIDEKICK
 using StepBro.Core;
 using StepBro.Core.Addons;
 using StepBro.Core.Api;
@@ -273,6 +274,13 @@ namespace StepBro.Cmd
                     sidekick.StartInfo.Arguments = pipename;
                     sidekickStarted = sidekick.Start();
 
+#if STOP_BEFORE_SIDEKICK
+                Console.WriteLine("<PRESS ANY KEY TO CONTINUE>");
+                while (!Console.KeyAvailable)
+                {
+                    System.Threading.Thread.Sleep(25);
+                }
+#endif
                     if (sidekickStarted)
                     {
                         commandObjectDictionary = new Dictionary<string, ITextCommandInput>();
