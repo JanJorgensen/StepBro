@@ -1,0 +1,115 @@
+\doxysection{Step\+Bro.\+Core.\+Data.\+Property\+Block\+Value Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_value}{}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_value}\index{StepBro.Core.Data.PropertyBlockValue@{StepBro.Core.Data.PropertyBlockValue}}
+Inheritance diagram for Step\+Bro.\+Core.\+Data.\+Property\+Block\+Value\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_core_1_1_data_1_1_property_block_value}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_ac2661d26e1bdfe967ea69495a6b0638f}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_ac2661d26e1bdfe967ea69495a6b0638f} 
+{\bfseries Property\+Block\+Value} (int line, string name, object value)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_a30853edb6b74b6b2ac2418f6d2037a72}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_a30853edb6b74b6b2ac2418f6d2037a72} 
+{\bfseries Property\+Block\+Value} (int line, string name, Property\+Block\+Value\+Solver solver)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_ab76583db8e8c5d15930efdfb2848febe}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_ab76583db8e8c5d15930efdfb2848febe} 
+override string {\bfseries To\+String} ()
+\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_ad374b5696d9032cad3d75b5ac453ee6a}{Get\+Test\+String}} (String\+Builder text)
+\item 
+override \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Property\+Block\+Entry}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_a6a3edef9045fd6be8a3d25303666bf50}{Clone}} (bool skip\+Used\+Or\+Approved=false)
+\item 
+override \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_serializable_property_block_entry}{Serializable\+Property\+Block\+Entry}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_a9ba18f10a1afa68eeec591b95790495c}{Clone\+For\+Serialization}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Step\+Bro.\+Core.\+Data.\+Property\+Block\+Entry}}}
+\begin{DoxyCompactItemize}
+\item 
+abstract void {\bfseries Get\+Test\+String} (String\+Builder text)
+\item 
+string {\bfseries Get\+Test\+String} ()
+\item 
+bool {\bfseries Is} (string name, Property\+Block\+Entry\+Type type)
+\item 
+abstract \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Property\+Block\+Entry}} {\bfseries Clone} (bool skip\+Used\+Or\+Approved=false)
+\item 
+abstract \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_serializable_property_block_entry}{Serializable\+Property\+Block\+Entry}} {\bfseries Clone\+For\+Serialization} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_a84e586241c5a18482d4204bfc72ec34e}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_a84e586241c5a18482d4204bfc72ec34e} 
+object {\bfseries Value}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_ab6dc3eff688b13a5e500e4d3129a6020}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_ab6dc3eff688b13a5e500e4d3129a6020} 
+bool {\bfseries Is\+String\+Or\+Identifier}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Step\+Bro.\+Core.\+Data.\+Property\+Block\+Entry}}}
+\begin{DoxyCompactItemize}
+\item 
+int {\bfseries Line}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+string {\bfseries Specified\+Type\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+bool {\bfseries Has\+Type\+Specified}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Type\+Or\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool {\bfseries Is\+Array\+Entry}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+bool {\bfseries Is\+Addition\+Assignment} = false\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+Property\+Block\+Entry\+Type {\bfseries Block\+Entry\+Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+object {\bfseries Tag}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+bool {\bfseries Is\+Used\+Or\+Approved}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Step\+Bro.\+Core.\+Data.\+Property\+Block\+Entry}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Property\+Block\+Entry} (int line, Property\+Block\+Entry\+Type type, string name=null)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_a6a3edef9045fd6be8a3d25303666bf50}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_a6a3edef9045fd6be8a3d25303666bf50} 
+\index{StepBro.Core.Data.PropertyBlockValue@{StepBro.Core.Data.PropertyBlockValue}!Clone@{Clone}}
+\index{Clone@{Clone}!StepBro.Core.Data.PropertyBlockValue@{StepBro.Core.Data.PropertyBlockValue}}
+\doxysubsubsection{\texorpdfstring{Clone()}{Clone()}}
+{\footnotesize\ttfamily override \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Property\+Block\+Entry}} Step\+Bro.\+Core.\+Data.\+Property\+Block\+Value.\+Clone (\begin{DoxyParamCaption}\item[{bool}]{skip\+Used\+Or\+Approved = {\ttfamily false} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Step\+Bro.\+Core.\+Data.\+Property\+Block\+Entry}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_a9ba18f10a1afa68eeec591b95790495c}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_a9ba18f10a1afa68eeec591b95790495c} 
+\index{StepBro.Core.Data.PropertyBlockValue@{StepBro.Core.Data.PropertyBlockValue}!CloneForSerialization@{CloneForSerialization}}
+\index{CloneForSerialization@{CloneForSerialization}!StepBro.Core.Data.PropertyBlockValue@{StepBro.Core.Data.PropertyBlockValue}}
+\doxysubsubsection{\texorpdfstring{CloneForSerialization()}{CloneForSerialization()}}
+{\footnotesize\ttfamily override \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_serializable_property_block_entry}{Serializable\+Property\+Block\+Entry}} Step\+Bro.\+Core.\+Data.\+Property\+Block\+Value.\+Clone\+For\+Serialization (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Step\+Bro.\+Core.\+Data.\+Property\+Block\+Entry}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_ad374b5696d9032cad3d75b5ac453ee6a}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_value_ad374b5696d9032cad3d75b5ac453ee6a} 
+\index{StepBro.Core.Data.PropertyBlockValue@{StepBro.Core.Data.PropertyBlockValue}!GetTestString@{GetTestString}}
+\index{GetTestString@{GetTestString}!StepBro.Core.Data.PropertyBlockValue@{StepBro.Core.Data.PropertyBlockValue}}
+\doxysubsubsection{\texorpdfstring{GetTestString()}{GetTestString()}}
+{\footnotesize\ttfamily override void Step\+Bro.\+Core.\+Data.\+Property\+Block\+Value.\+Get\+Test\+String (\begin{DoxyParamCaption}\item[{String\+Builder}]{text }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Step\+Bro.\+Core.\+Data.\+Property\+Block\+Entry}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Data/Property\+Block\+Value.\+cs\end{DoxyCompactItemize}

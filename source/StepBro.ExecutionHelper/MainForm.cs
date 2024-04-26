@@ -9,14 +9,28 @@ namespace StepBro.ExecutionHelper
     public partial class MainForm : Form
     {
         private Pipe? m_pipe = null;
-        FormClosingEventHandler? formCloseEventHandler = null;
         private bool m_closeRequested = false;
         private Dictionary<string, object> m_variables = new Dictionary<string, object>();
-        EventHandler<Tuple<string, string>>? receivedDataEventHandler = null;
 
         public MainForm()
         {
             InitializeComponent();
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+
+            if (m_pipe != null)
+            {
+                if (m_pipe.IsConnected() && !m_closeRequested)
+                {
+                    m_pipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.CloseApplication);
+                    Thread.Sleep(1000);
+                }
+
+                m_pipe.Dispose();
+            }
         }
 
         protected override void OnLoad(EventArgs e)
@@ -25,25 +39,12 @@ namespace StepBro.ExecutionHelper
 
             System.Diagnostics.Trace.WriteLine("Execution Helper STARTING!!");
 
-            m_pipe = Pipe.StartServer("StepBroExecutionHelper", "1998");
+            m_pipe = Pipe.StartServer("StepBroExecutionHelper", null);
 
-            formCloseEventHandler = (sender, e) =>
-            {
-                if (m_pipe.IsConnected() && !m_closeRequested)
-                {
-                    m_pipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.CloseApplication);
-                    Thread.Sleep(1000);
-                }
-            };
-
-            FormClosing += formCloseEventHandler;
-
-            receivedDataEventHandler = (sender, e) =>
+            m_pipe.ReceivedData += (sender, e) =>
             {
                 ReceivedData(e);
             };
-
-            Pipe.ReceivedData += receivedDataEventHandler;
 
             RunOnStartup();
         }
@@ -84,9 +85,11 @@ namespace StepBro.ExecutionHelper
                 if (cmd == ShortCommand.CloseApplication)
                 {
                     m_closeRequested = true;
-                    m_pipe!.Send(cmd);
-                    Pipe.ReceivedData -= receivedDataEventHandler;
-                    this.Close();
+                    this.BeginInvoke((MethodInvoker)delegate
+                    {
+                        // close the form on the forms thread
+                        this.Close();
+                    });
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateOrSetVariable))
@@ -96,7 +99,13 @@ namespace StepBro.ExecutionHelper
                 {
                     bool alreadyExists = m_variables.ContainsKey(data.VariableName);
                     bool isNumberKind = data.Value is System.Text.Json.JsonElement v && v.ValueKind == JsonValueKind.Number;
-                    if (alreadyExists)
+                    if (alreadyExists && isNumberKind)
+                    {
+                        long value = 0;
+                        Int64.TryParse(data.Value.ToString(), out value);
+                        m_variables[data.VariableName] = value;
+                    }
+                    else if (alreadyExists)
                     {
                         m_variables[data.VariableName] = data.Value;
                     }

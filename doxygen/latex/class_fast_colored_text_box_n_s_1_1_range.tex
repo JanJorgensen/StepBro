@@ -1,0 +1,1007 @@
+\doxysection{Fast\+Colored\+Text\+Box\+NS.\+Range Class Reference}
+\hypertarget{class_fast_colored_text_box_n_s_1_1_range}{}\label{class_fast_colored_text_box_n_s_1_1_range}\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+
+
+Diapason of text chars.  
+
+
+Inheritance diagram for Fast\+Colored\+Text\+Box\+NS.\+Range\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_fast_colored_text_box_n_s_1_1_range}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_aad0253b8be86b37b86986fb2814df7bc}\label{class_fast_colored_text_box_n_s_1_1_range_aad0253b8be86b37b86986fb2814df7bc} 
+{\bfseries Range} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} tb)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a3cc8b4ccee0bf2bba92feea085a24379}\label{class_fast_colored_text_box_n_s_1_1_range_a3cc8b4ccee0bf2bba92feea085a24379} 
+{\bfseries Range} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} tb, int i\+Start\+Char, int i\+Start\+Line, int i\+End\+Char, int i\+End\+Line)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a2a48e175c6f969f03decef90e293d99e}\label{class_fast_colored_text_box_n_s_1_1_range_a2a48e175c6f969f03decef90e293d99e} 
+{\bfseries Range} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} tb, \mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} start, \mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} end)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a2e9d3a0119767b84f5d4d5741126ca98}\label{class_fast_colored_text_box_n_s_1_1_range_a2e9d3a0119767b84f5d4d5741126ca98} 
+{\bfseries Range} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} tb, int i\+Line)
+\begin{DoxyCompactList}\small\item\em Constructor. Creates range of the line. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a8a21a91a632ca6ab2ed577ded70bd7ac}\label{class_fast_colored_text_box_n_s_1_1_range_a8a21a91a632ca6ab2ed577ded70bd7ac} 
+bool {\bfseries Contains} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} place)
+\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a103ad15dddb9e3ee9e75d7dc65198f1a}{Get\+Intersection\+With}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range)
+\begin{DoxyCompactList}\small\item\em Returns intersection with other range, empty range returned otherwise. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_afb29e911acdfa212bb017123d7116e9d}{Get\+Union\+With}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range)
+\begin{DoxyCompactList}\small\item\em Returns union with other range. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a5ceb003e1e2c407aefbb3c7999493cf7}\label{class_fast_colored_text_box_n_s_1_1_range_a5ceb003e1e2c407aefbb3c7999493cf7} 
+void {\bfseries Select\+All} ()
+\begin{DoxyCompactList}\small\item\em Select all chars of control. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a20b9d1bc66d8ab30484df3e474bad3ca}\label{class_fast_colored_text_box_n_s_1_1_range_a20b9d1bc66d8ab30484df3e474bad3ca} 
+string {\bfseries Get\+Chars\+Before\+Start} (int chars\+Count)
+\begin{DoxyCompactList}\small\item\em Returns required char\textquotesingle{}s number before start of the Range. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a96d8c70404300ca0c7e068e7b4810842}\label{class_fast_colored_text_box_n_s_1_1_range_a96d8c70404300ca0c7e068e7b4810842} 
+string {\bfseries Get\+Chars\+After\+Start} (int chars\+Count)
+\begin{DoxyCompactList}\small\item\em Returns required char\textquotesingle{}s number after start of the Range. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_ae88d141dd79dc85b4f885701c2299647}{Clone}} ()
+\begin{DoxyCompactList}\small\item\em Clone range. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_adbab7f3ea6201ab20ba831530fe50e40}{Go\+Right}} ()
+\begin{DoxyCompactList}\small\item\em Move range right. \end{DoxyCompactList}\item 
+virtual bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a69683337f486873d07d0ff0dee74f722}{Go\+Right\+Through\+Folded}} ()
+\begin{DoxyCompactList}\small\item\em Move range left. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_ab8dd73f058887cf33a0f4a7f4d6c6700}{Go\+Left}} ()
+\begin{DoxyCompactList}\small\item\em Move range left. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a4c660fc1bb494e296b8b220d45e3801f}{Go\+Left\+Through\+Folded}} ()
+\begin{DoxyCompactList}\small\item\em Move range left. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_adae85edc85456b7d81459f3797091e9c}\label{class_fast_colored_text_box_n_s_1_1_range_adae85edc85456b7d81459f3797091e9c} 
+void {\bfseries Go\+Left} (bool shift)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_af8432110c951ca0f09ab4e4e442c5191}\label{class_fast_colored_text_box_n_s_1_1_range_af8432110c951ca0f09ab4e4e442c5191} 
+void {\bfseries Go\+Right} (bool shift)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a8c43b96ec643ffb9deaa22f40d1115d4}\label{class_fast_colored_text_box_n_s_1_1_range_a8c43b96ec643ffb9deaa22f40d1115d4} 
+void {\bfseries Set\+Style} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style)
+\begin{DoxyCompactList}\small\item\em Set style for range. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a0b6148c7e936662bdaeb6d38df517878}\label{class_fast_colored_text_box_n_s_1_1_range_a0b6148c7e936662bdaeb6d38df517878} 
+void {\bfseries Set\+Style} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style, string regex\+Pattern)
+\begin{DoxyCompactList}\small\item\em Set style for given regex pattern. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a09e26375b97508d65fe6dee95f1c4260}\label{class_fast_colored_text_box_n_s_1_1_range_a09e26375b97508d65fe6dee95f1c4260} 
+void {\bfseries Set\+Style} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style, Regex regex)
+\begin{DoxyCompactList}\small\item\em Set style for given regex. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a6c7d5e5d49c495ed54cd2cbcc2f57256}\label{class_fast_colored_text_box_n_s_1_1_range_a6c7d5e5d49c495ed54cd2cbcc2f57256} 
+void {\bfseries Set\+Style} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style, string regex\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Set style for given regex pattern. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_acaa0cd4d5fc2c5288b25f183d536cee1}\label{class_fast_colored_text_box_n_s_1_1_range_acaa0cd4d5fc2c5288b25f183d536cee1} 
+void {\bfseries Set\+Style} (\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_aaa3ed378ba16c469d2d89b77605773a1}{Style\+Index}} style\+Layer, string regex\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Set style for given regex pattern. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_ab9cf9cec0caabf47e8f95f6c19181628}\label{class_fast_colored_text_box_n_s_1_1_range_ab9cf9cec0caabf47e8f95f6c19181628} 
+void {\bfseries Set\+Style} (\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_aaa3ed378ba16c469d2d89b77605773a1}{Style\+Index}} style\+Layer, Regex regex)
+\begin{DoxyCompactList}\small\item\em Set style for given regex pattern. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a02e21dba4e8fb10e5a622b52003b4f03}\label{class_fast_colored_text_box_n_s_1_1_range_a02e21dba4e8fb10e5a622b52003b4f03} 
+void {\bfseries Set\+Style} (\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_aaa3ed378ba16c469d2d89b77605773a1}{Style\+Index}} style\+Index)
+\begin{DoxyCompactList}\small\item\em Appends style to chars of range. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a7444276dd05d406a15e0eecc44eb8d58}{Set\+Folding\+Markers}} (string start\+Folding\+Pattern, string finish\+Folding\+Pattern)
+\begin{DoxyCompactList}\small\item\em Sets folding markers. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a51175fb54025b82ed76457a9e5ac4bad}{Set\+Folding\+Markers}} (string start\+Folding\+Pattern, string finish\+Folding\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Sets folding markers. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a58ba5d119e9c255719978cdee054b9b9}{Set\+Folding\+Markers}} (string folding\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Sets folding markers. \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a7634e6de44b052c99bdecd383d04141a}{Get\+Ranges}} (string regex\+Pattern)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex pattern. \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a7e2c5375f37d642e639204a0a8ca405c}{Get\+Ranges}} (string regex\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex pattern. \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_aaaba17752bff912b5ba9b140e0d37ae1}{Get\+Ranges\+By\+Lines}} (string regex\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex pattern. Search is separately in each line. This method requires less memory than Get\+Ranges(). \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_aba79a67eb59421ed588e0e19665d0443}{Get\+Ranges\+By\+Lines}} (Regex regex)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex. Search is separately in each line. This method requires less memory than Get\+Ranges(). \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_ad487f7b335569cf63f67d43b3d21da5f}{Get\+Ranges\+By\+Lines\+Reversed}} (string regex\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex pattern. Search is separately in each line (order of lines is reversed). This method requires less memory than Get\+Ranges(). \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a5453b0a45f02f818404c6b73751a83d3}{Get\+Ranges}} (Regex regex)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_ab37f3da689b54fe48a3bb58ecc50e815}\label{class_fast_colored_text_box_n_s_1_1_range_ab37f3da689b54fe48a3bb58ecc50e815} 
+void {\bfseries Clear\+Style} (params \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}}\mbox{[}$\,$\mbox{]} styles)
+\begin{DoxyCompactList}\small\item\em Clear styles of range. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a39299d32cf56e088ae739df0083d7bc8}\label{class_fast_colored_text_box_n_s_1_1_range_a39299d32cf56e088ae739df0083d7bc8} 
+void {\bfseries Clear\+Style} (\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_aaa3ed378ba16c469d2d89b77605773a1}{Style\+Index}} style\+Index)
+\begin{DoxyCompactList}\small\item\em Clear styles of range. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a2be62cd2254e785d75324ff6f9b19d07}\label{class_fast_colored_text_box_n_s_1_1_range_a2be62cd2254e785d75324ff6f9b19d07} 
+void {\bfseries Clear\+Folding\+Markers} ()
+\begin{DoxyCompactList}\small\item\em Clear folding markers of all lines of range. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a06e6c30550506a3fdb7c5f1d0e07177d}\label{class_fast_colored_text_box_n_s_1_1_range_a06e6c30550506a3fdb7c5f1d0e07177d} 
+void {\bfseries Begin\+Update} ()
+\begin{DoxyCompactList}\small\item\em Starts selection position updating. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_adf18e189530aa2aa550fca5a921c045b}\label{class_fast_colored_text_box_n_s_1_1_range_adf18e189530aa2aa550fca5a921c045b} 
+void {\bfseries End\+Update} ()
+\begin{DoxyCompactList}\small\item\em Ends selection position updating. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a22f54b06d58c3d32aa37fe57d990f1f4}\label{class_fast_colored_text_box_n_s_1_1_range_a22f54b06d58c3d32aa37fe57d990f1f4} 
+override string {\bfseries To\+String} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a72c9ab4d36399d91ab7fd7311a0bb309}\label{class_fast_colored_text_box_n_s_1_1_range_a72c9ab4d36399d91ab7fd7311a0bb309} 
+void {\bfseries Normalize} ()
+\begin{DoxyCompactList}\small\item\em Exchanges Start and End if End appears before Start. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a9d577353fc9d03de5314888bfb4acbf4}\label{class_fast_colored_text_box_n_s_1_1_range_a9d577353fc9d03de5314888bfb4acbf4} 
+void {\bfseries Inverse} ()
+\begin{DoxyCompactList}\small\item\em Exchanges Start and End. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a3c7b464c6b147d59ff15ea64d53f031c}\label{class_fast_colored_text_box_n_s_1_1_range_a3c7b464c6b147d59ff15ea64d53f031c} 
+void {\bfseries Expand} ()
+\begin{DoxyCompactList}\small\item\em Expands range from first char of Start line to last char of End line. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_add0a4f0b244d4ad77c8cbe879f3d64e6}{Get\+Fragment}} (string allowed\+Symbols\+Pattern)
+\begin{DoxyCompactList}\small\item\em Get fragment of text around Start place. Returns maximal matched to pattern fragment. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a622c39813bd03c18a335d1a9c14350bd}{Get\+Fragment}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style, bool allow\+Line\+Breaks)
+\begin{DoxyCompactList}\small\item\em Get fragment of text around Start place. Returns maximal matched to given Style. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_afd4239c01c383e3d7fa41c69193747f3}{Get\+Fragment}} (string allowed\+Symbols\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Get fragment of text around Start place. Returns maximal mathed to pattern fragment. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a4e43f45009aa2794fe4faf8dcceabb89}\label{class_fast_colored_text_box_n_s_1_1_range_a4e43f45009aa2794fe4faf8dcceabb89} 
+void {\bfseries Go\+Word\+Left} (bool shift)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_ad4b0eb739f18995c9d9c2d4e4db13f6b}\label{class_fast_colored_text_box_n_s_1_1_range_ad4b0eb739f18995c9d9c2d4e4db13f6b} 
+void {\bfseries Go\+Word\+Right} (bool shift, bool go\+To\+Start\+Of\+Next\+Word=false)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a239d543c7d2531e28f2303e2445ebb48}\label{class_fast_colored_text_box_n_s_1_1_range_a239d543c7d2531e28f2303e2445ebb48} 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ {\bfseries Get\+Sub\+Ranges} (bool include\+Empty)
+\item 
+bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a326bcc559099caa5c15c3e9babae4077}{Is\+Read\+Only\+Left\+Char}} ()
+\begin{DoxyCompactList}\small\item\em Is char before range readonly. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a9b3861a366f787d1d4a4a66676cc6445}{Is\+Read\+Only\+Right\+Char}} ()
+\begin{DoxyCompactList}\small\item\em Is char after range readonly. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a50651ec88b2068a7e432e79c2a94279d}\label{class_fast_colored_text_box_n_s_1_1_range_a50651ec88b2068a7e432e79c2a94279d} 
+IEnumerable$<$ \mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} $>$ {\bfseries Get\+Places\+Cyclic} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} start\+Place, bool backward=false)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_aad0253b8be86b37b86986fb2814df7bc}\label{class_fast_colored_text_box_n_s_1_1_range_aad0253b8be86b37b86986fb2814df7bc} 
+{\bfseries Range} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} tb)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a3cc8b4ccee0bf2bba92feea085a24379}\label{class_fast_colored_text_box_n_s_1_1_range_a3cc8b4ccee0bf2bba92feea085a24379} 
+{\bfseries Range} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} tb, int i\+Start\+Char, int i\+Start\+Line, int i\+End\+Char, int i\+End\+Line)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a2a48e175c6f969f03decef90e293d99e}\label{class_fast_colored_text_box_n_s_1_1_range_a2a48e175c6f969f03decef90e293d99e} 
+{\bfseries Range} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} tb, \mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} start, \mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} end)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a2e9d3a0119767b84f5d4d5741126ca98}\label{class_fast_colored_text_box_n_s_1_1_range_a2e9d3a0119767b84f5d4d5741126ca98} 
+{\bfseries Range} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} tb, int i\+Line)
+\begin{DoxyCompactList}\small\item\em Constructor. Creates range of the line. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a8a21a91a632ca6ab2ed577ded70bd7ac}\label{class_fast_colored_text_box_n_s_1_1_range_a8a21a91a632ca6ab2ed577ded70bd7ac} 
+bool {\bfseries Contains} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} place)
+\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a103ad15dddb9e3ee9e75d7dc65198f1a}{Get\+Intersection\+With}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range)
+\begin{DoxyCompactList}\small\item\em Returns intersection with other range, empty range returned otherwise. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_afb29e911acdfa212bb017123d7116e9d}{Get\+Union\+With}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range)
+\begin{DoxyCompactList}\small\item\em Returns union with other range. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a5ceb003e1e2c407aefbb3c7999493cf7}\label{class_fast_colored_text_box_n_s_1_1_range_a5ceb003e1e2c407aefbb3c7999493cf7} 
+void {\bfseries Select\+All} ()
+\begin{DoxyCompactList}\small\item\em Select all chars of control. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a20b9d1bc66d8ab30484df3e474bad3ca}\label{class_fast_colored_text_box_n_s_1_1_range_a20b9d1bc66d8ab30484df3e474bad3ca} 
+string {\bfseries Get\+Chars\+Before\+Start} (int chars\+Count)
+\begin{DoxyCompactList}\small\item\em Returns required char\textquotesingle{}s number before start of the Range. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a96d8c70404300ca0c7e068e7b4810842}\label{class_fast_colored_text_box_n_s_1_1_range_a96d8c70404300ca0c7e068e7b4810842} 
+string {\bfseries Get\+Chars\+After\+Start} (int chars\+Count)
+\begin{DoxyCompactList}\small\item\em Returns required char\textquotesingle{}s number after start of the Range. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_ae88d141dd79dc85b4f885701c2299647}{Clone}} ()
+\begin{DoxyCompactList}\small\item\em Clone range. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_adbab7f3ea6201ab20ba831530fe50e40}{Go\+Right}} ()
+\begin{DoxyCompactList}\small\item\em Move range right. \end{DoxyCompactList}\item 
+virtual bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a69683337f486873d07d0ff0dee74f722}{Go\+Right\+Through\+Folded}} ()
+\begin{DoxyCompactList}\small\item\em Move range left. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_ab8dd73f058887cf33a0f4a7f4d6c6700}{Go\+Left}} ()
+\begin{DoxyCompactList}\small\item\em Move range left. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a4c660fc1bb494e296b8b220d45e3801f}{Go\+Left\+Through\+Folded}} ()
+\begin{DoxyCompactList}\small\item\em Move range left. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_adae85edc85456b7d81459f3797091e9c}\label{class_fast_colored_text_box_n_s_1_1_range_adae85edc85456b7d81459f3797091e9c} 
+void {\bfseries Go\+Left} (bool shift)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_af8432110c951ca0f09ab4e4e442c5191}\label{class_fast_colored_text_box_n_s_1_1_range_af8432110c951ca0f09ab4e4e442c5191} 
+void {\bfseries Go\+Right} (bool shift)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a8c43b96ec643ffb9deaa22f40d1115d4}\label{class_fast_colored_text_box_n_s_1_1_range_a8c43b96ec643ffb9deaa22f40d1115d4} 
+void {\bfseries Set\+Style} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style)
+\begin{DoxyCompactList}\small\item\em Set style for range. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a0b6148c7e936662bdaeb6d38df517878}\label{class_fast_colored_text_box_n_s_1_1_range_a0b6148c7e936662bdaeb6d38df517878} 
+void {\bfseries Set\+Style} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style, string regex\+Pattern)
+\begin{DoxyCompactList}\small\item\em Set style for given regex pattern. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a09e26375b97508d65fe6dee95f1c4260}\label{class_fast_colored_text_box_n_s_1_1_range_a09e26375b97508d65fe6dee95f1c4260} 
+void {\bfseries Set\+Style} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style, Regex regex)
+\begin{DoxyCompactList}\small\item\em Set style for given regex. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a6c7d5e5d49c495ed54cd2cbcc2f57256}\label{class_fast_colored_text_box_n_s_1_1_range_a6c7d5e5d49c495ed54cd2cbcc2f57256} 
+void {\bfseries Set\+Style} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style, string regex\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Set style for given regex pattern. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_acaa0cd4d5fc2c5288b25f183d536cee1}\label{class_fast_colored_text_box_n_s_1_1_range_acaa0cd4d5fc2c5288b25f183d536cee1} 
+void {\bfseries Set\+Style} (\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_aaa3ed378ba16c469d2d89b77605773a1}{Style\+Index}} style\+Layer, string regex\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Set style for given regex pattern. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_ab9cf9cec0caabf47e8f95f6c19181628}\label{class_fast_colored_text_box_n_s_1_1_range_ab9cf9cec0caabf47e8f95f6c19181628} 
+void {\bfseries Set\+Style} (\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_aaa3ed378ba16c469d2d89b77605773a1}{Style\+Index}} style\+Layer, Regex regex)
+\begin{DoxyCompactList}\small\item\em Set style for given regex pattern. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a02e21dba4e8fb10e5a622b52003b4f03}\label{class_fast_colored_text_box_n_s_1_1_range_a02e21dba4e8fb10e5a622b52003b4f03} 
+void {\bfseries Set\+Style} (\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_aaa3ed378ba16c469d2d89b77605773a1}{Style\+Index}} style\+Index)
+\begin{DoxyCompactList}\small\item\em Appends style to chars of range. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a7444276dd05d406a15e0eecc44eb8d58}{Set\+Folding\+Markers}} (string start\+Folding\+Pattern, string finish\+Folding\+Pattern)
+\begin{DoxyCompactList}\small\item\em Sets folding markers. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a51175fb54025b82ed76457a9e5ac4bad}{Set\+Folding\+Markers}} (string start\+Folding\+Pattern, string finish\+Folding\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Sets folding markers. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a58ba5d119e9c255719978cdee054b9b9}{Set\+Folding\+Markers}} (string folding\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Sets folding markers. \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a7634e6de44b052c99bdecd383d04141a}{Get\+Ranges}} (string regex\+Pattern)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex pattern. \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a7e2c5375f37d642e639204a0a8ca405c}{Get\+Ranges}} (string regex\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex pattern. \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_aaaba17752bff912b5ba9b140e0d37ae1}{Get\+Ranges\+By\+Lines}} (string regex\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex pattern. Search is separately in each line. This method requires less memory than Get\+Ranges(). \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_aba79a67eb59421ed588e0e19665d0443}{Get\+Ranges\+By\+Lines}} (Regex regex)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex. Search is separately in each line. This method requires less memory than Get\+Ranges(). \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_ad487f7b335569cf63f67d43b3d21da5f}{Get\+Ranges\+By\+Lines\+Reversed}} (string regex\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex pattern. Search is separately in each line (order of lines is reversed). This method requires less memory than Get\+Ranges(). \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a5453b0a45f02f818404c6b73751a83d3}{Get\+Ranges}} (Regex regex)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_ab37f3da689b54fe48a3bb58ecc50e815}\label{class_fast_colored_text_box_n_s_1_1_range_ab37f3da689b54fe48a3bb58ecc50e815} 
+void {\bfseries Clear\+Style} (params \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}}\mbox{[}$\,$\mbox{]} styles)
+\begin{DoxyCompactList}\small\item\em Clear styles of range. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a39299d32cf56e088ae739df0083d7bc8}\label{class_fast_colored_text_box_n_s_1_1_range_a39299d32cf56e088ae739df0083d7bc8} 
+void {\bfseries Clear\+Style} (\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_aaa3ed378ba16c469d2d89b77605773a1}{Style\+Index}} style\+Index)
+\begin{DoxyCompactList}\small\item\em Clear styles of range. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a2be62cd2254e785d75324ff6f9b19d07}\label{class_fast_colored_text_box_n_s_1_1_range_a2be62cd2254e785d75324ff6f9b19d07} 
+void {\bfseries Clear\+Folding\+Markers} ()
+\begin{DoxyCompactList}\small\item\em Clear folding markers of all lines of range. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a06e6c30550506a3fdb7c5f1d0e07177d}\label{class_fast_colored_text_box_n_s_1_1_range_a06e6c30550506a3fdb7c5f1d0e07177d} 
+void {\bfseries Begin\+Update} ()
+\begin{DoxyCompactList}\small\item\em Starts selection position updating. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_adf18e189530aa2aa550fca5a921c045b}\label{class_fast_colored_text_box_n_s_1_1_range_adf18e189530aa2aa550fca5a921c045b} 
+void {\bfseries End\+Update} ()
+\begin{DoxyCompactList}\small\item\em Ends selection position updating. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a22f54b06d58c3d32aa37fe57d990f1f4}\label{class_fast_colored_text_box_n_s_1_1_range_a22f54b06d58c3d32aa37fe57d990f1f4} 
+override string {\bfseries To\+String} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a72c9ab4d36399d91ab7fd7311a0bb309}\label{class_fast_colored_text_box_n_s_1_1_range_a72c9ab4d36399d91ab7fd7311a0bb309} 
+void {\bfseries Normalize} ()
+\begin{DoxyCompactList}\small\item\em Exchanges Start and End if End appears before Start. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a9d577353fc9d03de5314888bfb4acbf4}\label{class_fast_colored_text_box_n_s_1_1_range_a9d577353fc9d03de5314888bfb4acbf4} 
+void {\bfseries Inverse} ()
+\begin{DoxyCompactList}\small\item\em Exchanges Start and End. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a3c7b464c6b147d59ff15ea64d53f031c}\label{class_fast_colored_text_box_n_s_1_1_range_a3c7b464c6b147d59ff15ea64d53f031c} 
+void {\bfseries Expand} ()
+\begin{DoxyCompactList}\small\item\em Expands range from first char of Start line to last char of End line. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_add0a4f0b244d4ad77c8cbe879f3d64e6}{Get\+Fragment}} (string allowed\+Symbols\+Pattern)
+\begin{DoxyCompactList}\small\item\em Get fragment of text around Start place. Returns maximal matched to pattern fragment. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a622c39813bd03c18a335d1a9c14350bd}{Get\+Fragment}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style, bool allow\+Line\+Breaks)
+\begin{DoxyCompactList}\small\item\em Get fragment of text around Start place. Returns maximal matched to given Style. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_afd4239c01c383e3d7fa41c69193747f3}{Get\+Fragment}} (string allowed\+Symbols\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Get fragment of text around Start place. Returns maximal mathed to pattern fragment. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a4e43f45009aa2794fe4faf8dcceabb89}\label{class_fast_colored_text_box_n_s_1_1_range_a4e43f45009aa2794fe4faf8dcceabb89} 
+void {\bfseries Go\+Word\+Left} (bool shift)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_ad4b0eb739f18995c9d9c2d4e4db13f6b}\label{class_fast_colored_text_box_n_s_1_1_range_ad4b0eb739f18995c9d9c2d4e4db13f6b} 
+void {\bfseries Go\+Word\+Right} (bool shift, bool go\+To\+Start\+Of\+Next\+Word=false)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a239d543c7d2531e28f2303e2445ebb48}\label{class_fast_colored_text_box_n_s_1_1_range_a239d543c7d2531e28f2303e2445ebb48} 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ {\bfseries Get\+Sub\+Ranges} (bool include\+Empty)
+\item 
+bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a326bcc559099caa5c15c3e9babae4077}{Is\+Read\+Only\+Left\+Char}} ()
+\begin{DoxyCompactList}\small\item\em Is char before range readonly. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a9b3861a366f787d1d4a4a66676cc6445}{Is\+Read\+Only\+Right\+Char}} ()
+\begin{DoxyCompactList}\small\item\em Is char after range readonly. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a50651ec88b2068a7e432e79c2a94279d}\label{class_fast_colored_text_box_n_s_1_1_range_a50651ec88b2068a7e432e79c2a94279d} 
+IEnumerable$<$ \mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} $>$ {\bfseries Get\+Places\+Cyclic} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} start\+Place, bool backward=false)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a9592e5bdb4d0562180765bfde6c4cef9}\label{class_fast_colored_text_box_n_s_1_1_range_a9592e5bdb4d0562180765bfde6c4cef9} 
+static \mbox{\hyperlink{namespace_fast_colored_text_box_n_s_aaa3ed378ba16c469d2d89b77605773a1}{Style\+Index}} {\bfseries To\+Style\+Index} (int i)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a9592e5bdb4d0562180765bfde6c4cef9}\label{class_fast_colored_text_box_n_s_1_1_range_a9592e5bdb4d0562180765bfde6c4cef9} 
+static \mbox{\hyperlink{namespace_fast_colored_text_box_n_s_aaa3ed378ba16c469d2d89b77605773a1}{Style\+Index}} {\bfseries To\+Style\+Index} (int i)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a76832dca4ef0b9a102f8e6c560729ffe}\label{class_fast_colored_text_box_n_s_1_1_range_a76832dca4ef0b9a102f8e6c560729ffe} 
+readonly \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} {\bfseries tb}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a107e5fd9983b449f327bad27f1b9df49}\label{class_fast_colored_text_box_n_s_1_1_range_a107e5fd9983b449f327bad27f1b9df49} 
+virtual bool {\bfseries Is\+Empty}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Return true if no selected text. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a391ca0dcaa328b6d78328c0a2a05af74}\label{class_fast_colored_text_box_n_s_1_1_range_a391ca0dcaa328b6d78328c0a2a05af74} 
+bool {\bfseries Column\+Selection\+Mode}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Column selection mode. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a6e302694fb3fecac00eaf4a42e3aa071}\label{class_fast_colored_text_box_n_s_1_1_range_a6e302694fb3fecac00eaf4a42e3aa071} 
+\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} {\bfseries Start}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Start line and char position. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a64378bb5360316a98ee3e68883ef6349}\label{class_fast_colored_text_box_n_s_1_1_range_a64378bb5360316a98ee3e68883ef6349} 
+\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} {\bfseries End}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Finish line and char position. \end{DoxyCompactList}\item 
+virtual string \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range_a2086f0aba4f26ad3a84b751b165b7790}{Text}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Text of range. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a80ce3209a3e3cc7c0d986ed018441c44}\label{class_fast_colored_text_box_n_s_1_1_range_a80ce3209a3e3cc7c0d986ed018441c44} 
+int {\bfseries Length}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_ac5f8f9de8913f1df21fe76b4d074f04b}\label{class_fast_colored_text_box_n_s_1_1_range_ac5f8f9de8913f1df21fe76b4d074f04b} 
+int {\bfseries Text\+Length}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a6f8c807e2604ef1abd0110fdd3e6e718}\label{class_fast_colored_text_box_n_s_1_1_range_a6f8c807e2604ef1abd0110fdd3e6e718} 
+char {\bfseries Char\+After\+Start}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Returns first char after Start place. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a98f430117d71a6a088358b2e785a7f0b}\label{class_fast_colored_text_box_n_s_1_1_range_a98f430117d71a6a088358b2e785a7f0b} 
+char {\bfseries Char\+Before\+Start}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Returns first char before Start place. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a47e9bc352224cab9aa23348bf655d8b0}\label{class_fast_colored_text_box_n_s_1_1_range_a47e9bc352224cab9aa23348bf655d8b0} 
+int {\bfseries From\+Line}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_abe068361ca061734214c436c9ccd32ce}\label{class_fast_colored_text_box_n_s_1_1_range_abe068361ca061734214c436c9ccd32ce} 
+int {\bfseries To\+Line}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a0fc5ba05cd60baa1070926ea612a8faa}\label{class_fast_colored_text_box_n_s_1_1_range_a0fc5ba05cd60baa1070926ea612a8faa} 
+IEnumerable$<$ \mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_char}{Char}} $>$ {\bfseries Chars}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Chars of range (exclude ~\newline
+) \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a0cec5def2a6691904bb541518c522a16}\label{class_fast_colored_text_box_n_s_1_1_range_a0cec5def2a6691904bb541518c522a16} 
+\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_range_rect}{Range\+Rect}} {\bfseries Bounds}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a4f4e3c2d4873b9ad36aac54a9c83e268}\label{class_fast_colored_text_box_n_s_1_1_range_a4f4e3c2d4873b9ad36aac54a9c83e268} 
+bool {\bfseries Read\+Only}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Range is readonly? This property return True if any char of the range contains Read\+Only\+Style. Set this property to True/\+False to mark chars of the range as Readonly/\+Writable. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Diapason of text chars. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_ae88d141dd79dc85b4f885701c2299647}\label{class_fast_colored_text_box_n_s_1_1_range_ae88d141dd79dc85b4f885701c2299647} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!Clone@{Clone}}
+\index{Clone@{Clone}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{Clone()}{Clone()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} Fast\+Colored\+Text\+Box\+NS.\+Range.\+Clone (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Clone range. 
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_ae88d141dd79dc85b4f885701c2299647}\label{class_fast_colored_text_box_n_s_1_1_range_ae88d141dd79dc85b4f885701c2299647} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!Clone@{Clone}}
+\index{Clone@{Clone}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{Clone()}{Clone()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} Fast\+Colored\+Text\+Box\+NS.\+Range.\+Clone (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Clone range. 
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_add0a4f0b244d4ad77c8cbe879f3d64e6}\label{class_fast_colored_text_box_n_s_1_1_range_add0a4f0b244d4ad77c8cbe879f3d64e6} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetFragment@{GetFragment}}
+\index{GetFragment@{GetFragment}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetFragment()}{GetFragment()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Fragment (\begin{DoxyParamCaption}\item[{string}]{allowed\+Symbols\+Pattern }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get fragment of text around Start place. Returns maximal matched to pattern fragment. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em allowed\+Symbols\+Pattern} & Allowed chars pattern for fragment\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Range of found fragment
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_add0a4f0b244d4ad77c8cbe879f3d64e6}\label{class_fast_colored_text_box_n_s_1_1_range_add0a4f0b244d4ad77c8cbe879f3d64e6} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetFragment@{GetFragment}}
+\index{GetFragment@{GetFragment}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetFragment()}{GetFragment()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Fragment (\begin{DoxyParamCaption}\item[{string}]{allowed\+Symbols\+Pattern }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get fragment of text around Start place. Returns maximal matched to pattern fragment. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em allowed\+Symbols\+Pattern} & Allowed chars pattern for fragment\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Range of found fragment
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_afd4239c01c383e3d7fa41c69193747f3}\label{class_fast_colored_text_box_n_s_1_1_range_afd4239c01c383e3d7fa41c69193747f3} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetFragment@{GetFragment}}
+\index{GetFragment@{GetFragment}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetFragment()}{GetFragment()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Fragment (\begin{DoxyParamCaption}\item[{string}]{allowed\+Symbols\+Pattern,  }\item[{Regex\+Options}]{options }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get fragment of text around Start place. Returns maximal mathed to pattern fragment. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em allowed\+Symbols\+Pattern} & Allowed chars pattern for fragment\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Range of found fragment
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_afd4239c01c383e3d7fa41c69193747f3}\label{class_fast_colored_text_box_n_s_1_1_range_afd4239c01c383e3d7fa41c69193747f3} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetFragment@{GetFragment}}
+\index{GetFragment@{GetFragment}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetFragment()}{GetFragment()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Fragment (\begin{DoxyParamCaption}\item[{string}]{allowed\+Symbols\+Pattern,  }\item[{Regex\+Options}]{options }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get fragment of text around Start place. Returns maximal mathed to pattern fragment. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em allowed\+Symbols\+Pattern} & Allowed chars pattern for fragment\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Range of found fragment
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a622c39813bd03c18a335d1a9c14350bd}\label{class_fast_colored_text_box_n_s_1_1_range_a622c39813bd03c18a335d1a9c14350bd} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetFragment@{GetFragment}}
+\index{GetFragment@{GetFragment}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetFragment()}{GetFragment()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Fragment (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}}}]{style,  }\item[{bool}]{allow\+Line\+Breaks }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get fragment of text around Start place. Returns maximal matched to given Style. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em style} & Allowed style for fragment\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Range of found fragment
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a622c39813bd03c18a335d1a9c14350bd}\label{class_fast_colored_text_box_n_s_1_1_range_a622c39813bd03c18a335d1a9c14350bd} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetFragment@{GetFragment}}
+\index{GetFragment@{GetFragment}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetFragment()}{GetFragment()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Fragment (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}}}]{style,  }\item[{bool}]{allow\+Line\+Breaks }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get fragment of text around Start place. Returns maximal matched to given Style. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em style} & Allowed style for fragment\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Range of found fragment
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a103ad15dddb9e3ee9e75d7dc65198f1a}\label{class_fast_colored_text_box_n_s_1_1_range_a103ad15dddb9e3ee9e75d7dc65198f1a} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetIntersectionWith@{GetIntersectionWith}}
+\index{GetIntersectionWith@{GetIntersectionWith}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetIntersectionWith()}{GetIntersectionWith()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Intersection\+With (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}}}]{range }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Returns intersection with other range, empty range returned otherwise. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em range} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a103ad15dddb9e3ee9e75d7dc65198f1a}\label{class_fast_colored_text_box_n_s_1_1_range_a103ad15dddb9e3ee9e75d7dc65198f1a} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetIntersectionWith@{GetIntersectionWith}}
+\index{GetIntersectionWith@{GetIntersectionWith}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetIntersectionWith()}{GetIntersectionWith()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Intersection\+With (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}}}]{range }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Returns intersection with other range, empty range returned otherwise. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em range} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a5453b0a45f02f818404c6b73751a83d3}\label{class_fast_colored_text_box_n_s_1_1_range_a5453b0a45f02f818404c6b73751a83d3} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetRanges@{GetRanges}}
+\index{GetRanges@{GetRanges}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetRanges()}{GetRanges()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Ranges (\begin{DoxyParamCaption}\item[{Regex}]{regex }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Finds ranges for given regex. 
+
+\begin{DoxyReturn}{Returns}
+Enumeration of ranges
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a5453b0a45f02f818404c6b73751a83d3}\label{class_fast_colored_text_box_n_s_1_1_range_a5453b0a45f02f818404c6b73751a83d3} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetRanges@{GetRanges}}
+\index{GetRanges@{GetRanges}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetRanges()}{GetRanges()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Ranges (\begin{DoxyParamCaption}\item[{Regex}]{regex }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Finds ranges for given regex. 
+
+\begin{DoxyReturn}{Returns}
+Enumeration of ranges
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a7634e6de44b052c99bdecd383d04141a}\label{class_fast_colored_text_box_n_s_1_1_range_a7634e6de44b052c99bdecd383d04141a} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetRanges@{GetRanges}}
+\index{GetRanges@{GetRanges}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetRanges()}{GetRanges()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Ranges (\begin{DoxyParamCaption}\item[{string}]{regex\+Pattern }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Finds ranges for given regex pattern. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em regex\+Pattern} & Regex pattern\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Enumeration of ranges
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a7634e6de44b052c99bdecd383d04141a}\label{class_fast_colored_text_box_n_s_1_1_range_a7634e6de44b052c99bdecd383d04141a} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetRanges@{GetRanges}}
+\index{GetRanges@{GetRanges}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetRanges()}{GetRanges()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Ranges (\begin{DoxyParamCaption}\item[{string}]{regex\+Pattern }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Finds ranges for given regex pattern. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em regex\+Pattern} & Regex pattern\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Enumeration of ranges
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a7e2c5375f37d642e639204a0a8ca405c}\label{class_fast_colored_text_box_n_s_1_1_range_a7e2c5375f37d642e639204a0a8ca405c} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetRanges@{GetRanges}}
+\index{GetRanges@{GetRanges}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetRanges()}{GetRanges()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Ranges (\begin{DoxyParamCaption}\item[{string}]{regex\+Pattern,  }\item[{Regex\+Options}]{options }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Finds ranges for given regex pattern. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em regex\+Pattern} & Regex pattern\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Enumeration of ranges
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a7e2c5375f37d642e639204a0a8ca405c}\label{class_fast_colored_text_box_n_s_1_1_range_a7e2c5375f37d642e639204a0a8ca405c} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetRanges@{GetRanges}}
+\index{GetRanges@{GetRanges}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetRanges()}{GetRanges()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Ranges (\begin{DoxyParamCaption}\item[{string}]{regex\+Pattern,  }\item[{Regex\+Options}]{options }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Finds ranges for given regex pattern. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em regex\+Pattern} & Regex pattern\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Enumeration of ranges
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_aba79a67eb59421ed588e0e19665d0443}\label{class_fast_colored_text_box_n_s_1_1_range_aba79a67eb59421ed588e0e19665d0443} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetRangesByLines@{GetRangesByLines}}
+\index{GetRangesByLines@{GetRangesByLines}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetRangesByLines()}{GetRangesByLines()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Ranges\+By\+Lines (\begin{DoxyParamCaption}\item[{Regex}]{regex }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Finds ranges for given regex. Search is separately in each line. This method requires less memory than Get\+Ranges(). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em regex} & Regex\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Enumeration of ranges
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_aba79a67eb59421ed588e0e19665d0443}\label{class_fast_colored_text_box_n_s_1_1_range_aba79a67eb59421ed588e0e19665d0443} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetRangesByLines@{GetRangesByLines}}
+\index{GetRangesByLines@{GetRangesByLines}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetRangesByLines()}{GetRangesByLines()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Ranges\+By\+Lines (\begin{DoxyParamCaption}\item[{Regex}]{regex }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Finds ranges for given regex. Search is separately in each line. This method requires less memory than Get\+Ranges(). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em regex} & Regex\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Enumeration of ranges
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_aaaba17752bff912b5ba9b140e0d37ae1}\label{class_fast_colored_text_box_n_s_1_1_range_aaaba17752bff912b5ba9b140e0d37ae1} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetRangesByLines@{GetRangesByLines}}
+\index{GetRangesByLines@{GetRangesByLines}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetRangesByLines()}{GetRangesByLines()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Ranges\+By\+Lines (\begin{DoxyParamCaption}\item[{string}]{regex\+Pattern,  }\item[{Regex\+Options}]{options }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Finds ranges for given regex pattern. Search is separately in each line. This method requires less memory than Get\+Ranges(). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em regex\+Pattern} & Regex pattern\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Enumeration of ranges
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_aaaba17752bff912b5ba9b140e0d37ae1}\label{class_fast_colored_text_box_n_s_1_1_range_aaaba17752bff912b5ba9b140e0d37ae1} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetRangesByLines@{GetRangesByLines}}
+\index{GetRangesByLines@{GetRangesByLines}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetRangesByLines()}{GetRangesByLines()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Ranges\+By\+Lines (\begin{DoxyParamCaption}\item[{string}]{regex\+Pattern,  }\item[{Regex\+Options}]{options }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Finds ranges for given regex pattern. Search is separately in each line. This method requires less memory than Get\+Ranges(). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em regex\+Pattern} & Regex pattern\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Enumeration of ranges
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_ad487f7b335569cf63f67d43b3d21da5f}\label{class_fast_colored_text_box_n_s_1_1_range_ad487f7b335569cf63f67d43b3d21da5f} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetRangesByLinesReversed@{GetRangesByLinesReversed}}
+\index{GetRangesByLinesReversed@{GetRangesByLinesReversed}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetRangesByLinesReversed()}{GetRangesByLinesReversed()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Ranges\+By\+Lines\+Reversed (\begin{DoxyParamCaption}\item[{string}]{regex\+Pattern,  }\item[{Regex\+Options}]{options }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Finds ranges for given regex pattern. Search is separately in each line (order of lines is reversed). This method requires less memory than Get\+Ranges(). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em regex\+Pattern} & Regex pattern\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Enumeration of ranges
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_ad487f7b335569cf63f67d43b3d21da5f}\label{class_fast_colored_text_box_n_s_1_1_range_ad487f7b335569cf63f67d43b3d21da5f} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetRangesByLinesReversed@{GetRangesByLinesReversed}}
+\index{GetRangesByLinesReversed@{GetRangesByLinesReversed}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetRangesByLinesReversed()}{GetRangesByLinesReversed()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Ranges\+By\+Lines\+Reversed (\begin{DoxyParamCaption}\item[{string}]{regex\+Pattern,  }\item[{Regex\+Options}]{options }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Finds ranges for given regex pattern. Search is separately in each line (order of lines is reversed). This method requires less memory than Get\+Ranges(). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em regex\+Pattern} & Regex pattern\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Enumeration of ranges
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_afb29e911acdfa212bb017123d7116e9d}\label{class_fast_colored_text_box_n_s_1_1_range_afb29e911acdfa212bb017123d7116e9d} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetUnionWith@{GetUnionWith}}
+\index{GetUnionWith@{GetUnionWith}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetUnionWith()}{GetUnionWith()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Union\+With (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}}}]{range }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns union with other range. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em range} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_afb29e911acdfa212bb017123d7116e9d}\label{class_fast_colored_text_box_n_s_1_1_range_afb29e911acdfa212bb017123d7116e9d} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GetUnionWith@{GetUnionWith}}
+\index{GetUnionWith@{GetUnionWith}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GetUnionWith()}{GetUnionWith()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} Fast\+Colored\+Text\+Box\+NS.\+Range.\+Get\+Union\+With (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}}}]{range }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns union with other range. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em range} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_ab8dd73f058887cf33a0f4a7f4d6c6700}\label{class_fast_colored_text_box_n_s_1_1_range_ab8dd73f058887cf33a0f4a7f4d6c6700} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GoLeft@{GoLeft}}
+\index{GoLeft@{GoLeft}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GoLeft()}{GoLeft()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Fast\+Colored\+Text\+Box\+NS.\+Range.\+Go\+Left (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Move range left. 
+
+This method jump over folded blocks\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_ab8dd73f058887cf33a0f4a7f4d6c6700}\label{class_fast_colored_text_box_n_s_1_1_range_ab8dd73f058887cf33a0f4a7f4d6c6700} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GoLeft@{GoLeft}}
+\index{GoLeft@{GoLeft}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GoLeft()}{GoLeft()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Fast\+Colored\+Text\+Box\+NS.\+Range.\+Go\+Left (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Move range left. 
+
+This method jump over folded blocks\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a4c660fc1bb494e296b8b220d45e3801f}\label{class_fast_colored_text_box_n_s_1_1_range_a4c660fc1bb494e296b8b220d45e3801f} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GoLeftThroughFolded@{GoLeftThroughFolded}}
+\index{GoLeftThroughFolded@{GoLeftThroughFolded}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GoLeftThroughFolded()}{GoLeftThroughFolded()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Fast\+Colored\+Text\+Box\+NS.\+Range.\+Go\+Left\+Through\+Folded (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Move range left. 
+
+This method can to go inside folded blocks\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a4c660fc1bb494e296b8b220d45e3801f}\label{class_fast_colored_text_box_n_s_1_1_range_a4c660fc1bb494e296b8b220d45e3801f} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GoLeftThroughFolded@{GoLeftThroughFolded}}
+\index{GoLeftThroughFolded@{GoLeftThroughFolded}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GoLeftThroughFolded()}{GoLeftThroughFolded()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Fast\+Colored\+Text\+Box\+NS.\+Range.\+Go\+Left\+Through\+Folded (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Move range left. 
+
+This method can to go inside folded blocks\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_adbab7f3ea6201ab20ba831530fe50e40}\label{class_fast_colored_text_box_n_s_1_1_range_adbab7f3ea6201ab20ba831530fe50e40} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GoRight@{GoRight}}
+\index{GoRight@{GoRight}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GoRight()}{GoRight()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Fast\+Colored\+Text\+Box\+NS.\+Range.\+Go\+Right (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Move range right. 
+
+This method jump over folded blocks\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_adbab7f3ea6201ab20ba831530fe50e40}\label{class_fast_colored_text_box_n_s_1_1_range_adbab7f3ea6201ab20ba831530fe50e40} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GoRight@{GoRight}}
+\index{GoRight@{GoRight}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GoRight()}{GoRight()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Fast\+Colored\+Text\+Box\+NS.\+Range.\+Go\+Right (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Move range right. 
+
+This method jump over folded blocks\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a69683337f486873d07d0ff0dee74f722}\label{class_fast_colored_text_box_n_s_1_1_range_a69683337f486873d07d0ff0dee74f722} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GoRightThroughFolded@{GoRightThroughFolded}}
+\index{GoRightThroughFolded@{GoRightThroughFolded}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GoRightThroughFolded()}{GoRightThroughFolded()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual bool Fast\+Colored\+Text\+Box\+NS.\+Range.\+Go\+Right\+Through\+Folded (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Move range left. 
+
+This method can to go inside folded blocks\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a69683337f486873d07d0ff0dee74f722}\label{class_fast_colored_text_box_n_s_1_1_range_a69683337f486873d07d0ff0dee74f722} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!GoRightThroughFolded@{GoRightThroughFolded}}
+\index{GoRightThroughFolded@{GoRightThroughFolded}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{GoRightThroughFolded()}{GoRightThroughFolded()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual bool Fast\+Colored\+Text\+Box\+NS.\+Range.\+Go\+Right\+Through\+Folded (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Move range left. 
+
+This method can to go inside folded blocks\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a326bcc559099caa5c15c3e9babae4077}\label{class_fast_colored_text_box_n_s_1_1_range_a326bcc559099caa5c15c3e9babae4077} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!IsReadOnlyLeftChar@{IsReadOnlyLeftChar}}
+\index{IsReadOnlyLeftChar@{IsReadOnlyLeftChar}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{IsReadOnlyLeftChar()}{IsReadOnlyLeftChar()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Fast\+Colored\+Text\+Box\+NS.\+Range.\+Is\+Read\+Only\+Left\+Char (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Is char before range readonly. 
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a326bcc559099caa5c15c3e9babae4077}\label{class_fast_colored_text_box_n_s_1_1_range_a326bcc559099caa5c15c3e9babae4077} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!IsReadOnlyLeftChar@{IsReadOnlyLeftChar}}
+\index{IsReadOnlyLeftChar@{IsReadOnlyLeftChar}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{IsReadOnlyLeftChar()}{IsReadOnlyLeftChar()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Fast\+Colored\+Text\+Box\+NS.\+Range.\+Is\+Read\+Only\+Left\+Char (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Is char before range readonly. 
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a9b3861a366f787d1d4a4a66676cc6445}\label{class_fast_colored_text_box_n_s_1_1_range_a9b3861a366f787d1d4a4a66676cc6445} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!IsReadOnlyRightChar@{IsReadOnlyRightChar}}
+\index{IsReadOnlyRightChar@{IsReadOnlyRightChar}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{IsReadOnlyRightChar()}{IsReadOnlyRightChar()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Fast\+Colored\+Text\+Box\+NS.\+Range.\+Is\+Read\+Only\+Right\+Char (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Is char after range readonly. 
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a9b3861a366f787d1d4a4a66676cc6445}\label{class_fast_colored_text_box_n_s_1_1_range_a9b3861a366f787d1d4a4a66676cc6445} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!IsReadOnlyRightChar@{IsReadOnlyRightChar}}
+\index{IsReadOnlyRightChar@{IsReadOnlyRightChar}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{IsReadOnlyRightChar()}{IsReadOnlyRightChar()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Fast\+Colored\+Text\+Box\+NS.\+Range.\+Is\+Read\+Only\+Right\+Char (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Is char after range readonly. 
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a58ba5d119e9c255719978cdee054b9b9}\label{class_fast_colored_text_box_n_s_1_1_range_a58ba5d119e9c255719978cdee054b9b9} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!SetFoldingMarkers@{SetFoldingMarkers}}
+\index{SetFoldingMarkers@{SetFoldingMarkers}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{SetFoldingMarkers()}{SetFoldingMarkers()}\hspace{0.1cm}{\footnotesize\ttfamily [1/6]}}
+{\footnotesize\ttfamily void Fast\+Colored\+Text\+Box\+NS.\+Range.\+Set\+Folding\+Markers (\begin{DoxyParamCaption}\item[{string}]{folding\+Pattern,  }\item[{Regex\+Options}]{options }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Sets folding markers. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em start\+End\+Folding\+Pattern} & Pattern for start and end folding line\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a58ba5d119e9c255719978cdee054b9b9}\label{class_fast_colored_text_box_n_s_1_1_range_a58ba5d119e9c255719978cdee054b9b9} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!SetFoldingMarkers@{SetFoldingMarkers}}
+\index{SetFoldingMarkers@{SetFoldingMarkers}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{SetFoldingMarkers()}{SetFoldingMarkers()}\hspace{0.1cm}{\footnotesize\ttfamily [2/6]}}
+{\footnotesize\ttfamily void Fast\+Colored\+Text\+Box\+NS.\+Range.\+Set\+Folding\+Markers (\begin{DoxyParamCaption}\item[{string}]{folding\+Pattern,  }\item[{Regex\+Options}]{options }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Sets folding markers. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em start\+End\+Folding\+Pattern} & Pattern for start and end folding line\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a7444276dd05d406a15e0eecc44eb8d58}\label{class_fast_colored_text_box_n_s_1_1_range_a7444276dd05d406a15e0eecc44eb8d58} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!SetFoldingMarkers@{SetFoldingMarkers}}
+\index{SetFoldingMarkers@{SetFoldingMarkers}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{SetFoldingMarkers()}{SetFoldingMarkers()}\hspace{0.1cm}{\footnotesize\ttfamily [3/6]}}
+{\footnotesize\ttfamily void Fast\+Colored\+Text\+Box\+NS.\+Range.\+Set\+Folding\+Markers (\begin{DoxyParamCaption}\item[{string}]{start\+Folding\+Pattern,  }\item[{string}]{finish\+Folding\+Pattern }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Sets folding markers. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em start\+Folding\+Pattern} & Pattern for start folding line\\
+\hline
+{\em finish\+Folding\+Pattern} & Pattern for finish folding line\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a7444276dd05d406a15e0eecc44eb8d58}\label{class_fast_colored_text_box_n_s_1_1_range_a7444276dd05d406a15e0eecc44eb8d58} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!SetFoldingMarkers@{SetFoldingMarkers}}
+\index{SetFoldingMarkers@{SetFoldingMarkers}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{SetFoldingMarkers()}{SetFoldingMarkers()}\hspace{0.1cm}{\footnotesize\ttfamily [4/6]}}
+{\footnotesize\ttfamily void Fast\+Colored\+Text\+Box\+NS.\+Range.\+Set\+Folding\+Markers (\begin{DoxyParamCaption}\item[{string}]{start\+Folding\+Pattern,  }\item[{string}]{finish\+Folding\+Pattern }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Sets folding markers. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em start\+Folding\+Pattern} & Pattern for start folding line\\
+\hline
+{\em finish\+Folding\+Pattern} & Pattern for finish folding line\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a51175fb54025b82ed76457a9e5ac4bad}\label{class_fast_colored_text_box_n_s_1_1_range_a51175fb54025b82ed76457a9e5ac4bad} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!SetFoldingMarkers@{SetFoldingMarkers}}
+\index{SetFoldingMarkers@{SetFoldingMarkers}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{SetFoldingMarkers()}{SetFoldingMarkers()}\hspace{0.1cm}{\footnotesize\ttfamily [5/6]}}
+{\footnotesize\ttfamily void Fast\+Colored\+Text\+Box\+NS.\+Range.\+Set\+Folding\+Markers (\begin{DoxyParamCaption}\item[{string}]{start\+Folding\+Pattern,  }\item[{string}]{finish\+Folding\+Pattern,  }\item[{Regex\+Options}]{options }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Sets folding markers. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em start\+Folding\+Pattern} & Pattern for start folding line\\
+\hline
+{\em finish\+Folding\+Pattern} & Pattern for finish folding line\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a51175fb54025b82ed76457a9e5ac4bad}\label{class_fast_colored_text_box_n_s_1_1_range_a51175fb54025b82ed76457a9e5ac4bad} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!SetFoldingMarkers@{SetFoldingMarkers}}
+\index{SetFoldingMarkers@{SetFoldingMarkers}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{SetFoldingMarkers()}{SetFoldingMarkers()}\hspace{0.1cm}{\footnotesize\ttfamily [6/6]}}
+{\footnotesize\ttfamily void Fast\+Colored\+Text\+Box\+NS.\+Range.\+Set\+Folding\+Markers (\begin{DoxyParamCaption}\item[{string}]{start\+Folding\+Pattern,  }\item[{string}]{finish\+Folding\+Pattern,  }\item[{Regex\+Options}]{options }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Sets folding markers. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em start\+Folding\+Pattern} & Pattern for start folding line\\
+\hline
+{\em finish\+Folding\+Pattern} & Pattern for finish folding line\\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_range_a2086f0aba4f26ad3a84b751b165b7790}\label{class_fast_colored_text_box_n_s_1_1_range_a2086f0aba4f26ad3a84b751b165b7790} 
+\index{FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}!Text@{Text}}
+\index{Text@{Text}!FastColoredTextBoxNS.Range@{FastColoredTextBoxNS.Range}}
+\doxysubsubsection{\texorpdfstring{Text}{Text}}
+{\footnotesize\ttfamily string Fast\+Colored\+Text\+Box\+NS.\+Range.\+Text\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Text of range. 
+
+This property has not \textquotesingle{}set\textquotesingle{} accessor because undo/redo stack works only with Fast\+Colored\+Text\+Box.\+Selection range. So, if you want to set text, you need to use Fast\+Colored\+Text\+Box.\+Selection and Fast\+Colored\+Text\+Box.\+Insert\+Text() mehtod. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Third\+Party/\+Fast\+Colored\+Text\+Box changed/Range.\+cs\item 
+source/\+Third\+Party/\+Fast\+Colored\+Text\+Box/Range.\+cs\end{DoxyCompactItemize}

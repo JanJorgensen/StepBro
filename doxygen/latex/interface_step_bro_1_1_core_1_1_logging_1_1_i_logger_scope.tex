@@ -1,0 +1,86 @@
+\doxysection{Step\+Bro.\+Core.\+Logging.\+ILogger\+Scope Interface Reference}
+\hypertarget{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{}\label{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}\index{StepBro.Core.Logging.ILoggerScope@{StepBro.Core.Logging.ILoggerScope}}
+Inheritance diagram for Step\+Bro.\+Core.\+Logging.\+ILogger\+Scope\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{ILogger\+Scope}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_a5161ab6c8cfa9e625b562e5cc87d56bd}{Log\+Entering}} (bool is\+High\+Level, string location, string text, Logger\+Dynamic\+Location\+Source dynamic\+Location)
+\begin{DoxyCompactList}\small\item\em Enters a new logging scope that is a sub scope of this scope and where the location string of each log entry can be different. \end{DoxyCompactList}\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_aaf19f2da58a6d1de75668aa2fa860f5f}\label{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_aaf19f2da58a6d1de75668aa2fa860f5f} 
+void {\bfseries Entered\+Parallel\+Task} (string text)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_af281dfc1fa8a27fca4d358b68a89f9f8}\label{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_af281dfc1fa8a27fca4d358b68a89f9f8} 
+void {\bfseries Log\+Exit} (string text)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{Step\+Bro.\+Core.\+Logging.\+ILogger}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{ILogger\+Scope}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_a13b55f3f88fd44473ecf7dab17fc5e38}{Log\+Entering}} (string location, string text)
+\begin{DoxyCompactList}\small\item\em Enters a new logging scope that is a sub scope of this scope. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{ILogger\+Scope}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_ac19314e6d991bf3ba337c27a72fe2de7}{Create\+Sub\+Location}} (string name)
+\begin{DoxyCompactList}\small\item\em Create a new scope for a location, but without adding the entering to the log. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_log_entry}{ILog\+Entry}} {\bfseries Log} (string text)
+\item 
+void {\bfseries Log\+Detail} (string text)
+\item 
+void {\bfseries Log\+Async} (string text)
+\item 
+void {\bfseries Log\+Error} (string text)
+\item 
+void {\bfseries Log\+User\+Action} (string text)
+\item 
+void {\bfseries Log\+System} (string text)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_a7f89f9051868b2bc31e4508578874d2c}\label{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_a7f89f9051868b2bc31e4508578874d2c} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_log_entry}{ILog\+Entry}} {\bfseries First\+Log\+Entry\+In\+Scope}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_a94624b5cd14c09d41538a672f5789178}\label{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_a94624b5cd14c09d41538a672f5789178} 
+bool {\bfseries Errors\+Logged}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates whether any errors were logged directly in this scope. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{Step\+Bro.\+Core.\+Logging.\+ILogger}}}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bfseries Is\+Debugging}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Location}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Get the current location identification for the logging. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_a5161ab6c8cfa9e625b562e5cc87d56bd}\label{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_a5161ab6c8cfa9e625b562e5cc87d56bd} 
+\index{StepBro.Core.Logging.ILoggerScope@{StepBro.Core.Logging.ILoggerScope}!LogEntering@{LogEntering}}
+\index{LogEntering@{LogEntering}!StepBro.Core.Logging.ILoggerScope@{StepBro.Core.Logging.ILoggerScope}}
+\doxysubsubsection{\texorpdfstring{LogEntering()}{LogEntering()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{ILogger\+Scope}} Step\+Bro.\+Core.\+Logging.\+ILogger\+Scope.\+Log\+Entering (\begin{DoxyParamCaption}\item[{bool}]{is\+High\+Level,  }\item[{string}]{location,  }\item[{string}]{text,  }\item[{Logger\+Dynamic\+Location\+Source}]{dynamic\+Location }\end{DoxyParamCaption})}
+
+
+
+Enters a new logging scope that is a sub scope of this scope and where the location string of each log entry can be different. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em is\+High\+Level} & Whether the entered scope is to be considered a high level scope in the execution.\\
+\hline
+{\em location} & The name of the location inside the new scope.\\
+\hline
+{\em text} & Additional log text for the scope entering.\\
+\hline
+{\em dynamic\+Location} & A delegate to be used for getting the location string for each new log entry within the scope.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A logger to use for the scope.
+\end{DoxyReturn}
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Logging/ILogger.\+cs\end{DoxyCompactItemize}

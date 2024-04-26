@@ -1,0 +1,56 @@
+\doxysection{Step\+Bro.\+Core.\+Data.\+ITimed\+Action Interface Reference}
+\hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action}{}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action}\index{StepBro.Core.Data.ITimedAction@{StepBro.Core.Data.ITimedAction}}
+Inheritance diagram for Step\+Bro.\+Core.\+Data.\+ITimed\+Action\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a5b108919bf85bda21da2114f26e20791}{Update\+When\+Handling}} (Date\+Time now)
+\begin{DoxyCompactList}\small\item\em Method to update the object when its time is due. \end{DoxyCompactList}\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a47520a8112f050da0f077eb39cd2d72f}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a47520a8112f050da0f077eb39cd2d72f} 
+void {\bfseries Deactivate} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a29b842fcd21736b89827f9519a3a601d}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a29b842fcd21736b89827f9519a3a601d} 
+bool {\bfseries Is\+Active}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a7020190c954bddd31dc916010bf3c73d}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a7020190c954bddd31dc916010bf3c73d} 
+bool {\bfseries Periodic}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a60c58171ba61f7fec2d41b123062560a}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a60c58171ba61f7fec2d41b123062560a} 
+Time\+Span {\bfseries Periodic\+Time}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_ab22bfaacf3e2a6c7913594983cd524a9}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_ab22bfaacf3e2a6c7913594983cd524a9} 
+Date\+Time {\bfseries Next\+Action\+Time}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a5b108919bf85bda21da2114f26e20791}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a5b108919bf85bda21da2114f26e20791} 
+\index{StepBro.Core.Data.ITimedAction@{StepBro.Core.Data.ITimedAction}!UpdateWhenHandling@{UpdateWhenHandling}}
+\index{UpdateWhenHandling@{UpdateWhenHandling}!StepBro.Core.Data.ITimedAction@{StepBro.Core.Data.ITimedAction}}
+\doxysubsubsection{\texorpdfstring{UpdateWhenHandling()}{UpdateWhenHandling()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+Data.\+ITimed\+Action.\+Update\+When\+Handling (\begin{DoxyParamCaption}\item[{Date\+Time}]{now }\end{DoxyParamCaption})}
+
+
+
+Method to update the object when its time is due. 
+
+\begin{DoxyReturn}{Returns}
+Whether the action is still active and should be added to the queue of action to handle.
+\end{DoxyReturn}
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_c_a_n_1_1_message_transmitter_ab3bb389f3fc1455d902132a9292c80a8}{Step\+Bro.\+CAN.\+Message\+Transmitter}}.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Data/ITimed\+Action.\+cs\end{DoxyCompactItemize}

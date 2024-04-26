@@ -1,0 +1,271 @@
+\doxysection{Step\+Bro.\+Process.\+Process Class Reference}
+\hypertarget{class_step_bro_1_1_process_1_1_process}{}\label{class_step_bro_1_1_process_1_1_process}\index{StepBro.Process.Process@{StepBro.Process.Process}}
+Inheritance diagram for Step\+Bro.\+Process.\+Process\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=1.803543cm]{class_step_bro_1_1_process_1_1_process}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a3abfba852bf56ec87f27976e6bf70c5a}\label{class_step_bro_1_1_process_1_1_process_a3abfba852bf56ec87f27976e6bf70c5a} 
+void {\bfseries Dispose} ()
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a08ce648ad76ac288e3e17f124ed05603}\label{class_step_bro_1_1_process_1_1_process_a08ce648ad76ac288e3e17f124ed05603} 
+bool {\bfseries Await\+Start} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context, Time\+Span timeout=default)
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a233b78fcd224692c0ea609805c4ee507}\label{class_step_bro_1_1_process_1_1_process_a233b78fcd224692c0ea609805c4ee507} 
+bool {\bfseries Wait\+For\+Exit} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context, Time\+Span timeout=default, bool expect\+No\+Errors=true, bool expect\+Return\+Code\+Zero=false)
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process_aa59e1408d1c8f9b6c346e6c6899f12c3}{Request\+Pause}} ()
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process_abae62488c7499ab38895182d7a8d9997}{Request\+Continue}} ()
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process_aaaac24dd4f08b51dc0d5d566855288d0}{Request\+Stop}} ()
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process_a308c06760dafcc9be18b17b60cf66e0c}{Kill}} ()
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_af4e3e707c175753d9708776dcf8210dd}\label{class_step_bro_1_1_process_1_1_process_af4e3e707c175753d9708776dcf8210dd} 
+bool {\bfseries Await\+Start} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} logger=null, Time\+Span timeout=default(Time\+Span))
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process_aa59e1408d1c8f9b6c346e6c6899f12c3}{Request\+Pause}} ()
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process_abae62488c7499ab38895182d7a8d9997}{Request\+Continue}} ()
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process_aaaac24dd4f08b51dc0d5d566855288d0}{Request\+Stop}} ()
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process_a308c06760dafcc9be18b17b60cf66e0c}{Kill}} ()
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control_a985e714114dc57acfc3c15342dd4c1ad}\label{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control_a985e714114dc57acfc3c15342dd4c1ad} 
+bool {\bfseries Request\+Pause} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control_ac3dc8ecda05745270ed644b19c06e390}\label{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control_ac3dc8ecda05745270ed644b19c06e390} 
+bool {\bfseries Request\+Continue} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control_a27b2e73229b4080b35e84628d3a24dda}\label{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control_a27b2e73229b4080b35e84628d3a24dda} 
+bool {\bfseries Request\+Stop} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control_a30e6891b46920d8fcd9bff52632a7f35}\label{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control_a30e6891b46920d8fcd9bff52632a7f35} 
+bool {\bfseries Kill} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a2ba8b78faaad6e85ed390f29169e6103}\label{class_step_bro_1_1_process_1_1_process_a2ba8b78faaad6e85ed390f29169e6103} 
+static \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process}{Process}} {\bfseries Start} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context, string filename, string arguments=\"{}\"{}, bool use\+Shell=false, Time\+Span start\+Timeout=new Time\+Span(), Time\+Span exit\+Timeout=new Time\+Span(), bool log\+Output=false, string working\+Directory=null)
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_ac98e17ede623d57573578322a91f2b98}\label{class_step_bro_1_1_process_1_1_process_ac98e17ede623d57573578322a91f2b98} 
+static \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process}{Process}} {\bfseries Start} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} logger=null, string filename=\"{}\"{}, string arguments=\"{}\"{})
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_aab3cd88887e4b8191b97eb9935c1c9b2}\label{class_step_bro_1_1_process_1_1_process_aab3cd88887e4b8191b97eb9935c1c9b2} 
+static \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process}{Process}} {\bfseries Start} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context, string filename, string arguments=\"{}\"{}, Time\+Span start\+Timeout=new Time\+Span(), Time\+Span exit\+Timeout=new Time\+Span())
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a5fd05300b827b6073fd411a9bd68a2da}\label{class_step_bro_1_1_process_1_1_process_a5fd05300b827b6073fd411a9bd68a2da} 
+System.\+Diagnostics.\+Process {\bfseries Dot\+Net\+Process}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_ab36d7e42f7074d5f79cefda2c870d6f5}\label{class_step_bro_1_1_process_1_1_process_ab36d7e42f7074d5f79cefda2c870d6f5} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{ILine\+Reader}} {\bfseries Output\+Lines}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a56d7985cbe2ccf4f310616bc8a417871}\label{class_step_bro_1_1_process_1_1_process_a56d7985cbe2ccf4f310616bc8a417871} 
+bool {\bfseries Has\+Error\+Output}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_aba4fbb5359f8eda7c9cb1c1674d42c44}\label{class_step_bro_1_1_process_1_1_process_aba4fbb5359f8eda7c9cb1c1674d42c44} 
+int {\bfseries Exit\+Code}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a9de4e96152ea83176ce97047283efaef}\label{class_step_bro_1_1_process_1_1_process_a9de4e96152ea83176ce97047283efaef} 
+bool {\bfseries Is\+Running}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a9f4d681bcc3954cbd0853458c0440ae9}\label{class_step_bro_1_1_process_1_1_process_a9f4d681bcc3954cbd0853458c0440ae9} 
+int {\bfseries ID}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_ab4f34ba3369ea3efed8d8d64218172f1}\label{class_step_bro_1_1_process_1_1_process_ab4f34ba3369ea3efed8d8d64218172f1} 
+string {\bfseries Executable\+Path}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a77105513d907791f19e41919cee0a522}\label{class_step_bro_1_1_process_1_1_process_a77105513d907791f19e41919cee0a522} 
+Time\+Span {\bfseries Total\+Execution\+Time}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Date\+Time \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process_a37b7b6015517240288e4a30a9a0c138d}{Start\+Time}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Date\+Time \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process_a2ab7e2fde386b1818d26a9a15d5d007c}{End\+Time}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3}{Task\+Execution\+State}} \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process_a1342723ae650709aadc57a5dea17a93d}{Current\+State}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cb}{Break\+Option}} \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process_abc2b1102fb35b0d5cb068df835f83238}{Break\+Options}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string \mbox{\hyperlink{class_step_bro_1_1_process_1_1_process_aa938576eb9cd8b2126c2221250baaae4}{Name}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Control}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3}{Task\+Execution\+State}} {\bfseries Current\+State}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Date\+Time {\bfseries Start\+Time}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Date\+Time {\bfseries End\+Time}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cb}{Break\+Option}} {\bfseries Break\+Options}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{Step\+Bro.\+Core.\+Data.\+INameable}}}
+\begin{DoxyCompactItemize}
+\item 
+string {\bfseries Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a33a0546dbaeb86258e64f0bb92ca0e6c}\label{class_step_bro_1_1_process_1_1_process_a33a0546dbaeb86258e64f0bb92ca0e6c} 
+Event\+Handler {\bfseries Current\+State\+Changed}
+\end{DoxyCompactItemize}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Control}}}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler {\bfseries Current\+State\+Changed}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a308c06760dafcc9be18b17b60cf66e0c}\label{class_step_bro_1_1_process_1_1_process_a308c06760dafcc9be18b17b60cf66e0c} 
+\index{StepBro.Process.Process@{StepBro.Process.Process}!Kill@{Kill}}
+\index{Kill@{Kill}!StepBro.Process.Process@{StepBro.Process.Process}}
+\doxysubsubsection{\texorpdfstring{Kill()}{Kill()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Process.\+Process.\+Kill (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Control}}.
+
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a308c06760dafcc9be18b17b60cf66e0c}\label{class_step_bro_1_1_process_1_1_process_a308c06760dafcc9be18b17b60cf66e0c} 
+\index{StepBro.Process.Process@{StepBro.Process.Process}!Kill@{Kill}}
+\index{Kill@{Kill}!StepBro.Process.Process@{StepBro.Process.Process}}
+\doxysubsubsection{\texorpdfstring{Kill()}{Kill()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Process.\+Process.\+Kill (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Control}}.
+
+\Hypertarget{class_step_bro_1_1_process_1_1_process_abae62488c7499ab38895182d7a8d9997}\label{class_step_bro_1_1_process_1_1_process_abae62488c7499ab38895182d7a8d9997} 
+\index{StepBro.Process.Process@{StepBro.Process.Process}!RequestContinue@{RequestContinue}}
+\index{RequestContinue@{RequestContinue}!StepBro.Process.Process@{StepBro.Process.Process}}
+\doxysubsubsection{\texorpdfstring{RequestContinue()}{RequestContinue()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Process.\+Process.\+Request\+Continue (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Control}}.
+
+\Hypertarget{class_step_bro_1_1_process_1_1_process_abae62488c7499ab38895182d7a8d9997}\label{class_step_bro_1_1_process_1_1_process_abae62488c7499ab38895182d7a8d9997} 
+\index{StepBro.Process.Process@{StepBro.Process.Process}!RequestContinue@{RequestContinue}}
+\index{RequestContinue@{RequestContinue}!StepBro.Process.Process@{StepBro.Process.Process}}
+\doxysubsubsection{\texorpdfstring{RequestContinue()}{RequestContinue()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Process.\+Process.\+Request\+Continue (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Control}}.
+
+\Hypertarget{class_step_bro_1_1_process_1_1_process_aa59e1408d1c8f9b6c346e6c6899f12c3}\label{class_step_bro_1_1_process_1_1_process_aa59e1408d1c8f9b6c346e6c6899f12c3} 
+\index{StepBro.Process.Process@{StepBro.Process.Process}!RequestPause@{RequestPause}}
+\index{RequestPause@{RequestPause}!StepBro.Process.Process@{StepBro.Process.Process}}
+\doxysubsubsection{\texorpdfstring{RequestPause()}{RequestPause()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Process.\+Process.\+Request\+Pause (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Control}}.
+
+\Hypertarget{class_step_bro_1_1_process_1_1_process_aa59e1408d1c8f9b6c346e6c6899f12c3}\label{class_step_bro_1_1_process_1_1_process_aa59e1408d1c8f9b6c346e6c6899f12c3} 
+\index{StepBro.Process.Process@{StepBro.Process.Process}!RequestPause@{RequestPause}}
+\index{RequestPause@{RequestPause}!StepBro.Process.Process@{StepBro.Process.Process}}
+\doxysubsubsection{\texorpdfstring{RequestPause()}{RequestPause()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Process.\+Process.\+Request\+Pause (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Control}}.
+
+\Hypertarget{class_step_bro_1_1_process_1_1_process_aaaac24dd4f08b51dc0d5d566855288d0}\label{class_step_bro_1_1_process_1_1_process_aaaac24dd4f08b51dc0d5d566855288d0} 
+\index{StepBro.Process.Process@{StepBro.Process.Process}!RequestStop@{RequestStop}}
+\index{RequestStop@{RequestStop}!StepBro.Process.Process@{StepBro.Process.Process}}
+\doxysubsubsection{\texorpdfstring{RequestStop()}{RequestStop()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Process.\+Process.\+Request\+Stop (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Control}}.
+
+\Hypertarget{class_step_bro_1_1_process_1_1_process_aaaac24dd4f08b51dc0d5d566855288d0}\label{class_step_bro_1_1_process_1_1_process_aaaac24dd4f08b51dc0d5d566855288d0} 
+\index{StepBro.Process.Process@{StepBro.Process.Process}!RequestStop@{RequestStop}}
+\index{RequestStop@{RequestStop}!StepBro.Process.Process@{StepBro.Process.Process}}
+\doxysubsubsection{\texorpdfstring{RequestStop()}{RequestStop()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Process.\+Process.\+Request\+Stop (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Control}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_process_1_1_process_abc2b1102fb35b0d5cb068df835f83238}\label{class_step_bro_1_1_process_1_1_process_abc2b1102fb35b0d5cb068df835f83238} 
+\index{StepBro.Process.Process@{StepBro.Process.Process}!BreakOptions@{BreakOptions}}
+\index{BreakOptions@{BreakOptions}!StepBro.Process.Process@{StepBro.Process.Process}}
+\doxysubsubsection{\texorpdfstring{BreakOptions}{BreakOptions}}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cb}{Break\+Option}} Step\+Bro.\+Process.\+Process.\+Break\+Options\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Control}}.
+
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a1342723ae650709aadc57a5dea17a93d}\label{class_step_bro_1_1_process_1_1_process_a1342723ae650709aadc57a5dea17a93d} 
+\index{StepBro.Process.Process@{StepBro.Process.Process}!CurrentState@{CurrentState}}
+\index{CurrentState@{CurrentState}!StepBro.Process.Process@{StepBro.Process.Process}}
+\doxysubsubsection{\texorpdfstring{CurrentState}{CurrentState}}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3}{Task\+Execution\+State}} Step\+Bro.\+Process.\+Process.\+Current\+State\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Control}}.
+
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a2ab7e2fde386b1818d26a9a15d5d007c}\label{class_step_bro_1_1_process_1_1_process_a2ab7e2fde386b1818d26a9a15d5d007c} 
+\index{StepBro.Process.Process@{StepBro.Process.Process}!EndTime@{EndTime}}
+\index{EndTime@{EndTime}!StepBro.Process.Process@{StepBro.Process.Process}}
+\doxysubsubsection{\texorpdfstring{EndTime}{EndTime}}
+{\footnotesize\ttfamily Date\+Time Step\+Bro.\+Process.\+Process.\+End\+Time\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Control}}.
+
+\Hypertarget{class_step_bro_1_1_process_1_1_process_aa938576eb9cd8b2126c2221250baaae4}\label{class_step_bro_1_1_process_1_1_process_aa938576eb9cd8b2126c2221250baaae4} 
+\index{StepBro.Process.Process@{StepBro.Process.Process}!Name@{Name}}
+\index{Name@{Name}!StepBro.Process.Process@{StepBro.Process.Process}}
+\doxysubsubsection{\texorpdfstring{Name}{Name}}
+{\footnotesize\ttfamily string Step\+Bro.\+Process.\+Process.\+Name\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{Step\+Bro.\+Core.\+Data.\+INameable}}.
+
+\Hypertarget{class_step_bro_1_1_process_1_1_process_a37b7b6015517240288e4a30a9a0c138d}\label{class_step_bro_1_1_process_1_1_process_a37b7b6015517240288e4a30a9a0c138d} 
+\index{StepBro.Process.Process@{StepBro.Process.Process}!StartTime@{StartTime}}
+\index{StartTime@{StartTime}!StepBro.Process.Process@{StepBro.Process.Process}}
+\doxysubsubsection{\texorpdfstring{StartTime}{StartTime}}
+{\footnotesize\ttfamily Date\+Time Step\+Bro.\+Process.\+Process.\+Start\+Time\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Control}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Modules/\+Step\+Bro.\+Process/Process.\+cs\item 
+source/\+Modules/\+Step\+Bro.\+Process\+\_\+/Process.\+cs\end{DoxyCompactItemize}

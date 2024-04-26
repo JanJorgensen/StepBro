@@ -1,0 +1,455 @@
+\doxysection{Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection Class Reference}
+\hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection}{}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection}\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+Inheritance diagram for Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=9.722222cm]{class_step_bro_1_1_test_interface_1_1_serial_test_connection}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a94aa7db45990ba70d7600c84f79bdb31}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a94aa7db45990ba70d7600c84f79bdb31} 
+{\bfseries Serial\+Test\+Connection} (\mbox{[}Object\+Name\mbox{]} string object\+Name=\"{}$<$a \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_serial_port}{Serial\+Port}}$>$\"{})
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a63716a9e8957c9a2ee67d19d8afaafd3}{Connect}} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_aa78aa48677a1aa129f72bc37fdaa9f38}{Open}} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ae7f4b48059e54026efec15f5962b351f}{Disconnect}} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a198ebb95e4cf630a44e6b63f784feb1e}{Close}} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+IEnumerable$<$ string $>$ \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ac38f98c037eed7822cec5b03d63a844a}{List\+Available\+Profiles}} ()
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a01688add1fb383df885bc9408fe49bad}{Set\+Profile}} (string profile, string accesskey=\"{}\"{})
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a6ef15f57122c6520bb4427ab91d998f9}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a6ef15f57122c6520bb4427ab91d998f9} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ object $>$ {\bfseries Send\+Command} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string command, params object\mbox{[}$\,$\mbox{]} arguments)
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ad43fac7b4b8dcdcd6ca5452b4e80576e}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ad43fac7b4b8dcdcd6ca5452b4e80576e} 
+void {\bfseries Send\+Direct} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string text)
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ab16eb3dee8c04d18d7e4ffecf50dda52}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ab16eb3dee8c04d18d7e4ffecf50dda52} 
+void {\bfseries Clear\+Setup\+Commands} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_af1354ee9b590dcc08e2de9455ff3c165}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_af1354ee9b590dcc08e2de9455ff3c165} 
+void {\bfseries Add\+Setup\+Command} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string command, params object\mbox{[}$\,$\mbox{]} arguments)
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a3d962884f74a15f21719c75971c89040}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a3d962884f74a15f21719c75971c89040} 
+string {\bfseries Create\+Setup\+Commands\+Hash} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a8e08d5f17402527b155261a341b8e9e5}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a8e08d5f17402527b155261a341b8e9e5} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}} {\bfseries Send\+Setup\+Commands} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ bool $>$ \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_aeb45cb176690571e67c331d4f6b0ada1}{Update\+Interface\+Data}} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context=null)
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ object $>$ \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a2fcda1f5337dd1ec6473e5d7bfa76cad}{Invoke}} (\mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_remote_procedure_info}{Remote\+Procedure\+Info}} procedure, params object\mbox{[}$\,$\mbox{]} arguments)
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ object $>$ \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a642c1676a5512d145475e881851c69fe}{Invoke}} (string procedure, params object\mbox{[}$\,$\mbox{]} arguments)
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_aa339af95ed5238d14711978b5c5d0b32}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_aa339af95ed5238d14711978b5c5d0b32} 
+void {\bfseries Set\+Next\+Response} (string response)
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_adb73586ba05450f1bafe9cd1bbc0d505}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_adb73586ba05450f1bafe9cd1bbc0d505} 
+void {\bfseries Set\+Loopback\+Respone} (string command, string response)
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ab54f8090b009c7ccdc095a7adefb85c6}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ab54f8090b009c7ccdc095a7adefb85c6} 
+void {\bfseries Setup\+Debug\+Commands} ()
+\item 
+void \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a9bed0e5251fddb3ba8c275f04d3466a0}{Pre\+Scan\+Data}} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block}{Property\+Block}} data, List$<$ Tuple$<$ int, string $>$ $>$ errors)
+\item 
+void \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_aa9dce4d678d7aa50c3922375aba7ab9a}{Setup}} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} logger, \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block}{Property\+Block}} properties)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_availability_base}{Step\+Bro.\+Core.\+Data.\+Availability\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries Dispose} ()
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_a3e50f58c97c4b4befdb6004073b814b5}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_a3e50f58c97c4b4befdb6004073b814b5} 
+bool {\bfseries Connect} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_a4fd497157d1f6bf56eef8313ef50ea11}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_a4fd497157d1f6bf56eef8313ef50ea11} 
+bool {\bfseries Disconnect} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_af7579a17edeea47f04755ec4ce9727dc}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_af7579a17edeea47f04755ec4ce9727dc} 
+bool {\bfseries Open} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_a3283a225087b80470fee7813dc2a38a2}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_a3283a225087b80470fee7813dc2a38a2} 
+bool {\bfseries Close} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_a08af56ae95a4cb4bd4962d44ab284a77}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_a08af56ae95a4cb4bd4962d44ab284a77} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ bool $>$ {\bfseries Update\+Interface\+Data} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context=null)
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_aa24154b2019b600bfa5800782e087b58}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_aa24154b2019b600bfa5800782e087b58} 
+IEnumerable$<$ string $>$ {\bfseries List\+Available\+Profiles} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_connection_a94eac37405e08ecf9008d477925b0291}\label{interface_step_bro_1_1_test_interface_1_1_i_connection_a94eac37405e08ecf9008d477925b0291} 
+bool {\bfseries Set\+Profile} (string profile, string accesskey=\"{}\"{})
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_remote_procedures_afdfabe62711689dc8edf8e79c20a9385}\label{interface_step_bro_1_1_test_interface_1_1_i_remote_procedures_afdfabe62711689dc8edf8e79c20a9385} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ object $>$ {\bfseries Invoke} (\mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_remote_procedure_info}{Remote\+Procedure\+Info}} procedure, params object\mbox{[}$\,$\mbox{]} arguments)
+\item 
+\Hypertarget{interface_step_bro_1_1_test_interface_1_1_i_remote_procedures_a0d84bbbd11c21d5f781d3b253522fc99}\label{interface_step_bro_1_1_test_interface_1_1_i_remote_procedures_a0d84bbbd11c21d5f781d3b253522fc99} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ object $>$ {\bfseries Invoke} (string procedure, params object\mbox{[}$\,$\mbox{]} arguments)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_settable_from_property_block_ab9921eed055d46a2eba83ead9ca87177}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_settable_from_property_block_ab9921eed055d46a2eba83ead9ca87177} 
+void {\bfseries Pre\+Scan\+Data} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block}{Property\+Block}} data, List$<$ Tuple$<$ int, string $>$ $>$ errors)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_settable_from_property_block_ab545d6367b4c526a743a32d97abf5be7}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_settable_from_property_block_ab545d6367b4c526a743a32d97abf5be7} 
+void {\bfseries Setup} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} logger, \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block}{Property\+Block}} data)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_text_command_input_a0f711fe3beb1c83bb0e2d430e83a208f}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_text_command_input_a0f711fe3beb1c83bb0e2d430e83a208f} 
+bool {\bfseries Accepting\+Commands} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_text_command_input_a8a51c5246136117dcd9cb4a0b50e6dfa}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_text_command_input_a8a51c5246136117dcd9cb4a0b50e6dfa} 
+void {\bfseries Execute\+Command} (string command)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a91b6603cf315e97cfadd0bb8fb1b2f7a}{Do\+Dispose}} (bool disposing)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_availability_base}{Step\+Bro.\+Core.\+Data.\+Availability\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries Dispose} (bool disposing)
+\item 
+virtual void {\bfseries Do\+Dispose} (bool disposing)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+string \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a15aeda71f77e4cb979ce1a45847d52e4}{Name}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_afd6b26c4949b07fe3a8a93f5e5ff7c45}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_afd6b26c4949b07fe3a8a93f5e5ff7c45} 
+string {\bfseries Display\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_adc4b436aa448d0077cedc1e70f54c0b3}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_adc4b436aa448d0077cedc1e70f54c0b3} 
+\mbox{\hyperlink{class_step_bro_1_1_streams_1_1_stream}{Stream}} {\bfseries Stream}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a4b44f152dd32a39bc9cfb0e6b10497d5}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a4b44f152dd32a39bc9cfb0e6b10497d5} 
+char {\bfseries Event\+Line\+Char} = \textquotesingle{}!\textquotesingle{}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a43189046fa8bc526cb248b2f26db2716}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a43189046fa8bc526cb248b2f26db2716} 
+char {\bfseries Response\+End\+Line\+Char} = \textquotesingle{}\+:\textquotesingle{}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a3ad1652e8b753330dae4a5ae5187f825}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a3ad1652e8b753330dae4a5ae5187f825} 
+char {\bfseries Response\+Multi\+Line\+Char} = \textquotesingle{}\texorpdfstring{$\ast$}{*}\textquotesingle{}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a45771f6379df350372cb677b89f6a4b7}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a45771f6379df350372cb677b89f6a4b7} 
+string {\bfseries Response\+Error\+Prefix} = \"{}\+:ERROR\"{}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a2bafdb359821a5a570b29799dd578e73}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a2bafdb359821a5a570b29799dd578e73} 
+Time\+Span {\bfseries Command\+Response\+Timeout} = Time\+Span.\+From\+Milliseconds(5000)\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ac8293ba5bea557c642f87f75cee08b1d}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ac8293ba5bea557c642f87f75cee08b1d} 
+long {\bfseries Instance\+ID}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a0f89f28608c012e0f5955b920db23097}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a0f89f28608c012e0f5955b920db23097} 
+bool {\bfseries Async\+Log\+Flush\+On\+Send\+Command} = true\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a8628564da6867718a17f6c4f16dd6bf4}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a8628564da6867718a17f6c4f16dd6bf4} 
+bool {\bfseries No\+Flush\+On\+Next\+Command} = false\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a99793ae1f081135ddee040e0fb793cc1}{Is\+Connected}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a953cb088ffcf76fb5310b2b2b70946d6}{Is\+Open}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_parameters_access}{IParameters\+Access}} \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a4a9ef01b1f8e6b8975aeea36baffafe4}{Parameters}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_remote_procedures}{IRemote\+Procedures}} \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_abd3db2eb4a38711001975b93298f92d5}{Remote\+Procedures}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+IEnumerable$<$ \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_remote_procedure_info}{Remote\+Procedure\+Info}} $>$ \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a0729d301183d26cf4c2e36a8b2933748}{Procedures}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a3040eb84f2336bb5c621ce88d4a91358}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a3040eb84f2336bb5c621ce88d4a91358} 
+List$<$ Tuple$<$ string, string $>$ $>$ {\bfseries UICommands}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_data}{Log\+Line\+Data}} \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ad09d6b510077f1ae2c6a53829cdadc9e}{First\+Entry}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_aecd1aa32038a8e914ebbcac1fd83af3f}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_aecd1aa32038a8e914ebbcac1fd83af3f} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{ILine\+Reader}} {\bfseries Async\+Log}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_availability_base}{Step\+Bro.\+Core.\+Data.\+Availability\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_availability_base_a4c48320c42006911e37b2b3f96bb8f9d}{Is\+Still\+Valid}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_availability}{Step\+Bro.\+Core.\+Data.\+IAvailability}}}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bfseries Is\+Still\+Valid}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_connection}{Step\+Bro.\+Test\+Interface.\+IConnection}}}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bfseries Is\+Connected}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool {\bfseries Is\+Open}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_parameters_access}{IParameters\+Access}} {\bfseries Parameters}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_remote_procedures}{IRemote\+Procedures}} {\bfseries Remote\+Procedures}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_remote_procedures}{Step\+Bro.\+Test\+Interface.\+IRemote\+Procedures}}}
+\begin{DoxyCompactItemize}
+\item 
+IEnumerable$<$ \mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_remote_procedure_info}{Remote\+Procedure\+Info}} $>$ {\bfseries Procedures}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{Step\+Bro.\+Core.\+Data.\+INameable}}}
+\begin{DoxyCompactItemize}
+\item 
+string {\bfseries Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_named_object}{Step\+Bro.\+Core.\+Data.\+INamed\+Object}}}
+\begin{DoxyCompactItemize}
+\item 
+string {\bfseries Short\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Full\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_log_line_parent}{Step\+Bro.\+Core.\+Data.\+ILog\+Line\+Parent}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_data}{Log\+Line\+Data}} {\bfseries First\+Entry}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ab8bfaa7cf52dee9bc0ee0d10e587c31b}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ab8bfaa7cf52dee9bc0ee0d10e587c31b} 
+Property\+Changed\+Event\+Handler {\bfseries Property\+Changed}
+\item 
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a460455b0e5581321c67ddf5db4efdf15}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a460455b0e5581321c67ddf5db4efdf15} 
+Log\+Line\+Add\+Event\+Handler {\bfseries Lines\+Added}
+\end{DoxyCompactItemize}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_availability_base}{Step\+Bro.\+Core.\+Data.\+Availability\+Base}}}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler {\bfseries Disposing}
+\item 
+Event\+Handler {\bfseries Disposed}
+\end{DoxyCompactItemize}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_availability}{Step\+Bro.\+Core.\+Data.\+IAvailability}}}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler {\bfseries Disposed}
+\end{DoxyCompactItemize}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_disposing}{Step\+Bro.\+Core.\+Data.\+IDisposing}}}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler {\bfseries Disposing}
+\end{DoxyCompactItemize}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_log_line_parent}{Step\+Bro.\+Core.\+Data.\+ILog\+Line\+Parent}}}
+\begin{DoxyCompactItemize}
+\item 
+Log\+Line\+Add\+Event\+Handler {\bfseries Lines\+Added}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a198ebb95e4cf630a44e6b63f784feb1e}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a198ebb95e4cf630a44e6b63f784feb1e} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!Close@{Close}}
+\index{Close@{Close}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{Close()}{Close()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Close (\begin{DoxyParamCaption}\item[{\mbox{[}\+Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}}}]{context }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_connection}{Step\+Bro.\+Test\+Interface.\+IConnection}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a63716a9e8957c9a2ee67d19d8afaafd3}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a63716a9e8957c9a2ee67d19d8afaafd3} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!Connect@{Connect}}
+\index{Connect@{Connect}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{Connect()}{Connect()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Connect (\begin{DoxyParamCaption}\item[{\mbox{[}\+Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}}}]{context }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_connection}{Step\+Bro.\+Test\+Interface.\+IConnection}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ae7f4b48059e54026efec15f5962b351f}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ae7f4b48059e54026efec15f5962b351f} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!Disconnect@{Disconnect}}
+\index{Disconnect@{Disconnect}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{Disconnect()}{Disconnect()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Disconnect (\begin{DoxyParamCaption}\item[{\mbox{[}\+Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}}}]{context }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_connection}{Step\+Bro.\+Test\+Interface.\+IConnection}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a91b6603cf315e97cfadd0bb8fb1b2f7a}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a91b6603cf315e97cfadd0bb8fb1b2f7a} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!DoDispose@{DoDispose}}
+\index{DoDispose@{DoDispose}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{DoDispose()}{DoDispose()}}
+{\footnotesize\ttfamily override void Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Do\+Dispose (\begin{DoxyParamCaption}\item[{bool}]{disposing }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_availability_base}{Step\+Bro.\+Core.\+Data.\+Availability\+Base}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a2fcda1f5337dd1ec6473e5d7bfa76cad}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a2fcda1f5337dd1ec6473e5d7bfa76cad} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!Invoke@{Invoke}}
+\index{Invoke@{Invoke}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{Invoke()}{Invoke()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ object $>$ Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Invoke (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_remote_procedure_info}{Remote\+Procedure\+Info}}}]{procedure,  }\item[{params object\mbox{[}$\,$\mbox{]}}]{arguments }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_remote_procedures}{Step\+Bro.\+Test\+Interface.\+IRemote\+Procedures}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a642c1676a5512d145475e881851c69fe}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a642c1676a5512d145475e881851c69fe} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!Invoke@{Invoke}}
+\index{Invoke@{Invoke}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{Invoke()}{Invoke()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ object $>$ Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Invoke (\begin{DoxyParamCaption}\item[{string}]{procedure,  }\item[{params object\mbox{[}$\,$\mbox{]}}]{arguments }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_remote_procedures}{Step\+Bro.\+Test\+Interface.\+IRemote\+Procedures}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ac38f98c037eed7822cec5b03d63a844a}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ac38f98c037eed7822cec5b03d63a844a} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!ListAvailableProfiles@{ListAvailableProfiles}}
+\index{ListAvailableProfiles@{ListAvailableProfiles}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{ListAvailableProfiles()}{ListAvailableProfiles()}}
+{\footnotesize\ttfamily IEnumerable$<$ string $>$ Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+List\+Available\+Profiles (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_connection}{Step\+Bro.\+Test\+Interface.\+IConnection}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_aa78aa48677a1aa129f72bc37fdaa9f38}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_aa78aa48677a1aa129f72bc37fdaa9f38} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!Open@{Open}}
+\index{Open@{Open}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{Open()}{Open()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Open (\begin{DoxyParamCaption}\item[{\mbox{[}\+Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}}}]{context }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_connection}{Step\+Bro.\+Test\+Interface.\+IConnection}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a9bed0e5251fddb3ba8c275f04d3466a0}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a9bed0e5251fddb3ba8c275f04d3466a0} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!PreScanData@{PreScanData}}
+\index{PreScanData@{PreScanData}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{PreScanData()}{PreScanData()}}
+{\footnotesize\ttfamily void Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Pre\+Scan\+Data (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block}{Property\+Block}}}]{data,  }\item[{List$<$ Tuple$<$ int, string $>$ $>$}]{errors }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_settable_from_property_block}{Step\+Bro.\+Core.\+Data.\+ISettable\+From\+Property\+Block}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a01688add1fb383df885bc9408fe49bad}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a01688add1fb383df885bc9408fe49bad} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!SetProfile@{SetProfile}}
+\index{SetProfile@{SetProfile}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{SetProfile()}{SetProfile()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Set\+Profile (\begin{DoxyParamCaption}\item[{string}]{profile,  }\item[{string}]{accesskey = {\ttfamily \"{}\"{}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_connection}{Step\+Bro.\+Test\+Interface.\+IConnection}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_aa9dce4d678d7aa50c3922375aba7ab9a}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_aa9dce4d678d7aa50c3922375aba7ab9a} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!Setup@{Setup}}
+\index{Setup@{Setup}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{Setup()}{Setup()}}
+{\footnotesize\ttfamily void Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Setup (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}}}]{logger,  }\item[{\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block}{Property\+Block}}}]{properties }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_settable_from_property_block}{Step\+Bro.\+Core.\+Data.\+ISettable\+From\+Property\+Block}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_aeb45cb176690571e67c331d4f6b0ada1}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_aeb45cb176690571e67c331d4f6b0ada1} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!UpdateInterfaceData@{UpdateInterfaceData}}
+\index{UpdateInterfaceData@{UpdateInterfaceData}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{UpdateInterfaceData()}{UpdateInterfaceData()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}$<$ bool $>$ Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Update\+Interface\+Data (\begin{DoxyParamCaption}\item[{\mbox{[}\+Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}}}]{context = {\ttfamily null} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_connection}{Step\+Bro.\+Test\+Interface.\+IConnection}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ad09d6b510077f1ae2c6a53829cdadc9e}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_ad09d6b510077f1ae2c6a53829cdadc9e} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!FirstEntry@{FirstEntry}}
+\index{FirstEntry@{FirstEntry}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{FirstEntry}{FirstEntry}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_log_line_data}{Log\+Line\+Data}} Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+First\+Entry\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_log_line_parent}{Step\+Bro.\+Core.\+Data.\+ILog\+Line\+Parent}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a99793ae1f081135ddee040e0fb793cc1}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a99793ae1f081135ddee040e0fb793cc1} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!IsConnected@{IsConnected}}
+\index{IsConnected@{IsConnected}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{IsConnected}{IsConnected}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Is\+Connected\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_connection}{Step\+Bro.\+Test\+Interface.\+IConnection}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a953cb088ffcf76fb5310b2b2b70946d6}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a953cb088ffcf76fb5310b2b2b70946d6} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!IsOpen@{IsOpen}}
+\index{IsOpen@{IsOpen}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{IsOpen}{IsOpen}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Is\+Open\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_connection}{Step\+Bro.\+Test\+Interface.\+IConnection}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a15aeda71f77e4cb979ce1a45847d52e4}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a15aeda71f77e4cb979ce1a45847d52e4} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!Name@{Name}}
+\index{Name@{Name}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{Name}{Name}}
+{\footnotesize\ttfamily string Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Name\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{Step\+Bro.\+Core.\+Data.\+INameable}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a4a9ef01b1f8e6b8975aeea36baffafe4}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a4a9ef01b1f8e6b8975aeea36baffafe4} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!Parameters@{Parameters}}
+\index{Parameters@{Parameters}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{Parameters}{Parameters}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_parameters_access}{IParameters\+Access}} Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Parameters\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_connection}{Step\+Bro.\+Test\+Interface.\+IConnection}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a0729d301183d26cf4c2e36a8b2933748}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_a0729d301183d26cf4c2e36a8b2933748} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!Procedures@{Procedures}}
+\index{Procedures@{Procedures}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{Procedures}{Procedures}}
+{\footnotesize\ttfamily IEnumerable$<$\mbox{\hyperlink{class_step_bro_1_1_test_interface_1_1_remote_procedure_info}{Remote\+Procedure\+Info}}$>$ Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Procedures\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_remote_procedures}{Step\+Bro.\+Test\+Interface.\+IRemote\+Procedures}}.
+
+\Hypertarget{class_step_bro_1_1_test_interface_1_1_serial_test_connection_abd3db2eb4a38711001975b93298f92d5}\label{class_step_bro_1_1_test_interface_1_1_serial_test_connection_abd3db2eb4a38711001975b93298f92d5} 
+\index{StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}!RemoteProcedures@{RemoteProcedures}}
+\index{RemoteProcedures@{RemoteProcedures}!StepBro.TestInterface.SerialTestConnection@{StepBro.TestInterface.SerialTestConnection}}
+\doxysubsubsection{\texorpdfstring{RemoteProcedures}{RemoteProcedures}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_remote_procedures}{IRemote\+Procedures}} Step\+Bro.\+Test\+Interface.\+Serial\+Test\+Connection.\+Remote\+Procedures\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_test_interface_1_1_i_connection}{Step\+Bro.\+Test\+Interface.\+IConnection}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Modules/\+Step\+Bro.\+Test\+Interface/Serial\+Test\+Connection.\+cs\end{DoxyCompactItemize}

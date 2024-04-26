@@ -1,5 +1,6 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
+using StepBro.Core.Execution;
 using System;
 
 namespace StepBro.StateMachine
@@ -11,11 +12,11 @@ namespace StepBro.StateMachine
     public interface IStateMachine : IDynamicStepBroObject
     {
         string Name { get; }
-        void ChangeState(Identifier state);
-        void StartPollTimer(TimeSpan time);
-        void StartTimer(string name, TimeSpan time, bool repeating);
-        void StartTimer(string name, DateTime time);
-        void StopTimer(string name);
+        void ChangeState([Implicit] ICallContext context, Identifier state);
+        void StartPollTimer([Implicit] ICallContext context, TimeSpan time, bool currentStateOnly);
+        void StartTimer([Implicit] ICallContext context, string name, TimeSpan time, bool repeating, bool currentStateOnly);
+        void StartTimer([Implicit] ICallContext context, string name, DateTime time, bool currentStateOnly);
+        void StopTimer([Implicit] ICallContext context, string name);
         DateTime StateEntryTime { get; }
     }
 }

@@ -1,0 +1,62 @@
+\doxysection{Step\+Bro.\+Core.\+Api.\+ICore\+Access Interface Reference}
+\hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_core_access}{}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_core_access}\index{StepBro.Core.Api.ICoreAccess@{StepBro.Core.Api.ICoreAccess}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_api_1_1_i_execution_access}{IExecution\+Access}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_api_1_1_i_core_access_a37a34d7aa22ae37c869d798a9ae4e297}{Start\+Execution}} (string element, string model, string object\+Variable, object\mbox{[}$\,$\mbox{]} args)
+\begin{DoxyCompactList}\small\item\em Request starting a script execution of the specified script element. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_api_1_1_i_core_access_afd3ebc699820af693cc9c70a2a12a48c}{Execute\+Object\+Command}} (string object\+Variable, string command)
+\begin{DoxyCompactList}\small\item\em Executes the specified command on the specified object. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_core_access_aa55717986ae65bcfed8356e7864e2f92}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_core_access_aa55717986ae65bcfed8356e7864e2f92} 
+int {\bfseries Executions\+Running}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets tne number of currently running script execution threads. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_core_access_afd3ebc699820af693cc9c70a2a12a48c}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_core_access_afd3ebc699820af693cc9c70a2a12a48c} 
+\index{StepBro.Core.Api.ICoreAccess@{StepBro.Core.Api.ICoreAccess}!ExecuteObjectCommand@{ExecuteObjectCommand}}
+\index{ExecuteObjectCommand@{ExecuteObjectCommand}!StepBro.Core.Api.ICoreAccess@{StepBro.Core.Api.ICoreAccess}}
+\doxysubsubsection{\texorpdfstring{ExecuteObjectCommand()}{ExecuteObjectCommand()}}
+{\footnotesize\ttfamily void Step\+Bro.\+Core.\+Api.\+ICore\+Access.\+Execute\+Object\+Command (\begin{DoxyParamCaption}\item[{string}]{object\+Variable,  }\item[{string}]{command }\end{DoxyParamCaption})}
+
+
+
+Executes the specified command on the specified object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em object\+Variable} & An optional object (variable reference) to execute the command on.\\
+\hline
+{\em command} & The command to execute.\\
+\hline
+\end{DoxyParams}
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_core_access_a37a34d7aa22ae37c869d798a9ae4e297}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_core_access_a37a34d7aa22ae37c869d798a9ae4e297} 
+\index{StepBro.Core.Api.ICoreAccess@{StepBro.Core.Api.ICoreAccess}!StartExecution@{StartExecution}}
+\index{StartExecution@{StartExecution}!StepBro.Core.Api.ICoreAccess@{StepBro.Core.Api.ICoreAccess}}
+\doxysubsubsection{\texorpdfstring{StartExecution()}{StartExecution()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_api_1_1_i_execution_access}{IExecution\+Access}} Step\+Bro.\+Core.\+Api.\+ICore\+Access.\+Start\+Execution (\begin{DoxyParamCaption}\item[{string}]{element,  }\item[{string}]{model,  }\item[{string}]{object\+Variable,  }\item[{object\mbox{[}$\,$\mbox{]}}]{args }\end{DoxyParamCaption})}
+
+
+
+Request starting a script execution of the specified script element. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em element} & The file element to execute (procedure or testlist).\\
+\hline
+{\em model} & The model/partner to use for the execution.\\
+\hline
+{\em args} & The input arguments for the target procedure (or partner).\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Interface to the started execution.
+\end{DoxyReturn}
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Api/ICore\+Access.\+cs\end{DoxyCompactItemize}

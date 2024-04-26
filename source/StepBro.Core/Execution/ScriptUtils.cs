@@ -48,18 +48,26 @@ namespace StepBro.Core.Execution
         public static void delay([Implicit] ICallContext context, TimeSpan time, string purpose = null)
 #pragma warning restore IDE1006 // Naming Styles
         {
+            bool isLongDelay = time >= g_fiveSeconds;
             if (context != null && context.LoggingEnabled)
             {
                 string purposetext = String.IsNullOrEmpty(purpose) ? "" : " - " + purpose;
-                context.Logger.Log($"{(long)time.TotalMilliseconds}ms{purposetext}");
+                string expiryText = "";
+                if (isLongDelay)
+                {
+                    expiryText = " (expires at " + (DateTime.Now + time).ToString() + ")";
+                }
+                context.Logger.Log($"{(long)time.TotalMilliseconds}ms{expiryText}{purposetext}");
             }
-            if (time >= g_fiveSeconds)
+            if (isLongDelay)
             {
                 var reporter = context.StatusUpdater.CreateProgressReporter(String.IsNullOrEmpty(purpose) ? "delay" : purpose, time);
                 using (reporter)
                 {
                     bool skipClicked = false;
+                    bool pauseClicked = false;
                     reporter.AddActionButton("Skip Delay", b => { skipClicked |= b; return b; });
+                    reporter.AddActionButton("Pause Delay", b => { pauseClicked |= b; return b; });
                     var entry = DateTime.Now;
                     var timeout = entry + time;
                     var timeLeft = time;
@@ -72,6 +80,15 @@ namespace StepBro.Core.Execution
                         else
                         {
                             System.Threading.Thread.Sleep(timeLeft);    // Last time to sleep; take whats left.
+                        }
+                        if (pauseClicked)
+                        {
+                            context.Logger.LogUserAction("    User pressed the \"Pause delay\" button.");
+                            while (pauseClicked)    // Loop as long as the user has paused the delay.
+                            {
+                                System.Threading.Thread.Sleep(g_50mills);
+                            }
+                            context.Logger.LogUserAction("    User terminated the delay pause.");
                         }
                         timeLeft = DateTime.Now.TimeTill(timeout);
                     }
@@ -134,7 +151,7 @@ namespace StepBro.Core.Execution
             if (result == null)
             {
                 context.ReportError(error);
-            } 
+            }
             return result;
         }
 
@@ -260,13 +277,13 @@ namespace StepBro.Core.Execution
             {
                 referenceTime = reader.LatestTimeStamp; // Defaults to DateTime.MinValue
             }
-            
+
             // Limit timestamp - The latest timestamp we will look for in the log
             DateTime limitTime = (limit == default || limit == TimeSpan.MaxValue) ? DateTime.MaxValue : referenceTime + limit;
 
             // Timeout timestamp - The amount of realtime we can look for the data, as the data may appear asynchronously in some use cases
             DateTime timeoutTime;
-            
+
             if (timeout == default)
             {
                 timeoutTime = DateTime.MinValue; // Default is we look through the log once and then exit
@@ -282,7 +299,7 @@ namespace StepBro.Core.Execution
 
             var peaker = reader.Peak();
 
-            lock(reader.Sync)
+            lock (reader.Sync)
             {
                 ILineReaderEntry last = null;
                 do
@@ -340,7 +357,7 @@ namespace StepBro.Core.Execution
             reader.DebugDump();
 
             // If we do not want to match with the current entry
-            if(skipCurrent)
+            if (skipCurrent)
             {
                 reader.NextUnlessNewEntry();
             }

@@ -1,0 +1,94 @@
+\doxysection{Step\+Bro.\+Core.\+Script\+Data.\+IScript\+File Interface Reference}
+\hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file}{}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file}\index{StepBro.Core.ScriptData.IScriptFile@{StepBro.Core.ScriptData.IScriptFile}}
+
+
+Interface to an object containing information about a specific script file.  
+
+
+Inheritance diagram for Step\+Bro.\+Core.\+Script\+Data.\+IScript\+File\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.533937cm]{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file_afc0e7d1bed6b0f59f9c44e02f1228bee}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file_afc0e7d1bed6b0f59f9c44e02f1228bee} 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{IFile\+Element}} $>$ {\bfseries List\+Elements} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{Step\+Bro.\+Core.\+General.\+ILoaded\+File}}}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a2cc5c8f7edd40eb9f1143f1d7d62b760}{Register\+Dependant}} (object using\+Object)
+\begin{DoxyCompactList}\small\item\em Registers an object as a dependant. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a3c0579698feb0b8ba635a491f4843421}{Is\+Dependant\+Of}} (object @object)
+\begin{DoxyCompactList}\small\item\em Returns whether the specified object is in the list of dependants. \end{DoxyCompactList}\item 
+bool {\bfseries Unregister\+Dependant} (object using\+Object, bool throw\+If\+Not\+Found=true)
+\item 
+IEnumerable$<$ string $>$ {\bfseries List\+Dependant\+Descriptors} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_object_host}{Step\+Bro.\+Core.\+Data.\+IObject\+Host}}}
+\begin{DoxyCompactItemize}
+\item 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_object_container}{IObject\+Container}} $>$ {\bfseries List\+Object\+Containers} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+string \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file_aba09a326163fcbe69adfeec1131bcad7}{File\+Revision}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em The revision of the file. \end{DoxyCompactList}\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file_a602607f7fb19678e200cd28368da939e}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file_a602607f7fb19678e200cd28368da939e} 
+string {\bfseries Author}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em The last author of the script file. \end{DoxyCompactList}\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file_ada79ad43faae09bf27ab4157fec2efdf}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file_ada79ad43faae09bf27ab4157fec2efdf} 
+string {\bfseries Namespace}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file_af51a87d1fcf2720fcc4237d3c99f883b}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file_af51a87d1fcf2720fcc4237d3c99f883b} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_parser_1_1_i_error_collector}{IError\+Collector}} {\bfseries Errors}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file_a08f7b81f1986bc99fc3684648a4839be}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file_a08f7b81f1986bc99fc3684648a4839be} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcuts_source}{IFolder\+Shortcuts\+Source}} {\bfseries Folder\+Shortcuts}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{Step\+Bro.\+Core.\+General.\+ILoaded\+File}}}
+\begin{DoxyCompactItemize}
+\item 
+string {\bfseries File\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries File\+Path}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Loaded\+File\+Type {\bfseries Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+int {\bfseries Unique\+ID}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Off\+Disk\+File\+Content}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+int {\bfseries Registered\+Dependants\+Count}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_object_host}{Step\+Bro.\+Core.\+Data.\+IObject\+Host}}}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler {\bfseries Object\+Container\+List\+Changed}
+\begin{DoxyCompactList}\small\item\em Notifies changes in the list object containers. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Interface to an object containing information about a specific script file. 
+
+\doxysubsection{Property Documentation}
+\Hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file_aba09a326163fcbe69adfeec1131bcad7}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file_aba09a326163fcbe69adfeec1131bcad7} 
+\index{StepBro.Core.ScriptData.IScriptFile@{StepBro.Core.ScriptData.IScriptFile}!FileRevision@{FileRevision}}
+\index{FileRevision@{FileRevision}!StepBro.Core.ScriptData.IScriptFile@{StepBro.Core.ScriptData.IScriptFile}}
+\doxysubsubsection{\texorpdfstring{FileRevision}{FileRevision}}
+{\footnotesize\ttfamily string Step\+Bro.\+Core.\+Script\+Data.\+IScript\+File.\+File\+Revision\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+The revision of the file. 
+
+If the file has been changed, a timestamp is appended to the revision name/number.
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Script\+Data/IScript\+File.\+cs\end{DoxyCompactItemize}

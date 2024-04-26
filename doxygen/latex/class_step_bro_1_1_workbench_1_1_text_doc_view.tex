@@ -1,0 +1,129 @@
+\doxysection{Step\+Bro.\+Workbench.\+Text\+Doc\+View Class Reference}
+\hypertarget{class_step_bro_1_1_workbench_1_1_text_doc_view}{}\label{class_step_bro_1_1_workbench_1_1_text_doc_view}\index{StepBro.Workbench.TextDocView@{StepBro.Workbench.TextDocView}}
+Inheritance diagram for Step\+Bro.\+Workbench.\+Text\+Doc\+View\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=4.000000cm]{class_step_bro_1_1_workbench_1_1_text_doc_view}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_text_doc_view_a11a17c0a835726c68fda38ea9270587d}\label{class_step_bro_1_1_workbench_1_1_text_doc_view_a11a17c0a835726c68fda38ea9270587d} 
+{\bfseries Text\+Doc\+View} (object file\+Owner)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_text_editor_dock_content}{Step\+Bro.\+Workbench.\+Text\+Editor\+Dock\+Content}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Text\+Editor\+Dock\+Content} (object script\+Owner)
+\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_text_editor_dock_content_a8fb47f79746c93d3c0ca3349593d6858}{Show\+Line}} (int line, int selection\+Start, int selection\+End)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_document_view_dock_content}{Step\+Bro.\+Workbench.\+Document\+View\+Dock\+Content}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Document\+View\+Dock\+Content} (object script\+Owner)
+\item 
+virtual void {\bfseries Show\+Line} (int line, int selection\+Start, int selection\+End)
+\item 
+bool {\bfseries File\+Changed} ()
+\item 
+bool {\bfseries Open\+File\+View} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} file)
+\item 
+bool {\bfseries Open\+File} (string filepath)
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a446a0f1db8007df028d91952195f373a}{Save\+File}} (\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5}{Save\+Option}} option, string filepath=null)
+\begin{DoxyCompactList}\small\item\em Saves the content of the editor/view to a file. \end{DoxyCompactList}\item 
+bool {\bfseries Discard\+Changes} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+override \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_text_doc_view_a3d670e6845f5d7a84152475005352264}{Do\+Open\+File}} (string filepath)
+\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_text_doc_view_ad8f00b179c6f44b0b01be7ce8a8aca47}{Dispose}} (bool disposing)
+\begin{DoxyCompactList}\small\item\em Clean up any resources being used. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_text_editor_dock_content}{Step\+Bro.\+Workbench.\+Text\+Editor\+Dock\+Content}}}
+\begin{DoxyCompactItemize}
+\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_text_editor_dock_content_ace84ecf8e05b87c886c9d166f64aab85}{Do\+Open\+File\+View}} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} file)
+\item 
+override bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_text_editor_dock_content_a7170c2e0a7f569b3086ed2fef8dce8b0}{Do\+Discard\+Changes}} ()
+\item 
+override bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_text_editor_dock_content_ab9b49046d6c6176b736a440fa25d2b21}{Is\+File\+Changed}} ()
+\item 
+override bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_text_editor_dock_content_a51d2f625cf1a78f883ebd379e7cc259e}{Do\+Save\+File}} (\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5}{Save\+Option}} option, string filepath)
+\item 
+override \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_text_editor_dock_content_a29f821a2abff8437339f9bf31c33eb9d}{Do\+Open\+File}} (string filepath)
+\item 
+void {\bfseries On\+Editor\+Is\+Changed\+Changed} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_document_view_dock_content}{Step\+Bro.\+Workbench.\+Document\+View\+Dock\+Content}}}
+\begin{DoxyCompactItemize}
+\item 
+override string {\bfseries Get\+Persist\+String} ()
+\item 
+abstract bool {\bfseries Is\+File\+Changed} ()
+\item 
+abstract void {\bfseries Do\+Open\+File\+View} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} file)
+\item 
+abstract \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} {\bfseries Do\+Open\+File} (string filepath)
+\item 
+abstract bool {\bfseries Do\+Save\+File} (\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5}{Save\+Option}} option, string filepath)
+\item 
+abstract bool {\bfseries Do\+Discard\+Changes} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_text_doc_view_a2c6785d81c9c1c0f85ca5f8ccb209a60}\label{class_step_bro_1_1_workbench_1_1_text_doc_view_a2c6785d81c9c1c0f85ca5f8ccb209a60} 
+override \mbox{\hyperlink{class_step_bro_1_1_core_1_1_controls_1_1_text_editor}{Text\+Editor}} {\bfseries Editor}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_text_editor_dock_content}{Step\+Bro.\+Workbench.\+Text\+Editor\+Dock\+Content}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual \mbox{\hyperlink{class_step_bro_1_1_core_1_1_controls_1_1_text_editor}{Text\+Editor}} {\bfseries Editor}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+int {\bfseries Selection\+Start\+Line}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_document_view_dock_content}{Step\+Bro.\+Workbench.\+Document\+View\+Dock\+Content}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} {\bfseries File}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+object {\bfseries File\+Owner}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_text_doc_view_ad8f00b179c6f44b0b01be7ce8a8aca47}\label{class_step_bro_1_1_workbench_1_1_text_doc_view_ad8f00b179c6f44b0b01be7ce8a8aca47} 
+\index{StepBro.Workbench.TextDocView@{StepBro.Workbench.TextDocView}!Dispose@{Dispose}}
+\index{Dispose@{Dispose}!StepBro.Workbench.TextDocView@{StepBro.Workbench.TextDocView}}
+\doxysubsubsection{\texorpdfstring{Dispose()}{Dispose()}}
+{\footnotesize\ttfamily override void Step\+Bro.\+Workbench.\+Text\+Doc\+View.\+Dispose (\begin{DoxyParamCaption}\item[{bool}]{disposing }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Clean up any resources being used. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em disposing} & true if managed resources should be disposed; otherwise, false.\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_text_doc_view_a3d670e6845f5d7a84152475005352264}\label{class_step_bro_1_1_workbench_1_1_text_doc_view_a3d670e6845f5d7a84152475005352264} 
+\index{StepBro.Workbench.TextDocView@{StepBro.Workbench.TextDocView}!DoOpenFile@{DoOpenFile}}
+\index{DoOpenFile@{DoOpenFile}!StepBro.Workbench.TextDocView@{StepBro.Workbench.TextDocView}}
+\doxysubsubsection{\texorpdfstring{DoOpenFile()}{DoOpenFile()}}
+{\footnotesize\ttfamily override \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} Step\+Bro.\+Workbench.\+Text\+Doc\+View.\+Do\+Open\+File (\begin{DoxyParamCaption}\item[{string}]{filepath }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_document_view_dock_content}{Step\+Bro.\+Workbench.\+Document\+View\+Dock\+Content}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Workbench/Text\+Doc\+View.\+cs\item 
+source/\+Step\+Bro.\+Workbench/Text\+Doc\+View.\+Designer.\+cs\end{DoxyCompactItemize}

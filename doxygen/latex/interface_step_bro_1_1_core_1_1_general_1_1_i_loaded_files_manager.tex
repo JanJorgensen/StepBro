@@ -1,0 +1,59 @@
+\doxysection{Step\+Bro.\+Core.\+General.\+ILoaded\+Files\+Manager Interface Reference}
+\hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager}{}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager}\index{StepBro.Core.General.ILoadedFilesManager@{StepBro.Core.General.ILoadedFilesManager}}
+
+
+Inherited by Step\+Bro.\+Core.\+General.\+Loaded\+Files\+Manager.
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_a8561a1d32051b1457c23460c8f027fe1}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_a8561a1d32051b1457c23460c8f027fe1} 
+void {\bfseries Register\+Loaded\+File} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} file)
+\item 
+IEnumerable$<$ T $>$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_adb1d48552420346dcc0130ffc03fe6ff}{List\+Files$<$ T $>$}} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_acb8d49678697b48c5c26181ea4b2d51a}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_acb8d49678697b48c5c26181ea4b2d51a} 
+void {\bfseries Unload\+All\+Files\+Without\+Dependants} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_a7c296829f60b0fc84962c1564c83c3f6}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_a7c296829f60b0fc84962c1564c83c3f6} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} {\bfseries Try\+Get\+Or\+Load\+File} (string currentpath, string filepath)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_a05ee971b858984952603c14bc8be9be4}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_a05ee971b858984952603c14bc8be9be4} 
+IRead\+Only\+Collection$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file}{IScript\+File}} $>$ {\bfseries Try\+Get\+Namespace\+List} (string @namespace)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_af76bd227c9c73bce255af20877ddb1be}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_af76bd227c9c73bce255af20877ddb1be} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file}{IScript\+File}} {\bfseries Top\+Script\+File}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_af71151c27bd429c08afda3d1958f09e7}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_af71151c27bd429c08afda3d1958f09e7} 
+Loaded\+File\+Event\+Handler {\bfseries File\+Loaded}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_ac7ccf94d91e341865c3b086769937b43}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_ac7ccf94d91e341865c3b086769937b43} 
+Loaded\+File\+Event\+Handler {\bfseries File\+Closed}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_a1d0ba7fe259ddb96d1ce649eaa4e2bbe}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_a1d0ba7fe259ddb96d1ce649eaa4e2bbe} 
+Property\+Changed\+Event\+Handler {\bfseries File\+Property\+Changed}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_adb1d48552420346dcc0130ffc03fe6ff}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_files_manager_adb1d48552420346dcc0130ffc03fe6ff} 
+\index{StepBro.Core.General.ILoadedFilesManager@{StepBro.Core.General.ILoadedFilesManager}!ListFiles$<$ T $>$@{ListFiles$<$ T $>$}}
+\index{ListFiles$<$ T $>$@{ListFiles$<$ T $>$}!StepBro.Core.General.ILoadedFilesManager@{StepBro.Core.General.ILoadedFilesManager}}
+\doxysubsubsection{\texorpdfstring{ListFiles$<$ T $>$()}{ListFiles< T >()}}
+{\footnotesize\ttfamily IEnumerable$<$ T $>$ Step\+Bro.\+Core.\+General.\+ILoaded\+Files\+Manager.\+List\+Files$<$ T $>$ (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{Desc}
+\item[Type Constraints]\begin{description}
+\item[{\em T} : {\em class}]\item[{\em T} : {\em ILoaded\+File}]\end{description}
+\end{Desc}
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+General/ILoaded\+Files\+Manager.\+cs\end{DoxyCompactItemize}

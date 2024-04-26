@@ -1,0 +1,67 @@
+\doxysection{Step\+Bro.\+Core.\+Logging.\+Logger Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger}{}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger}\index{StepBro.Core.Logging.Logger@{StepBro.Core.Logging.Logger}}
+Inheritance diagram for Step\+Bro.\+Core.\+Logging.\+Logger\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_core_1_1_logging_1_1_logger}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_adeee6c1397de384919e20f501288548b}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_adeee6c1397de384919e20f501288548b} 
+{\bfseries Logger} (string output\+File, bool direct\+Log\+To\+File, string location, string starttext)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_aafc0359aa18fc0f1a4c21822814948a6}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_aafc0359aa18fc0f1a4c21822814948a6} 
+void {\bfseries Set\+Breaker} (Predicate$<$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_logging_1_1_log_entry}{Log\+Entry}} $>$ breaker)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_afc483b9426da02b3577221e16964fa4b}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_afc483b9426da02b3577221e16964fa4b} 
+void {\bfseries Dispose} ()
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_a52bb851990b6e9b982903c619f0070c6}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_a52bb851990b6e9b982903c619f0070c6} 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_logging_1_1_log_entry}{Log\+Entry}} {\bfseries Get\+Oldest\+Entry} ()
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_af0470ad39760c1451e49930536b6fe6a}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_af0470ad39760c1451e49930536b6fe6a} 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_logging_1_1_log_entry}{Log\+Entry}} {\bfseries Get\+Newest\+Entry} ()
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_a269e7fde7c81a75fe213ff2271838d68}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_a269e7fde7c81a75fe213ff2271838d68} 
+void {\bfseries Debug\+Dump} ()
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_aeb1e8217e64e3f084dfb150d64ba386f}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_aeb1e8217e64e3f084dfb150d64ba386f} 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_logging_1_1_log_entry}{Log\+Entry}} {\bfseries Get} (ulong index)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_ad110214501c179410e762ba69a9ffcad}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_ad110214501c179410e762ba69a9ffcad} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_log_history}{ILog\+History}}$<$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_logging_1_1_log_entry}{Log\+Entry}} $>$ {\bfseries Get\+History} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_acc8a48126a9cdeeeab330ba773a80b4d}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_acc8a48126a9cdeeeab330ba773a80b4d} 
+uint {\bfseries BLOCK\+\_\+\+SIZE} = 2000
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_afcef4050882834037f3be1715d12a424}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_afcef4050882834037f3be1715d12a424} 
+uint {\bfseries BLOCK\+\_\+\+COUNT} = 5000
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_ac85ecbdd2c7502d6cfde7e748fe82efb}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_ac85ecbdd2c7502d6cfde7e748fe82efb} 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_logging_1_1_log_entry}{Log\+Entry}}\mbox{[}$\,$\mbox{]} {\bfseries m\+\_\+block\+Starts}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_a47c7f8a4dd721f22e8da4efe74a45380}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_a47c7f8a4dd721f22e8da4efe74a45380} 
+uint {\bfseries m\+\_\+block\+Index} = 0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_aa4c5bde07cb063f1ca7eac8e85f00fbc}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_aa4c5bde07cb063f1ca7eac8e85f00fbc} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_i_service}{IService}} {\bfseries Root\+Scope\+Service}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_a78c520a25c62412a3efc85008020a7f7}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_a78c520a25c62412a3efc85008020a7f7} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} {\bfseries Root\+Logger}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_logging_1_1_logger_a7efce0734fd37b8200ce723e90d2b883}\label{class_step_bro_1_1_core_1_1_logging_1_1_logger_a7efce0734fd37b8200ce723e90d2b883} 
+bool {\bfseries Is\+Debugging} = false\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Logging/Logger.\+cs\end{DoxyCompactItemize}

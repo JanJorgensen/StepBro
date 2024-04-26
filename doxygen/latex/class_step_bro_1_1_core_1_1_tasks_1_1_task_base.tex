@@ -1,0 +1,88 @@
+\doxysection{Step\+Bro.\+Core.\+Tasks.\+Task\+Base Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_tasks_1_1_task_base}{}\label{class_step_bro_1_1_core_1_1_tasks_1_1_task_base}\index{StepBro.Core.Tasks.TaskBase@{StepBro.Core.Tasks.TaskBase}}
+Inheritance diagram for Step\+Bro.\+Core.\+Tasks.\+Task\+Base\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_core_1_1_tasks_1_1_task_base}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_a626c73ccc283e10200dc025494e59a01}{Wait}} (Time\+Span time)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_a87375f8ad5bb2c2bcd9b3277908a296f}\label{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_a87375f8ad5bb2c2bcd9b3277908a296f} 
+bool {\bfseries Wait} (Time\+Span time)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_a0ef9cfc709ca97114d795b07eb04f4df}\label{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_a0ef9cfc709ca97114d795b07eb04f4df} 
+{\bfseries Task\+Base} (string title)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_a9aa7f42d6a09c5bd81bb16015e084123}\label{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_a9aa7f42d6a09c5bd81bb16015e084123} 
+abstract bool {\bfseries Do\+Wait} (Time\+Span time)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_a58d6f5317074d9b563d71b175b753c15}\label{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_a58d6f5317074d9b563d71b175b753c15} 
+void {\bfseries Start} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context}{ITask\+Context}} context)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_adf70ddadfe53730729d48c2e70f6d450}\label{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_adf70ddadfe53730729d48c2e70f6d450} 
+abstract void {\bfseries Execute\+Task\+Function} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context}{ITask\+Context}} context)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+string \mbox{\hyperlink{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_a90893db25e380bcee966bd58e06e71dd}{Title}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+abstract \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{ITask\+Control}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_afed561f3ba9aa4db25b534203a52a7d9}{Control}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task}{Step\+Bro.\+Core.\+Tasks.\+ITask}}}
+\begin{DoxyCompactItemize}
+\item 
+string {\bfseries Title}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{ITask\+Control}} {\bfseries Control}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_a626c73ccc283e10200dc025494e59a01}\label{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_a626c73ccc283e10200dc025494e59a01} 
+\index{StepBro.Core.Tasks.TaskBase@{StepBro.Core.Tasks.TaskBase}!Wait@{Wait}}
+\index{Wait@{Wait}!StepBro.Core.Tasks.TaskBase@{StepBro.Core.Tasks.TaskBase}}
+\doxysubsubsection{\texorpdfstring{Wait()}{Wait()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+Tasks.\+Task\+Base.\+Wait (\begin{DoxyParamCaption}\item[{Time\+Span}]{time }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task}{Step\+Bro.\+Core.\+Tasks.\+ITask}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_afed561f3ba9aa4db25b534203a52a7d9}\label{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_afed561f3ba9aa4db25b534203a52a7d9} 
+\index{StepBro.Core.Tasks.TaskBase@{StepBro.Core.Tasks.TaskBase}!Control@{Control}}
+\index{Control@{Control}!StepBro.Core.Tasks.TaskBase@{StepBro.Core.Tasks.TaskBase}}
+\doxysubsubsection{\texorpdfstring{Control}{Control}}
+{\footnotesize\ttfamily abstract \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{ITask\+Control}} Step\+Bro.\+Core.\+Tasks.\+Task\+Base.\+Control\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task}{Step\+Bro.\+Core.\+Tasks.\+ITask}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_a90893db25e380bcee966bd58e06e71dd}\label{class_step_bro_1_1_core_1_1_tasks_1_1_task_base_a90893db25e380bcee966bd58e06e71dd} 
+\index{StepBro.Core.Tasks.TaskBase@{StepBro.Core.Tasks.TaskBase}!Title@{Title}}
+\index{Title@{Title}!StepBro.Core.Tasks.TaskBase@{StepBro.Core.Tasks.TaskBase}}
+\doxysubsubsection{\texorpdfstring{Title}{Title}}
+{\footnotesize\ttfamily string Step\+Bro.\+Core.\+Tasks.\+Task\+Base.\+Title\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task}{Step\+Bro.\+Core.\+Tasks.\+ITask}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Tasks/Task\+Base.\+cs\end{DoxyCompactItemize}

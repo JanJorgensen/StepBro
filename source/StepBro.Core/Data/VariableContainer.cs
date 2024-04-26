@@ -131,6 +131,16 @@ namespace StepBro.Core.Data
             m_uniqueID = VariableContainer.GetIdentifier();
         }
 
+        protected override void DoDispose(bool disposing)
+        {
+            base.DoDispose(disposing);
+
+            if (m_value is IDisposable v)
+            {
+                v.Dispose();
+            }
+        }
+
         public static IValueContainerOwnerAccess Create(string @namespace, string name, TypeReference declaredType, T value, bool readOnly)
         {
             var container = new VariableContainer<T>(@namespace, name, declaredType, value, readOnly);

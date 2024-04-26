@@ -318,8 +318,8 @@ namespace StepBro.TestInterface
 
         protected override void DoDispose(bool disposing)
         {
-            Disconnect(null);
-            Stream = null;
+            this.Close(null);
+            this.Stream = null;
             if (m_asyncLogLineReader != null)
             {
                 m_asyncLogLineReader = null;
@@ -446,7 +446,10 @@ namespace StepBro.TestInterface
                 m_stopReceiver = true;
                 m_receiverTask.Wait();      // Important, to avoid having two running tasks if connecting again soon. 
             }
-            m_stream.Close(context);
+            if (m_stream != null)
+            {
+                m_stream.Close(context);
+            }
             m_receiverTask = null;
             return true;
         }

@@ -1,0 +1,230 @@
+\doxysection{Step\+Bro.\+Workbench.\+Main\+View\+Model Class Reference}
+\hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model}{}\label{class_step_bro_1_1_workbench_1_1_main_view_model}\index{StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}}
+
+
+Represents the main view-\/model.  
+
+
+Inheritance diagram for Step\+Bro.\+Workbench.\+Main\+View\+Model\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_workbench_1_1_main_view_model}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_ac4eb643aa4a569f0564632db5909954c}\label{class_step_bro_1_1_workbench_1_1_main_view_model_ac4eb643aa4a569f0564632db5909954c} 
+{\bfseries Main\+View\+Model} ()
+\begin{DoxyCompactList}\small\item\em Initializes a new instance of the Main\+View\+Model class. \end{DoxyCompactList}\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_acfd1af1a345f9774c07dc2604a8e22b3}\label{class_step_bro_1_1_workbench_1_1_main_view_model_acfd1af1a345f9774c07dc2604a8e22b3} 
+void {\bfseries Log\+User\+Action} (string text)
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_af5bc14024fdad79934c9d6a4c27f1ca7}\label{class_step_bro_1_1_workbench_1_1_main_view_model_af5bc14024fdad79934c9d6a4c27f1ca7} 
+Tuple$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{IFile\+Element}}, string $>$ {\bfseries Get\+Execution\+Target} ()
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a07db0fea0e18a8d12f85e00a0e224344}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a07db0fea0e18a8d12f85e00a0e224344} 
+void {\bfseries Set\+Selected\+Document} (\mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_document_item_view_model}{Document\+Item\+View\+Model}} doc)
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_main_view_model_a634ff0d0e797ce026037ed588115ee61}{Create\+New\+Text\+Document}} (bool activate, string name\+Formatting=\"{}Document\{0\}.txt\"{}, string initial\+Text=\"{}$<$text document$>$\"{})
+\begin{DoxyCompactList}\small\item\em Creates a new text document. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file}{IScript\+File}} \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_main_view_model_a5a63ed68845ab71ea3c2ad9bf9690de9}{Create\+New\+Step\+Bro\+Document}} (bool activate, string name\+Formatting=\"{}Script\{0\}.sbs\"{}, string initial\+Text=null)
+\begin{DoxyCompactList}\small\item\em Creates a new \doxylink{namespace_step_bro}{Step\+Bro} script. \end{DoxyCompactList}\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a69e991946dd8304c1998b20b17542e3e}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a69e991946dd8304c1998b20b17542e3e} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file}{IScript\+File}} {\bfseries Load\+Script\+File} (string filepath)
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_acd41e56c2ccb2bfa85280990a488f323}\label{class_step_bro_1_1_workbench_1_1_main_view_model_acd41e56c2ccb2bfa85280990a488f323} 
+\mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_text_document_item_view_model}{Text\+Document\+Item\+View\+Model}} {\bfseries Open\+Document\+Window} (string filepath, bool activate)
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a43e0064737b9b4feba2891785253dcf8}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a43e0064737b9b4feba2891785253dcf8} 
+void {\bfseries Show\+Errors\+Tool} (bool activate)
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a7aa3d0f402f0828bc4add26d99451935}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a7aa3d0f402f0828bc4add26d99451935} 
+void {\bfseries Show\+Output\+Tool} (bool activate)
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a0896e0206794bd228d36be7a36eb6411}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a0896e0206794bd228d36be7a36eb6411} 
+void {\bfseries Show\+Calculator\+Tool} (bool activate)
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a85ef2fb91e1d7c2795833996773a17c8}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a85ef2fb91e1d7c2795833996773a17c8} 
+void {\bfseries Create\+Custom\+Panel} (bool activate)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a4dd61298b166381b5d564bfa87cebb94}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a4dd61298b166381b5d564bfa87cebb94} 
+string {\bfseries Application\+State\+Message}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+IList$<$ \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_document_item_view_model}{Document\+Item\+View\+Model}} $>$ \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_main_view_model_a1fa84dc24fc3b6d3c5b2d02af84b5823}{Document\+Items}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets the document items associated with this view-\/model. \end{DoxyCompactList}\item 
+IList$<$ \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tool_item_view_model}{Tool\+Item\+View\+Model}} $>$ \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_main_view_model_ad8d29d244e1a4983465e7d9c460fa078}{Tool\+Items}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets the tool items associated with this view-\/model. \end{DoxyCompactList}\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a984cebc4f755f502b15ebe723c7b2646}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a984cebc4f755f502b15ebe723c7b2646} 
+IList$<$ \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_create_custom_panel_menu_item_view_model}{Create\+Custom\+Panel\+Menu\+Item\+View\+Model}} $>$ {\bfseries Createable\+Custom\+Panel\+Menu\+Items}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a711e37a31fbc243df03dcd2f3768b9d9}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a711e37a31fbc243df03dcd2f3768b9d9} 
+bool {\bfseries File\+Parsing\+Running}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_aef295ca7dc3bc067c96e94fe10578285}\label{class_step_bro_1_1_workbench_1_1_main_view_model_aef295ca7dc3bc067c96e94fe10578285} 
+string {\bfseries Execution\+Target}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a4f2bbae6eb147eb4b8a3617e1b4301a6}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a4f2bbae6eb147eb4b8a3617e1b4301a6} 
+string {\bfseries Last\+Calculator\+Result}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a3af090ba405b8c799222e5b3f56f3244}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a3af090ba405b8c799222e5b3f56f3244} 
+string {\bfseries Caret\+Line}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_ae08751e6142f7fcd12fee3eb1264091e}\label{class_step_bro_1_1_workbench_1_1_main_view_model_ae08751e6142f7fcd12fee3eb1264091e} 
+string {\bfseries Caret\+Character}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a6443bc9bcfac4488543e470db0a5d28a}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a6443bc9bcfac4488543e470db0a5d28a} 
+string {\bfseries Caret\+Display\+Char\+Column}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+ICommand \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_main_view_model_ae7f02c46b0b721b4b55032164f3ade04}{Create\+New\+Text\+Document\+Command}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets the create new text document command. \end{DoxyCompactList}\item 
+ICommand \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_main_view_model_a4af664b892abd3ba872c99c2abaa0b9f}{Create\+New\+Step\+Bro\+Document\+Command}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets the create new text document command. \end{DoxyCompactList}\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a2941d74f31668bcacb43fac79ac21194}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a2941d74f31668bcacb43fac79ac21194} 
+ICommand {\bfseries Show\+Errors\+View\+Command}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a2cd8566e81aed157e6d940313b744beb}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a2cd8566e81aed157e6d940313b744beb} 
+ICommand {\bfseries Show\+Output\+View\+Command}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_ae61593bc54642f5ddbab4489f41802e4}\label{class_step_bro_1_1_workbench_1_1_main_view_model_ae61593bc54642f5ddbab4489f41802e4} 
+ICommand {\bfseries Show\+Calculator\+Tool\+Command}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+ICommand \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_main_view_model_a471a1120856822cc89c689f06ec616bd}{Select\+First\+Document\+Command}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets the select first document command. \end{DoxyCompactList}\item 
+ICommand \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_main_view_model_a348dd3c84eb8f135cf8b7e51452eadfe}{Activate\+Next\+Document\+Command}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets the activate next document command. \end{DoxyCompactList}\item 
+ICommand \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_main_view_model_a991c7ec5dabea94e0e30e7ed283823cb}{Close\+Active\+Document\+Command}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets the close active document command. \end{DoxyCompactList}\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a4582c024f18b672d37cda8629832a283}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a4582c024f18b672d37cda8629832a283} 
+ICommand {\bfseries Parse\+All\+Files\+Command}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_aa9af0f4cdd0fcdd054992bb2cddae509}\label{class_step_bro_1_1_workbench_1_1_main_view_model_aa9af0f4cdd0fcdd054992bb2cddae509} 
+ICommand {\bfseries Start\+Or\+Continue\+Execution\+Command}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a08f6c634c51878f5f4cab3e21d6ff18a}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a08f6c634c51878f5f4cab3e21d6ff18a} 
+ICommand {\bfseries Start\+Execution\+Of\+Selected\+File\+Element\+Command}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Represents the main view-\/model. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a5a63ed68845ab71ea3c2ad9bf9690de9}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a5a63ed68845ab71ea3c2ad9bf9690de9} 
+\index{StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}!CreateNewStepBroDocument@{CreateNewStepBroDocument}}
+\index{CreateNewStepBroDocument@{CreateNewStepBroDocument}!StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}}
+\doxysubsubsection{\texorpdfstring{CreateNewStepBroDocument()}{CreateNewStepBroDocument()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file}{IScript\+File}} Step\+Bro.\+Workbench.\+Main\+View\+Model.\+Create\+New\+Step\+Bro\+Document (\begin{DoxyParamCaption}\item[{bool}]{activate,  }\item[{string}]{name\+Formatting = {\ttfamily \"{}Script\{0\}.sbs\"{}},  }\item[{string}]{initial\+Text = {\ttfamily null} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Creates a new \doxylink{namespace_step_bro}{Step\+Bro} script. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em activate} & Whether to activate the document.\\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a634ff0d0e797ce026037ed588115ee61}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a634ff0d0e797ce026037ed588115ee61} 
+\index{StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}!CreateNewTextDocument@{CreateNewTextDocument}}
+\index{CreateNewTextDocument@{CreateNewTextDocument}!StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}}
+\doxysubsubsection{\texorpdfstring{CreateNewTextDocument()}{CreateNewTextDocument()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} Step\+Bro.\+Workbench.\+Main\+View\+Model.\+Create\+New\+Text\+Document (\begin{DoxyParamCaption}\item[{bool}]{activate,  }\item[{string}]{name\+Formatting = {\ttfamily \"{}Document\{0\}.txt\"{}},  }\item[{string}]{initial\+Text = {\ttfamily \"{}$<$text~document$>$\"{}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Creates a new text document. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em activate} & Whether to activate the document.\\
+\hline
+{\em name\+Formatting} & A \begin{DoxySeeAlso}{See also}
+string.\+Format
+
+
+\end{DoxySeeAlso}
+text to use for generating the file name.\\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a348dd3c84eb8f135cf8b7e51452eadfe}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a348dd3c84eb8f135cf8b7e51452eadfe} 
+\index{StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}!ActivateNextDocumentCommand@{ActivateNextDocumentCommand}}
+\index{ActivateNextDocumentCommand@{ActivateNextDocumentCommand}!StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}}
+\doxysubsubsection{\texorpdfstring{ActivateNextDocumentCommand}{ActivateNextDocumentCommand}}
+{\footnotesize\ttfamily ICommand Step\+Bro.\+Workbench.\+Main\+View\+Model.\+Activate\+Next\+Document\+Command\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Gets the activate next document command. 
+
+The activate next document command.\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a991c7ec5dabea94e0e30e7ed283823cb}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a991c7ec5dabea94e0e30e7ed283823cb} 
+\index{StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}!CloseActiveDocumentCommand@{CloseActiveDocumentCommand}}
+\index{CloseActiveDocumentCommand@{CloseActiveDocumentCommand}!StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}}
+\doxysubsubsection{\texorpdfstring{CloseActiveDocumentCommand}{CloseActiveDocumentCommand}}
+{\footnotesize\ttfamily ICommand Step\+Bro.\+Workbench.\+Main\+View\+Model.\+Close\+Active\+Document\+Command\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Gets the close active document command. 
+
+The close active document command.\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a4af664b892abd3ba872c99c2abaa0b9f}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a4af664b892abd3ba872c99c2abaa0b9f} 
+\index{StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}!CreateNewStepBroDocumentCommand@{CreateNewStepBroDocumentCommand}}
+\index{CreateNewStepBroDocumentCommand@{CreateNewStepBroDocumentCommand}!StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}}
+\doxysubsubsection{\texorpdfstring{CreateNewStepBroDocumentCommand}{CreateNewStepBroDocumentCommand}}
+{\footnotesize\ttfamily ICommand Step\+Bro.\+Workbench.\+Main\+View\+Model.\+Create\+New\+Step\+Bro\+Document\+Command\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Gets the create new text document command. 
+
+The create new text document command.\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_ae7f02c46b0b721b4b55032164f3ade04}\label{class_step_bro_1_1_workbench_1_1_main_view_model_ae7f02c46b0b721b4b55032164f3ade04} 
+\index{StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}!CreateNewTextDocumentCommand@{CreateNewTextDocumentCommand}}
+\index{CreateNewTextDocumentCommand@{CreateNewTextDocumentCommand}!StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}}
+\doxysubsubsection{\texorpdfstring{CreateNewTextDocumentCommand}{CreateNewTextDocumentCommand}}
+{\footnotesize\ttfamily ICommand Step\+Bro.\+Workbench.\+Main\+View\+Model.\+Create\+New\+Text\+Document\+Command\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Gets the create new text document command. 
+
+The create new text document command.\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a1fa84dc24fc3b6d3c5b2d02af84b5823}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a1fa84dc24fc3b6d3c5b2d02af84b5823} 
+\index{StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}!DocumentItems@{DocumentItems}}
+\index{DocumentItems@{DocumentItems}!StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}}
+\doxysubsubsection{\texorpdfstring{DocumentItems}{DocumentItems}}
+{\footnotesize\ttfamily IList$<$\mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_document_item_view_model}{Document\+Item\+View\+Model}}$>$ Step\+Bro.\+Workbench.\+Main\+View\+Model.\+Document\+Items\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Gets the document items associated with this view-\/model. 
+
+The document items associated with this view-\/model.\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_a471a1120856822cc89c689f06ec616bd}\label{class_step_bro_1_1_workbench_1_1_main_view_model_a471a1120856822cc89c689f06ec616bd} 
+\index{StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}!SelectFirstDocumentCommand@{SelectFirstDocumentCommand}}
+\index{SelectFirstDocumentCommand@{SelectFirstDocumentCommand}!StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}}
+\doxysubsubsection{\texorpdfstring{SelectFirstDocumentCommand}{SelectFirstDocumentCommand}}
+{\footnotesize\ttfamily ICommand Step\+Bro.\+Workbench.\+Main\+View\+Model.\+Select\+First\+Document\+Command\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Gets the select first document command. 
+
+The select first document command.\Hypertarget{class_step_bro_1_1_workbench_1_1_main_view_model_ad8d29d244e1a4983465e7d9c460fa078}\label{class_step_bro_1_1_workbench_1_1_main_view_model_ad8d29d244e1a4983465e7d9c460fa078} 
+\index{StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}!ToolItems@{ToolItems}}
+\index{ToolItems@{ToolItems}!StepBro.Workbench.MainViewModel@{StepBro.Workbench.MainViewModel}}
+\doxysubsubsection{\texorpdfstring{ToolItems}{ToolItems}}
+{\footnotesize\ttfamily IList$<$\mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tool_item_view_model}{Tool\+Item\+View\+Model}}$>$ Step\+Bro.\+Workbench.\+Main\+View\+Model.\+Tool\+Items\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Gets the tool items associated with this view-\/model. 
+
+The tool items associated with this view-\/model.
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Workbench.\+WPF/Main\+View\+Model.\+cs\end{DoxyCompactItemize}

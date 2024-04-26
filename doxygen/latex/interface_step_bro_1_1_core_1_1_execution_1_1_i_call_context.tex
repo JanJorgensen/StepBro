@@ -1,0 +1,194 @@
+\doxysection{Step\+Bro.\+Core.\+Execution.\+ICall\+Context Interface Reference}
+\hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}\index{StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}}
+
+
+Context interface to allow code module methods to access functionality from the script execution and the \doxylink{namespace_step_bro}{Step\+Bro} system.  
+
+
+Inheritance diagram for Step\+Bro.\+Core.\+Execution.\+ICall\+Context\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_abecbe76905f19f7b6a6619a2c5b16453}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_abecbe76905f19f7b6a6619a2c5b16453} 
+bool {\bfseries Report\+Parsing\+Error} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_error_i_d}{Error\+ID}} error=null, string description=\"{}\"{}, Exception exception=null)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_afb33ab6dadcce1c30c365753599608dd}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_afb33ab6dadcce1c30c365753599608dd} 
+void {\bfseries Report\+Failure} (string failure\+Description, \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_error_i_d}{Error\+ID}} id=null)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a9fce104ece4ecf6b9a5498eef1977663}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a9fce104ece4ecf6b9a5498eef1977663} 
+void {\bfseries Report\+Error} (string error\+Description, \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_error_i_d}{Error\+ID}} id=null, Exception exception=null)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a0856d3c844da18446f66ab45e2044955}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a0856d3c844da18446f66ab45e2044955} 
+void {\bfseries Report\+Expect\+Result} (string title, string expected, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_data_afaa5659617470a47a35fa5022b980aa1}{Verdict}} verdict)
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_abfaae4c87877f18d91fa10938d4fbc78}{Enter\+New\+Context}} (string location, bool separate\+State\+Level)
+\begin{DoxyCompactList}\small\item\em Creates a new named call context. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a86eb76f5247d841ce1fe91a732388840}{Stop\+Requested}} ()
+\begin{DoxyCompactList}\small\item\em Indicates whether the user or the host application has requested to stop the script execution. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcuts_source}{Step\+Bro.\+Core.\+File.\+IFolder\+Shortcuts\+Source}}}
+\begin{DoxyCompactItemize}
+\item 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcut}{IFolder\+Shortcut}} $>$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcuts_source_a61afb4ec996cabe10d0c634c17eb1ca8}{List\+Shortcuts}} ()
+\begin{DoxyCompactList}\small\item\em The list of folder shortcuts defined in the environment (OS), the host application, the configuration and the current script file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778d}{Call\+Entry}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a7260367d3fb84dfd7da51b381e9467ec}{Current\+Call\+Entry}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets an indication whether the current method has been called earlier from the the same script line. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_host_1_1_i_host}{IHost}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_ae73894c03c381b38cdde61d403c5feeb}{Host\+Application}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets a reference to an object representing the host application. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a874910a843a9aacea1ab659f8d599501}{Logger}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Interface to the logger to use in the current context. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_ab36f1834e1bc96982aaf99f4e12fbded}{Logging\+Enabled}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates whether normal logging is enabled in the current context. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update}{IExecution\+Scope\+Status\+Update}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a4be2df45c5b45b17bb177eca72073e8a}{Status\+Updater}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Interface to the status update for the current context. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_aa612c84451a6e76406d6143a4baabf4f}{Debug\+Break\+Is\+Set}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates user wish to break debugging inside the called code module method. \end{DoxyCompactList}\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_ac946b4dd68515e61d6b7cedb473872f0}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_ac946b4dd68515e61d6b7cedb473872f0} 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_tasks_1_1_task_manager}{Task\+Manager}} {\bfseries Task\+Manager}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Context interface to allow code module methods to access functionality from the script execution and the \doxylink{namespace_step_bro}{Step\+Bro} system. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_abfaae4c87877f18d91fa10938d4fbc78}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_abfaae4c87877f18d91fa10938d4fbc78} 
+\index{StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}!EnterNewContext@{EnterNewContext}}
+\index{EnterNewContext@{EnterNewContext}!StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}}
+\doxysubsubsection{\texorpdfstring{EnterNewContext()}{EnterNewContext()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} Step\+Bro.\+Core.\+Execution.\+ICall\+Context.\+Enter\+New\+Context (\begin{DoxyParamCaption}\item[{string}]{location,  }\item[{bool}]{separate\+State\+Level }\end{DoxyParamCaption})}
+
+
+
+Creates a new named call context. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em location} & A descriptive identification of the static or dynamic location of the entered context/scope.\\
+\hline
+{\em separate\+State\+Level} & Whether the new context should be displayed in a new progress/state level./\\
+\hline
+\end{DoxyParams}
+
+
+The new call context must be disposed upon exit of the context scope.
+
+\begin{DoxyReturn}{Returns}
+Reference to a new call context object.
+\end{DoxyReturn}
+
+
+Implemented in \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_a6be6652cb8765c4a2571cf824efda468}{Module\+Test\+Support.\+Console\+Call\+Context}}.
+
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a86eb76f5247d841ce1fe91a732388840}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a86eb76f5247d841ce1fe91a732388840} 
+\index{StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}!StopRequested@{StopRequested}}
+\index{StopRequested@{StopRequested}!StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}}
+\doxysubsubsection{\texorpdfstring{StopRequested()}{StopRequested()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+Execution.\+ICall\+Context.\+Stop\+Requested (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Indicates whether the user or the host application has requested to stop the script execution. 
+
+\begin{DoxyReturn}{Returns}
+Whether to stop execution.
+\end{DoxyReturn}
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a7260367d3fb84dfd7da51b381e9467ec}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a7260367d3fb84dfd7da51b381e9467ec} 
+\index{StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}!CurrentCallEntry@{CurrentCallEntry}}
+\index{CurrentCallEntry@{CurrentCallEntry}!StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}}
+\doxysubsubsection{\texorpdfstring{CurrentCallEntry}{CurrentCallEntry}}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778d}{Call\+Entry}} Step\+Bro.\+Core.\+Execution.\+ICall\+Context.\+Current\+Call\+Entry\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Gets an indication whether the current method has been called earlier from the the same script line. 
+
+
+
+Implemented in \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_aef078ce7e1cc1d9bcec30465f9fa398c}{Module\+Test\+Support.\+Console\+Call\+Context}}.
+
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_aa612c84451a6e76406d6143a4baabf4f}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_aa612c84451a6e76406d6143a4baabf4f} 
+\index{StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}!DebugBreakIsSet@{DebugBreakIsSet}}
+\index{DebugBreakIsSet@{DebugBreakIsSet}!StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}}
+\doxysubsubsection{\texorpdfstring{DebugBreakIsSet}{DebugBreakIsSet}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+Execution.\+ICall\+Context.\+Debug\+Break\+Is\+Set\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Indicates user wish to break debugging inside the called code module method. 
+
+To use this flag, the user must attach a dot net debugger to the \doxylink{namespace_step_bro}{Step\+Bro} host application.
+
+Implemented in \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_a696f06804f5b3db3b157270f07ed2dc0}{Module\+Test\+Support.\+Console\+Call\+Context}}.
+
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_ae73894c03c381b38cdde61d403c5feeb}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_ae73894c03c381b38cdde61d403c5feeb} 
+\index{StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}!HostApplication@{HostApplication}}
+\index{HostApplication@{HostApplication}!StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}}
+\doxysubsubsection{\texorpdfstring{HostApplication}{HostApplication}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_host_1_1_i_host}{IHost}} Step\+Bro.\+Core.\+Execution.\+ICall\+Context.\+Host\+Application\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Gets a reference to an object representing the host application. 
+
+
+
+Implemented in \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_ac8ff0d50d72d5de967e31a81ebfc1e83}{Module\+Test\+Support.\+Console\+Call\+Context}}.
+
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a874910a843a9aacea1ab659f8d599501}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a874910a843a9aacea1ab659f8d599501} 
+\index{StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}!Logger@{Logger}}
+\index{Logger@{Logger}!StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}}
+\doxysubsubsection{\texorpdfstring{Logger}{Logger}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} Step\+Bro.\+Core.\+Execution.\+ICall\+Context.\+Logger\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Interface to the logger to use in the current context. 
+
+
+
+Implemented in \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_a1dcbffc360043a10bbf95037e16469d2}{Module\+Test\+Support.\+Console\+Call\+Context}}.
+
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_ab36f1834e1bc96982aaf99f4e12fbded}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_ab36f1834e1bc96982aaf99f4e12fbded} 
+\index{StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}!LoggingEnabled@{LoggingEnabled}}
+\index{LoggingEnabled@{LoggingEnabled}!StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}}
+\doxysubsubsection{\texorpdfstring{LoggingEnabled}{LoggingEnabled}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+Execution.\+ICall\+Context.\+Logging\+Enabled\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Indicates whether normal logging is enabled in the current context. 
+
+
+
+Implemented in \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_acd9deff709cf9ce0dac79c505c3c9ebd}{Module\+Test\+Support.\+Console\+Call\+Context}}.
+
+\Hypertarget{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a4be2df45c5b45b17bb177eca72073e8a}\label{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a4be2df45c5b45b17bb177eca72073e8a} 
+\index{StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}!StatusUpdater@{StatusUpdater}}
+\index{StatusUpdater@{StatusUpdater}!StepBro.Core.Execution.ICallContext@{StepBro.Core.Execution.ICallContext}}
+\doxysubsubsection{\texorpdfstring{StatusUpdater}{StatusUpdater}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update}{IExecution\+Scope\+Status\+Update}} Step\+Bro.\+Core.\+Execution.\+ICall\+Context.\+Status\+Updater\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Interface to the status update for the current context. 
+
+
+
+Implemented in \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_a721e879c913d6c85cd819698896836ea}{Module\+Test\+Support.\+Console\+Call\+Context}}.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Execution/ICall\+Context.\+cs\end{DoxyCompactItemize}

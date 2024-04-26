@@ -16,7 +16,7 @@ namespace StepBro.UI.WinForms.PanelElements
     public partial class ProcedureActivationButton : PanelElementBase
     {
         private enum Mode { ActivateOnClick = 0, ClickToStop, RunWhilePushed }
-        private ProcedureActivationInfo m_startProcedure;
+        private ActivationInfo m_startProcedure;
         //private ProcedureActivationInfo m_stopProcedure;
         //private ProcedureActivationInfo m_enabledCheckProcedure;
         private Mode m_mode = Mode.ActivateOnClick;
@@ -55,15 +55,15 @@ namespace StepBro.UI.WinForms.PanelElements
                     {
                         if (m_startProcedure == null)
                         {
-                            m_startProcedure = new ProcedureActivationInfo();
+                            m_startProcedure = new ActivationInfo();
                         }
-                        m_startProcedure.Name = valueField.ValueAsString();
+                        m_startProcedure.FileElementName = valueField.ValueAsString();
                     }
                     else if (valueField.Name == "Model" || valueField.Name == "Partner")
                     {
                         if (m_startProcedure == null)
                         {
-                            m_startProcedure = new ProcedureActivationInfo();
+                            m_startProcedure = new ActivationInfo();
                         }
                         m_startProcedure.Partner = valueField.ValueAsString();
                     }
@@ -97,7 +97,7 @@ namespace StepBro.UI.WinForms.PanelElements
                 m_buttonColorNormal = checkBox.BackColor;
                 checkBox.BackColor = Color.Orange;
             }
-            m_execution = this.CoreAccess.StartExecution(m_startProcedure.Name, m_startProcedure.Partner, null, null);
+            m_execution = this.CoreAccess.StartExecution(m_startProcedure.FileElementName, m_startProcedure.Partner, null, null);
             m_execution.CurrentStateChanged += Execution_CurrentStateChanged;
             System.Diagnostics.Debug.WriteLine("StartProcedure End");
         }

@@ -1,0 +1,94 @@
+\doxysection{Step\+Bro.\+Core.\+General.\+ILoaded\+File Interface Reference}
+\hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}\index{StepBro.Core.General.ILoadedFile@{StepBro.Core.General.ILoadedFile}}
+Inheritance diagram for Step\+Bro.\+Core.\+General.\+ILoaded\+File\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a2cc5c8f7edd40eb9f1143f1d7d62b760}{Register\+Dependant}} (object using\+Object)
+\begin{DoxyCompactList}\small\item\em Registers an object as a dependant. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a3c0579698feb0b8ba635a491f4843421}{Is\+Dependant\+Of}} (object @object)
+\begin{DoxyCompactList}\small\item\em Returns whether the specified object is in the list of dependants. \end{DoxyCompactList}\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a8389febdaca0e8eeb4e271325df727cd}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a8389febdaca0e8eeb4e271325df727cd} 
+bool {\bfseries Unregister\+Dependant} (object using\+Object, bool throw\+If\+Not\+Found=true)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a1ef649456405b0878adaa75845cae0e0}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a1ef649456405b0878adaa75845cae0e0} 
+IEnumerable$<$ string $>$ {\bfseries List\+Dependant\+Descriptors} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a300c19eef49e90f54c82b27686d146e3}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a300c19eef49e90f54c82b27686d146e3} 
+string {\bfseries File\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a4465f37b8df985da82e4a52e7285f319}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a4465f37b8df985da82e4a52e7285f319} 
+string {\bfseries File\+Path}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_ae25420da51d267740d2dad8c81e9e135}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_ae25420da51d267740d2dad8c81e9e135} 
+Loaded\+File\+Type {\bfseries Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a8ad6b9fb0a1e9f2f69f0f51e41c0e520}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a8ad6b9fb0a1e9f2f69f0f51e41c0e520} 
+int {\bfseries Unique\+ID}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a268327fdca18e35c8715805a6f3c11d2}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a268327fdca18e35c8715805a6f3c11d2} 
+string {\bfseries Off\+Disk\+File\+Content}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a66e4e7214c1ae34894ca66c00d325b88}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a66e4e7214c1ae34894ca66c00d325b88} 
+int {\bfseries Registered\+Dependants\+Count}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a3c0579698feb0b8ba635a491f4843421}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a3c0579698feb0b8ba635a491f4843421} 
+\index{StepBro.Core.General.ILoadedFile@{StepBro.Core.General.ILoadedFile}!IsDependantOf@{IsDependantOf}}
+\index{IsDependantOf@{IsDependantOf}!StepBro.Core.General.ILoadedFile@{StepBro.Core.General.ILoadedFile}}
+\doxysubsubsection{\texorpdfstring{IsDependantOf()}{IsDependantOf()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+General.\+ILoaded\+File.\+Is\+Dependant\+Of (\begin{DoxyParamCaption}\item[{object @}]{object }\end{DoxyParamCaption})}
+
+
+
+Returns whether the specified object is in the list of dependants. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em object} & The object to check for dependency.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_aacf7aa0ec099628e2e4144d94e452553}{Step\+Bro.\+Core.\+General.\+Loaded\+File\+Base}}.
+
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a2cc5c8f7edd40eb9f1143f1d7d62b760}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a2cc5c8f7edd40eb9f1143f1d7d62b760} 
+\index{StepBro.Core.General.ILoadedFile@{StepBro.Core.General.ILoadedFile}!RegisterDependant@{RegisterDependant}}
+\index{RegisterDependant@{RegisterDependant}!StepBro.Core.General.ILoadedFile@{StepBro.Core.General.ILoadedFile}}
+\doxysubsubsection{\texorpdfstring{RegisterDependant()}{RegisterDependant()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+General.\+ILoaded\+File.\+Register\+Dependant (\begin{DoxyParamCaption}\item[{object}]{using\+Object }\end{DoxyParamCaption})}
+
+
+
+Registers an object as a dependant. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em using\+Object} & The dependant object \"{}using\"{} the file.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether the {\itshape using\+Object}  is already registered.
+\end{DoxyReturn}
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a6f0c865afd8769c8682ebc990df2f559}{Step\+Bro.\+Core.\+General.\+Loaded\+File\+Base}}.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+General/ILoaded\+File.\+cs\end{DoxyCompactItemize}

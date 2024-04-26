@@ -1,0 +1,63 @@
+\doxysection{Step\+Bro.\+Core.\+Tasks.\+ITask\+State\+Reporting Interface Reference}
+\hypertarget{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting}{}\label{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting}\index{StepBro.Core.Tasks.ITaskStateReporting@{StepBro.Core.Tasks.ITaskStateReporting}}
+Inheritance diagram for Step\+Bro.\+Core.\+Tasks.\+ITask\+State\+Reporting\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.326870cm]{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_af732e12dfea6ded5a4e8e01563c5cb62}\label{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_af732e12dfea6ded5a4e8e01563c5cb62} 
+void {\bfseries Progress\+Setup} (long start, long length, Func$<$ long, string $>$ to\+Text)
+\item 
+void \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_af3d1c75d16c6ff1036ad6dc787a03f6b}{Update\+Status}} (string text=null, long progress=-\/1)
+\begin{DoxyCompactList}\small\item\em Sets the status text for the context. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_a3d19eb95902f53b2947a2ef722f3dc77}{Progress\+Alive\+Signal}} ()
+\begin{DoxyCompactList}\small\item\em Indicates the current running task is still alive. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_a3d19eb95902f53b2947a2ef722f3dc77}\label{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_a3d19eb95902f53b2947a2ef722f3dc77} 
+\index{StepBro.Core.Tasks.ITaskStateReporting@{StepBro.Core.Tasks.ITaskStateReporting}!ProgressAliveSignal@{ProgressAliveSignal}}
+\index{ProgressAliveSignal@{ProgressAliveSignal}!StepBro.Core.Tasks.ITaskStateReporting@{StepBro.Core.Tasks.ITaskStateReporting}}
+\doxysubsubsection{\texorpdfstring{ProgressAliveSignal()}{ProgressAliveSignal()}}
+{\footnotesize\ttfamily void Step\+Bro.\+Core.\+Tasks.\+ITask\+State\+Reporting.\+Progress\+Alive\+Signal (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Indicates the current running task is still alive. 
+
+remarks\texorpdfstring{$>$}{>}The status text is not changed.
+
+Implemented in \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a0b0ca7dac1f759fcda2febe3b4bf5a67}{Step\+Bro\+Core\+Test.\+Mocks.\+Execution\+Scope\+Status\+Updater\+Mock}}, and \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_abcdd64584222dd27155d93a0cd065c8e}{Step\+Bro\+Core\+Test.\+Mocks.\+Task\+Context\+Mock}}.
+
+\Hypertarget{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_af3d1c75d16c6ff1036ad6dc787a03f6b}\label{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_af3d1c75d16c6ff1036ad6dc787a03f6b} 
+\index{StepBro.Core.Tasks.ITaskStateReporting@{StepBro.Core.Tasks.ITaskStateReporting}!UpdateStatus@{UpdateStatus}}
+\index{UpdateStatus@{UpdateStatus}!StepBro.Core.Tasks.ITaskStateReporting@{StepBro.Core.Tasks.ITaskStateReporting}}
+\doxysubsubsection{\texorpdfstring{UpdateStatus()}{UpdateStatus()}}
+{\footnotesize\ttfamily void Step\+Bro.\+Core.\+Tasks.\+ITask\+State\+Reporting.\+Update\+Status (\begin{DoxyParamCaption}\item[{string}]{text = {\ttfamily null},  }\item[{long}]{progress = {\ttfamily -\/1} }\end{DoxyParamCaption})}
+
+
+
+Sets the status text for the context. 
+
+If progress is set, the progress will be closed.
+
+
+\begin{DoxyParams}{Parameters}
+{\em text} & State text to show to the user.\\
+\hline
+{\em progress} & Current progress value.\\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_execution_scope_status_updater_mock_a51a085a436f3a65861afd70c54c4367b}{Step\+Bro\+Core\+Test.\+Mocks.\+Execution\+Scope\+Status\+Updater\+Mock}}, and \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_a74a7799e861ca4ef786ee39a4c7bfac3}{Step\+Bro\+Core\+Test.\+Mocks.\+Task\+Context\+Mock}}.
+
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Tasks/ITask\+State\+Reporting.\+cs\end{DoxyCompactItemize}

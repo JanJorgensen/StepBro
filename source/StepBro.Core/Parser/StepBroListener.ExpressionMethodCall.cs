@@ -694,6 +694,7 @@ namespace StepBro.Core.Parser
                                     }
                                     if (m_callAssignmentTarget != null)
                                     {
+                                        callMethod = SBExpressionData.NarrowGetValueTypeByConverting(callMethod, callMethod.Type); 
                                         callMethod = Expression.Assign(m_callAssignmentTarget.ExpressionCode, callMethod);
                                     }
 
@@ -744,7 +745,7 @@ namespace StepBro.Core.Parser
             ThisReference,
             Mandatory,
             Named,
-            ArgumentList,
+            //ArgumentList,
             Params,
             NoArguments
         }
@@ -866,9 +867,45 @@ namespace StepBro.Core.Parser
 
                 if (state == ArgumentInsertState.Mandatory)
                 {
-                    if (p.GetType() == typeof(ArgumentList))
+                    if (p.ParameterType == typeof(ArgumentList))
                     {
-                        state = ArgumentInsertState.ArgumentList;
+                        if (i < (parameters.Length - 1)) return 0;  // There are more parameters after the ArgumentList; that's not okay.
+                        var unnamed = new List<SBExpressionData>();
+                        var named = new List<SBExpressionData>();
+                        bool namedFound = false;
+                        while (argPicker.UnpickedCount > 0)
+                        {
+                            if (argPicker.Current.IsNamed) namedFound = true;
+                            if (!namedFound) unnamed.Add(argPicker.Pick());
+                            else
+                            {
+                                if (!argPicker.Current.IsNamed) return 0; // An unnamed after a named is not okay.
+                                named.Add(argPicker.Pick());
+                            }
+                        }
+
+                        Expression unnamedArray = Expression.Constant(null, typeof(object[]));
+                        Expression namedArray = Expression.Constant(null, typeof(NamedArgument[]));
+
+                        if (unnamed.Count > 0)
+                        {
+                            unnamedArray = Expression.NewArrayInit(typeof(object), unnamed.Select(ex => ex.ExpressionCode).ToArray());
+                        }
+                        if (named.Count > 0)
+                        {
+                            var ctor = typeof(NamedArgument).GetConstructor(new Type[] { typeof(string), typeof(object) });
+                            namedArray = Expression.NewArrayInit(
+                                typeof(NamedArgument),
+                                named.Select(ex => Expression.New(ctor, Expression.Constant(ex.ParameterName), Expression.Convert(ex.ExpressionCode, typeof(object)))).ToArray());
+                        }
+
+                        Expression listCreator = Expression.New(
+                            typeof(ArgumentList).GetConstructor(new Type[] { typeof(object[]), typeof(NamedArgument[]) }),
+                            unnamedArray,
+                            namedArray);
+                        suggestedAssignmentsOut.Add(new SBExpressionData(listCreator));
+
+                        return matchScore - (50 * 1);
                     }
                     else
                     {
@@ -882,6 +919,18 @@ namespace StepBro.Core.Parser
                             {
                                 // TODO: report error; unexpected that args before current are not picked.
                                 return 0;
+                            }
+                        }
+                        else if (argPicker.Current.IsUnknownIdentifier)
+                        {
+                            if (p.ParameterType.IsEnum)
+                            {
+                                throw new NotImplementedException("Handling of unknown enum literal or enum short-form not implemented.");
+                            }
+                            else if (p.ParameterType == typeof(Identifier))
+                            {
+                                var ctor = typeof(Identifier).GetConstructor(new Type[] { typeof(string) });
+                                suggestedAssignmentsOut.Add(new SBExpressionData(Expression.New(ctor, Expression.Constant((string)(argPicker.Pick().Value)))));
                             }
                         }
                         else if (IsParameterAssignableFromArgument(p, argPicker.Current))
@@ -909,6 +958,13 @@ namespace StepBro.Core.Parser
                         else if (argPicker.Current.DataType.IsInt() && (p.ParameterType == typeof(Double) || p.ParameterType == typeof(Single)))
                         {
                             suggestedAssignmentsOut.Add(new SBExpressionData(Expression.Convert(argPicker.Pick().ExpressionCode, p.ParameterType)));
+                            matchScore -= 20;    // Matching an integer is not as good as matching the exact same type.
+                            continue;   // next parameter
+                        }
+                        else if (argPicker.Current.DataType.Type == typeof(string) && p.ParameterType == typeof(Identifier))
+                        {
+                            suggestedAssignmentsOut.Add(
+                                new SBExpressionData(Expression.New(typeof(Identifier).GetConstructor(new Type[] { typeof(string) }), argPicker.Pick().ExpressionCode)));
                             matchScore -= 20;    // Matching an integer is not as good as matching the exact same type.
                             continue;   // next parameter
                         }
@@ -1221,9 +1277,13 @@ namespace StepBro.Core.Parser
                 if (argument.ReferencedType != SBExpressionType.LocalVariableReference) return false;   // TODO: report reason for rejection.
                 return (parameter.ParameterType == argument.DataType.Type);  // When it's a ByRef, the type must be exactly the same (I think).
             }
-            if (typeof(IValueContainer).IsAssignableFrom(argument.DataType.Type) && !typeof(IValueContainer).IsAssignableFrom(parameter.ParameterType))
+            if (argument.IsUnknownIdentifier)
             {
-                if (argument.DataType.Type.IsGenericType && 
+                return false;
+            }
+            else if (typeof(IValueContainer).IsAssignableFrom(argument.DataType.Type) && !typeof(IValueContainer).IsAssignableFrom(parameter.ParameterType))
+            {
+                if (argument.DataType.Type.IsGenericType &&
                     argument.DataType.Type.GetGenericTypeDefinition() == typeof(IValueContainer<>) &&
                     parameter.ParameterType.IsAssignableFrom(argument.DataType.Type.GenericTypeArguments[0]))
                 {

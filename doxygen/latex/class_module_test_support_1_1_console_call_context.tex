@@ -1,0 +1,244 @@
+\doxysection{Module\+Test\+Support.\+Console\+Call\+Context Class Reference}
+\hypertarget{class_module_test_support_1_1_console_call_context}{}\label{class_module_test_support_1_1_console_call_context}\index{ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}}
+Inheritance diagram for Module\+Test\+Support.\+Console\+Call\+Context\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.153846cm]{class_module_test_support_1_1_console_call_context}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_module_test_support_1_1_console_call_context_a7c65ca370ca6c85f42b2d37eb2e764c4}\label{class_module_test_support_1_1_console_call_context_a7c65ca370ca6c85f42b2d37eb2e764c4} 
+void {\bfseries Dispose} ()
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_a6be6652cb8765c4a2571cf824efda468}{Enter\+New\+Context}} (string short\+Description, bool separate\+State\+Level)
+\begin{DoxyCompactList}\small\item\em Creates a new named call context. \end{DoxyCompactList}\item 
+\Hypertarget{class_module_test_support_1_1_console_call_context_a27fb7c2486030b41414c340701a3d77c}\label{class_module_test_support_1_1_console_call_context_a27fb7c2486030b41414c340701a3d77c} 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcut}{IFolder\+Shortcut}} $>$ {\bfseries Get\+Folders} ()
+\item 
+\Hypertarget{class_module_test_support_1_1_console_call_context_ab427362f74d090c47a7f578e38b112b6}\label{class_module_test_support_1_1_console_call_context_ab427362f74d090c47a7f578e38b112b6} 
+bool {\bfseries Report\+Error} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_error_i_d}{Error\+ID}} error=null, string description=\"{}\"{}, Exception exception=null)
+\item 
+\Hypertarget{class_module_test_support_1_1_console_call_context_a9265b6a9e009bb5d0ef8bb3ee6335593}\label{class_module_test_support_1_1_console_call_context_a9265b6a9e009bb5d0ef8bb3ee6335593} 
+void {\bfseries Report\+Expect\+Result} (string title, string expected, string actual, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_data_afaa5659617470a47a35fa5022b980aa1}{Verdict}} verdict)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}}}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bfseries Report\+Parsing\+Error} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_error_i_d}{Error\+ID}} error=null, string description=\"{}\"{}, Exception exception=null)
+\item 
+void {\bfseries Report\+Failure} (string failure\+Description, \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_error_i_d}{Error\+ID}} id=null)
+\item 
+void {\bfseries Report\+Error} (string error\+Description, \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_error_i_d}{Error\+ID}} id=null, Exception exception=null)
+\item 
+void {\bfseries Report\+Expect\+Result} (string title, string expected, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_data_afaa5659617470a47a35fa5022b980aa1}{Verdict}} verdict)
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_abfaae4c87877f18d91fa10938d4fbc78}{Enter\+New\+Context}} (string location, bool separate\+State\+Level)
+\begin{DoxyCompactList}\small\item\em Creates a new named call context. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a86eb76f5247d841ce1fe91a732388840}{Stop\+Requested}} ()
+\begin{DoxyCompactList}\small\item\em Indicates whether the user or the host application has requested to stop the script execution. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcuts_source}{Step\+Bro.\+Core.\+File.\+IFolder\+Shortcuts\+Source}}}
+\begin{DoxyCompactItemize}
+\item 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcut}{IFolder\+Shortcut}} $>$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_file_1_1_i_folder_shortcuts_source_a61afb4ec996cabe10d0c634c17eb1ca8}{List\+Shortcuts}} ()
+\begin{DoxyCompactList}\small\item\em The list of folder shortcuts defined in the environment (OS), the host application, the configuration and the current script file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{Step\+Bro.\+Core.\+Logging.\+ILogger}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{ILogger\+Scope}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_a13b55f3f88fd44473ecf7dab17fc5e38}{Log\+Entering}} (string location, string text)
+\begin{DoxyCompactList}\small\item\em Enters a new logging scope that is a sub scope of this scope. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{ILogger\+Scope}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_ac19314e6d991bf3ba337c27a72fe2de7}{Create\+Sub\+Location}} (string name)
+\begin{DoxyCompactList}\small\item\em Create a new scope for a location, but without adding the entering to the log. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_log_entry}{ILog\+Entry}} {\bfseries Log} (string text)
+\item 
+void {\bfseries Log\+Detail} (string text)
+\item 
+void {\bfseries Log\+Async} (string text)
+\item 
+void {\bfseries Log\+Error} (string text)
+\item 
+void {\bfseries Log\+User\+Action} (string text)
+\item 
+void {\bfseries Log\+System} (string text)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778d}{Call\+Entry}} \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_aef078ce7e1cc1d9bcec30465f9fa398c}{Current\+Call\+Entry}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets an indication whether the current method has been called earlier from the the same script line. \end{DoxyCompactList}\item 
+\Hypertarget{class_module_test_support_1_1_console_call_context_aa5dbb08479af304f80783b6b5dd82a55}\label{class_module_test_support_1_1_console_call_context_aa5dbb08479af304f80783b6b5dd82a55} 
+int {\bfseries Current\+Test\+Step\+Index}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_module_test_support_1_1_console_call_context_a9e08a6e49322597da9d7d0eb93c5a742}\label{class_module_test_support_1_1_console_call_context_a9e08a6e49322597da9d7d0eb93c5a742} 
+string {\bfseries Current\+Test\+Step\+Title}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_host_1_1_i_host}{IHost}} \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_ac8ff0d50d72d5de967e31a81ebfc1e83}{Host\+Application}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets a reference to an object representing the host application. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_a1dcbffc360043a10bbf95037e16469d2}{Logger}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Interface to the logger to use in the current context. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_acd9deff709cf9ce0dac79c505c3c9ebd}{Logging\+Enabled}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates whether normal logging is enabled in the current context. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update}{IExecution\+Scope\+Status\+Update}} \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_a721e879c913d6c85cd819698896836ea}{Status\+Updater}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Interface to the status update for the current context. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_a696f06804f5b3db3b157270f07ed2dc0}{Debug\+Break\+Is\+Set}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates user wish to break debugging inside the called code module method. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_tasks_1_1_task_manager}{Task\+Manager}} \mbox{\hyperlink{class_module_test_support_1_1_console_call_context_adc5847dbfea317eccbcf28f2b0c21784}{Task\+Manager}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778d}{Call\+Entry}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a7260367d3fb84dfd7da51b381e9467ec}{Current\+Call\+Entry}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets an indication whether the current method has been called earlier from the the same script line. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_host_1_1_i_host}{IHost}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_ae73894c03c381b38cdde61d403c5feeb}{Host\+Application}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets a reference to an object representing the host application. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a874910a843a9aacea1ab659f8d599501}{Logger}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Interface to the logger to use in the current context. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_ab36f1834e1bc96982aaf99f4e12fbded}{Logging\+Enabled}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates whether normal logging is enabled in the current context. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update}{IExecution\+Scope\+Status\+Update}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a4be2df45c5b45b17bb177eca72073e8a}{Status\+Updater}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Interface to the status update for the current context. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_aa612c84451a6e76406d6143a4baabf4f}{Debug\+Break\+Is\+Set}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates user wish to break debugging inside the called code module method. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_tasks_1_1_task_manager}{Task\+Manager}} {\bfseries Task\+Manager}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{Step\+Bro.\+Core.\+Logging.\+ILogger}}}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bfseries Is\+Debugging}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Location}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Get the current location identification for the logging. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_module_test_support_1_1_console_call_context_a6be6652cb8765c4a2571cf824efda468}\label{class_module_test_support_1_1_console_call_context_a6be6652cb8765c4a2571cf824efda468} 
+\index{ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}!EnterNewContext@{EnterNewContext}}
+\index{EnterNewContext@{EnterNewContext}!ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}}
+\doxysubsubsection{\texorpdfstring{EnterNewContext()}{EnterNewContext()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} Module\+Test\+Support.\+Console\+Call\+Context.\+Enter\+New\+Context (\begin{DoxyParamCaption}\item[{string}]{location,  }\item[{bool}]{separate\+State\+Level }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Creates a new named call context. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em location} & A descriptive identification of the static or dynamic location of the entered context/scope.\\
+\hline
+{\em separate\+State\+Level} & Whether the new context should be displayed in a new progress/state level./\\
+\hline
+\end{DoxyParams}
+
+
+The new call context must be disposed upon exit of the context scope.
+
+\begin{DoxyReturn}{Returns}
+Reference to a new call context object.
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_abfaae4c87877f18d91fa10938d4fbc78}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_module_test_support_1_1_console_call_context_aef078ce7e1cc1d9bcec30465f9fa398c}\label{class_module_test_support_1_1_console_call_context_aef078ce7e1cc1d9bcec30465f9fa398c} 
+\index{ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}!CurrentCallEntry@{CurrentCallEntry}}
+\index{CurrentCallEntry@{CurrentCallEntry}!ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}}
+\doxysubsubsection{\texorpdfstring{CurrentCallEntry}{CurrentCallEntry}}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_execution_a7d2ded831109ffb318ac534cee06778d}{Call\+Entry}} Module\+Test\+Support.\+Console\+Call\+Context.\+Current\+Call\+Entry\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Gets an indication whether the current method has been called earlier from the the same script line. 
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a7260367d3fb84dfd7da51b381e9467ec}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}}.
+
+\Hypertarget{class_module_test_support_1_1_console_call_context_a696f06804f5b3db3b157270f07ed2dc0}\label{class_module_test_support_1_1_console_call_context_a696f06804f5b3db3b157270f07ed2dc0} 
+\index{ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}!DebugBreakIsSet@{DebugBreakIsSet}}
+\index{DebugBreakIsSet@{DebugBreakIsSet}!ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}}
+\doxysubsubsection{\texorpdfstring{DebugBreakIsSet}{DebugBreakIsSet}}
+{\footnotesize\ttfamily bool Module\+Test\+Support.\+Console\+Call\+Context.\+Debug\+Break\+Is\+Set\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Indicates user wish to break debugging inside the called code module method. 
+
+To use this flag, the user must attach a dot net debugger to the \doxylink{namespace_step_bro}{Step\+Bro} host application.
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_aa612c84451a6e76406d6143a4baabf4f}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}}.
+
+\Hypertarget{class_module_test_support_1_1_console_call_context_ac8ff0d50d72d5de967e31a81ebfc1e83}\label{class_module_test_support_1_1_console_call_context_ac8ff0d50d72d5de967e31a81ebfc1e83} 
+\index{ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}!HostApplication@{HostApplication}}
+\index{HostApplication@{HostApplication}!ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}}
+\doxysubsubsection{\texorpdfstring{HostApplication}{HostApplication}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_host_1_1_i_host}{IHost}} Module\+Test\+Support.\+Console\+Call\+Context.\+Host\+Application\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Gets a reference to an object representing the host application. 
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_ae73894c03c381b38cdde61d403c5feeb}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}}.
+
+\Hypertarget{class_module_test_support_1_1_console_call_context_a1dcbffc360043a10bbf95037e16469d2}\label{class_module_test_support_1_1_console_call_context_a1dcbffc360043a10bbf95037e16469d2} 
+\index{ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}!Logger@{Logger}}
+\index{Logger@{Logger}!ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}}
+\doxysubsubsection{\texorpdfstring{Logger}{Logger}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{ILogger}} Module\+Test\+Support.\+Console\+Call\+Context.\+Logger\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Interface to the logger to use in the current context. 
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a874910a843a9aacea1ab659f8d599501}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}}.
+
+\Hypertarget{class_module_test_support_1_1_console_call_context_acd9deff709cf9ce0dac79c505c3c9ebd}\label{class_module_test_support_1_1_console_call_context_acd9deff709cf9ce0dac79c505c3c9ebd} 
+\index{ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}!LoggingEnabled@{LoggingEnabled}}
+\index{LoggingEnabled@{LoggingEnabled}!ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}}
+\doxysubsubsection{\texorpdfstring{LoggingEnabled}{LoggingEnabled}}
+{\footnotesize\ttfamily bool Module\+Test\+Support.\+Console\+Call\+Context.\+Logging\+Enabled\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Indicates whether normal logging is enabled in the current context. 
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_ab36f1834e1bc96982aaf99f4e12fbded}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}}.
+
+\Hypertarget{class_module_test_support_1_1_console_call_context_a721e879c913d6c85cd819698896836ea}\label{class_module_test_support_1_1_console_call_context_a721e879c913d6c85cd819698896836ea} 
+\index{ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}!StatusUpdater@{StatusUpdater}}
+\index{StatusUpdater@{StatusUpdater}!ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}}
+\doxysubsubsection{\texorpdfstring{StatusUpdater}{StatusUpdater}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_execution_scope_status_update}{IExecution\+Scope\+Status\+Update}} Module\+Test\+Support.\+Console\+Call\+Context.\+Status\+Updater\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Interface to the status update for the current context. 
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context_a4be2df45c5b45b17bb177eca72073e8a}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}}.
+
+\Hypertarget{class_module_test_support_1_1_console_call_context_adc5847dbfea317eccbcf28f2b0c21784}\label{class_module_test_support_1_1_console_call_context_adc5847dbfea317eccbcf28f2b0c21784} 
+\index{ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}!TaskManager@{TaskManager}}
+\index{TaskManager@{TaskManager}!ModuleTestSupport.ConsoleCallContext@{ModuleTestSupport.ConsoleCallContext}}
+\doxysubsubsection{\texorpdfstring{TaskManager}{TaskManager}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_step_bro_1_1_core_1_1_tasks_1_1_task_manager}{Task\+Manager}} Module\+Test\+Support.\+Console\+Call\+Context.\+Task\+Manager\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Module\+Test\+Support/Console\+Call\+Context.\+cs\end{DoxyCompactItemize}

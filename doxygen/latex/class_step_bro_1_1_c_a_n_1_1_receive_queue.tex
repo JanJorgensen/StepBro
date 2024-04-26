@@ -1,0 +1,115 @@
+\doxysection{Step\+Bro.\+CAN.\+Receive\+Queue Class Reference}
+\hypertarget{class_step_bro_1_1_c_a_n_1_1_receive_queue}{}\label{class_step_bro_1_1_c_a_n_1_1_receive_queue}\index{StepBro.CAN.ReceiveQueue@{StepBro.CAN.ReceiveQueue}}
+Inheritance diagram for Step\+Bro.\+CAN.\+Receive\+Queue\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_c_a_n_1_1_receive_queue}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_receive_queue_aef29a32d71bd8e38c0f5d7d0513ffe9e}\label{class_step_bro_1_1_c_a_n_1_1_receive_queue_aef29a32d71bd8e38c0f5d7d0513ffe9e} 
+{\bfseries Receive\+Queue} (string name)
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_receive_queue_ae3966970b0b6e57e30c041625ef7d937}\label{class_step_bro_1_1_c_a_n_1_1_receive_queue_ae3966970b0b6e57e30c041625ef7d937} 
+{\bfseries Receive\+Queue} (string name, Predicate$<$ \mbox{\hyperlink{interface_step_bro_1_1_c_a_n_1_1_i_message}{IMessage}} $>$ filter)
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_c_a_n_1_1_receive_queue_a3e8c870f73a979f6ac21542ba732d446}{Try\+Add\+Handover}} (\mbox{\hyperlink{interface_step_bro_1_1_c_a_n_1_1_i_message}{IMessage}} message)
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_receive_queue_abff5e77c869186c5d9e8b0718d48b006}\label{class_step_bro_1_1_c_a_n_1_1_receive_queue_abff5e77c869186c5d9e8b0718d48b006} 
+\mbox{\hyperlink{interface_step_bro_1_1_c_a_n_1_1_i_message}{IMessage}} {\bfseries Get\+Next} (\mbox{[}Implicit\mbox{]}\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, Time\+Span timeout)
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_receive_queue_a3becb2c9268f8d2f1d79a61b188f42a7}\label{class_step_bro_1_1_c_a_n_1_1_receive_queue_a3becb2c9268f8d2f1d79a61b188f42a7} 
+\mbox{\hyperlink{interface_step_bro_1_1_c_a_n_1_1_i_message}{IMessage}} {\bfseries Get\+Next} (\mbox{[}Implicit\mbox{]}\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\item 
+void \mbox{\hyperlink{class_step_bro_1_1_c_a_n_1_1_receive_queue_a2f54bbab0b216281d6e89dd98432cb64}{Flush}} (bool clear\+Stats)
+\item 
+string \mbox{\hyperlink{class_step_bro_1_1_c_a_n_1_1_receive_queue_ae0828770605fd67757d2b62b0a206183}{Get\+Status\+Text}} ()
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_c_a_n_1_1_i_receive_entity_a01035cae1296172c5461b8c3dac99dd4}\label{interface_step_bro_1_1_c_a_n_1_1_i_receive_entity_a01035cae1296172c5461b8c3dac99dd4} 
+bool {\bfseries Try\+Add\+Handover} (\mbox{\hyperlink{interface_step_bro_1_1_c_a_n_1_1_i_message}{IMessage}} message)
+\item 
+\Hypertarget{interface_step_bro_1_1_c_a_n_1_1_i_receive_entity_a36b29f297e0c70ad4794d18b33d04512}\label{interface_step_bro_1_1_c_a_n_1_1_i_receive_entity_a36b29f297e0c70ad4794d18b33d04512} 
+string {\bfseries Get\+Status\+Text} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_c_a_n_1_1_i_receive_entity_af8fcff44408e0fbb0d8c81b37e074098}\label{interface_step_bro_1_1_c_a_n_1_1_i_receive_entity_af8fcff44408e0fbb0d8c81b37e074098} 
+void {\bfseries Flush} (bool clear\+Stats)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+string \mbox{\hyperlink{class_step_bro_1_1_c_a_n_1_1_receive_queue_ab513dfc32d187c53be64da8d549257b7}{Name}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+long \mbox{\hyperlink{class_step_bro_1_1_c_a_n_1_1_receive_queue_a307712d0d6117f40e068c093e64fe9dc}{Total\+Count}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_c_a_n_1_1_i_receive_entity}{Step\+Bro.\+CAN.\+IReceive\+Entity}}}
+\begin{DoxyCompactItemize}
+\item 
+string {\bfseries Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+long {\bfseries Total\+Count}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_receive_queue_a2f54bbab0b216281d6e89dd98432cb64}\label{class_step_bro_1_1_c_a_n_1_1_receive_queue_a2f54bbab0b216281d6e89dd98432cb64} 
+\index{StepBro.CAN.ReceiveQueue@{StepBro.CAN.ReceiveQueue}!Flush@{Flush}}
+\index{Flush@{Flush}!StepBro.CAN.ReceiveQueue@{StepBro.CAN.ReceiveQueue}}
+\doxysubsubsection{\texorpdfstring{Flush()}{Flush()}}
+{\footnotesize\ttfamily void Step\+Bro.\+CAN.\+Receive\+Queue.\+Flush (\begin{DoxyParamCaption}\item[{bool}]{clear\+Stats }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_c_a_n_1_1_i_receive_entity}{Step\+Bro.\+CAN.\+IReceive\+Entity}}.
+
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_receive_queue_ae0828770605fd67757d2b62b0a206183}\label{class_step_bro_1_1_c_a_n_1_1_receive_queue_ae0828770605fd67757d2b62b0a206183} 
+\index{StepBro.CAN.ReceiveQueue@{StepBro.CAN.ReceiveQueue}!GetStatusText@{GetStatusText}}
+\index{GetStatusText@{GetStatusText}!StepBro.CAN.ReceiveQueue@{StepBro.CAN.ReceiveQueue}}
+\doxysubsubsection{\texorpdfstring{GetStatusText()}{GetStatusText()}}
+{\footnotesize\ttfamily string Step\+Bro.\+CAN.\+Receive\+Queue.\+Get\+Status\+Text (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_c_a_n_1_1_i_receive_entity}{Step\+Bro.\+CAN.\+IReceive\+Entity}}.
+
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_receive_queue_a3e8c870f73a979f6ac21542ba732d446}\label{class_step_bro_1_1_c_a_n_1_1_receive_queue_a3e8c870f73a979f6ac21542ba732d446} 
+\index{StepBro.CAN.ReceiveQueue@{StepBro.CAN.ReceiveQueue}!TryAddHandover@{TryAddHandover}}
+\index{TryAddHandover@{TryAddHandover}!StepBro.CAN.ReceiveQueue@{StepBro.CAN.ReceiveQueue}}
+\doxysubsubsection{\texorpdfstring{TryAddHandover()}{TryAddHandover()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+CAN.\+Receive\+Queue.\+Try\+Add\+Handover (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interface_step_bro_1_1_c_a_n_1_1_i_message}{IMessage}}}]{message }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_c_a_n_1_1_i_receive_entity}{Step\+Bro.\+CAN.\+IReceive\+Entity}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_receive_queue_ab513dfc32d187c53be64da8d549257b7}\label{class_step_bro_1_1_c_a_n_1_1_receive_queue_ab513dfc32d187c53be64da8d549257b7} 
+\index{StepBro.CAN.ReceiveQueue@{StepBro.CAN.ReceiveQueue}!Name@{Name}}
+\index{Name@{Name}!StepBro.CAN.ReceiveQueue@{StepBro.CAN.ReceiveQueue}}
+\doxysubsubsection{\texorpdfstring{Name}{Name}}
+{\footnotesize\ttfamily string Step\+Bro.\+CAN.\+Receive\+Queue.\+Name\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_c_a_n_1_1_i_receive_entity}{Step\+Bro.\+CAN.\+IReceive\+Entity}}.
+
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_receive_queue_a307712d0d6117f40e068c093e64fe9dc}\label{class_step_bro_1_1_c_a_n_1_1_receive_queue_a307712d0d6117f40e068c093e64fe9dc} 
+\index{StepBro.CAN.ReceiveQueue@{StepBro.CAN.ReceiveQueue}!TotalCount@{TotalCount}}
+\index{TotalCount@{TotalCount}!StepBro.CAN.ReceiveQueue@{StepBro.CAN.ReceiveQueue}}
+\doxysubsubsection{\texorpdfstring{TotalCount}{TotalCount}}
+{\footnotesize\ttfamily long Step\+Bro.\+CAN.\+Receive\+Queue.\+Total\+Count\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_c_a_n_1_1_i_receive_entity}{Step\+Bro.\+CAN.\+IReceive\+Entity}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Modules/\+Step\+Bro.\+CAN/Receive\+Queue.\+cs\end{DoxyCompactItemize}

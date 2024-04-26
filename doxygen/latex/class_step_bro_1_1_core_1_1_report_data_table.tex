@@ -1,0 +1,84 @@
+\doxysection{Step\+Bro.\+Core.\+Report\+Data\+Table Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_report_data_table}{}\label{class_step_bro_1_1_core_1_1_report_data_table}\index{StepBro.Core.ReportDataTable@{StepBro.Core.ReportDataTable}}
+Inheritance diagram for Step\+Bro.\+Core.\+Report\+Data\+Table\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_core_1_1_report_data_table}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_report_data_table_1_1_data_fieldt_info}{Data\+Fieldt\+Info}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_report_data_table_a5b6e969a4c61289a8d970c2a70568712}\label{class_step_bro_1_1_core_1_1_report_data_table_a5b6e969a4c61289a8d970c2a70568712} 
+enum {\bfseries Data\+Set\+Direction} \{ {\bfseries Row}
+, {\bfseries Column}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_report_data_table_a2c501bf830e978fd273ddf3cb21fb475}\label{class_step_bro_1_1_core_1_1_report_data_table_a2c501bf830e978fd273ddf3cb21fb475} 
+{\bfseries Report\+Data\+Table} (Date\+Time timestamp, string title, string subttitle, Data\+Set\+Direction data\+Set\+Direction=Data\+Set\+Direction.\+Row)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_report_data_table_af6c4d87083226a1d9008c97eb9b4e973}\label{class_step_bro_1_1_core_1_1_report_data_table_af6c4d87083226a1d9008c97eb9b4e973} 
+void {\bfseries Create\+Header\+Field} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, string title, System.\+Type datatype)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_report_data_table_a2fb189683588599466d4f69e4e7c046e}\label{class_step_bro_1_1_core_1_1_report_data_table_a2fb189683588599466d4f69e4e7c046e} 
+void {\bfseries Add\+Data\+Set} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, params object\mbox{[}$\,$\mbox{]} data)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_report_data_table_a03b6b922afcb4ab30cff26a2b3b8d4bc}\label{class_step_bro_1_1_core_1_1_report_data_table_a03b6b922afcb4ab30cff26a2b3b8d4bc} 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_report_data_table_1_1_data_fieldt_info}{Data\+Fieldt\+Info}} {\bfseries Get\+Field\+Info} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, long index)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_report_data_table_a28d7e466fbfc1b8bc5bd1839a88390a5}\label{class_step_bro_1_1_core_1_1_report_data_table_a28d7e466fbfc1b8bc5bd1839a88390a5} 
+object {\bfseries Get\+Field\+Value} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, long field, long set)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_report_data}{Step\+Bro.\+Core.\+Report\+Data}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries Lock} ()
+\item 
+bool {\bfseries Is\+Still\+Open} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_report_data_table_a6c7e91712afaeba6f9336899089311e3}\label{class_step_bro_1_1_core_1_1_report_data_table_a6c7e91712afaeba6f9336899089311e3} 
+string {\bfseries Title}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_report_data_table_ad76a7bce96bae3d5b7e39dc30def52e8}\label{class_step_bro_1_1_core_1_1_report_data_table_ad76a7bce96bae3d5b7e39dc30def52e8} 
+string {\bfseries Subtitle}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_report_data_table_a5ef70134956510558612397f89bd1c59}\label{class_step_bro_1_1_core_1_1_report_data_table_a5ef70134956510558612397f89bd1c59} 
+long {\bfseries Field\+Count}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_report_data_table_a95fcec8cc4b46e450e59c831779ff2fe}\label{class_step_bro_1_1_core_1_1_report_data_table_a95fcec8cc4b46e450e59c831779ff2fe} 
+long {\bfseries Data\+Set\+Count}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_report_data_table_a06e23f1cdfc8d12894d3a052a35ec38c}\label{class_step_bro_1_1_core_1_1_report_data_table_a06e23f1cdfc8d12894d3a052a35ec38c} 
+Data\+Set\+Direction {\bfseries Direction}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_report_data}{Step\+Bro.\+Core.\+Report\+Data}}}
+\begin{DoxyCompactItemize}
+\item 
+Date\+Time {\bfseries Time\+Stamp}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Report\+Data\+Type {\bfseries Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool {\bfseries Is\+Locked}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_report_data}{Step\+Bro.\+Core.\+Report\+Data}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Report\+Data} (Date\+Time timestamp, Report\+Data\+Type type)
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Data/\+Report/Report\+Data\+Table.\+cs\end{DoxyCompactItemize}

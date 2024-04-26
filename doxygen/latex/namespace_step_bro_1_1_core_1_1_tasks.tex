@@ -1,0 +1,130 @@
+\doxysection{Step\+Bro.\+Core.\+Tasks Namespace Reference}
+\hypertarget{namespace_step_bro_1_1_core_1_1_tasks}{}\label{namespace_step_bro_1_1_core_1_1_tasks}\index{StepBro.Core.Tasks@{StepBro.Core.Tasks}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_tasks_1_1_async_result}{Async\+Result}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_async_result}{IAsync\+Result}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task}{ITask}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context}{ITask\+Context}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_control}{ITask\+Control}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting}{ITask\+State\+Reporting}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_tasks_1_1_task_base}{Task\+Base}}
+\item 
+class {\bfseries Task\+Control\+Support}
+\item 
+class {\bfseries Task\+Execution\+State\+Helpers}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_tasks_1_1_task_manager}{Task\+Manager}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_tasks_1_1_task_to_async_result}{Task\+To\+Async\+Result}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cb}{Break\+Option}} \{ \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cba6adf97f83acf6453d4a6a4b1070f3754}{None}} = 0x00
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cba11a755d598c0c417f9a36758c3da7481}{Stop}} = 0x01
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cba105b296a83f9c105355403f3332af50f}{Pause}} = 0x02
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cba292ed5e525d66c64f13a3bf54a17c06a}{Kill}} = 0x04
+ \}
+\begin{DoxyCompactList}\small\item\em The different available options for stopping a running task. \end{DoxyCompactList}\item 
+\Hypertarget{namespace_step_bro_1_1_core_1_1_tasks_ab8771003988b70b76974f3770da50127}\label{namespace_step_bro_1_1_core_1_1_tasks_ab8771003988b70b76974f3770da50127} 
+enum {\bfseries Task\+Result\+Type} \{ {\bfseries Success}
+, {\bfseries Timeout}
+, {\bfseries Failed}
+ \}
+\item 
+enum \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3}{Task\+Execution\+State}} \{ \newline
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3a0eceeb45861f9585dd7a97a3e36f85c6}{Created}}
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3a098b846b8fb78489d3e9cc558a565f2b}{Start\+Requested}}
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3aad3ba63cc7ce3b56cd675126f612b832}{Awaiting\+Start\+Condition}}
+, {\bfseries Error\+Starting}
+, \newline
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3a5bda814c4aedb126839228f1a3d92f09}{Running}}
+, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3a3576c13c45c55242be542cc15f922005}{Running\+Not\+Responding}}
+, {\bfseries Pause\+Requested}
+, {\bfseries Paused}
+, \newline
+{\bfseries Stop\+Requested}
+, {\bfseries Kill\+Requested}
+, {\bfseries Terminating}
+, {\bfseries Ended}
+, \newline
+{\bfseries Ended\+By\+Exception}
+ \}
+\begin{DoxyCompactList}\small\item\em Enumerates the different execution states of a task. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{namespace_step_bro_1_1_core_1_1_tasks_a41b240bf1aea3db296daea37a4455a74}\label{namespace_step_bro_1_1_core_1_1_tasks_a41b240bf1aea3db296daea37a4455a74} 
+delegate void {\bfseries Task\+Delegate} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context}{ITask\+Context}} context)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cb}\label{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cb} 
+\index{StepBro.Core.Tasks@{StepBro.Core.Tasks}!BreakOption@{BreakOption}}
+\index{BreakOption@{BreakOption}!StepBro.Core.Tasks@{StepBro.Core.Tasks}}
+\doxysubsubsection{\texorpdfstring{BreakOption}{BreakOption}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cb}{Step\+Bro.\+Core.\+Tasks.\+Break\+Option}}}
+
+
+
+The different available options for stopping a running task. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{None@{None}!StepBro.Core.Tasks@{StepBro.Core.Tasks}}\index{StepBro.Core.Tasks@{StepBro.Core.Tasks}!None@{None}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cba6adf97f83acf6453d4a6a4b1070f3754}\label{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cba6adf97f83acf6453d4a6a4b1070f3754} 
+None&No stop action available. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Stop@{Stop}!StepBro.Core.Tasks@{StepBro.Core.Tasks}}\index{StepBro.Core.Tasks@{StepBro.Core.Tasks}!Stop@{Stop}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cba11a755d598c0c417f9a36758c3da7481}\label{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cba11a755d598c0c417f9a36758c3da7481} 
+Stop&The task can be stopped. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Pause@{Pause}!StepBro.Core.Tasks@{StepBro.Core.Tasks}}\index{StepBro.Core.Tasks@{StepBro.Core.Tasks}!Pause@{Pause}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cba105b296a83f9c105355403f3332af50f}\label{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cba105b296a83f9c105355403f3332af50f} 
+Pause&The task can be paused. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Kill@{Kill}!StepBro.Core.Tasks@{StepBro.Core.Tasks}}\index{StepBro.Core.Tasks@{StepBro.Core.Tasks}!Kill@{Kill}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cba292ed5e525d66c64f13a3bf54a17c06a}\label{namespace_step_bro_1_1_core_1_1_tasks_ac67ff79e4044f0b62f374be1d93772cba292ed5e525d66c64f13a3bf54a17c06a} 
+Kill&The task can be brutally killed. \\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3}\label{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3} 
+\index{StepBro.Core.Tasks@{StepBro.Core.Tasks}!TaskExecutionState@{TaskExecutionState}}
+\index{TaskExecutionState@{TaskExecutionState}!StepBro.Core.Tasks@{StepBro.Core.Tasks}}
+\doxysubsubsection{\texorpdfstring{TaskExecutionState}{TaskExecutionState}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3}{Step\+Bro.\+Core.\+Tasks.\+Task\+Execution\+State}}}
+
+
+
+Enumerates the different execution states of a task. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Created@{Created}!StepBro.Core.Tasks@{StepBro.Core.Tasks}}\index{StepBro.Core.Tasks@{StepBro.Core.Tasks}!Created@{Created}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3a0eceeb45861f9585dd7a97a3e36f85c6}\label{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3a0eceeb45861f9585dd7a97a3e36f85c6} 
+Created&The initial state where the process/task has been created but not started yet. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{StartRequested@{StartRequested}!StepBro.Core.Tasks@{StepBro.Core.Tasks}}\index{StepBro.Core.Tasks@{StepBro.Core.Tasks}!StartRequested@{StartRequested}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3a098b846b8fb78489d3e9cc558a565f2b}\label{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3a098b846b8fb78489d3e9cc558a565f2b} 
+Start\+Requested&Process start requested, but start condition has not been checked. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{AwaitingStartCondition@{AwaitingStartCondition}!StepBro.Core.Tasks@{StepBro.Core.Tasks}}\index{StepBro.Core.Tasks@{StepBro.Core.Tasks}!AwaitingStartCondition@{AwaitingStartCondition}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3aad3ba63cc7ce3b56cd675126f612b832}\label{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3aad3ba63cc7ce3b56cd675126f612b832} 
+Awaiting\+Start\+Condition&As the Started state, but a request to await the start conditions has been made. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Running@{Running}!StepBro.Core.Tasks@{StepBro.Core.Tasks}}\index{StepBro.Core.Tasks@{StepBro.Core.Tasks}!Running@{Running}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3a5bda814c4aedb126839228f1a3d92f09}\label{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3a5bda814c4aedb126839228f1a3d92f09} 
+Running&Process is confirmed to be running. \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RunningNotResponding@{RunningNotResponding}!StepBro.Core.Tasks@{StepBro.Core.Tasks}}\index{StepBro.Core.Tasks@{StepBro.Core.Tasks}!RunningNotResponding@{RunningNotResponding}}}\Hypertarget{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3a3576c13c45c55242be542cc15f922005}\label{namespace_step_bro_1_1_core_1_1_tasks_a4cd34c728fb7ad82cb8aaf1ebdb505b3a3576c13c45c55242be542cc15f922005} 
+Running\+Not\+Responding&Process should be running, but is currently not responding. \\
+\hline
+
+\end{DoxyEnumFields}

@@ -1,4 +1,6 @@
-﻿using StepBro.Core.Data;
+﻿using StepBro.Core.Api;
+using StepBro.Core.Data;
+using StepBro.Core.Execution;
 using StepBro.Core.IPC;
 using System;
 using System.IO;
@@ -9,10 +11,11 @@ using System.Threading;
 
 namespace StepBro.ExecutionHelper
 {
-    public class Access : INameable
+    public class Access : INameable, IDisposable
     {
         private Pipe m_executionHelperPipe = null;
         private bool m_closeWhenExecutionHelperCloses = false;
+        private EventHandler m_executionHelperClosedEventHandler = null;
 
         public string Name { get; set; } = null;
         public string Prefix { get; set; } = null;
@@ -25,14 +28,12 @@ namespace StepBro.ExecutionHelper
                 var cmd = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.ShortCommand>(message.Item2);
                 if (cmd == StepBro.ExecutionHelper.Messages.ShortCommand.CloseApplication && m_closeWhenExecutionHelperCloses)
                 {
-                    Thread.Sleep(100);
-                    // m_executionHelperPipe.Dispose();
-                    System.Environment.Exit(0); // Close the application gracefully
+                    m_executionHelperPipe.Dispose();
                 }
             }
         }
 
-        public bool CreateExecutionHelper(bool closeWhenExecutionHelperCloses = false)
+        public bool CreateExecutionHelper([Implicit] ICallContext context = null, bool closeWhenExecutionHelperCloses = false)
         {
             // If constructor with no arguments were used, we use the name of the instance instead
             if (Prefix == null)
@@ -57,12 +58,19 @@ namespace StepBro.ExecutionHelper
                 }
             }
             
-            m_executionHelperPipe = Pipe.StartClient("StepBroExecutionHelper", "1998");
+            m_executionHelperPipe = Pipe.StartClient("StepBroExecutionHelper", null);
 
-            Pipe.ReceivedData += (sender, e) =>
+            m_executionHelperPipe.ReceivedData += (sender, e) =>
             {
                 ReceivedData(e);
             };
+
+            m_executionHelperClosedEventHandler = (sender, e) =>
+            {
+                context.Logger.LogError("VISA closed unexpectedly");
+            };
+
+            m_executionHelperPipe.OnConnectionClosed += m_executionHelperClosedEventHandler;
 
             if (result)
             {
@@ -172,6 +180,7 @@ namespace StepBro.ExecutionHelper
 
         public bool CloseApplication()
         {
+            m_executionHelperPipe.OnConnectionClosed -= m_executionHelperClosedEventHandler;
             m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.CloseApplication);
 
             m_executionHelperPipe.Dispose();
@@ -201,6 +210,10 @@ namespace StepBro.ExecutionHelper
                 {
                     result = true;
                 }
+                else
+                {
+                    result = false;
+                }
             }
             else
             {
@@ -208,6 +221,15 @@ namespace StepBro.ExecutionHelper
             }
 
             return result;
+        }
+
+        public void Dispose()
+        {
+            m_executionHelperPipe.OnConnectionClosed -= m_executionHelperClosedEventHandler;
+            if (m_executionHelperPipe.IsConnected())
+            {
+                m_executionHelperPipe.Dispose();
+            }
         }
     }
 }

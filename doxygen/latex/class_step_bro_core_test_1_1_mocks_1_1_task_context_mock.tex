@@ -1,0 +1,216 @@
+\doxysection{Step\+Bro\+Core\+Test.\+Mocks.\+Task\+Context\+Mock Class Reference}
+\hypertarget{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock}{}\label{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock}\index{StepBroCoreTest.Mocks.TaskContextMock@{StepBroCoreTest.Mocks.TaskContextMock}}
+Inheritance diagram for Step\+Bro\+Core\+Test.\+Mocks.\+Task\+Context\+Mock\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.153846cm]{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_a44c93869b71922d8f28f5aed35995f5a}\label{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_a44c93869b71922d8f28f5aed35995f5a} 
+{\bfseries Task\+Context\+Mock} (\mbox{\hyperlink{class_step_bro_core_test_1_1_utils_1_1_mini_logger}{Mini\+Logger}} logger)
+\item 
+bool \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_a9b275751d145f82222195f9a35553528}{Enter\+Pause\+If\+Requested}} (string state)
+\begin{DoxyCompactList}\small\item\em Tells the task controller that the task is ready to enter a pause, if it is requested. A task that runs through a list of sub asks, can call this method before each iteration. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_abcdd64584222dd27155d93a0cd065c8e}{Progress\+Alive\+Signal}} ()
+\begin{DoxyCompactList}\small\item\em Indicates the current running task is still alive. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_ad57677852ff9f8ab33bc8eab65cd0dab}{Progress\+Setup}} (long start, long length, Func$<$ long, string $>$ to\+Text)
+\item 
+void \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_a74a7799e861ca4ef786ee39a4c7bfac3}{Update\+Status}} (string text=null, long progress=-\/1)
+\begin{DoxyCompactList}\small\item\em Sets the status text for the context. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context_ad0cb3e0c82e8c2e94078d30687a7f109}{Enter\+Pause\+If\+Requested}} (string state)
+\begin{DoxyCompactList}\small\item\em Tells the task controller that the task is ready to enter a pause, if it is requested. A task that runs through a list of sub asks, can call this method before each iteration. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_af732e12dfea6ded5a4e8e01563c5cb62}\label{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_af732e12dfea6ded5a4e8e01563c5cb62} 
+void {\bfseries Progress\+Setup} (long start, long length, Func$<$ long, string $>$ to\+Text)
+\item 
+void \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_af3d1c75d16c6ff1036ad6dc787a03f6b}{Update\+Status}} (string text=null, long progress=-\/1)
+\begin{DoxyCompactList}\small\item\em Sets the status text for the context. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_a3d19eb95902f53b2947a2ef722f3dc77}{Progress\+Alive\+Signal}} ()
+\begin{DoxyCompactList}\small\item\em Indicates the current running task is still alive. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{ILogger\+Scope}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_a5161ab6c8cfa9e625b562e5cc87d56bd}{Log\+Entering}} (bool is\+High\+Level, string location, string text, Logger\+Dynamic\+Location\+Source dynamic\+Location)
+\begin{DoxyCompactList}\small\item\em Enters a new logging scope that is a sub scope of this scope and where the location string of each log entry can be different. \end{DoxyCompactList}\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_aaf19f2da58a6d1de75668aa2fa860f5f}\label{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_aaf19f2da58a6d1de75668aa2fa860f5f} 
+void {\bfseries Entered\+Parallel\+Task} (string text)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_af281dfc1fa8a27fca4d358b68a89f9f8}\label{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope_af281dfc1fa8a27fca4d358b68a89f9f8} 
+void {\bfseries Log\+Exit} (string text)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{ILogger\+Scope}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_a13b55f3f88fd44473ecf7dab17fc5e38}{Log\+Entering}} (string location, string text)
+\begin{DoxyCompactList}\small\item\em Enters a new logging scope that is a sub scope of this scope. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{ILogger\+Scope}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_ac19314e6d991bf3ba337c27a72fe2de7}{Create\+Sub\+Location}} (string name)
+\begin{DoxyCompactList}\small\item\em Create a new scope for a location, but without adding the entering to the log. \end{DoxyCompactList}\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_ac30ed1f66264f5ff80a2955f0c7a2b49}\label{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_ac30ed1f66264f5ff80a2955f0c7a2b49} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_log_entry}{ILog\+Entry}} {\bfseries Log} (string text)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_a36aa45badcdf4cd2a98688f38e37173d}\label{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_a36aa45badcdf4cd2a98688f38e37173d} 
+void {\bfseries Log\+Detail} (string text)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_a8d3b924388b5f2ebadfc9b74b3f60765}\label{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_a8d3b924388b5f2ebadfc9b74b3f60765} 
+void {\bfseries Log\+Async} (string text)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_ae7c5ae44beed4a07507b8bec4428a197}\label{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_ae7c5ae44beed4a07507b8bec4428a197} 
+void {\bfseries Log\+Error} (string text)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_a1e9a22f0fc636e33c85984fbbc8deb29}\label{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_a1e9a22f0fc636e33c85984fbbc8deb29} 
+void {\bfseries Log\+User\+Action} (string text)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_a100b48d9f6c319260e5457ca218b8711}\label{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_a100b48d9f6c319260e5457ca218b8711} 
+void {\bfseries Log\+System} (string text)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_a3ad2f85d4b0ea2ebd087011b5bab880d}\label{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_a3ad2f85d4b0ea2ebd087011b5bab880d} 
+virtual void {\bfseries Dispose} (bool disposing)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_aa4748b54edd63b9b52f3789379ca78d7}{Pause\+Requested}} = false\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates whether the task controller requests the task to start a pause. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{ILogger\+Scope}} \mbox{\hyperlink{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_a2f7528fe95632b3de41ec3f30f7d0187}{Logger}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em The logger to use in the task. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Context}}}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context_a0dd01c5777638172381b8b9d173322f8}{Pause\+Requested}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates whether the task controller requests the task to start a pause. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{ILogger\+Scope}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context_a45dcd5fe3e768ed789839d12c3e725e0}{Logger}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em The logger to use in the task. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{Step\+Bro.\+Core.\+Logging.\+ILogger\+Scope}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_log_entry}{ILog\+Entry}} {\bfseries First\+Log\+Entry\+In\+Scope}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool {\bfseries Errors\+Logged}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates whether any errors were logged directly in this scope. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger}{Step\+Bro.\+Core.\+Logging.\+ILogger}}}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bfseries Is\+Debugging}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Location}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Get the current location identification for the logging. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_a9b275751d145f82222195f9a35553528}\label{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_a9b275751d145f82222195f9a35553528} 
+\index{StepBroCoreTest.Mocks.TaskContextMock@{StepBroCoreTest.Mocks.TaskContextMock}!EnterPauseIfRequested@{EnterPauseIfRequested}}
+\index{EnterPauseIfRequested@{EnterPauseIfRequested}!StepBroCoreTest.Mocks.TaskContextMock@{StepBroCoreTest.Mocks.TaskContextMock}}
+\doxysubsubsection{\texorpdfstring{EnterPauseIfRequested()}{EnterPauseIfRequested()}}
+{\footnotesize\ttfamily bool Step\+Bro\+Core\+Test.\+Mocks.\+Task\+Context\+Mock.\+Enter\+Pause\+If\+Requested (\begin{DoxyParamCaption}\item[{string}]{state }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Tells the task controller that the task is ready to enter a pause, if it is requested. A task that runs through a list of sub asks, can call this method before each iteration. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em state} & A description of the current task state.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether a pause was effectuated.
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context_ad0cb3e0c82e8c2e94078d30687a7f109}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Context}}.
+
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_abcdd64584222dd27155d93a0cd065c8e}\label{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_abcdd64584222dd27155d93a0cd065c8e} 
+\index{StepBroCoreTest.Mocks.TaskContextMock@{StepBroCoreTest.Mocks.TaskContextMock}!ProgressAliveSignal@{ProgressAliveSignal}}
+\index{ProgressAliveSignal@{ProgressAliveSignal}!StepBroCoreTest.Mocks.TaskContextMock@{StepBroCoreTest.Mocks.TaskContextMock}}
+\doxysubsubsection{\texorpdfstring{ProgressAliveSignal()}{ProgressAliveSignal()}}
+{\footnotesize\ttfamily void Step\+Bro\+Core\+Test.\+Mocks.\+Task\+Context\+Mock.\+Progress\+Alive\+Signal (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Indicates the current running task is still alive. 
+
+remarks\texorpdfstring{$>$}{>}The status text is not changed.
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_a3d19eb95902f53b2947a2ef722f3dc77}{Step\+Bro.\+Core.\+Tasks.\+ITask\+State\+Reporting}}.
+
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_ad57677852ff9f8ab33bc8eab65cd0dab}\label{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_ad57677852ff9f8ab33bc8eab65cd0dab} 
+\index{StepBroCoreTest.Mocks.TaskContextMock@{StepBroCoreTest.Mocks.TaskContextMock}!ProgressSetup@{ProgressSetup}}
+\index{ProgressSetup@{ProgressSetup}!StepBroCoreTest.Mocks.TaskContextMock@{StepBroCoreTest.Mocks.TaskContextMock}}
+\doxysubsubsection{\texorpdfstring{ProgressSetup()}{ProgressSetup()}}
+{\footnotesize\ttfamily void Step\+Bro\+Core\+Test.\+Mocks.\+Task\+Context\+Mock.\+Progress\+Setup (\begin{DoxyParamCaption}\item[{long}]{start,  }\item[{long}]{length,  }\item[{Func$<$ long, string $>$}]{to\+Text }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting}{Step\+Bro.\+Core.\+Tasks.\+ITask\+State\+Reporting}}.
+
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_a74a7799e861ca4ef786ee39a4c7bfac3}\label{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_a74a7799e861ca4ef786ee39a4c7bfac3} 
+\index{StepBroCoreTest.Mocks.TaskContextMock@{StepBroCoreTest.Mocks.TaskContextMock}!UpdateStatus@{UpdateStatus}}
+\index{UpdateStatus@{UpdateStatus}!StepBroCoreTest.Mocks.TaskContextMock@{StepBroCoreTest.Mocks.TaskContextMock}}
+\doxysubsubsection{\texorpdfstring{UpdateStatus()}{UpdateStatus()}}
+{\footnotesize\ttfamily void Step\+Bro\+Core\+Test.\+Mocks.\+Task\+Context\+Mock.\+Update\+Status (\begin{DoxyParamCaption}\item[{string}]{text = {\ttfamily null},  }\item[{long}]{progress = {\ttfamily -\/1} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Sets the status text for the context. 
+
+If progress is set, the progress will be closed.
+
+
+\begin{DoxyParams}{Parameters}
+{\em text} & State text to show to the user.\\
+\hline
+{\em progress} & Current progress value.\\
+\hline
+\end{DoxyParams}
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_state_reporting_af3d1c75d16c6ff1036ad6dc787a03f6b}{Step\+Bro.\+Core.\+Tasks.\+ITask\+State\+Reporting}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_a2f7528fe95632b3de41ec3f30f7d0187}\label{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_a2f7528fe95632b3de41ec3f30f7d0187} 
+\index{StepBroCoreTest.Mocks.TaskContextMock@{StepBroCoreTest.Mocks.TaskContextMock}!Logger@{Logger}}
+\index{Logger@{Logger}!StepBroCoreTest.Mocks.TaskContextMock@{StepBroCoreTest.Mocks.TaskContextMock}}
+\doxysubsubsection{\texorpdfstring{Logger}{Logger}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_logging_1_1_i_logger_scope}{ILogger\+Scope}} Step\+Bro\+Core\+Test.\+Mocks.\+Task\+Context\+Mock.\+Logger\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+The logger to use in the task. 
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context_a45dcd5fe3e768ed789839d12c3e725e0}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Context}}.
+
+\Hypertarget{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_aa4748b54edd63b9b52f3789379ca78d7}\label{class_step_bro_core_test_1_1_mocks_1_1_task_context_mock_aa4748b54edd63b9b52f3789379ca78d7} 
+\index{StepBroCoreTest.Mocks.TaskContextMock@{StepBroCoreTest.Mocks.TaskContextMock}!PauseRequested@{PauseRequested}}
+\index{PauseRequested@{PauseRequested}!StepBroCoreTest.Mocks.TaskContextMock@{StepBroCoreTest.Mocks.TaskContextMock}}
+\doxysubsubsection{\texorpdfstring{PauseRequested}{PauseRequested}}
+{\footnotesize\ttfamily bool Step\+Bro\+Core\+Test.\+Mocks.\+Task\+Context\+Mock.\+Pause\+Requested = false\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Indicates whether the task controller requests the task to start a pause. 
+
+\begin{DoxySeeAlso}{See also}
+Enter\+Pause\+If\+Requested(string)
+
+
+\end{DoxySeeAlso}
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context_a0dd01c5777638172381b8b9d173322f8}{Step\+Bro.\+Core.\+Tasks.\+ITask\+Context}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Test/\+Step\+Bro.\+Core.\+Test/\+Mocks/Task\+Context\+Mock.\+cs\end{DoxyCompactItemize}

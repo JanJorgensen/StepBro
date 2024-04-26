@@ -1,0 +1,114 @@
+\doxysection{Step\+Bro.\+Core.\+Parser Namespace Reference}
+\hypertarget{namespace_step_bro_1_1_core_1_1_parser}{}\label{namespace_step_bro_1_1_core_1_1_parser}\index{StepBro.Core.Parser@{StepBro.Core.Parser}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class {\bfseries Editor\+Support}
+\item 
+class {\bfseries Error\+Collector}
+\item 
+class {\bfseries Expression\+Stack}
+\item 
+class {\bfseries Expression\+To\+Data\+Tree}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_parser_1_1_file_builder}{File\+Builder}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_parser_1_1_i_error_collector}{IError\+Collector}}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_parser_1_1_i_error_data}{IError\+Data}}
+\item 
+interface {\bfseries IParsing\+Context}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_parser_1_1_i_syntax_editor_step_bro_classification_type_provider}{ISyntax\+Editor\+Step\+Bro\+Classification\+Type\+Provider}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_parser_1_1_parameter_data}{Parameter\+Data}}
+\item 
+class {\bfseries Parser\+Test\+Support}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_parser_1_1_parsing_error_exception}{Parsing\+Error\+Exception}}
+\item 
+class {\bfseries Procedure\+Parsing\+Scope}
+\item 
+class {\bfseries Procedure\+Variable}
+\item 
+class {\bfseries Project\+Parsing\+Scope}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_parser_1_1_s_b_expression_data}{SBExpression\+Data}}
+\item 
+class {\bfseries Step\+Bro\+Listener}
+\item 
+class {\bfseries Step\+Bro\+Type\+Scan\+Listener}
+\item 
+class {\bfseries Step\+Bro\+Type\+Visitor}
+\item 
+class {\bfseries Syntax\+Editor\+Antlr\+Token}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_parser_1_1_syntax_editor_step_bro_classification_type_provider}{Syntax\+Editor\+Step\+Bro\+Classification\+Type\+Provider}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_parser_1_1_syntax_editor_step_bro_lexer}{Syntax\+Editor\+Step\+Bro\+Lexer}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_parser_1_1_syntax_editor_step_bro_lexical_state_id}{Syntax\+Editor\+Step\+Bro\+Lexical\+State\+Id}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_parser_1_1_syntax_editor_step_bro_parse_data}{Syntax\+Editor\+Step\+Bro\+Parse\+Data}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_parser_1_1_syntax_editor_step_bro_parser}{Syntax\+Editor\+Step\+Bro\+Parser}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_parser_1_1_syntax_editor_step_bro_syntax_language}{Syntax\+Editor\+Step\+Bro\+Syntax\+Language}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_parser_1_1_syntax_editor_step_bro_token_id_provider}{Syntax\+Editor\+Step\+Bro\+Token\+Id\+Provider}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_parser_1_1_syntax_editor_step_bro_token_tagger}{Syntax\+Editor\+Step\+Bro\+Token\+Tagger}}
+\item 
+class \mbox{\hyperlink{class_step_bro_1_1_core_1_1_parser_1_1_syntax_editor_step_bro_token_tagger_provider}{Syntax\+Editor\+Step\+Bro\+Token\+Tagger\+Provider}}
+\item 
+class {\bfseries Throw\+Exception\+Error\+Listener}
+\item 
+class {\bfseries Token\+Or\+Section}
+\item 
+class {\bfseries Unresolved\+Procedure\+Type}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{namespace_step_bro_1_1_core_1_1_parser_a1a517042e7b94498f30f547ede930784}\label{namespace_step_bro_1_1_core_1_1_parser_a1a517042e7b94498f30f547ede930784} 
+enum {\bfseries Home\+Type} \{ {\bfseries Immediate}
+, {\bfseries Local\+Variable}
+, {\bfseries Global\+Variable}
+ \}
+\item 
+\Hypertarget{namespace_step_bro_1_1_core_1_1_parser_af0b58e498e58b0a14389c47ab5417465}\label{namespace_step_bro_1_1_core_1_1_parser_af0b58e498e58b0a14389c47ab5417465} 
+enum {\bfseries SBExpression\+Type} \{ \newline
+{\bfseries Namespace}
+, {\bfseries Constant}
+, {\bfseries Identifier}
+, {\bfseries Expression}
+, \newline
+{\bfseries This\+Reference}
+, {\bfseries Global\+Variable\+Reference}
+, {\bfseries Local\+Variable\+Reference}
+, {\bfseries Indexing}
+, \newline
+{\bfseries Type\+Reference}
+, {\bfseries Generic\+Type\+Definition}
+, {\bfseries Property\+Reference}
+, {\bfseries Method\+Reference}
+, \newline
+{\bfseries Script\+Namespace}
+, {\bfseries Procedure\+Reference}
+, {\bfseries Procedure\+Partner}
+, {\bfseries Procedure\+Property\+Reference}
+, \newline
+{\bfseries Procedure\+Custom\+Property\+Reference}
+, {\bfseries Test\+List\+Reference}
+, {\bfseries File\+Element\+Override}
+, {\bfseries Datatable\+Reference}
+, \newline
+{\bfseries Await\+Expression}
+, {\bfseries Dynamic\+Object\+Member}
+, {\bfseries Dynamic\+Async\+Object\+Member}
+, {\bfseries Expression\+Error}
+, \newline
+{\bfseries Unknown\+Identifier}
+, {\bfseries Unsupported\+Operation}
+ \}
+\end{DoxyCompactItemize}

@@ -1,0 +1,52 @@
+\doxysection{Step\+Bro.\+Core.\+Service\+Base\texorpdfstring{$<$}{<} TService, TThis \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_service_base}{}\label{class_step_bro_1_1_core_1_1_service_base}\index{StepBro.Core.ServiceBase$<$ TService, TThis $>$@{StepBro.Core.ServiceBase$<$ TService, TThis $>$}}
+
+
+Base class for a service. This class encapsulates the service housekeeping, to ensure users cannot directly start or stop the service.  
+
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_service_base_a5fabe55b880c5dfffb9fc400b1d24f6d}\label{class_step_bro_1_1_core_1_1_service_base_a5fabe55b880c5dfffb9fc400b1d24f6d} 
+{\bfseries Service\+Base} (string name, out \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_i_service}{IService}} service\+Access, params Type\mbox{[}$\,$\mbox{]} dependencies)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_service_base_a71701374530eed36e7f8a3e9eae4755e}\label{class_step_bro_1_1_core_1_1_service_base_a71701374530eed36e7f8a3e9eae4755e} 
+{\bfseries Service\+Base} ()
+\begin{DoxyCompactList}\small\item\em Constructor for using when the derived object is not actually used as a service. \end{DoxyCompactList}\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_service_base_a29c2ddd79d5b5570afbec292f129d689}\label{class_step_bro_1_1_core_1_1_service_base_a29c2ddd79d5b5570afbec292f129d689} 
+virtual void {\bfseries Initialize} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_service_manager}{Service\+Manager}} manager, \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context}{ITask\+Context}} context)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_service_base_ab17d268a339f17758d90996e66f7afd6}\label{class_step_bro_1_1_core_1_1_service_base_ab17d268a339f17758d90996e66f7afd6} 
+virtual void {\bfseries Start} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_service_manager}{Service\+Manager}} manager, \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context}{ITask\+Context}} context)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_service_base_a56504f30b59a13c69160a9935193450d}\label{class_step_bro_1_1_core_1_1_service_base_a56504f30b59a13c69160a9935193450d} 
+virtual void {\bfseries Stop} (\mbox{\hyperlink{class_step_bro_1_1_core_1_1_service_manager}{Service\+Manager}} manager, \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_tasks_1_1_i_task_context}{ITask\+Context}} context)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_service_base_a9d701ed4f2978d5fbad1ecff00fd81fb}\label{class_step_bro_1_1_core_1_1_service_base_a9d701ed4f2978d5fbad1ecff00fd81fb} 
+void {\bfseries Expect\+Service\+Started} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Base class for a service. This class encapsulates the service housekeeping, to ensure users cannot directly start or stop the service. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em TService} & The public service type (typically interface) users will know the service by.\\
+\hline
+{\em TThis} & The actual type of the parent class implementing the service.\\
+\hline
+\end{DoxyTemplParams}
+\begin{Desc}
+\item[Type Constraints]\begin{description}
+\item[{\em TThis} : {\em \mbox{\hyperlink{class_step_bro_1_1_core_1_1_service_base}{Service\+Base}}}]\item[{\em TThis} : {\em TService}]\item[{\em TThis} : {\em TThis}]\item[{\em TThis} : {\em TService}]\end{description}
+\end{Desc}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+General/IService.\+cs\end{DoxyCompactItemize}

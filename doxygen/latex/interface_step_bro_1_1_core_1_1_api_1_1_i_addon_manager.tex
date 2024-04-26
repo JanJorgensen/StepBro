@@ -1,0 +1,59 @@
+\doxysection{Step\+Bro.\+Core.\+Api.\+IAddon\+Manager Interface Reference}
+\hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager}{}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager}\index{StepBro.Core.Api.IAddonManager@{StepBro.Core.Api.IAddonManager}}
+
+
+Inherited by Step\+Bro.\+Core.\+Api.\+Addon\+Manager.
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a3f39b8eb5871153c31c3da3efbfc8622}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a3f39b8eb5871153c31c3da3efbfc8622} 
+void {\bfseries Add\+Type\+Handler} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_type_handler}{IAddon\+Type\+Handler}} handler)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a92b00b36776632d0b8d4f13f477ff6d0}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a92b00b36776632d0b8d4f13f477ff6d0} 
+void {\bfseries Load\+Assembly} (string path, bool load\+Only\+Types\+With\+Public\+Attribute)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_af3baca4016bce4870f71bc87091c9c1c}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_af3baca4016bce4870f71bc87091c9c1c} 
+void {\bfseries Add\+Assembly} (Assembly assembly, bool load\+Only\+Types\+With\+Public\+Attribute)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a81bcbfde2ed1c637080a51601efab2c3}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a81bcbfde2ed1c637080a51601efab2c3} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_identifier_info}{IIdentifier\+Info}} {\bfseries Lookup} (IEnumerable$<$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_using_data}{Using\+Data}} $>$ usings, string name)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a29164775bec45e260d2670bd4bc19c72}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a29164775bec45e260d2670bd4bc19c72} 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_identifier_info}{IIdentifier\+Info}} $>$ {\bfseries List} (IEnumerable$<$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_using_data}{Using\+Data}} $>$ usings)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a3d85a59619ad7b72f236e79cfe4b9a66}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a3d85a59619ad7b72f236e79cfe4b9a66} 
+IEnumerable$<$ Method\+Info $>$ {\bfseries List\+Extension\+Methods} (Type type, string name)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a18cf2baa2655da6448bd81b0f8c7e5ba}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a18cf2baa2655da6448bd81b0f8c7e5ba} 
+Type {\bfseries Try\+Get\+Type} (IEnumerable$<$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_using_data}{Using\+Data}} $>$ usings, string name)
+\item 
+T \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a328ed15c9f6fc395eaab6b41f76b303e}{Try\+Get\+Addon$<$ T $>$}} (string name)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a7308b51499f131d299ad62dd1c0c2d4a}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a7308b51499f131d299ad62dd1c0c2d4a} 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_api_1_1_i_addon}{IAddon}} $>$ {\bfseries Addons}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a8910486ae97d66865ba50a981c00f2de}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a8910486ae97d66865ba50a981c00f2de} 
+IEnumerable$<$ Tuple$<$ string, bool, Exception $>$ $>$ {\bfseries Scanned\+Files}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a328ed15c9f6fc395eaab6b41f76b303e}\label{interface_step_bro_1_1_core_1_1_api_1_1_i_addon_manager_a328ed15c9f6fc395eaab6b41f76b303e} 
+\index{StepBro.Core.Api.IAddonManager@{StepBro.Core.Api.IAddonManager}!TryGetAddon$<$ T $>$@{TryGetAddon$<$ T $>$}}
+\index{TryGetAddon$<$ T $>$@{TryGetAddon$<$ T $>$}!StepBro.Core.Api.IAddonManager@{StepBro.Core.Api.IAddonManager}}
+\doxysubsubsection{\texorpdfstring{TryGetAddon$<$ T $>$()}{TryGetAddon< T >()}}
+{\footnotesize\ttfamily T Step\+Bro.\+Core.\+Api.\+IAddon\+Manager.\+Try\+Get\+Addon$<$ T $>$ (\begin{DoxyParamCaption}\item[{string}]{name }\end{DoxyParamCaption})}
+
+\begin{Desc}
+\item[Type Constraints]\begin{description}
+\item[{\em T} : {\em class}]\item[{\em T} : {\em IAddon}]\end{description}
+\end{Desc}
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Api/IAddon\+Manager.\+cs\end{DoxyCompactItemize}

@@ -1,0 +1,245 @@
+\doxysection{Step\+Bro.\+Streams.\+Serial\+Port Class Reference}
+\hypertarget{class_step_bro_1_1_streams_1_1_serial_port}{}\label{class_step_bro_1_1_streams_1_1_serial_port}\index{StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}}
+Inheritance diagram for Step\+Bro.\+Streams.\+Serial\+Port\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_step_bro_1_1_streams_1_1_serial_port}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a05d8be5732a32a650944a696f0e9351e}\label{class_step_bro_1_1_streams_1_1_serial_port_a05d8be5732a32a650944a696f0e9351e} 
+delegate void {\bfseries Open\+Port\+Failure\+Explorer} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{ICall\+Context}} context, Exception ex)
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_acfbb2afe069cd156e4519c48511e9a87}\label{class_step_bro_1_1_streams_1_1_serial_port_acfbb2afe069cd156e4519c48511e9a87} 
+{\bfseries Serial\+Port} (\mbox{[}Object\+Name\mbox{]} string object\+Name=\"{}$<$a \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_serial_port}{Serial\+Port}}$>$\"{})
+\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_serial_port_a6bfd9c27c42d38c114396c888d24ea5d}{Write}} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context, string text)
+\item 
+override string \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_serial_port_a012f938ca342118512d6c31ba365f1d5}{Read\+Line\+Direct}} ()
+\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_serial_port_a1ae59877d2eba9e5484cd1e22c4c2411}{Discard\+In\+Buffer}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_stream}{Step\+Bro.\+Streams.\+Stream}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries Dispose} ()
+\item 
+bool {\bfseries Open} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context)
+\item 
+void {\bfseries Close} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context)
+\item 
+abstract void {\bfseries Write} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context, string text)
+\item 
+abstract string {\bfseries Read\+Line\+Direct} ()
+\item 
+string {\bfseries Read\+Line} (\mbox{[}Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context, Time\+Span timeout)
+\item 
+abstract void {\bfseries Discard\+In\+Buffer} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+override string \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_serial_port_a188e8dcdc9da5db718f52ad77407a374}{Get\+Target\+Identification}} ()
+\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_serial_port_a1199c403d6b0fc82c8d4fdb310f25dc9}{Set\+Encoding}} (System.\+Text.\+Encoding encoding)
+\item 
+override System.\+Text.\+Encoding \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_serial_port_a0363b9ed8e96293bd8666e2ed3a10ecf}{Get\+Encoding}} ()
+\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_serial_port_aa69767d3cec83033fdb215a3b22805a2}{Do\+Dispose}} ()
+\item 
+override bool \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_serial_port_a63a51174d2ee6bae94c139e2bc0ef2a0}{Do\+Open}} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context)
+\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_serial_port_a2e916d1d22d11796fd8329af094ad9d5}{Do\+Close}} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context)
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a87010fda5494cd50ca46240bf1ccdaa6}\label{class_step_bro_1_1_streams_1_1_stream_a87010fda5494cd50ca46240bf1ccdaa6} 
+virtual void {\bfseries Do\+Dispose} ()
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a90e4a13d3cf635b9e900b97d1ad8b55e}\label{class_step_bro_1_1_streams_1_1_stream_a90e4a13d3cf635b9e900b97d1ad8b55e} 
+abstract string {\bfseries Get\+Target\+Identification} ()
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a1f32d142eca824b9dd5d32b4c8af443f}\label{class_step_bro_1_1_streams_1_1_stream_a1f32d142eca824b9dd5d32b4c8af443f} 
+abstract void {\bfseries Set\+Encoding} (System.\+Text.\+Encoding encoding)
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a354ae6bbfefaec57c13b32e4a92afb3e}\label{class_step_bro_1_1_streams_1_1_stream_a354ae6bbfefaec57c13b32e4a92afb3e} 
+abstract System.\+Text.\+Encoding {\bfseries Get\+Encoding} ()
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_aac8f78c80ca413bdba08b82ea35d162a}\label{class_step_bro_1_1_streams_1_1_stream_aac8f78c80ca413bdba08b82ea35d162a} 
+abstract bool {\bfseries Do\+Open} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context)
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_stream_a771ff16efbda9a3aa80fb786155f8a53}\label{class_step_bro_1_1_streams_1_1_stream_a771ff16efbda9a3aa80fb786155f8a53} 
+abstract void {\bfseries Do\+Close} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro.\+Core.\+Execution.\+ICall\+Context}} context)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+string \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_serial_port_a3f425e03f9dbefb8860a5e90e9109c1a}{Name}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_aa5f30348a43042d9dc3ca7d99520c82f}\label{class_step_bro_1_1_streams_1_1_serial_port_aa5f30348a43042d9dc3ca7d99520c82f} 
+long {\bfseries Data\+Received\+Counter}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a6428d90a427d40c2fe4d162712224885}\label{class_step_bro_1_1_streams_1_1_serial_port_a6428d90a427d40c2fe4d162712224885} 
+string {\bfseries Port\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_af84e2fa829273541f03b319c08bb692a}\label{class_step_bro_1_1_streams_1_1_serial_port_af84e2fa829273541f03b319c08bb692a} 
+long {\bfseries Baud\+Rate}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a29c24cce50f29ae2d8db76399aec61f1}\label{class_step_bro_1_1_streams_1_1_serial_port_a29c24cce50f29ae2d8db76399aec61f1} 
+long {\bfseries Data\+Bits}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a657678b2c20d9c4bf656015ae38b93f7}\label{class_step_bro_1_1_streams_1_1_serial_port_a657678b2c20d9c4bf656015ae38b93f7} 
+Handshake {\bfseries Handshake}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a6ae0eda036c9a7717c2a3e36787ef724}\label{class_step_bro_1_1_streams_1_1_serial_port_a6ae0eda036c9a7717c2a3e36787ef724} 
+Parity {\bfseries Parity}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a6e51445b7af29d74828745299a97db13}\label{class_step_bro_1_1_streams_1_1_serial_port_a6e51445b7af29d74828745299a97db13} 
+Stop\+Bits {\bfseries Stop\+Bits}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a5c6c3994e0585eb374930718e2927d75}\label{class_step_bro_1_1_streams_1_1_serial_port_a5c6c3994e0585eb374930718e2927d75} 
+override string {\bfseries New\+Line}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_aac3ba42e056b8213d06f1b23e8a1687a}\label{class_step_bro_1_1_streams_1_1_serial_port_aac3ba42e056b8213d06f1b23e8a1687a} 
+override int {\bfseries Read\+Timeout}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_adc9714ee5ce68e79ac8aa5a4bb13b3f4}\label{class_step_bro_1_1_streams_1_1_serial_port_adc9714ee5ce68e79ac8aa5a4bb13b3f4} 
+override bool {\bfseries Is\+Open}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_stream}{Step\+Bro.\+Streams.\+Stream}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual string {\bfseries New\+Line} = \"{}\textbackslash{}n\"{}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+virtual bool {\bfseries Is\+Finite\+Stream}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates whether the stream contains a finite amount of data (e.\+g. a file). \end{DoxyCompactList}\item 
+System.\+Text.\+Encoding {\bfseries Encoding}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+virtual int {\bfseries Read\+Timeout}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+abstract bool {\bfseries Is\+Open}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{Step\+Bro.\+Core.\+Data.\+INameable}}}
+\begin{DoxyCompactItemize}
+\item 
+string {\bfseries Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_stream}{Step\+Bro.\+Streams.\+Stream}}}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler {\bfseries Is\+Open\+Changed}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a1ae59877d2eba9e5484cd1e22c4c2411}\label{class_step_bro_1_1_streams_1_1_serial_port_a1ae59877d2eba9e5484cd1e22c4c2411} 
+\index{StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}!DiscardInBuffer@{DiscardInBuffer}}
+\index{DiscardInBuffer@{DiscardInBuffer}!StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}}
+\doxysubsubsection{\texorpdfstring{DiscardInBuffer()}{DiscardInBuffer()}}
+{\footnotesize\ttfamily override void Step\+Bro.\+Streams.\+Serial\+Port.\+Discard\+In\+Buffer (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_stream}{Step\+Bro.\+Streams.\+Stream}}.
+
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a2e916d1d22d11796fd8329af094ad9d5}\label{class_step_bro_1_1_streams_1_1_serial_port_a2e916d1d22d11796fd8329af094ad9d5} 
+\index{StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}!DoClose@{DoClose}}
+\index{DoClose@{DoClose}!StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}}
+\doxysubsubsection{\texorpdfstring{DoClose()}{DoClose()}}
+{\footnotesize\ttfamily override void Step\+Bro.\+Streams.\+Serial\+Port.\+Do\+Close (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro\+::\+Core\+::\+Execution\+::\+ICall\+Context}}}]{context }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_stream}{Step\+Bro.\+Streams.\+Stream}}.
+
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_aa69767d3cec83033fdb215a3b22805a2}\label{class_step_bro_1_1_streams_1_1_serial_port_aa69767d3cec83033fdb215a3b22805a2} 
+\index{StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}!DoDispose@{DoDispose}}
+\index{DoDispose@{DoDispose}!StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}}
+\doxysubsubsection{\texorpdfstring{DoDispose()}{DoDispose()}}
+{\footnotesize\ttfamily override void Step\+Bro.\+Streams.\+Serial\+Port.\+Do\+Dispose (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_stream}{Step\+Bro.\+Streams.\+Stream}}.
+
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a63a51174d2ee6bae94c139e2bc0ef2a0}\label{class_step_bro_1_1_streams_1_1_serial_port_a63a51174d2ee6bae94c139e2bc0ef2a0} 
+\index{StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}!DoOpen@{DoOpen}}
+\index{DoOpen@{DoOpen}!StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}}
+\doxysubsubsection{\texorpdfstring{DoOpen()}{DoOpen()}}
+{\footnotesize\ttfamily override bool Step\+Bro.\+Streams.\+Serial\+Port.\+Do\+Open (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro\+::\+Core\+::\+Execution\+::\+ICall\+Context}}}]{context }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_stream}{Step\+Bro.\+Streams.\+Stream}}.
+
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a0363b9ed8e96293bd8666e2ed3a10ecf}\label{class_step_bro_1_1_streams_1_1_serial_port_a0363b9ed8e96293bd8666e2ed3a10ecf} 
+\index{StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}!GetEncoding@{GetEncoding}}
+\index{GetEncoding@{GetEncoding}!StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}}
+\doxysubsubsection{\texorpdfstring{GetEncoding()}{GetEncoding()}}
+{\footnotesize\ttfamily override System.\+Text.\+Encoding Step\+Bro.\+Streams.\+Serial\+Port.\+Get\+Encoding (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_stream}{Step\+Bro.\+Streams.\+Stream}}.
+
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a188e8dcdc9da5db718f52ad77407a374}\label{class_step_bro_1_1_streams_1_1_serial_port_a188e8dcdc9da5db718f52ad77407a374} 
+\index{StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}!GetTargetIdentification@{GetTargetIdentification}}
+\index{GetTargetIdentification@{GetTargetIdentification}!StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}}
+\doxysubsubsection{\texorpdfstring{GetTargetIdentification()}{GetTargetIdentification()}}
+{\footnotesize\ttfamily override string Step\+Bro.\+Streams.\+Serial\+Port.\+Get\+Target\+Identification (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_stream}{Step\+Bro.\+Streams.\+Stream}}.
+
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a012f938ca342118512d6c31ba365f1d5}\label{class_step_bro_1_1_streams_1_1_serial_port_a012f938ca342118512d6c31ba365f1d5} 
+\index{StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}!ReadLineDirect@{ReadLineDirect}}
+\index{ReadLineDirect@{ReadLineDirect}!StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}}
+\doxysubsubsection{\texorpdfstring{ReadLineDirect()}{ReadLineDirect()}}
+{\footnotesize\ttfamily override string Step\+Bro.\+Streams.\+Serial\+Port.\+Read\+Line\+Direct (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_stream}{Step\+Bro.\+Streams.\+Stream}}.
+
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a1199c403d6b0fc82c8d4fdb310f25dc9}\label{class_step_bro_1_1_streams_1_1_serial_port_a1199c403d6b0fc82c8d4fdb310f25dc9} 
+\index{StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}!SetEncoding@{SetEncoding}}
+\index{SetEncoding@{SetEncoding}!StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}}
+\doxysubsubsection{\texorpdfstring{SetEncoding()}{SetEncoding()}}
+{\footnotesize\ttfamily override void Step\+Bro.\+Streams.\+Serial\+Port.\+Set\+Encoding (\begin{DoxyParamCaption}\item[{System\+::\+Text\+::\+Encoding}]{encoding }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_stream}{Step\+Bro.\+Streams.\+Stream}}.
+
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a6bfd9c27c42d38c114396c888d24ea5d}\label{class_step_bro_1_1_streams_1_1_serial_port_a6bfd9c27c42d38c114396c888d24ea5d} 
+\index{StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}!Write@{Write}}
+\index{Write@{Write}!StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}}
+\doxysubsubsection{\texorpdfstring{Write()}{Write()}}
+{\footnotesize\ttfamily override void Step\+Bro.\+Streams.\+Serial\+Port.\+Write (\begin{DoxyParamCaption}\item[{\mbox{[}\+Implicit\mbox{]} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_execution_1_1_i_call_context}{Step\+Bro\+::\+Core\+::\+Execution\+::\+ICall\+Context}}}]{context,  }\item[{string}]{text }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_streams_1_1_stream}{Step\+Bro.\+Streams.\+Stream}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_streams_1_1_serial_port_a3f425e03f9dbefb8860a5e90e9109c1a}\label{class_step_bro_1_1_streams_1_1_serial_port_a3f425e03f9dbefb8860a5e90e9109c1a} 
+\index{StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}!Name@{Name}}
+\index{Name@{Name}!StepBro.Streams.SerialPort@{StepBro.Streams.SerialPort}}
+\doxysubsubsection{\texorpdfstring{Name}{Name}}
+{\footnotesize\ttfamily string Step\+Bro.\+Streams.\+Serial\+Port.\+Name\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{Step\+Bro.\+Core.\+Data.\+INameable}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Modules/\+Step\+Bro.\+Streams/Serial\+Port.\+cs\end{DoxyCompactItemize}

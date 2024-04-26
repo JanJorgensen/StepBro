@@ -1,0 +1,267 @@
+\doxysection{Step\+Bro.\+Core.\+Script\+Data.\+File\+Element Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element}{}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element}\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+Inheritance diagram for Step\+Bro.\+Core.\+Script\+Data.\+File\+Element\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_step_bro_1_1_core_1_1_script_data_1_1_file_element}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a6b5d4651a8072a2f511982633c327d61}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a6b5d4651a8072a2f511982633c327d61} 
+{\bfseries File\+Element} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file}{IScript\+File}} file, int line, \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{IFile\+Element}} parent\+Element, string @namespace, string name, Access\+Modifier access, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894}{File\+Element\+Type}} type)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_af8eb7bf4443f3809706b208ab4cea6d0}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_af8eb7bf4443f3809706b208ab4cea6d0} 
+override string {\bfseries To\+String} ()
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a73e69e324e2f9cc3b9db6b9fe00d940c}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a73e69e324e2f9cc3b9db6b9fe00d940c} 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element}{File\+Element}} {\bfseries Get\+Root\+Base\+Element} ()
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_ac193152c5c0a7f4f37c525e6adc85609}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_ac193152c5c0a7f4f37c525e6adc85609} 
+bool {\bfseries IsA} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{IFile\+Element}} element\+Type)
+\item 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_partner}{IPartner}} $>$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_ac962afd6eb373524c50744cf33ce730f}{List\+Partners}} ()
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element_a2ee97a5b649127f1d7b72046aff61d99}\label{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element_a2ee97a5b649127f1d7b72046aff61d99} 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_partner}{IPartner}} $>$ {\bfseries List\+Partners} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_af7f6a7fccb4d80674bc334340616df3f}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_af7f6a7fccb4d80674bc334340616df3f} 
+abstract \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_type_reference}{Type\+Reference}} {\bfseries Get\+Data\+Type} ()
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a39762367a2c8241657be88dd569368eb}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a39762367a2c8241657be88dd569368eb} 
+virtual bool {\bfseries Parse\+Property\+Block\+Flag} (string name)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a63f1f1fb15cc0278844efb903b9a21c3}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a63f1f1fb15cc0278844efb903b9a21c3} 
+readonly int {\bfseries m\+\_\+uid} = g\+\_\+next\+ID++
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a6814c5c2b7366bed9752203ef63f9a83}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a6814c5c2b7366bed9752203ef63f9a83} 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block}{Property\+Block}} {\bfseries m\+\_\+property\+Block} = null
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+string \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a5503957d0ceb2b45cd9717a6d2c757f8}{Name}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894}{File\+Element\+Type}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a2c477e24dc30afce0a1a80c328deb231}{Element\+Type}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+string \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a22ffb86cf2b018d7ddc39ccf96877dd1}{Full\+Name}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Access\+Modifier \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_af80464734ae2b77ce4eb00a3321c465f}{Access\+Level}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{IFile\+Element}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_af4e83b12893a9b43a704120752eadeca}{Base\+Element}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{IFile\+Element}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a31b8d49a9c0ee9f86c78acd2a12e9d24}{Parent\+Element}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file}{IScript\+File}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a0ba3b9b318a629f6a9cfb6fea13a1c0e}{Parent\+File}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+string \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a1ca9b147db4036814ea0b35d100008b6}{Summary}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+string \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a72de4b22fe10c6373da7dbc285c2549e}{Doc\+Reference}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_data_a1007a83f4c84fb18d5823591c53e71d2}{Identifier\+Type}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a14b523d1d7af3307b99fe94c9f56984b}{Type}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_type_reference}{Type\+Reference}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a4c17c8cf7230f07bef1deafcce6e03b7}{Data\+Type}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+int \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a7402a99dcac06b927e2b4fc845bcf4ce}{Unique\+ID}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+int \mbox{\hyperlink{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a5d99035c6414e67aac137c42955e97b5}{Line}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{Step\+Bro.\+Core.\+Script\+Data.\+IFile\+Element}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file}{IScript\+File}} {\bfseries Parent\+File}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+int {\bfseries Line}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{IFile\+Element}} {\bfseries Base\+Element}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{IFile\+Element}} {\bfseries Parent\+Element}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894}{File\+Element\+Type}} {\bfseries Element\+Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Summary}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Doc\+Reference}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+int {\bfseries Unique\+ID}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Access\+Modifier {\bfseries Access\+Level}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_identifier_info}{Step\+Bro.\+Core.\+Data.\+IIdentifier\+Info}}}
+\begin{DoxyCompactItemize}
+\item 
+string {\bfseries Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Full\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_data_a1007a83f4c84fb18d5823591c53e71d2}{Identifier\+Type}} {\bfseries Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_type_reference}{Type\+Reference}} {\bfseries Data\+Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+object {\bfseries Reference}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_inheritable}{Step\+Bro.\+Core.\+Data.\+IInheritable}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_inheritable}{IInheritable}} \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_inheritable_a03b962fed1c61d3d60838813209bb5c2}{Base}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets reference to the object inherited from. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_ac962afd6eb373524c50744cf33ce730f}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_ac962afd6eb373524c50744cf33ce730f} 
+\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}!ListPartners@{ListPartners}}
+\index{ListPartners@{ListPartners}!StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+\doxysubsubsection{\texorpdfstring{ListPartners()}{ListPartners()}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_partner}{IPartner}} $>$ Step\+Bro.\+Core.\+Script\+Data.\+File\+Element.\+List\+Partners (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{Step\+Bro.\+Core.\+Script\+Data.\+IFile\+Element}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_af80464734ae2b77ce4eb00a3321c465f}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_af80464734ae2b77ce4eb00a3321c465f} 
+\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}!AccessLevel@{AccessLevel}}
+\index{AccessLevel@{AccessLevel}!StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+\doxysubsubsection{\texorpdfstring{AccessLevel}{AccessLevel}}
+{\footnotesize\ttfamily Access\+Modifier Step\+Bro.\+Core.\+Script\+Data.\+File\+Element.\+Access\+Level\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{Step\+Bro.\+Core.\+Script\+Data.\+IFile\+Element}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_af4e83b12893a9b43a704120752eadeca}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_af4e83b12893a9b43a704120752eadeca} 
+\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}!BaseElement@{BaseElement}}
+\index{BaseElement@{BaseElement}!StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+\doxysubsubsection{\texorpdfstring{BaseElement}{BaseElement}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{IFile\+Element}} Step\+Bro.\+Core.\+Script\+Data.\+File\+Element.\+Base\+Element\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{Step\+Bro.\+Core.\+Script\+Data.\+IFile\+Element}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a4c17c8cf7230f07bef1deafcce6e03b7}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a4c17c8cf7230f07bef1deafcce6e03b7} 
+\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}!DataType@{DataType}}
+\index{DataType@{DataType}!StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+\doxysubsubsection{\texorpdfstring{DataType}{DataType}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_type_reference}{Type\+Reference}} Step\+Bro.\+Core.\+Script\+Data.\+File\+Element.\+Data\+Type\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_identifier_info}{Step\+Bro.\+Core.\+Data.\+IIdentifier\+Info}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a72de4b22fe10c6373da7dbc285c2549e}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a72de4b22fe10c6373da7dbc285c2549e} 
+\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}!DocReference@{DocReference}}
+\index{DocReference@{DocReference}!StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+\doxysubsubsection{\texorpdfstring{DocReference}{DocReference}}
+{\footnotesize\ttfamily string Step\+Bro.\+Core.\+Script\+Data.\+File\+Element.\+Doc\+Reference\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{Step\+Bro.\+Core.\+Script\+Data.\+IFile\+Element}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a2c477e24dc30afce0a1a80c328deb231}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a2c477e24dc30afce0a1a80c328deb231} 
+\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}!ElementType@{ElementType}}
+\index{ElementType@{ElementType}!StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+\doxysubsubsection{\texorpdfstring{ElementType}{ElementType}}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_script_data_a9f383df1bc860cb930272e083f025894}{File\+Element\+Type}} Step\+Bro.\+Core.\+Script\+Data.\+File\+Element.\+Element\+Type\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{Step\+Bro.\+Core.\+Script\+Data.\+IFile\+Element}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a22ffb86cf2b018d7ddc39ccf96877dd1}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a22ffb86cf2b018d7ddc39ccf96877dd1} 
+\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}!FullName@{FullName}}
+\index{FullName@{FullName}!StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+\doxysubsubsection{\texorpdfstring{FullName}{FullName}}
+{\footnotesize\ttfamily string Step\+Bro.\+Core.\+Script\+Data.\+File\+Element.\+Full\+Name\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_identifier_info}{Step\+Bro.\+Core.\+Data.\+IIdentifier\+Info}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a5d99035c6414e67aac137c42955e97b5}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a5d99035c6414e67aac137c42955e97b5} 
+\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}!Line@{Line}}
+\index{Line@{Line}!StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+\doxysubsubsection{\texorpdfstring{Line}{Line}}
+{\footnotesize\ttfamily int Step\+Bro.\+Core.\+Script\+Data.\+File\+Element.\+Line\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{Step\+Bro.\+Core.\+Script\+Data.\+IFile\+Element}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a5503957d0ceb2b45cd9717a6d2c757f8}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a5503957d0ceb2b45cd9717a6d2c757f8} 
+\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}!Name@{Name}}
+\index{Name@{Name}!StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+\doxysubsubsection{\texorpdfstring{Name}{Name}}
+{\footnotesize\ttfamily string Step\+Bro.\+Core.\+Script\+Data.\+File\+Element.\+Name\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_identifier_info}{Step\+Bro.\+Core.\+Data.\+IIdentifier\+Info}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a31b8d49a9c0ee9f86c78acd2a12e9d24}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a31b8d49a9c0ee9f86c78acd2a12e9d24} 
+\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}!ParentElement@{ParentElement}}
+\index{ParentElement@{ParentElement}!StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+\doxysubsubsection{\texorpdfstring{ParentElement}{ParentElement}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{IFile\+Element}} Step\+Bro.\+Core.\+Script\+Data.\+File\+Element.\+Parent\+Element\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{Step\+Bro.\+Core.\+Script\+Data.\+IFile\+Element}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a0ba3b9b318a629f6a9cfb6fea13a1c0e}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a0ba3b9b318a629f6a9cfb6fea13a1c0e} 
+\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}!ParentFile@{ParentFile}}
+\index{ParentFile@{ParentFile}!StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+\doxysubsubsection{\texorpdfstring{ParentFile}{ParentFile}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_script_file}{IScript\+File}} Step\+Bro.\+Core.\+Script\+Data.\+File\+Element.\+Parent\+File\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{Step\+Bro.\+Core.\+Script\+Data.\+IFile\+Element}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a1ca9b147db4036814ea0b35d100008b6}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a1ca9b147db4036814ea0b35d100008b6} 
+\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}!Summary@{Summary}}
+\index{Summary@{Summary}!StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+\doxysubsubsection{\texorpdfstring{Summary}{Summary}}
+{\footnotesize\ttfamily string Step\+Bro.\+Core.\+Script\+Data.\+File\+Element.\+Summary\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{Step\+Bro.\+Core.\+Script\+Data.\+IFile\+Element}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a14b523d1d7af3307b99fe94c9f56984b}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a14b523d1d7af3307b99fe94c9f56984b} 
+\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}!Type@{Type}}
+\index{Type@{Type}!StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+\doxysubsubsection{\texorpdfstring{Type}{Type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_data_a1007a83f4c84fb18d5823591c53e71d2}{Identifier\+Type}} Step\+Bro.\+Core.\+Script\+Data.\+File\+Element.\+Type\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_identifier_info}{Step\+Bro.\+Core.\+Data.\+IIdentifier\+Info}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a7402a99dcac06b927e2b4fc845bcf4ce}\label{class_step_bro_1_1_core_1_1_script_data_1_1_file_element_a7402a99dcac06b927e2b4fc845bcf4ce} 
+\index{StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}!UniqueID@{UniqueID}}
+\index{UniqueID@{UniqueID}!StepBro.Core.ScriptData.FileElement@{StepBro.Core.ScriptData.FileElement}}
+\doxysubsubsection{\texorpdfstring{UniqueID}{UniqueID}}
+{\footnotesize\ttfamily int Step\+Bro.\+Core.\+Script\+Data.\+File\+Element.\+Unique\+ID\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_script_data_1_1_i_file_element}{Step\+Bro.\+Core.\+Script\+Data.\+IFile\+Element}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Script\+Data/File\+Element.\+cs\end{DoxyCompactItemize}

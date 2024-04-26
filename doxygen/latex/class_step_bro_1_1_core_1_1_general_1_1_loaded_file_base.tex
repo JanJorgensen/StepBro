@@ -1,0 +1,220 @@
+\doxysection{Step\+Bro.\+Core.\+General.\+Loaded\+File\+Base Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base}{}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base}\index{StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}}
+Inheritance diagram for Step\+Bro.\+Core.\+General.\+Loaded\+File\+Base\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a4dadeaa0b298bd9f2eca85f8c556bae8}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a4dadeaa0b298bd9f2eca85f8c556bae8} 
+{\bfseries Loaded\+File\+Base} (string filepath, Loaded\+File\+Type type)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a62977af3bf0c807d98c0f112c78ca9de}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a62977af3bf0c807d98c0f112c78ca9de} 
+string {\bfseries Get\+Full\+Path} ()
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a6f0c865afd8769c8682ebc990df2f559}{Register\+Dependant}} (object using\+Object)
+\begin{DoxyCompactList}\small\item\em Registers an object as a dependant. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a8abeb0b11c69e2a3c6b9d172ef2f7e5b}{Unregister\+Dependant}} (object using\+Object, bool throw\+If\+Not\+Found=true)
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_aacf7aa0ec099628e2e4144d94e452553}{Is\+Dependant\+Of}} (object @object)
+\begin{DoxyCompactList}\small\item\em Returns whether the specified object is in the list of dependants. \end{DoxyCompactList}\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a729c32bd8c1e7827541337bbb60ea7bf}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a729c32bd8c1e7827541337bbb60ea7bf} 
+void {\bfseries Dispose} ()
+\item 
+IEnumerable$<$ string $>$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a4e368bd21365473cad5cba0cafe9c97e}{List\+Dependant\+Descriptors}} ()
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a2cc5c8f7edd40eb9f1143f1d7d62b760}{Register\+Dependant}} (object using\+Object)
+\begin{DoxyCompactList}\small\item\em Registers an object as a dependant. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a3c0579698feb0b8ba635a491f4843421}{Is\+Dependant\+Of}} (object @object)
+\begin{DoxyCompactList}\small\item\em Returns whether the specified object is in the list of dependants. \end{DoxyCompactList}\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a8389febdaca0e8eeb4e271325df727cd}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a8389febdaca0e8eeb4e271325df727cd} 
+bool {\bfseries Unregister\+Dependant} (object using\+Object, bool throw\+If\+Not\+Found=true)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a1ef649456405b0878adaa75845cae0e0}\label{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a1ef649456405b0878adaa75845cae0e0} 
+IEnumerable$<$ string $>$ {\bfseries List\+Dependant\+Descriptors} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a0fcc0cc60412d15d3bdf05579bce4df6}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a0fcc0cc60412d15d3bdf05579bce4df6} 
+void {\bfseries Notify\+Property\+Changed} (string name)
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_add8f64495ed0ec67d3ac85d96e4d03b5}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_add8f64495ed0ec67d3ac85d96e4d03b5} 
+virtual void {\bfseries Do\+Dispose} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+string \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a013d7a87500635ec42d038f38b1b3dfd}{File\+Name}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_abd236bac3cf27eca9bd14bf1dddf5000}{File\+Path}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+int \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a20bf2d7b9b7ba330d6ef654f827fe8bf}{Registered\+Dependants\+Count}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+virtual Loaded\+File\+Type \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a7593e9d68a2538b678df156bbc2bede9}{Type}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+int \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_aae1a16f9cf871472e25ddaf60ce74f7d}{Unique\+ID}} = g\+\_\+next\+ID++\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string \mbox{\hyperlink{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_afd58f62d2e31739ac8d7bcb3285770c8}{Off\+Disk\+File\+Content}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{Step\+Bro.\+Core.\+General.\+ILoaded\+File}}}
+\begin{DoxyCompactItemize}
+\item 
+string {\bfseries File\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries File\+Path}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Loaded\+File\+Type {\bfseries Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+int {\bfseries Unique\+ID}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Off\+Disk\+File\+Content}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+int {\bfseries Registered\+Dependants\+Count}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a15bd5d6512564b3dd8a65901e2d7410c}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a15bd5d6512564b3dd8a65901e2d7410c} 
+Property\+Changed\+Event\+Handler {\bfseries Property\+Changed}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_aacf7aa0ec099628e2e4144d94e452553}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_aacf7aa0ec099628e2e4144d94e452553} 
+\index{StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}!IsDependantOf@{IsDependantOf}}
+\index{IsDependantOf@{IsDependantOf}!StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}}
+\doxysubsubsection{\texorpdfstring{IsDependantOf()}{IsDependantOf()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+General.\+Loaded\+File\+Base.\+Is\+Dependant\+Of (\begin{DoxyParamCaption}\item[{object @}]{object }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns whether the specified object is in the list of dependants. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em object} & The object to check for dependency.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a3c0579698feb0b8ba635a491f4843421}{Step\+Bro.\+Core.\+General.\+ILoaded\+File}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a4e368bd21365473cad5cba0cafe9c97e}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a4e368bd21365473cad5cba0cafe9c97e} 
+\index{StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}!ListDependantDescriptors@{ListDependantDescriptors}}
+\index{ListDependantDescriptors@{ListDependantDescriptors}!StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}}
+\doxysubsubsection{\texorpdfstring{ListDependantDescriptors()}{ListDependantDescriptors()}}
+{\footnotesize\ttfamily IEnumerable$<$ string $>$ Step\+Bro.\+Core.\+General.\+Loaded\+File\+Base.\+List\+Dependant\+Descriptors (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{Step\+Bro.\+Core.\+General.\+ILoaded\+File}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a6f0c865afd8769c8682ebc990df2f559}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a6f0c865afd8769c8682ebc990df2f559} 
+\index{StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}!RegisterDependant@{RegisterDependant}}
+\index{RegisterDependant@{RegisterDependant}!StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}}
+\doxysubsubsection{\texorpdfstring{RegisterDependant()}{RegisterDependant()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+General.\+Loaded\+File\+Base.\+Register\+Dependant (\begin{DoxyParamCaption}\item[{object}]{using\+Object }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Registers an object as a dependant. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em using\+Object} & The dependant object \"{}using\"{} the file.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether the {\itshape using\+Object}  is already registered.
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file_a2cc5c8f7edd40eb9f1143f1d7d62b760}{Step\+Bro.\+Core.\+General.\+ILoaded\+File}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a8abeb0b11c69e2a3c6b9d172ef2f7e5b}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a8abeb0b11c69e2a3c6b9d172ef2f7e5b} 
+\index{StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}!UnregisterDependant@{UnregisterDependant}}
+\index{UnregisterDependant@{UnregisterDependant}!StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}}
+\doxysubsubsection{\texorpdfstring{UnregisterDependant()}{UnregisterDependant()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+General.\+Loaded\+File\+Base.\+Unregister\+Dependant (\begin{DoxyParamCaption}\item[{object}]{using\+Object,  }\item[{bool}]{throw\+If\+Not\+Found = {\ttfamily true} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{Step\+Bro.\+Core.\+General.\+ILoaded\+File}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a013d7a87500635ec42d038f38b1b3dfd}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a013d7a87500635ec42d038f38b1b3dfd} 
+\index{StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}!FileName@{FileName}}
+\index{FileName@{FileName}!StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}}
+\doxysubsubsection{\texorpdfstring{FileName}{FileName}}
+{\footnotesize\ttfamily string Step\+Bro.\+Core.\+General.\+Loaded\+File\+Base.\+File\+Name\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{Step\+Bro.\+Core.\+General.\+ILoaded\+File}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_abd236bac3cf27eca9bd14bf1dddf5000}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_abd236bac3cf27eca9bd14bf1dddf5000} 
+\index{StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}!FilePath@{FilePath}}
+\index{FilePath@{FilePath}!StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}}
+\doxysubsubsection{\texorpdfstring{FilePath}{FilePath}}
+{\footnotesize\ttfamily string Step\+Bro.\+Core.\+General.\+Loaded\+File\+Base.\+File\+Path\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{Step\+Bro.\+Core.\+General.\+ILoaded\+File}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_afd58f62d2e31739ac8d7bcb3285770c8}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_afd58f62d2e31739ac8d7bcb3285770c8} 
+\index{StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}!OffDiskFileContent@{OffDiskFileContent}}
+\index{OffDiskFileContent@{OffDiskFileContent}!StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}}
+\doxysubsubsection{\texorpdfstring{OffDiskFileContent}{OffDiskFileContent}}
+{\footnotesize\ttfamily string Step\+Bro.\+Core.\+General.\+Loaded\+File\+Base.\+Off\+Disk\+File\+Content\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{Step\+Bro.\+Core.\+General.\+ILoaded\+File}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a20bf2d7b9b7ba330d6ef654f827fe8bf}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a20bf2d7b9b7ba330d6ef654f827fe8bf} 
+\index{StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}!RegisteredDependantsCount@{RegisteredDependantsCount}}
+\index{RegisteredDependantsCount@{RegisteredDependantsCount}!StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}}
+\doxysubsubsection{\texorpdfstring{RegisteredDependantsCount}{RegisteredDependantsCount}}
+{\footnotesize\ttfamily int Step\+Bro.\+Core.\+General.\+Loaded\+File\+Base.\+Registered\+Dependants\+Count\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{Step\+Bro.\+Core.\+General.\+ILoaded\+File}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a7593e9d68a2538b678df156bbc2bede9}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_a7593e9d68a2538b678df156bbc2bede9} 
+\index{StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}!Type@{Type}}
+\index{Type@{Type}!StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}}
+\doxysubsubsection{\texorpdfstring{Type}{Type}}
+{\footnotesize\ttfamily virtual Loaded\+File\+Type Step\+Bro.\+Core.\+General.\+Loaded\+File\+Base.\+Type\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{Step\+Bro.\+Core.\+General.\+ILoaded\+File}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_aae1a16f9cf871472e25ddaf60ce74f7d}\label{class_step_bro_1_1_core_1_1_general_1_1_loaded_file_base_aae1a16f9cf871472e25ddaf60ce74f7d} 
+\index{StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}!UniqueID@{UniqueID}}
+\index{UniqueID@{UniqueID}!StepBro.Core.General.LoadedFileBase@{StepBro.Core.General.LoadedFileBase}}
+\doxysubsubsection{\texorpdfstring{UniqueID}{UniqueID}}
+{\footnotesize\ttfamily int Step\+Bro.\+Core.\+General.\+Loaded\+File\+Base.\+Unique\+ID = g\+\_\+next\+ID++\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{Step\+Bro.\+Core.\+General.\+ILoaded\+File}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+General/Loaded\+File\+Base.\+cs\end{DoxyCompactItemize}

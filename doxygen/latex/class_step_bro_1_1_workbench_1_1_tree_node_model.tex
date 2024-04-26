@@ -1,0 +1,192 @@
+\doxysection{Step\+Bro.\+Workbench.\+Tree\+Node\+Model Class Reference}
+\hypertarget{class_step_bro_1_1_workbench_1_1_tree_node_model}{}\label{class_step_bro_1_1_workbench_1_1_tree_node_model}\index{StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}}
+
+
+Provides a common implementation of a tree node model.  
+
+
+Inheritance diagram for Step\+Bro.\+Workbench.\+Tree\+Node\+Model\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_workbench_1_1_tree_node_model}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+override string \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model_a0b29535b0b80eed281079866640bfee0}{To\+String}} ()
+\begin{DoxyCompactList}\small\item\em Returns a String representation of this instance. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+Observable\+Collection$<$ \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model}{Tree\+Node\+Model}} $>$ \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model_a7d3cf6f4262ecf8e0d01b5c34fe2ab85}{Children}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets the collection of child nodes. \end{DoxyCompactList}\item 
+Delegate\+Command$<$ object $>$ \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model_afc10902ce098e04c675eb02a4b576419}{Default\+Action\+Command}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets the default action command. \end{DoxyCompactList}\item 
+Image\+Source \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model_a53311f1b335d3a70675ff9ee3d2e7668}{Image\+Source}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets the Image\+Source for an image to display on the node. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model_a6a5e06ef00bff5b97ad8b3533e1f5a26}{Is\+Draggable}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets whether the node is draggable. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model_acb345b5cdc3b5f9857a82127c45395a4}{Is\+Editable}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets whether the node is editable. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model_a581d06d3723aa236a649776e383ac729}{Is\+Editing}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets whether the node is currently being edited. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model_af407f66812fd43919ba8812cf2e52059}{Is\+Expanded}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets whether the node is expanded. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model_ad1aa0aa30132a9a06d70fe3898b46198}{Is\+Loading}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets whether the node is currently loading children asynchronously. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model_aa82a8360253440c594e0e2bbb63a22c5}{Is\+Selectable}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets whether the node is capable of being selected. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model_a373fb31cb37b29c038c988ebe1f231ab}{Is\+Selected}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets whether the node is selected. \end{DoxyCompactList}\item 
+string \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model_a089262fe60c8a14dc9b933468101b615}{Name}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets the name of the node. \end{DoxyCompactList}\item 
+object \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model_a9b760b2f6e913f061317aa51f5054e3e}{Tag}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets custom data for the node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Provides a common implementation of a tree node model. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_tree_node_model_a0b29535b0b80eed281079866640bfee0}\label{class_step_bro_1_1_workbench_1_1_tree_node_model_a0b29535b0b80eed281079866640bfee0} 
+\index{StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}!ToString@{ToString}}
+\index{ToString@{ToString}!StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}}
+\doxysubsubsection{\texorpdfstring{ToString()}{ToString()}}
+{\footnotesize\ttfamily override string Step\+Bro.\+Workbench.\+Tree\+Node\+Model.\+To\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns a String representation of this instance. 
+
+\begin{DoxyReturn}{Returns}
+A String representation of this instance. 
+\end{DoxyReturn}
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_tree_node_model_a7d3cf6f4262ecf8e0d01b5c34fe2ab85}\label{class_step_bro_1_1_workbench_1_1_tree_node_model_a7d3cf6f4262ecf8e0d01b5c34fe2ab85} 
+\index{StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}!Children@{Children}}
+\index{Children@{Children}!StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}}
+\doxysubsubsection{\texorpdfstring{Children}{Children}}
+{\footnotesize\ttfamily Observable\+Collection$<$\mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_tree_node_model}{Tree\+Node\+Model}}$>$ Step\+Bro.\+Workbench.\+Tree\+Node\+Model.\+Children\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Gets the collection of child nodes. 
+
+The collection of child nodes.\Hypertarget{class_step_bro_1_1_workbench_1_1_tree_node_model_afc10902ce098e04c675eb02a4b576419}\label{class_step_bro_1_1_workbench_1_1_tree_node_model_afc10902ce098e04c675eb02a4b576419} 
+\index{StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}!DefaultActionCommand@{DefaultActionCommand}}
+\index{DefaultActionCommand@{DefaultActionCommand}!StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}}
+\doxysubsubsection{\texorpdfstring{DefaultActionCommand}{DefaultActionCommand}}
+{\footnotesize\ttfamily Delegate\+Command$<$object$>$ Step\+Bro.\+Workbench.\+Tree\+Node\+Model.\+Default\+Action\+Command\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets the default action command. 
+
+The default action command.\Hypertarget{class_step_bro_1_1_workbench_1_1_tree_node_model_a53311f1b335d3a70675ff9ee3d2e7668}\label{class_step_bro_1_1_workbench_1_1_tree_node_model_a53311f1b335d3a70675ff9ee3d2e7668} 
+\index{StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}!ImageSource@{ImageSource}}
+\index{ImageSource@{ImageSource}!StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}}
+\doxysubsubsection{\texorpdfstring{ImageSource}{ImageSource}}
+{\footnotesize\ttfamily Image\+Source Step\+Bro.\+Workbench.\+Tree\+Node\+Model.\+Image\+Source\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets the Image\+Source for an image to display on the node. 
+
+The Image\+Source for an image to display on the node.\Hypertarget{class_step_bro_1_1_workbench_1_1_tree_node_model_a6a5e06ef00bff5b97ad8b3533e1f5a26}\label{class_step_bro_1_1_workbench_1_1_tree_node_model_a6a5e06ef00bff5b97ad8b3533e1f5a26} 
+\index{StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}!IsDraggable@{IsDraggable}}
+\index{IsDraggable@{IsDraggable}!StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}}
+\doxysubsubsection{\texorpdfstring{IsDraggable}{IsDraggable}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Workbench.\+Tree\+Node\+Model.\+Is\+Draggable\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets whether the node is draggable. 
+
+{\ttfamily true} if the node is draggable; otherwise, {\ttfamily false}. \Hypertarget{class_step_bro_1_1_workbench_1_1_tree_node_model_acb345b5cdc3b5f9857a82127c45395a4}\label{class_step_bro_1_1_workbench_1_1_tree_node_model_acb345b5cdc3b5f9857a82127c45395a4} 
+\index{StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}!IsEditable@{IsEditable}}
+\index{IsEditable@{IsEditable}!StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}}
+\doxysubsubsection{\texorpdfstring{IsEditable}{IsEditable}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Workbench.\+Tree\+Node\+Model.\+Is\+Editable\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets whether the node is editable. 
+
+{\ttfamily true} if the node is editable; otherwise, {\ttfamily false}. \Hypertarget{class_step_bro_1_1_workbench_1_1_tree_node_model_a581d06d3723aa236a649776e383ac729}\label{class_step_bro_1_1_workbench_1_1_tree_node_model_a581d06d3723aa236a649776e383ac729} 
+\index{StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}!IsEditing@{IsEditing}}
+\index{IsEditing@{IsEditing}!StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}}
+\doxysubsubsection{\texorpdfstring{IsEditing}{IsEditing}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Workbench.\+Tree\+Node\+Model.\+Is\+Editing\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets whether the node is currently being edited. 
+
+{\ttfamily true} if the node is currently being edited; otherwise, {\ttfamily false}. \Hypertarget{class_step_bro_1_1_workbench_1_1_tree_node_model_af407f66812fd43919ba8812cf2e52059}\label{class_step_bro_1_1_workbench_1_1_tree_node_model_af407f66812fd43919ba8812cf2e52059} 
+\index{StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}!IsExpanded@{IsExpanded}}
+\index{IsExpanded@{IsExpanded}!StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}}
+\doxysubsubsection{\texorpdfstring{IsExpanded}{IsExpanded}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Workbench.\+Tree\+Node\+Model.\+Is\+Expanded\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets whether the node is expanded. 
+
+{\ttfamily true} if the node is expanded; otherwise, {\ttfamily false}. \Hypertarget{class_step_bro_1_1_workbench_1_1_tree_node_model_ad1aa0aa30132a9a06d70fe3898b46198}\label{class_step_bro_1_1_workbench_1_1_tree_node_model_ad1aa0aa30132a9a06d70fe3898b46198} 
+\index{StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}!IsLoading@{IsLoading}}
+\index{IsLoading@{IsLoading}!StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}}
+\doxysubsubsection{\texorpdfstring{IsLoading}{IsLoading}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Workbench.\+Tree\+Node\+Model.\+Is\+Loading\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets whether the node is currently loading children asynchronously. 
+
+{\ttfamily true} if the node is currently loading children asynchronously; otherwise, {\ttfamily false}. \Hypertarget{class_step_bro_1_1_workbench_1_1_tree_node_model_aa82a8360253440c594e0e2bbb63a22c5}\label{class_step_bro_1_1_workbench_1_1_tree_node_model_aa82a8360253440c594e0e2bbb63a22c5} 
+\index{StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}!IsSelectable@{IsSelectable}}
+\index{IsSelectable@{IsSelectable}!StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}}
+\doxysubsubsection{\texorpdfstring{IsSelectable}{IsSelectable}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Workbench.\+Tree\+Node\+Model.\+Is\+Selectable\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets whether the node is capable of being selected. 
+
+{\ttfamily true} if the node is capable of being selected; otherwise, {\ttfamily false}. \Hypertarget{class_step_bro_1_1_workbench_1_1_tree_node_model_a373fb31cb37b29c038c988ebe1f231ab}\label{class_step_bro_1_1_workbench_1_1_tree_node_model_a373fb31cb37b29c038c988ebe1f231ab} 
+\index{StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}!IsSelected@{IsSelected}}
+\index{IsSelected@{IsSelected}!StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}}
+\doxysubsubsection{\texorpdfstring{IsSelected}{IsSelected}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Workbench.\+Tree\+Node\+Model.\+Is\+Selected\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets whether the node is selected. 
+
+{\ttfamily true} if the node is selected; otherwise, {\ttfamily false}. \Hypertarget{class_step_bro_1_1_workbench_1_1_tree_node_model_a089262fe60c8a14dc9b933468101b615}\label{class_step_bro_1_1_workbench_1_1_tree_node_model_a089262fe60c8a14dc9b933468101b615} 
+\index{StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}!Name@{Name}}
+\index{Name@{Name}!StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}}
+\doxysubsubsection{\texorpdfstring{Name}{Name}}
+{\footnotesize\ttfamily string Step\+Bro.\+Workbench.\+Tree\+Node\+Model.\+Name\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets the name of the node. 
+
+The name of the node.\Hypertarget{class_step_bro_1_1_workbench_1_1_tree_node_model_a9b760b2f6e913f061317aa51f5054e3e}\label{class_step_bro_1_1_workbench_1_1_tree_node_model_a9b760b2f6e913f061317aa51f5054e3e} 
+\index{StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}!Tag@{Tag}}
+\index{Tag@{Tag}!StepBro.Workbench.TreeNodeModel@{StepBro.Workbench.TreeNodeModel}}
+\doxysubsubsection{\texorpdfstring{Tag}{Tag}}
+{\footnotesize\ttfamily object Step\+Bro.\+Workbench.\+Tree\+Node\+Model.\+Tag\hspace{0.3cm}{\ttfamily [get]}, {\ttfamily [set]}}
+
+
+
+Gets or sets custom data for the node. 
+
+The custom data for the node.
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Workbench.\+WPF/Tree\+Node\+Model.\+cs\end{DoxyCompactItemize}

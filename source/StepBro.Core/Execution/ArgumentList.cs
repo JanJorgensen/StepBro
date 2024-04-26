@@ -43,6 +43,19 @@ namespace StepBro.Core.Execution
             m_parent = parent;
         }
 
+        public ArgumentList(object[] firstUnnamed, NamedArgument[] named)
+        {
+            m_parent = null;
+            if (firstUnnamed != null)
+            {
+                foreach (object arg in firstUnnamed) this.Add(null, arg);
+            }
+            if (named != null)
+            {
+                foreach (var arg in named) this.Add(arg.Name, arg.Value);
+            }
+        }
+
         public void Add(string name, object value)
         {
             m_arguments.Add(new NamedArgument(name, value));

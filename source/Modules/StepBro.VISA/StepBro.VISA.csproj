@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <Compile Include="..\..\CommonVersion.cs" Link="CommonVersion.cs" />
+    <Compile Include="..\..\StepBro.VISABridge\StepBroVISAMessages.cs" Link="StepBroVISAMessages.cs" />
   </ItemGroup>
 
   <ItemGroup>

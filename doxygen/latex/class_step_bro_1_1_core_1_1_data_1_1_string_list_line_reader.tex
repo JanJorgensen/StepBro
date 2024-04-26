@@ -1,0 +1,210 @@
+\doxysection{Step\+Bro.\+Core.\+Data.\+String\+List\+Line\+Reader Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader}{}\label{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader}\index{StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}}
+Inheritance diagram for Step\+Bro.\+Core.\+Data.\+String\+List\+Line\+Reader\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a212a1cb5a43c31b9303f0f0e839d3656}\label{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a212a1cb5a43c31b9303f0f0e839d3656} 
+{\bfseries String\+List\+Line\+Reader} (List$<$ string $>$ list, \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{INameable}} source=null)
+\item 
+void \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a16a42090a67ef9e3b99d9f0175440d5d}{Flush}} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} stop\+At=null)
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a5dc446dfc7dc040568a66984853e83e3}{Next}} ()
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_ac528bcfac98bacdf01a1269697118f70}{Next\+Unless\+New\+Entry}} ()
+\item 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} $>$ \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a8ef6bb3a4321931a9f4e8cc05b2c078b}{Peak}} ()
+\item 
+void \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a08ae489a68adc2baf8452138d7fc4b9b}{Debug\+Dump}} ()
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a3185cb5fb4b8be2d114f58f02176875c}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a3185cb5fb4b8be2d114f58f02176875c} 
+bool {\bfseries Next} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a4808af657c5ba22068548a8645d2c931}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a4808af657c5ba22068548a8645d2c931} 
+bool {\bfseries Next\+Unless\+New\+Entry} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a43f0c3fdd3a9d6c5a8e8008a39962c77}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a43f0c3fdd3a9d6c5a8e8008a39962c77} 
+void {\bfseries Flush} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} stop\+At=null)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a2284b4006515f128380b9515f4f92d9e}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a2284b4006515f128380b9515f4f92d9e} 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} $>$ {\bfseries Peak} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_ab5a471edfe2941c865adf3541085e033}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_ab5a471edfe2941c865adf3541085e033} 
+void {\bfseries Debug\+Dump} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+object \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a0e2a81936aedb392526a24f0d6f5989c}{Sync}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a7ecbf7fde3314ed25d4d9ad0d4fd523c}{Current}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_adab26da95e803ab8c34d7e48e9819081}{Lines\+Have\+Timestamp}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Date\+Time \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a6f0b6f4a01a0aaa3899dc47bec5ba380}{Latest\+Time\+Stamp}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a573c48e8f0c32ab7ba7ec4f155b28adc}{Has\+More}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{INameable}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_afba199cc7971865c9a7d5d23d6f78797}{Source}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Event\+Handler \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_ae8f37c60e9d0272ef2e1d57a6bd96cba}{Lines\+Added}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{INameable}} {\bfseries Source}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+object {\bfseries Sync}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} {\bfseries Current}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Date\+Time {\bfseries Latest\+Time\+Stamp}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool {\bfseries Lines\+Have\+Timestamp}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool {\bfseries Has\+More}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler {\bfseries Lines\+Added}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a08ae489a68adc2baf8452138d7fc4b9b}\label{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a08ae489a68adc2baf8452138d7fc4b9b} 
+\index{StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}!DebugDump@{DebugDump}}
+\index{DebugDump@{DebugDump}!StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}}
+\doxysubsubsection{\texorpdfstring{DebugDump()}{DebugDump()}}
+{\footnotesize\ttfamily void Step\+Bro.\+Core.\+Data.\+String\+List\+Line\+Reader.\+Debug\+Dump (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a16a42090a67ef9e3b99d9f0175440d5d}\label{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a16a42090a67ef9e3b99d9f0175440d5d} 
+\index{StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}!Flush@{Flush}}
+\index{Flush@{Flush}!StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}}
+\doxysubsubsection{\texorpdfstring{Flush()}{Flush()}}
+{\footnotesize\ttfamily void Step\+Bro.\+Core.\+Data.\+String\+List\+Line\+Reader.\+Flush (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}}}]{stop\+At = {\ttfamily null} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a5dc446dfc7dc040568a66984853e83e3}\label{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a5dc446dfc7dc040568a66984853e83e3} 
+\index{StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}!Next@{Next}}
+\index{Next@{Next}!StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}}
+\doxysubsubsection{\texorpdfstring{Next()}{Next()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+Data.\+String\+List\+Line\+Reader.\+Next (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_ac528bcfac98bacdf01a1269697118f70}\label{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_ac528bcfac98bacdf01a1269697118f70} 
+\index{StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}!NextUnlessNewEntry@{NextUnlessNewEntry}}
+\index{NextUnlessNewEntry@{NextUnlessNewEntry}!StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}}
+\doxysubsubsection{\texorpdfstring{NextUnlessNewEntry()}{NextUnlessNewEntry()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+Data.\+String\+List\+Line\+Reader.\+Next\+Unless\+New\+Entry (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a8ef6bb3a4321931a9f4e8cc05b2c078b}\label{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a8ef6bb3a4321931a9f4e8cc05b2c078b} 
+\index{StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}!Peak@{Peak}}
+\index{Peak@{Peak}!StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}}
+\doxysubsubsection{\texorpdfstring{Peak()}{Peak()}}
+{\footnotesize\ttfamily IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} $>$ Step\+Bro.\+Core.\+Data.\+String\+List\+Line\+Reader.\+Peak (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a7ecbf7fde3314ed25d4d9ad0d4fd523c}\label{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a7ecbf7fde3314ed25d4d9ad0d4fd523c} 
+\index{StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}!Current@{Current}}
+\index{Current@{Current}!StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}}
+\doxysubsubsection{\texorpdfstring{Current}{Current}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} Step\+Bro.\+Core.\+Data.\+String\+List\+Line\+Reader.\+Current\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a573c48e8f0c32ab7ba7ec4f155b28adc}\label{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a573c48e8f0c32ab7ba7ec4f155b28adc} 
+\index{StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}!HasMore@{HasMore}}
+\index{HasMore@{HasMore}!StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}}
+\doxysubsubsection{\texorpdfstring{HasMore}{HasMore}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+Data.\+String\+List\+Line\+Reader.\+Has\+More\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a6f0b6f4a01a0aaa3899dc47bec5ba380}\label{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a6f0b6f4a01a0aaa3899dc47bec5ba380} 
+\index{StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}!LatestTimeStamp@{LatestTimeStamp}}
+\index{LatestTimeStamp@{LatestTimeStamp}!StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}}
+\doxysubsubsection{\texorpdfstring{LatestTimeStamp}{LatestTimeStamp}}
+{\footnotesize\ttfamily Date\+Time Step\+Bro.\+Core.\+Data.\+String\+List\+Line\+Reader.\+Latest\+Time\+Stamp\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_ae8f37c60e9d0272ef2e1d57a6bd96cba}\label{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_ae8f37c60e9d0272ef2e1d57a6bd96cba} 
+\index{StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}!LinesAdded@{LinesAdded}}
+\index{LinesAdded@{LinesAdded}!StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}}
+\doxysubsubsection{\texorpdfstring{LinesAdded}{LinesAdded}}
+{\footnotesize\ttfamily Event\+Handler Step\+Bro.\+Core.\+Data.\+String\+List\+Line\+Reader.\+Lines\+Added\hspace{0.3cm}{\ttfamily [add]}, {\ttfamily [remove]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_adab26da95e803ab8c34d7e48e9819081}\label{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_adab26da95e803ab8c34d7e48e9819081} 
+\index{StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}!LinesHaveTimestamp@{LinesHaveTimestamp}}
+\index{LinesHaveTimestamp@{LinesHaveTimestamp}!StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}}
+\doxysubsubsection{\texorpdfstring{LinesHaveTimestamp}{LinesHaveTimestamp}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Core.\+Data.\+String\+List\+Line\+Reader.\+Lines\+Have\+Timestamp\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_afba199cc7971865c9a7d5d23d6f78797}\label{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_afba199cc7971865c9a7d5d23d6f78797} 
+\index{StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}!Source@{Source}}
+\index{Source@{Source}!StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}}
+\doxysubsubsection{\texorpdfstring{Source}{Source}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{INameable}} Step\+Bro.\+Core.\+Data.\+String\+List\+Line\+Reader.\+Source\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a0e2a81936aedb392526a24f0d6f5989c}\label{class_step_bro_1_1_core_1_1_data_1_1_string_list_line_reader_a0e2a81936aedb392526a24f0d6f5989c} 
+\index{StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}!Sync@{Sync}}
+\index{Sync@{Sync}!StepBro.Core.Data.StringListLineReader@{StepBro.Core.Data.StringListLineReader}}
+\doxysubsubsection{\texorpdfstring{Sync}{Sync}}
+{\footnotesize\ttfamily object Step\+Bro.\+Core.\+Data.\+String\+List\+Line\+Reader.\+Sync\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{Step\+Bro.\+Core.\+Data.\+ILine\+Reader}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Data/Line\+Readers.\+cs\end{DoxyCompactItemize}

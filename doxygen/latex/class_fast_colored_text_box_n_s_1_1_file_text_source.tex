@@ -1,0 +1,462 @@
+\doxysection{Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source Class Reference}
+\hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source}{}\label{class_fast_colored_text_box_n_s_1_1_file_text_source}\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+
+
+This class contains the source text (chars and styles). It stores a text lines, the manager of commands, undo/redo stack, styles.  
+
+
+Inheritance diagram for Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.343096cm]{class_fast_colored_text_box_n_s_1_1_file_text_source}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a2e55edd7607061bb8b199b56220391b7}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a2e55edd7607061bb8b199b56220391b7} 
+{\bfseries File\+Text\+Source} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} current\+TB)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a9f589f8da5869451b432dd1e54e1bb53}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a9f589f8da5869451b432dd1e54e1bb53} 
+void {\bfseries Open\+File} (string file\+Name, Encoding enc)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_aaff533ba67bd3106dcb017ec8ebfef0d}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_aaff533ba67bd3106dcb017ec8ebfef0d} 
+void {\bfseries Close\+File} ()
+\item 
+override void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_ae9c812bef4c37b92dc9b8acfa26aba57}{Save\+To\+File}} (string file\+Name, Encoding enc)
+\item 
+override void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_a72114635b88a214e9e680700fbdfa8fe}{Clear\+Is\+Changed}} ()
+\item 
+override void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_a60934d2dfcf089b89e366776af2a8a59}{Insert\+Line}} (int index, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} line)
+\item 
+override void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_a1eb1fd94be0c5ab65d667e65ba13f25c}{Remove\+Line}} (int index, int count)
+\item 
+override void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_a2edd7b7b4bdd7c68364fc77daa8a6a63}{Clear}} ()
+\item 
+override int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_a2d00180f2c8f90f6bd3aa67a1d8481bc}{Get\+Line\+Length}} (int i)
+\item 
+override bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_a411d3d8d7cafb7ba6f7b9abb896fc274}{Line\+Has\+Folding\+Start\+Marker}} (int i\+Line)
+\item 
+override bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_af54cf35e965b973ef0f96bc1a9994bbb}{Line\+Has\+Folding\+End\+Marker}} (int i\+Line)
+\item 
+override void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_a0d6c98e4162c79311ac7350c20e7ad20}{Dispose}} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a2e55edd7607061bb8b199b56220391b7}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a2e55edd7607061bb8b199b56220391b7} 
+{\bfseries File\+Text\+Source} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} current\+TB)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a9f589f8da5869451b432dd1e54e1bb53}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a9f589f8da5869451b432dd1e54e1bb53} 
+void {\bfseries Open\+File} (string file\+Name, Encoding enc)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_aaff533ba67bd3106dcb017ec8ebfef0d}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_aaff533ba67bd3106dcb017ec8ebfef0d} 
+void {\bfseries Close\+File} ()
+\item 
+override void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_ae9c812bef4c37b92dc9b8acfa26aba57}{Save\+To\+File}} (string file\+Name, Encoding enc)
+\item 
+override void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_a72114635b88a214e9e680700fbdfa8fe}{Clear\+Is\+Changed}} ()
+\item 
+override void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_a60934d2dfcf089b89e366776af2a8a59}{Insert\+Line}} (int index, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} line)
+\item 
+override void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_a1eb1fd94be0c5ab65d667e65ba13f25c}{Remove\+Line}} (int index, int count)
+\item 
+override void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_a2edd7b7b4bdd7c68364fc77daa8a6a63}{Clear}} ()
+\item 
+override int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_a2d00180f2c8f90f6bd3aa67a1d8481bc}{Get\+Line\+Length}} (int i)
+\item 
+override bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_a411d3d8d7cafb7ba6f7b9abb896fc274}{Line\+Has\+Folding\+Start\+Marker}} (int i\+Line)
+\item 
+override bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_af54cf35e965b973ef0f96bc1a9994bbb}{Line\+Has\+Folding\+End\+Marker}} (int i\+Line)
+\item 
+override void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_file_text_source_a0d6c98e4162c79311ac7350c20e7ad20}{Dispose}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual void {\bfseries Clear\+Is\+Changed} ()
+\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} {\bfseries Create\+Line} ()
+\item 
+{\bfseries Text\+Source} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} current\+TB)
+\item 
+virtual void {\bfseries Init\+Default\+Style} ()
+\item 
+virtual bool {\bfseries Is\+Line\+Loaded} (int i\+Line)
+\item 
+virtual IList$<$ string $>$ {\bfseries Get\+Lines} ()
+\begin{DoxyCompactList}\small\item\em Text lines. \end{DoxyCompactList}\item 
+IEnumerator$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} $>$ {\bfseries Get\+Enumerator} ()
+\item 
+virtual int {\bfseries Binary\+Search} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item, IComparer$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} $>$ comparer)
+\item 
+virtual int {\bfseries Generate\+Unique\+Line\+Id} ()
+\item 
+virtual void {\bfseries Insert\+Line} (int index, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} line)
+\item 
+virtual void {\bfseries On\+Line\+Inserted} (int index)
+\item 
+virtual void {\bfseries On\+Line\+Inserted} (int index, int count)
+\item 
+virtual void {\bfseries Remove\+Line} (int index)
+\item 
+virtual void {\bfseries Remove\+Line} (int index, int count)
+\item 
+virtual void {\bfseries On\+Line\+Removed} (int index, int count, List$<$ int $>$ removed\+Line\+Ids)
+\item 
+virtual void {\bfseries On\+Text\+Changed} (int from\+Line, int to\+Line)
+\item 
+virtual int {\bfseries Index\+Of} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+virtual void {\bfseries Insert} (int index, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+virtual void {\bfseries Remove\+At} (int index)
+\item 
+virtual void {\bfseries Add} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+virtual void {\bfseries Clear} ()
+\item 
+virtual bool {\bfseries Contains} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+virtual void {\bfseries Copy\+To} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}}\mbox{[}$\,$\mbox{]} array, int array\+Index)
+\item 
+virtual bool {\bfseries Remove} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+virtual void {\bfseries Need\+Recalc} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} args)
+\item 
+virtual void {\bfseries On\+Recalc\+Word\+Wrap} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} args)
+\item 
+virtual void {\bfseries On\+Text\+Changing} ()
+\item 
+virtual void {\bfseries On\+Text\+Changing} (ref string text)
+\item 
+virtual int {\bfseries Get\+Line\+Length} (int i)
+\item 
+virtual bool {\bfseries Line\+Has\+Folding\+Start\+Marker} (int i\+Line)
+\item 
+virtual bool {\bfseries Line\+Has\+Folding\+End\+Marker} (int i\+Line)
+\item 
+virtual void {\bfseries Dispose} ()
+\item 
+virtual void {\bfseries Save\+To\+File} (string file\+Name, Encoding enc)
+\item 
+virtual void {\bfseries Clear\+Is\+Changed} ()
+\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} {\bfseries Create\+Line} ()
+\item 
+{\bfseries Text\+Source} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} current\+TB)
+\item 
+virtual void {\bfseries Init\+Default\+Style} ()
+\item 
+virtual bool {\bfseries Is\+Line\+Loaded} (int i\+Line)
+\item 
+virtual IList$<$ string $>$ {\bfseries Get\+Lines} ()
+\begin{DoxyCompactList}\small\item\em Text lines. \end{DoxyCompactList}\item 
+IEnumerator$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} $>$ {\bfseries Get\+Enumerator} ()
+\item 
+virtual int {\bfseries Binary\+Search} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item, IComparer$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} $>$ comparer)
+\item 
+virtual int {\bfseries Generate\+Unique\+Line\+Id} ()
+\item 
+virtual void {\bfseries Insert\+Line} (int index, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} line)
+\item 
+virtual void {\bfseries On\+Line\+Inserted} (int index)
+\item 
+virtual void {\bfseries On\+Line\+Inserted} (int index, int count)
+\item 
+virtual void {\bfseries Remove\+Line} (int index)
+\item 
+virtual void {\bfseries Remove\+Line} (int index, int count)
+\item 
+virtual void {\bfseries On\+Line\+Removed} (int index, int count, List$<$ int $>$ removed\+Line\+Ids)
+\item 
+virtual void {\bfseries On\+Text\+Changed} (int from\+Line, int to\+Line)
+\item 
+virtual int {\bfseries Index\+Of} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+virtual void {\bfseries Insert} (int index, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+virtual void {\bfseries Remove\+At} (int index)
+\item 
+virtual void {\bfseries Add} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+virtual void {\bfseries Clear} ()
+\item 
+virtual bool {\bfseries Contains} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+virtual void {\bfseries Copy\+To} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}}\mbox{[}$\,$\mbox{]} array, int array\+Index)
+\item 
+virtual bool {\bfseries Remove} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+virtual void {\bfseries Need\+Recalc} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} args)
+\item 
+virtual void {\bfseries On\+Recalc\+Word\+Wrap} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} args)
+\item 
+virtual void {\bfseries On\+Text\+Changing} ()
+\item 
+virtual void {\bfseries On\+Text\+Changing} (ref string text)
+\item 
+virtual int {\bfseries Get\+Line\+Length} (int i)
+\item 
+virtual bool {\bfseries Line\+Has\+Folding\+Start\+Marker} (int i\+Line)
+\item 
+virtual bool {\bfseries Line\+Has\+Folding\+End\+Marker} (int i\+Line)
+\item 
+virtual void {\bfseries Dispose} ()
+\item 
+virtual void {\bfseries Save\+To\+File} (string file\+Name, Encoding enc)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a810ef981a283e48e3bbf86c69d94e478}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a810ef981a283e48e3bbf86c69d94e478} 
+string {\bfseries Save\+EOL}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em End Of Line characters used for saving. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_aa7c67c2af5a7074ea8bf2bfedbc5cc9e}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_aa7c67c2af5a7074ea8bf2bfedbc5cc9e} 
+override \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} {\bfseries this\mbox{[}int i\mbox{]}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_command_manager}{Command\+Manager}} {\bfseries Manager}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} {\bfseries Current\+TB}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Current focused Fast\+Colored\+Text\+Box. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_style}{Text\+Style}} {\bfseries Default\+Style}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Default text style This style is using when no one other Text\+Style is not defined in Char.\+style. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} {\bfseries this\mbox{[}int i\mbox{]}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+virtual bool {\bfseries Is\+Need\+Build\+Removed\+Line\+Ids}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+virtual int {\bfseries Count}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Lines count. \end{DoxyCompactList}\item 
+virtual bool {\bfseries Is\+Read\+Only}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a6514891fddcfde9a101e1ce3ead2cf82}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a6514891fddcfde9a101e1ce3ead2cf82} 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line_needed_event_args}{Line\+Needed\+Event\+Args}} $>$ {\bfseries Line\+Needed}
+\begin{DoxyCompactList}\small\item\em Occurs when need to display line in the textbox. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a83e121716de77e90c2e9214b1c8dc1ce}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a83e121716de77e90c2e9214b1c8dc1ce} 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line_pushed_event_args}{Line\+Pushed\+Event\+Args}} $>$ {\bfseries Line\+Pushed}
+\begin{DoxyCompactList}\small\item\em Occurs when need to save line in the file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line_inserted_event_args}{Line\+Inserted\+Event\+Args}} $>$ {\bfseries Line\+Inserted}
+\begin{DoxyCompactList}\small\item\em Occurs when line was inserted/added. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line_removed_event_args}{Line\+Removed\+Event\+Args}} $>$ {\bfseries Line\+Removed}
+\begin{DoxyCompactList}\small\item\em Occurs when line was removed. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} $>$ {\bfseries Text\+Changed}
+\begin{DoxyCompactList}\small\item\em Occurs when text was changed. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} $>$ {\bfseries Recalc\+Needed}
+\begin{DoxyCompactList}\small\item\em Occurs when recalc is needed. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} $>$ {\bfseries Recalc\+Word\+Wrap}
+\begin{DoxyCompactList}\small\item\em Occurs when recalc wordwrap is needed. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_changing_event_args}{Text\+Changing\+Event\+Args}} $>$ {\bfseries Text\+Changing}
+\begin{DoxyCompactList}\small\item\em Occurs before text changing. \end{DoxyCompactList}\item 
+Event\+Handler {\bfseries Current\+TBChanged}
+\begin{DoxyCompactList}\small\item\em Occurs after Current\+TB was changed. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}}
+\begin{DoxyCompactItemize}
+\item 
+readonly \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}}\mbox{[}$\,$\mbox{]} {\bfseries Styles}
+\begin{DoxyCompactList}\small\item\em Styles. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}}
+\begin{DoxyCompactItemize}
+\item 
+readonly List$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} $>$ {\bfseries lines} = new List$<$\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}}$>$()
+\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_lines_accessor}{Lines\+Accessor}} {\bfseries lines\+Accessor}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This class contains the source text (chars and styles). It stores a text lines, the manager of commands, undo/redo stack, styles. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a2edd7b7b4bdd7c68364fc77daa8a6a63}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a2edd7b7b4bdd7c68364fc77daa8a6a63} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!Clear@{Clear}}
+\index{Clear@{Clear}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{Clear()}{Clear()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily override void Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a2edd7b7b4bdd7c68364fc77daa8a6a63}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a2edd7b7b4bdd7c68364fc77daa8a6a63} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!Clear@{Clear}}
+\index{Clear@{Clear}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{Clear()}{Clear()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily override void Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a72114635b88a214e9e680700fbdfa8fe}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a72114635b88a214e9e680700fbdfa8fe} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!ClearIsChanged@{ClearIsChanged}}
+\index{ClearIsChanged@{ClearIsChanged}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{ClearIsChanged()}{ClearIsChanged()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily override void Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Clear\+Is\+Changed (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a72114635b88a214e9e680700fbdfa8fe}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a72114635b88a214e9e680700fbdfa8fe} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!ClearIsChanged@{ClearIsChanged}}
+\index{ClearIsChanged@{ClearIsChanged}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{ClearIsChanged()}{ClearIsChanged()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily override void Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Clear\+Is\+Changed (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a0d6c98e4162c79311ac7350c20e7ad20}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a0d6c98e4162c79311ac7350c20e7ad20} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!Dispose@{Dispose}}
+\index{Dispose@{Dispose}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{Dispose()}{Dispose()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily override void Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Dispose (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a0d6c98e4162c79311ac7350c20e7ad20}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a0d6c98e4162c79311ac7350c20e7ad20} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!Dispose@{Dispose}}
+\index{Dispose@{Dispose}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{Dispose()}{Dispose()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily override void Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Dispose (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a2d00180f2c8f90f6bd3aa67a1d8481bc}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a2d00180f2c8f90f6bd3aa67a1d8481bc} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!GetLineLength@{GetLineLength}}
+\index{GetLineLength@{GetLineLength}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{GetLineLength()}{GetLineLength()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily override int Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Get\+Line\+Length (\begin{DoxyParamCaption}\item[{int}]{i }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a2d00180f2c8f90f6bd3aa67a1d8481bc}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a2d00180f2c8f90f6bd3aa67a1d8481bc} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!GetLineLength@{GetLineLength}}
+\index{GetLineLength@{GetLineLength}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{GetLineLength()}{GetLineLength()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily override int Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Get\+Line\+Length (\begin{DoxyParamCaption}\item[{int}]{i }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a60934d2dfcf089b89e366776af2a8a59}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a60934d2dfcf089b89e366776af2a8a59} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!InsertLine@{InsertLine}}
+\index{InsertLine@{InsertLine}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{InsertLine()}{InsertLine()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily override void Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Insert\+Line (\begin{DoxyParamCaption}\item[{int}]{index,  }\item[{\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}}}]{line }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a60934d2dfcf089b89e366776af2a8a59}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a60934d2dfcf089b89e366776af2a8a59} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!InsertLine@{InsertLine}}
+\index{InsertLine@{InsertLine}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{InsertLine()}{InsertLine()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily override void Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Insert\+Line (\begin{DoxyParamCaption}\item[{int}]{index,  }\item[{\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}}}]{line }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_af54cf35e965b973ef0f96bc1a9994bbb}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_af54cf35e965b973ef0f96bc1a9994bbb} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!LineHasFoldingEndMarker@{LineHasFoldingEndMarker}}
+\index{LineHasFoldingEndMarker@{LineHasFoldingEndMarker}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{LineHasFoldingEndMarker()}{LineHasFoldingEndMarker()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily override bool Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Line\+Has\+Folding\+End\+Marker (\begin{DoxyParamCaption}\item[{int}]{i\+Line }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_af54cf35e965b973ef0f96bc1a9994bbb}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_af54cf35e965b973ef0f96bc1a9994bbb} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!LineHasFoldingEndMarker@{LineHasFoldingEndMarker}}
+\index{LineHasFoldingEndMarker@{LineHasFoldingEndMarker}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{LineHasFoldingEndMarker()}{LineHasFoldingEndMarker()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily override bool Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Line\+Has\+Folding\+End\+Marker (\begin{DoxyParamCaption}\item[{int}]{i\+Line }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a411d3d8d7cafb7ba6f7b9abb896fc274}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a411d3d8d7cafb7ba6f7b9abb896fc274} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!LineHasFoldingStartMarker@{LineHasFoldingStartMarker}}
+\index{LineHasFoldingStartMarker@{LineHasFoldingStartMarker}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{LineHasFoldingStartMarker()}{LineHasFoldingStartMarker()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily override bool Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Line\+Has\+Folding\+Start\+Marker (\begin{DoxyParamCaption}\item[{int}]{i\+Line }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a411d3d8d7cafb7ba6f7b9abb896fc274}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a411d3d8d7cafb7ba6f7b9abb896fc274} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!LineHasFoldingStartMarker@{LineHasFoldingStartMarker}}
+\index{LineHasFoldingStartMarker@{LineHasFoldingStartMarker}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{LineHasFoldingStartMarker()}{LineHasFoldingStartMarker()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily override bool Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Line\+Has\+Folding\+Start\+Marker (\begin{DoxyParamCaption}\item[{int}]{i\+Line }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a1eb1fd94be0c5ab65d667e65ba13f25c}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a1eb1fd94be0c5ab65d667e65ba13f25c} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!RemoveLine@{RemoveLine}}
+\index{RemoveLine@{RemoveLine}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{RemoveLine()}{RemoveLine()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily override void Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Remove\+Line (\begin{DoxyParamCaption}\item[{int}]{index,  }\item[{int}]{count }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_a1eb1fd94be0c5ab65d667e65ba13f25c}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_a1eb1fd94be0c5ab65d667e65ba13f25c} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!RemoveLine@{RemoveLine}}
+\index{RemoveLine@{RemoveLine}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{RemoveLine()}{RemoveLine()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily override void Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Remove\+Line (\begin{DoxyParamCaption}\item[{int}]{index,  }\item[{int}]{count }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_ae9c812bef4c37b92dc9b8acfa26aba57}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_ae9c812bef4c37b92dc9b8acfa26aba57} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!SaveToFile@{SaveToFile}}
+\index{SaveToFile@{SaveToFile}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{SaveToFile()}{SaveToFile()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily override void Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Save\+To\+File (\begin{DoxyParamCaption}\item[{string}]{file\+Name,  }\item[{Encoding}]{enc }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_file_text_source_ae9c812bef4c37b92dc9b8acfa26aba57}\label{class_fast_colored_text_box_n_s_1_1_file_text_source_ae9c812bef4c37b92dc9b8acfa26aba57} 
+\index{FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}!SaveToFile@{SaveToFile}}
+\index{SaveToFile@{SaveToFile}!FastColoredTextBoxNS.FileTextSource@{FastColoredTextBoxNS.FileTextSource}}
+\doxysubsubsection{\texorpdfstring{SaveToFile()}{SaveToFile()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily override void Fast\+Colored\+Text\+Box\+NS.\+File\+Text\+Source.\+Save\+To\+File (\begin{DoxyParamCaption}\item[{string}]{file\+Name,  }\item[{Encoding}]{enc }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Third\+Party/\+Fast\+Colored\+Text\+Box changed/File\+Text\+Source.\+cs\item 
+source/\+Third\+Party/\+Fast\+Colored\+Text\+Box/File\+Text\+Source.\+cs\end{DoxyCompactItemize}

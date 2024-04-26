@@ -1,0 +1,146 @@
+\doxysection{Step\+Bro.\+CAN.\+Message\+Transmitter Class Reference}
+\hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter}{}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter}\index{StepBro.CAN.MessageTransmitter@{StepBro.CAN.MessageTransmitter}}
+Inheritance diagram for Step\+Bro.\+CAN.\+Message\+Transmitter\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_c_a_n_1_1_message_transmitter}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter_af4515c2fc5af5d6e9c17a27162eb51a9}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter_af4515c2fc5af5d6e9c17a27162eb51a9} 
+{\bfseries Message\+Transmitter} (string name, Message\+Type type, uint ID, byte\mbox{[}$\,$\mbox{]} data, bool periodic, Time\+Span time, Date\+Time next, bool active)
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a9df2c7a3a6afe34219d9d8d7f1bcb5be}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a9df2c7a3a6afe34219d9d8d7f1bcb5be} 
+{\bfseries Message\+Transmitter} (string name, Message\+Type type, uint ID, byte\mbox{[}$\,$\mbox{]} data, Time\+Span time, bool start\+Now)
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a9cfb49a8472189bf2daeed8496ea58cc}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a9cfb49a8472189bf2daeed8496ea58cc} 
+{\bfseries Message\+Transmitter} (string name, Message\+Type type, uint ID, byte\mbox{[}$\,$\mbox{]} data, Date\+Time time)
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_c_a_n_1_1_message_transmitter_ab3bb389f3fc1455d902132a9292c80a8}{Update\+When\+Handling}} (Date\+Time now)
+\begin{DoxyCompactList}\small\item\em Method to update the object when its time is due. \end{DoxyCompactList}\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a9b6495948b9b322a455128f3d4d249de}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a9b6495948b9b322a455128f3d4d249de} 
+void {\bfseries Reset} ()
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter_ade395677fb30dcdacae9e7cb1fad36bd}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter_ade395677fb30dcdacae9e7cb1fad36bd} 
+void {\bfseries Activate} ()
+\item 
+void \mbox{\hyperlink{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a7ea1ab50eccc201206e17e7cedf3ecc4}{Deactivate}} ()
+\end{DoxyCompactItemize}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a5b108919bf85bda21da2114f26e20791}{Update\+When\+Handling}} (Date\+Time now)
+\begin{DoxyCompactList}\small\item\em Method to update the object when its time is due. \end{DoxyCompactList}\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a47520a8112f050da0f077eb39cd2d72f}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a47520a8112f050da0f077eb39cd2d72f} 
+void {\bfseries Deactivate} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_c_a_n_1_1_message_transmitter_aef16961b060f365ae87f7419c6fc62bd}{Is\+Active}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a13e73881ae29f9e066c5cfbe927cc966}{Periodic}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Time\+Span \mbox{\hyperlink{class_step_bro_1_1_c_a_n_1_1_message_transmitter_ac4d7bcef0c2819f9bb78af73a731452d}{Periodic\+Time}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Date\+Time \mbox{\hyperlink{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a14ca6fd27053c99c57e4143d562411b7}{Next\+Action\+Time}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a21f2b9abb956f6294870c3af42f94ae8}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a21f2b9abb956f6294870c3af42f94ae8} 
+Message\+Type {\bfseries Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a395f34becbc547620052a69acba2b909}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a395f34becbc547620052a69acba2b909} 
+uint {\bfseries ID}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter_aafa435cd4201ed271affccf5e620f69f}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter_aafa435cd4201ed271affccf5e620f69f} 
+byte\mbox{[}$\,$\mbox{]} {\bfseries Data}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action}{Step\+Bro.\+Core.\+Data.\+ITimed\+Action}}}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bfseries Is\+Active}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool {\bfseries Periodic}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Time\+Span {\bfseries Periodic\+Time}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+Date\+Time {\bfseries Next\+Action\+Time}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a7ea1ab50eccc201206e17e7cedf3ecc4}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a7ea1ab50eccc201206e17e7cedf3ecc4} 
+\index{StepBro.CAN.MessageTransmitter@{StepBro.CAN.MessageTransmitter}!Deactivate@{Deactivate}}
+\index{Deactivate@{Deactivate}!StepBro.CAN.MessageTransmitter@{StepBro.CAN.MessageTransmitter}}
+\doxysubsubsection{\texorpdfstring{Deactivate()}{Deactivate()}}
+{\footnotesize\ttfamily void Step\+Bro.\+CAN.\+Message\+Transmitter.\+Deactivate (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action}{Step\+Bro.\+Core.\+Data.\+ITimed\+Action}}.
+
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter_ab3bb389f3fc1455d902132a9292c80a8}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter_ab3bb389f3fc1455d902132a9292c80a8} 
+\index{StepBro.CAN.MessageTransmitter@{StepBro.CAN.MessageTransmitter}!UpdateWhenHandling@{UpdateWhenHandling}}
+\index{UpdateWhenHandling@{UpdateWhenHandling}!StepBro.CAN.MessageTransmitter@{StepBro.CAN.MessageTransmitter}}
+\doxysubsubsection{\texorpdfstring{UpdateWhenHandling()}{UpdateWhenHandling()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+CAN.\+Message\+Transmitter.\+Update\+When\+Handling (\begin{DoxyParamCaption}\item[{Date\+Time}]{now }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Method to update the object when its time is due. 
+
+\begin{DoxyReturn}{Returns}
+Whether the action is still active and should be added to the queue of action to handle.
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action_a5b108919bf85bda21da2114f26e20791}{Step\+Bro.\+Core.\+Data.\+ITimed\+Action}}.
+
+
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter_aef16961b060f365ae87f7419c6fc62bd}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter_aef16961b060f365ae87f7419c6fc62bd} 
+\index{StepBro.CAN.MessageTransmitter@{StepBro.CAN.MessageTransmitter}!IsActive@{IsActive}}
+\index{IsActive@{IsActive}!StepBro.CAN.MessageTransmitter@{StepBro.CAN.MessageTransmitter}}
+\doxysubsubsection{\texorpdfstring{IsActive}{IsActive}}
+{\footnotesize\ttfamily bool Step\+Bro.\+CAN.\+Message\+Transmitter.\+Is\+Active\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action}{Step\+Bro.\+Core.\+Data.\+ITimed\+Action}}.
+
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a14ca6fd27053c99c57e4143d562411b7}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a14ca6fd27053c99c57e4143d562411b7} 
+\index{StepBro.CAN.MessageTransmitter@{StepBro.CAN.MessageTransmitter}!NextActionTime@{NextActionTime}}
+\index{NextActionTime@{NextActionTime}!StepBro.CAN.MessageTransmitter@{StepBro.CAN.MessageTransmitter}}
+\doxysubsubsection{\texorpdfstring{NextActionTime}{NextActionTime}}
+{\footnotesize\ttfamily Date\+Time Step\+Bro.\+CAN.\+Message\+Transmitter.\+Next\+Action\+Time\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action}{Step\+Bro.\+Core.\+Data.\+ITimed\+Action}}.
+
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a13e73881ae29f9e066c5cfbe927cc966}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter_a13e73881ae29f9e066c5cfbe927cc966} 
+\index{StepBro.CAN.MessageTransmitter@{StepBro.CAN.MessageTransmitter}!Periodic@{Periodic}}
+\index{Periodic@{Periodic}!StepBro.CAN.MessageTransmitter@{StepBro.CAN.MessageTransmitter}}
+\doxysubsubsection{\texorpdfstring{Periodic}{Periodic}}
+{\footnotesize\ttfamily bool Step\+Bro.\+CAN.\+Message\+Transmitter.\+Periodic\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action}{Step\+Bro.\+Core.\+Data.\+ITimed\+Action}}.
+
+\Hypertarget{class_step_bro_1_1_c_a_n_1_1_message_transmitter_ac4d7bcef0c2819f9bb78af73a731452d}\label{class_step_bro_1_1_c_a_n_1_1_message_transmitter_ac4d7bcef0c2819f9bb78af73a731452d} 
+\index{StepBro.CAN.MessageTransmitter@{StepBro.CAN.MessageTransmitter}!PeriodicTime@{PeriodicTime}}
+\index{PeriodicTime@{PeriodicTime}!StepBro.CAN.MessageTransmitter@{StepBro.CAN.MessageTransmitter}}
+\doxysubsubsection{\texorpdfstring{PeriodicTime}{PeriodicTime}}
+{\footnotesize\ttfamily Time\+Span Step\+Bro.\+CAN.\+Message\+Transmitter.\+Periodic\+Time\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Implements \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_timed_action}{Step\+Bro.\+Core.\+Data.\+ITimed\+Action}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Modules/\+Step\+Bro.\+CAN/Message\+Transmitter.\+cs\end{DoxyCompactItemize}

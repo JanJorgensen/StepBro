@@ -1,0 +1,81 @@
+\doxysection{Step\+Bro.\+UI.\+Syntax\+Editor\+Support.\+Step\+Bro\+Token\+Tagger Class Reference}
+\hypertarget{class_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_step_bro_token_tagger}{}\label{class_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_step_bro_token_tagger}\index{StepBro.UI.SyntaxEditorSupport.StepBroTokenTagger@{StepBro.UI.SyntaxEditorSupport.StepBroTokenTagger}}
+Inheritance diagram for Step\+Bro.\+UI.\+Syntax\+Editor\+Support.\+Step\+Bro\+Token\+Tagger\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_step_bro_token_tagger}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_step_bro_token_tagger_ae35affd375793057379f9115c1efc1be}{Step\+Bro\+Token\+Tagger}} (ICode\+Document document, \mbox{\hyperlink{interface_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_i_step_bro_classification_type_provider}{IStep\+Bro\+Classification\+Type\+Provider}} classification\+Type\+Provider)
+\begin{DoxyCompactList}\small\item\em Initializes a new instance of the {\ttfamily Simple\+Token\+Tagger} class. \end{DoxyCompactList}\item 
+override IClassification\+Type \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_step_bro_token_tagger_af10023e3d6b195f8087c30983b955ec4}{Classify\+Token}} (Actipro\+Lex.\+IToken token)
+\begin{DoxyCompactList}\small\item\em Returns an IClassification\+Type for the specified IToken, if one is appropriate. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{interface_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_i_step_bro_classification_type_provider}{IStep\+Bro\+Classification\+Type\+Provider}} \mbox{\hyperlink{class_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_step_bro_token_tagger_aafa1c7131a7a3d8230df43e9cb9cf4e5}{Classification\+Type\+Provider}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets the IStep\+Bro\+Classification\+Type\+Provider that provides classification types used by this token tagger. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_step_bro_token_tagger_ae35affd375793057379f9115c1efc1be}\label{class_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_step_bro_token_tagger_ae35affd375793057379f9115c1efc1be} 
+\index{StepBro.UI.SyntaxEditorSupport.StepBroTokenTagger@{StepBro.UI.SyntaxEditorSupport.StepBroTokenTagger}!StepBroTokenTagger@{StepBroTokenTagger}}
+\index{StepBroTokenTagger@{StepBroTokenTagger}!StepBro.UI.SyntaxEditorSupport.StepBroTokenTagger@{StepBro.UI.SyntaxEditorSupport.StepBroTokenTagger}}
+\doxysubsubsection{\texorpdfstring{StepBroTokenTagger()}{StepBroTokenTagger()}}
+{\footnotesize\ttfamily Step\+Bro.\+UI.\+Syntax\+Editor\+Support.\+Step\+Bro\+Token\+Tagger.\+Step\+Bro\+Token\+Tagger (\begin{DoxyParamCaption}\item[{ICode\+Document}]{document,  }\item[{\mbox{\hyperlink{interface_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_i_step_bro_classification_type_provider}{IStep\+Bro\+Classification\+Type\+Provider}}}]{classification\+Type\+Provider }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Initializes a new instance of the {\ttfamily Simple\+Token\+Tagger} class. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em document} & The specific ICode\+Document for which this token tagger will be used.\\
+\hline
+{\em classification\+Type\+Provider} & A IStep\+Bro\+Classification\+Type\+Provider that provides classification types used by this token tagger.\\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_step_bro_token_tagger_af10023e3d6b195f8087c30983b955ec4}\label{class_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_step_bro_token_tagger_af10023e3d6b195f8087c30983b955ec4} 
+\index{StepBro.UI.SyntaxEditorSupport.StepBroTokenTagger@{StepBro.UI.SyntaxEditorSupport.StepBroTokenTagger}!ClassifyToken@{ClassifyToken}}
+\index{ClassifyToken@{ClassifyToken}!StepBro.UI.SyntaxEditorSupport.StepBroTokenTagger@{StepBro.UI.SyntaxEditorSupport.StepBroTokenTagger}}
+\doxysubsubsection{\texorpdfstring{ClassifyToken()}{ClassifyToken()}}
+{\footnotesize\ttfamily override IClassification\+Type Step\+Bro.\+UI.\+Syntax\+Editor\+Support.\+Step\+Bro\+Token\+Tagger.\+Classify\+Token (\begin{DoxyParamCaption}\item[{Actipro\+Lex\+::\+IToken}]{token }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns an IClassification\+Type for the specified IToken, if one is appropriate. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em token} & The IToken to examine.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An IClassification\+Type for the specified IToken, if one is appropriate.
+\end{DoxyReturn}
+
+
+The default implementation of this method automatically returns the classification type if the token is an IMergable\+Token. 
+
+\doxysubsection{Property Documentation}
+\Hypertarget{class_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_step_bro_token_tagger_aafa1c7131a7a3d8230df43e9cb9cf4e5}\label{class_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_step_bro_token_tagger_aafa1c7131a7a3d8230df43e9cb9cf4e5} 
+\index{StepBro.UI.SyntaxEditorSupport.StepBroTokenTagger@{StepBro.UI.SyntaxEditorSupport.StepBroTokenTagger}!ClassificationTypeProvider@{ClassificationTypeProvider}}
+\index{ClassificationTypeProvider@{ClassificationTypeProvider}!StepBro.UI.SyntaxEditorSupport.StepBroTokenTagger@{StepBro.UI.SyntaxEditorSupport.StepBroTokenTagger}}
+\doxysubsubsection{\texorpdfstring{ClassificationTypeProvider}{ClassificationTypeProvider}}
+{\footnotesize\ttfamily \mbox{\hyperlink{interface_step_bro_1_1_u_i_1_1_syntax_editor_support_1_1_i_step_bro_classification_type_provider}{IStep\+Bro\+Classification\+Type\+Provider}} Step\+Bro.\+UI.\+Syntax\+Editor\+Support.\+Step\+Bro\+Token\+Tagger.\+Classification\+Type\+Provider\hspace{0.3cm}{\ttfamily [get]}}
+
+
+
+Gets the IStep\+Bro\+Classification\+Type\+Provider that provides classification types used by this token tagger. 
+
+The IStep\+Bro\+Classification\+Type\+Provider that provides classification types used by this token tagger.
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+UI/\+Syntax\+Editor\+Support/Step\+Bro\+Token\+Tagger.\+cs\end{DoxyCompactItemize}

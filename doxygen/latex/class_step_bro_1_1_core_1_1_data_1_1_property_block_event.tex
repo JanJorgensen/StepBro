@@ -1,0 +1,106 @@
+\doxysection{Step\+Bro.\+Core.\+Data.\+Property\+Block\+Event Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_event}{}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_event}\index{StepBro.Core.Data.PropertyBlockEvent@{StepBro.Core.Data.PropertyBlockEvent}}
+Inheritance diagram for Step\+Bro.\+Core.\+Data.\+Property\+Block\+Event\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_step_bro_1_1_core_1_1_data_1_1_property_block_event}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_event_a793d2ae772c133a568a19612bca5cba6}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_event_a793d2ae772c133a568a19612bca5cba6} 
+{\bfseries Property\+Block\+Event} (int line, string name, \mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_data_afaa5659617470a47a35fa5022b980aa1}{Verdict}} verdict)
+\item 
+override void \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_event_add0fef987402f967e6f0743f1c26ae22}{Get\+Test\+String}} (String\+Builder text)
+\item 
+override \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Property\+Block\+Entry}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_event_a4cb21367031b1798c0f055eba65091b3}{Clone}} (bool skip\+Used\+Or\+Approved=false)
+\item 
+override \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_serializable_property_block_entry}{Serializable\+Property\+Block\+Entry}} \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_event_a976dc48f08199eea9ba934e2f65e24a6}{Clone\+For\+Serialization}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Step\+Bro.\+Core.\+Data.\+Property\+Block\+Entry}}}
+\begin{DoxyCompactItemize}
+\item 
+abstract void {\bfseries Get\+Test\+String} (String\+Builder text)
+\item 
+string {\bfseries Get\+Test\+String} ()
+\item 
+bool {\bfseries Is} (string name, Property\+Block\+Entry\+Type type)
+\item 
+abstract \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Property\+Block\+Entry}} {\bfseries Clone} (bool skip\+Used\+Or\+Approved=false)
+\item 
+abstract \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_serializable_property_block_entry}{Serializable\+Property\+Block\+Entry}} {\bfseries Clone\+For\+Serialization} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_event_a9400efdd9dd5866c64d4437ea6b397bf}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_event_a9400efdd9dd5866c64d4437ea6b397bf} 
+\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_data_afaa5659617470a47a35fa5022b980aa1}{Verdict}} {\bfseries Verdict}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Step\+Bro.\+Core.\+Data.\+Property\+Block\+Entry}}}
+\begin{DoxyCompactItemize}
+\item 
+int {\bfseries Line}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+string {\bfseries Specified\+Type\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+bool {\bfseries Has\+Type\+Specified}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+string {\bfseries Type\+Or\+Name}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+bool {\bfseries Is\+Array\+Entry}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+bool {\bfseries Is\+Addition\+Assignment} = false\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+Property\+Block\+Entry\+Type {\bfseries Block\+Entry\+Type}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+object {\bfseries Tag}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+bool {\bfseries Is\+Used\+Or\+Approved}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Step\+Bro.\+Core.\+Data.\+Property\+Block\+Entry}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Property\+Block\+Entry} (int line, Property\+Block\+Entry\+Type type, string name=null)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_event_a4cb21367031b1798c0f055eba65091b3}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_event_a4cb21367031b1798c0f055eba65091b3} 
+\index{StepBro.Core.Data.PropertyBlockEvent@{StepBro.Core.Data.PropertyBlockEvent}!Clone@{Clone}}
+\index{Clone@{Clone}!StepBro.Core.Data.PropertyBlockEvent@{StepBro.Core.Data.PropertyBlockEvent}}
+\doxysubsubsection{\texorpdfstring{Clone()}{Clone()}}
+{\footnotesize\ttfamily override \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Property\+Block\+Entry}} Step\+Bro.\+Core.\+Data.\+Property\+Block\+Event.\+Clone (\begin{DoxyParamCaption}\item[{bool}]{skip\+Used\+Or\+Approved = {\ttfamily false} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Step\+Bro.\+Core.\+Data.\+Property\+Block\+Entry}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_event_a976dc48f08199eea9ba934e2f65e24a6}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_event_a976dc48f08199eea9ba934e2f65e24a6} 
+\index{StepBro.Core.Data.PropertyBlockEvent@{StepBro.Core.Data.PropertyBlockEvent}!CloneForSerialization@{CloneForSerialization}}
+\index{CloneForSerialization@{CloneForSerialization}!StepBro.Core.Data.PropertyBlockEvent@{StepBro.Core.Data.PropertyBlockEvent}}
+\doxysubsubsection{\texorpdfstring{CloneForSerialization()}{CloneForSerialization()}}
+{\footnotesize\ttfamily override \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_serializable_property_block_entry}{Serializable\+Property\+Block\+Entry}} Step\+Bro.\+Core.\+Data.\+Property\+Block\+Event.\+Clone\+For\+Serialization (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Step\+Bro.\+Core.\+Data.\+Property\+Block\+Entry}}.
+
+\Hypertarget{class_step_bro_1_1_core_1_1_data_1_1_property_block_event_add0fef987402f967e6f0743f1c26ae22}\label{class_step_bro_1_1_core_1_1_data_1_1_property_block_event_add0fef987402f967e6f0743f1c26ae22} 
+\index{StepBro.Core.Data.PropertyBlockEvent@{StepBro.Core.Data.PropertyBlockEvent}!GetTestString@{GetTestString}}
+\index{GetTestString@{GetTestString}!StepBro.Core.Data.PropertyBlockEvent@{StepBro.Core.Data.PropertyBlockEvent}}
+\doxysubsubsection{\texorpdfstring{GetTestString()}{GetTestString()}}
+{\footnotesize\ttfamily override void Step\+Bro.\+Core.\+Data.\+Property\+Block\+Event.\+Get\+Test\+String (\begin{DoxyParamCaption}\item[{String\+Builder}]{text }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{class_step_bro_1_1_core_1_1_data_1_1_property_block_entry}{Step\+Bro.\+Core.\+Data.\+Property\+Block\+Entry}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Data/Property\+Block\+Event.\+cs\end{DoxyCompactItemize}

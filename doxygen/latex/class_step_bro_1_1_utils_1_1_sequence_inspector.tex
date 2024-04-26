@@ -1,0 +1,69 @@
+\doxysection{Step\+Bro.\+Utils.\+Sequence\+Inspector\texorpdfstring{$<$}{<} T \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{class_step_bro_1_1_utils_1_1_sequence_inspector}{}\label{class_step_bro_1_1_utils_1_1_sequence_inspector}\index{StepBro.Utils.SequenceInspector$<$ T $>$@{StepBro.Utils.SequenceInspector$<$ T $>$}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_utils_1_1_sequence_inspector_a071cc1b4c59cc94c29fa423bd7ba1b2d}\label{class_step_bro_1_1_utils_1_1_sequence_inspector_a071cc1b4c59cc94c29fa423bd7ba1b2d} 
+{\bfseries Sequence\+Inspector} (IEnumerable$<$ T $>$ source, Converter$<$ T, string $>$ descriptor=null)
+\item 
+\Hypertarget{class_step_bro_1_1_utils_1_1_sequence_inspector_a8567dcc311408810371745c4ffdc0151}\label{class_step_bro_1_1_utils_1_1_sequence_inspector_a8567dcc311408810371745c4ffdc0151} 
+void {\bfseries Set\+Expect\+Failure\+Action} (Action$<$ string $>$ handler)
+\item 
+\Hypertarget{class_step_bro_1_1_utils_1_1_sequence_inspector_a43f8ebd0b1554b3f3e7ac58f228897f3}\label{class_step_bro_1_1_utils_1_1_sequence_inspector_a43f8ebd0b1554b3f3e7ac58f228897f3} 
+\mbox{\hyperlink{interface_step_bro_1_1_utils_1_1_i_value_with_description}{IValue\+With\+Description}}$<$ T $>$ {\bfseries Next} ()
+\item 
+\Hypertarget{class_step_bro_1_1_utils_1_1_sequence_inspector_aca670d777f79d9fe53c45d82fb62267c}\label{class_step_bro_1_1_utils_1_1_sequence_inspector_aca670d777f79d9fe53c45d82fb62267c} 
+T {\bfseries Next\+Value} ()
+\item 
+\Hypertarget{class_step_bro_1_1_utils_1_1_sequence_inspector_a7f9c1d38867f88155b3c1aaacfacfddb}\label{class_step_bro_1_1_utils_1_1_sequence_inspector_a7f9c1d38867f88155b3c1aaacfacfddb} 
+string {\bfseries Last\+Description} ()
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_utils_1_1_sequence_inspector_aba0f0c2424a84c133dcc43a5fe7acf1b}{Expect\+End}} ()
+\begin{DoxyCompactList}\small\item\em Checks if there are more entries left in the sequence. \end{DoxyCompactList}\item 
+\Hypertarget{class_step_bro_1_1_utils_1_1_sequence_inspector_a6182adec245824728d164927cbc38880}\label{class_step_bro_1_1_utils_1_1_sequence_inspector_a6182adec245824728d164927cbc38880} 
+bool {\bfseries Expect\+Next} (T value)
+\item 
+\Hypertarget{class_step_bro_1_1_utils_1_1_sequence_inspector_a0b5e09127106df6a125900267cd87781}\label{class_step_bro_1_1_utils_1_1_sequence_inspector_a0b5e09127106df6a125900267cd87781} 
+void {\bfseries Reset} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_utils_1_1_sequence_inspector_acf130036cadf5cd47394672a9621b449}\label{class_step_bro_1_1_utils_1_1_sequence_inspector_acf130036cadf5cd47394672a9621b449} 
+IEnumerable$<$ T $>$ {\bfseries m\+\_\+source}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_utils_1_1_sequence_inspector_a5888f91dd721bb1bbbac7dd1cb313c27}\label{class_step_bro_1_1_utils_1_1_sequence_inspector_a5888f91dd721bb1bbbac7dd1cb313c27} 
+\mbox{\hyperlink{interface_step_bro_1_1_utils_1_1_i_value_with_description}{IValue\+With\+Description}}$<$ T $>$ {\bfseries Last}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_utils_1_1_sequence_inspector_a46b88b9d49c6387e12eb61889e8ad747}\label{class_step_bro_1_1_utils_1_1_sequence_inspector_a46b88b9d49c6387e12eb61889e8ad747} 
+int {\bfseries Next\+Index}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_utils_1_1_sequence_inspector_aa3ce376d60d9aa379b5f6d10bb736c1d}\label{class_step_bro_1_1_utils_1_1_sequence_inspector_aa3ce376d60d9aa379b5f6d10bb736c1d} 
+int {\bfseries Index}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_utils_1_1_sequence_inspector_aba0f0c2424a84c133dcc43a5fe7acf1b}\label{class_step_bro_1_1_utils_1_1_sequence_inspector_aba0f0c2424a84c133dcc43a5fe7acf1b} 
+\index{StepBro.Utils.SequenceInspector$<$ T $>$@{StepBro.Utils.SequenceInspector$<$ T $>$}!ExpectEnd@{ExpectEnd}}
+\index{ExpectEnd@{ExpectEnd}!StepBro.Utils.SequenceInspector$<$ T $>$@{StepBro.Utils.SequenceInspector$<$ T $>$}}
+\doxysubsubsection{\texorpdfstring{ExpectEnd()}{ExpectEnd()}}
+{\footnotesize\ttfamily bool \mbox{\hyperlink{class_step_bro_1_1_utils_1_1_sequence_inspector}{Step\+Bro.\+Utils.\+Sequence\+Inspector}}$<$ T $>$.Expect\+End (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Checks if there are more entries left in the sequence. 
+
+This method will \textquotesingle{}eat\textquotesingle{} the next entry if there are more entries left.
+
+\begin{DoxyReturn}{Returns}
+Whether there are more entries left.
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Utils/Sequence\+Inspector.\+cs\end{DoxyCompactItemize}

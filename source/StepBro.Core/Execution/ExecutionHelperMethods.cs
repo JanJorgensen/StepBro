@@ -760,7 +760,7 @@ namespace StepBro.Core.Execution
                 if (context != null)
                 {
                     context.ReportError(
-                        $"Exception getting property '{name}' on the object of type '{instance.GetType().Name}'.",
+                        $"Exception getting property '{name}' on the object of type '{instance.GetType().Name}'. Expected type: '{typeof(TExpected).Name}'.",
                         exception: ex);
                 }
             }

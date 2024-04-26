@@ -1,0 +1,1144 @@
+\doxysection{Step\+Bro.\+Core.\+Controls.\+Text\+View Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_controls_1_1_text_view}{}\label{class_step_bro_1_1_core_1_1_controls_1_1_text_view}\index{StepBro.Core.Controls.TextView@{StepBro.Core.Controls.TextView}}
+Inheritance diagram for Step\+Bro.\+Core.\+Controls.\+Text\+View\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=4.000000cm]{class_step_bro_1_1_core_1_1_controls_1_1_text_view}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_controls_1_1_text_view_aae483a5ff021f3c66e7d037e72dcc17b}\label{class_step_bro_1_1_core_1_1_controls_1_1_text_view_aae483a5ff021f3c66e7d037e72dcc17b} 
+void {\bfseries Update\+View} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box\+NS.\+Fast\+Colored\+Text\+Box}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Fast\+Colored\+Text\+Box} ()
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+void {\bfseries Clear\+Hints} ()
+\begin{DoxyCompactList}\small\item\em Removes all hints. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_hint}{Hint}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a75cdd2a23a1fb024e1d56bf711e76330}{Add\+Hint}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range, Control inner\+Control, bool scroll\+To\+Hint, bool inline, bool dock)
+\begin{DoxyCompactList}\small\item\em Add and shows the hint. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_hint}{Hint}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a37ac9bc9d9ae1945e47068ef057ba706}{Add\+Hint}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range, Control inner\+Control)
+\begin{DoxyCompactList}\small\item\em Add and shows the hint. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_hint}{Hint}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a780682900b236bfaa26c9635868fd8ab}{Add\+Hint}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range, string text, bool scroll\+To\+Hint, bool inline, bool dock)
+\begin{DoxyCompactList}\small\item\em Add and shows simple text hint. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_hint}{Hint}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ade7d2041d30e0af33aafb57e09076ff2}{Add\+Hint}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range, string text)
+\begin{DoxyCompactList}\small\item\em Add and shows simple text hint. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a5924cc4e9962dc3feddc067695547c14}{On\+Hint\+Click}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_hint}{Hint}} hint)
+\begin{DoxyCompactList}\small\item\em Occurs when user click on the hint. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Visible\+Range\+Changed} ()
+\begin{DoxyCompactList}\small\item\em Occurs when Visible\+Range is changed. \end{DoxyCompactList}\item 
+new void {\bfseries Invalidate} ()
+\begin{DoxyCompactList}\small\item\em Invalidates the entire surface of the control and causes the control to be redrawn. This method is thread safe and does not require Invoke. \end{DoxyCompactList}\item 
+List$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} $>$ {\bfseries Get\+Styles\+Of\+Char} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} place)
+\begin{DoxyCompactList}\small\item\em Returns list of styles of given place. \end{DoxyCompactList}\item 
+void {\bfseries Need\+Recalc} ()
+\begin{DoxyCompactList}\small\item\em Call this method if the recalc of the position of lines is needed. \end{DoxyCompactList}\item 
+void {\bfseries Need\+Recalc} (bool forced)
+\begin{DoxyCompactList}\small\item\em Call this method if the recalc of the position of lines is needed. \end{DoxyCompactList}\item 
+void {\bfseries Need\+Recalc} (bool forced, bool word\+Wrap\+Recalc)
+\begin{DoxyCompactList}\small\item\em Call this method if the recalc of the position of lines is needed. \end{DoxyCompactList}\item 
+bool {\bfseries Navigate\+Forward} ()
+\begin{DoxyCompactList}\small\item\em Navigates forward (by Line.\+Last\+Visit property) \end{DoxyCompactList}\item 
+bool {\bfseries Navigate\+Backward} ()
+\begin{DoxyCompactList}\small\item\em Navigates backward (by Line.\+Last\+Visit property) \end{DoxyCompactList}\item 
+void {\bfseries Navigate} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Navigates to defined line, without Line.\+Last\+Visit reseting. \end{DoxyCompactList}\item 
+void {\bfseries Add\+Visual\+Marker} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_visual_marker}{Visual\+Marker}} marker)
+\item 
+virtual void {\bfseries On\+Text\+Changed\+Delayed} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} changed\+Range)
+\item 
+virtual void {\bfseries On\+Selection\+Changed\+Delayed} ()
+\item 
+virtual void {\bfseries On\+Visible\+Range\+Changed\+Delayed} ()
+\item 
+int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_adfa91da8fde0c77986cbb153457a1267}{Add\+Style}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style)
+\begin{DoxyCompactList}\small\item\em Add new style. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a437749cd0672dc6e4f566bfb860ae6c5}{Check\+Styles\+Buffer\+Size}} ()
+\begin{DoxyCompactList}\small\item\em Checks if the styles buffer has enough space to add one more element. If not, an exception is thrown. Otherwise, the index of a free slot is returned. \end{DoxyCompactList}\item 
+virtual void {\bfseries Show\+Find\+Dialog} ()
+\begin{DoxyCompactList}\small\item\em Shows find dialog. \end{DoxyCompactList}\item 
+virtual void {\bfseries Show\+Find\+Dialog} (string find\+Text)
+\begin{DoxyCompactList}\small\item\em Shows find dialog. \end{DoxyCompactList}\item 
+virtual void {\bfseries Show\+Replace\+Dialog} ()
+\begin{DoxyCompactList}\small\item\em Shows replace dialog. \end{DoxyCompactList}\item 
+virtual void {\bfseries Show\+Replace\+Dialog} (string find\+Text)
+\begin{DoxyCompactList}\small\item\em Shows replace dialog. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a3e369309508d972d6a30b27bdbce823a}{Get\+Line\+Length}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Gets length of given line. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_af7b6039d8f5bb3e2a2949697588a9b9c}{Get\+Line}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Get range of line. \end{DoxyCompactList}\item 
+virtual void {\bfseries Copy} ()
+\begin{DoxyCompactList}\small\item\em Copy selected text into Clipboard. \end{DoxyCompactList}\item 
+virtual void {\bfseries Cut} ()
+\begin{DoxyCompactList}\small\item\em Cut selected text into Clipboard. \end{DoxyCompactList}\item 
+virtual void {\bfseries Paste} ()
+\begin{DoxyCompactList}\small\item\em Paste text from clipboard into selected position. \end{DoxyCompactList}\item 
+void {\bfseries Select\+All} ()
+\begin{DoxyCompactList}\small\item\em Select all chars of text. \end{DoxyCompactList}\item 
+void {\bfseries Go\+End} ()
+\begin{DoxyCompactList}\small\item\em Move caret to end of text. \end{DoxyCompactList}\item 
+void {\bfseries Go\+Home} ()
+\begin{DoxyCompactList}\small\item\em Move caret to first position. \end{DoxyCompactList}\item 
+virtual void {\bfseries Clear} ()
+\begin{DoxyCompactList}\small\item\em Clear text, styles, history, caches. \end{DoxyCompactList}\item 
+void {\bfseries Clear\+Styles\+Buffer} ()
+\begin{DoxyCompactList}\small\item\em Clear buffer of styles. \end{DoxyCompactList}\item 
+void {\bfseries Clear\+Style} (\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_aaa3ed378ba16c469d2d89b77605773a1}{Style\+Index}} style\+Index)
+\begin{DoxyCompactList}\small\item\em Clear style of all text. \end{DoxyCompactList}\item 
+void {\bfseries Clear\+Undo} ()
+\begin{DoxyCompactList}\small\item\em Clears undo and redo stacks. \end{DoxyCompactList}\item 
+virtual void {\bfseries Insert\+Text} (string text)
+\begin{DoxyCompactList}\small\item\em Insert text into current selected position. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a887912f7e2d249d29cf9f1384921211d}{Insert\+Text}} (string text, bool jump\+To\+Caret)
+\begin{DoxyCompactList}\small\item\em Insert text into current selected position. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a0cf4b434730d1104be9f9b264dbfd0b5}{Insert\+Text}} (string text, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style)
+\begin{DoxyCompactList}\small\item\em Insert text into current selection position (with predefined style) \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} {\bfseries Insert\+Text} (string text, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style, bool jump\+To\+Caret)
+\begin{DoxyCompactList}\small\item\em Insert text into current selection position (with predefined style) \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} {\bfseries Insert\+Text\+And\+Restore\+Selection} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} replace\+Range, string text, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style)
+\begin{DoxyCompactList}\small\item\em Insert text into replace\+Range and restore previous selection. \end{DoxyCompactList}\item 
+virtual void {\bfseries Append\+Text} (string text)
+\begin{DoxyCompactList}\small\item\em Append string to end of the Text. \end{DoxyCompactList}\item 
+virtual void {\bfseries Append\+Text} (string text, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style)
+\begin{DoxyCompactList}\small\item\em Append string to end of the Text. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a11d12e0ce56fcf6612bb3df7581ea423}{Get\+Style\+Index}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style)
+\begin{DoxyCompactList}\small\item\em Returns index of the style in Styles -\/1 otherwise. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_aaa3ed378ba16c469d2d89b77605773a1}{Style\+Index}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a85d2306918b3c105aea25ba0906650a9}{Get\+Style\+Index\+Mask}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}}\mbox{[}$\,$\mbox{]} styles)
+\begin{DoxyCompactList}\small\item\em Returns Style\+Index mask of given styles. \end{DoxyCompactList}\item 
+static Int\+Ptr {\bfseries Imm\+Get\+Context} (Int\+Ptr h\+Wnd)
+\item 
+static Int\+Ptr {\bfseries Imm\+Associate\+Context} (Int\+Ptr h\+Wnd, Int\+Ptr h\+IMC)
+\item 
+void {\bfseries On\+Scroll} (Scroll\+Event\+Args se, bool align\+By\+Lines)
+\item 
+virtual void {\bfseries Clear\+Selected} ()
+\begin{DoxyCompactList}\small\item\em Deletes selected chars. \end{DoxyCompactList}\item 
+void {\bfseries Clear\+Current\+Line} ()
+\begin{DoxyCompactList}\small\item\em Deletes current line(s) \end{DoxyCompactList}\item 
+void {\bfseries Update\+Scrollbars} ()
+\begin{DoxyCompactList}\small\item\em Updates scrollbar position after Value changed. \end{DoxyCompactList}\item 
+void {\bfseries Do\+Caret\+Visible} ()
+\begin{DoxyCompactList}\small\item\em Scroll control for display caret. \end{DoxyCompactList}\item 
+void {\bfseries Scroll\+Left} ()
+\begin{DoxyCompactList}\small\item\em Scroll control left. \end{DoxyCompactList}\item 
+void {\bfseries Do\+Selection\+Visible} ()
+\begin{DoxyCompactList}\small\item\em Scroll control for display selection area. \end{DoxyCompactList}\item 
+void {\bfseries Do\+Range\+Visible} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range)
+\begin{DoxyCompactList}\small\item\em Scroll control for display given range. \end{DoxyCompactList}\item 
+void {\bfseries Do\+Range\+Visible} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range, bool try\+To\+Centre)
+\begin{DoxyCompactList}\small\item\em Scroll control for display given range. \end{DoxyCompactList}\item 
+virtual bool {\bfseries Process\+Key} (Keys key\+Data)
+\begin{DoxyCompactList}\small\item\em Process control keys. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ada32d5d3db98cc4ea938121dec1d8c3d}{Goto\+Next\+Bookmark}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Scrolls to nearest bookmark or to first bookmark. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a26f33e2c46c477efe25d4742ae89c3fc}{Goto\+Prev\+Bookmark}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Scrolls to nearest previous bookmark or to last bookmark. \end{DoxyCompactList}\item 
+virtual void {\bfseries Bookmark\+Line} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Bookmarks line. \end{DoxyCompactList}\item 
+virtual void {\bfseries Unbookmark\+Line} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Unbookmarks current line. \end{DoxyCompactList}\item 
+virtual void {\bfseries Move\+Selected\+Lines\+Down} ()
+\begin{DoxyCompactList}\small\item\em Moves selected lines down. \end{DoxyCompactList}\item 
+virtual void {\bfseries Move\+Selected\+Lines\+Up} ()
+\begin{DoxyCompactList}\small\item\em Moves selected lines up. \end{DoxyCompactList}\item 
+virtual void {\bfseries Upper\+Case} ()
+\begin{DoxyCompactList}\small\item\em Convert selected text to upper case. \end{DoxyCompactList}\item 
+virtual void {\bfseries Lower\+Case} ()
+\begin{DoxyCompactList}\small\item\em Convert selected text to lower case. \end{DoxyCompactList}\item 
+virtual void {\bfseries Title\+Case} ()
+\begin{DoxyCompactList}\small\item\em Convert selected text to title case. \end{DoxyCompactList}\item 
+virtual void {\bfseries Sentence\+Case} ()
+\begin{DoxyCompactList}\small\item\em Convert selected text to sentence case. \end{DoxyCompactList}\item 
+void {\bfseries Comment\+Selected} ()
+\begin{DoxyCompactList}\small\item\em Insert/remove comment prefix into selected lines. \end{DoxyCompactList}\item 
+virtual void {\bfseries Comment\+Selected} (string comment\+Prefix)
+\begin{DoxyCompactList}\small\item\em Insert/remove comment prefix into selected lines. \end{DoxyCompactList}\item 
+void {\bfseries On\+Key\+Pressing} (Key\+Press\+Event\+Args args)
+\item 
+void {\bfseries On\+Key\+Pressed} (char c)
+\item 
+virtual bool {\bfseries Process\+Key} (char c, Keys modifiers)
+\begin{DoxyCompactList}\small\item\em Process \"{}real\"{} keys (no control) \end{DoxyCompactList}\item 
+void {\bfseries Do\+Auto\+Indent\+Chars} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Do Auto\+Indent\+Chars. \end{DoxyCompactList}\item 
+virtual void {\bfseries Do\+Auto\+Indent\+If\+Need} ()
+\item 
+virtual void {\bfseries Do\+Auto\+Indent} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Inserts autoindent\textquotesingle{}s spaces in the line. \end{DoxyCompactList}\item 
+virtual int {\bfseries Calc\+Auto\+Indent} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Returns needed start space count for the line. \end{DoxyCompactList}\item 
+virtual void {\bfseries Undo} ()
+\begin{DoxyCompactList}\small\item\em Undo last operation. \end{DoxyCompactList}\item 
+virtual void {\bfseries Redo} ()
+\begin{DoxyCompactList}\small\item\em Redo. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a6fbe8ea1b60de16f6c60dec8880b5564}{Draw\+Text}} (Graphics gr, \mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} start, Size size)
+\begin{DoxyCompactList}\small\item\em Draws text to given Graphics. \end{DoxyCompactList}\item 
+void {\bfseries Change\+Font\+Size} (int step)
+\item 
+int {\bfseries Yto\+Line\+Index} (int y)
+\item 
+\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_aaa4975c5f05aae45b561c88911f398e6}{Point\+To\+Place}} (Point point)
+\begin{DoxyCompactList}\small\item\em Gets nearest line and char position from coordinates. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ac9793b072917a0f7d5862a6db1d8aef3}{Point\+To\+Position}} (Point point)
+\begin{DoxyCompactList}\small\item\em Gets nearest absolute text position for given point. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Text\+Changing} (ref string text)
+\begin{DoxyCompactList}\small\item\em Fires Text\+Changing event. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Text\+Changing} ()
+\item 
+virtual void {\bfseries On\+Text\+Changed} ()
+\begin{DoxyCompactList}\small\item\em Fires Text\+Changed event. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Text\+Changed} (int from\+Line, int to\+Line)
+\begin{DoxyCompactList}\small\item\em Fires Text\+Changed event. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Text\+Changed} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} r)
+\begin{DoxyCompactList}\small\item\em Fires Text\+Changed event. \end{DoxyCompactList}\item 
+void {\bfseries Begin\+Update} ()
+\begin{DoxyCompactList}\small\item\em Call this method before multiple text changing. \end{DoxyCompactList}\item 
+void {\bfseries End\+Update} ()
+\begin{DoxyCompactList}\small\item\em Call this method after multiple text changing. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Selection\+Changed} ()
+\begin{DoxyCompactList}\small\item\em Fires Selection\+Changed event. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a70ffe0bcad9fedc15dd161344177b32a}{Place\+To\+Position}} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} point)
+\begin{DoxyCompactList}\small\item\em Gets absolute text position from line and char position. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} {\bfseries Position\+To\+Place} (int pos)
+\begin{DoxyCompactList}\small\item\em Gets line and char position from absolute text position. \end{DoxyCompactList}\item 
+Point {\bfseries Position\+To\+Point} (int pos)
+\begin{DoxyCompactList}\small\item\em Gets absolute char position from char position. \end{DoxyCompactList}\item 
+Point \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ae065863bf15439e28b5d766b2596fe05}{Place\+To\+Point}} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} place)
+\begin{DoxyCompactList}\small\item\em Gets point for given line and char position. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ab1cc38f4caecb41ca032ee7889dd4926}{Get\+Range}} (int from\+Pos, int to\+Pos)
+\begin{DoxyCompactList}\small\item\em Get range of text. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_adeb85b57a2fd348f84d279a5edc9df1e}{Get\+Range}} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} from\+Place, \mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} to\+Place)
+\begin{DoxyCompactList}\small\item\em Get range of text. \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ad4a4ab12e46653ad78765d8faa8067e9}{Get\+Ranges}} (string regex\+Pattern)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex pattern. \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_adbf14c58545e51d17690dc4d4873ca02}{Get\+Ranges}} (string regex\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex pattern. \end{DoxyCompactList}\item 
+string \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ae557fef121ddbdaf4ef9c01a969d6c64}{Get\+Line\+Text}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Get text of given line. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a63a7fb067739dc75f08ab2acec05e80c}{Expand\+Folded\+Block}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Exapnds folded block. \end{DoxyCompactList}\item 
+virtual void {\bfseries Adjust\+Folding} ()
+\begin{DoxyCompactList}\small\item\em Collapse folding blocks using Folded\+Blocks dictionary. \end{DoxyCompactList}\item 
+virtual void {\bfseries Expand\+Block} (int from\+Line, int to\+Line)
+\begin{DoxyCompactList}\small\item\em Expand collapsed block. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_aa19f1a83e8f20042ff5948b399ce4037}{Expand\+Block}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Expand collapsed block. \end{DoxyCompactList}\item 
+virtual void {\bfseries Collapse\+All\+Folding\+Blocks} ()
+\begin{DoxyCompactList}\small\item\em Collapses all folding blocks. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a67d8c492e8e0f33b2e2605602090a2f1}{Expand\+All\+Folding\+Blocks}} ()
+\begin{DoxyCompactList}\small\item\em Exapnds all folded blocks. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a39ba566e295da89adf7628162ef0318d}{Collapse\+Folding\+Block}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Collapses folding block. \end{DoxyCompactList}\item 
+string {\bfseries Get\+Line\+Folding\+Start\+Marker} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Start foilding marker for the line. \end{DoxyCompactList}\item 
+string {\bfseries Get\+Line\+Folding\+End\+Marker} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em End foilding marker for the line. \end{DoxyCompactList}\item 
+virtual void {\bfseries Collapse\+Block} (int from\+Line, int to\+Line)
+\begin{DoxyCompactList}\small\item\em Collapse text block. \end{DoxyCompactList}\item 
+virtual void {\bfseries Increase\+Indent} ()
+\begin{DoxyCompactList}\small\item\em Insert TAB into front of seletcted lines. \end{DoxyCompactList}\item 
+virtual void {\bfseries Decrease\+Indent} ()
+\begin{DoxyCompactList}\small\item\em Remove TAB from front of seletcted lines. \end{DoxyCompactList}\item 
+virtual void {\bfseries Do\+Auto\+Indent} ()
+\begin{DoxyCompactList}\small\item\em Insert autoindents into selected lines. \end{DoxyCompactList}\item 
+virtual void {\bfseries Insert\+Line\+Prefix} (string prefix)
+\begin{DoxyCompactList}\small\item\em Insert prefix into front of seletcted lines. \end{DoxyCompactList}\item 
+virtual void {\bfseries Remove\+Line\+Prefix} (string prefix)
+\begin{DoxyCompactList}\small\item\em Remove prefix from front of selected lines This method ignores forward spaces of the line. \end{DoxyCompactList}\item 
+void {\bfseries Begin\+Auto\+Undo} ()
+\begin{DoxyCompactList}\small\item\em Begins Auto\+Undo block. All changes of text between Begin\+Auto\+Undo() and End\+Auto\+Undo() will be canceled in one operation Undo. \end{DoxyCompactList}\item 
+void {\bfseries End\+Auto\+Undo} ()
+\begin{DoxyCompactList}\small\item\em Ends Auto\+Undo block. All changes of text between Begin\+Auto\+Undo() and End\+Auto\+Undo() will be canceled in one operation Undo. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Visual\+Marker\+Click} (Mouse\+Event\+Args args, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style_visual_marker}{Style\+Visual\+Marker}} marker)
+\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} {\bfseries Get\+Brackets\+Range} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} place\+Inside\+Brackets, char left\+Bracket, char right\+Bracket, bool include\+Brackets)
+\begin{DoxyCompactList}\small\item\em Returns range between brackets (or null if not found) \end{DoxyCompactList}\item 
+bool {\bfseries Select\+Next} (string regex\+Pattern, bool backward=false, Regex\+Options options=Regex\+Options.\+None)
+\begin{DoxyCompactList}\small\item\em Selectes next fragment for given regex. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Syntax\+Highlight} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} args)
+\item 
+virtual void {\bfseries Print} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_print_dialog_settings}{Print\+Dialog\+Settings}} settings)
+\begin{DoxyCompactList}\small\item\em Prints range of text. \end{DoxyCompactList}\item 
+void {\bfseries Print} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_print_dialog_settings}{Print\+Dialog\+Settings}} settings)
+\begin{DoxyCompactList}\small\item\em Prints all text. \end{DoxyCompactList}\item 
+void {\bfseries Print} ()
+\begin{DoxyCompactList}\small\item\em Prints all text, without any dialog windows. \end{DoxyCompactList}\item 
+void {\bfseries Open\+File} (string file\+Name, Encoding enc)
+\begin{DoxyCompactList}\small\item\em Open text file. \end{DoxyCompactList}\item 
+void {\bfseries Open\+File} (string file\+Name)
+\begin{DoxyCompactList}\small\item\em Open text file (with automatic encoding detector) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_adc9f35d96a8c5944b0840cb49dabcf8f}{Open\+Binding\+File}} (string file\+Name, Encoding enc)
+\begin{DoxyCompactList}\small\item\em Open file binding mode. \end{DoxyCompactList}\item 
+void {\bfseries Close\+Binding\+File} ()
+\begin{DoxyCompactList}\small\item\em Close file binding mode. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ab90cc36b4b4cc8310c6d7d73d82af29f}{Save\+To\+File}} (string file\+Name, Encoding enc)
+\begin{DoxyCompactList}\small\item\em Save text to the file. \end{DoxyCompactList}\item 
+void {\bfseries Set\+Visible\+State} (int i\+Line, Visible\+State state)
+\begin{DoxyCompactList}\small\item\em Set Visible\+State of line. \end{DoxyCompactList}\item 
+Visible\+State {\bfseries Get\+Visible\+State} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Returns Visible\+State of the line. \end{DoxyCompactList}\item 
+void {\bfseries Show\+Go\+To\+Dialog} ()
+\begin{DoxyCompactList}\small\item\em Shows Goto dialog form. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_aad64db0dca974c6b077ba11bbae7bdfe}{Set\+Selected\+Line}} (int line\+Number\+To\+Select)
+\begin{DoxyCompactList}\small\item\em Set current line number and make it visible. \end{DoxyCompactList}\item 
+void {\bfseries On\+Undo\+Redo\+State\+Changed} ()
+\begin{DoxyCompactList}\small\item\em Occurs when undo/redo stack is changed. \end{DoxyCompactList}\item 
+List$<$ int $>$ {\bfseries Find\+Lines} (string search\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Search lines by regex pattern. \end{DoxyCompactList}\item 
+void {\bfseries Remove\+Lines} (List$<$ int $>$ i\+Lines)
+\begin{DoxyCompactList}\small\item\em Removes given lines. \end{DoxyCompactList}\item 
+{\bfseries Fast\+Colored\+Text\+Box} ()
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+void {\bfseries Clear\+Hints} ()
+\begin{DoxyCompactList}\small\item\em Removes all hints. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_hint}{Hint}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a75cdd2a23a1fb024e1d56bf711e76330}{Add\+Hint}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range, Control inner\+Control, bool scroll\+To\+Hint, bool inline, bool dock)
+\begin{DoxyCompactList}\small\item\em Add and shows the hint. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_hint}{Hint}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a37ac9bc9d9ae1945e47068ef057ba706}{Add\+Hint}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range, Control inner\+Control)
+\begin{DoxyCompactList}\small\item\em Add and shows the hint. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_hint}{Hint}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a780682900b236bfaa26c9635868fd8ab}{Add\+Hint}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range, string text, bool scroll\+To\+Hint, bool inline, bool dock)
+\begin{DoxyCompactList}\small\item\em Add and shows simple text hint. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_hint}{Hint}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ade7d2041d30e0af33aafb57e09076ff2}{Add\+Hint}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range, string text)
+\begin{DoxyCompactList}\small\item\em Add and shows simple text hint. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a5924cc4e9962dc3feddc067695547c14}{On\+Hint\+Click}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_hint}{Hint}} hint)
+\begin{DoxyCompactList}\small\item\em Occurs when user click on the hint. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Visible\+Range\+Changed} ()
+\begin{DoxyCompactList}\small\item\em Occurs when Visible\+Range is changed. \end{DoxyCompactList}\item 
+new void {\bfseries Invalidate} ()
+\begin{DoxyCompactList}\small\item\em Invalidates the entire surface of the control and causes the control to be redrawn. This method is thread safe and does not require Invoke. \end{DoxyCompactList}\item 
+List$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} $>$ {\bfseries Get\+Styles\+Of\+Char} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} place)
+\begin{DoxyCompactList}\small\item\em Returns list of styles of given place. \end{DoxyCompactList}\item 
+void {\bfseries Need\+Recalc} ()
+\begin{DoxyCompactList}\small\item\em Call this method if the recalc of the position of lines is needed. \end{DoxyCompactList}\item 
+void {\bfseries Need\+Recalc} (bool forced)
+\begin{DoxyCompactList}\small\item\em Call this method if the recalc of the position of lines is needed. \end{DoxyCompactList}\item 
+void {\bfseries Need\+Recalc} (bool forced, bool word\+Wrap\+Recalc)
+\begin{DoxyCompactList}\small\item\em Call this method if the recalc of the position of lines is needed. \end{DoxyCompactList}\item 
+bool {\bfseries Navigate\+Forward} ()
+\begin{DoxyCompactList}\small\item\em Navigates forward (by Line.\+Last\+Visit property) \end{DoxyCompactList}\item 
+bool {\bfseries Navigate\+Backward} ()
+\begin{DoxyCompactList}\small\item\em Navigates backward (by Line.\+Last\+Visit property) \end{DoxyCompactList}\item 
+void {\bfseries Navigate} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Navigates to defined line, without Line.\+Last\+Visit reseting. \end{DoxyCompactList}\item 
+void {\bfseries Add\+Visual\+Marker} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_visual_marker}{Visual\+Marker}} marker)
+\item 
+virtual void {\bfseries On\+Text\+Changed\+Delayed} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} changed\+Range)
+\item 
+virtual void {\bfseries On\+Selection\+Changed\+Delayed} ()
+\item 
+virtual void {\bfseries On\+Visible\+Range\+Changed\+Delayed} ()
+\item 
+int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_adfa91da8fde0c77986cbb153457a1267}{Add\+Style}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style)
+\begin{DoxyCompactList}\small\item\em Add new style. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a437749cd0672dc6e4f566bfb860ae6c5}{Check\+Styles\+Buffer\+Size}} ()
+\begin{DoxyCompactList}\small\item\em Checks if the styles buffer has enough space to add one more element. If not, an exception is thrown. Otherwise, the index of a free slot is returned. \end{DoxyCompactList}\item 
+virtual void {\bfseries Show\+Find\+Dialog} ()
+\begin{DoxyCompactList}\small\item\em Shows find dialog. \end{DoxyCompactList}\item 
+virtual void {\bfseries Show\+Find\+Dialog} (string find\+Text)
+\begin{DoxyCompactList}\small\item\em Shows find dialog. \end{DoxyCompactList}\item 
+virtual void {\bfseries Show\+Replace\+Dialog} ()
+\begin{DoxyCompactList}\small\item\em Shows replace dialog. \end{DoxyCompactList}\item 
+virtual void {\bfseries Show\+Replace\+Dialog} (string find\+Text)
+\begin{DoxyCompactList}\small\item\em Shows replace dialog. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a3e369309508d972d6a30b27bdbce823a}{Get\+Line\+Length}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Gets length of given line. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_af7b6039d8f5bb3e2a2949697588a9b9c}{Get\+Line}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Get range of line. \end{DoxyCompactList}\item 
+virtual void {\bfseries Copy} ()
+\begin{DoxyCompactList}\small\item\em Copy selected text into Clipboard. \end{DoxyCompactList}\item 
+virtual void {\bfseries Cut} ()
+\begin{DoxyCompactList}\small\item\em Cut selected text into Clipboard. \end{DoxyCompactList}\item 
+virtual void {\bfseries Paste} ()
+\begin{DoxyCompactList}\small\item\em Paste text from clipboard into selected position. \end{DoxyCompactList}\item 
+void {\bfseries Select\+All} ()
+\begin{DoxyCompactList}\small\item\em Select all chars of text. \end{DoxyCompactList}\item 
+void {\bfseries Go\+End} ()
+\begin{DoxyCompactList}\small\item\em Move caret to end of text. \end{DoxyCompactList}\item 
+void {\bfseries Go\+Home} ()
+\begin{DoxyCompactList}\small\item\em Move caret to first position. \end{DoxyCompactList}\item 
+virtual void {\bfseries Clear} ()
+\begin{DoxyCompactList}\small\item\em Clear text, styles, history, caches. \end{DoxyCompactList}\item 
+void {\bfseries Clear\+Styles\+Buffer} ()
+\begin{DoxyCompactList}\small\item\em Clear buffer of styles. \end{DoxyCompactList}\item 
+void {\bfseries Clear\+Style} (\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_aaa3ed378ba16c469d2d89b77605773a1}{Style\+Index}} style\+Index)
+\begin{DoxyCompactList}\small\item\em Clear style of all text. \end{DoxyCompactList}\item 
+void {\bfseries Clear\+Undo} ()
+\begin{DoxyCompactList}\small\item\em Clears undo and redo stacks. \end{DoxyCompactList}\item 
+virtual void {\bfseries Insert\+Text} (string text)
+\begin{DoxyCompactList}\small\item\em Insert text into current selected position. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a887912f7e2d249d29cf9f1384921211d}{Insert\+Text}} (string text, bool jump\+To\+Caret)
+\begin{DoxyCompactList}\small\item\em Insert text into current selected position. \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a0cf4b434730d1104be9f9b264dbfd0b5}{Insert\+Text}} (string text, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style)
+\begin{DoxyCompactList}\small\item\em Insert text into current selection position (with predefined style) \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} {\bfseries Insert\+Text} (string text, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style, bool jump\+To\+Caret)
+\begin{DoxyCompactList}\small\item\em Insert text into current selection position (with predefined style) \end{DoxyCompactList}\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} {\bfseries Insert\+Text\+And\+Restore\+Selection} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} replace\+Range, string text, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style)
+\begin{DoxyCompactList}\small\item\em Insert text into replace\+Range and restore previous selection. \end{DoxyCompactList}\item 
+virtual void {\bfseries Append\+Text} (string text)
+\begin{DoxyCompactList}\small\item\em Append string to end of the Text. \end{DoxyCompactList}\item 
+virtual void {\bfseries Append\+Text} (string text, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style)
+\begin{DoxyCompactList}\small\item\em Append string to end of the Text. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a11d12e0ce56fcf6612bb3df7581ea423}{Get\+Style\+Index}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}} style)
+\begin{DoxyCompactList}\small\item\em Returns index of the style in Styles -\/1 otherwise. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_aaa3ed378ba16c469d2d89b77605773a1}{Style\+Index}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a85d2306918b3c105aea25ba0906650a9}{Get\+Style\+Index\+Mask}} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}}\mbox{[}$\,$\mbox{]} styles)
+\begin{DoxyCompactList}\small\item\em Returns Style\+Index mask of given styles. \end{DoxyCompactList}\item 
+static Int\+Ptr {\bfseries Imm\+Get\+Context} (Int\+Ptr h\+Wnd)
+\item 
+static Int\+Ptr {\bfseries Imm\+Associate\+Context} (Int\+Ptr h\+Wnd, Int\+Ptr h\+IMC)
+\item 
+void {\bfseries On\+Scroll} (Scroll\+Event\+Args se, bool align\+By\+Lines)
+\item 
+virtual void {\bfseries Clear\+Selected} ()
+\begin{DoxyCompactList}\small\item\em Deletes selected chars. \end{DoxyCompactList}\item 
+void {\bfseries Clear\+Current\+Line} ()
+\begin{DoxyCompactList}\small\item\em Deletes current line(s) \end{DoxyCompactList}\item 
+void {\bfseries Update\+Scrollbars} ()
+\begin{DoxyCompactList}\small\item\em Updates scrollbar position after Value changed. \end{DoxyCompactList}\item 
+void {\bfseries Do\+Caret\+Visible} ()
+\begin{DoxyCompactList}\small\item\em Scroll control for display caret. \end{DoxyCompactList}\item 
+void {\bfseries Scroll\+Left} ()
+\begin{DoxyCompactList}\small\item\em Scroll control left. \end{DoxyCompactList}\item 
+void {\bfseries Do\+Selection\+Visible} ()
+\begin{DoxyCompactList}\small\item\em Scroll control for display selection area. \end{DoxyCompactList}\item 
+void {\bfseries Do\+Range\+Visible} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range)
+\begin{DoxyCompactList}\small\item\em Scroll control for display given range. \end{DoxyCompactList}\item 
+void {\bfseries Do\+Range\+Visible} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range, bool try\+To\+Centre)
+\begin{DoxyCompactList}\small\item\em Scroll control for display given range. \end{DoxyCompactList}\item 
+virtual bool {\bfseries Process\+Key} (Keys key\+Data)
+\begin{DoxyCompactList}\small\item\em Process control keys. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ada32d5d3db98cc4ea938121dec1d8c3d}{Goto\+Next\+Bookmark}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Scrolls to nearest bookmark or to first bookmark. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a26f33e2c46c477efe25d4742ae89c3fc}{Goto\+Prev\+Bookmark}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Scrolls to nearest previous bookmark or to last bookmark. \end{DoxyCompactList}\item 
+virtual void {\bfseries Bookmark\+Line} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Bookmarks line. \end{DoxyCompactList}\item 
+virtual void {\bfseries Unbookmark\+Line} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Unbookmarks current line. \end{DoxyCompactList}\item 
+virtual void {\bfseries Move\+Selected\+Lines\+Down} ()
+\begin{DoxyCompactList}\small\item\em Moves selected lines down. \end{DoxyCompactList}\item 
+virtual void {\bfseries Move\+Selected\+Lines\+Up} ()
+\begin{DoxyCompactList}\small\item\em Moves selected lines up. \end{DoxyCompactList}\item 
+virtual void {\bfseries Upper\+Case} ()
+\begin{DoxyCompactList}\small\item\em Convert selected text to upper case. \end{DoxyCompactList}\item 
+virtual void {\bfseries Lower\+Case} ()
+\begin{DoxyCompactList}\small\item\em Convert selected text to lower case. \end{DoxyCompactList}\item 
+virtual void {\bfseries Title\+Case} ()
+\begin{DoxyCompactList}\small\item\em Convert selected text to title case. \end{DoxyCompactList}\item 
+virtual void {\bfseries Sentence\+Case} ()
+\begin{DoxyCompactList}\small\item\em Convert selected text to sentence case. \end{DoxyCompactList}\item 
+void {\bfseries Comment\+Selected} ()
+\begin{DoxyCompactList}\small\item\em Insert/remove comment prefix into selected lines. \end{DoxyCompactList}\item 
+virtual void {\bfseries Comment\+Selected} (string comment\+Prefix)
+\begin{DoxyCompactList}\small\item\em Insert/remove comment prefix into selected lines. \end{DoxyCompactList}\item 
+void {\bfseries On\+Key\+Pressing} (Key\+Press\+Event\+Args args)
+\item 
+void {\bfseries On\+Key\+Pressed} (char c)
+\item 
+virtual bool {\bfseries Process\+Key} (char c, Keys modifiers)
+\begin{DoxyCompactList}\small\item\em Process \"{}real\"{} keys (no control) \end{DoxyCompactList}\item 
+void {\bfseries Do\+Auto\+Indent\+Chars} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Do Auto\+Indent\+Chars. \end{DoxyCompactList}\item 
+virtual void {\bfseries Do\+Auto\+Indent\+If\+Need} ()
+\item 
+virtual void {\bfseries Do\+Auto\+Indent} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Inserts autoindent\textquotesingle{}s spaces in the line. \end{DoxyCompactList}\item 
+virtual int {\bfseries Calc\+Auto\+Indent} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Returns needed start space count for the line. \end{DoxyCompactList}\item 
+virtual void {\bfseries Undo} ()
+\begin{DoxyCompactList}\small\item\em Undo last operation. \end{DoxyCompactList}\item 
+virtual void {\bfseries Redo} ()
+\begin{DoxyCompactList}\small\item\em Redo. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a6fbe8ea1b60de16f6c60dec8880b5564}{Draw\+Text}} (Graphics gr, \mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} start, Size size)
+\begin{DoxyCompactList}\small\item\em Draws text to given Graphics. \end{DoxyCompactList}\item 
+void {\bfseries Change\+Font\+Size} (int step)
+\item 
+int {\bfseries Yto\+Line\+Index} (int y)
+\item 
+\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_aaa4975c5f05aae45b561c88911f398e6}{Point\+To\+Place}} (Point point)
+\begin{DoxyCompactList}\small\item\em Gets nearest line and char position from coordinates. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ac9793b072917a0f7d5862a6db1d8aef3}{Point\+To\+Position}} (Point point)
+\begin{DoxyCompactList}\small\item\em Gets nearest absolute text position for given point. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Text\+Changing} (ref string text)
+\begin{DoxyCompactList}\small\item\em Fires Text\+Changing event. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Text\+Changing} ()
+\item 
+virtual void {\bfseries On\+Text\+Changed} ()
+\begin{DoxyCompactList}\small\item\em Fires Text\+Changed event. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Text\+Changed} (int from\+Line, int to\+Line)
+\begin{DoxyCompactList}\small\item\em Fires Text\+Changed event. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Text\+Changed} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} r)
+\begin{DoxyCompactList}\small\item\em Fires Text\+Changed event. \end{DoxyCompactList}\item 
+void {\bfseries Begin\+Update} ()
+\begin{DoxyCompactList}\small\item\em Call this method before multiple text changing. \end{DoxyCompactList}\item 
+void {\bfseries End\+Update} ()
+\begin{DoxyCompactList}\small\item\em Call this method after multiple text changing. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Selection\+Changed} ()
+\begin{DoxyCompactList}\small\item\em Fires Selection\+Changed event. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a70ffe0bcad9fedc15dd161344177b32a}{Place\+To\+Position}} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} point)
+\begin{DoxyCompactList}\small\item\em Gets absolute text position from line and char position. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} {\bfseries Position\+To\+Place} (int pos)
+\begin{DoxyCompactList}\small\item\em Gets line and char position from absolute text position. \end{DoxyCompactList}\item 
+Point {\bfseries Position\+To\+Point} (int pos)
+\begin{DoxyCompactList}\small\item\em Gets absolute char position from char position. \end{DoxyCompactList}\item 
+Point \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ae065863bf15439e28b5d766b2596fe05}{Place\+To\+Point}} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} place)
+\begin{DoxyCompactList}\small\item\em Gets point for given line and char position. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ab1cc38f4caecb41ca032ee7889dd4926}{Get\+Range}} (int from\+Pos, int to\+Pos)
+\begin{DoxyCompactList}\small\item\em Get range of text. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_adeb85b57a2fd348f84d279a5edc9df1e}{Get\+Range}} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} from\+Place, \mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} to\+Place)
+\begin{DoxyCompactList}\small\item\em Get range of text. \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ad4a4ab12e46653ad78765d8faa8067e9}{Get\+Ranges}} (string regex\+Pattern)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex pattern. \end{DoxyCompactList}\item 
+IEnumerable$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_adbf14c58545e51d17690dc4d4873ca02}{Get\+Ranges}} (string regex\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Finds ranges for given regex pattern. \end{DoxyCompactList}\item 
+string \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ae557fef121ddbdaf4ef9c01a969d6c64}{Get\+Line\+Text}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Get text of given line. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a63a7fb067739dc75f08ab2acec05e80c}{Expand\+Folded\+Block}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Exapnds folded block. \end{DoxyCompactList}\item 
+virtual void {\bfseries Adjust\+Folding} ()
+\begin{DoxyCompactList}\small\item\em Collapse folding blocks using Folded\+Blocks dictionary. \end{DoxyCompactList}\item 
+virtual void {\bfseries Expand\+Block} (int from\+Line, int to\+Line)
+\begin{DoxyCompactList}\small\item\em Expand collapsed block. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_aa19f1a83e8f20042ff5948b399ce4037}{Expand\+Block}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Expand collapsed block. \end{DoxyCompactList}\item 
+virtual void {\bfseries Collapse\+All\+Folding\+Blocks} ()
+\begin{DoxyCompactList}\small\item\em Collapses all folding blocks. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a67d8c492e8e0f33b2e2605602090a2f1}{Expand\+All\+Folding\+Blocks}} ()
+\begin{DoxyCompactList}\small\item\em Exapnds all folded blocks. \end{DoxyCompactList}\item 
+virtual void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a39ba566e295da89adf7628162ef0318d}{Collapse\+Folding\+Block}} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Collapses folding block. \end{DoxyCompactList}\item 
+string {\bfseries Get\+Line\+Folding\+Start\+Marker} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Start foilding marker for the line. \end{DoxyCompactList}\item 
+string {\bfseries Get\+Line\+Folding\+End\+Marker} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em End foilding marker for the line. \end{DoxyCompactList}\item 
+virtual void {\bfseries Collapse\+Block} (int from\+Line, int to\+Line)
+\begin{DoxyCompactList}\small\item\em Collapse text block. \end{DoxyCompactList}\item 
+virtual void {\bfseries Increase\+Indent} ()
+\begin{DoxyCompactList}\small\item\em Insert TAB into front of seletcted lines. \end{DoxyCompactList}\item 
+virtual void {\bfseries Decrease\+Indent} ()
+\begin{DoxyCompactList}\small\item\em Remove TAB from front of seletcted lines. \end{DoxyCompactList}\item 
+virtual void {\bfseries Do\+Auto\+Indent} ()
+\begin{DoxyCompactList}\small\item\em Insert autoindents into selected lines. \end{DoxyCompactList}\item 
+virtual void {\bfseries Insert\+Line\+Prefix} (string prefix)
+\begin{DoxyCompactList}\small\item\em Insert prefix into front of seletcted lines. \end{DoxyCompactList}\item 
+virtual void {\bfseries Remove\+Line\+Prefix} (string prefix)
+\begin{DoxyCompactList}\small\item\em Remove prefix from front of selected lines This method ignores forward spaces of the line. \end{DoxyCompactList}\item 
+void {\bfseries Begin\+Auto\+Undo} ()
+\begin{DoxyCompactList}\small\item\em Begins Auto\+Undo block. All changes of text between Begin\+Auto\+Undo() and End\+Auto\+Undo() will be canceled in one operation Undo. \end{DoxyCompactList}\item 
+void {\bfseries End\+Auto\+Undo} ()
+\begin{DoxyCompactList}\small\item\em Ends Auto\+Undo block. All changes of text between Begin\+Auto\+Undo() and End\+Auto\+Undo() will be canceled in one operation Undo. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Visual\+Marker\+Click} (Mouse\+Event\+Args args, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style_visual_marker}{Style\+Visual\+Marker}} marker)
+\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} {\bfseries Get\+Brackets\+Range} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} place\+Inside\+Brackets, char left\+Bracket, char right\+Bracket, bool include\+Brackets)
+\begin{DoxyCompactList}\small\item\em Returns range between brackets (or null if not found) \end{DoxyCompactList}\item 
+bool {\bfseries Select\+Next} (string regex\+Pattern, bool backward=false, Regex\+Options options=Regex\+Options.\+None)
+\begin{DoxyCompactList}\small\item\em Selectes next fragment for given regex. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Syntax\+Highlight} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} args)
+\item 
+virtual void {\bfseries Print} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} range, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_print_dialog_settings}{Print\+Dialog\+Settings}} settings)
+\begin{DoxyCompactList}\small\item\em Prints range of text. \end{DoxyCompactList}\item 
+void {\bfseries Print} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_print_dialog_settings}{Print\+Dialog\+Settings}} settings)
+\begin{DoxyCompactList}\small\item\em Prints all text. \end{DoxyCompactList}\item 
+void {\bfseries Print} ()
+\begin{DoxyCompactList}\small\item\em Prints all text, without any dialog windows. \end{DoxyCompactList}\item 
+void {\bfseries Open\+File} (string file\+Name, Encoding enc)
+\begin{DoxyCompactList}\small\item\em Open text file. \end{DoxyCompactList}\item 
+void {\bfseries Open\+File} (string file\+Name)
+\begin{DoxyCompactList}\small\item\em Open text file (with automatic encoding detector) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_adc9f35d96a8c5944b0840cb49dabcf8f}{Open\+Binding\+File}} (string file\+Name, Encoding enc)
+\begin{DoxyCompactList}\small\item\em Open file binding mode. \end{DoxyCompactList}\item 
+void {\bfseries Close\+Binding\+File} ()
+\begin{DoxyCompactList}\small\item\em Close file binding mode. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ab90cc36b4b4cc8310c6d7d73d82af29f}{Save\+To\+File}} (string file\+Name, Encoding enc)
+\begin{DoxyCompactList}\small\item\em Save text to the file. \end{DoxyCompactList}\item 
+void {\bfseries Set\+Visible\+State} (int i\+Line, Visible\+State state)
+\begin{DoxyCompactList}\small\item\em Set Visible\+State of line. \end{DoxyCompactList}\item 
+Visible\+State {\bfseries Get\+Visible\+State} (int i\+Line)
+\begin{DoxyCompactList}\small\item\em Returns Visible\+State of the line. \end{DoxyCompactList}\item 
+void {\bfseries Show\+Go\+To\+Dialog} ()
+\begin{DoxyCompactList}\small\item\em Shows Goto dialog form. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_aad64db0dca974c6b077ba11bbae7bdfe}{Set\+Selected\+Line}} (int line\+Number\+To\+Select)
+\begin{DoxyCompactList}\small\item\em Set current line number and make it visible. \end{DoxyCompactList}\item 
+void {\bfseries On\+Undo\+Redo\+State\+Changed} ()
+\begin{DoxyCompactList}\small\item\em Occurs when undo/redo stack is changed. \end{DoxyCompactList}\item 
+List$<$ int $>$ {\bfseries Find\+Lines} (string search\+Pattern, Regex\+Options options)
+\begin{DoxyCompactList}\small\item\em Search lines by regex pattern. \end{DoxyCompactList}\item 
+void {\bfseries Remove\+Lines} (List$<$ int $>$ i\+Lines)
+\begin{DoxyCompactList}\small\item\em Removes given lines. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_controls_1_1_text_view_a17c670150823694606efb92f49edb751}\label{class_step_bro_1_1_core_1_1_controls_1_1_text_view_a17c670150823694606efb92f49edb751} 
+virtual bool {\bfseries Is\+Update\+Needed} ()
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_controls_1_1_text_view_ac47c2517297de941a41ec7a575a6c9e0}\label{class_step_bro_1_1_core_1_1_controls_1_1_text_view_ac47c2517297de941a41ec7a575a6c9e0} 
+virtual bool {\bfseries Do\+Update} (Date\+Time resent\+Changed\+Limit, Date\+Time timeout)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box\+NS.\+Fast\+Colored\+Text\+Box}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual void {\bfseries On\+Tool\+Tip} ()
+\item 
+virtual void {\bfseries On\+Char\+Size\+Changed} ()
+\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Text\+Source}} {\bfseries Create\+Text\+Source} ()
+\item 
+virtual void {\bfseries Init\+Text\+Source} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Text\+Source}} ts)
+\item 
+override void {\bfseries On\+Load} (Event\+Args e)
+\item 
+override void {\bfseries On\+Handle\+Created} (Event\+Args e)
+\item 
+virtual void {\bfseries On\+Create\+Clipboard\+Data} (Data\+Object data)
+\item 
+void {\bfseries Set\+Clipboard} (Data\+Object data)
+\item 
+override void {\bfseries Wnd\+Proc} (ref Message m)
+\item 
+override void {\bfseries On\+Scroll} (Scroll\+Event\+Args se)
+\item 
+virtual void {\bfseries Insert\+Char} (char c)
+\item 
+override void {\bfseries On\+Client\+Size\+Changed} (Event\+Args e)
+\item 
+virtual void {\bfseries On\+Scrollbars\+Updated} ()
+\item 
+override void {\bfseries On\+Key\+Up} (Key\+Event\+Args e)
+\item 
+override void {\bfseries On\+Key\+Down} (Key\+Event\+Args e)
+\item 
+override bool {\bfseries Process\+Dialog\+Key} (Keys key\+Data)
+\item 
+virtual void {\bfseries On\+Custom\+Action} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_custom_action_event_args}{Custom\+Action\+Event\+Args}} e)
+\item 
+override bool {\bfseries Process\+Mnemonic} (char char\+Code)
+\item 
+override bool {\bfseries Process\+Key\+Message} (ref Message m)
+\item 
+void {\bfseries Do\+Auto\+Indent\+Chars} (int i\+Line, Regex regex)
+\item 
+virtual void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a1b27bccbe94c646da8fb2381192d63c6}{Find\+Char}} (char c)
+\begin{DoxyCompactList}\small\item\em Finds given char after current caret position, moves the caret to found pos. \end{DoxyCompactList}\item 
+int {\bfseries Get\+Min\+Start\+Spaces\+Count} (int from\+Line, int to\+Line)
+\item 
+int {\bfseries Get\+Max\+Start\+Spaces\+Count} (int from\+Line, int to\+Line)
+\item 
+override bool {\bfseries Is\+Input\+Key} (Keys key\+Data)
+\item 
+override void {\bfseries On\+Paint\+Background} (Paint\+Event\+Args e)
+\item 
+override void {\bfseries On\+Paint} (Paint\+Event\+Args e)
+\begin{DoxyCompactList}\small\item\em Draw control. \end{DoxyCompactList}\item 
+virtual void {\bfseries Draw\+Folding\+Lines} (Paint\+Event\+Args e, int start\+Line, int end\+Line)
+\item 
+override void {\bfseries On\+Enter} (Event\+Args e)
+\item 
+override void {\bfseries On\+Mouse\+Up} (Mouse\+Event\+Args e)
+\item 
+override void {\bfseries On\+Mouse\+Down} (Mouse\+Event\+Args e)
+\item 
+virtual void {\bfseries Check\+And\+Change\+Selection\+Type} ()
+\item 
+override void {\bfseries On\+Mouse\+Wheel} (Mouse\+Event\+Args e)
+\item 
+virtual void {\bfseries On\+Zoom\+Changed} ()
+\item 
+override void {\bfseries On\+Mouse\+Leave} (Event\+Args e)
+\item 
+override void {\bfseries On\+Mouse\+Move} (Mouse\+Event\+Args e)
+\item 
+override void {\bfseries On\+Mouse\+Double\+Click} (Mouse\+Event\+Args e)
+\item 
+virtual void {\bfseries On\+Text\+Changed} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} args)
+\begin{DoxyCompactList}\small\item\em Fires Text\+Changed event. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Folding\+Highlight\+Changed} ()
+\item 
+override void {\bfseries On\+Got\+Focus} (Event\+Args e)
+\item 
+override void {\bfseries On\+Lost\+Focus} (Event\+Args e)
+\item 
+virtual int {\bfseries Find\+End\+Of\+Folding\+Block} (int i\+Start\+Line, int max\+Lines)
+\item 
+virtual void {\bfseries Recalc\+Folding\+Lines} ()
+\item 
+virtual void {\bfseries Decrease\+Indent\+Of\+Single\+Line} ()
+\begin{DoxyCompactList}\small\item\em Remove TAB in front of the caret ot the selected line. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Marker\+Click} (Mouse\+Event\+Args args, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_visual_marker}{Visual\+Marker}} marker)
+\item 
+virtual void {\bfseries On\+Marker\+Double\+Click} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_visual_marker}{Visual\+Marker}} marker)
+\item 
+virtual string {\bfseries Prepare\+Html\+Text} (string s)
+\item 
+override void {\bfseries Dispose} (bool disposing)
+\item 
+virtual void {\bfseries On\+Paint\+Line} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_paint_line_event_args}{Paint\+Line\+Event\+Args}} e)
+\item 
+override void {\bfseries On\+Drag\+Enter} (Drag\+Event\+Args e)
+\item 
+override void {\bfseries On\+Drag\+Drop} (Drag\+Event\+Args e)
+\item 
+virtual void {\bfseries Do\+Drag\+Drop} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} place, string text)
+\item 
+override void {\bfseries On\+Drag\+Over} (Drag\+Event\+Args e)
+\item 
+override void {\bfseries On\+Drag\+Leave} (Event\+Args e)
+\item 
+virtual void {\bfseries On\+Tool\+Tip} ()
+\item 
+virtual void {\bfseries On\+Char\+Size\+Changed} ()
+\item 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Text\+Source}} {\bfseries Create\+Text\+Source} ()
+\item 
+virtual void {\bfseries Init\+Text\+Source} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Text\+Source}} ts)
+\item 
+override void {\bfseries On\+Load} (Event\+Args e)
+\item 
+override void {\bfseries On\+Handle\+Created} (Event\+Args e)
+\item 
+virtual void {\bfseries On\+Create\+Clipboard\+Data} (Data\+Object data)
+\item 
+void {\bfseries Set\+Clipboard} (Data\+Object data)
+\item 
+override void {\bfseries Wnd\+Proc} (ref Message m)
+\item 
+override void {\bfseries On\+Scroll} (Scroll\+Event\+Args se)
+\item 
+virtual void {\bfseries Insert\+Char} (char c)
+\item 
+override void {\bfseries On\+Client\+Size\+Changed} (Event\+Args e)
+\item 
+virtual void {\bfseries On\+Scrollbars\+Updated} ()
+\item 
+override void {\bfseries On\+Key\+Up} (Key\+Event\+Args e)
+\item 
+override void {\bfseries On\+Key\+Down} (Key\+Event\+Args e)
+\item 
+override bool {\bfseries Process\+Dialog\+Key} (Keys key\+Data)
+\item 
+virtual void {\bfseries On\+Custom\+Action} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_custom_action_event_args}{Custom\+Action\+Event\+Args}} e)
+\item 
+override bool {\bfseries Process\+Mnemonic} (char char\+Code)
+\item 
+override bool {\bfseries Process\+Key\+Message} (ref Message m)
+\item 
+void {\bfseries Do\+Auto\+Indent\+Chars} (int i\+Line, Regex regex)
+\item 
+virtual void \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a1b27bccbe94c646da8fb2381192d63c6}{Find\+Char}} (char c)
+\begin{DoxyCompactList}\small\item\em Finds given char after current caret position, moves the caret to found pos. \end{DoxyCompactList}\item 
+int {\bfseries Get\+Min\+Start\+Spaces\+Count} (int from\+Line, int to\+Line)
+\item 
+int {\bfseries Get\+Max\+Start\+Spaces\+Count} (int from\+Line, int to\+Line)
+\item 
+override bool {\bfseries Is\+Input\+Key} (Keys key\+Data)
+\item 
+override void {\bfseries On\+Paint\+Background} (Paint\+Event\+Args e)
+\item 
+override void {\bfseries On\+Paint} (Paint\+Event\+Args e)
+\begin{DoxyCompactList}\small\item\em Draw control. \end{DoxyCompactList}\item 
+virtual void {\bfseries Draw\+Folding\+Lines} (Paint\+Event\+Args e, int start\+Line, int end\+Line)
+\item 
+override void {\bfseries On\+Enter} (Event\+Args e)
+\item 
+override void {\bfseries On\+Mouse\+Up} (Mouse\+Event\+Args e)
+\item 
+override void {\bfseries On\+Mouse\+Down} (Mouse\+Event\+Args e)
+\item 
+virtual void {\bfseries Check\+And\+Change\+Selection\+Type} ()
+\item 
+override void {\bfseries On\+Mouse\+Wheel} (Mouse\+Event\+Args e)
+\item 
+virtual void {\bfseries On\+Zoom\+Changed} ()
+\item 
+override void {\bfseries On\+Mouse\+Leave} (Event\+Args e)
+\item 
+override void {\bfseries On\+Mouse\+Move} (Mouse\+Event\+Args e)
+\item 
+override void {\bfseries On\+Mouse\+Double\+Click} (Mouse\+Event\+Args e)
+\item 
+virtual void {\bfseries On\+Text\+Changed} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} args)
+\begin{DoxyCompactList}\small\item\em Fires Text\+Changed event. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Folding\+Highlight\+Changed} ()
+\item 
+override void {\bfseries On\+Got\+Focus} (Event\+Args e)
+\item 
+override void {\bfseries On\+Lost\+Focus} (Event\+Args e)
+\item 
+virtual int {\bfseries Find\+End\+Of\+Folding\+Block} (int i\+Start\+Line, int max\+Lines)
+\item 
+virtual void {\bfseries Recalc\+Folding\+Lines} ()
+\item 
+virtual void {\bfseries Decrease\+Indent\+Of\+Single\+Line} ()
+\begin{DoxyCompactList}\small\item\em Remove TAB in front of the caret ot the selected line. \end{DoxyCompactList}\item 
+virtual void {\bfseries On\+Marker\+Click} (Mouse\+Event\+Args args, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_visual_marker}{Visual\+Marker}} marker)
+\item 
+virtual void {\bfseries On\+Marker\+Double\+Click} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_visual_marker}{Visual\+Marker}} marker)
+\item 
+virtual string {\bfseries Prepare\+Html\+Text} (string s)
+\item 
+override void {\bfseries Dispose} (bool disposing)
+\item 
+virtual void {\bfseries On\+Paint\+Line} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_paint_line_event_args}{Paint\+Line\+Event\+Args}} e)
+\item 
+override void {\bfseries On\+Drag\+Enter} (Drag\+Event\+Args e)
+\item 
+override void {\bfseries On\+Drag\+Drop} (Drag\+Event\+Args e)
+\item 
+virtual void {\bfseries Do\+Drag\+Drop} (\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_place}{Place}} place, string text)
+\item 
+override void {\bfseries On\+Drag\+Over} (Drag\+Event\+Args e)
+\item 
+override void {\bfseries On\+Drag\+Leave} (Event\+Args e)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_controls_1_1_text_view_a06350c391d3ca9dfbdfaca6d34aa6236}\label{class_step_bro_1_1_core_1_1_controls_1_1_text_view_a06350c391d3ca9dfbdfaca6d34aa6236} 
+Time\+Span {\bfseries Max\+Update\+Time} = Time\+Span.\+From\+Milliseconds(20)\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_controls_1_1_text_view_ae51dc2fddba252dd1385686be6f527ad}\label{class_step_bro_1_1_core_1_1_controls_1_1_text_view_ae51dc2fddba252dd1385686be6f527ad} 
+Time\+Span {\bfseries Max\+Resent\+Indication\+Age} = Time\+Span.\+From\+Milliseconds(5000)\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_controls_1_1_text_view_a037be9b420001f3e6ee95245bfb487f0}\label{class_step_bro_1_1_core_1_1_controls_1_1_text_view_a037be9b420001f3e6ee95245bfb487f0} 
+bool {\bfseries Auto\+Scroll\+To\+End\+Enabled} = true\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties inherited from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box\+NS.\+Fast\+Colored\+Text\+Box}}}
+\begin{DoxyCompactItemize}
+\item 
+char\mbox{[}$\,$\mbox{]} {\bfseries Auto\+Complete\+Brackets\+List}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+bool {\bfseries Auto\+Complete\+Brackets}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Auto\+Complete brackets. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_service_colors}{Service\+Colors}} {\bfseries Service\+Colors}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Colors of some service visual markers. \end{DoxyCompactList}\item 
+Dictionary$<$ int, int $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a729cdb951f77021f25f597e9ffb3a38e}{Folded\+Blocks}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Contains Unique\+Id of start lines of folded blocks. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_a953599a71fe7ecccc2d5c712c0357868}{Brackets\+Highlight\+Strategy}} {\bfseries Brackets\+Highlight\+Strategy}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Strategy of search of brackets to highlighting. \end{DoxyCompactList}\item 
+bool {\bfseries Word\+Wrap\+Auto\+Indent}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Automatically shifts secondary wordwrap lines on the shift amount of the first line. \end{DoxyCompactList}\item 
+int {\bfseries Word\+Wrap\+Indent}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indent of secondary wordwrap lines (in chars) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_macros_manager}{Macros\+Manager}} {\bfseries Macros\+Manager}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Macros\+Manager records, stores and executes the macroses. \end{DoxyCompactList}\item 
+override bool {\bfseries Allow\+Drop}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Allows drag and drop. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_hints}{Hints}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a2d5620248d7baf270666dca7b2dfd050}{Hints}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Collection of Hints. This is temporary buffer for currently displayed hints. \end{DoxyCompactList}\item 
+int {\bfseries Tool\+Tip\+Delay}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Delay (ms) of Tool\+Tip. \end{DoxyCompactList}\item 
+Tool\+Tip {\bfseries Tool\+Tip}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Tool\+Tip component. \end{DoxyCompactList}\item 
+Color {\bfseries Bookmark\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Color of bookmarks. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_base_bookmarks}{Base\+Bookmarks}} {\bfseries Bookmarks}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Bookmarks. \end{DoxyCompactList}\item 
+bool {\bfseries Virtual\+Space}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Enables virtual spaces. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_ae2728a9829fba4cd0b304c3d51922cd8}{Find\+End\+Of\+Folding\+Block\+Strategy}} {\bfseries Find\+End\+Of\+Folding\+Block\+Strategy}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Strategy of search of end of folding block. \end{DoxyCompactList}\item 
+bool {\bfseries Accepts\+Tab}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates if tab characters are accepted as input. \end{DoxyCompactList}\item 
+bool {\bfseries Accepts\+Return}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates if return characters are accepted as input. \end{DoxyCompactList}\item 
+bool {\bfseries Caret\+Visible}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Shows or hides the caret. \end{DoxyCompactList}\item 
+bool {\bfseries Caret\+Blinking}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Enables caret blinking. \end{DoxyCompactList}\item 
+bool {\bfseries Show\+Caret\+When\+Inactive}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Draw caret when the control is not focused. \end{DoxyCompactList}\item 
+Color {\bfseries Text\+Area\+Border\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Color of border of text area. \end{DoxyCompactList}\item 
+Text\+Area\+Border\+Type {\bfseries Text\+Area\+Border}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Type of border of text area. \end{DoxyCompactList}\item 
+Color {\bfseries Current\+Line\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Background color for current line. \end{DoxyCompactList}\item 
+Color {\bfseries Changed\+Line\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Background color for highlighting of changed lines. \end{DoxyCompactList}\item 
+override Color {\bfseries Fore\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Fore color (default style color) \end{DoxyCompactList}\item 
+int {\bfseries Char\+Height}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Height of char in pixels (includes Line\+Interval) \end{DoxyCompactList}\item 
+int {\bfseries Line\+Interval}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Interval between lines (in pixels) \end{DoxyCompactList}\item 
+int {\bfseries Char\+Width}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Width of char in pixels. \end{DoxyCompactList}\item 
+int {\bfseries Tab\+Length}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Spaces count for tab. \end{DoxyCompactList}\item 
+bool {\bfseries Is\+Changed}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Text was changed. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a91f1451e795f5b44792375e8294064e7}{Text\+Version}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Text version. \end{DoxyCompactList}\item 
+bool {\bfseries Read\+Only}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Read only. \end{DoxyCompactList}\item 
+bool {\bfseries Show\+Line\+Numbers}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Shows line numbers. \end{DoxyCompactList}\item 
+bool {\bfseries Show\+Folding\+Lines}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Shows vertical lines between folding start line and folding end line. \end{DoxyCompactList}\item 
+Rectangle {\bfseries Text\+Area\+Rect}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Rectangle where located text. \end{DoxyCompactList}\item 
+Color {\bfseries Line\+Number\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Color of line numbers. \end{DoxyCompactList}\item 
+uint {\bfseries Line\+Number\+Start\+Value}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Start value of first line number. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line_number_formatting}{Line\+Number\+Formatting}} {\bfseries Line\+Number\+Formatting}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em To create your own line number formatting, you have to implement the abstract Line\+Number\+Formatting class. \end{DoxyCompactList}\item 
+Color {\bfseries Indent\+Back\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Background color of indent area. \end{DoxyCompactList}\item 
+Color {\bfseries Padding\+Back\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Background color of padding area. \end{DoxyCompactList}\item 
+Color {\bfseries Disabled\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Color of disabled component. \end{DoxyCompactList}\item 
+Color {\bfseries Caret\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Color of caret. \end{DoxyCompactList}\item 
+bool {\bfseries Wide\+Caret}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Wide caret. \end{DoxyCompactList}\item 
+Color {\bfseries Service\+Lines\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Color of service lines (folding lines, borders of blocks etc.) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a135c4d2665bfa5a7fd5d8ffd1c24340c}{Padding}} {\bfseries Paddings}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Padings of text area. \end{DoxyCompactList}\item 
+new Padding {\bfseries Padding}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em --Do not use this property-- \end{DoxyCompactList}\item 
+new bool {\bfseries Right\+To\+Left}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+Color {\bfseries Folding\+Indicator\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Color of folding area indicator. \end{DoxyCompactList}\item 
+bool {\bfseries Highlight\+Folding\+Indicator}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Enables folding indicator (left vertical line between folding bounds) \end{DoxyCompactList}\item 
+int {\bfseries Left\+Indent}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Left distance to text beginning. \end{DoxyCompactList}\item 
+int {\bfseries Left\+Padding}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Left padding in pixels. \end{DoxyCompactList}\item 
+int {\bfseries Preferred\+Line\+Width}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em This property draws vertical line after defined char position. Set to 0 for disable drawing of vertical line. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}}\mbox{[}$\,$\mbox{]} {\bfseries Styles}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Styles. \end{DoxyCompactList}\item 
+string {\bfseries Hotkeys}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Hotkeys. Do not use this property in your code, use Hotkeys\+Mapping property. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_hotkeys_mapping}{Hotkeys\+Mapping}} {\bfseries Hotkeys\+Mapping}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Hotkeys mapping. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_style}{Text\+Style}} {\bfseries Default\+Style}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Default text style This style is using when no one other Text\+Style is not defined in Char.\+style. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_selection_style}{Selection\+Style}} {\bfseries Selection\+Style}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Style for rendering Selection area. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_style}{Text\+Style}} {\bfseries Folded\+Block\+Style}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Style for folded block rendering. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_marker_style}{Marker\+Style}} {\bfseries Brackets\+Style}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Style for brackets highlighting. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_marker_style}{Marker\+Style}} {\bfseries Brackets\+Style2}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Style for alternative brackets highlighting. \end{DoxyCompactList}\item 
+char {\bfseries Left\+Bracket}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Opening bracket for brackets highlighting. Set to \textquotesingle{}\textbackslash{}x0\textquotesingle{} for disable brackets highlighting. \end{DoxyCompactList}\item 
+char {\bfseries Right\+Bracket}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Closing bracket for brackets highlighting. Set to \textquotesingle{}\textbackslash{}x0\textquotesingle{} for disable brackets highlighting. \end{DoxyCompactList}\item 
+char {\bfseries Left\+Bracket2}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Alternative opening bracket for brackets highlighting. Set to \textquotesingle{}\textbackslash{}x0\textquotesingle{} for disable brackets highlighting. \end{DoxyCompactList}\item 
+char {\bfseries Right\+Bracket2}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Alternative closing bracket for brackets highlighting. Set to \textquotesingle{}\textbackslash{}x0\textquotesingle{} for disable brackets highlighting. \end{DoxyCompactList}\item 
+string {\bfseries Comment\+Prefix}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Comment line prefix. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_a31ffa48f01e78f0f694e4c152ca5e12c}{Highlighting\+Range\+Type}} \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a2e1ff9a1ece56ac7157216f523072086}{Highlighting\+Range\+Type}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em This property specifies which part of the text will be highlighted as you type (by built-\/in highlighter). \end{DoxyCompactList}\item 
+bool {\bfseries Is\+Replace\+Mode}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Is keyboard in replace mode (wide caret) ? \end{DoxyCompactList}\item 
+bool {\bfseries Allow\+Several\+Text\+Style\+Drawing}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Allows text rendering several styles same time. \end{DoxyCompactList}\item 
+bool {\bfseries Allow\+Macro\+Recording}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Allows to record macros. \end{DoxyCompactList}\item 
+bool {\bfseries Auto\+Indent}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Allows Auto\+Indent. Inserts spaces before new line. \end{DoxyCompactList}\item 
+bool {\bfseries Auto\+Indent\+Existing\+Lines}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Does autoindenting in existing lines. It works only if Auto\+Indent is True. \end{DoxyCompactList}\item 
+int {\bfseries Delayed\+Events\+Interval}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Minimal delay(ms) for delayed events (except Text\+Changed\+Delayed). \end{DoxyCompactList}\item 
+int {\bfseries Delayed\+Text\+Changed\+Interval}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Minimal delay(ms) for Text\+Changed\+Delayed event. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_a5427afb6cb4a740f98bd24e06881925c}{Language}} {\bfseries Language}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Language for highlighting by built-\/in highlighter. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_syntax_highlighter}{Syntax\+Highlighter}} {\bfseries Syntax\+Highlighter}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Syntax Highlighter. \end{DoxyCompactList}\item 
+string {\bfseries Description\+File}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em XML file with description of syntax highlighting. This property works only with Language == Language.\+Custom. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} {\bfseries Left\+Bracket\+Position}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Position of left highlighted bracket. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} {\bfseries Right\+Bracket\+Position}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Position of right highlighted bracket. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} {\bfseries Left\+Bracket\+Position2}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Position of left highlighted alternative bracket. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} {\bfseries Right\+Bracket\+Position2}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Position of right highlighted alternative bracket. \end{DoxyCompactList}\item 
+int {\bfseries Start\+Folding\+Line}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Start line index of current highlighted folding area. Return -\/1 if start of area is not found. \end{DoxyCompactList}\item 
+int {\bfseries End\+Folding\+Line}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em End line index of current highlighted folding area. Return -\/1 if end of area is not found. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source}{Text\+Source}} {\bfseries Text\+Source}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Text\+Source. \end{DoxyCompactList}\item 
+bool {\bfseries Has\+Source\+Text\+Box}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} {\bfseries Source\+Text\+Box}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em The source of the text. Allows to get text from other Fast\+Colored\+Text\+Box. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} {\bfseries Visible\+Range}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Returns current visible range of text. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} {\bfseries Selection}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Current selection range. \end{DoxyCompactList}\item 
+override Color {\bfseries Back\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Background color. It is used if Back\+Brush is null. \end{DoxyCompactList}\item 
+Brush {\bfseries Back\+Brush}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Background brush. If Null then Back\+Color is used. \end{DoxyCompactList}\item 
+bool {\bfseries Show\+Scroll\+Bars}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+bool {\bfseries Multiline}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Multiline. \end{DoxyCompactList}\item 
+bool {\bfseries Word\+Wrap}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Word\+Wrap. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{namespace_fast_colored_text_box_n_s_ab4e313ab5ac853b70ab7726ad9990ce0}{Word\+Wrap\+Mode}} {\bfseries Word\+Wrap\+Mode}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Word\+Wrap mode. \end{DoxyCompactList}\item 
+bool {\bfseries Selection\+Highlighting\+For\+Line\+Breaks\+Enabled}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em If {\ttfamily true} then line breaks included into the selection will be selected too. Then line breaks will be shown as selected blank character. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_find_form}{Find\+Form}} {\bfseries find\+Form}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_replace_form}{Replace\+Form}} {\bfseries replace\+Form}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+override bool {\bfseries Auto\+Scroll}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Do not change this property. \end{DoxyCompactList}\item 
+int {\bfseries Lines\+Count}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Count of lines. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_char}{Char}} {\bfseries this\mbox{[}\+Place place\mbox{]}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets or sets char and style\+Id for given place This property does not fire On\+Text\+Changed event. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} {\bfseries this\mbox{[}int i\+Line\mbox{]}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets Line. \end{DoxyCompactList}\item 
+override string {\bfseries Text}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Text of control. \end{DoxyCompactList}\item 
+int {\bfseries Text\+Length}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+IList$<$ string $>$ {\bfseries Lines}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Text lines. \end{DoxyCompactList}\item 
+string \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ae5a77aa0061b3267a56045c160dfd1b9}{Html}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets colored text as HTML. \end{DoxyCompactList}\item 
+string \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_ae228b55fc67b99d3b7a8268e98ecb173}{Rtf}}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Gets colored text as RTF. \end{DoxyCompactList}\item 
+string {\bfseries Selected\+Text}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Text of current selection. \end{DoxyCompactList}\item 
+int {\bfseries Selection\+Start}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Start position of selection. \end{DoxyCompactList}\item 
+int {\bfseries Selection\+Length}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Length of selected text. \end{DoxyCompactList}\item 
+override Font \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a34cd2985b59b18e152e870081dc077b7}{Font}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Font. \end{DoxyCompactList}\item 
+new Size {\bfseries Auto\+Scroll\+Min\+Size}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+bool {\bfseries Ime\+Allowed}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Indicates that IME is allowed (for CJK language entering) \end{DoxyCompactList}\item 
+bool {\bfseries Undo\+Enabled}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Is undo enabled? \end{DoxyCompactList}\item 
+bool {\bfseries Redo\+Enabled}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Is redo enabled? \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} {\bfseries Range}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Range of all text. \end{DoxyCompactList}\item 
+virtual Color {\bfseries Selection\+Color}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Color of selected area. \end{DoxyCompactList}\item 
+override Cursor {\bfseries Cursor}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+int {\bfseries Reserved\+Count\+Of\+Line\+Number\+Chars}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Reserved space for line number characters. If smaller than needed (e. g. line count \texorpdfstring{$>$}{>}= 10 and this value set to 1) this value will have no impact. If you want to reserve space, e. g. for line numbers \texorpdfstring{$>$}{>}= 10 or \texorpdfstring{$>$}{>}= 100 than you can set this value to 2 or 3 or higher. \end{DoxyCompactList}\item 
+bool {\bfseries Auto\+Indent\+Chars}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Enables Auto\+Indent\+Chars mode. \end{DoxyCompactList}\item 
+string {\bfseries Auto\+Indent\+Chars\+Patterns}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Regex patterns for Auto\+Indent\+Chars (one regex per line) \end{DoxyCompactList}\item 
+int {\bfseries Zoom}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Zooming (in percentages) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box\+NS.\+Fast\+Colored\+Text\+Box}}}
+\begin{DoxyCompactItemize}
+\item 
+static Memory\+Stream {\bfseries Prepare\+Html\+For\+Clipboard} (string html)
+\item 
+static SizeF {\bfseries Get\+Char\+Size} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a34cd2985b59b18e152e870081dc077b7}{Font}} font, char c)
+\item 
+static void {\bfseries Calc\+Cut\+Offs} (List$<$ int $>$ cut\+Off\+Positions, int max\+Chars\+Per\+Line, int max\+Chars\+Per\+Secondary\+Line, bool allow\+IME, bool char\+Wrap, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} line)
+\begin{DoxyCompactList}\small\item\em Calculates wordwrap cutoffs. \end{DoxyCompactList}\item 
+static bool {\bfseries Is\+CJKLetter} (char c)
+\item 
+static Memory\+Stream {\bfseries Prepare\+Html\+For\+Clipboard} (string html)
+\item 
+static SizeF {\bfseries Get\+Char\+Size} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a34cd2985b59b18e152e870081dc077b7}{Font}} font, char c)
+\item 
+static void {\bfseries Calc\+Cut\+Offs} (List$<$ int $>$ cut\+Off\+Positions, int max\+Chars\+Per\+Line, int max\+Chars\+Per\+Secondary\+Line, bool allow\+IME, bool char\+Wrap, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} line)
+\begin{DoxyCompactList}\small\item\em Calculates wordwrap cutoffs. \end{DoxyCompactList}\item 
+static bool {\bfseries Is\+CJKLetter} (char c)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box\+NS.\+Fast\+Colored\+Text\+Box}}}
+\begin{DoxyCompactItemize}
+\item 
+readonly List$<$ \mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_line_info}{Line\+Info}} $>$ {\bfseries Line\+Infos} = new List$<$\mbox{\hyperlink{struct_fast_colored_text_box_n_s_1_1_line_info}{Line\+Info}}$>$()
+\item 
+int {\bfseries Text\+Height}
+\item 
+bool {\bfseries Allow\+Insert\+Remove\+Lines} = true
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box\+NS.\+Fast\+Colored\+Text\+Box}}}
+\begin{DoxyCompactItemize}
+\item 
+Dictionary$<$ int, int $>$ {\bfseries folding\+Pairs} = new Dictionary$<$int, int$>$()
+\item 
+bool {\bfseries need\+Recalc}
+\item 
+bool {\bfseries need\+Recalc\+Word\+Wrap}
+\item 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_range}{Range}} {\bfseries dragged\+Range}
+\end{DoxyCompactItemize}
+\doxysubsection*{Events inherited from \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box\+NS.\+Fast\+Colored\+Text\+Box}}}
+\begin{DoxyCompactItemize}
+\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_tool_tip_needed_event_args}{Tool\+Tip\+Needed\+Event\+Args}} $>$ {\bfseries Tool\+Tip\+Needed}
+\begin{DoxyCompactList}\small\item\em Occurs when mouse is moving over text and tooltip is needed. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_hint_click_event_args}{Hint\+Click\+Event\+Args}} $>$ {\bfseries Hint\+Click}
+\begin{DoxyCompactList}\small\item\em Hint\+Click event. It occurs if user click on the hint. \end{DoxyCompactList}\item 
+new Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} $>$ {\bfseries Text\+Changed}
+\begin{DoxyCompactList}\small\item\em Text\+Changed event. It occurs after insert, delete, clear, undo and redo operations. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_changing_event_args}{Text\+Changing\+Event\+Args}} $>$ {\bfseries Pasting}
+\begin{DoxyCompactList}\small\item\em Occurs when user paste text from clipboard. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_changing_event_args}{Text\+Changing\+Event\+Args}} $>$ {\bfseries Text\+Changing}
+\begin{DoxyCompactList}\small\item\em Text\+Changing event. It occurs before insert, delete, clear, undo and redo operations. \end{DoxyCompactList}\item 
+Event\+Handler {\bfseries Selection\+Changed}
+\begin{DoxyCompactList}\small\item\em Selection\+Changed event. It occurs after changing of selection. \end{DoxyCompactList}\item 
+Event\+Handler {\bfseries Visible\+Range\+Changed}
+\begin{DoxyCompactList}\small\item\em Visible\+Range\+Changed event. It occurs after changing of visible range. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} $>$ {\bfseries Text\+Changed\+Delayed}
+\begin{DoxyCompactList}\small\item\em Text\+Changed\+Delayed event. It occurs after insert, delete, clear, undo and redo operations. This event occurs with a delay relative to Text\+Changed, and fires only once. \end{DoxyCompactList}\item 
+Event\+Handler {\bfseries Selection\+Changed\+Delayed}
+\begin{DoxyCompactList}\small\item\em Selection\+Changed\+Delayed event. It occurs after changing of selection. This event occurs with a delay relative to Selection\+Changed, and fires only once. \end{DoxyCompactList}\item 
+Event\+Handler {\bfseries Visible\+Range\+Changed\+Delayed}
+\begin{DoxyCompactList}\small\item\em Visible\+Range\+Changed\+Delayed event. It occurs after changing of visible range. This event occurs with a delay relative to Visible\+Range\+Changed, and fires only once. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_visual_marker_event_args}{Visual\+Marker\+Event\+Args}} $>$ {\bfseries Visual\+Marker\+Click}
+\begin{DoxyCompactList}\small\item\em It occurs when user click on Visual\+Marker. \end{DoxyCompactList}\item 
+Key\+Press\+Event\+Handler \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_aebdf777d4707237f971786050d6cf198}{Key\+Pressing}}
+\begin{DoxyCompactList}\small\item\em It occurs when visible char is enetering (alphabetic, digit, punctuation, DEL, BACKSPACE) \end{DoxyCompactList}\item 
+Key\+Press\+Event\+Handler {\bfseries Key\+Pressed}
+\begin{DoxyCompactList}\small\item\em It occurs when visible char is enetered (alphabetic, digit, punctuation, DEL, BACKSPACE) \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_auto_indent_event_args}{Auto\+Indent\+Event\+Args}} $>$ {\bfseries Auto\+Indent\+Needed}
+\begin{DoxyCompactList}\small\item\em It occurs when calculates Auto\+Indent for new line. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_paint_line_event_args}{Paint\+Line\+Event\+Args}} $>$ {\bfseries Paint\+Line}
+\begin{DoxyCompactList}\small\item\em It occurs when line background is painting. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line_inserted_event_args}{Line\+Inserted\+Event\+Args}} $>$ {\bfseries Line\+Inserted}
+\begin{DoxyCompactList}\small\item\em Occurs when line was inserted/added. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line_removed_event_args}{Line\+Removed\+Event\+Args}} $>$ {\bfseries Line\+Removed}
+\begin{DoxyCompactList}\small\item\em Occurs when line was removed. \end{DoxyCompactList}\item 
+Event\+Handler$<$ Event\+Args $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a0e48b994d7f7edf5d4bb2ec035c50442}{Folding\+Highlight\+Changed}}
+\begin{DoxyCompactList}\small\item\em Occurs when current highlighted folding area is changed. Current folding area see in Start\+Folding\+Line and End\+Folding\+Line. \end{DoxyCompactList}\item 
+Event\+Handler$<$ Event\+Args $>$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box_a59c78ed2155ef45e79bdd65091691217}{Undo\+Redo\+State\+Changed}}
+\begin{DoxyCompactList}\small\item\em Occurs when undo/redo stack is changed. \end{DoxyCompactList}\item 
+Event\+Handler {\bfseries Zoom\+Changed}
+\begin{DoxyCompactList}\small\item\em Occurs when component was zoomed. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_custom_action_event_args}{Custom\+Action\+Event\+Args}} $>$ {\bfseries Custom\+Action}
+\begin{DoxyCompactList}\small\item\em Occurs when user pressed key, that specified as Custom\+Action. \end{DoxyCompactList}\item 
+Event\+Handler {\bfseries Scrollbars\+Updated}
+\begin{DoxyCompactList}\small\item\em Occurs when scroolbars are updated. \end{DoxyCompactList}\item 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_word_wrap_needed_event_args}{Word\+Wrap\+Needed\+Event\+Args}} $>$ {\bfseries Word\+Wrap\+Needed}
+\begin{DoxyCompactList}\small\item\em Occurs when custom wordwrap is needed. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Controls/\+Win\+Forms/Text\+View.\+cs\end{DoxyCompactItemize}

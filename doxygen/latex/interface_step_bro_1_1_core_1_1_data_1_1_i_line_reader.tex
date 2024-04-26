@@ -1,0 +1,58 @@
+\doxysection{Step\+Bro.\+Core.\+Data.\+ILine\+Reader Interface Reference}
+\hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}{}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}\index{StepBro.Core.Data.ILineReader@{StepBro.Core.Data.ILineReader}}
+Inheritance diagram for Step\+Bro.\+Core.\+Data.\+ILine\+Reader\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a3185cb5fb4b8be2d114f58f02176875c}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a3185cb5fb4b8be2d114f58f02176875c} 
+bool {\bfseries Next} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a4808af657c5ba22068548a8645d2c931}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a4808af657c5ba22068548a8645d2c931} 
+bool {\bfseries Next\+Unless\+New\+Entry} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a43f0c3fdd3a9d6c5a8e8008a39962c77}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a43f0c3fdd3a9d6c5a8e8008a39962c77} 
+void {\bfseries Flush} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} stop\+At=null)
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a2284b4006515f128380b9515f4f92d9e}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a2284b4006515f128380b9515f4f92d9e} 
+IEnumerable$<$ \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} $>$ {\bfseries Peak} ()
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_ab5a471edfe2941c865adf3541085e033}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_ab5a471edfe2941c865adf3541085e033} 
+void {\bfseries Debug\+Dump} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_ad97058d6b1f5c60852062d1ad8a4493d}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_ad97058d6b1f5c60852062d1ad8a4493d} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_nameable}{INameable}} {\bfseries Source}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a7dfe0c87d7a3b7a86278099fa2cb6cb2}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a7dfe0c87d7a3b7a86278099fa2cb6cb2} 
+object {\bfseries Sync}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_ad1f9360ae897f8af97f031fc4f132e55}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_ad1f9360ae897f8af97f031fc4f132e55} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_entry}{ILine\+Reader\+Entry}} {\bfseries Current}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a4e832839de82f0ec0a35ef50bb7bc88d}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a4e832839de82f0ec0a35ef50bb7bc88d} 
+Date\+Time {\bfseries Latest\+Time\+Stamp}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_add9404c35a5280b1d356f7723145e781}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_add9404c35a5280b1d356f7723145e781} 
+bool {\bfseries Lines\+Have\+Timestamp}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a0dcaaabc027a4ab7e0fe636272cc45c1}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a0dcaaabc027a4ab7e0fe636272cc45c1} 
+bool {\bfseries Has\+More}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a8e7583ed8751a643a2835411b7395b46}\label{interface_step_bro_1_1_core_1_1_data_1_1_i_line_reader_a8e7583ed8751a643a2835411b7395b46} 
+Event\+Handler {\bfseries Lines\+Added}
+\end{DoxyCompactItemize}
+
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+Data/ILine\+Reader.\+cs\end{DoxyCompactItemize}

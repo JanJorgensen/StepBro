@@ -1,0 +1,291 @@
+\doxysection{Fast\+Colored\+Text\+Box\+NS.\+Text\+Source Class Reference}
+\hypertarget{class_fast_colored_text_box_n_s_1_1_text_source}{}\label{class_fast_colored_text_box_n_s_1_1_text_source}\index{FastColoredTextBoxNS.TextSource@{FastColoredTextBoxNS.TextSource}}
+
+
+This class contains the source text (chars and styles). It stores a text lines, the manager of commands, undo/redo stack, styles.  
+
+
+Inheritance diagram for Fast\+Colored\+Text\+Box\+NS.\+Text\+Source\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{class_fast_colored_text_box_n_s_1_1_text_source}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a1d00651ba99b4e9de533e4f80bd86a11}\label{class_fast_colored_text_box_n_s_1_1_text_source_a1d00651ba99b4e9de533e4f80bd86a11} 
+virtual void {\bfseries Clear\+Is\+Changed} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a4d05739fa209eec4c677c36a82e1239c}\label{class_fast_colored_text_box_n_s_1_1_text_source_a4d05739fa209eec4c677c36a82e1239c} 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} {\bfseries Create\+Line} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a439159ba718591e427c5c7864bea1c7f}\label{class_fast_colored_text_box_n_s_1_1_text_source_a439159ba718591e427c5c7864bea1c7f} 
+{\bfseries Text\+Source} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} current\+TB)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a2969ba7aaadafbd4df0afb69923cdf3d}\label{class_fast_colored_text_box_n_s_1_1_text_source_a2969ba7aaadafbd4df0afb69923cdf3d} 
+virtual void {\bfseries Init\+Default\+Style} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a1accd159e2f24cd9187f3f6dc392895f}\label{class_fast_colored_text_box_n_s_1_1_text_source_a1accd159e2f24cd9187f3f6dc392895f} 
+virtual bool {\bfseries Is\+Line\+Loaded} (int i\+Line)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a8882528d25d0454baaf3f7b94ee568a2}\label{class_fast_colored_text_box_n_s_1_1_text_source_a8882528d25d0454baaf3f7b94ee568a2} 
+virtual IList$<$ string $>$ {\bfseries Get\+Lines} ()
+\begin{DoxyCompactList}\small\item\em Text lines. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a4fb53be988ed69a6978fac0904e289eb}\label{class_fast_colored_text_box_n_s_1_1_text_source_a4fb53be988ed69a6978fac0904e289eb} 
+IEnumerator$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} $>$ {\bfseries Get\+Enumerator} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a010b196e2131028b73076be84cc51ec6}\label{class_fast_colored_text_box_n_s_1_1_text_source_a010b196e2131028b73076be84cc51ec6} 
+virtual int {\bfseries Binary\+Search} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item, IComparer$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} $>$ comparer)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a4f02a1054b682ec43a513e8053db81c1}\label{class_fast_colored_text_box_n_s_1_1_text_source_a4f02a1054b682ec43a513e8053db81c1} 
+virtual int {\bfseries Generate\+Unique\+Line\+Id} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_af582d630f701df4897a77c9ad48e47e0}\label{class_fast_colored_text_box_n_s_1_1_text_source_af582d630f701df4897a77c9ad48e47e0} 
+virtual void {\bfseries Insert\+Line} (int index, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} line)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ae88f21837a364c9614e5dd183df79e44}\label{class_fast_colored_text_box_n_s_1_1_text_source_ae88f21837a364c9614e5dd183df79e44} 
+virtual void {\bfseries On\+Line\+Inserted} (int index)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_aad2ebd14624e081744d5a5f36d4dfa8f}\label{class_fast_colored_text_box_n_s_1_1_text_source_aad2ebd14624e081744d5a5f36d4dfa8f} 
+virtual void {\bfseries On\+Line\+Inserted} (int index, int count)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a2949ea8a100e710927bc965a88e0837f}\label{class_fast_colored_text_box_n_s_1_1_text_source_a2949ea8a100e710927bc965a88e0837f} 
+virtual void {\bfseries Remove\+Line} (int index)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ad4e774fb3d7e14bd1cec1815635bf4f7}\label{class_fast_colored_text_box_n_s_1_1_text_source_ad4e774fb3d7e14bd1cec1815635bf4f7} 
+virtual void {\bfseries Remove\+Line} (int index, int count)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a1702736cea1e4f3a89b136d43d8435e4}\label{class_fast_colored_text_box_n_s_1_1_text_source_a1702736cea1e4f3a89b136d43d8435e4} 
+virtual void {\bfseries On\+Line\+Removed} (int index, int count, List$<$ int $>$ removed\+Line\+Ids)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a14313194c929053cbf1fd2ab03cbc965}\label{class_fast_colored_text_box_n_s_1_1_text_source_a14313194c929053cbf1fd2ab03cbc965} 
+virtual void {\bfseries On\+Text\+Changed} (int from\+Line, int to\+Line)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_af8442c91dbc2f31a1351ae8f196c3c7b}\label{class_fast_colored_text_box_n_s_1_1_text_source_af8442c91dbc2f31a1351ae8f196c3c7b} 
+virtual int {\bfseries Index\+Of} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_aaa9b12ba9c9ee45f3b93abfbd4fc362b}\label{class_fast_colored_text_box_n_s_1_1_text_source_aaa9b12ba9c9ee45f3b93abfbd4fc362b} 
+virtual void {\bfseries Insert} (int index, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a9a7872fc56fb14f37143d58525597816}\label{class_fast_colored_text_box_n_s_1_1_text_source_a9a7872fc56fb14f37143d58525597816} 
+virtual void {\bfseries Remove\+At} (int index)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ad5192d3cc7b2f361eaa0bc02038e858f}\label{class_fast_colored_text_box_n_s_1_1_text_source_ad5192d3cc7b2f361eaa0bc02038e858f} 
+virtual void {\bfseries Add} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ab6cc7c07ff34ff985cd559471c1057fe}\label{class_fast_colored_text_box_n_s_1_1_text_source_ab6cc7c07ff34ff985cd559471c1057fe} 
+virtual void {\bfseries Clear} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a6495fc6f1661022b9578ade6a3d253c6}\label{class_fast_colored_text_box_n_s_1_1_text_source_a6495fc6f1661022b9578ade6a3d253c6} 
+virtual bool {\bfseries Contains} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_aa02db547d872b814d82fe8ade2b871a9}\label{class_fast_colored_text_box_n_s_1_1_text_source_aa02db547d872b814d82fe8ade2b871a9} 
+virtual void {\bfseries Copy\+To} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}}\mbox{[}$\,$\mbox{]} array, int array\+Index)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ad7fb409d9cc64f310afae10dbc4b162b}\label{class_fast_colored_text_box_n_s_1_1_text_source_ad7fb409d9cc64f310afae10dbc4b162b} 
+virtual bool {\bfseries Remove} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a938c9683fc63e0a3cfa0c9853f8d06f1}\label{class_fast_colored_text_box_n_s_1_1_text_source_a938c9683fc63e0a3cfa0c9853f8d06f1} 
+virtual void {\bfseries Need\+Recalc} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} args)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ad3256000e9b0625a48d7c471a4ff782b}\label{class_fast_colored_text_box_n_s_1_1_text_source_ad3256000e9b0625a48d7c471a4ff782b} 
+virtual void {\bfseries On\+Recalc\+Word\+Wrap} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} args)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ad4bfc06cd3f80936874cde659b51fabd}\label{class_fast_colored_text_box_n_s_1_1_text_source_ad4bfc06cd3f80936874cde659b51fabd} 
+virtual void {\bfseries On\+Text\+Changing} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a3a7333f48210d36fe72115967b73d6fa}\label{class_fast_colored_text_box_n_s_1_1_text_source_a3a7333f48210d36fe72115967b73d6fa} 
+virtual void {\bfseries On\+Text\+Changing} (ref string text)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_aef44f661b18f9350401c3b9d709e764b}\label{class_fast_colored_text_box_n_s_1_1_text_source_aef44f661b18f9350401c3b9d709e764b} 
+virtual int {\bfseries Get\+Line\+Length} (int i)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a1868f2ced5e795a0fdc40651f10f70d2}\label{class_fast_colored_text_box_n_s_1_1_text_source_a1868f2ced5e795a0fdc40651f10f70d2} 
+virtual bool {\bfseries Line\+Has\+Folding\+Start\+Marker} (int i\+Line)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a3ba70ab2c39604a4a6c8341bfb03a97e}\label{class_fast_colored_text_box_n_s_1_1_text_source_a3ba70ab2c39604a4a6c8341bfb03a97e} 
+virtual bool {\bfseries Line\+Has\+Folding\+End\+Marker} (int i\+Line)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ac493684f7948f1709a2012d752b615c3}\label{class_fast_colored_text_box_n_s_1_1_text_source_ac493684f7948f1709a2012d752b615c3} 
+virtual void {\bfseries Dispose} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a3badaaa5f7efa1bedbdeb4e4b25ad02e}\label{class_fast_colored_text_box_n_s_1_1_text_source_a3badaaa5f7efa1bedbdeb4e4b25ad02e} 
+virtual void {\bfseries Save\+To\+File} (string file\+Name, Encoding enc)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a1d00651ba99b4e9de533e4f80bd86a11}\label{class_fast_colored_text_box_n_s_1_1_text_source_a1d00651ba99b4e9de533e4f80bd86a11} 
+virtual void {\bfseries Clear\+Is\+Changed} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a4d05739fa209eec4c677c36a82e1239c}\label{class_fast_colored_text_box_n_s_1_1_text_source_a4d05739fa209eec4c677c36a82e1239c} 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} {\bfseries Create\+Line} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a439159ba718591e427c5c7864bea1c7f}\label{class_fast_colored_text_box_n_s_1_1_text_source_a439159ba718591e427c5c7864bea1c7f} 
+{\bfseries Text\+Source} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} current\+TB)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a2969ba7aaadafbd4df0afb69923cdf3d}\label{class_fast_colored_text_box_n_s_1_1_text_source_a2969ba7aaadafbd4df0afb69923cdf3d} 
+virtual void {\bfseries Init\+Default\+Style} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a1accd159e2f24cd9187f3f6dc392895f}\label{class_fast_colored_text_box_n_s_1_1_text_source_a1accd159e2f24cd9187f3f6dc392895f} 
+virtual bool {\bfseries Is\+Line\+Loaded} (int i\+Line)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a8882528d25d0454baaf3f7b94ee568a2}\label{class_fast_colored_text_box_n_s_1_1_text_source_a8882528d25d0454baaf3f7b94ee568a2} 
+virtual IList$<$ string $>$ {\bfseries Get\+Lines} ()
+\begin{DoxyCompactList}\small\item\em Text lines. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a4fb53be988ed69a6978fac0904e289eb}\label{class_fast_colored_text_box_n_s_1_1_text_source_a4fb53be988ed69a6978fac0904e289eb} 
+IEnumerator$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} $>$ {\bfseries Get\+Enumerator} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a010b196e2131028b73076be84cc51ec6}\label{class_fast_colored_text_box_n_s_1_1_text_source_a010b196e2131028b73076be84cc51ec6} 
+virtual int {\bfseries Binary\+Search} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item, IComparer$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} $>$ comparer)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a4f02a1054b682ec43a513e8053db81c1}\label{class_fast_colored_text_box_n_s_1_1_text_source_a4f02a1054b682ec43a513e8053db81c1} 
+virtual int {\bfseries Generate\+Unique\+Line\+Id} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_af582d630f701df4897a77c9ad48e47e0}\label{class_fast_colored_text_box_n_s_1_1_text_source_af582d630f701df4897a77c9ad48e47e0} 
+virtual void {\bfseries Insert\+Line} (int index, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} line)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ae88f21837a364c9614e5dd183df79e44}\label{class_fast_colored_text_box_n_s_1_1_text_source_ae88f21837a364c9614e5dd183df79e44} 
+virtual void {\bfseries On\+Line\+Inserted} (int index)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_aad2ebd14624e081744d5a5f36d4dfa8f}\label{class_fast_colored_text_box_n_s_1_1_text_source_aad2ebd14624e081744d5a5f36d4dfa8f} 
+virtual void {\bfseries On\+Line\+Inserted} (int index, int count)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a2949ea8a100e710927bc965a88e0837f}\label{class_fast_colored_text_box_n_s_1_1_text_source_a2949ea8a100e710927bc965a88e0837f} 
+virtual void {\bfseries Remove\+Line} (int index)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ad4e774fb3d7e14bd1cec1815635bf4f7}\label{class_fast_colored_text_box_n_s_1_1_text_source_ad4e774fb3d7e14bd1cec1815635bf4f7} 
+virtual void {\bfseries Remove\+Line} (int index, int count)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a1702736cea1e4f3a89b136d43d8435e4}\label{class_fast_colored_text_box_n_s_1_1_text_source_a1702736cea1e4f3a89b136d43d8435e4} 
+virtual void {\bfseries On\+Line\+Removed} (int index, int count, List$<$ int $>$ removed\+Line\+Ids)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a14313194c929053cbf1fd2ab03cbc965}\label{class_fast_colored_text_box_n_s_1_1_text_source_a14313194c929053cbf1fd2ab03cbc965} 
+virtual void {\bfseries On\+Text\+Changed} (int from\+Line, int to\+Line)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_af8442c91dbc2f31a1351ae8f196c3c7b}\label{class_fast_colored_text_box_n_s_1_1_text_source_af8442c91dbc2f31a1351ae8f196c3c7b} 
+virtual int {\bfseries Index\+Of} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_aaa9b12ba9c9ee45f3b93abfbd4fc362b}\label{class_fast_colored_text_box_n_s_1_1_text_source_aaa9b12ba9c9ee45f3b93abfbd4fc362b} 
+virtual void {\bfseries Insert} (int index, \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a9a7872fc56fb14f37143d58525597816}\label{class_fast_colored_text_box_n_s_1_1_text_source_a9a7872fc56fb14f37143d58525597816} 
+virtual void {\bfseries Remove\+At} (int index)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ad5192d3cc7b2f361eaa0bc02038e858f}\label{class_fast_colored_text_box_n_s_1_1_text_source_ad5192d3cc7b2f361eaa0bc02038e858f} 
+virtual void {\bfseries Add} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ab6cc7c07ff34ff985cd559471c1057fe}\label{class_fast_colored_text_box_n_s_1_1_text_source_ab6cc7c07ff34ff985cd559471c1057fe} 
+virtual void {\bfseries Clear} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a6495fc6f1661022b9578ade6a3d253c6}\label{class_fast_colored_text_box_n_s_1_1_text_source_a6495fc6f1661022b9578ade6a3d253c6} 
+virtual bool {\bfseries Contains} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_aa02db547d872b814d82fe8ade2b871a9}\label{class_fast_colored_text_box_n_s_1_1_text_source_aa02db547d872b814d82fe8ade2b871a9} 
+virtual void {\bfseries Copy\+To} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}}\mbox{[}$\,$\mbox{]} array, int array\+Index)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ad7fb409d9cc64f310afae10dbc4b162b}\label{class_fast_colored_text_box_n_s_1_1_text_source_ad7fb409d9cc64f310afae10dbc4b162b} 
+virtual bool {\bfseries Remove} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} item)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a938c9683fc63e0a3cfa0c9853f8d06f1}\label{class_fast_colored_text_box_n_s_1_1_text_source_a938c9683fc63e0a3cfa0c9853f8d06f1} 
+virtual void {\bfseries Need\+Recalc} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} args)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ad3256000e9b0625a48d7c471a4ff782b}\label{class_fast_colored_text_box_n_s_1_1_text_source_ad3256000e9b0625a48d7c471a4ff782b} 
+virtual void {\bfseries On\+Recalc\+Word\+Wrap} (\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} args)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ad4bfc06cd3f80936874cde659b51fabd}\label{class_fast_colored_text_box_n_s_1_1_text_source_ad4bfc06cd3f80936874cde659b51fabd} 
+virtual void {\bfseries On\+Text\+Changing} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a3a7333f48210d36fe72115967b73d6fa}\label{class_fast_colored_text_box_n_s_1_1_text_source_a3a7333f48210d36fe72115967b73d6fa} 
+virtual void {\bfseries On\+Text\+Changing} (ref string text)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_aef44f661b18f9350401c3b9d709e764b}\label{class_fast_colored_text_box_n_s_1_1_text_source_aef44f661b18f9350401c3b9d709e764b} 
+virtual int {\bfseries Get\+Line\+Length} (int i)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a1868f2ced5e795a0fdc40651f10f70d2}\label{class_fast_colored_text_box_n_s_1_1_text_source_a1868f2ced5e795a0fdc40651f10f70d2} 
+virtual bool {\bfseries Line\+Has\+Folding\+Start\+Marker} (int i\+Line)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a3ba70ab2c39604a4a6c8341bfb03a97e}\label{class_fast_colored_text_box_n_s_1_1_text_source_a3ba70ab2c39604a4a6c8341bfb03a97e} 
+virtual bool {\bfseries Line\+Has\+Folding\+End\+Marker} (int i\+Line)
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ac493684f7948f1709a2012d752b615c3}\label{class_fast_colored_text_box_n_s_1_1_text_source_ac493684f7948f1709a2012d752b615c3} 
+virtual void {\bfseries Dispose} ()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a3badaaa5f7efa1bedbdeb4e4b25ad02e}\label{class_fast_colored_text_box_n_s_1_1_text_source_a3badaaa5f7efa1bedbdeb4e4b25ad02e} 
+virtual void {\bfseries Save\+To\+File} (string file\+Name, Encoding enc)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a5cf60c2d94c6fe005ed6873e464143b8}\label{class_fast_colored_text_box_n_s_1_1_text_source_a5cf60c2d94c6fe005ed6873e464143b8} 
+readonly \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_style}{Style}}\mbox{[}$\,$\mbox{]} {\bfseries Styles}
+\begin{DoxyCompactList}\small\item\em Styles. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a624b223f869e1a30b979c1ef4f59d8b5}\label{class_fast_colored_text_box_n_s_1_1_text_source_a624b223f869e1a30b979c1ef4f59d8b5} 
+readonly List$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} $>$ {\bfseries lines} = new List$<$\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}}$>$()
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_acc8c29f8f7e3a8b9b854ac682b820be8}\label{class_fast_colored_text_box_n_s_1_1_text_source_acc8c29f8f7e3a8b9b854ac682b820be8} 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_lines_accessor}{Lines\+Accessor}} {\bfseries lines\+Accessor}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_aa17b9496bf1f6e67f00049b8e9ded1e4}\label{class_fast_colored_text_box_n_s_1_1_text_source_aa17b9496bf1f6e67f00049b8e9ded1e4} 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_command_manager}{Command\+Manager}} {\bfseries Manager}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a30ab99be1464f69d0aec985460cb5596}\label{class_fast_colored_text_box_n_s_1_1_text_source_a30ab99be1464f69d0aec985460cb5596} 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_fast_colored_text_box}{Fast\+Colored\+Text\+Box}} {\bfseries Current\+TB}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Current focused Fast\+Colored\+Text\+Box. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a68054f657b4ec534d8fa9f84e91e3946}\label{class_fast_colored_text_box_n_s_1_1_text_source_a68054f657b4ec534d8fa9f84e91e3946} 
+\mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_style}{Text\+Style}} {\bfseries Default\+Style}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Default text style This style is using when no one other Text\+Style is not defined in Char.\+style. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a2a4d73832b176bfc33b1435abbad1d30}\label{class_fast_colored_text_box_n_s_1_1_text_source_a2a4d73832b176bfc33b1435abbad1d30} 
+virtual \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line}{Line}} {\bfseries this\mbox{[}int i\mbox{]}}\hspace{0.3cm}{\ttfamily  \mbox{[}get, set\mbox{]}}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a615fb4aeed1f23c35915854d8f28cc15}\label{class_fast_colored_text_box_n_s_1_1_text_source_a615fb4aeed1f23c35915854d8f28cc15} 
+virtual bool {\bfseries Is\+Need\+Build\+Removed\+Line\+Ids}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a4c7ae8610d0e46911fc1fbc107d744a6}\label{class_fast_colored_text_box_n_s_1_1_text_source_a4c7ae8610d0e46911fc1fbc107d744a6} 
+virtual int {\bfseries Count}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\begin{DoxyCompactList}\small\item\em Lines count. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a7a9b25b011ed4a67eb4c8ff0c131b655}\label{class_fast_colored_text_box_n_s_1_1_text_source_a7a9b25b011ed4a67eb4c8ff0c131b655} 
+virtual bool {\bfseries Is\+Read\+Only}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Events}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a060cd31e7312e26d5e0af65b7cc6f0bb}\label{class_fast_colored_text_box_n_s_1_1_text_source_a060cd31e7312e26d5e0af65b7cc6f0bb} 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line_inserted_event_args}{Line\+Inserted\+Event\+Args}} $>$ {\bfseries Line\+Inserted}
+\begin{DoxyCompactList}\small\item\em Occurs when line was inserted/added. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_ab58a989f01b5a800f7b563ee4ea68029}\label{class_fast_colored_text_box_n_s_1_1_text_source_ab58a989f01b5a800f7b563ee4ea68029} 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_line_removed_event_args}{Line\+Removed\+Event\+Args}} $>$ {\bfseries Line\+Removed}
+\begin{DoxyCompactList}\small\item\em Occurs when line was removed. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a134be166d34b07c38784b26f04be259c}\label{class_fast_colored_text_box_n_s_1_1_text_source_a134be166d34b07c38784b26f04be259c} 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} $>$ {\bfseries Text\+Changed}
+\begin{DoxyCompactList}\small\item\em Occurs when text was changed. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a77269d4131231406973e0a940c416bd6}\label{class_fast_colored_text_box_n_s_1_1_text_source_a77269d4131231406973e0a940c416bd6} 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} $>$ {\bfseries Recalc\+Needed}
+\begin{DoxyCompactList}\small\item\em Occurs when recalc is needed. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a05750329f0913415fa4de7897ea3e112}\label{class_fast_colored_text_box_n_s_1_1_text_source_a05750329f0913415fa4de7897ea3e112} 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_source_1_1_text_changed_event_args}{Text\+Changed\+Event\+Args}} $>$ {\bfseries Recalc\+Word\+Wrap}
+\begin{DoxyCompactList}\small\item\em Occurs when recalc wordwrap is needed. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_a7ff78f14569f903b9094c59a2b433c99}\label{class_fast_colored_text_box_n_s_1_1_text_source_a7ff78f14569f903b9094c59a2b433c99} 
+Event\+Handler$<$ \mbox{\hyperlink{class_fast_colored_text_box_n_s_1_1_text_changing_event_args}{Text\+Changing\+Event\+Args}} $>$ {\bfseries Text\+Changing}
+\begin{DoxyCompactList}\small\item\em Occurs before text changing. \end{DoxyCompactList}\item 
+\Hypertarget{class_fast_colored_text_box_n_s_1_1_text_source_adb621c8a87e430544bcc9e37a58ce8fe}\label{class_fast_colored_text_box_n_s_1_1_text_source_adb621c8a87e430544bcc9e37a58ce8fe} 
+Event\+Handler {\bfseries Current\+TBChanged}
+\begin{DoxyCompactList}\small\item\em Occurs after Current\+TB was changed. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This class contains the source text (chars and styles). It stores a text lines, the manager of commands, undo/redo stack, styles. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Third\+Party/\+Fast\+Colored\+Text\+Box changed/Text\+Source.\+cs\item 
+source/\+Third\+Party/\+Fast\+Colored\+Text\+Box/Text\+Source.\+cs\end{DoxyCompactItemize}

@@ -53,14 +53,15 @@ namespace StepBro.ToolBarCreator
             var instance = new PropertyBlockDecoder.ValueString<object>("Instance");
             var procedure = new PropertyBlockDecoder.ValueString<object>("Procedure", "Element");
 
-            var procButton = new PropertyBlockDecoder.Block<object, object>("ProcedureActivationButton",
+            var procButton = new PropertyBlockDecoder.Block<object, object>("Button", "ProcedureActivationButton",
                 color, text, instance,
                 new PropertyBlockDecoder.ValueString<object>("Procedure", "Element"),
                 new PropertyBlockDecoder.ValueString<object>("Partner"),
                 new PropertyBlockDecoder.Value<object>("Arg", "Argument"),
                 new PropertyBlockDecoder.Array<object>("Args", "Arguments"),
                 new PropertyBlockDecoder.Flag<object>("Stoppable"),
-                new PropertyBlockDecoder.Flag<object>("StopOnButtonRelease")
+                new PropertyBlockDecoder.Flag<object>("StopOnButtonRelease"),
+                new PropertyBlockDecoder.ValueString<object>("Command")
                 );
             var objCmdButton = new PropertyBlockDecoder.Block<object, object>("ObjectCommandButton",
                 color, text, instance,
@@ -74,7 +75,7 @@ namespace StepBro.ToolBarCreator
                 (
                     new PropertyBlockDecoder.ValueString<object>("Label"),
                     color,
-                    new PropertyBlockDecoder.ValueInt<object>("Priority"),
+                    new PropertyBlockDecoder.ValueInt<object>("Index"),
                     new PropertyBlockDecoder.Flag<object>("Separator"),
                     new PropertyBlockDecoder.Flag<object>("ColumnSeparator"),
                     menu, procButton, objCmdButton, instance

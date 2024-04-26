@@ -1,0 +1,66 @@
+\doxysection{Step\+Bro.\+Core.\+Service\+Manager Class Reference}
+\hypertarget{class_step_bro_1_1_core_1_1_service_manager}{}\label{class_step_bro_1_1_core_1_1_service_manager}\index{StepBro.Core.ServiceManager@{StepBro.Core.ServiceManager}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+interface \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_service_manager_1_1_i_service_manager_administration}{IService\+Manager\+Administration}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_service_manager_a122e5999c12598c7ddd3dc61ec93d27f}\label{class_step_bro_1_1_core_1_1_service_manager_a122e5999c12598c7ddd3dc61ec93d27f} 
+enum {\bfseries Service\+Manager\+State} \{ \newline
+{\bfseries Initial}
+, {\bfseries Initialized}
+, {\bfseries Starting}
+, {\bfseries Started}
+, \newline
+{\bfseries Init\+Or\+Start\+Failed}
+, {\bfseries Stopped}
+, {\bfseries Stop\+Failed}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_service_manager_acbffd7cf66bffdf730e4b087377f6d57}\label{class_step_bro_1_1_core_1_1_service_manager_acbffd7cf66bffdf730e4b087377f6d57} 
+IEnumerable$<$ Type $>$ {\bfseries List\+Unregistered\+Dependencies} ()
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_service_manager_a8492147c7f4f8a461950f29b664650ad}\label{class_step_bro_1_1_core_1_1_service_manager_a8492147c7f4f8a461950f29b664650ad} 
+void {\bfseries Register} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_i_service}{IService}} service, bool force\+Replace=false)
+\item 
+T \mbox{\hyperlink{class_step_bro_1_1_core_1_1_service_manager_ab9493cf9a9ac292337db687e6a45c611}{Get$<$ T $>$}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_service_manager_ad723343f5a01243579e8f1afc8947acf}\label{class_step_bro_1_1_core_1_1_service_manager_ad723343f5a01243579e8f1afc8947acf} 
+static \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_service_manager_1_1_i_service_manager_administration}{IService\+Manager\+Administration}} {\bfseries Create} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_service_manager_af3529bacb9a29e4edfc86e82e001f72a}\label{class_step_bro_1_1_core_1_1_service_manager_af3529bacb9a29e4edfc86e82e001f72a} 
+static \mbox{\hyperlink{class_step_bro_1_1_core_1_1_service_manager}{Service\+Manager}} {\bfseries Global}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_core_1_1_service_manager_ae96f76cf3c5fc9b551b59ba926110a02}\label{class_step_bro_1_1_core_1_1_service_manager_ae96f76cf3c5fc9b551b59ba926110a02} 
+Service\+Manager\+State {\bfseries State} = Service\+Manager\+State.\+Initial\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_core_1_1_service_manager_ab9493cf9a9ac292337db687e6a45c611}\label{class_step_bro_1_1_core_1_1_service_manager_ab9493cf9a9ac292337db687e6a45c611} 
+\index{StepBro.Core.ServiceManager@{StepBro.Core.ServiceManager}!Get$<$ T $>$@{Get$<$ T $>$}}
+\index{Get$<$ T $>$@{Get$<$ T $>$}!StepBro.Core.ServiceManager@{StepBro.Core.ServiceManager}}
+\doxysubsubsection{\texorpdfstring{Get$<$ T $>$()}{Get< T >()}}
+{\footnotesize\ttfamily T Step\+Bro.\+Core.\+Service\+Manager.\+Get$<$ T $>$ (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+\begin{Desc}
+\item[Type Constraints]\begin{description}
+\item[{\em T} : {\em class}]\end{description}
+\end{Desc}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Core/\+General/Service\+Manager.\+cs\end{DoxyCompactItemize}

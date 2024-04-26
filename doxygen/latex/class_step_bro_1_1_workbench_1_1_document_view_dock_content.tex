@@ -1,0 +1,89 @@
+\doxysection{Step\+Bro.\+Workbench.\+Document\+View\+Dock\+Content Class Reference}
+\hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content}{}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content}\index{StepBro.Workbench.DocumentViewDockContent@{StepBro.Workbench.DocumentViewDockContent}}
+Inheritance diagram for Step\+Bro.\+Workbench.\+Document\+View\+Dock\+Content\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.822526cm]{class_step_bro_1_1_workbench_1_1_document_view_dock_content}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a0288fd5e52e97e4ca744e01a23d658ad}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a0288fd5e52e97e4ca744e01a23d658ad} 
+{\bfseries Document\+View\+Dock\+Content} (object script\+Owner)
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_abec0d869c312a7ed7bcafcdd26153032}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_abec0d869c312a7ed7bcafcdd26153032} 
+virtual void {\bfseries Show\+Line} (int line, int selection\+Start, int selection\+End)
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a91d1ebd91b997e913f57ad95b3aa0c2e}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a91d1ebd91b997e913f57ad95b3aa0c2e} 
+bool {\bfseries File\+Changed} ()
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a6105564e843d1d388da417ae4b5a93d5}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a6105564e843d1d388da417ae4b5a93d5} 
+bool {\bfseries Open\+File\+View} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} file)
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a00a68a103a009c6b5840e333303be39d}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a00a68a103a009c6b5840e333303be39d} 
+bool {\bfseries Open\+File} (string filepath)
+\item 
+bool \mbox{\hyperlink{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a446a0f1db8007df028d91952195f373a}{Save\+File}} (\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5}{Save\+Option}} option, string filepath=null)
+\begin{DoxyCompactList}\small\item\em Saves the content of the editor/view to a file. \end{DoxyCompactList}\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a0278713e08ef1b71779d1001c91ae0be}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a0278713e08ef1b71779d1001c91ae0be} 
+bool {\bfseries Discard\+Changes} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a7dbd5be3fa8b373dd5935f56b2062b00}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a7dbd5be3fa8b373dd5935f56b2062b00} 
+override string {\bfseries Get\+Persist\+String} ()
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a54ee1ce4703a3142008d4f3b6981161d}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a54ee1ce4703a3142008d4f3b6981161d} 
+abstract bool {\bfseries Is\+File\+Changed} ()
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a05ab781763b3a5246607ba0d951ba2f0}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a05ab781763b3a5246607ba0d951ba2f0} 
+abstract void {\bfseries Do\+Open\+File\+View} (\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} file)
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a6381d6455a39c17ad964cc3359d39beb}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a6381d6455a39c17ad964cc3359d39beb} 
+abstract \mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} {\bfseries Do\+Open\+File} (string filepath)
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a1e9bf99b6f5f04c2a4225ab80ae74adb}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a1e9bf99b6f5f04c2a4225ab80ae74adb} 
+abstract bool {\bfseries Do\+Save\+File} (\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5}{Save\+Option}} option, string filepath)
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a8305deba0f75fd81330530534fb4dd66}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a8305deba0f75fd81330530534fb4dd66} 
+abstract bool {\bfseries Do\+Discard\+Changes} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a940e9acdafcf65d6515990091a1fb03f}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a940e9acdafcf65d6515990091a1fb03f} 
+\mbox{\hyperlink{interface_step_bro_1_1_core_1_1_general_1_1_i_loaded_file}{ILoaded\+File}} {\bfseries File}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\item 
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a7a05bd210e399a3cc4c5feecd03eb7e1}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a7a05bd210e399a3cc4c5feecd03eb7e1} 
+object {\bfseries File\+Owner}\hspace{0.3cm}{\ttfamily  \mbox{[}get\mbox{]}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a446a0f1db8007df028d91952195f373a}\label{class_step_bro_1_1_workbench_1_1_document_view_dock_content_a446a0f1db8007df028d91952195f373a} 
+\index{StepBro.Workbench.DocumentViewDockContent@{StepBro.Workbench.DocumentViewDockContent}!SaveFile@{SaveFile}}
+\index{SaveFile@{SaveFile}!StepBro.Workbench.DocumentViewDockContent@{StepBro.Workbench.DocumentViewDockContent}}
+\doxysubsubsection{\texorpdfstring{SaveFile()}{SaveFile()}}
+{\footnotesize\ttfamily bool Step\+Bro.\+Workbench.\+Document\+View\+Dock\+Content.\+Save\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespace_step_bro_1_1_core_1_1_file_abea78b996f2e88ded10734ce9d1ab9f5}{Save\+Option}}}]{option,  }\item[{string}]{filepath = {\ttfamily null} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Saves the content of the editor/view to a file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em option} & The type of save operation to do.\\
+\hline
+{\em filepath} & The file path and name to save to.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Whether the save operation succeeded.
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+source/\+Step\+Bro.\+Workbench/Document\+View\+Dock\+Content.\+cs\end{DoxyCompactItemize}
