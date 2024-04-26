@@ -10,6 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Windows.Forms;
 
 namespace StepBro.ConsoleSidekick.WinForms
 {
@@ -33,6 +34,7 @@ namespace StepBro.ConsoleSidekick.WinForms
         private string m_userFile = null;
         private object m_userShortcutItemTag = new object();
         private List<Tuple<string, StepBro.UI.WinForms.CustomToolBar.ToolBar>> m_customToolStrips = new List<Tuple<string, StepBro.UI.WinForms.CustomToolBar.ToolBar>>();
+        private List<string> m_hiddenToolbars = new List<string>();
 
         private class ScriptExecutionToolStripMenuItem : ToolStripMenuItem
         {
@@ -118,6 +120,8 @@ namespace StepBro.ConsoleSidekick.WinForms
             public int version { get; set; } = 2;
             public Shortcut[] Shortcuts { get; set; } = null;
             public PanelSetting[] PanelSettings { get; set; } = null;
+            public string[] HiddenToolbars { get; set; } = null;
+
         }
 
         public MainForm()
@@ -128,6 +132,8 @@ namespace StepBro.ConsoleSidekick.WinForms
             toolStripButtonStopScriptExecution.Text = "\u23F9";
             toolStripButtonAddShortcut.Text = "\u2795";
             toolStripDropDownButtonMainMenu.Text = "\u2630";
+
+            this.UpdateToolbarVisibility();
         }
 
         // TODO: https://stackoverflow.com/questions/1732140/displaying-tooltip-over-a-disabled-control
@@ -141,15 +147,27 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             string[] args = Environment.GetCommandLineArgs();
 
+            //MessageBox.Show("Say when ...", "Waiting");
+
             if (args.Length == 2)
             {
                 m_consoleWindow = nint.Parse(args[1], System.Globalization.NumberStyles.HexNumber);
                 m_pipe = Pipe.StartClient("StepBroConsoleSidekick", args[1]);
+                m_pipe.OnConnectionClosed += (sender, e) =>
+                {
+                    m_closeRequestedByConsole = true; // We consider a connection closed to be a request by console
+                    this.BeginInvoke((MethodInvoker)delegate
+                    {
+                        // close the form on the forms thread
+                        this.Close();
+                    });
+                };
             }
             else
             {
                 return;
             }
+
             m_forceResize = true;
         }
 
@@ -189,7 +207,9 @@ namespace StepBro.ConsoleSidekick.WinForms
                     userData.Shortcuts = shortcuts.ToArray();
                 }
 
-                if (userData.Shortcuts != null || userData.PanelSettings != null)
+                userData.HiddenToolbars = (m_hiddenToolbars.Count > 0) ? m_hiddenToolbars.ToArray() : null;
+
+                if (userData.Shortcuts != null || userData.PanelSettings != null || userData.HiddenToolbars != null)
                 {
                     JsonSerializerOptions options = new JsonSerializerOptions();
                     options.WriteIndented = true;
@@ -207,7 +227,10 @@ namespace StepBro.ConsoleSidekick.WinForms
             else
             {
                 System.Diagnostics.Trace.WriteLine("Sidekick base.OnFormClosing() - requesting console app");
-                m_pipe.Send(ShortCommand.RequestClose);
+                if (m_pipe.IsConnected())
+                {
+                    m_pipe.Send(ShortCommand.RequestClose);
+                }
                 e.Cancel = true;    // Don't close; wait for close request from console.
             }
             System.Diagnostics.Trace.WriteLine("Sidekick closing end");
@@ -324,6 +347,7 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void ExecuteCommand(string instance, string command)
         {
+            // TODO: Show MessageBox with error message.
             m_pipe.Send(new ObjectCommand(instance, command));
         }
 
@@ -613,7 +637,6 @@ namespace StepBro.ConsoleSidekick.WinForms
                     if (cmd == ShortCommand.Close)
                     {
                         m_closeRequestedByConsole = true;
-                        m_pipe.Send(cmd);   // Send back, to make console continue the closing process.
                         Thread.Sleep(100);
                         m_pipe.Dispose();
                         this.Close();
@@ -967,17 +990,27 @@ namespace StepBro.ConsoleSidekick.WinForms
             //}
 
             this.Controls.Clear();
+            toolStripMenuItemShownToolbars.DropDownItems.Clear();
             m_customToolStrips = newToolBarList.ToList();
-            m_customToolStrips.Sort((l, r) => r.Item2.Priority.CompareTo(l.Item2.Priority));
+            m_customToolStrips.Sort((l, r) => (1000000 - r.Item2.Index).CompareTo(1000000 - l.Item2.Index));    // Toolbars with same index in reading order from script, otherwise use after index order.
             m_customToolStrips.Reverse();
             int tabIndex = m_customToolStrips.Count;
             foreach (var tbData in m_customToolStrips)
             {
+                var visibilityMenuItem = new ToolStripMenuItem();
+                visibilityMenuItem.CheckOnClick = true;
+                visibilityMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
+                visibilityMenuItem.Size = new Size(180, 22);
+                visibilityMenuItem.Text = tbData.Item1;
+                visibilityMenuItem.Checked = !m_hiddenToolbars.Contains(tbData.Item1);
+                visibilityMenuItem.CheckedChanged += (s, e) => { SetToolbarVisibility(((ToolStripMenuItem)s).Text, ((ToolStripMenuItem)s).Checked); };
+                visibilityMenuItem.Tag = tbData.Item2;
+                toolStripMenuItemShownToolbars.DropDownItems.Insert(0, visibilityMenuItem);
+
                 if (tabIndex % 2 == 0)
                 {
                     tbData.Item2.DefaultBackColor = Color.Beige;
                 }
-                //tbData.Item2.DefaultBackColor = (tabIndex % 2 == 0) ? Color.Beige : Color.Wheat;
                 tbData.Item2.TabIndex = tabIndex--;
                 this.Controls.Add(tbData.Item2);
             }
@@ -985,7 +1018,6 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             if (m_customToolStrips.Count > 0)
             {
-                this.Height = m_customToolStrips[0].Item2.Bounds.Bottom + 2;
                 m_customToolStrips[0].Item2.AdjustColumns();
             }
             else
@@ -1022,12 +1054,69 @@ namespace StepBro.ConsoleSidekick.WinForms
                             }
                         }
                     }
+                    if (data.HiddenToolbars != null && data.HiddenToolbars.Length > 0)
+                    {
+                        m_hiddenToolbars = data.HiddenToolbars.ToList();
+                    }
                 }
             }
 
             #endregion
+
+            this.UpdateToolbarVisibility();
         }
 
+        private void SetToolbarVisibility(string name, bool visible)
+        {
+
+            int i = -1;
+            for (int j = 0; j < m_hiddenToolbars.Count; j++)
+            {
+                if (m_hiddenToolbars[j] == name)
+                {
+                    i = j;
+                    break;
+                }
+            }
+            if (visible)
+            {
+                if (i >= 0)
+                {
+                    m_hiddenToolbars.RemoveAt(i);
+                }
+            }
+            else
+            {
+                if (i < 0)
+                {
+                    m_hiddenToolbars.Add(name);
+                }
+            }
+            this.UpdateToolbarVisibility();
+        }
+
+        private void UpdateToolbarVisibility()
+        {
+            StepBro.UI.WinForms.CustomToolBar.ToolBar bottomVisible = null; // Actually the first visible in the list, as toolbars are added in reverse order.
+            if (m_customToolStrips.Count > 0)
+            {
+                foreach (var tb in m_customToolStrips)
+                {
+                    bool visible = !m_hiddenToolbars.Contains(tb.Item1);
+                    tb.Item2.Visible = visible;
+                    if (bottomVisible == null && visible)
+                    {
+                        bottomVisible = tb.Item2;
+                    }
+                }
+                if (bottomVisible != null)
+                {
+                    this.Height = bottomVisible.Bounds.Bottom + 2;
+                    return;
+                }
+            }
+            this.Height = toolStripMain.Bounds.Bottom + 2;
+        }
 
         public static string ScripExecutionButtonTitle(bool showFullName, string element, string partner, string objectVariable, object[] args)
         {
@@ -1215,6 +1304,19 @@ namespace StepBro.ConsoleSidekick.WinForms
         private void SetExtraFieldsSeparatorVisibility()
         {
             toolStripSeparatorExtraFields.Visible = toolStripTextBoxExeNote.Visible;
+        }
+
+        private void toolStripMenuItemShownToolbars_DropDownOpening(object sender, EventArgs e)
+        {
+            foreach (ToolStripMenuItem item in toolStripMenuItemShownToolbars.DropDownItems)
+            {
+                item.Checked = (item.Tag as StepBro.UI.WinForms.CustomToolBar.ToolBar).Visible;
+            }
+        }
+
+        private void toolStripMenuItemView_DropDownOpening(object sender, EventArgs e)
+        {
+            toolStripMenuItemShownToolbars.Enabled = (m_customToolStrips.Count > 0);
         }
 
         #region ILogger

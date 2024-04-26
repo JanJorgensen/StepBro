@@ -123,6 +123,8 @@ namespace StepBroCoreTest.Data
         public static long MethodStaticLongOut7(DummyEnum value) { return (long)((int)value) * 7L; }
         public static long MethodStaticLongOut8(object value) { return (value == null) ? -1L : value.ToString().Length; }
 
+        public static int MethodStaticLongToInt(long value) { return (int)value; }
+
         public static long MethodStaticLongSevaralArgs(
             long a = 5L,
             bool b = true,

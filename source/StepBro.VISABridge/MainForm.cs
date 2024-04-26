@@ -1,4 +1,6 @@
 ﻿using NationalInstruments.Visa;
+using StepBro.Core.IPC;
+using StepBro.VISABridge.Messages;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,6 +8,8 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
@@ -14,13 +18,98 @@ namespace StepBro.VISABridge
 {
     public partial class MainForm : Form
     {
-        private string m_lastResourceString = "";
+        private string m_lastResourceString = null;
         private MessageBasedSession m_session = null;
+        private Pipe m_pipe = null;
+
+        private void ReceivedData(Tuple<string, string> received)
+        {
+            switch(received.Item1)
+            {
+                case nameof(ShortCommand):
+                    switch(JsonSerializer.Deserialize<ShortCommand>(received.Item2))
+                    {
+                        case ShortCommand.None:
+                            // Should not happen
+                            break;
+                        case ShortCommand.GetInstrumentList:
+                            // TODO: Handle Get Instrument List
+
+                            break;
+                        case ShortCommand.SessionClosed:
+                            // Should not happen
+                            break;
+                        case ShortCommand.Receive:
+                            byte[] readData = m_session.RawIO.Read();
+                            m_pipe.Send(new Received(new UTF8Encoding(true).GetString(readData)));
+                            break;
+                    }
+                    break;
+                case nameof(OpenSession):
+                    var openSessionData = JsonSerializer.Deserialize<OpenSession>(received.Item2);
+                    if (!String.IsNullOrEmpty(openSessionData.Resource))
+                    {
+                        m_lastResourceString = openSessionData.Resource;
+                        Open();
+                    }
+                    m_pipe.Send(new SessionOpened(m_lastResourceString, 0));
+                    break;
+                case nameof(CloseSession):
+                    var closeSessionData = JsonSerializer.Deserialize<CloseSession>(received.Item2);
+                    if (m_lastResourceString.Equals(closeSessionData.Resource))
+                    {
+                        m_session.Dispose();
+                        m_session = null;
+                        m_lastResourceString = null;
+                    }
+                    m_pipe.Send(ShortCommand.SessionClosed);
+                    break;
+                case nameof(ConnectedInstruments):
+                    // Should not happen
+                    break;
+                case nameof(Received):
+                    // Should not happen
+                    break;
+                case nameof(Send):
+                    var sendData = JsonSerializer.Deserialize<Send>(received.Item2);
+                    m_session.RawIO.Write(sendData.Request);
+                    break;
+                case nameof(SessionOpened):
+                    // Should not happen
+                    break;
+            }
+        }
 
         public MainForm()
         {
             InitializeComponent();
             SetupControlState();
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+
+            if (m_pipe != null)
+            {
+                m_pipe.Dispose();
+            }
+        }
+
+        private void Open()
+        {
+            using (SelectResource sr = new SelectResource())
+            {
+                if (!String.IsNullOrEmpty(m_lastResourceString))
+                {
+                    sr.ResourceName = m_lastResourceString;
+                }
+                m_lastResourceString = sr.ResourceName;
+                using (var rmSession = new ResourceManager())
+                {
+                    m_session = (MessageBasedSession)rmSession.Open(sr.ResourceName);
+                }
+            }
         }
 
         private void SetupControlState()
@@ -153,6 +242,13 @@ namespace StepBro.VISABridge
         private void MainForm_Load(object sender, EventArgs e)
         {
             string[] args = Environment.GetCommandLineArgs();
+
+            m_pipe = Pipe.StartServer("StepBroVisaPipe", null);
+
+            m_pipe.ReceivedData += (_, eventArgs) =>
+            {
+                ReceivedData(eventArgs);
+            };
 
             if (args.Length == 2)
             {

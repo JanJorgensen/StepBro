@@ -583,7 +583,7 @@ propertyblockStatementNamed
 
 propertyblockStatementNameSpecifier : identifierOrQualified | primitiveType | keywordWide | REGULAR_STRING ;
 
-propertyblockStatementTypeSpecifier : identifierOrQualified | primitiveType | keywordWide ;
+propertyblockStatementTypeSpecifier : identifierOrQualified | primitiveType | keywordWide | VAR;
 
 propertyblockStatementNamedValue
     :	propertyblock

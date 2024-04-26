@@ -11,6 +11,7 @@ namespace StepBro.Core.Execution
 {
     internal class ScriptTaskContext
     {
+        private static ScriptTaskContext m_lastCreatedContext = null;
         private object m_value = null;
         private ILoggerScope m_logger = null;
         private ContextLogOption m_logOption = ContextLogOption.Normal;
@@ -22,6 +23,13 @@ namespace StepBro.Core.Execution
         private ProcedureResult m_result = null;
         private DataReport m_dataReport = null;
         private bool m_stopRequested = false;
+
+        public ScriptTaskContext()
+        {
+            m_lastCreatedContext = this;
+        }
+
+        public static ScriptTaskContext LastContext { get { return m_lastCreatedContext; } }
 
         public void Setup(
             ILoggerScope logger,
@@ -123,6 +131,6 @@ namespace StepBro.Core.Execution
             m_stopRequested = true;
         }
 
-        public bool StopRequested {  get {  return m_stopRequested; } }
+        public bool StopRequested { get { return m_stopRequested; } }
     }
 }

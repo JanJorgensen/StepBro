@@ -1,4 +1,5 @@
 ﻿//#define STOP_BEFORE_PARSING
+//#define STOP_BEFORE_SIDEKICK
 using StepBro.Core;
 using StepBro.Core.Addons;
 using StepBro.Core.Api;
@@ -12,6 +13,9 @@ using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -64,6 +68,7 @@ namespace StepBro.Cmd
         private static bool sidekickStarted = false;
         private static ILoggerScope m_sidekickLogger = null;
         private static List<Tuple<ulong, object>> m_requestObjectDictionary = new List<Tuple<ulong, object>>();
+        private static IExecutionScopeStatus m_statusTop = null;
 
         private static int Main(string[] args)
         {
@@ -120,6 +125,14 @@ namespace StepBro.Cmd
                 Console.BackgroundColor = back; Console.ForegroundColor = fore;
                 Console.WriteLine();
                 Console.WriteLine();
+
+                AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
+                {
+                    if (m_sideKickPipe.IsConnected())
+                    {
+                        m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.Close);
+                    }
+                };
             }
             else if (m_commandLineOptions.Verbose)
             {
@@ -243,7 +256,7 @@ namespace StepBro.Cmd
                         m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.Close);
                         Thread.Sleep(1000);     // Leave some time for the execution helper application to receive the command.
                     };
-                    
+
                     m_sidekickLogger = StepBroMain.Logger.RootLogger.CreateSubLocation("SideKick");
 
                     Console.CancelKeyPress += consoleCancelEventHandler;
@@ -261,6 +274,13 @@ namespace StepBro.Cmd
                     sidekick.StartInfo.Arguments = pipename;
                     sidekickStarted = sidekick.Start();
 
+#if STOP_BEFORE_SIDEKICK
+                Console.WriteLine("<PRESS ANY KEY TO CONTINUE>");
+                while (!Console.KeyAvailable)
+                {
+                    System.Threading.Thread.Sleep(25);
+                }
+#endif
                     if (sidekickStarted)
                     {
                         commandObjectDictionary = new Dictionary<string, ITextCommandInput>();
@@ -422,6 +442,7 @@ namespace StepBro.Cmd
                                     }
                                     else if (input.Item1 == nameof(StepBro.Sidekick.Messages.StopExecutionRequest))
                                     {
+                                        StepBroMain.Logger.RootLogger.LogUserAction("Execution stop requested by user");
                                         var request = JsonSerializer.Deserialize<StepBro.Sidekick.Messages.StopExecutionRequest>(input.Item2);
                                         var reqistration = m_requestObjectDictionary.FirstOrDefault(r => r.Item1 == request.RequestID);
                                         if (reqistration != null)
@@ -754,6 +775,8 @@ namespace StepBro.Cmd
                                                     execution = StepBroMain.ExecuteProcedure(element, partner, targetArguments.ToArray());
                                                 }
 
+                                                ((INotifyCollectionChanged)execution.StateStack).CollectionChanged += ExecutionState_CollectionChanged;
+
                                                 executionStarted = true;
                                                 m_next.Enqueue(StateOrCommand.AwaitScriptExecutionEnd);
                                             }
@@ -931,6 +954,15 @@ namespace StepBro.Cmd
                 ConsoleWriteErrorLine($"Error: {ex.GetType().Name}, {ex.Message}");
                 retval = -1;
             }
+            finally
+            {
+                if (m_sideKickPipe != null)
+                {
+                    m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.Close);
+                    m_sideKickPipe.Dispose();
+                }
+            }
+
             Trace.WriteLine("StepBro ended command loop");
 
 
@@ -989,12 +1021,6 @@ namespace StepBro.Cmd
                 ConsoleWriteLine($"Internal Debug Log saved in {DebugLogUtils.DumpFilePath}");
             }
 
-            if (m_sideKickPipe != null)
-            {
-                m_sideKickPipe.Send(StepBro.Sidekick.Messages.ShortCommand.Close);
-                m_sideKickPipe.Dispose();
-            }
-
             StepBroMain.Deinitialize();
 
             if (m_commandLineOptions.AwaitKeypress)
@@ -1007,6 +1033,73 @@ namespace StepBro.Cmd
                 Console.ReadKey(true);
             }
             return retval;
+        }
+
+        private class ExecutionScopeData : IDisposable
+        {
+            private IExecutionScopeStatus m_status;
+            private int m_level;
+            private ulong m_id;
+            public bool m_isDisposed = false;
+
+            public ExecutionScopeData(IExecutionScopeStatus status, int level)
+            {
+                m_id = UniqueInteger.GetLongProtected();
+                m_status = status;
+                m_status.UITag = this;
+                m_status.PropertyChanged += Status_PropertyChanged;
+                ((INotifyCollectionChanged)m_status.Buttons).CollectionChanged += Buttons_CollectionChanged;
+            }
+
+            public int Level { get { return m_level; } }
+
+            private void Buttons_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+            {
+                System.Diagnostics.Debug.WriteLine("Buttons in state level changed; " + String.Join(", ", m_status.Buttons.Select(b => b.Title)));
+            }
+
+            private void Status_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+            {
+                System.Diagnostics.Debug.WriteLine("State level property changed: " + e.PropertyName);
+            }
+
+            public void Dispose()
+            {
+                System.Diagnostics.Debug.WriteLine("State level dispose");
+                m_status.PropertyChanged -= Status_PropertyChanged;
+                m_status = null;
+                // TODO: Notify list changed
+            }
+        }
+
+        private static void ExecutionState_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            var collection = sender as ReadOnlyObservableCollection<IExecutionScopeStatus>;
+            int level = 0;
+            foreach (var item in collection)
+            {
+                if (item.UITag == null)
+                {
+                    item.UITag = new ExecutionScopeData(item, level);
+                    System.Diagnostics.Debug.WriteLine("New state level created: " + item.MainText);
+                    // TODO: Notify list changed
+                }
+                level++;
+            }
+            IExecutionScopeStatus top = null;
+            while (collection.Count > 0)
+            {
+                try
+                {
+                    top = collection[collection.Count - 1];
+                    break;
+                }
+                catch { }
+            }
+            if (((top == null) != (m_statusTop == null)) || Object.ReferenceEquals(top, m_statusTop))
+            {
+                m_statusTop = top;  // Can be null.
+            }
         }
 
         private static void ExecutionTask_CurrentStateChanged(object sender, EventArgs e)

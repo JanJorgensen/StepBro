@@ -354,3 +354,5 @@ launchSettings.json
 test files/Profiling/BigCallTree.sbs
 test files/Profiling/ManyTools.sbs
 test files/ModuleTests/SerialTestConnection/SerialTestConnectionTests.user.json
+test files/ModuleTests/ExecutionHelper/accessTestData.sbd
+test files/ModuleTests/ExecutionHelper/backup_accessTestData.sbd

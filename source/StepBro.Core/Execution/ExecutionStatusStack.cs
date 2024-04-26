@@ -12,7 +12,7 @@ namespace StepBro.Core.Execution
     public interface IExecutionStateButton : INotifyPropertyChanged
     {
         public string Title { get; }
-        public bool ShownActivated{ get; }
+        public bool ShownActivated { get; }
         public void SetButtonState(bool pushed);
     }
 
@@ -24,5 +24,10 @@ namespace StepBro.Core.Execution
         DateTime StartTime { get; }
         TimeSpan? ExpectedExecutionTime { get; }
         ReadOnlyObservableCollection<IExecutionStateButton> Buttons { get; }
+        /// <summary>
+        /// Place holder for an object representing/showing this execution status.
+        /// The tag object will be disposed when the status object is closed.
+        /// </summary>
+        IDisposable UITag { get; set; }
     }
 }

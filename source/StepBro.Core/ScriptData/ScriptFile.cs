@@ -70,6 +70,11 @@ namespace StepBro.Core.ScriptData
             foreach (var fileVariable in m_fileScopeVariables)
             {
                 fileVariable.VariableOwnerAccess.Dispose();
+
+                if (fileVariable is IDisposable fv)
+                {
+                    fv.Dispose();
+                }
             }
             m_fileScopeVariables = null;
         }
