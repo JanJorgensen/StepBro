@@ -648,10 +648,42 @@ namespace StepBro.Core.Parser
                         }
 
                         varTimeoutTime = m_scopeStack.Peek().AddVariable(
-                            CreateStatementVariableName(context, "whileLoop_TimeoutTime"),
+                            CreateStatementVariableName(context, "forLoop_TimeoutTime"),
                             TypeReference.TypeDateTime,
                             new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
                             EntryModifiers.Private);
+                    }
+                    else if (property.Is("Stoppable", PropertyBlockEntryType.Flag))
+                    {
+                        loopExpressions.Add(
+                            Expression.IfThen(
+                                Expression.Call(
+                                    Expression.Convert(m_currentProcedure.ContextReferenceInternal, typeof(ICallContext)),
+                                    typeof(ICallContext).GetMethod(nameof(ICallContext.StopRequested), new Type[] { })),
+                                Expression.Block(
+                                    Expression.Call(
+                                        m_currentProcedure.ContextReferenceInternal,
+                                        typeof(IScriptCallContext).GetMethod("Log", new Type[] { typeof(string) }),
+                                        Expression.Constant("Loop stopped by user!")),
+                                    Expression.Break(breakLabel))));
+                    }
+                    else
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append("Unknown property: \"");
+                        sb.Append(property.Name);
+                        sb.Append("\" on loop.");
+                        switch (property.Name.ToLower())
+                        {
+                            case "stoppable":
+                                sb.Append(" Did you mean \"Stoppable\"?");
+                                break;
+                            default:
+                                sb.Append(" Check spelling or parameters.");
+                                break;
+                        }
+                        sb.Append(" Keep in mind properties are case-sensitive.");
+                        m_errors.SymanticError(property.Line, -1, false, sb.ToString());
                     }
                 }
             }
