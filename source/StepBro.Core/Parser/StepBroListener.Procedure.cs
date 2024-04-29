@@ -869,6 +869,24 @@ namespace StepBro.Core.Parser
                                         Expression.Constant("Loop stopped by user!")),
                                     Expression.Break(breakLabel))));
                     }
+                    else
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append("Unknown property: \"");
+                        sb.Append(property.Name);
+                        sb.Append("\" on loop.");
+                        switch(property.Name.ToLower())
+                        {
+                            case "stoppable":
+                                sb.Append(" Did you mean \"Stoppable\"?");
+                                break;
+                            default:
+                                sb.Append(" Check spelling or parameters.");
+                                break;
+                        }
+                        sb.Append(" Keep in mind properties are case-sensitive.");
+                        m_errors.SymanticError(property.Line, -1, false, sb.ToString());
+                    }
                 }
             }
             #endregion
