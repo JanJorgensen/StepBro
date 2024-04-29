@@ -674,6 +674,8 @@ namespace StepBro.Core.Parser
                         sb.Append("Unknown property: \"");
                         sb.Append(property.Name);
                         sb.Append("\" on loop.");
+                        // TODO: Figure out a way to give a proper error message for Timeout, as we would hit Timeout here
+                        //       even if we write Timeout correctly but forget to give it a value
                         switch (property.Name.ToLower())
                         {
                             case "stoppable":
@@ -909,6 +911,8 @@ namespace StepBro.Core.Parser
                         sb.Append("Unknown property: \"");
                         sb.Append(property.Name);
                         sb.Append("\" on loop.");
+                        // TODO: Figure out a way to give a proper error message for Timeout, as we would hit Timeout here
+                        //       even if we write Timeout correctly but forget to give it a value
                         switch(property.Name.ToLower())
                         {
                             case "stoppable":
