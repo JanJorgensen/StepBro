@@ -611,6 +611,7 @@ namespace StepBro.Core.Parser
             loopExpressions.Add(Expression.Increment(varLoopIndex.VariableExpression));     // index++; therefore index = 1 inside and after first iteration.
 
             // TODO: Add some logging, interactive break check, timeout and other stuff
+            // TODO: Combine this with the same in the while loop
             #region Attribute Handling
 
             if ((m_currentProcedure.Flags & ProcedureFlags.IsFunction) == ProcedureFlags.None && props != null)
@@ -845,6 +846,7 @@ namespace StepBro.Core.Parser
             loopExpressions.Add(Expression.Increment(varLoopIndex.VariableExpression));     // index++; therefore index = 1 inside and after first iteration.
 
             // TODO: Add some logging, interactive break check, timeout and other stuff
+            // TODO: Combine this with the same in the for loop
             #region Attribute Handling
 
             if ((m_currentProcedure.Flags & ProcedureFlags.IsFunction) == ProcedureFlags.None && props != null)
