@@ -311,16 +311,12 @@ namespace StepBro.Core.IPC
                     m_lastReadString = streamEncoding.GetString(inBuffer);
                     return m_lastReadString;
                 }
-                else
-                {
-                    return null;
-                }
             }
             catch (ObjectDisposedException)
             {
                 // Pipe is closed
-                return null;
             }
+            return null;
         }
 
         public string ReadString(int timeout = 1000)
