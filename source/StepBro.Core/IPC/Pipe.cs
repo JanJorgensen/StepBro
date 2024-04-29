@@ -296,21 +296,29 @@ namespace StepBro.Core.IPC
 
         public string ReadStringDelegate()
         {
-            var b1 = ioStream.ReadByte();
-            var b2 = ioStream.ReadByte();
-            var b3 = ioStream.ReadByte();
-            var b4 = ioStream.ReadByte();
+            try
+            {
+                var b1 = ioStream.ReadByte();
+                var b2 = ioStream.ReadByte();
+                var b3 = ioStream.ReadByte();
+                var b4 = ioStream.ReadByte();
 
-            if (b1 >= 0 && b2 >= 0 && b3 >= 0 && b3 >= 0)
-            {
-                int len = (b1 * 0x1000000) + (b2 * 0x10000) + (b3 * 0x100) + b4;
-                byte[] inBuffer = new byte[len];
-                ioStream.Read(inBuffer, 0, len);
-                m_lastReadString = streamEncoding.GetString(inBuffer);
-                return m_lastReadString;
+                if (b1 >= 0 && b2 >= 0 && b3 >= 0 && b3 >= 0)
+                {
+                    int len = (b1 * 0x1000000) + (b2 * 0x10000) + (b3 * 0x100) + b4;
+                    byte[] inBuffer = new byte[len];
+                    ioStream.Read(inBuffer, 0, len);
+                    m_lastReadString = streamEncoding.GetString(inBuffer);
+                    return m_lastReadString;
+                }
+                else
+                {
+                    return null;
+                }
             }
-            else
+            catch (ObjectDisposedException)
             {
+                // Pipe is closed
                 return null;
             }
         }
