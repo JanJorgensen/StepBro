@@ -218,7 +218,7 @@ namespace StepBro.ExecutionHelper
             else if (input.Item1 == nameof(StepBro.ExecutionHelper.Messages.Error))
             {
                 var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.Error>(input.Item2);
-                context.Logger.LogError(data.Message);
+                context.ReportError(data.Message);
                 result = false;
             }
             else
