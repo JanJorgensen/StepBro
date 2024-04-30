@@ -11,7 +11,8 @@ namespace StepBro.ExecutionHelper.Messages
         None,
         CloseApplication,
         CloseConnection,
-        Acknowledge
+        Acknowledge,
+        Error
     }
 
     public class CreateOrSetVariable
