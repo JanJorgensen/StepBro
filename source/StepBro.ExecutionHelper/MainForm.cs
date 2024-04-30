@@ -165,13 +165,17 @@ namespace StepBro.ExecutionHelper
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.GetVariable))
             {
                 var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.GetVariable>(received.Item2);
-                if (data != null)
+                if (data != null && m_variables.ContainsKey(data.VariableName))
                 {
                     m_pipe!.Send(new SendVariable(data.VariableName, m_variables[data.VariableName]));
                 }
+                else if (data != null && !m_variables.ContainsKey(data.VariableName))
+                {
+                    m_pipe!.Send(new Error("Variable is unknown in IncrementVariable."));
+                }
                 else
                 {
-                    m_pipe!.Send(new Error("Data in GetVariable is null."));
+                    m_pipe!.Send(new Error("Data in IncrementVariable is null."));
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.SaveFile))
