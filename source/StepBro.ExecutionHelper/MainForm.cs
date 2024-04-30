@@ -153,9 +153,13 @@ namespace StepBro.ExecutionHelper
                         m_pipe!.Send(new Error($"{data.VariableName} is not a numeric type."));
                     }
                 }
+                else if (data != null && !m_variables.ContainsKey(data.VariableName))
+                {
+                    m_pipe!.Send(new Error("Variable is unknown in IncrementVariable."));
+                }
                 else
                 {
-                    m_pipe!.Send(new Error("Data in IncrementVariable is null or the variable is unknown."));
+                    m_pipe!.Send(new Error("Data in IncrementVariable is null."));
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.GetVariable))
