@@ -11,8 +11,17 @@ namespace StepBro.ExecutionHelper.Messages
         None,
         CloseApplication,
         CloseConnection,
-        Acknowledge,
-        Error
+        Acknowledge
+    }
+
+    public class Error
+    {
+        public Error(string message)
+        {
+            this.Message = message;
+        }
+        
+        public string Message { get; set; }
     }
 
     public class CreateOrSetVariable

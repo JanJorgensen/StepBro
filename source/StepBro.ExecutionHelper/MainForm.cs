@@ -126,7 +126,7 @@ namespace StepBro.ExecutionHelper
                 }
                 else
                 {
-                    m_pipe!.Send(ShortCommand.Error);
+                    m_pipe!.Send(new Error("Data in CreateOrSetVariable is null."));
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.IncrementVariable))
@@ -150,12 +150,12 @@ namespace StepBro.ExecutionHelper
                     }
                     else
                     {
-                        m_pipe!.Send(ShortCommand.Error);
+                        m_pipe!.Send(new Error($"{data.VariableName} is not a number."));
                     }
                 }
                 else
                 {
-                    m_pipe!.Send(ShortCommand.Error);
+                    m_pipe!.Send(new Error("Data in IncrementVariable is null."));
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.GetVariable))
@@ -167,7 +167,7 @@ namespace StepBro.ExecutionHelper
                 }
                 else
                 {
-                    m_pipe!.Send(ShortCommand.Error);
+                    m_pipe!.Send(new Error("Data in GetVariable is null."));
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.SaveFile))
@@ -184,7 +184,7 @@ namespace StepBro.ExecutionHelper
                 }
                 else
                 {
-                    m_pipe!.Send(ShortCommand.Error);
+                    m_pipe!.Send(new Error("Data in SaveFile is null."));
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.LoadFile))
@@ -222,7 +222,7 @@ namespace StepBro.ExecutionHelper
                 }
                 else
                 {
-                    m_pipe!.Send(ShortCommand.Error);
+                    m_pipe!.Send(new Error("Data in LoadFile is null."));
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.SetCommandRunOnStartup))
@@ -252,7 +252,7 @@ namespace StepBro.ExecutionHelper
                 }
                 else
                 {
-                    m_pipe!.Send(ShortCommand.Error);
+                    m_pipe!.Send(new Error("Data in SetCommandRunOnStartup is null."));
                 }
             }
         }
