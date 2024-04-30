@@ -29,6 +29,9 @@ void ExecutionHelperTest() : TestCase
     result = access.CreateOrSetVariable("TestBool", true);
     expect(result == true);
 
+    result = access.IncrementVariable("TestBool");
+    expect(result == false); // We expect that we are not allowed to increment a test bool
+
     bool testBool = (bool)access.GetVariable("TestBool");
     expect(testBool == true);
 
