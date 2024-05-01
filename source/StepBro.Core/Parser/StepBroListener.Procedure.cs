@@ -446,6 +446,12 @@ namespace StepBro.Core.Parser
             {
                 trueStatement = subStatements[0].GetOnlyStatementCode();
             }
+
+            if (trueStatement == null)
+            {
+                trueStatement = Expression.Empty();
+            }
+
             Expression falseStatement = null;
             if (subStatements.Count == 2)
             {
@@ -457,6 +463,11 @@ namespace StepBro.Core.Parser
                 {
                     falseStatement = subStatements[1].GetOnlyStatementCode();
                 }
+            }
+
+            if (falseStatement == null)
+            {
+                falseStatement = Expression.Empty();
             }
 
             if (condition.IsValueType && condition.DataType.Type == typeof(bool))
