@@ -11,6 +11,7 @@ namespace StepBro.ExecutionHelper
         private Pipe? m_pipe = null;
         private bool m_closeRequested = false;
         private Dictionary<string, object> m_variables = new Dictionary<string, object>();
+        private bool m_shouldAutoSave = true;
 
         public MainForm()
         {
@@ -91,6 +92,14 @@ namespace StepBro.ExecutionHelper
                         this.Close();
                     });
                 }
+                else if (cmd == ShortCommand.PauseAutosave)
+                {
+                    m_shouldAutoSave = false;
+                }
+                else if (cmd == ShortCommand.ResumeAutosave)
+                {
+                    m_shouldAutoSave = true;
+                }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateOrSetVariable))
             {
@@ -135,7 +144,7 @@ namespace StepBro.ExecutionHelper
                 if (data != null && m_variables.ContainsKey(data.VariableName))
                 {
                     bool isNumberKind = m_variables[data.VariableName] is System.Text.Json.JsonElement j && j.ValueKind == JsonValueKind.Number;
-                    
+
                     if (isNumberKind)
                     {
                         long value = 0;
@@ -283,6 +292,15 @@ namespace StepBro.ExecutionHelper
             {
                 var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
                 fs.Write(dataInFile, 0, dataInFile.Length);
+            }
+        }
+
+        private void SaveTimer_Tick(object sender, EventArgs e)
+        {
+            if (m_shouldAutoSave)
+            {
+                string dataToSave = JsonSerializer.Serialize<Dictionary<string, object>>(m_variables);
+                SaveFile("Autosave" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + ".sbd", dataToSave);
             }
         }
     }

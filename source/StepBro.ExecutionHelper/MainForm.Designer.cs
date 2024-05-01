@@ -28,20 +28,29 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
+            SaveTimer = new System.Windows.Forms.Timer(components);
             SuspendLayout();
+            // 
+            // SaveTimer
+            // 
+            SaveTimer.Interval = 1000;
+            SaveTimer.Tick += SaveTimer_Tick;
             // 
             // MainForm
             // 
-            AutoScaleDimensions = new SizeF(120F, 120F);
+            AutoScaleDimensions = new SizeF(144F, 144F);
             AutoScaleMode = AutoScaleMode.Dpi;
-            ClientSize = new Size(667, 375);
+            ClientSize = new Size(800, 450);
             FormBorderStyle = FormBorderStyle.FixedDialog;
-            Margin = new Padding(2, 2, 2, 2);
+            Margin = new Padding(2);
             Name = "MainForm";
             Text = "StepBro Execution Helper";
             ResumeLayout(false);
         }
 
         #endregion
+
+        private System.Windows.Forms.Timer SaveTimer;
     }
 }

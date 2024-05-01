@@ -187,6 +187,18 @@ namespace StepBro.ExecutionHelper
             return true;
         }
 
+        public bool PauseAutosave()
+        {
+            m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.PauseAutosave);
+            return true;
+        }
+
+        public bool ResumeAutosave()
+        {
+            m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.ResumeAutosave);
+            return true;
+        }
+
         bool WaitForAcknowledge(ICallContext context)
         {
             bool result = false;
