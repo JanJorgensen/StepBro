@@ -156,7 +156,7 @@ namespace StepBroCoreTest.Parser
         public void TestProcedureIfStatementEmpty()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
-                "int Func(){ int a = 5; if(a == 5) {} return a;");
+                "int Func(){ int a = 5; if(a == 5) {} return a; }");
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
 
             object result = proc.Call();
@@ -169,7 +169,7 @@ namespace StepBroCoreTest.Parser
         public void TestProcedureIfElseStatementEmpty()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
-                "int Func(){ int a = 5; if(a == 5) {} else {} return a;");
+                "int Func(){ int a = 5; if(a == 5) {} else {} return a; }");
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
 
             object result = proc.Call();
@@ -182,7 +182,7 @@ namespace StepBroCoreTest.Parser
         public void TestProcedureIfElseWithIfStatementEmpty()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
-                "int Func(){ int a = 5; if(a == 6) {} else { a = 7; } return a;");
+                "int Func(){ int a = 5; if(a == 6) {} else { a = 7; } return a; }");
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
 
             object result = proc.Call();
@@ -195,7 +195,7 @@ namespace StepBroCoreTest.Parser
         public void TestProcedureIfElseWithElseStatementEmpty()
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
-                "int Func(){ int a = 5; if(a == 5) { a = 13; } else {} return a;");
+                "int Func(){ int a = 5; if(a == 5) { a = 13; } else {} return a; }");
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
 
             object result = proc.Call();
