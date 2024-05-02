@@ -317,10 +317,21 @@ namespace StepBro.ExecutionHelper
                 }
             }
 
-            using (FileStream fs = File.Create(fileName))
+            if (!File.Exists(fileName) || !shouldAppend)
             {
-                var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
-                fs.Write(dataInFile, 0, dataInFile.Length);
+                using (FileStream fs = File.Create(fileName))
+                {
+                    var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
+                    fs.Write(dataInFile, 0, dataInFile.Length);
+                }
+            }
+            else if (shouldAppend)
+            {
+                using (StreamWriter fs = File.AppendText(fileName))
+                {
+                    var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
+                    fs.Write(dataToSave);
+                }
             }
 
             AddToLogData($"ReceivedData - Saved File {fileName}");
@@ -342,7 +353,7 @@ namespace StepBro.ExecutionHelper
                 localLogData = m_logData;
                 m_logData = "";
             }
-            SaveFile(m_logFileName + DateTime.Now.ToString("yyyy-MM-dd-HH"), localLogData);
+            SaveFile(m_logFileName + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".sbd", localLogData, true);
         }
 
         private void AddToLogData(string data)

@@ -67,7 +67,7 @@ namespace StepBro.ExecutionHelper
 
             m_executionHelperClosedEventHandler = (sender, e) =>
             {
-                context.Logger.LogError("VISA closed unexpectedly");
+                context.Logger.LogError("ExecutionHelper closed unexpectedly");
             };
 
             m_executionHelperPipe.OnConnectionClosed += m_executionHelperClosedEventHandler;
