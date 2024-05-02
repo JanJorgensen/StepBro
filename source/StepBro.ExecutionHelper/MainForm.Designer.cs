@@ -34,6 +34,7 @@
             // 
             // SaveTimer
             // 
+            SaveTimer.Enabled = true;
             SaveTimer.Interval = 1000;
             SaveTimer.Tick += SaveTimer_Tick;
             // 
