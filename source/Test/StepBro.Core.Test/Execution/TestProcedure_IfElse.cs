@@ -151,5 +151,57 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(typeof(long), proc.ReturnType.Type);
             Assert.AreEqual(1, FileBuilder.LastInstance.Errors.ErrorCount);
         }
+
+        [TestMethod]
+        public void TestProcedureIfStatementEmpty()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                "int Func(){ int a = 5; if(a == 5) {} return a; }");
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(5L, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureIfElseStatementEmpty()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                "int Func(){ int a = 5; if(a == 5) {} else {} return a; }");
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(5L, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureIfElseWithIfStatementEmpty()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                "int Func(){ int a = 5; if(a == 6) {} else { a = 7; } return a; }");
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(7L, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureIfElseWithElseStatementEmpty()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                "int Func(){ int a = 5; if(a == 5) { a = 13; } else {} return a; }");
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(13L, (long)result);
+        }
     }
 }

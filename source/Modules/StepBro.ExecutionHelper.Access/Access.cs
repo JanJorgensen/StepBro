@@ -87,23 +87,23 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
-        public bool CreateOrSetVariable(string variableName, object value)
+        public bool CreateOrSetVariable([Implicit] ICallContext context, string variableName, object value)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.CreateOrSetVariable(Prefix + variableName, value));
 
-            bool result = WaitForAcknowledge();
+            bool result = WaitForAcknowledge(context);
             return result;
         }
 
-        public bool IncrementVariable(string variableName)
+        public bool IncrementVariable([Implicit] ICallContext context, string variableName)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.IncrementVariable(Prefix + variableName));
 
-            bool result = WaitForAcknowledge();
+            bool result = WaitForAcknowledge(context);
             return result;
         }
 
-        public object GetVariable(string variableName)
+        public object GetVariable([Implicit] ICallContext context, string variableName)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.GetVariable(Prefix + variableName));
 
@@ -154,27 +154,27 @@ namespace StepBro.ExecutionHelper
             return variable;
         }
 
-        public bool SaveFile(string fileName)
+        public bool SaveFile([Implicit] ICallContext context, string fileName)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SaveFile(Prefix + fileName));
 
-            bool result = WaitForAcknowledge();
+            bool result = WaitForAcknowledge(context);
             return result;
         }
 
-        public bool LoadFile(string fileName)
+        public bool LoadFile([Implicit] ICallContext context, string fileName)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.LoadFile(Prefix + fileName));
 
-            bool result = WaitForAcknowledge();
+            bool result = WaitForAcknowledge(context);
             return result;
         }
 
-        public bool SetCommandRunOnStartup(string command)
+        public bool SetCommandRunOnStartup([Implicit] ICallContext context, string command)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SetCommandRunOnStartup(command));
 
-            bool result = WaitForAcknowledge();
+            bool result = WaitForAcknowledge(context);
             return result;
         }
 
@@ -187,7 +187,7 @@ namespace StepBro.ExecutionHelper
             return true;
         }
 
-        bool WaitForAcknowledge()
+        bool WaitForAcknowledge(ICallContext context)
         {
             bool result = false;
 
@@ -214,6 +214,12 @@ namespace StepBro.ExecutionHelper
                 {
                     result = false;
                 }
+            }
+            else if (input.Item1 == nameof(StepBro.ExecutionHelper.Messages.Error))
+            {
+                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.Error>(input.Item2);
+                context.ReportError(data.Message);
+                result = false;
             }
             else
             {
