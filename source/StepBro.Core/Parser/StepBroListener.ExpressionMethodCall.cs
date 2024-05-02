@@ -156,7 +156,7 @@ namespace StepBro.Core.Parser
                         return;
 
                     case SBExpressionType.TypeReference:
-                        m_errors.SymanticError(context.Start.Line, -1, false, $"\"{left.ToString()}\" should access a ctor or Create-function, but is not implemented.");
+                        // This occurs when an object is created without a body, which just uses default constructor, so this is fine.
                         return;
 
                     case SBExpressionType.Identifier:
