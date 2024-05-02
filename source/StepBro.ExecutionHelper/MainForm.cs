@@ -12,7 +12,7 @@ namespace StepBro.ExecutionHelper
         private bool m_closeRequested = false;
         private Dictionary<string, object> m_variables = new Dictionary<string, object>();
         private bool m_shouldAutoSave = true;
-        private bool m_shouldMinimizeSpaceUsage = true;
+        private bool m_shouldMinimizeSpaceUsage = false;
         private const string m_commandToRunOnStartupFileName = "CommandToRunOnStartup.sbd";
         private const string m_logFileName = "ExecutionHelperLog";
         private string m_logData = "";
