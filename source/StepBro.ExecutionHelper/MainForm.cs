@@ -300,7 +300,9 @@ namespace StepBro.ExecutionHelper
             if (m_shouldAutoSave)
             {
                 string dataToSave = JsonSerializer.Serialize<Dictionary<string, object>>(m_variables);
-                SaveFile("Autosave" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + ".sbd", dataToSave);
+                // Use a new save file name every hour, utilizing the functionality in SaveFile to overwrite
+                // existing filename
+                SaveFile("Autosave" + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".sbd", dataToSave);
             }
         }
     }
