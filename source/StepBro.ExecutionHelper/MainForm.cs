@@ -12,6 +12,10 @@ namespace StepBro.ExecutionHelper
         private bool m_closeRequested = false;
         private Dictionary<string, object> m_variables = new Dictionary<string, object>();
         private bool m_shouldAutoSave = true;
+        private const string m_commandToRunOnStartupFileName = "CommandToRunOnStartup.sbd";
+        private const string m_logFileName = "ExecutionHelperLog";
+        private string m_logData = "";
+        private readonly object m_logLock = new object();
 
         public MainForm()
         {
@@ -52,7 +56,7 @@ namespace StepBro.ExecutionHelper
 
         private void RunOnStartup()
         {
-            string fileName = "CommandToRunOnStartup.sbd";
+            string fileName = m_commandToRunOnStartupFileName;
             string loadedData = "";
 
             if (File.Exists(fileName))
@@ -73,6 +77,7 @@ namespace StepBro.ExecutionHelper
 
                 if (!String.IsNullOrEmpty(loadedData))
                 {
+                    AddToLogData($"RunOnStartup - Tried to run command: {loadedData}");
                     // TODO: Run the command - Remember to do sanity checking, possibly by deserializing into an object that has the specific parameters we look for, i.e. filename, testlist, model, print_report etc.
                 }
             }
@@ -85,6 +90,7 @@ namespace StepBro.ExecutionHelper
                 var cmd = JsonSerializer.Deserialize<ShortCommand>(received.Item2);
                 if (cmd == ShortCommand.CloseApplication)
                 {
+                    AddToLogData("ReceivedData - Received Close Request");
                     m_closeRequested = true;
                     this.BeginInvoke((MethodInvoker)delegate
                     {
@@ -94,15 +100,18 @@ namespace StepBro.ExecutionHelper
                 }
                 else if (cmd == ShortCommand.PauseAutosave)
                 {
+                    AddToLogData("ReceivedData - Received Pause Autosave");
                     m_shouldAutoSave = false;
                 }
                 else if (cmd == ShortCommand.ResumeAutosave)
                 {
+                    AddToLogData("ReceivedData - Received Resume Autosave");
                     m_shouldAutoSave = true;
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateOrSetVariable))
             {
+                AddToLogData("ReceivedData - Received Create or Set Variable");
                 var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.CreateOrSetVariable>(received.Item2);
                 if (data != null)
                 {
@@ -110,16 +119,19 @@ namespace StepBro.ExecutionHelper
                     bool isNumberKind = data.Value is System.Text.Json.JsonElement v && v.ValueKind == JsonValueKind.Number;
                     if (alreadyExists && isNumberKind)
                     {
+                        AddToLogData($"ReceivedData - Setting variable: {data.VariableName} to {data.Value}");
                         long value = 0;
                         Int64.TryParse(data.Value.ToString(), out value);
                         m_variables[data.VariableName] = value;
                     }
                     else if (alreadyExists)
                     {
+                        AddToLogData($"ReceivedData - Setting variable: {data.VariableName} to {data.Value}");
                         m_variables[data.VariableName] = data.Value;
                     }
                     else if (isNumberKind)
                     {
+                        AddToLogData($"ReceivedData - Creating variable: {data.VariableName} with value: {data.Value}");
                         // It is some sort of number, so we save it as a long like StepBro uses
                         long value = 0;
                         Int64.TryParse(data.Value.ToString(), out value);
@@ -127,6 +139,7 @@ namespace StepBro.ExecutionHelper
                     }
                     else
                     {
+                        AddToLogData($"ReceivedData - Creating variable: {data.VariableName} with value: {data.Value}");
                         // It is not a number so we assume the user knows what they are doing
                         m_variables.TryAdd(data.VariableName, data.Value);
                     }
@@ -154,20 +167,24 @@ namespace StepBro.ExecutionHelper
 
                     if (m_variables[data.VariableName] is long v)
                     {
+                        AddToLogData($"ReceivedData - Incrementing variable: {data.VariableName}");
                         m_variables[data.VariableName] = ++v;
                         m_pipe!.Send(ShortCommand.Acknowledge);
                     }
                     else
                     {
+                        AddToLogData($"ReceivedData - Tried to increment variable: {data.VariableName}, but failed because {data.VariableName} is not numeric!");
                         m_pipe!.Send(new Error($"{data.VariableName} is not a numeric type."));
                     }
                 }
                 else if (data != null && !m_variables.ContainsKey(data.VariableName))
                 {
+                    AddToLogData($"ReceivedData - Tried to increment variable: {data.VariableName}, but failed because {data.VariableName} is unknown!");
                     m_pipe!.Send(new Error("Variable is unknown in IncrementVariable."));
                 }
                 else
                 {
+                    AddToLogData($"ReceivedData - Tried to increment variable, but failed because variable is null!");
                     m_pipe!.Send(new Error("Data in IncrementVariable is null."));
                 }
             }
@@ -274,18 +291,21 @@ namespace StepBro.ExecutionHelper
             }
         }
 
-        private void SaveFile(string fileName, string dataToSave)
+        private void SaveFile(string fileName, string dataToSave, bool shouldAppend = false)
         {
-            if (File.Exists(fileName))
+            if (!shouldAppend)
             {
-                if (File.Exists("backup_" + fileName))
+                if (File.Exists(fileName))
                 {
-                    File.Delete("backup_" + fileName);
-                }
+                    if (File.Exists("backup_" + fileName))
+                    {
+                        File.Delete("backup_" + fileName);
+                    }
 
-                // We rename the old file to a backup in case we crash during writing
-                // the new file or in case we accidentally save two files with the same name
-                File.Move(fileName, "backup_" + fileName);
+                    // We rename the old file to a backup in case we crash during writing
+                    // the new file or in case we accidentally save two files with the same name
+                    File.Move(fileName, "backup_" + fileName);
+                }
             }
 
             using (FileStream fs = File.Create(fileName))
@@ -303,6 +323,20 @@ namespace StepBro.ExecutionHelper
                 // Use a new save file name every hour, utilizing the functionality in SaveFile to overwrite
                 // existing filename
                 SaveFile("Autosave" + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".sbd", dataToSave);
+            }
+
+            lock(m_logLock)
+            {
+                SaveFile(m_logFileName + DateTime.Now.ToString("yyyy-MM-dd-HH"), m_logData);
+                m_logData = "";
+            }
+        }
+
+        private void AddToLogData(string data)
+        {
+            lock(m_logLock)
+            {
+                m_logData += $"{data}\n";
             }
         }
     }
