@@ -184,7 +184,7 @@ namespace StepBro.ExecutionHelper
                 }
                 else
                 {
-                    AddToLogData($"ReceivedData - Tried to increment variable, but failed because variable is null!");
+                    AddToLogData($"ReceivedData - Tried to increment variable, but failed because data is null!");
                     m_pipe!.Send(new Error("Data in IncrementVariable is null."));
                 }
             }
@@ -193,14 +193,17 @@ namespace StepBro.ExecutionHelper
                 var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.GetVariable>(received.Item2);
                 if (data != null && m_variables.ContainsKey(data.VariableName))
                 {
+                    AddToLogData($"ReceivedData - Sent variable {data.VariableName}");
                     m_pipe!.Send(new SendVariable(data.VariableName, m_variables[data.VariableName]));
                 }
                 else if (data != null && !m_variables.ContainsKey(data.VariableName))
                 {
+                    AddToLogData($"ReceivedData - Tried sending variable {data.VariableName}, but failed because {data.VariableName} is unknown.");
                     m_pipe!.Send(new Error("Variable is unknown in IncrementVariable."));
                 }
                 else
                 {
+                    AddToLogData($"ReceivedData - Tried sending variable, but failed because data is null!");
                     m_pipe!.Send(new Error("Data in IncrementVariable is null."));
                 }
             }
@@ -218,6 +221,7 @@ namespace StepBro.ExecutionHelper
                 }
                 else
                 {
+                    AddToLogData($"ReceivedData - Tried to save file, but failed because data is null.");
                     m_pipe!.Send(new Error("Data in SaveFile is null."));
                 }
             }
@@ -228,6 +232,7 @@ namespace StepBro.ExecutionHelper
                 {
                     string fileName = data.FileName;
                     string loadedData = "";
+                    AddToLogData($"ReceivedData - Trying to Load {fileName}.");
 
                     using (FileStream fs = File.Open(fileName, FileMode.Open, FileAccess.Read))
                     {
@@ -248,6 +253,7 @@ namespace StepBro.ExecutionHelper
                         Dictionary<string, object>? loadedVariables = JsonSerializer.Deserialize<Dictionary<string, object>>(loadedData);
                         if (loadedVariables != null)
                         {
+                            AddToLogData($"ReceivedData - Loaded {fileName} succesfully.");
                             m_variables = loadedVariables;
                         }
                     }
@@ -256,6 +262,7 @@ namespace StepBro.ExecutionHelper
                 }
                 else
                 {
+                    AddToLogData($"ReceivedData - Failed to load file because data is null!");
                     m_pipe!.Send(new Error("Data in LoadFile is null."));
                 }
             }
@@ -283,9 +290,11 @@ namespace StepBro.ExecutionHelper
                         var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
                         fs.Write(dataInFile, 0, dataInFile.Length);
                     }
+                    AddToLogData($"ReceivedData - Set command run on startup to {data.Command}!");
                 }
                 else
                 {
+                    AddToLogData($"ReceivedData - Failed to set command run on startup because data is null!");
                     m_pipe!.Send(new Error("Data in SetCommandRunOnStartup is null."));
                 }
             }
@@ -313,6 +322,8 @@ namespace StepBro.ExecutionHelper
                 var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
                 fs.Write(dataInFile, 0, dataInFile.Length);
             }
+
+            AddToLogData($"ReceivedData - Saved File {fileName}");
         }
 
         private void SaveTimer_Tick(object sender, EventArgs e)
@@ -325,11 +336,13 @@ namespace StepBro.ExecutionHelper
                 SaveFile("Autosave" + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".sbd", dataToSave);
             }
 
+            string localLogData = "";
             lock(m_logLock)
             {
-                SaveFile(m_logFileName + DateTime.Now.ToString("yyyy-MM-dd-HH"), m_logData);
+                localLogData = m_logData;
                 m_logData = "";
             }
+            SaveFile(m_logFileName + DateTime.Now.ToString("yyyy-MM-dd-HH"), localLogData);
         }
 
         private void AddToLogData(string data)
