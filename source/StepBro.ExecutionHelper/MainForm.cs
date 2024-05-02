@@ -349,7 +349,7 @@ namespace StepBro.ExecutionHelper
         {
             lock(m_logLock)
             {
-                m_logData += $"{data}\n";
+                m_logData += $"{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")} - {data}\n";
             }
         }
     }
