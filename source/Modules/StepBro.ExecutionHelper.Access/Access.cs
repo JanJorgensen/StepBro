@@ -231,10 +231,13 @@ namespace StepBro.ExecutionHelper
 
         public void Dispose()
         {
-            m_executionHelperPipe.OnConnectionClosed -= m_executionHelperClosedEventHandler;
-            if (m_executionHelperPipe.IsConnected())
+            if (m_executionHelperPipe != null)
             {
-                m_executionHelperPipe.Dispose();
+                m_executionHelperPipe.OnConnectionClosed -= m_executionHelperClosedEventHandler;
+                if (m_executionHelperPipe.IsConnected())
+                {
+                    m_executionHelperPipe.Dispose();
+                }
             }
         }
     }

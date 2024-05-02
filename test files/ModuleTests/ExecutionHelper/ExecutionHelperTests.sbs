@@ -2,7 +2,7 @@ using System;
 using StepBro.ExecutionHelper.Access;
 using "TestFramework.sbs";
 
-public StepBro.ExecutionHelper.Access access = StepBro.ExecutionHelper.Access(){}
+public StepBro.ExecutionHelper.Access access = StepBro.ExecutionHelper.Access();
 
 testlist ExecutionHelperTests : TestSuite
 {
