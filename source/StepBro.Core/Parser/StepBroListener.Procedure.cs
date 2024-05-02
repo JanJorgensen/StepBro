@@ -446,6 +446,12 @@ namespace StepBro.Core.Parser
             {
                 trueStatement = subStatements[0].GetOnlyStatementCode();
             }
+
+            if (trueStatement == null)
+            {
+                trueStatement = Expression.Empty();
+            }
+
             Expression falseStatement = null;
             if (subStatements.Count == 2)
             {
@@ -457,6 +463,11 @@ namespace StepBro.Core.Parser
                 {
                     falseStatement = subStatements[1].GetOnlyStatementCode();
                 }
+            }
+
+            if (falseStatement == null)
+            {
+                falseStatement = Expression.Empty();
             }
 
             if (condition.IsValueType && condition.DataType.Type == typeof(bool))
@@ -611,6 +622,7 @@ namespace StepBro.Core.Parser
             loopExpressions.Add(Expression.Increment(varLoopIndex.VariableExpression));     // index++; therefore index = 1 inside and after first iteration.
 
             // TODO: Add some logging, interactive break check, timeout and other stuff
+            // TODO: Combine this with the same in the while loop
             #region Attribute Handling
 
             if ((m_currentProcedure.Flags & ProcedureFlags.IsFunction) == ProcedureFlags.None && props != null)
@@ -648,10 +660,44 @@ namespace StepBro.Core.Parser
                         }
 
                         varTimeoutTime = m_scopeStack.Peek().AddVariable(
-                            CreateStatementVariableName(context, "whileLoop_TimeoutTime"),
+                            CreateStatementVariableName(context, "forLoop_TimeoutTime"),
                             TypeReference.TypeDateTime,
                             new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
                             EntryModifiers.Private);
+                    }
+                    else if (property.Is("Stoppable", PropertyBlockEntryType.Flag))
+                    {
+                        loopExpressions.Add(
+                            Expression.IfThen(
+                                Expression.Call(
+                                    Expression.Convert(m_currentProcedure.ContextReferenceInternal, typeof(ICallContext)),
+                                    typeof(ICallContext).GetMethod(nameof(ICallContext.StopRequested), new Type[] { })),
+                                Expression.Block(
+                                    Expression.Call(
+                                        m_currentProcedure.ContextReferenceInternal,
+                                        typeof(IScriptCallContext).GetMethod("Log", new Type[] { typeof(string) }),
+                                        Expression.Constant("Loop stopped by user!")),
+                                    Expression.Break(breakLabel))));
+                    }
+                    else
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append("Unknown property: \"");
+                        sb.Append(property.Name);
+                        sb.Append("\" on loop.");
+                        // TODO: Figure out a way to give a proper error message for Timeout, as we would hit Timeout here
+                        //       even if we write Timeout correctly but forget to give it a value
+                        switch (property.Name.ToLower())
+                        {
+                            case "stoppable":
+                                sb.Append(" Did you mean \"Stoppable\"?");
+                                break;
+                            default:
+                                sb.Append(" Check spelling or parameters.");
+                                break;
+                        }
+                        sb.Append(" Keep in mind properties are case-sensitive.");
+                        m_errors.SymanticError(property.Line, -1, false, sb.ToString());
                     }
                 }
             }
@@ -813,6 +859,7 @@ namespace StepBro.Core.Parser
             loopExpressions.Add(Expression.Increment(varLoopIndex.VariableExpression));     // index++; therefore index = 1 inside and after first iteration.
 
             // TODO: Add some logging, interactive break check, timeout and other stuff
+            // TODO: Combine this with the same in the for loop
             #region Attribute Handling
 
             if ((m_currentProcedure.Flags & ProcedureFlags.IsFunction) == ProcedureFlags.None && props != null)
@@ -868,6 +915,26 @@ namespace StepBro.Core.Parser
                                         typeof(IScriptCallContext).GetMethod("Log", new Type[] { typeof(string) }),
                                         Expression.Constant("Loop stopped by user!")),
                                     Expression.Break(breakLabel))));
+                    }
+                    else
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append("Unknown property: \"");
+                        sb.Append(property.Name);
+                        sb.Append("\" on loop.");
+                        // TODO: Figure out a way to give a proper error message for Timeout, as we would hit Timeout here
+                        //       even if we write Timeout correctly but forget to give it a value
+                        switch(property.Name.ToLower())
+                        {
+                            case "stoppable":
+                                sb.Append(" Did you mean \"Stoppable\"?");
+                                break;
+                            default:
+                                sb.Append(" Check spelling or parameters.");
+                                break;
+                        }
+                        sb.Append(" Keep in mind properties are case-sensitive.");
+                        m_errors.SymanticError(property.Line, -1, false, sb.ToString());
                     }
                 }
             }

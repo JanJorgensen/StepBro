@@ -124,25 +124,58 @@ namespace StepBro.ExecutionHelper
 
                     m_pipe!.Send(ShortCommand.Acknowledge);
                 }
+                else
+                {
+                    m_pipe!.Send(new Error("Data in CreateOrSetVariable is null."));
+                }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.IncrementVariable))
             {
                 var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.IncrementVariable>(received.Item2);
                 if (data != null && m_variables.ContainsKey(data.VariableName))
                 {
+                    bool isNumberKind = m_variables[data.VariableName] is System.Text.Json.JsonElement j && j.ValueKind == JsonValueKind.Number;
+                    
+                    if (isNumberKind)
+                    {
+                        long value = 0;
+                        Int64.TryParse(m_variables[data.VariableName].ToString(), out value);
+                        m_variables[data.VariableName] = value;
+                    }
+
                     if (m_variables[data.VariableName] is long v)
                     {
                         m_variables[data.VariableName] = ++v;
                         m_pipe!.Send(ShortCommand.Acknowledge);
                     }
+                    else
+                    {
+                        m_pipe!.Send(new Error($"{data.VariableName} is not a numeric type."));
+                    }
+                }
+                else if (data != null && !m_variables.ContainsKey(data.VariableName))
+                {
+                    m_pipe!.Send(new Error("Variable is unknown in IncrementVariable."));
+                }
+                else
+                {
+                    m_pipe!.Send(new Error("Data in IncrementVariable is null."));
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.GetVariable))
             {
                 var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.GetVariable>(received.Item2);
-                if (data != null)
+                if (data != null && m_variables.ContainsKey(data.VariableName))
                 {
                     m_pipe!.Send(new SendVariable(data.VariableName, m_variables[data.VariableName]));
+                }
+                else if (data != null && !m_variables.ContainsKey(data.VariableName))
+                {
+                    m_pipe!.Send(new Error("Variable is unknown in IncrementVariable."));
+                }
+                else
+                {
+                    m_pipe!.Send(new Error("Data in IncrementVariable is null."));
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.SaveFile))
@@ -156,6 +189,10 @@ namespace StepBro.ExecutionHelper
                     SaveFile(fileName, dataToSave);
 
                     m_pipe!.Send(ShortCommand.Acknowledge);
+                }
+                else
+                {
+                    m_pipe!.Send(new Error("Data in SaveFile is null."));
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.LoadFile))
@@ -191,6 +228,10 @@ namespace StepBro.ExecutionHelper
 
                     m_pipe!.Send(ShortCommand.Acknowledge);
                 }
+                else
+                {
+                    m_pipe!.Send(new Error("Data in LoadFile is null."));
+                }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.SetCommandRunOnStartup))
             {
@@ -216,6 +257,10 @@ namespace StepBro.ExecutionHelper
                         var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
                         fs.Write(dataInFile, 0, dataInFile.Length);
                     }
+                }
+                else
+                {
+                    m_pipe!.Send(new Error("Data in SetCommandRunOnStartup is null."));
                 }
             }
         }

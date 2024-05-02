@@ -14,6 +14,16 @@ namespace StepBro.ExecutionHelper.Messages
         Acknowledge
     }
 
+    public class Error
+    {
+        public Error(string message)
+        {
+            this.Message = message;
+        }
+        
+        public string Message { get; set; }
+    }
+
     public class CreateOrSetVariable
     {
         public CreateOrSetVariable(string variableName, object value)
