@@ -12,6 +12,7 @@ namespace StepBro.ExecutionHelper
         private bool m_closeRequested = false;
         private Dictionary<string, object> m_variables = new Dictionary<string, object>();
         private bool m_shouldAutoSave = true;
+        private bool m_shouldMinimizeSpaceUsage = true;
         private const string m_commandToRunOnStartupFileName = "CommandToRunOnStartup.sbd";
         private const string m_logFileName = "ExecutionHelperLog";
         private string m_logData = "";
@@ -107,6 +108,16 @@ namespace StepBro.ExecutionHelper
                 {
                     AddToLogData("ReceivedData - Received Resume Autosave");
                     m_shouldAutoSave = true;
+                }
+                else if (cmd == ShortCommand.TurnOnSpaceSaving)
+                {
+                    m_shouldMinimizeSpaceUsage = true;
+                    AddToLogData("ReceivedData - Turn on space saving");
+                }
+                else if (cmd == ShortCommand.TurnOffSpaceSaving)
+                {
+                    m_shouldMinimizeSpaceUsage = false;
+                    AddToLogData("ReceivedData - Turn off space saving");
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateOrSetVariable))
@@ -334,7 +345,7 @@ namespace StepBro.ExecutionHelper
                 }
             }
 
-            AddToLogData($"ReceivedData - Saved File {fileName}");
+            AddToLogData($"SaveFile - Saved File {fileName}");
         }
 
         private void SaveTimer_Tick(object sender, EventArgs e)
@@ -360,7 +371,19 @@ namespace StepBro.ExecutionHelper
         {
             lock(m_logLock)
             {
-                m_logData += $"{DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")} - {data}\n";
+                string dataToWrite = data;
+                string timestamp = "";
+                if (m_shouldMinimizeSpaceUsage)
+                {
+                    int index = dataToWrite.IndexOf('-');
+                    dataToWrite = dataToWrite.Substring(index + 2);
+                    timestamp = DateTime.Now.ToString("dd HH:mm:ss");
+                }
+                else
+                {
+                    timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                }
+                m_logData += $"{timestamp} - {dataToWrite}\n";
             }
         }
     }

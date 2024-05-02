@@ -199,6 +199,18 @@ namespace StepBro.ExecutionHelper
             return true;
         }
 
+        public bool TurnOnSpaceSaving()
+        {
+            m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.TurnOnSpaceSaving);
+            return true;
+        }
+
+        public bool TurnOffSpaceSaving()
+        {
+            m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.TurnOffSpaceSaving);
+            return true;
+        }
+
         bool WaitForAcknowledge(ICallContext context)
         {
             bool result = false;
