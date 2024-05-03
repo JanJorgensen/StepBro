@@ -159,6 +159,7 @@ namespace StepBro.ExecutionHelper
                 }
                 else
                 {
+                    AddToLogData($"ReceivedData - Tried to create or set variable, but failed because data is null!");
                     m_pipe!.Send(new Error("Data in CreateOrSetVariable is null."));
                 }
             }
