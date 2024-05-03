@@ -12,7 +12,7 @@ namespace StepBro.ExecutionHelper.Messages
         CloseApplication,
         CloseConnection,
         Acknowledge,
-        PauseAutosave,
+        SuspendAutosave,
         ResumeAutosave
     }
 
