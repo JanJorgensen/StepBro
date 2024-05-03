@@ -77,7 +77,7 @@ namespace StepBro.ExecutionHelper
 
                 if (!String.IsNullOrEmpty(loadedData))
                 {
-                    AddToLogData($"RunOnStartup - Tried to run command: {loadedData}");
+                    AddToLogData($"RunOnStartup: {loadedData}");
                     // TODO: Run the command - Remember to do sanity checking, possibly by deserializing into an object that has the specific parameters we look for, i.e. filename, testlist, model, print_report etc.
                 }
             }
@@ -90,7 +90,7 @@ namespace StepBro.ExecutionHelper
                 var cmd = JsonSerializer.Deserialize<ShortCommand>(received.Item2);
                 if (cmd == ShortCommand.CloseApplication)
                 {
-                    AddToLogData("Receive: Close Request");
+                    AddToLogData("Request: Close");
                     m_closeRequested = true;
                     this.BeginInvoke((MethodInvoker)delegate
                     {
@@ -100,12 +100,12 @@ namespace StepBro.ExecutionHelper
                 }
                 else if (cmd == ShortCommand.SuspendAutosave)
                 {
-                    AddToLogData("Receive: Suspend Autosave");
+                    AddToLogData("Request: Suspend Autosave");
                     m_shouldAutoSave = false;
                 }
                 else if (cmd == ShortCommand.ResumeAutosave)
                 {
-                    AddToLogData("Receive: Resume Autosave");
+                    AddToLogData("Request: Resume Autosave");
                     m_shouldAutoSave = true;
                 }
             }
@@ -118,19 +118,19 @@ namespace StepBro.ExecutionHelper
                     bool isNumberKind = data.Value is System.Text.Json.JsonElement v && v.ValueKind == JsonValueKind.Number;
                     if (alreadyExists && isNumberKind)
                     {
-                        AddToLogData($"ReceivedData - Setting variable: {data.VariableName} to: {data.Value}");
+                        AddToLogData($"Request: Set variable: {data.VariableName} to: {data.Value}");
                         long value = 0;
                         Int64.TryParse(data.Value.ToString(), out value);
                         m_variables[data.VariableName] = value;
                     }
                     else if (alreadyExists)
                     {
-                        AddToLogData($"ReceivedData - Setting variable: {data.VariableName} to: {data.Value}");
+                        AddToLogData($"Request: Set variable: {data.VariableName} to: {data.Value}");
                         m_variables[data.VariableName] = data.Value;
                     }
                     else if (isNumberKind)
                     {
-                        AddToLogData($"ReceivedData - Creating variable: {data.VariableName} with value: {data.Value}");
+                        AddToLogData($"Request: Create variable: {data.VariableName} with value: {data.Value}");
                         // It is some sort of number, so we save it as a long like StepBro uses
                         long value = 0;
                         Int64.TryParse(data.Value.ToString(), out value);
@@ -138,7 +138,7 @@ namespace StepBro.ExecutionHelper
                     }
                     else
                     {
-                        AddToLogData($"ReceivedData - Creating variable: {data.VariableName} with value: {data.Value}");
+                        AddToLogData($"Request: Create variable: {data.VariableName} with value: {data.Value}");
                         // It is not a number so we assume the user knows what they are doing
                         m_variables.TryAdd(data.VariableName, data.Value);
                     }
@@ -147,7 +147,7 @@ namespace StepBro.ExecutionHelper
                 }
                 else
                 {
-                    AddToLogData($"ReceivedData - Tried to create or set variable, but failed because data is null!");
+                    AddToLogData($"Request: Create or set variable FAILED, data is null");
                     m_pipe!.Send(new Error("Data in CreateOrSetVariable is null."));
                 }
             }
@@ -167,24 +167,24 @@ namespace StepBro.ExecutionHelper
 
                     if (m_variables[data.VariableName] is long v)
                     {
-                        AddToLogData($"ReceivedData - Incrementing variable: {data.VariableName}");
                         m_variables[data.VariableName] = ++v;
+                        AddToLogData($"Request: Increment: {data.VariableName} to: {m_variables[data.VariableName]}");
                         m_pipe!.Send(ShortCommand.Acknowledge);
                     }
                     else
                     {
-                        AddToLogData($"ReceivedData - Tried to increment variable: {data.VariableName}, but failed because {data.VariableName} is not numeric!");
+                        AddToLogData($"Request: Increment: {data.VariableName} FAILED, {data.VariableName} is not numeric");
                         m_pipe!.Send(new Error($"{data.VariableName} is not a numeric type."));
                     }
                 }
                 else if (data != null && !m_variables.ContainsKey(data.VariableName))
                 {
-                    AddToLogData($"ReceivedData - Tried to increment variable: {data.VariableName}, but failed because {data.VariableName} is unknown!");
+                    AddToLogData($"Request: Increment: {data.VariableName} FAILED, {data.VariableName} is unknown");
                     m_pipe!.Send(new Error("Variable is unknown in IncrementVariable."));
                 }
                 else
                 {
-                    AddToLogData($"ReceivedData - Tried to increment variable, but failed because data is null!");
+                    AddToLogData($"Request: Increment FAILED, data is null");
                     m_pipe!.Send(new Error("Data in IncrementVariable is null."));
                 }
             }
@@ -193,17 +193,17 @@ namespace StepBro.ExecutionHelper
                 var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.GetVariable>(received.Item2);
                 if (data != null && m_variables.ContainsKey(data.VariableName))
                 {
-                    AddToLogData($"ReceivedData - Sent variable {data.VariableName}");
+                    AddToLogData($"Request: Get variable {data.VariableName}");
                     m_pipe!.Send(new SendVariable(data.VariableName, m_variables[data.VariableName]));
                 }
                 else if (data != null && !m_variables.ContainsKey(data.VariableName))
                 {
-                    AddToLogData($"ReceivedData - Tried sending variable {data.VariableName}, but failed because {data.VariableName} is unknown.");
+                    AddToLogData($"Request: Get variable {data.VariableName} FAILED, {data.VariableName} is unknown");
                     m_pipe!.Send(new Error("Variable is unknown in IncrementVariable."));
                 }
                 else
                 {
-                    AddToLogData($"ReceivedData - Tried sending variable, but failed because data is null!");
+                    AddToLogData($"Request: Get variable FAILED, data is null");
                     m_pipe!.Send(new Error("Data in IncrementVariable is null."));
                 }
             }
@@ -221,7 +221,7 @@ namespace StepBro.ExecutionHelper
                 }
                 else
                 {
-                    AddToLogData($"ReceivedData - Tried to save file, but failed because data is null.");
+                    AddToLogData($"Request: Save file FAILED, data is null");
                     m_pipe!.Send(new Error("Data in SaveFile is null."));
                 }
             }
@@ -232,7 +232,7 @@ namespace StepBro.ExecutionHelper
                 {
                     string fileName = data.FileName;
                     string loadedData = "";
-                    AddToLogData($"ReceivedData - Trying to Load {fileName}.");
+                    AddToLogData($"Request: Load {fileName}");
 
                     using (FileStream fs = File.Open(fileName, FileMode.Open, FileAccess.Read))
                     {
@@ -253,7 +253,7 @@ namespace StepBro.ExecutionHelper
                         Dictionary<string, object>? loadedVariables = JsonSerializer.Deserialize<Dictionary<string, object>>(loadedData);
                         if (loadedVariables != null)
                         {
-                            AddToLogData($"ReceivedData - Loaded {fileName} succesfully.");
+                            AddToLogData($"Request: Load {fileName}");
                             m_variables = loadedVariables;
                         }
                     }
@@ -262,7 +262,7 @@ namespace StepBro.ExecutionHelper
                 }
                 else
                 {
-                    AddToLogData($"ReceivedData - Failed to load file because data is null!");
+                    AddToLogData($"Request: Load file FAILED, data is null");
                     m_pipe!.Send(new Error("Data in LoadFile is null."));
                 }
             }
@@ -290,11 +290,11 @@ namespace StepBro.ExecutionHelper
                         var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
                         fs.Write(dataInFile, 0, dataInFile.Length);
                     }
-                    AddToLogData($"ReceivedData - Set command run on startup to {data.Command}!");
+                    AddToLogData($"Request: Set command run on startup to {data.Command}");
                 }
                 else
                 {
-                    AddToLogData($"ReceivedData - Failed to set command run on startup because data is null!");
+                    AddToLogData($"Request: Set command run on startup FAILED, data is null");
                     m_pipe!.Send(new Error("Data in SetCommandRunOnStartup is null."));
                 }
             }
@@ -334,7 +334,7 @@ namespace StepBro.ExecutionHelper
                 }
             }
 
-            AddToLogData($"SaveFile - Saved File {fileName}");
+            AddToLogData($"Request: Saved File: {fileName}");
         }
 
         private void SaveTimer_Tick(object sender, EventArgs e)
