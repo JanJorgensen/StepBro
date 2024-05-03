@@ -91,7 +91,7 @@ namespace StepBro.ExecutionHelper
                 var cmd = JsonSerializer.Deserialize<ShortCommand>(received.Item2);
                 if (cmd == ShortCommand.CloseApplication)
                 {
-                    AddToLogData("ReceivedData - Received Close Request");
+                    AddToLogData("Receive: Close Request");
                     m_closeRequested = true;
                     this.BeginInvoke((MethodInvoker)delegate
                     {
@@ -99,30 +99,29 @@ namespace StepBro.ExecutionHelper
                         this.Close();
                     });
                 }
-                else if (cmd == ShortCommand.PauseAutosave)
+                else if (cmd == ShortCommand.SuspendAutosave)
                 {
-                    AddToLogData("ReceivedData - Received Pause Autosave");
+                    AddToLogData("Receive: Suspend Autosave");
                     m_shouldAutoSave = false;
                 }
                 else if (cmd == ShortCommand.ResumeAutosave)
                 {
-                    AddToLogData("ReceivedData - Received Resume Autosave");
+                    AddToLogData("Receive: Resume Autosave");
                     m_shouldAutoSave = true;
                 }
                 else if (cmd == ShortCommand.TurnOnSpaceSaving)
                 {
                     m_shouldMinimizeSpaceUsage = true;
-                    AddToLogData("ReceivedData - Turn on space saving");
+                    AddToLogData("Receive: Turn on space saving");
                 }
                 else if (cmd == ShortCommand.TurnOffSpaceSaving)
                 {
                     m_shouldMinimizeSpaceUsage = false;
-                    AddToLogData("ReceivedData - Turn off space saving");
+                    AddToLogData("Receive: Turn off space saving");
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateOrSetVariable))
             {
-                AddToLogData("ReceivedData - Received Create or Set Variable");
                 var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.CreateOrSetVariable>(received.Item2);
                 if (data != null)
                 {
@@ -130,14 +129,14 @@ namespace StepBro.ExecutionHelper
                     bool isNumberKind = data.Value is System.Text.Json.JsonElement v && v.ValueKind == JsonValueKind.Number;
                     if (alreadyExists && isNumberKind)
                     {
-                        AddToLogData($"ReceivedData - Setting variable: {data.VariableName} to {data.Value}");
+                        AddToLogData($"ReceivedData - Setting variable: {data.VariableName} to: {data.Value}");
                         long value = 0;
                         Int64.TryParse(data.Value.ToString(), out value);
                         m_variables[data.VariableName] = value;
                     }
                     else if (alreadyExists)
                     {
-                        AddToLogData($"ReceivedData - Setting variable: {data.VariableName} to {data.Value}");
+                        AddToLogData($"ReceivedData - Setting variable: {data.VariableName} to: {data.Value}");
                         m_variables[data.VariableName] = data.Value;
                     }
                     else if (isNumberKind)
@@ -377,8 +376,17 @@ namespace StepBro.ExecutionHelper
                 if (m_shouldMinimizeSpaceUsage)
                 {
                     int index = dataToWrite.IndexOf('-');
-                    dataToWrite = dataToWrite.Substring(index + 2);
-                    timestamp = DateTime.Now.ToString("dd HH:mm:ss");
+
+                    if (index == -1)
+                    {
+                        index = dataToWrite.IndexOf(':');
+                    }
+
+                    if (index != -1)
+                    {
+                        dataToWrite = dataToWrite.Substring(index + 2);
+                        timestamp = DateTime.Now.ToString("dd HH:mm:ss");
+                    }
                 }
                 else
                 {
