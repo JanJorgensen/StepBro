@@ -13,9 +13,7 @@ namespace StepBro.ExecutionHelper.Messages
         CloseConnection,
         Acknowledge,
         SuspendAutosave,
-        ResumeAutosave,
-        TurnOnSpaceSaving,
-        TurnOffSpaceSaving
+        ResumeAutosave
     }
 
     public class Error
