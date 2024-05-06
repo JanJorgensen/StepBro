@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="LogWindowNew.cs" />
+    <Compile Remove="LogWindowNew.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="LogWindowNew.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="LogWindowNew.cs" />
+    <None Include="LogWindowNew.Designer.cs" />
+    <None Include="LogWindowNew.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StepBro.UI.WinForms\StepBro.UI.WinForms.csproj" />
+  </ItemGroup>
+
+</Project>

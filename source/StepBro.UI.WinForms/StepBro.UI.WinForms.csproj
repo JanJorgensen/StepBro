@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2478.35" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
   </ItemGroup>
 
