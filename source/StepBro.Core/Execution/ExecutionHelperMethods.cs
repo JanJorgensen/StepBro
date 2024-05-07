@@ -956,13 +956,22 @@ namespace StepBro.Core.Execution
             return false;
         }
 
-        public static ICallContext CreateMethodCallContext(IScriptCallContext context, string locationPrefix)
+        public static ICallContext CreateMethodCallContext(IScriptCallContext context, string locationStatic, object locationObject, string locationFixed)
         {
+            string location = (locationObject != null && locationObject is INamedObject) ? ((INamedObject)locationObject).ShortName : locationStatic;
+            if (String.IsNullOrEmpty(location))
+            {
+                location = locationFixed;
+            }
+            else
+            {
+                location = location + "." + locationFixed;
+            }
             var newContext = new CallContext(
                 (ScriptCallContext)context,
                 CallEntry.Subsequent,
                 false,
-                ((ScriptCallContext)context).GetDynamicLogLocation() + " " + locationPrefix);  // TODO: set the last two arguments.
+                ((ScriptCallContext)context).GetDynamicLogLocation() + " " + location);  // TODO: set the last two arguments.
             return newContext;
         }
     }

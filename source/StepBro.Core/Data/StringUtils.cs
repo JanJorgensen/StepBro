@@ -372,6 +372,8 @@ namespace StepBro.Core.Data
             string type = entry.EntryType switch
             {
                 LogEntry.Type.Async => "<A> ",
+                LogEntry.Type.CommunicationOut => "                                <Out> ",
+                LogEntry.Type.CommunicationIn =>  "                                <In>  ",
                 LogEntry.Type.TaskEntry => "TaskEntry - ",
                 LogEntry.Type.Error => showErrorAndFailType ? "Error - " : "",
                 LogEntry.Type.Failure => showErrorAndFailType ? "Fail - " : "",

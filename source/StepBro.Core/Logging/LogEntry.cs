@@ -30,9 +30,22 @@ namespace StepBro.Core.Logging
             /// Details from the parallell task just entered.
             /// </summary>
             TaskEntry,
+            /// <summary>
+            /// Information of a more detailed nature, that typically are not necessary for documenting a test execution.
+            /// </summary>
             Detail, 
-            Async, 
-            Error, 
+            /// <summary>
+            /// Information logged on a separate thread and not synchronized with the general execution thred.
+            /// </summary>
+            Async,
+            /// <summary>
+            /// Communication out of (sent from) the automation system.
+            /// </summary>
+            CommunicationOut,
+            /// <summary>
+            /// Communication in to (received by) the automation system.
+            /// </summary>
+            CommunicationIn, Error, 
             Failure, 
             UserAction, 
             System

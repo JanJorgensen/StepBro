@@ -55,6 +55,8 @@ namespace StepBro.Core.Addons
                             Console.ForegroundColor = ConsoleColor.White;
                             break;
                         case Logging.LogEntry.Type.Async:
+                        case Logging.LogEntry.Type.CommunicationOut:
+                        case Logging.LogEntry.Type.CommunicationIn:
                             Console.ForegroundColor = ConsoleColor.DarkYellow;
                             break;
                         case Logging.LogEntry.Type.Error:

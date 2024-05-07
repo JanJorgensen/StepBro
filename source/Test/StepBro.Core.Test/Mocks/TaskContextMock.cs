@@ -127,6 +127,16 @@ namespace StepBroCoreTest.Mocks
             throw new NotImplementedException();
         }
 
+        void ILogger.LogCommSent(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ILogger.LogCommReceived(string text)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         #region IDisposable Support

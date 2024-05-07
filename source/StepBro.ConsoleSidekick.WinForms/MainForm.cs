@@ -1367,6 +1367,16 @@ namespace StepBro.ConsoleSidekick.WinForms
             System.Diagnostics.Debug.WriteLine("ILogger.LogError: " + text);
         }
 
+        void ILogger.LogCommSent(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ILogger.LogCommReceived(string text)
+        {
+            throw new NotImplementedException();
+        }
+
         void ILogger.LogSystem(string text)
         {
             throw new NotImplementedException();

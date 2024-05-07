@@ -818,22 +818,24 @@ namespace StepBro.Core.Parser
                             }
                             else
                             {
-                                string prefix = method.Name;
+                                string prefix = null;
                                 if (!String.IsNullOrEmpty(instanceName))
                                 {
-                                    prefix = instanceName + "." + prefix;
+                                    prefix = instanceName;
                                 }
                                 else if (method.DeclaringType != typeof(ScriptUtils))
                                 {
-                                    prefix = method.DeclaringType.Name + "." + prefix;
+                                    prefix = method.DeclaringType.Name;
                                 }
+                                var objectRef = (Expression)Expression.Constant(null, typeof(object));
+                                if (instance != null) objectRef = instance;
                                 var contextCreator = Expression.Call(
                                     s_CreateMethodCallContext,
                                     contextReference,
-                                    Expression.Constant(prefix));
+                                    Expression.Constant(prefix, typeof(string)),
+                                    objectRef,
+                                    Expression.Constant(method.Name));
                                 suggestedAssignmentsOut.Add(new SBExpressionData(contextCreator));
-
-                                //suggestedAssignmentsOut.Add(new SBExpressionData(m_currentProcedure.ContextReference));
                             }
                             continue;
                         }
