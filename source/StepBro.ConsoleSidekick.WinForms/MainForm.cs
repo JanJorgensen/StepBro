@@ -251,10 +251,6 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void MoveWindows()
         {
-            if (!m_shouldAttach)
-            {
-                return;
-            }
             bool consoleActive = (GetForegroundWindow() == m_consoleWindow);
             if (consoleActive != m_isConsoleActive)
             {
@@ -690,7 +686,10 @@ namespace StepBro.ConsoleSidekick.WinForms
                 }
             }
 
-            MoveWindows();
+            if (m_shouldAttach)
+            {
+                MoveWindows();
+            }
         }
 
 
