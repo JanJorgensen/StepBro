@@ -22,6 +22,8 @@ namespace StepBro.ConsoleSidekick.WinForms
         private bool m_forceResize = false;
         private bool m_moveToTop = true;
         private bool m_closeRequestedByConsole = false;
+        private bool m_shouldAttach = true;
+        private int m_titleHeight = 0;
         private Pipe m_pipe = null;
         private Rect m_lastConsolePosition = new Rect();
         private IExecutionAccess m_executingScript = null;
@@ -149,8 +151,19 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             //MessageBox.Show("Say when ...", "Waiting");
 
-            if (args.Length == 2)
+            if (args.Length >= 2)
             {
+                if (args.Length == 3)
+                {
+                    if (args[2].Equals("--no_attach"))
+                    {
+                        this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
+                        m_shouldAttach = false;
+                        // Calculate height of the Windows title so we can use that when setting height of toolbar
+                        Rectangle screenRectangle = this.RectangleToScreen(this.ClientRectangle);
+                        m_titleHeight = screenRectangle.Top - this.Top + 9; // + 9 to ensure rounded corners do not remove any visibility
+                    }
+                }
                 m_consoleWindow = nint.Parse(args[1], System.Globalization.NumberStyles.HexNumber);
                 m_pipe = Pipe.StartClient("StepBroConsoleSidekick", args[1]);
                 m_pipe.OnConnectionClosed += (sender, e) =>
@@ -238,6 +251,10 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void MoveWindows()
         {
+            if (!m_shouldAttach)
+            {
+                return;
+            }
             bool consoleActive = (GetForegroundWindow() == m_consoleWindow);
             if (consoleActive != m_isConsoleActive)
             {
@@ -1111,11 +1128,11 @@ namespace StepBro.ConsoleSidekick.WinForms
                 }
                 if (bottomVisible != null)
                 {
-                    this.Height = bottomVisible.Bounds.Bottom + 2;
+                    this.Height = bottomVisible.Bounds.Bottom + m_titleHeight + 2;
                     return;
                 }
             }
-            this.Height = toolStripMain.Bounds.Bottom + 2;
+            this.Height = toolStripMain.Bounds.Bottom + m_titleHeight + 2;
         }
 
         public static string ScripExecutionButtonTitle(bool showFullName, string element, string partner, string objectVariable, object[] args)

@@ -41,5 +41,7 @@ namespace StepBro.Cmd
 
         [Option("sidekick", Default = false, HelpText = "Opens a sidekick window for interactive command input and script execution.")]
         public bool Sidekick { get; set; } = false;
+        [Option("no_attach", Default = false, HelpText = "Only usable with --sidekick. Makes sidekick not attach to console, useful if running with a non-supported terminal such as Win11 Terminal or VSCode.")]
+        public bool NoAttach { get; set; } = false;
     }
 }
