@@ -1112,6 +1112,8 @@ namespace StepBro.ConsoleSidekick.WinForms
         {
             int missingHeight = toolStripMain.Bounds.Bottom - this.ClientRectangle.Height;
 
+            // We can not use Controls[0] here, as that could give an invisible toolbar
+            // so we search for the bottom-most visible toolbar
             StepBro.UI.WinForms.CustomToolBar.ToolBar bottomVisible = null; // Actually the first visible in the list, as toolbars are added in reverse order.
             if (m_customToolStrips.Count > 0)
             {
