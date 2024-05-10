@@ -272,6 +272,10 @@ namespace StepBro.Cmd
                     var sidekick = new System.Diagnostics.Process();
                     sidekick.StartInfo.FileName = Path.Combine(folder, "StepBro.Sidekick.exe");
                     sidekick.StartInfo.Arguments = pipename;
+                    if (m_commandLineOptions.NoAttach)
+                    {
+                        sidekick.StartInfo.Arguments += " --no_attach";
+                    }
                     sidekickStarted = sidekick.Start();
 
 #if STOP_BEFORE_SIDEKICK
