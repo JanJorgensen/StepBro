@@ -1111,6 +1111,7 @@ namespace StepBro.ConsoleSidekick.WinForms
         private void UpdateToolbarVisibility()
         {
             int missingHeight = toolStripMain.Bounds.Bottom - this.ClientRectangle.Height;
+
             StepBro.UI.WinForms.CustomToolBar.ToolBar bottomVisible = null; // Actually the first visible in the list, as toolbars are added in reverse order.
             if (m_customToolStrips.Count > 0)
             {
@@ -1126,10 +1127,9 @@ namespace StepBro.ConsoleSidekick.WinForms
                 if (bottomVisible != null)
                 {
                     missingHeight = bottomVisible.Bounds.Bottom - this.ClientRectangle.Height;
-                    this.Height += missingHeight;
-                    return;
                 }
             }
+
             this.Height += missingHeight;
         }
 
