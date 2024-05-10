@@ -23,7 +23,6 @@ namespace StepBro.ConsoleSidekick.WinForms
         private bool m_moveToTop = true;
         private bool m_closeRequestedByConsole = false;
         private bool m_shouldAttach = true;
-        private int m_titleHeight = 0;
         private Pipe m_pipe = null;
         private Rect m_lastConsolePosition = new Rect();
         private IExecutionAccess m_executingScript = null;
@@ -159,9 +158,6 @@ namespace StepBro.ConsoleSidekick.WinForms
                     {
                         this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
                         m_shouldAttach = false;
-                        // Calculate height of the Windows title so we can use that when setting height of toolbar
-                        Rectangle screenRectangle = this.RectangleToScreen(this.ClientRectangle);
-                        m_titleHeight = screenRectangle.Top - this.Top + 9; // + 9 to ensure rounded corners do not remove any visibility
                     }
                 }
                 m_consoleWindow = nint.Parse(args[1], System.Globalization.NumberStyles.HexNumber);
@@ -181,6 +177,7 @@ namespace StepBro.ConsoleSidekick.WinForms
                 return;
             }
 
+            this.UpdateToolbarVisibility();
             m_forceResize = true;
         }
 
@@ -1113,6 +1110,7 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void UpdateToolbarVisibility()
         {
+            int missingHeight = toolStripMain.Bounds.Bottom - this.ClientRectangle.Height;
             StepBro.UI.WinForms.CustomToolBar.ToolBar bottomVisible = null; // Actually the first visible in the list, as toolbars are added in reverse order.
             if (m_customToolStrips.Count > 0)
             {
@@ -1127,11 +1125,12 @@ namespace StepBro.ConsoleSidekick.WinForms
                 }
                 if (bottomVisible != null)
                 {
-                    this.Height = bottomVisible.Bounds.Bottom + m_titleHeight + 2;
+                    missingHeight = bottomVisible.Bounds.Bottom - this.ClientRectangle.Height;
+                    this.Height += missingHeight;
                     return;
                 }
             }
-            this.Height = toolStripMain.Bounds.Bottom + m_titleHeight + 2;
+            this.Height += missingHeight;
         }
 
         public static string ScripExecutionButtonTitle(bool showFullName, string element, string partner, string objectVariable, object[] args)
