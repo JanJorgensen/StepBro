@@ -2,19 +2,20 @@
 using StepBro.Core.Data;
 using StepBro.Core.Logging;
 using System;
+using System.Web;
 
 namespace StepBro.Core.Addons
 {
     [Public]
-    public class OutputSimpleCleartextAddon : IOutputFormatterTypeAddon
+    public class OutputHtmlAddon : IOutputFormatterTypeAddon
     {
-        static public string Name { get { return "SimpleCleartext"; } }
+        static public string Name { get { return "HTML"; } }
 
         public string ShortName { get { return Name; } }
 
         public string FullName { get { return "OutputFormatter." + this.ShortName; } }
 
-        public string Description { get { return "Converts log entry to relative timestamped and indented cleartext."; } }
+        public string Description { get { return "Converts log entry to relative timestamped and indented HTML text."; } }
 
         public OutputType FormatterType { get { return OutputType.Text; } }
 
@@ -27,7 +28,7 @@ namespace StepBro.Core.Addons
         {
             if (writer != null)
             {
-                return new Outputter(options, writer);
+                return new Outputter(writer);
             }
             else
             {
@@ -37,28 +38,10 @@ namespace StepBro.Core.Addons
 
         private class Outputter : IOutputFormatter
         {
-            private OutputFormatOptions m_options;
             private ITextWriter m_writer;
-            
-            public Outputter(OutputFormatOptions options, ITextWriter writer)
+            public Outputter(ITextWriter writer)
             {
-                m_options = options;
                 m_writer = writer;
-            }
-            public bool WriteLogEntry(LogEntry entry, DateTime zero)
-            {
-                var line = entry.ToClearText(zero, false);
-                if (line != null)
-                {
-                    m_writer.WriteLine(line);
-                    return true;
-                }
-                return false;
-            }
-
-            public void WriteReport(DataReport report)
-            {
-                throw new NotImplementedException();
             }
 
             public void Dispose()
@@ -68,6 +51,24 @@ namespace StepBro.Core.Addons
                     m_writer.Dispose();
                     m_writer = null;
                 }
+            }
+
+            public bool WriteLogEntry(LogEntry entry, DateTime zero)
+            {
+                var line = entry.ToClearText(zero, false);
+                if (line != null)
+                {
+                    line = HttpUtility.HtmlEncode(line);
+                    line = line.Replace("  ", " &nbsp;");
+                    m_writer.WriteLine(line + "<br>\r\n");
+                    return true;
+                }
+                return false;
+            }
+
+            public void WriteReport(DataReport report)
+            {
+                throw new NotImplementedException();
             }
         }
     }

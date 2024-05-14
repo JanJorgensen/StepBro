@@ -151,6 +151,11 @@ namespace StepBro.Cmd
                 }
             }
 
+            if (m_commandLineOptions.LogToConsoleOld)
+            {
+                m_commandLineOptions.LogToConsole = true;
+            }
+
             try
             {
                 StepBroMain.Initialize(m_hostService);
@@ -159,7 +164,7 @@ namespace StepBro.Cmd
 
                 if (m_commandLineOptions.Verbose)
                 {
-                    m_commandLineOptions.TraceToConsole = true;
+                    m_commandLineOptions.LogToConsole = true;
                 }
 
                 if (!String.IsNullOrEmpty(m_commandLineOptions.OutputFormat))
@@ -167,7 +172,7 @@ namespace StepBro.Cmd
                     selectedOutputAddon = m_commandLineOptions.OutputFormat;
                     if (!m_commandLineOptions.PrintReport)
                     {
-                        m_commandLineOptions.TraceToConsole = true;     // If report output is not enabled, the idea MUST be to output the execution log.
+                        m_commandLineOptions.LogToConsole = true;     // If report output is not enabled, the idea MUST be to output the execution log.
                     }
                 }
 
@@ -180,7 +185,8 @@ namespace StepBro.Cmd
                     retval = -1;
                     throw new ExitException();
                 }
-                m_outputFormatter = m_outputAddon.Create(createHighLevelLogSections: true);
+                OutputFormatOptions options = new OutputFormatOptions { CreateHighLevelLogSections = true };
+                m_outputFormatter = m_outputAddon.Create(options);
 
                 if (m_commandLineOptions.Verbose)
                 {
@@ -1163,9 +1169,8 @@ namespace StepBro.Cmd
 
         private static void StartLogDumpTask()
         {
-            if (!m_dumpingExecutionLog && m_commandLineOptions.TraceToConsole)
+            if (!m_dumpingExecutionLog && m_commandLineOptions.LogToConsole)
             {
-
                 m_dumpingExecutionLog = true;
                 var logTask = new Task(() => LogDumpTask());
                 logTask.Start();

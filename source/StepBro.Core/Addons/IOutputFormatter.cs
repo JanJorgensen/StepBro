@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Api;
+using StepBro.Core.Data;
 using StepBro.Core.Logging;
 using System;
 using System.Collections.Generic;
@@ -10,19 +11,13 @@ namespace StepBro.Core.Addons
 {
     public enum OutputType { Text, Console }
 
-    public interface ITextWriter
-    {
-        void Write(string text);
-        void WriteLine(string text);
-    }
-
     public interface IOutputFormatterTypeAddon : IAddon
     {
         OutputType FormatterType { get; }
-        IOutputFormatter Create(bool createHighLevelLogSections, ITextWriter writer = null);
+        IOutputFormatter Create(OutputFormatOptions options, ITextWriter writer = null);
     }
 
-    public interface IOutputFormatter
+    public interface IOutputFormatter : IDisposable
     {
         /// <summary>
         /// Creates a cleartext representation for a specified log entry.
