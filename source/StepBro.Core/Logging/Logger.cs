@@ -3,7 +3,7 @@ using System;
 
 namespace StepBro.Core.Logging
 {
-    public class Logger : /*LogStorage<LogEntry>, */IDisposable
+    public class Logger : /*LogStorage<LogEntry>, */IDisposable //, IElementIndexer<LogEntry>
     {
         private readonly object m_sync;
         private ulong m_firstIndex = 0;      // The history index of the first entry currently known. This will only change when entries are disposed.
@@ -46,7 +46,7 @@ namespace StepBro.Core.Logging
         {
             lock (m_sync)
             {
-                m_newest = new LogEntry(m_newest, parent, type, UniqueInteger.GetLongDirectly(), timestamp, 0, location, text);
+                m_newest = new LogEntry(m_newest, parent, type, UniqueInteger.GetLongDirectly(), timestamp, thread, location, text);
 
                 if ((++m_lastIndex % BLOCK_SIZE) == 0)
                 {
@@ -57,7 +57,7 @@ namespace StepBro.Core.Logging
                     }
                     if (m_blockStarts[m_blockIndex] != null)
                     {
-                        // Loose the connection the the oldest block to avoid using all memory.
+                        // Loose the connection to the oldest block to avoid using all memory.
                         m_oldest = m_blockStarts[m_blockIndex];
                         m_firstIndex += BLOCK_SIZE;
                     }
@@ -152,7 +152,7 @@ namespace StepBro.Core.Logging
         private class HistoryAccess : ILogHistory<LogEntry>
         {
             private uint m_cacheSize;
-            private uint m_minimumCacheFill = 5;
+            private uint m_minimumCacheFill;
             private Logger m_parent;
             private ulong m_firstCachedIndex = UInt64.MaxValue;
             private ulong m_lastCachedIndex = UInt64.MaxValue;
