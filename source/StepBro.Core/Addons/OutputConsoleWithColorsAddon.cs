@@ -93,18 +93,6 @@ namespace StepBro.Core.Addons
             {
                 try
                 {
-                    // WRITE SUMMARY
-                    if (report.Summary != null)
-                    {
-                        var summary = report.Summary;
-                        m_writer.WriteLine("--- SUMMARY ---");
-                        foreach (var result in summary.ListResults())
-                        {
-                            m_writer.WriteLine($"{result.Item1}: {(result.Item2 != null ? result.Item2.ToString(false) : "MISSING")}");
-                        }
-                        m_writer.WriteLine("");     // Empty line
-                    }
-
                     // WRITE GROUPS
                     bool firstGroup = true;
                     foreach (var group in report.ListGroups())
@@ -116,7 +104,7 @@ namespace StepBro.Core.Addons
                         }
                         else
                         {
-                            for (int i = 0; i < 3; i++) m_writer.WriteLine(""); // Empty line
+                            for (int i = 0; i < 3; i++) m_writer.WriteLine(""); // Empty lines
                         }
 
                         m_writer.WriteLine($"--- GROUP: {group.Name} ---");
@@ -213,6 +201,19 @@ namespace StepBro.Core.Addons
                                 WriteLogEntry(entry, entry.Timestamp);
                                 entry = entry.Next;
                             }
+                        }
+                    }
+
+                    // WRITE SUMMARY
+                    // This is done at the end of the report on console so it is easier to get a quick overview
+                    if (report.Summary != null)
+                    {
+                        for (int i = 0; i < 3; i++) m_writer.WriteLine(""); // Empty lines
+                        var summary = report.Summary;
+                        m_writer.WriteLine("--- SUMMARY ---");
+                        foreach (var result in summary.ListResults())
+                        {
+                            m_writer.WriteLine($"{result.Item1}: {(result.Item2 != null ? result.Item2.ToString(false) : "MISSING")}");
                         }
                     }
 
