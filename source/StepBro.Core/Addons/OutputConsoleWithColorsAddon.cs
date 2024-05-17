@@ -2,6 +2,7 @@
 using StepBro.Core.Data;
 using StepBro.Core.Logging;
 using System;
+using System.IO;
 
 namespace StepBro.Core.Addons
 {
@@ -89,11 +90,21 @@ namespace StepBro.Core.Addons
             void ITextWriter.Write(string text)
             {
                 System.Console.Write(text);
+
+                using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
+                {
+                    sw.Write(text);
+                }
             }
 
             void ITextWriter.WriteLine(string text)
             {
                 System.Console.WriteLine(text);
+
+                using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
+                {
+                    sw.WriteLine(text);
+                }
             }
         }
     }

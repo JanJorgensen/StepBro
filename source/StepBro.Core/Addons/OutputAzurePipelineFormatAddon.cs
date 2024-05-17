@@ -5,6 +5,7 @@ using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml;
 
@@ -274,11 +275,21 @@ namespace StepBro.Core.Addons
             void ITextWriter.Write(string text)
             {
                 System.Console.Write(text);
+
+                using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
+                {
+                    sw.Write(text);
+                }
             }
 
             void ITextWriter.WriteLine(string text)
             {
                 System.Console.WriteLine(text);
+
+                using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
+                {
+                    sw.WriteLine(text);
+                }
             }
         }
     }
