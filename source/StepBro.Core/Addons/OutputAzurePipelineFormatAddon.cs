@@ -200,6 +200,9 @@ namespace StepBro.Core.Addons
                             }
                         }
                     }
+
+                    // RENAME FILE SO WE DO NOT OVERWRITE REPORT
+                    System.IO.File.Move("report.sbr", $"report-{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.sbr");
                 }
                 finally
                 {
