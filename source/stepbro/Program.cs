@@ -985,6 +985,11 @@ namespace StepBro.Cmd
 
             if (m_commandLineOptions.PrintReport && createdReport != null)
             {
+                using (FileStream fs = System.IO.File.Create("report.sbr"))
+                {
+                    byte[] generatedInfo = new UTF8Encoding(true).GetBytes($"--- BEGAN GENERATION AT {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")} ---\n");
+                    fs.Write(generatedInfo, 0, generatedInfo.Length);
+                }
                 m_outputFormatter.WriteReport(createdReport);
             }
             else

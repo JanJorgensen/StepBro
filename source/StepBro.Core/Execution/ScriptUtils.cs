@@ -171,11 +171,6 @@ namespace StepBro.Core.Execution
             try
             {
                 internalContext.AddReport(report);
-                using (FileStream fs = System.IO.File.Create("report.sbr"))
-                {
-                    byte[] generatedInfo = new UTF8Encoding(true).GetBytes($"--- BEGAN GENERATION AT {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")} ---\n");
-                    fs.Write(generatedInfo, 0, generatedInfo.Length);
-                }
                 return report;
             }
             catch
