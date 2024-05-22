@@ -216,5 +216,10 @@ namespace StepBro.Core.Data
             time += dt;
             return time;
         }
+
+        public static string AsHMSm(this DateTime time)
+        {
+            return time.ToString("yyyy-MM-dd HH:mm:ss.fff", System.Globalization.CultureInfo.InvariantCulture);
+        }
     }
 }

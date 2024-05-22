@@ -24,5 +24,6 @@ namespace StepBro.Core.Api
         public static readonly string PLUGINS_LIST_FILE = "StepBro Plugins.cfg";
         public static readonly string CURRENT_FILE_FOLDER_SHORTCUT = "this";
         public static readonly string TOP_FILE_FOLDER_SHORTCUT = "TopFolder";
+        public static readonly string STEPBRO_OUTPUT_FOLDER_SHORTCUT = "STEPBRO_OUTPUT_FOLDER";
     }
 }

@@ -381,8 +381,7 @@ namespace StepBro.TestInterface
         {
             if (!m_stream.IsOpen)
             {
-                this.NotifyPropertyChanged(nameof(IsConnected));
-                //m_streamWasClosed = true;
+                this.NotifyPropertyChanged(nameof(IsOpen));
             }
         }
 
@@ -481,10 +480,6 @@ namespace StepBro.TestInterface
             }
             NoFlushOnNextCommand = false;
 
-            if (context != null && context.LoggingEnabled)
-            {
-                context.Logger.Log("\"" + command + "\"");
-            }
             var commandParts = new List<string>();
             commandParts.Add(command);
             if (arguments != null && arguments.Length > 0)
@@ -494,7 +489,12 @@ namespace StepBro.TestInterface
                     commandParts.Add(ArgumentToCommandString(a));
                 }
             }
-            var commandData = new CommandData(context?.Logger, String.Join(" ", commandParts), this.CommandResponseTimeout, null);
+            var fullCommand = String.Join(" ", commandParts);
+            if (context != null && context.LoggingEnabled)
+            {
+                context.Logger.Log("\"" + fullCommand + "\"");
+            }
+            var commandData = new CommandData(context?.Logger, fullCommand, this.CommandResponseTimeout, null);
             return EnqueueCommand(commandData);
         }
 
@@ -878,7 +878,7 @@ namespace StepBro.TestInterface
                     case LogType.ReceivedError:
                         if (m_mainLogger != null)
                         {
-                            m_mainLogger.LogAsync("Received: " + text);
+                            m_mainLogger.LogCommReceived(text);
                         }
                         else if (m_currentExecutingCommand != null)
                         {
@@ -892,7 +892,7 @@ namespace StepBro.TestInterface
                     case LogType.ReceivedAsync:
                         if (m_mainLogger != null)
                         {
-                            m_mainLogger.LogAsync("Event:    " + text);
+                            m_mainLogger.LogCommReceived(text);
                         }
                         if (m_asyncLogLineReader != null)
                         {
@@ -1024,8 +1024,8 @@ namespace StepBro.TestInterface
             var commandstring = command.GetAndMarkActive();
             m_loopbackAnswers?.TryGetValue(commandstring, out commandstring);
             if (m_nextResponse != null) commandstring = m_nextResponse;
-            if (command.Logger != null) command.Logger.LogDetail("Send: " + commandstring);
-            else if (m_mainLogger != null) m_mainLogger.LogAsync("Send: " + commandstring);
+            if (m_mainLogger != null) m_mainLogger.LogCommSent(commandstring);
+            else if (command.Logger != null) command.Logger.LogCommSent(commandstring);
             m_currentExecutingCommand = command;
             DoSendDirect(commandstring);
         }

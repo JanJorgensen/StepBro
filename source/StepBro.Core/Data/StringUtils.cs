@@ -1,10 +1,14 @@
-﻿using StepBro.Core.Execution;
+﻿using StepBro.Core.Api;
+using StepBro.Core.Execution;
+using StepBro.Core.File;
 using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace StepBro.Core.Data
 {
@@ -48,9 +52,9 @@ namespace StepBro.Core.Data
             return String.Concat(prefix, seconds.ToString(), ".", fraction.ToString("000"));
         }
 
-        public static string ToFileName(this DateTime time)
+        public static string ToFileName(this DateTime time, string extension = null)
         {
-            return time.ToString("yyyyMMdd_HHmmss");
+            return time.ToString("yyyyMMdd_HHmmss") + ((extension != null) ? ("." + extension) : "");
         }
 
         public static bool TryParseLiteral(this string value, out object literal)
@@ -363,15 +367,19 @@ namespace StepBro.Core.Data
         public static string ToClearText(this LogEntry entry, DateTime zero, bool forceShow = false, bool showErrorAndFailType = true)
         {
             var timestamp = entry.Timestamp.ToSecondsTimestamp(zero);
-            var timestampIndent = new string(' ', Math.Max(0, 8 - timestamp.Length));
+            return entry.ToClearText(new string(' ', Math.Max(0, 8 - timestamp.Length)) + timestamp, forceShow, showErrorAndFailType);
+        }
 
+        public static string ToClearText(this LogEntry entry, string timestamp, bool forceShow = false, bool showErrorAndFailType = true)
+        {
             StringBuilder text = new(1000);
-            text.Append(timestampIndent);
             text.Append(timestamp);
             text.Append(new string(' ', 1 + entry.IndentLevel * 3));
             string type = entry.EntryType switch
             {
                 LogEntry.Type.Async => "<A> ",
+                LogEntry.Type.CommunicationOut => "                                <Out> ",
+                LogEntry.Type.CommunicationIn => "                                <In>  ",
                 LogEntry.Type.TaskEntry => "TaskEntry - ",
                 LogEntry.Type.Error => showErrorAndFailType ? "Error - " : "",
                 LogEntry.Type.Failure => showErrorAndFailType ? "Fail - " : "",
@@ -402,6 +410,28 @@ namespace StepBro.Core.Data
                 else
                 {
                     return null;    // "Don't show this entry"
+                }
+            }
+            return text.ToString();
+        }
+
+        public static string ToStringTextAndLocation(this LogEntry entry)
+        {
+            StringBuilder text = new();
+            if (entry.Text != null)
+            {
+                if (entry.Location != null)
+                {
+                    text.Append(entry.Location);
+                    text.Append(" - ");
+                }
+                text.Append(entry.Text);
+            }
+            else
+            {
+                if (entry.Location != null)
+                {
+                    text.Append(entry.Location);
                 }
             }
             return text.ToString();

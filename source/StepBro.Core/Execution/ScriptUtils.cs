@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
+using SharpCompress.Common;
 using StepBro.Core;
 using StepBro.Core.Addons;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Data.Report;
 using StepBro.Core.File;
+using StepBro.Core.Logging;
 using static StepBro.Core.Data.StringUtils;
 
 namespace StepBro.Core.Execution
@@ -155,6 +158,23 @@ namespace StepBro.Core.Execution
             return result;
         }
 
+
+        [Public]
+        public static string GetOutputFileFolder()
+        {
+            var folderShortcut = StepBro.Core.Main.GetService<IFolderManager>().ListShortcuts().FirstOrDefault(s => s.Name == Constants.STEPBRO_OUTPUT_FOLDER_SHORTCUT);
+            return folderShortcut.Path;
+        }
+
+        [Public]
+        public static string CreateTimestampedFilePath(DateTime time, string prefix, string postfix, string extension)
+        {
+            if (String.IsNullOrEmpty(prefix)) throw new ArgumentException(nameof(prefix));
+            string folder = GetOutputFileFolder();
+            string filename = prefix + time.ToFileName() + ((String.IsNullOrEmpty(postfix)) ? "" : postfix) + "." + extension;
+            return System.IO.Path.Combine(folder, filename);
+        }
+
         [Public]
         public static void NextProcedureIsHighLevel([Implicit] ICallContext context, string type)
         {
@@ -162,6 +182,7 @@ namespace StepBro.Core.Execution
             internalContext.SetNextProcedureAsHighLevel(type);
         }
 
+        [Public]
         public static DataReport StartReport([Implicit] ICallContext context, string type, string title)
         {
             var internalContext = ToScriptContext(context);
@@ -178,6 +199,7 @@ namespace StepBro.Core.Execution
             }
         }
 
+        [Public]
         public static DataReport GetReport([Implicit] ICallContext context)
         {
             var internalContext = context as ScriptCallContext;
@@ -189,6 +211,7 @@ namespace StepBro.Core.Execution
             return report;
         }
 
+        [Public]
         public static ReportTestSummary CreateTestSummary([Implicit] ICallContext context)
         {
             var internalContext = (context is ScriptCallContext) ? context as ScriptCallContext : (context as CallContext).ParentContext as ScriptCallContext;
@@ -203,6 +226,7 @@ namespace StepBro.Core.Execution
             }
         }
 
+        [Public]
         public static void ReportMeasurement([Implicit] ICallContext context, string id, string instance, string unit, object value)
         {
             var internalContext = (context is ScriptCallContext) ? context as ScriptCallContext : (context as CallContext).ParentContext as ScriptCallContext;
@@ -235,6 +259,44 @@ namespace StepBro.Core.Execution
                 //throw new ExitException();
             }
         }
+
+        public static ILogFileCreator StartCreatingLogFile(
+            [Implicit] ICallContext context,
+            string filename,
+            string format = "SimpleCleartext",
+            bool includePast = false)
+        {
+            var manager = StepBro.Core.Main.GetService<ILogFileCreationManager>();
+            if (String.IsNullOrEmpty(format))
+            {
+                format = "SimpleCleartext";
+            }
+
+            try
+            {
+                StreamWriter fileStream = new StreamWriter(filename, true);
+
+                var formatterAddon = StepBro.Core.Main.GetService<Core.Api.IAddonManager>().TryGetAddon<IOutputFormatterTypeAddon>(format);
+                if (formatterAddon == null)
+                {
+                    context.ReportError("Could not find a log file formatter named \"" + format + "\".");
+                    return null;
+                }
+
+                var writer = new TextFileWriter(fileStream);
+
+                OutputFormatOptions options = new OutputFormatOptions { CreateHighLevelLogSections = true, UseLocalTime = true };
+                var formatter = formatterAddon.Create(options, writer);
+
+                return manager.AddLogFileCreator(formatter, includePast);
+            }
+            catch (Exception ex)
+            {
+                context.ReportError("Error creating log file \"" + filename + "\".", exception: ex);
+                return null;
+            }
+        }
+
 
         #region LineReader
 

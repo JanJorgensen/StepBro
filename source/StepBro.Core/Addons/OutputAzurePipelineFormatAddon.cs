@@ -22,19 +22,19 @@ namespace StepBro.Core.Addons
 
         public OutputType FormatterType { get { return OutputType.Text; } }
 
-        public IOutputFormatter Create(bool createHighLevelLogSections, ITextWriter writer = null)
+        public IOutputFormatter Create(OutputFormatOptions options, ITextWriter writer = null)
         {
-            return new Outputter(createHighLevelLogSections, writer);
+            return new Outputter(options, writer);
         }
 
         private class Outputter : IOutputFormatter, ITextWriter
         {
-            bool m_createHighLevelLogSections;
+            OutputFormatOptions m_options;
             readonly ITextWriter m_writer;
 
-            public Outputter(bool createHighLevelLogSections, ITextWriter writer)
+            public Outputter(OutputFormatOptions options, ITextWriter writer)
             {
-                m_createHighLevelLogSections = createHighLevelLogSections;
+                m_options = options;
                 m_writer = (writer != null) ? writer : this;
             }
 
@@ -68,8 +68,8 @@ namespace StepBro.Core.Addons
 
             public void WriteReport(DataReport report)
             {
-                bool oldCcreateHighLevelLogSections = m_createHighLevelLogSections;
-                m_createHighLevelLogSections = false;
+                //bool oldCreateHighLevelLogSections = m_options.CreateHighLevelLogSections;
+                //m_options.CreateHighLevelLogSections = false;
                 try
                 {
                     if (report.Summary != null)
@@ -206,7 +206,7 @@ namespace StepBro.Core.Addons
                 }
                 finally
                 {
-                    m_createHighLevelLogSections = oldCcreateHighLevelLogSections;
+                    //m_options.CreateHighLevelLogSections = oldCreateHighLevelLogSections;
                 }
             }
 
@@ -293,6 +293,15 @@ namespace StepBro.Core.Addons
                 {
                     sw.WriteLine(text);
                 }
+            }
+
+            public void Dispose()
+            {
+            }
+
+            public void Flush()
+            {
+                // No action needed.
             }
         }
     }

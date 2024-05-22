@@ -999,6 +999,16 @@ namespace StepBro.Core.ScriptData
             {
                 m_logger.LogUserAction(text);
             }
+
+            public void LogCommSent(string text)
+            {
+                m_logger.LogCommSent(text);
+            }
+
+            public void LogCommReceived(string text)
+            {
+                m_logger.LogCommReceived(text);
+            }
         }
 
 

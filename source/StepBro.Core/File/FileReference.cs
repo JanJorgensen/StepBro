@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-
+using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Tasks;
+using static StepBro.Core.Data.PropertyBlockDecoder;
 
 namespace StepBro.Core.File
 {
@@ -300,6 +301,7 @@ namespace StepBro.Core.File
                     m_environmentShortcuts.AddShortcut(sfname, folder, isResolved: true);
                 }
             }
+            bool hasOutputFolderShortcut = false;
             foreach (DictionaryEntry ev in Environment.GetEnvironmentVariables())
             {
                 var value = ev.Value as string;
@@ -310,8 +312,19 @@ namespace StepBro.Core.File
                     {
                         m_environmentShortcuts.AddShortcut(key, value, isResolved: true);
                     }
+                    if (key.Equals(Constants.STEPBRO_OUTPUT_FOLDER_SHORTCUT, StringComparison.InvariantCulture))
+                    {
+                        hasOutputFolderShortcut = true;
+                    }
                 }
             }
+
+            if (!hasOutputFolderShortcut)
+            {
+                // Not configured, so use the documents folder.
+                m_environmentShortcuts.AddShortcut(Constants.STEPBRO_OUTPUT_FOLDER_SHORTCUT, System.Environment.GetFolderPath(Environment.SpecialFolder.Personal), isResolved: true);
+            }
+
             m_collections = new FolderShortcutCollection(FolderShortcutOrigin.Root, m_environmentShortcuts, m_configurationShortcuts);
         }
     }

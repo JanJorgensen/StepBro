@@ -34,6 +34,7 @@ namespace StepBro.Core
         //private static List<ScriptFile> m_loadedFiles = new List<ScriptFile>();
         private static ScriptExecutionManager m_scriptExecutionManager = null;
         private static DynamicObjectManager m_dynamicObjectManager = null;
+        private static LogFileCreationManager m_logFileCreationManager = null;
         private static UICalculator m_uiCalculator = null;
         private static FolderManager m_folderShortcuts = null;
         //private static readonly object m_mainObject = new object();
@@ -115,6 +116,9 @@ namespace StepBro.Core
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_dynamicObjectManager = new DynamicObjectManager(out service);
+            m_serviceManagerAdmin.Manager.Register(service);
+
+            m_logFileCreationManager = new LogFileCreationManager(out service);
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_uiCalculator = new UICalculator(out service);

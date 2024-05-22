@@ -23,13 +23,13 @@ namespace StepBro.Core.Addons
 
         public OutputType FormatterType { get { return OutputType.Console; } }
 
-        public IOutputFormatter Create(bool createHighLevelLogSections, ITextWriter writer = null)
+        public IOutputFormatter Create(OutputFormatOptions options, ITextWriter writer = null)
         {
             if (writer != null)
             {
                 throw new NotSupportedException();
             }
-            return new TextToConsoleFormatter();
+            return new TextToConsoleFormatter(options);
         }
 
         public IOutputFormatter Create(ITextWriter writer)
@@ -39,11 +39,22 @@ namespace StepBro.Core.Addons
 
         public class TextToConsoleFormatter : IOutputFormatter, ITextWriter
         {
+            OutputFormatOptions m_options;
             ITextWriter m_writer = null;
 
-            public TextToConsoleFormatter(ITextWriter writer = null)
+            public TextToConsoleFormatter(OutputFormatOptions options, ITextWriter writer = null)
             {
+                m_options = options;
                 m_writer = (writer != null ? writer : this);
+            }
+
+            public void Dispose()
+            {
+            }
+
+            public void Flush()
+            {
+                // No action needed.
             }
 
             public bool WriteLogEntry(LogEntry entry, DateTime zero)
@@ -63,6 +74,8 @@ namespace StepBro.Core.Addons
                             Console.ForegroundColor = ConsoleColor.White;
                             break;
                         case Logging.LogEntry.Type.Async:
+                        case Logging.LogEntry.Type.CommunicationOut:
+                        case Logging.LogEntry.Type.CommunicationIn:
                             Console.ForegroundColor = ConsoleColor.DarkYellow;
                             break;
                         case Logging.LogEntry.Type.Error:
