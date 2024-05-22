@@ -10,11 +10,15 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using static StepBro.Core.Data.PropertyBlockDecoder;
 
 namespace StepBro.StateMachine
 {
     public class Executor : INameable
     {
+        internal const string PollTimerName = "poll";
+
         internal class InstanceData
         {
             public class Variable
@@ -33,8 +37,10 @@ namespace StepBro.StateMachine
             private string m_name;
             private List<Variable> m_variables;
             private List<Tuple<int, string, IProcedureReference>> m_states;
-            private uint m_stateTransitionNumber = 0;
 
+            private bool m_isActive = true;
+            private bool m_requestedStop = false;
+            private uint m_stateTransitionNumber = 0;
             private int m_currentState = 0;
             private int m_requestedState = 0;
 
@@ -57,6 +63,8 @@ namespace StepBro.StateMachine
 
             public string Name { get { return m_name; } }
             public string TypeName { get { return m_definition.Name; } }
+            public bool IsActive { get { return m_isActive; } set { m_isActive = value; } }
+            public bool StopRequested { get { return m_requestedStop; } }
 
             public uint StateTransitionNumber { get { return m_stateTransitionNumber; } }
 
@@ -92,9 +100,14 @@ namespace StepBro.StateMachine
             {
                 return m_variables.FirstOrDefault(v => v.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
             }
+
+            public void SetStopRequest()
+            {
+                m_requestedStop = true;
+            }
         }
 
-        internal class Timer
+        internal class Timer : IDisposable
         {
             public Timer(InstanceData instance, string name, DateTime time)
             {
@@ -111,6 +124,10 @@ namespace StepBro.StateMachine
                 this.CurrentStateOnly = true;
                 this.StateTransitionIndex = stateIndex;
             }
+            public bool IsActive()
+            {
+                return this.Instance != null;
+            }
             public Timer Next { get; set; }     // As linked list.
             public InstanceData Instance { get; private set; }
             public string Name { get; private set; }
@@ -118,6 +135,11 @@ namespace StepBro.StateMachine
             public TimeSpan IntervalTime { get; set; } = TimeSpan.Zero;
             public bool CurrentStateOnly { get; set; } = false;
             public uint StateTransitionIndex { get; set; } = 0;
+
+            public void Dispose()
+            {
+                this.Instance = null;
+            }
         }
 
         private class Context : IStateMachine, INameable, INamedObject
@@ -129,6 +151,11 @@ namespace StepBro.StateMachine
             public Context(Executor parent)
             {
                 m_executor = parent;
+            }
+
+            public override string ToString()
+            {
+                return this.Name;
             }
 
             public void Setup(InstanceData instance, Event @event)
@@ -163,7 +190,8 @@ namespace StepBro.StateMachine
 
             public void StartPollTimer([Implicit] ICallContext context, TimeSpan time, bool currentStateOnly)
             {
-                var timer = new Timer(m_instance, "poll", DateTime.UtcNow + time);
+                m_executor.StopTimer(m_instance, PollTimerName);    // Just in case it is already started.
+                var timer = new Timer(m_instance, PollTimerName, DateTime.UtcNow + time);
                 timer.IntervalTime = time;
                 if (currentStateOnly)
                 {
@@ -175,6 +203,7 @@ namespace StepBro.StateMachine
 
             public void StartTimer([Implicit] ICallContext context, string name, TimeSpan time, bool repeating, bool currentStateOnly)
             {
+                m_executor.StopTimer(m_instance, name);    // Just in case it is already started.
                 var timer = new Timer(m_instance, name, DateTime.UtcNow + time);
                 if (repeating)
                 {
@@ -192,6 +221,7 @@ namespace StepBro.StateMachine
 
             public void StartTimer([Implicit] ICallContext context, string name, DateTime time, bool currentStateOnly)
             {
+                m_executor.StopTimer(m_instance, name);    // Just in case it is already started.
                 var now = DateTime.UtcNow;
                 var t = time.ToUniversalTime();
                 if (time == DateTime.MinValue || (now - t) > TimeSpan.FromSeconds(60))
@@ -212,17 +242,24 @@ namespace StepBro.StateMachine
 
             public void StopTimer([Implicit] ICallContext context, string name)
             {
-                throw new NotImplementedException();
+                m_executor.StopTimer(m_instance, name);
             }
+
+            public void Stop([Implicit] ICallContext context)
+            {
+                m_instance.IsActive = false;
+            }
+
+            public bool StopRequested { get { return m_instance.StopRequested; } }
 
             #region IDynamicStepBroObject
 
             public object GetProperty([Implicit] ICallContext context, string name)
             {
-                context.Logger.LogDetail("Get '" + this.Name + "." + name + "'.");
                 var variable = m_instance.GetVariable(name);
                 if (variable != null)
                 {
+                    context.Logger.LogDetail("Get '" + this.Name + "." + name + "': " + StringUtils.ObjectToString(variable.Value));
                     return variable.Value;
                 }
                 else
@@ -286,6 +323,13 @@ namespace StepBro.StateMachine
 
         public string Name { get { return m_name; } set { m_name = value; } }
 
+        public void Reset([Implicit] ICallContext context)
+        {
+            m_instances.Clear();
+            m_highPriorityEvents.Clear();
+            m_lowPriorityEvents.Clear();
+        }
+
         public void CreateStateMachine([Implicit] ICallContext context, StateMachineDefinition type, Identifier name, ArgumentList arguments)
         {
             context.Logger.Log("Name: " + name.Name);
@@ -324,7 +368,7 @@ namespace StepBro.StateMachine
 
         public EventData AwaitNextEvent([Implicit] ICallContext context, TimeSpan timeout)
         {
-            System.Diagnostics.Debug.WriteLine("AwaitNextEvent enter");
+            //System.Diagnostics.Debug.WriteLine("AwaitNextEvent enter");
             /////////////////// FIRST HANDLE THE CURRENT EVENT /////////////////// 
             // When we enter here, we might just have called a state procedure,
             // so we might have some post-actions to do.
@@ -343,28 +387,28 @@ namespace StepBro.StateMachine
             /////////////////// NOW HANDLE THE NEXT EVENT /////////////////// 
 
             var entryTime = DateTime.UtcNow;
-            System.Diagnostics.Debug.WriteLine("AwaitNextEvent at " + entryTime.ToLongTimeString());
+            //System.Diagnostics.Debug.WriteLine("AwaitNextEvent at " + entryTime.ToLongTimeString());
 
             while (true)
             { // We might be looping, waiting for a timer.
-                System.Diagnostics.Debug.WriteLine("AwaitNextEvent loop");
+                //System.Diagnostics.Debug.WriteLine("AwaitNextEvent loop");
 
                 var now = DateTime.UtcNow;
                 // Check timers. Note that these timers use UTC time, to stay out of trouble with daylight saving.
                 while (m_nextTimer != null && m_nextTimer.Time <= now)
                 {
-                    System.Diagnostics.Debug.WriteLine("AwaitNextEvent timer expiry! - " + m_nextTimer.Instance.Name + " timer " + m_nextTimer.Name);
+                    //System.Diagnostics.Debug.WriteLine("AwaitNextEvent timer expiry! - " + m_nextTimer.Instance.Name + " timer " + m_nextTimer.Name);
                     var t = m_nextTimer;
                     m_nextTimer = m_nextTimer.Next;
 
                     // Check if timer was bound to a state.
-                    if (!t.CurrentStateOnly || t.StateTransitionIndex == t.Instance.StateTransitionNumber)
+                    if (t.Instance.IsActive && (!t.CurrentStateOnly || t.StateTransitionIndex == t.Instance.StateTransitionNumber))
                     {
-                        System.Diagnostics.Debug.WriteLine("AwaitNextEvent do add timer event");
+                        //System.Diagnostics.Debug.WriteLine("AwaitNextEvent do add timer event");
                         var e = new EventData(
                             t.Instance,
-                            (t.Name.Equals("poll", StringComparison.InvariantCulture)) ? Event.PollTimer : Event.Timer);
-                        e.TimerName = t.Name;
+                            (t.Name.Equals(PollTimerName, StringComparison.InvariantCulture)) ? Event.PollTimer : Event.Timer);
+                        e.Timer = t;
 
                         // Re-insert if repeating timer.
                         if (t.IntervalTime != TimeSpan.Zero)
@@ -388,7 +432,12 @@ namespace StepBro.StateMachine
 
                 if (m_currentEvent != null)
                 {
-                    System.Diagnostics.Debug.WriteLine("AwaitNextEvent event!");
+                    if (!m_currentEvent.Instance.IsActive)
+                    {
+                        m_currentEvent = null;
+                        continue;
+                    }
+                    //System.Diagnostics.Debug.WriteLine("AwaitNextEvent event!");
                     m_currentEvent.Context = m_context;
                     if (m_currentEvent.StateEvent == Event.Enter)
                     {
@@ -397,12 +446,12 @@ namespace StepBro.StateMachine
                     m_currentEvent.Procedure = m_currentEvent.Instance.CurrentProcedure();
                     m_context.Setup(m_currentEvent.Instance, m_currentEvent.StateEvent);
 
-                    context.Logger.LogDetail("Event: " + m_currentEvent.Instance.Name + "." + m_currentEvent.StateEvent.ToString() + ", " + m_currentEvent.Instance.StateTransitionNumber.ToString());
+                    //context.Logger.LogDetail("Event: " + m_currentEvent.Instance.Name + "." + m_currentEvent.StateEvent.ToString() + ", " + m_currentEvent.Instance.StateTransitionNumber.ToString());
                     break;
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("AwaitNextEvent no event; sleep?");
+                    //System.Diagnostics.Debug.WriteLine("AwaitNextEvent no event; sleep?");
                     bool exitAfterSleep = true;
                     var sleepUntil = entryTime + timeout;    // Time for the specified timeout in method argument.
                     if (m_nextTimer != null && m_nextTimer.Time < sleepUntil)
@@ -414,7 +463,7 @@ namespace StepBro.StateMachine
                     var timeLeft = sleepUntil - DateTime.UtcNow;
                     while (timeLeft > TimeSpan.Zero)
                     {
-                        System.Diagnostics.Debug.WriteLine("AwaitNextEvent sleep");
+                        //System.Diagnostics.Debug.WriteLine("AwaitNextEvent sleep");
                         if (justStartedWaiting)
                         {
                             context.Logger.LogDetail("Waiting " + ((long)timeLeft.TotalMilliseconds).ToString() + "ms");
@@ -427,7 +476,7 @@ namespace StepBro.StateMachine
                         }
                         var sleepTime = TimeSpan.FromMilliseconds(1000);
                         if (timeLeft < sleepTime) sleepTime = timeLeft;
-                        System.Diagnostics.Debug.WriteLine("Sleep " + ((long)sleepTime.TotalMilliseconds).ToString() + "ms");
+                        //System.Diagnostics.Debug.WriteLine("Sleep " + ((long)sleepTime.TotalMilliseconds).ToString() + "ms");
                         Thread.Sleep(sleepTime);
                         timeLeft = sleepUntil - DateTime.UtcNow;
                     }
@@ -435,14 +484,44 @@ namespace StepBro.StateMachine
                 }
             }
 
-            System.Diagnostics.Debug.WriteLine("AwaitNextEvent exit");
+            //System.Diagnostics.Debug.WriteLine("AwaitNextEvent exit");
             return m_currentEvent;
+        }
+
+        public bool AnyActiveStateMachines
+        {
+            get
+            {
+                return m_instances.Any(inst => inst.IsActive);
+            }
+        }
+
+        public void RequestStop([Implicit] ICallContext context)
+        {
+            foreach (var inst in m_instances)
+            {
+                inst.SetStopRequest();
+            }
         }
 
         internal void MakeStateChange(InstanceData instance)
         {
             var exitEvent = new EventData(instance, Event.Exit);
             m_highPriorityEvents.Enqueue(exitEvent);
+        }
+
+        internal Timer TryGetTimer(InstanceData instance, string name)
+        {
+            var t = m_nextTimer;
+            while (t != null)
+            {
+                if (Object.ReferenceEquals(t.Instance, instance) && t.Name.Equals(name, StringComparison.InvariantCulture))
+                {
+                    return t;
+                }
+                t = t.Next;
+            }
+            return null;
         }
 
         internal void AddTimer(Timer timer)
@@ -462,6 +541,33 @@ namespace StepBro.StateMachine
                 timer.Next = current.Next;
                 current.Next = timer;
             }
+        }
+
+        internal bool StopTimer(InstanceData instance, string name)
+        {
+            Timer last = null;
+            Timer timer = m_nextTimer;
+            while (timer != null)
+            {
+                if (Object.ReferenceEquals(timer.Instance, instance) && timer.Name == name)
+                {
+                    timer.Dispose();
+                    if (last != null)
+                    {
+                        last.Next = timer.Next;
+                        timer.Next = null;
+                    }
+                    else
+                    {
+                        m_nextTimer = timer.Next;
+                        timer.Next = null;
+                    }
+                    return true;
+                }
+                last = timer;
+                timer = timer.Next;
+            }
+            return false;
         }
     }
 }
