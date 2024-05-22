@@ -22,6 +22,11 @@ namespace StepBro.Core.Data
             m_stream = null;
         }
 
+        public void Flush()
+        {
+            m_stream.Flush();
+        }
+
         public void Write(string text)
         {
             m_stream.Write(text);

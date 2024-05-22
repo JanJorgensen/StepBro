@@ -83,6 +83,7 @@ namespace StepBro.Core.Logging
                             else
                             {
                                 Thread.Sleep(100);  // Wait for some action.
+                                m_formatter.Flush();
                             }
                         }
                     }

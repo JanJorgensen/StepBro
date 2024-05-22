@@ -44,6 +44,11 @@ namespace StepBro.Core.Addons
             {
             }
 
+            public void Flush()
+            {
+                // No action needed.
+            }
+
             public bool WriteLogEntry(LogEntry entry, DateTime zero)
             {
                 var txt = entry.ToClearText(zero, false, false);

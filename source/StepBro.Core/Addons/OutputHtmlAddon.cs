@@ -28,7 +28,7 @@ namespace StepBro.Core.Addons
         {
             if (writer != null)
             {
-                return new Outputter(writer);
+                return new Outputter(writer, options.UseLocalTime);
             }
             else
             {
@@ -39,9 +39,11 @@ namespace StepBro.Core.Addons
         private class Outputter : IOutputFormatter
         {
             private ITextWriter m_writer;
-            public Outputter(ITextWriter writer)
+            private bool m_useLocalTime;
+            public Outputter(ITextWriter writer, bool useLocalTime)
             {
                 m_writer = writer;
+                m_useLocalTime = useLocalTime;
             }
 
             public void Dispose()
@@ -53,9 +55,14 @@ namespace StepBro.Core.Addons
                 }
             }
 
+            public void Flush()
+            {
+                m_writer.Flush();
+            }
+
             public bool WriteLogEntry(LogEntry entry, DateTime zero)
             {
-                var line = entry.ToClearText(zero, false);
+                var line = (m_useLocalTime) ? entry.ToClearText(entry.Timestamp.ToLocalTime().AsHMSm(), false) : entry.ToClearText(zero, false);
                 if (line != null)
                 {
                     line = HttpUtility.HtmlEncode(line);

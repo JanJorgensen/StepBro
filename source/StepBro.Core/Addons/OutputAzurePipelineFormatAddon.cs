@@ -284,6 +284,11 @@ namespace StepBro.Core.Addons
             public void Dispose()
             {
             }
+
+            public void Flush()
+            {
+                // No action needed.
+            }
         }
     }
 }

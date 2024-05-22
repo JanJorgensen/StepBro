@@ -367,10 +367,12 @@ namespace StepBro.Core.Data
         public static string ToClearText(this LogEntry entry, DateTime zero, bool forceShow = false, bool showErrorAndFailType = true)
         {
             var timestamp = entry.Timestamp.ToSecondsTimestamp(zero);
-            var timestampIndent = new string(' ', Math.Max(0, 8 - timestamp.Length));
+            return entry.ToClearText(new string(' ', Math.Max(0, 8 - timestamp.Length)) + timestamp, forceShow, showErrorAndFailType);
+        }
 
+        public static string ToClearText(this LogEntry entry, string timestamp, bool forceShow = false, bool showErrorAndFailType = true)
+        {
             StringBuilder text = new(1000);
-            text.Append(timestampIndent);
             text.Append(timestamp);
             text.Append(new string(' ', 1 + entry.IndentLevel * 3));
             string type = entry.EntryType switch

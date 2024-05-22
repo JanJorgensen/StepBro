@@ -47,7 +47,7 @@ namespace StepBro.Core.Addons
             }
             public bool WriteLogEntry(LogEntry entry, DateTime zero)
             {
-                var line = entry.ToClearText(zero, false);
+                var line = m_options.UseLocalTime ? entry.ToClearText(entry.Timestamp.ToLocalTime().AsHMSm(), false) : entry.ToClearText(zero, false);
                 if (line != null)
                 {
                     m_writer.WriteLine(line);
@@ -68,6 +68,11 @@ namespace StepBro.Core.Addons
                     m_writer.Dispose();
                     m_writer = null;
                 }
+            }
+
+            public void Flush()
+            {
+                m_writer.Flush();
             }
         }
     }

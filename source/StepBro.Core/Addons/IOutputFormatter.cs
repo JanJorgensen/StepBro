@@ -32,5 +32,10 @@ namespace StepBro.Core.Addons
         /// </summary>
         /// <param name="report">The report data.</param>
         void WriteReport(DataReport report);
+
+        /// <summary>
+        /// Force writing all data to the underlying <seealso cref="ITextWriter"/> object.
+        /// </summary>
+        void Flush();
     }
 }

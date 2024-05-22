@@ -285,7 +285,7 @@ namespace StepBro.Core.Execution
 
                 var writer = new TextFileWriter(fileStream);
 
-                OutputFormatOptions options = new OutputFormatOptions { CreateHighLevelLogSections = true };
+                OutputFormatOptions options = new OutputFormatOptions { CreateHighLevelLogSections = true, UseLocalTime = true };
                 var formatter = formatterAddon.Create(options, writer);
 
                 return manager.AddLogFileCreator(formatter, includePast);

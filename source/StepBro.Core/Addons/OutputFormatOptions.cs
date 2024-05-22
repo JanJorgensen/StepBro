@@ -9,5 +9,6 @@ namespace StepBro.Core.Addons
     public class OutputFormatOptions
     {
         public bool CreateHighLevelLogSections {  get; set; }
+        public bool UseLocalTime { get; set; } = false;
     }
 }
