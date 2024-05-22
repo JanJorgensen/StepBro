@@ -278,6 +278,10 @@ namespace StepBro.Cmd
                     var sidekick = new System.Diagnostics.Process();
                     sidekick.StartInfo.FileName = Path.Combine(folder, "StepBro.Sidekick.exe");
                     sidekick.StartInfo.Arguments = pipename;
+                    if (m_commandLineOptions.NoAttach)
+                    {
+                        sidekick.StartInfo.Arguments += " --no_attach";
+                    }
                     sidekickStarted = sidekick.Start();
 
 #if STOP_BEFORE_SIDEKICK
@@ -987,6 +991,11 @@ namespace StepBro.Cmd
 
             if (m_commandLineOptions.PrintReport && createdReport != null)
             {
+                using (FileStream fs = System.IO.File.Create("report.sbr"))
+                {
+                    byte[] generatedInfo = new UTF8Encoding(true).GetBytes($"--- BEGAN GENERATION AT {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")} ---\n");
+                    fs.Write(generatedInfo, 0, generatedInfo.Length);
+                }
                 m_outputFormatter.WriteReport(createdReport);
             }
             else

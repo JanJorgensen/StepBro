@@ -464,7 +464,8 @@ namespace StepBro.Core.Execution
                 }
                 context.ReportFailure($"No entry matching \"{text}\" was found in {readerName}.");
             }
-            return null;
+
+            return String.Empty; // Return empty string instead of null to ensure we do not get null reference exceptions
         }
 
         [Public]
