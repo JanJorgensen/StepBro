@@ -259,7 +259,10 @@ namespace StepBro.StateMachine
                 var variable = m_instance.GetVariable(name);
                 if (variable != null)
                 {
-                    context.Logger.LogDetail("Get '" + this.Name + "." + name + "': " + StringUtils.ObjectToString(variable.Value));
+                    if (context.LoggingEnabled)
+                    {
+                        context.Logger.LogDetail("Get '" + this.Name + "." + name + "': " + StringUtils.ObjectToString(variable.Value));
+                    }
                     return variable.Value;
                 }
                 else
@@ -271,7 +274,10 @@ namespace StepBro.StateMachine
 
             public void SetProperty([Implicit] ICallContext context, string name, object value)
             {
-                context.Logger.LogDetail("Set '" + this.Name + "." + name + "': " + StringUtils.ObjectToString(value));
+                if (context.LoggingEnabled)
+                {
+                    context.Logger.LogDetail("Set '" + this.Name + "." + name + "': " + StringUtils.ObjectToString(value));
+                }
                 var variable = m_instance.GetVariable(name);
                 if (variable != null)
                 {

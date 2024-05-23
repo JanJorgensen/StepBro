@@ -741,7 +741,18 @@ namespace StepBro.Core.Execution
             {
                 if (context != null && context.LoggingEnabled && context.Logger.IsDebugging)
                 {
-                    context.Log($"Getting dynamic property '{name}' on object of type '{instance.GetType().Name}'.");
+                    if (instance is INameable)
+                    {
+                        context.LogDetail($"Getting dynamic property '{name}' on '{((INameable)instance).Name}'.");
+                    }
+                    else if (instance is INamedObject)
+                    {
+                        context.LogDetail($"Getting dynamic property '{name}' on '{((INamedObject)instance).FullName}'.");
+                    }
+                    else
+                    {
+                        context.LogDetail($"Getting dynamic property '{name}' on object of type '{instance.GetType().Name}'.");
+                    }
                 }
                 var value = instance.GetProperty(context.EnterNewContext(instance.GetType().Name, false), name);
                 return (TExpected)System.Convert.ChangeType(value, typeof(TExpected));
@@ -777,7 +788,18 @@ namespace StepBro.Core.Execution
             {
                 if (context != null && context.LoggingEnabled && context.Logger.IsDebugging)
                 {
-                    context.Log($"Setting dynamic property '{name}' on object of type '{instance.GetType().Name}'.");
+                    if (instance is INameable)
+                    {
+                        context.LogDetail($"Setting dynamic property '{name}' on '{((INameable)instance).Name}'.");
+                    }
+                    else if (instance is INamedObject)
+                    {
+                        context.LogDetail($"Setting dynamic property '{name}' on '{((INamedObject)instance).FullName}'.");
+                    }
+                    else
+                    {
+                        context.LogDetail($"Setting dynamic property '{name}' on object of type '{instance.GetType().Name}'.");
+                    }
                 }
                 instance.SetProperty(context.EnterNewContext(instance.GetType().Name, false), name, value);
             }
