@@ -156,7 +156,7 @@ namespace StepBro.Core.Parser
                         return;
 
                     case SBExpressionType.TypeReference:
-                        m_errors.SymanticError(context.Start.Line, -1, false, $"\"{left.ToString()}\" should access a ctor or Create-function, but is not implemented.");
+                        // This occurs when an object is created without a body, which just uses default constructor, so this is fine.
                         return;
 
                     case SBExpressionType.Identifier:
@@ -818,22 +818,24 @@ namespace StepBro.Core.Parser
                             }
                             else
                             {
-                                string prefix = method.Name;
+                                string prefix = null;
                                 if (!String.IsNullOrEmpty(instanceName))
                                 {
-                                    prefix = instanceName + "." + prefix;
+                                    prefix = instanceName;
                                 }
                                 else if (method.DeclaringType != typeof(ScriptUtils))
                                 {
-                                    prefix = method.DeclaringType.Name + "." + prefix;
+                                    prefix = method.DeclaringType.Name;
                                 }
+                                var objectRef = (Expression)Expression.Constant(null, typeof(object));
+                                if (instance != null) objectRef = instance;
                                 var contextCreator = Expression.Call(
                                     s_CreateMethodCallContext,
                                     contextReference,
-                                    Expression.Constant(prefix));
+                                    Expression.Constant(prefix, typeof(string)),
+                                    objectRef,
+                                    Expression.Constant(method.Name));
                                 suggestedAssignmentsOut.Add(new SBExpressionData(contextCreator));
-
-                                //suggestedAssignmentsOut.Add(new SBExpressionData(m_currentProcedure.ContextReference));
                             }
                             continue;
                         }

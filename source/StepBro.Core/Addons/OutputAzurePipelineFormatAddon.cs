@@ -5,6 +5,7 @@ using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml;
 
@@ -21,19 +22,19 @@ namespace StepBro.Core.Addons
 
         public OutputType FormatterType { get { return OutputType.Text; } }
 
-        public IOutputFormatter Create(bool createHighLevelLogSections, ITextWriter writer = null)
+        public IOutputFormatter Create(OutputFormatOptions options, ITextWriter writer = null)
         {
-            return new Outputter(createHighLevelLogSections, writer);
+            return new Outputter(options, writer);
         }
 
         private class Outputter : IOutputFormatter, ITextWriter
         {
-            bool m_createHighLevelLogSections;
+            OutputFormatOptions m_options;
             readonly ITextWriter m_writer;
 
-            public Outputter(bool createHighLevelLogSections, ITextWriter writer)
+            public Outputter(OutputFormatOptions options, ITextWriter writer)
             {
-                m_createHighLevelLogSections = createHighLevelLogSections;
+                m_options = options;
                 m_writer = (writer != null) ? writer : this;
             }
 
@@ -67,8 +68,8 @@ namespace StepBro.Core.Addons
 
             public void WriteReport(DataReport report)
             {
-                bool oldCcreateHighLevelLogSections = m_createHighLevelLogSections;
-                m_createHighLevelLogSections = false;
+                //bool oldCreateHighLevelLogSections = m_options.CreateHighLevelLogSections;
+                //m_options.CreateHighLevelLogSections = false;
                 try
                 {
                     if (report.Summary != null)
@@ -199,10 +200,13 @@ namespace StepBro.Core.Addons
                             }
                         }
                     }
+
+                    // RENAME FILE SO WE DO NOT OVERWRITE REPORT
+                    System.IO.File.Move("report.sbr", $"report-{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.sbr");
                 }
                 finally
                 {
-                    m_createHighLevelLogSections = oldCcreateHighLevelLogSections;
+                    //m_options.CreateHighLevelLogSections = oldCreateHighLevelLogSections;
                 }
             }
 
@@ -274,11 +278,30 @@ namespace StepBro.Core.Addons
             void ITextWriter.Write(string text)
             {
                 System.Console.Write(text);
+
+                using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
+                {
+                    sw.Write(text);
+                }
             }
 
             void ITextWriter.WriteLine(string text)
             {
                 System.Console.WriteLine(text);
+
+                using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
+                {
+                    sw.WriteLine(text);
+                }
+            }
+
+            public void Dispose()
+            {
+            }
+
+            public void Flush()
+            {
+                // No action needed.
             }
         }
     }

@@ -152,7 +152,7 @@ namespace StepBro.Core.Execution
 
         public ICallContext EnterNewContext(string shortDescription, bool separateStateLevel)
         {
-            throw new NotImplementedException();
+            return new FunctionCallContextWrapper(this, -1, -1);    // NOTE: Seems good enough. Improve this if ever needed.
         }
 
         public IScriptCallContext EnterNewScriptContext(IProcedureReference procedure, ContextLogOption procedureLoggingOption, bool isDynamicCall, object[] arguments)

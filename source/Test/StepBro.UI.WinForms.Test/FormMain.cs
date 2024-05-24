@@ -136,6 +136,8 @@ namespace StepBro.UI.WinForms.Test
                 string type = entry.EntryType switch
                 {
                     LogEntry.Type.Async => "<A>",
+                    LogEntry.Type.CommunicationOut => "<Out>",
+                    LogEntry.Type.CommunicationIn => "<In>",
                     LogEntry.Type.TaskEntry => "TaskEntry",
                     LogEntry.Type.Error => "Error",
                     LogEntry.Type.Failure => "Fail",

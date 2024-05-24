@@ -533,7 +533,7 @@ namespace StepBro.Core.Parser
                         }
                         else
                         {
-                            if (!isSettableFromPropertyBlock)
+                            if (!isSettableFromPropertyBlock && !entry.Name.Equals(Constants.VARIABLE_DEVICE_REFERENCE, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 errors.SymanticError(startToken.Line, startToken.Column, false, $"The object has no property named \"{entry.Name}\".");
                             }

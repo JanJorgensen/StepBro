@@ -213,7 +213,17 @@ namespace StepBro.Core.Parser
         public override void ExitVariableInitializerExpression([NotNull] SBP.VariableInitializerExpressionContext context)
         {
             var stack = m_expressionData.PopStackLevel();
-            m_variableInitializer = this.ResolveForGetOperation(stack.Pop(), targetType: m_variableType);
+
+            // If stack.Count is 0, then there is no body and we do not initialize to anything
+            if (stack.Count != 0)
+            {
+                m_variableInitializer = this.ResolveForGetOperation(stack.Pop(), targetType: m_variableType);
+            }
+            else
+            {
+                m_variableInitializer = this.ResolveForGetOperation(new SBExpressionData(Expression.New(m_variableType.Type.GetConstructor(Type.EmptyTypes))), targetType: m_variableType);
+            }
+
             if (m_variableInitializer.IsError())
             {
                 m_errors.UnresolvedIdentifier(m_variableInitializer.Token.Line, m_variableInitializer.Token.Column, m_variableInitializer.Value as string);

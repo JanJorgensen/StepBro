@@ -24,28 +24,31 @@ namespace StepBro.StateMachine
         public IStateMachine Context { get; internal set; } = null;
         public Event StateEvent { get; private set; }
         public string MessageName { get; internal set; } = null;
-        public string TimerName { get; internal set; } = null;
+        internal Timer Timer { get; set; } = null;
         public object Data { get; internal set; } = null;
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append('\'');
-            sb.Append(m_instance.Name);
-            sb.Append("' ");
-            sb.Append(this.StateEvent.ToString());
+            //sb.Append('\'');
+            //sb.Append(m_instance.Name);
+            //sb.Append("' ");
+            //sb.Append(this.StateEvent.ToString());
 
             switch (StateEvent)
             {
                 case Event.Timer:
                     sb.Append(" \"");
-                    sb.Append(this.TimerName);
+                    sb.Append(this.Timer.Name);
                     sb.Append('"');
                     break;
                 case Event.ExternalEvent:
                     sb.Append(" \"");
                     sb.Append(this.MessageName);
                     sb.Append('"');
+                    break;
+                default:
+                    sb.Append("<empty>");
                     break;
             }
             return sb.ToString();
