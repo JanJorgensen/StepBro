@@ -939,16 +939,16 @@ namespace StepBro.Core.Parser
                         {
                             var a = ResolveForGetOperation(argPicker.Pick(), (TypeReference)p.ParameterType);
                             suggestedAssignmentsOut.Add(a);
-                            matchScore += 20; // If the types are exactly the same, the matchscore should increase
                             continue;   // next parameter
                         }
                         else if (IsParameterAssignableFromArgument(p, argPicker.Current))
                         {
                             var a = ResolveForGetOperation(argPicker.Pick(), (TypeReference)p.ParameterType);
+                            matchScore -= 5;
                             if (p.ParameterType == typeof(object))
                             {
                                 a = a.NewExpressionCode(Expression.Convert(a.ExpressionCode, typeof(object)));
-                                matchScore -= 10;    // Matching an object parameter is not as good as matching the exact same type.
+                                matchScore -= 5;    // Matching an object parameter is not as good as matching the exact same type.
                             }
                             suggestedAssignmentsOut.Add(a);
                             continue;   // next parameter
@@ -956,25 +956,26 @@ namespace StepBro.Core.Parser
                         else if (argPicker.Current.DataType.Type == typeof(Int64) && p.ParameterType.IsPrimitiveNarrowableIntType())
                         {
                             suggestedAssignmentsOut.Add(new SBExpressionData(Expression.Convert(argPicker.Pick().ExpressionCode, p.ParameterType)));
+                            matchScore -= 5;
                             continue;   // next parameter
                         }
                         else if (argPicker.Current.DataType.Type == typeof(Double) && p.ParameterType == typeof(Single))
                         {
                             suggestedAssignmentsOut.Add(new SBExpressionData(Expression.Convert(argPicker.Pick().ExpressionCode, p.ParameterType)));
-                            matchScore -= 5;    // Matching a 'single' is not as good as matching the exact same type.
+                            matchScore -= 20;    // Matching a 'single' is not as good as matching the exact same type.
                             continue;   // next parameter
                         }
                         else if (argPicker.Current.DataType.IsInt() && (p.ParameterType == typeof(Double) || p.ParameterType == typeof(Single)))
                         {
                             suggestedAssignmentsOut.Add(new SBExpressionData(Expression.Convert(argPicker.Pick().ExpressionCode, p.ParameterType)));
-                            matchScore -= 20;    // Matching an integer is not as good as matching the exact same type.
+                            matchScore -= 40;    // Matching an integer is not as good as matching the exact same type.
                             continue;   // next parameter
                         }
                         else if (argPicker.Current.DataType.Type == typeof(string) && p.ParameterType == typeof(Identifier))
                         {
                             suggestedAssignmentsOut.Add(
                                 new SBExpressionData(Expression.New(typeof(Identifier).GetConstructor(new Type[] { typeof(string) }), argPicker.Pick().ExpressionCode)));
-                            matchScore -= 20;    // Matching an integer is not as good as matching the exact same type.
+                            matchScore -= 40;    // Matching an integer is not as good as matching the exact same type.
                             continue;   // next parameter
                         }
                         else
