@@ -83,7 +83,7 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void TestDotNetArrayWithVariableIndex()
         {
-            Assert.AreEqual(891L, ParseAndRun<long>("testArr[4]", "int i = 4; int[] myArr = [10, 26, 80, 127, 891, 11]; var testArr = myArr.ToArray(); int testValue = testArr[i];", false));
+            Assert.AreEqual(891L, ParseAndRun<long>("testValue", "int i = 4; int[] myArr = [10, 26, 80, 127, 891, 11]; var testArr = myArr.ToArray(); int testValue = testArr[i];", false));
         }
     }
 }
