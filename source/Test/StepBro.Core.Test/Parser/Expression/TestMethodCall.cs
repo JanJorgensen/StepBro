@@ -401,5 +401,25 @@ namespace StepBroCoreTest.Parser
             Assert.IsInstanceOfType(result, typeof(bool));
             Assert.AreEqual(false, (bool)result);
         }
+
+        [TestMethod]
+        public void TestMultipleMethodsChooseCorrect()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    int a = 15;
+                    int correctNumber = Math.Min(a, 13);
+                    return correctNumber;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(13L, (long)result);
+        }
     }
 }
