@@ -939,7 +939,7 @@ namespace StepBro.Core.Parser
                         {
                             var a = ResolveForGetOperation(argPicker.Pick(), (TypeReference)p.ParameterType);
                             suggestedAssignmentsOut.Add(a);
-                            matchScore += 100; // If the types are exactly the same, the matchscore should increase
+                            matchScore += 20; // If the types are exactly the same, the matchscore should increase
                             continue;   // next parameter
                         }
                         else if (IsParameterAssignableFromArgument(p, argPicker.Current))
