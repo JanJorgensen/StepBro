@@ -67,5 +67,11 @@ namespace StepBroCoreTest.Parser
             //        "datetime[] myArr = [@2016-03-07 12:30:00, @2017-02-25 12:30:10, @2015-07-20 12:30:00]; myArr[1] = @2017-06-22 12:31:00;",
             //        true));
         }
+
+        [TestMethod]
+        public void TestArrayWithVariableIndex()
+        {
+            Assert.AreEqual(892L, ParseAndRun<long>("myArr[4]", "int i = 4; int[] myArr = [10, 26, 80, 127, 891, 11]; myArr[i]++;", false));
+        }
     }
 }
