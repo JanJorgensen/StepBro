@@ -28,7 +28,7 @@ namespace StepBro.Core.Parser
             }
             else if (sourceType.Type.IsArray)
             {
-                throw new NotImplementedException();
+                m_expressionData.Push(this.CreateArrayIndexerExpression(source, this.ResolveForGetOperation(indexingExpressions[0], reportIfUnresolved: true)));
             }
             else if (sourceType.Type == typeof(string))
             {
@@ -83,6 +83,23 @@ namespace StepBro.Core.Parser
 
             var substringExpression = Expression.Call(source.ExpressionCode, typeof(string).GetMethod(nameof(String.Substring), new Type[] { typeof(Int32), typeof(Int32)}), indexerCode, Expression.Constant(1));
             return new SBExpressionData(substringExpression, SBExpressionType.Expression);
+        }
+
+        public SBExpressionData CreateArrayIndexerExpression(SBExpressionData source, SBExpressionData indexer)
+        {
+            var indexerCode = indexer.ExpressionCode;
+
+            if (indexer.DataType.Equals(typeof(long)))
+            {
+                indexerCode = Expression.Convert(indexerCode, typeof(int));
+            }
+            else if (!indexer.DataType.Equals(typeof(int)))
+            {
+                throw new NotImplementedException("An indexer type not supported yet.");
+            }
+
+            var arrayIndexingExpression = Expression.ArrayIndex(source.ExpressionCode, indexerCode);
+            return new SBExpressionData(arrayIndexingExpression, SBExpressionType.Expression);
         }
 
         public override void EnterExpArray([NotNull] SBP.ExpArrayContext context)
