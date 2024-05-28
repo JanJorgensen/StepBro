@@ -24,7 +24,7 @@ namespace StepBro.Core.Parser
 
             if (sourceType.Type.IsGenericType && sourceType.Type.GetGenericTypeDefinition() == typeof(List<>))
             {
-                m_expressionData.Push(this.CreateListIndexerExpression(source, indexingExpressions[0]));
+                m_expressionData.Push(this.CreateListIndexerExpression(source, this.ResolveForGetOperation(indexingExpressions[0], reportIfUnresolved: true)));
             }
             else if (sourceType.Type.IsArray)
             {
@@ -32,7 +32,7 @@ namespace StepBro.Core.Parser
             }
             else if (sourceType.Type == typeof(string))
             {
-                m_expressionData.Push(this.CreateStringIndexerExpression(source, indexingExpressions[0]));
+                m_expressionData.Push(this.CreateStringIndexerExpression(source, this.ResolveForGetOperation(indexingExpressions[0], reportIfUnresolved: true)));
             }
             else
             {
