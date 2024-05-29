@@ -218,10 +218,14 @@ namespace StepBro.VISA
                     timeoutMs--;
                 } while (timeoutMs > 0);
 
-                if (input.Item1 == nameof(VISABridge.Messages.Received))
+                if (input != null && input.Item1 == nameof(VISABridge.Messages.Received))
                 {
                     var data = System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2);
                     received = data.Line.TrimEnd('\n','\r',' ');
+                }
+                else if (input == null)
+                {
+                    received = "Nothing received.";
                 }
             }
             else
