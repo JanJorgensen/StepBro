@@ -18,8 +18,8 @@ namespace StepBro.VISA
     {
         private string m_resource = "";
         private string m_name = "instrument";
-        private Pipe m_visaPipe = null;
-        private bool m_sessionOpened = false;
+        private static Pipe m_visaPipe = null;
+        private static bool m_sessionOpened = false;
         private EventHandler m_visaClosedEventHandler = null;
 
         private void ReceivedData(Tuple<string, string> received)
@@ -210,7 +210,7 @@ namespace StepBro.VISA
                 if (input.Item1 == nameof(VISABridge.Messages.Received))
                 {
                     var data = System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2);
-                    received = data.Line;
+                    received = data.Line.TrimEnd('\n','\r',' ');
                 }
             }
             else
@@ -268,7 +268,7 @@ namespace StepBro.VISA
             return received;
         }
 
-        public string[] ListAvailableResources([Implicit] ICallContext context)
+        public static string[] ListAvailableResources([Implicit] ICallContext context)
         {
             string[] instruments = null;
 

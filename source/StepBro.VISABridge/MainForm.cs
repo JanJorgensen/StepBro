@@ -33,8 +33,11 @@ namespace StepBro.VISABridge
                             // Should not happen
                             break;
                         case ShortCommand.GetInstrumentList:
-                            // TODO: Handle Get Instrument List
-
+                            using (var rmSession = new ResourceManager())
+                            {
+                                var resources = rmSession.Find("(ASRL|GPIB|TCPIP|USB)?*");
+                                m_pipe.Send(new ConnectedInstruments(resources.ToArray()));
+                            }
                             break;
                         case ShortCommand.SessionClosed:
                             // Should not happen
