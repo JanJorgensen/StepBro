@@ -33,21 +33,32 @@ namespace StepBro.VISABridge
                             // Should not happen
                             break;
                         case ShortCommand.GetInstrumentList:
-                            // TODO: Handle Get Instrument List
-
+                            using (var rmSession = new ResourceManager())
+                            {
+                                var resources = rmSession.Find("(ASRL|GPIB|TCPIP|USB)?*");
+                                m_pipe.Send(new ConnectedInstruments(resources.ToArray()));
+                            }
                             break;
                         case ShortCommand.SessionClosed:
                             // Should not happen
                             break;
                         case ShortCommand.Receive:
-                            byte[] readData = m_session.RawIO.Read();
+                            byte[] readData = { };
+                            try
+                            {
+                                readData = m_session.RawIO.Read();
+                            }
+                            catch
+                            {
+                                // Do nothing - Timeout occurred
+                            }
                             m_pipe.Send(new Received(new UTF8Encoding(true).GetString(readData)));
                             break;
                     }
                     break;
                 case nameof(OpenSession):
                     var openSessionData = JsonSerializer.Deserialize<OpenSession>(received.Item2);
-                    if (!String.IsNullOrEmpty(openSessionData.Resource))
+                    if (!String.IsNullOrEmpty(openSessionData.Resource) && m_lastResourceString != openSessionData.Resource)
                     {
                         m_lastResourceString = openSessionData.Resource;
                         Open();

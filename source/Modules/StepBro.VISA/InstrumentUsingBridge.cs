@@ -18,8 +18,8 @@ namespace StepBro.VISA
     {
         private string m_resource = "";
         private string m_name = "instrument";
-        private Pipe m_visaPipe = null;
-        private bool m_sessionOpened = false;
+        private static Pipe m_visaPipe = null;
+        private static bool m_sessionOpened = false;
         private EventHandler m_visaClosedEventHandler = null;
 
         private void ReceivedData(Tuple<string, string> received)
@@ -90,30 +90,33 @@ namespace StepBro.VISA
                 started = bridge.Start();
             }
 
-            m_visaPipe = Pipe.StartClient("StepBroVisaPipe", null);
-
-            m_visaPipe.ReceivedData += (sender, e) =>
-            {
-                ReceivedData(e);
-            };
-
-            m_visaClosedEventHandler = (sender, e) =>
-            {
-                context.Logger.LogError("VISA closed unexpectedly");
-            };
-
-            m_visaPipe.OnConnectionClosed += m_visaClosedEventHandler;
-
             int timeoutMs = 2500;
-            if (started)
+            if (m_visaPipe == null || !m_visaPipe.IsConnected())
             {
-                while (!m_visaPipe.IsConnected() && timeoutMs > 0)
+                m_visaPipe = Pipe.StartClient("StepBroVisaPipe", null);
+
+                m_visaPipe.ReceivedData += (sender, e) =>
                 {
-                    int waitTimeMs = 200;
-                    System.Threading.Thread.Sleep(waitTimeMs);
-                    timeoutMs -= waitTimeMs;
+                    ReceivedData(e);
+                };
+
+                m_visaClosedEventHandler = (sender, e) =>
+                {
+                    context.Logger.LogError("VISA closed unexpectedly");
+                };
+
+                m_visaPipe.OnConnectionClosed += m_visaClosedEventHandler;
+
+                if (started)
+                {
+                    while (!m_visaPipe.IsConnected() && timeoutMs > 0)
+                    {
+                        int waitTimeMs = 200;
+                        System.Threading.Thread.Sleep(waitTimeMs);
+                        timeoutMs -= waitTimeMs;
+                    }
+                    started = timeoutMs > 0;
                 }
-                started = timeoutMs > 0;
             }
 
             m_visaPipe.Send(new VISABridge.Messages.OpenSession(m_resource));
@@ -185,7 +188,7 @@ namespace StepBro.VISA
             }
         }
 
-        public string Query([Implicit] ICallContext context, string command)
+        public string Query([Implicit] ICallContext context, string command, int timeout = 2500)
         {
             string received = null;
             if (m_sessionOpened)
@@ -193,24 +196,36 @@ namespace StepBro.VISA
                 m_visaPipe.Send(new VISABridge.Messages.Send(command));
                 m_visaPipe.Send(VISABridge.Messages.ShortCommand.Receive);
 
-                int timeoutMs = 2500;
+                int timeoutMs = timeout;
                 Tuple<string, string> input = null;
                 do
                 {
                     input = m_visaPipe.TryGetReceived();
-                    if (input != null)
+
+                    // If we have received an answer that is not empty we break
+                    if (input != null && (!String.IsNullOrEmpty(System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line) || input.Item1 != nameof(VISABridge.Messages.Received)))
                     {
                         break;
                     }
+                    else if (input != null)
+                    {
+                        // If we received an empty answer, we try to get a new answer
+                        m_visaPipe.Send(VISABridge.Messages.ShortCommand.Receive);
+                    }
+
                     // Wait
                     Thread.Sleep(1);
                     timeoutMs--;
                 } while (timeoutMs > 0);
 
-                if (input.Item1 == nameof(VISABridge.Messages.Received))
+                if (input != null && input.Item1 == nameof(VISABridge.Messages.Received))
                 {
                     var data = System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2);
-                    received = data.Line;
+                    received = data.Line.TrimEnd('\n','\r',' ');
+                }
+                else if (input == null)
+                {
+                    received = "Nothing received.";
                 }
             }
             else
@@ -268,7 +283,7 @@ namespace StepBro.VISA
             return received;
         }
 
-        public string[] ListAvailableResources([Implicit] ICallContext context)
+        public static string[] ListAvailableResources([Implicit] ICallContext context)
         {
             string[] instruments = null;
 
