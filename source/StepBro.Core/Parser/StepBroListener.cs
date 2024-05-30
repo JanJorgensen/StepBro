@@ -226,23 +226,29 @@ namespace StepBro.Core.Parser
 
         public override void ExitFileVariableSimple([NotNull] SBP.FileVariableSimpleContext context)
         {
-            System.Diagnostics.Debug.Assert(m_variables.Count == 1);
             TypeReference type = m_variableType;
-            var variable = m_variables[0];
-            if (type == (TypeReference)typeof(VarSpecifiedType))
+            if (m_variables.Count != 0)
             {
-                type = variable.Type;
+                var variable = m_variables[0];
+                if (type == (TypeReference)typeof(VarSpecifiedType))
+                {
+                    type = variable.Type;
+                }
+                if (!type.Type.IsAssignableFrom(variable.Initializer.DataType.Type))
+                {
+                    throw new NotImplementedException("Variable assignment of incompatible type.");
+                }
+                var codeHash = context.GetText().GetHashCode();
+                var id = m_file.CreateOrGetFileVariable(
+                    m_currentNamespace, m_fileElementModifier, variable.Name, type, false,
+                    context.Start.Line, context.Start.Column, codeHash,
+                    CreateVariableContainerValueAssignAction(variable.Initializer.ExpressionCode));
+                m_file.SetFileVariableModifier(id, m_fileElementModifier);
             }
-            if (!type.Type.IsAssignableFrom(variable.Initializer.DataType.Type))
+            else
             {
-                throw new NotImplementedException("Variable assignment of incompatible type.");
+                m_errors.InternalError(context.Start.Line, context.Start.Column, "Variable not created.");
             }
-            var codeHash = context.GetText().GetHashCode();
-            var id = m_file.CreateOrGetFileVariable(
-                m_currentNamespace, m_fileElementModifier, variable.Name, type, false,
-                context.Start.Line, context.Start.Column, codeHash,
-                CreateVariableContainerValueAssignAction(variable.Initializer.ExpressionCode));
-            m_file.SetFileVariableModifier(id, m_fileElementModifier);
         }
 
         public override void ExitFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)
