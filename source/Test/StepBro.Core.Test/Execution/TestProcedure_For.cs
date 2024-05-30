@@ -530,5 +530,230 @@ namespace StepBroCoreTest.Parser
             Assert.IsTrue((long)result < 5000000);
             Assert.IsTrue((long)result > 1000);         // Just to check that the loop iterated several times
         }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithNoControl()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 200;
+                    for (;;)
+                    {
+                        output++;
+                        if (output >= 400)
+                        {
+                            break;
+                        }
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(400, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithOnlyInit()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 0;
+                    for (output = 200;;)
+                    {
+                        if (output < 100)
+                        {
+                            break;
+                        }
+                        output++;
+                        if (output >= 400)
+                        {
+                            break;
+                        }
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(400, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithOnlyCondition()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 200;
+                    for (;output < 400;)
+                    {
+                        output++;
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(400, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithOnlyUpdate()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 200;
+                    for (;;output++)
+                    {
+                        if (output >= 400)
+                        {
+                            break;
+                        }
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(400, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithInitCondition()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 0;
+                    for (output = 200; output < 400;)
+                    {
+                        if (output < 100)
+                        {
+                            break;
+                        }
+
+                        output++;
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(400, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithInitUpdate()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 0;
+                    for (output = 200;; output++)
+                    {
+                        if (output < 100)
+                        {
+                            break;
+                        }
+
+                        if (output >= 400)
+                        {
+                            break;
+                        }
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(400, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithConditionUpdate()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 200;
+                    for (; output < 400; output++)
+                    {
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(400, (long)result);
+        }
+
+        [TestMethod]
+        public void TestProcedureForStatementWithMultipleFor()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                int Func()
+                {
+                    var output = 200;
+
+                    int j = 0;
+                    for (;j < 10;)
+                    {
+                        j++;
+                        output++;
+                    }
+
+                    int k = 0;
+                    for (;;)
+                    {
+                        k++;
+                        output++;
+                        if (k >= 10)
+                        {
+                            break;
+                        }
+                    }
+                    return output;
+                }
+                """);
+            Assert.AreEqual(typeof(long), proc.ReturnType.Type);
+            Assert.AreEqual(0, proc.Parameters.Length);
+            object result = proc.Call();
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(220, (long)result);
+        }
     }
 }
