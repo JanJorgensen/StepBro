@@ -221,37 +221,6 @@ namespace StepBro.Core.Parser
             {
                 m_variableInitializer = this.ResolveForGetOperation(stack.Pop(), targetType: m_variableType);
             }
-            else
-            {
-                // Split between the type and the '(' so we can have one part be the Type and another part the constructor
-                // Furthermore we trim the last ')' so the second part is only arguments separated by ','
-                string[] splitConstructor = context.GetText().TrimEnd(')').Split('(');
-
-                string constructorTypeString = splitConstructor[0];
-                TypeReference constructorType = ParseTypeString(constructorTypeString, false, true, context.Start);
-
-                // Split the arguments by ',' so we have the arguments by themselves
-                string[] constructorArguments = splitConstructor[1].Split(',');
-
-                if (constructorArguments.Length == 0)
-                {
-                    m_variableInitializer = this.ResolveForGetOperation(new SBExpressionData(Expression.New(constructorType.Type.GetConstructor(Type.EmptyTypes))), targetType: m_variableType);
-                }
-                else
-                {
-                    List<Type> argumentTypes = new();
-                    List<SBExpressionData> arguments = m_arguments.Pop().ToList<SBExpressionData>();
-                    List<Expression> argumentExpressions = new List<Expression>();
-
-                    for (int i = arguments.Count - 1; i >= 0; i--)
-                    {
-                        argumentTypes.Add(ResolveForGetOperation(arguments[i]).DataType.Type);
-                        argumentExpressions.Add(ResolveForGetOperation(arguments[i]).ExpressionCode);
-                    }
-
-                    m_variableInitializer = this.ResolveForGetOperation(new SBExpressionData(Expression.New(constructorType.Type.GetConstructor(argumentTypes.ToArray()), argumentExpressions)), targetType: m_variableType);
-                }
-            }
 
             if (m_variableInitializer.IsError())
             {

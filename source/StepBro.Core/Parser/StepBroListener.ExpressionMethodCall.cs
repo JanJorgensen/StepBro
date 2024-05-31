@@ -94,11 +94,8 @@ namespace StepBro.Core.Parser
         public override void ExitExpParens([NotNull] SBP.ExpParensContext context)
         {
             var left = m_expressionData.Pop();
-            if (left.ReferencedType != SBExpressionType.TypeReference)
-            {
-                var argumentStack = m_arguments.Pop();
-                this.HandleParensExpression(context, false, left, argumentStack, null, null);
-            }
+            var argumentStack = m_arguments.Pop();
+            this.HandleParensExpression(context, false, left, argumentStack, null, null);
         }
 
         private enum ParansExpressionType
@@ -159,8 +156,16 @@ namespace StepBro.Core.Parser
                         return;
 
                     case SBExpressionType.TypeReference:
-                        // This should not occur as constructors are handled elsewhere
-                        m_errors.InternalError(left.Token.Line, left.Token.Column, "We have ended up an illegal place when using a constructor somehow. Please report issue!");
+                        List<Type> argumentTypes = new();
+                        List<Expression> argumentExpressions = new List<Expression>();
+
+                        foreach (SBExpressionData cArg in arguments)
+                        {
+                            argumentTypes.Add(ResolveForGetOperation(cArg).DataType.Type);
+                            argumentExpressions.Add(ResolveForGetOperation(cArg).ExpressionCode);
+                        }
+
+                        m_expressionData.Push(new SBExpressionData(Expression.New(left.DataType.Type.GetConstructor(argumentTypes.ToArray()), argumentExpressions)));
                         return;
 
                     case SBExpressionType.Identifier:
