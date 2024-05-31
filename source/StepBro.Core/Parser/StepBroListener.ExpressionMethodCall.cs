@@ -156,7 +156,16 @@ namespace StepBro.Core.Parser
                         return;
 
                     case SBExpressionType.TypeReference:
-                        // This occurs when an object is created without a body, which just uses default constructor, so this is fine.
+                        List<Type> argumentTypes = new List<Type>();
+                        List<Expression> argumentExpressions = new List<Expression>();
+
+                        foreach (SBExpressionData cArg in arguments)
+                        {
+                            argumentTypes.Add(ResolveForGetOperation(cArg).DataType.Type);
+                            argumentExpressions.Add(ResolveForGetOperation(cArg).ExpressionCode);
+                        }
+
+                        m_expressionData.Push(new SBExpressionData(Expression.New(left.DataType.Type.GetConstructor(argumentTypes.ToArray()), argumentExpressions)));
                         return;
 
                     case SBExpressionType.Identifier:
