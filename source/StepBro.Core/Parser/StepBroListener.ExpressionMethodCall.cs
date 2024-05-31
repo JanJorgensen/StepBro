@@ -156,7 +156,7 @@ namespace StepBro.Core.Parser
                         return;
 
                     case SBExpressionType.TypeReference:
-                        List<Type> argumentTypes = new();
+                        List<Type> argumentTypes = new List<Type>();
                         List<Expression> argumentExpressions = new List<Expression>();
 
                         foreach (SBExpressionData cArg in arguments)
