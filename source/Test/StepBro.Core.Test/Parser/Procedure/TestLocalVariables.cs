@@ -204,9 +204,15 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        public void TestUseConstructorTypeVariables()
+        public void TestUseConstructorType()
         {
             Assert.AreEqual("test", ParseAndRun<string>("myVar.ToString()", "var myVar = System.Text.StringBuilder(); myVar.Append(\"test\");"));
+        }
+
+        [TestMethod]
+        public void TestUseConstructorTypeWithArguments()
+        {
+            Assert.AreEqual("test", ParseAndRun<string>("myVar.ToString()", "var myVar = System.Text.StringBuilder(\"test\");"));
         }
     }
 }
