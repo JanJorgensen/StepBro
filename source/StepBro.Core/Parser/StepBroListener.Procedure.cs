@@ -43,8 +43,8 @@ namespace StepBro.Core.Parser
         private Stack<Stack<SBExpressionData>> m_statementExpressions = new Stack<Stack<SBExpressionData>>();
         private Stack<List<Expression>> m_forInitVariables = new Stack<List<Expression>>();
         private Stack<SBExpressionData> m_forCondition = new Stack<SBExpressionData>();
-        private bool m_forConditionExists = false;
-        private bool m_forUpdateExists = false;
+        private Stack<bool> m_forConditionExists = new Stack<bool>();
+        private Stack<bool> m_forUpdateExists = new Stack<bool>();
         //private Stack<TSExpressionData> m_keywordArguments = null;
 
         public Stack<SBExpressionData> GetArguments()
@@ -496,8 +496,8 @@ namespace StepBro.Core.Parser
 
         public override void EnterForStatement([NotNull] SBP.ForStatementContext context)
         {
-            m_forConditionExists = false;
-            m_forUpdateExists = false;
+            m_forConditionExists.Push(false);
+            m_forUpdateExists.Push(false);
 
             this.AddEnterStatement(context);
             m_enteredLoopStatement = true;
@@ -548,16 +548,18 @@ namespace StepBro.Core.Parser
             m_forCondition.Push(m_expressionData.Peek().Pop());
 
             m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-loop", ProcedureParsingScope.ScopeType.Block));
-            m_forConditionExists = true;
+            m_forConditionExists.Pop();
+            m_forConditionExists.Push(true);
         }
 
         public override void EnterForUpdate([NotNull] SBP.ForUpdateContext context)
         {
             m_expressionData.PushStackLevel("for-update");
-            m_forUpdateExists = true;
+            m_forUpdateExists.Pop();
+            m_forUpdateExists.Push(true);
 
             // If no conditions are present, we create the scopestack here
-            if (!m_forConditionExists)
+            if (!m_forConditionExists.Peek())
             {
                 m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-loop", ProcedureParsingScope.ScopeType.Block));
             }
@@ -566,7 +568,7 @@ namespace StepBro.Core.Parser
         public override void ExitForControl([NotNull] ForControlContext context)
         {
             // If no conditions and no updates are present, we create the scopestack here
-            if (!m_forConditionExists && !m_forUpdateExists)
+            if (!m_forConditionExists.Peek() && !m_forUpdateExists.Peek())
             {
                 m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-loop", ProcedureParsingScope.ScopeType.Block));
             }
@@ -580,11 +582,11 @@ namespace StepBro.Core.Parser
             var forInitVariables = m_forInitVariables.Pop();
 
             // Contains the expressions in the for-update part of the for-loop
-            var forUpdateExpressions = (m_forUpdateExists ? m_expressionData.PopStackLevel() : new());
+            var forUpdateExpressions = (m_forUpdateExists.Pop() ? m_expressionData.PopStackLevel() : new());
             var forInitExpressions = m_expressionData.PopStackLevel();
 
             // Contains the part of the for-loop that contains the condition
-            var condition = (m_forConditionExists ? m_forCondition.Pop() : new SBExpressionData(Expression.Constant(true)));
+            var condition = (m_forConditionExists.Pop() ? m_forCondition.Pop() : new SBExpressionData(Expression.Constant(true)));
 
             var subStatements = forLoopScope.GetSubStatements();
             var attributes = forLoopScope.GetAttributes();
