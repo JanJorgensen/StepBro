@@ -202,5 +202,11 @@ namespace StepBroCoreTest.Parser
             Assert.IsTrue(result.GetType() == typeof(long));
             Assert.AreEqual(2, (long)result);
         }
+
+        [TestMethod]
+        public void TestUseConstructorTypeVariables()
+        {
+            Assert.AreEqual("test", ParseAndRun<string>("myVar.ToString()", "var myVar = System.Text.StringBuilder(); myVar.Append(\"test\");"));
+        }
     }
 }

@@ -221,7 +221,9 @@ namespace StepBro.Core.Parser
             }
             else
             {
-                m_variableInitializer = this.ResolveForGetOperation(new SBExpressionData(Expression.New(m_variableType.Type.GetConstructor(Type.EmptyTypes))), targetType: m_variableType);
+                string constructorTypeString = context.GetText().Split('(')[0];
+                TypeReference constructorType = ParseTypeString(constructorTypeString, false, true, context.Start);
+                m_variableInitializer = this.ResolveForGetOperation(new SBExpressionData(Expression.New(constructorType.Type.GetConstructor(Type.EmptyTypes))), targetType: m_variableType);
             }
 
             if (m_variableInitializer.IsError())
