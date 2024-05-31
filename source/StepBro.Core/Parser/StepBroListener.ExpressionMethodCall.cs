@@ -93,8 +93,8 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpParens([NotNull] SBP.ExpParensContext context)
         {
-            var left = m_expressionData.Pop();
             var argumentStack = m_arguments.Pop();
+            var left = m_expressionData.Pop();
             this.HandleParensExpression(context, false, left, argumentStack, null, null);
         }
 
