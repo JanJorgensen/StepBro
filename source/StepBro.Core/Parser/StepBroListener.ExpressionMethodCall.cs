@@ -159,7 +159,7 @@ namespace StepBro.Core.Parser
                         return;
 
                     case SBExpressionType.TypeReference:
-                        // This occurs when an object is created without a body, which uses a constructor, which is handled elsewhere.
+                        // This should not occur as constructors are handled elsewhere
                         m_errors.InternalError(left.Token.Line, left.Token.Column, "We have ended up an illegal place when using a constructor somehow. Please report issue!");
                         return;
 
