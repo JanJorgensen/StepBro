@@ -3,7 +3,9 @@ using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
@@ -221,9 +223,34 @@ namespace StepBro.Core.Parser
             }
             else
             {
-                string constructorTypeString = context.GetText().Split('(')[0];
+                // Split between the type and the '(' so we can have one part be the Type and another part the constructor
+                // Furthermore we trim the last ')' so the second part is only arguments separated by ','
+                string[] splitConstructor = context.GetText().TrimEnd(')').Split('(');
+
+                string constructorTypeString = splitConstructor[0];
                 TypeReference constructorType = ParseTypeString(constructorTypeString, false, true, context.Start);
-                m_variableInitializer = this.ResolveForGetOperation(new SBExpressionData(Expression.New(constructorType.Type.GetConstructor(Type.EmptyTypes))), targetType: m_variableType);
+
+                // Split the arguments by ',' so we have the arguments by themselves
+                string[] constructorArguments = splitConstructor[1].Split(',');
+
+                if (constructorArguments.Length == 0)
+                {
+                    m_variableInitializer = this.ResolveForGetOperation(new SBExpressionData(Expression.New(constructorType.Type.GetConstructor(Type.EmptyTypes))), targetType: m_variableType);
+                }
+                else
+                {
+                    List<Type> argumentTypes = new();
+                    List<SBExpressionData> arguments = m_arguments.Pop().ToList<SBExpressionData>();
+                    List<Expression> argumentExpressions = new List<Expression>();
+
+                    for (int i = arguments.Count - 1; i >= 0; i--)
+                    {
+                        argumentTypes.Add(ResolveForGetOperation(arguments[i]).DataType.Type);
+                        argumentExpressions.Add(ResolveForGetOperation(arguments[i]).ExpressionCode);
+                    }
+
+                    m_variableInitializer = this.ResolveForGetOperation(new SBExpressionData(Expression.New(constructorType.Type.GetConstructor(argumentTypes.ToArray()), argumentExpressions)), targetType: m_variableType);
+                }
             }
 
             if (m_variableInitializer.IsError())

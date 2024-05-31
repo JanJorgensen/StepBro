@@ -93,9 +93,12 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpParens([NotNull] SBP.ExpParensContext context)
         {
-            var argumentStack = m_arguments.Pop();
             var left = m_expressionData.Pop();
-            this.HandleParensExpression(context, false, left, argumentStack, null, null);
+            if (left.ReferencedType != SBExpressionType.TypeReference)
+            {
+                var argumentStack = m_arguments.Pop();
+                this.HandleParensExpression(context, false, left, argumentStack, null, null);
+            }
         }
 
         private enum ParansExpressionType
@@ -156,7 +159,8 @@ namespace StepBro.Core.Parser
                         return;
 
                     case SBExpressionType.TypeReference:
-                        // This occurs when an object is created without a body, which just uses default constructor, so this is fine.
+                        // This occurs when an object is created without a body, which uses a constructor, which is handled elsewhere.
+                        m_errors.InternalError(left.Token.Line, left.Token.Column, "We have ended up an illegal place when using a constructor somehow. Please report issue!");
                         return;
 
                     case SBExpressionType.Identifier:
