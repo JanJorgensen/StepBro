@@ -206,7 +206,11 @@ namespace StepBro.VISA
                     input = m_visaPipe.TryGetReceived();
 
                     // If we have received an answer that is not empty we break
-                    if (input != null && (!String.IsNullOrEmpty(System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line) || input.Item1 != nameof(VISABridge.Messages.Received)))
+                    if (input != null &&
+                        (!String.IsNullOrEmpty(System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line) ||
+                        input.Item1 != nameof(VISABridge.Messages.Received)) &&
+                        (System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line[^1] == '\n' ||
+                         System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line[^1] == '\r'))
                     {
                         break;
                     }
@@ -267,7 +271,11 @@ namespace StepBro.VISA
                 do
                 {
                     input = m_visaPipe.TryGetReceived();
-                    if (input != null)
+                    if (input != null && 
+                        (!String.IsNullOrEmpty(System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line) || 
+                        input.Item1 != nameof(VISABridge.Messages.Received)) && 
+                        (System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line[^1] == '\n' ||
+                         System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line[^1] == '\r'))
                     {
                         break;
                     }
