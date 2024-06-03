@@ -71,11 +71,13 @@ namespace StepBro.VISA
 
         public string FullName { get { return this.Name; } }
 
+        public TimeSpan ReadTimeout { get; set; } = TimeSpan.FromMilliseconds(2500);
+
         public bool Open([Implicit] ICallContext context = null, TimeSpan timeout = new TimeSpan())
         {
             if (timeout.Equals(new TimeSpan()))
             {
-                timeout = TimeSpan.FromMilliseconds(2500);
+                timeout = ReadTimeout;
             }
 
             string path = Assembly.GetExecutingAssembly().Location;
@@ -134,7 +136,7 @@ namespace StepBro.VISA
 
             started = m_visaPipe.IsConnected();
 
-            if (input.Item1 != nameof(VISABridge.Messages.SessionOpened))
+            if (input != null && input.Item1 != nameof(VISABridge.Messages.SessionOpened))
             {
                 context.ReportError("Received different message than SessionOpened.");
             }
@@ -150,7 +152,7 @@ namespace StepBro.VISA
         {
             if (timeout.Equals(new TimeSpan()))
             {
-                timeout = TimeSpan.FromMilliseconds(2500);
+                timeout = ReadTimeout;
             }
 
             m_visaPipe.Send(new VISABridge.Messages.CloseSession(m_resource));
@@ -168,7 +170,7 @@ namespace StepBro.VISA
                 Thread.Sleep(1);
             } while ((DateTime.Now - start) < timeout);
 
-            if (input.Item1 == nameof(VISABridge.Messages.ShortCommand))
+            if (input != null && input.Item1 == nameof(VISABridge.Messages.ShortCommand))
             {
                 var cmd = System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.ShortCommand>(input.Item2);
                 if (cmd != VISABridge.Messages.ShortCommand.SessionClosed)
@@ -190,7 +192,7 @@ namespace StepBro.VISA
         {
             if (timeout.Equals(new TimeSpan()))
             {
-                timeout = TimeSpan.FromMilliseconds(2500);
+                timeout = ReadTimeout;
             }
 
             string received = null;
@@ -256,7 +258,7 @@ namespace StepBro.VISA
         {
             if (timeout.Equals(new TimeSpan()))
             {
-                timeout = TimeSpan.FromMilliseconds(2500);
+                timeout = ReadTimeout;
             }
 
             string received = null;
@@ -297,7 +299,7 @@ namespace StepBro.VISA
         {
             if (timeout.Equals(new TimeSpan()))
             {
-                timeout = TimeSpan.FromMilliseconds(2500);
+                timeout = TimeSpan.FromSeconds(20); // List Available Resources can often take quite a bit longer than 2,5s
             }
 
             string[] instruments = null;
@@ -319,7 +321,7 @@ namespace StepBro.VISA
                     Thread.Sleep(1);
                 } while ((DateTime.Now - start) < timeout);
 
-                if (input.Item1 == nameof(VISABridge.Messages.ConnectedInstruments))
+                if (input != null && input.Item1 == nameof(VISABridge.Messages.ConnectedInstruments))
                 {
                     var data = System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.ConnectedInstruments>(input.Item2);
                     instruments = data.Instruments;
