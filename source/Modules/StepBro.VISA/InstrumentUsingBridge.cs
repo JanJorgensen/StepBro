@@ -3,14 +3,9 @@ using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.IPC;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace StepBro.VISA
 {
@@ -76,7 +71,7 @@ namespace StepBro.VISA
 
         public string FullName { get { return this.Name; } }
 
-        public bool Open([Implicit] ICallContext context = null)
+        public bool Open([Implicit] ICallContext context = null, int timeoutMs = 2500)
         {
             string path = Assembly.GetExecutingAssembly().Location;
             var folder = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path), ".."));
@@ -90,7 +85,7 @@ namespace StepBro.VISA
                 started = bridge.Start();
             }
 
-            int timeoutMs = 2500;
+            DateTime start = DateTime.Now;
             if (m_visaPipe == null || !m_visaPipe.IsConnected())
             {
                 m_visaPipe = Pipe.StartClient("StepBroVisaPipe", null);
@@ -109,19 +104,17 @@ namespace StepBro.VISA
 
                 if (started)
                 {
-                    while (!m_visaPipe.IsConnected() && timeoutMs > 0)
+                    while (!m_visaPipe.IsConnected() && (DateTime.Now - start).TotalMilliseconds < timeoutMs)
                     {
                         int waitTimeMs = 200;
-                        System.Threading.Thread.Sleep(waitTimeMs);
-                        timeoutMs -= waitTimeMs;
+                        Thread.Sleep(waitTimeMs);
                     }
-                    started = timeoutMs > 0;
+                    started = m_visaPipe.IsConnected();
                 }
             }
 
             m_visaPipe.Send(new VISABridge.Messages.OpenSession(m_resource));
 
-            timeoutMs = 2500;
             Tuple<string, string> input = null;
             do
             {
@@ -132,13 +125,9 @@ namespace StepBro.VISA
                 }
                 // Wait
                 Thread.Sleep(1);
-                timeoutMs--;
-            } while (timeoutMs > 0);
+            } while ((DateTime.Now - start).TotalMilliseconds < timeoutMs);
 
-            if (timeoutMs <= 0)
-            {
-                started = false;
-            }
+            started = m_visaPipe.IsConnected();
 
             if (input.Item1 != nameof(VISABridge.Messages.SessionOpened))
             {
@@ -152,12 +141,12 @@ namespace StepBro.VISA
             return started;
         }
 
-        public void Close([Implicit] ICallContext context = null)
+        public void Close([Implicit] ICallContext context = null, int timeoutMs = 2500)
         {
             m_visaPipe.Send(new VISABridge.Messages.CloseSession(m_resource));
 
-            int timeoutMs = 2500;
             Tuple<string, string> input = null;
+            DateTime start = DateTime.Now;
             do
             {
                 input = m_visaPipe.TryGetReceived();
@@ -167,8 +156,7 @@ namespace StepBro.VISA
                 }
                 // Wait
                 Thread.Sleep(1);
-                timeoutMs--;
-            } while (timeoutMs > 0);
+            } while ((DateTime.Now - start).TotalMilliseconds < timeoutMs);
 
             if (input.Item1 == nameof(VISABridge.Messages.ShortCommand))
             {
@@ -188,7 +176,7 @@ namespace StepBro.VISA
             }
         }
 
-        public string Query([Implicit] ICallContext context, string command, int timeout = 2500)
+        public string Query([Implicit] ICallContext context, string command, int timeoutMs = 2500)
         {
             string received = null;
             if (m_sessionOpened)
@@ -196,8 +184,8 @@ namespace StepBro.VISA
                 m_visaPipe.Send(new VISABridge.Messages.Send(command));
                 m_visaPipe.Send(VISABridge.Messages.ShortCommand.Receive);
 
-                int timeoutMs = timeout;
                 Tuple<string, string> input = null;
+                DateTime start = DateTime.Now;
                 do
                 {
                     input = m_visaPipe.TryGetReceived();
@@ -215,8 +203,7 @@ namespace StepBro.VISA
 
                     // Wait
                     Thread.Sleep(1);
-                    timeoutMs--;
-                } while (timeoutMs > 0);
+                } while ((DateTime.Now - start).TotalMilliseconds < timeoutMs);
 
                 if (input != null && input.Item1 == nameof(VISABridge.Messages.Received))
                 {
@@ -248,15 +235,15 @@ namespace StepBro.VISA
             }
         }
 
-        public string Read([Implicit] ICallContext context)
+        public string Read([Implicit] ICallContext context, int timeoutMs = 2500)
         {
             string received = null;
             if (m_sessionOpened)
             {
                 m_visaPipe.Send(VISABridge.Messages.ShortCommand.Receive);
 
-                int timeoutMs = 2500;
                 Tuple<string, string> input = null;
+                DateTime start = DateTime.Now;
                 do
                 {
                     input = m_visaPipe.TryGetReceived();
@@ -266,8 +253,7 @@ namespace StepBro.VISA
                     }
                     // Wait
                     Thread.Sleep(1);
-                    timeoutMs--;
-                } while (timeoutMs > 0);
+                } while ((DateTime.Now - start).TotalMilliseconds < timeoutMs);
 
                 if (input.Item1 == nameof(VISABridge.Messages.Received))
                 {
@@ -283,7 +269,7 @@ namespace StepBro.VISA
             return received;
         }
 
-        public static string[] ListAvailableResources([Implicit] ICallContext context)
+        public static string[] ListAvailableResources([Implicit] ICallContext context, int timeoutMs = 2500)
         {
             string[] instruments = null;
 
@@ -291,8 +277,8 @@ namespace StepBro.VISA
             {
                 m_visaPipe.Send(VISABridge.Messages.ShortCommand.GetInstrumentList);
 
-                int timeoutMs = 2500;
                 Tuple<string, string> input = null;
+                DateTime start = DateTime.Now;
                 do
                 {
                     input = m_visaPipe.TryGetReceived();
@@ -302,8 +288,7 @@ namespace StepBro.VISA
                     }
                     // Wait
                     Thread.Sleep(1);
-                    timeoutMs--;
-                } while (timeoutMs > 0);
+                } while ((DateTime.Now - start).TotalMilliseconds < timeoutMs);
 
                 if (input.Item1 == nameof(VISABridge.Messages.ConnectedInstruments))
                 {
