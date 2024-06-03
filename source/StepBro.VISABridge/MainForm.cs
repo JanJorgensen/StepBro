@@ -1,4 +1,5 @@
-﻿using NationalInstruments.Visa;
+﻿using Ivi.Visa;
+using NationalInstruments.Visa;
 using StepBro.Core.IPC;
 using StepBro.VISABridge.Messages;
 using System;
@@ -21,6 +22,7 @@ namespace StepBro.VISABridge
         private string m_lastResourceString = null;
         private MessageBasedSession m_session = null;
         private Pipe m_pipe = null;
+        private Stack<string> m_readList = new Stack<string>();
 
         private void ReceivedData(Tuple<string, string> received)
         {
@@ -43,17 +45,61 @@ namespace StepBro.VISABridge
                             // Should not happen
                             break;
                         case ShortCommand.Receive:
-                            byte[] readData = { };
-                            try
                             {
-                                readData = m_session.RawIO.Read();
+                                List<byte> readData = new List<byte>();
+                                ReadStatus status = ReadStatus.Unknown;
+                                try
+                                {
+                                    while (status == ReadStatus.Unknown || status == ReadStatus.MaximumCountReached)
+                                    {
+                                        readData.AddRange(m_session.RawIO.Read(1024, out status));
+                                    }
+                                }
+                                catch
+                                {
+                                    // Do nothing - Timeout occurred
+                                }
+                                m_pipe.Send(new Received(new UTF8Encoding(true).GetString(readData.ToArray())));
+                                break;
                             }
-                            catch
+                        case ShortCommand.ReadLine:
                             {
-                                // Do nothing - Timeout occurred
+                                if (m_readList.Count > 0)
+                                {
+                                    m_pipe.Send(new Received(m_readList.Pop()));
+                                }
+                                else
+                                {
+                                    List<byte> readData = new List<byte>();
+                                    ReadStatus status = ReadStatus.Unknown;
+                                    try
+                                    {
+                                        while (status == ReadStatus.Unknown || status == ReadStatus.MaximumCountReached)
+                                        {
+                                            readData.AddRange(m_session.RawIO.Read(1024, out status));
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        // Do nothing - Timeout occurred
+                                    }
+                                    string readDataString = new UTF8Encoding(true).GetString(readData.ToArray());
+                                    string[] readDataStringArray = readDataString.Split('\r', '\n');
+
+                                    // We push ":END" to the bottom of the stack to show the user that when they get here, there is nothing more
+                                    m_readList.Push(":END");
+                                    for (int i = readDataStringArray.Length - 1; i >= 0; i--)
+                                    {
+                                        if (!String.IsNullOrEmpty(readDataStringArray[i]))
+                                        {
+                                            m_readList.Push(readDataStringArray[i]);
+                                        }
+                                    }
+
+                                    m_pipe.Send(new Received(m_readList.Pop()));
+                                }
+                                break;
                             }
-                            m_pipe.Send(new Received(new UTF8Encoding(true).GetString(readData)));
-                            break;
                     }
                     break;
                 case nameof(OpenSession):
