@@ -71,8 +71,13 @@ namespace StepBro.VISA
 
         public string FullName { get { return this.Name; } }
 
-        public bool Open([Implicit] ICallContext context = null, int timeoutMs = 2500)
+        public bool Open([Implicit] ICallContext context = null, TimeSpan timeout = new TimeSpan())
         {
+            if (timeout.Equals(new TimeSpan()))
+            {
+                timeout = TimeSpan.FromMilliseconds(2500);
+            }
+
             string path = Assembly.GetExecutingAssembly().Location;
             var folder = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path), ".."));
 
@@ -104,7 +109,7 @@ namespace StepBro.VISA
 
                 if (started)
                 {
-                    while (!m_visaPipe.IsConnected() && (DateTime.Now - start).TotalMilliseconds < timeoutMs)
+                    while (!m_visaPipe.IsConnected() && (DateTime.Now - start) < timeout)
                     {
                         int waitTimeMs = 200;
                         Thread.Sleep(waitTimeMs);
@@ -125,7 +130,7 @@ namespace StepBro.VISA
                 }
                 // Wait
                 Thread.Sleep(1);
-            } while ((DateTime.Now - start).TotalMilliseconds < timeoutMs);
+            } while ((DateTime.Now - start) < timeout);
 
             started = m_visaPipe.IsConnected();
 
@@ -141,8 +146,13 @@ namespace StepBro.VISA
             return started;
         }
 
-        public void Close([Implicit] ICallContext context = null, int timeoutMs = 2500)
+        public void Close([Implicit] ICallContext context = null, TimeSpan timeout = new TimeSpan())
         {
+            if (timeout.Equals(new TimeSpan()))
+            {
+                timeout = TimeSpan.FromMilliseconds(2500);
+            }
+
             m_visaPipe.Send(new VISABridge.Messages.CloseSession(m_resource));
 
             Tuple<string, string> input = null;
@@ -156,7 +166,7 @@ namespace StepBro.VISA
                 }
                 // Wait
                 Thread.Sleep(1);
-            } while ((DateTime.Now - start).TotalMilliseconds < timeoutMs);
+            } while ((DateTime.Now - start) < timeout);
 
             if (input.Item1 == nameof(VISABridge.Messages.ShortCommand))
             {
@@ -176,8 +186,13 @@ namespace StepBro.VISA
             }
         }
 
-        public string Query([Implicit] ICallContext context, string command, int timeoutMs = 2500)
+        public string Query([Implicit] ICallContext context, string command, TimeSpan timeout = new TimeSpan())
         {
+            if (timeout.Equals(new TimeSpan()))
+            {
+                timeout = TimeSpan.FromMilliseconds(2500);
+            }
+
             string received = null;
             if (m_sessionOpened)
             {
@@ -203,10 +218,10 @@ namespace StepBro.VISA
 
                     // Wait
                     Thread.Sleep(1);
-                } while ((DateTime.Now - start).TotalMilliseconds < timeoutMs);
+                } while ((DateTime.Now - start) < timeout);
 
                 if (input != null && input.Item1 == nameof(VISABridge.Messages.Received))
-                {
+                {   
                     var data = System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2);
                     received = data.Line.TrimEnd('\n','\r',' ');
                 }
@@ -235,8 +250,13 @@ namespace StepBro.VISA
             }
         }
 
-        public string Read([Implicit] ICallContext context, int timeoutMs = 2500)
+        public string Read([Implicit] ICallContext context, TimeSpan timeout = new TimeSpan())
         {
+            if (timeout.Equals(new TimeSpan()))
+            {
+                timeout = TimeSpan.FromMilliseconds(2500);
+            }
+
             string received = null;
             if (m_sessionOpened)
             {
@@ -253,7 +273,7 @@ namespace StepBro.VISA
                     }
                     // Wait
                     Thread.Sleep(1);
-                } while ((DateTime.Now - start).TotalMilliseconds < timeoutMs);
+                } while ((DateTime.Now - start) < timeout);
 
                 if (input.Item1 == nameof(VISABridge.Messages.Received))
                 {
@@ -269,8 +289,13 @@ namespace StepBro.VISA
             return received;
         }
 
-        public static string[] ListAvailableResources([Implicit] ICallContext context, int timeoutMs = 2500)
+        public static string[] ListAvailableResources([Implicit] ICallContext context, TimeSpan timeout = new TimeSpan())
         {
+            if (timeout.Equals(new TimeSpan()))
+            {
+                timeout = TimeSpan.FromMilliseconds(2500);
+            }
+
             string[] instruments = null;
 
             if (m_sessionOpened)
@@ -288,7 +313,7 @@ namespace StepBro.VISA
                     }
                     // Wait
                     Thread.Sleep(1);
-                } while ((DateTime.Now - start).TotalMilliseconds < timeoutMs);
+                } while ((DateTime.Now - start) < timeout);
 
                 if (input.Item1 == nameof(VISABridge.Messages.ConnectedInstruments))
                 {
