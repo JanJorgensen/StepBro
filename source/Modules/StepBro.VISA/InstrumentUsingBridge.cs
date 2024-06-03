@@ -278,7 +278,7 @@ namespace StepBro.VISA
                 if (input.Item1 == nameof(VISABridge.Messages.Received))
                 {
                     var data = System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2);
-                    received = data.Line;
+                    received = data.Line.TrimEnd('\n', '\r', ' ');
                 }
             }
             else
