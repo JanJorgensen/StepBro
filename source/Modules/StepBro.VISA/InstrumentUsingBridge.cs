@@ -295,6 +295,47 @@ namespace StepBro.VISA
             return received;
         }
 
+        public string ReadLine([Implicit] ICallContext context, TimeSpan timeout = new TimeSpan())
+        {
+            if (timeout.Equals(new TimeSpan()))
+            {
+                timeout = ReadTimeout;
+            }
+
+            string received = null;
+            if (m_sessionOpened)
+            {
+                m_visaPipe.Send(VISABridge.Messages.ShortCommand.ReadLine);
+
+                Tuple<string, string> input = null;
+                DateTime start = DateTime.Now;
+                do
+                {
+                    input = m_visaPipe.TryGetReceived();
+                    if (input != null &&
+                        (!String.IsNullOrEmpty(System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line) ||
+                        input.Item1 != nameof(VISABridge.Messages.Received)))
+                    {
+                        break;
+                    }
+                    // Wait
+                    Thread.Sleep(1);
+                } while ((DateTime.Now - start) < timeout);
+
+                if (input != null && input.Item1 == nameof(VISABridge.Messages.Received))
+                {
+                    var data = System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2);
+                    received = data.Line.TrimEnd('\n', '\r', ' ');
+                }
+            }
+            else
+            {
+                context.ReportError("Session is not open.");
+            }
+
+            return received;
+        }
+
         public static string[] ListAvailableResources([Implicit] ICallContext context, TimeSpan timeout = new TimeSpan())
         {
             if (timeout.Equals(new TimeSpan()))
