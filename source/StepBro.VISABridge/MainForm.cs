@@ -1,4 +1,5 @@
-﻿using NationalInstruments.Visa;
+﻿using Ivi.Visa;
+using NationalInstruments.Visa;
 using StepBro.Core.IPC;
 using StepBro.VISABridge.Messages;
 using System;
@@ -43,16 +44,20 @@ namespace StepBro.VISABridge
                             // Should not happen
                             break;
                         case ShortCommand.Receive:
-                            byte[] readData = { };
+                            List<byte> readData = new List<byte>();
+                            ReadStatus status = ReadStatus.Unknown;
                             try
                             {
-                                readData = m_session.RawIO.Read();
+                                while (status == ReadStatus.Unknown || status == ReadStatus.MaximumCountReached)
+                                {
+                                    readData.AddRange(m_session.RawIO.Read(1024, out status));
+                                }
                             }
                             catch
                             {
                                 // Do nothing - Timeout occurred
                             }
-                            m_pipe.Send(new Received(new UTF8Encoding(true).GetString(readData)));
+                            m_pipe.Send(new Received(new UTF8Encoding(true).GetString(readData.ToArray())));
                             break;
                     }
                     break;

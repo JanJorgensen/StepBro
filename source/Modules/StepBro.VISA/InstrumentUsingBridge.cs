@@ -208,9 +208,7 @@ namespace StepBro.VISA
                     // If we have received an answer that is not empty we break
                     if (input != null &&
                         (!String.IsNullOrEmpty(System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line) ||
-                        input.Item1 != nameof(VISABridge.Messages.Received)) &&
-                        (System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line[^1] == '\n' ||
-                         System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line[^1] == '\r'))
+                        input.Item1 != nameof(VISABridge.Messages.Received)))
                     {
                         break;
                     }
@@ -273,9 +271,7 @@ namespace StepBro.VISA
                     input = m_visaPipe.TryGetReceived();
                     if (input != null && 
                         (!String.IsNullOrEmpty(System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line) || 
-                        input.Item1 != nameof(VISABridge.Messages.Received)) && 
-                        (System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line[^1] == '\n' ||
-                         System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2).Line[^1] == '\r'))
+                        input.Item1 != nameof(VISABridge.Messages.Received)))
                     {
                         break;
                     }
@@ -283,7 +279,7 @@ namespace StepBro.VISA
                     Thread.Sleep(1);
                 } while ((DateTime.Now - start) < timeout);
 
-                if (input.Item1 == nameof(VISABridge.Messages.Received))
+                if (input != null && input.Item1 == nameof(VISABridge.Messages.Received))
                 {
                     var data = System.Text.Json.JsonSerializer.Deserialize<VISABridge.Messages.Received>(input.Item2);
                     received = data.Line.TrimEnd('\n', '\r', ' ');
