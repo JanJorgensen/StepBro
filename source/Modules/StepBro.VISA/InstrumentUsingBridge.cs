@@ -186,17 +186,25 @@ namespace StepBro.VISA
             }
         }
 
-        public string Query([Implicit] ICallContext context, string command, TimeSpan timeout = new TimeSpan())
+        public string Query([Implicit] ICallContext context, string command, TimeSpan timeout = new TimeSpan(), TimeSpan waitTimeBetweenSendReceived = new TimeSpan())
         {
             if (timeout.Equals(new TimeSpan()))
             {
                 timeout = TimeSpan.FromMilliseconds(2500);
             }
 
+            if (waitTimeBetweenSendReceived.Equals(new TimeSpan()))
+            {
+                // This is necessary because long messages received from VISA can take a few milliseconds
+                // to be sent to StepBro.VISABridge, and we may receive only a small part of the message otherwise.
+                waitTimeBetweenSendReceived = TimeSpan.FromMilliseconds(5);
+            }
+
             string received = null;
             if (m_sessionOpened)
             {
                 m_visaPipe.Send(new VISABridge.Messages.Send(command));
+                Thread.Sleep(waitTimeBetweenSendReceived);
                 m_visaPipe.Send(VISABridge.Messages.ShortCommand.Receive);
 
                 Tuple<string, string> input = null;
