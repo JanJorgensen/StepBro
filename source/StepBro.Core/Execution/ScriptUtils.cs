@@ -298,7 +298,7 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static bool AppendTextToFile(string path, string text, bool addLineTerminator = true)
+        public static bool AppendTextToFile([Implicit] ICallContext context, string path, string text, bool reportErrors = false)
         {
             bool result = true;
 
@@ -306,18 +306,42 @@ namespace StepBro.Core.Execution
             {
                 try
                 {
-                    if (addLineTerminator)
-                    {
-                        sw.WriteLine(text);
-                    }
-                    else
-                    {
-                        sw.Write(text);
-                    }
+                    sw.Write(text);
                 }
-                catch
+                catch (Exception e)
                 {
                     // The write failed
+                    if (reportErrors)
+                    {
+                        context.ReportError("AppendTextToFile failed.", exception: e);
+                    }
+
+                    result = false;
+                }
+            }
+
+            return result;
+        }
+
+        [Public]
+        public static bool AppendLineToFile([Implicit] ICallContext context, string path, string text, bool reportErrors = false)
+        {
+            bool result = true;
+
+            using (StreamWriter sw = System.IO.File.AppendText(path))
+            {
+                try
+                {
+                    sw.WriteLine(text);
+                }
+                catch (Exception e)
+                {
+                    // The write failed
+                    if (reportErrors)
+                    {
+                        context.ReportError("AppendTextToFile failed.", exception: e);
+                    }
+
                     result = false;
                 }
             }
