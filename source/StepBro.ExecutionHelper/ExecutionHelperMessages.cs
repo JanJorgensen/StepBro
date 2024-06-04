@@ -11,7 +11,9 @@ namespace StepBro.ExecutionHelper.Messages
         None,
         CloseApplication,
         CloseConnection,
-        Acknowledge
+        Acknowledge,
+        SuspendAutosave,
+        ResumeAutosave
     }
 
     public class Error

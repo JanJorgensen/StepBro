@@ -320,7 +320,7 @@ namespace StepBro.Core.Test.Data
             Assert.AreEqual("Christian", found);
 
             found = reader.Await(null, "Anders", TimeSpan.FromSeconds(1));
-            Assert.AreEqual(null, found);
+            Assert.IsTrue(String.IsNullOrEmpty(found));
         }
 
         [TestMethod]

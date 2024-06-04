@@ -22,6 +22,7 @@ namespace StepBro.ConsoleSidekick.WinForms
         private bool m_forceResize = false;
         private bool m_moveToTop = true;
         private bool m_closeRequestedByConsole = false;
+        private bool m_shouldAttach = true;
         private Pipe m_pipe = null;
         private Rect m_lastConsolePosition = new Rect();
         private IExecutionAccess m_executingScript = null;
@@ -149,8 +150,16 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             //MessageBox.Show("Say when ...", "Waiting");
 
-            if (args.Length == 2)
+            if (args.Length >= 2)
             {
+                if (args.Length == 3)
+                {
+                    if (args[2].Equals("--no_attach"))
+                    {
+                        this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
+                        m_shouldAttach = false;
+                    }
+                }
                 m_consoleWindow = nint.Parse(args[1], System.Globalization.NumberStyles.HexNumber);
                 m_pipe = Pipe.StartClient("StepBroConsoleSidekick", args[1]);
                 m_pipe.OnConnectionClosed += (sender, e) =>
@@ -168,6 +177,7 @@ namespace StepBro.ConsoleSidekick.WinForms
                 return;
             }
 
+            this.UpdateToolbarVisibility();
             m_forceResize = true;
         }
 
@@ -673,7 +683,10 @@ namespace StepBro.ConsoleSidekick.WinForms
                 }
             }
 
-            MoveWindows();
+            if (m_shouldAttach)
+            {
+                MoveWindows();
+            }
         }
 
 
@@ -1097,6 +1110,10 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         private void UpdateToolbarVisibility()
         {
+            int missingHeight = toolStripMain.Bounds.Bottom - this.ClientRectangle.Height;
+
+            // We can not use Controls[0] here, as that could give an invisible toolbar
+            // so we search for the bottom-most visible toolbar
             StepBro.UI.WinForms.CustomToolBar.ToolBar bottomVisible = null; // Actually the first visible in the list, as toolbars are added in reverse order.
             if (m_customToolStrips.Count > 0)
             {
@@ -1111,11 +1128,11 @@ namespace StepBro.ConsoleSidekick.WinForms
                 }
                 if (bottomVisible != null)
                 {
-                    this.Height = bottomVisible.Bounds.Bottom + 2;
-                    return;
+                    missingHeight = bottomVisible.Bounds.Bottom - this.ClientRectangle.Height;
                 }
             }
-            this.Height = toolStripMain.Bounds.Bottom + 2;
+
+            this.Height += missingHeight;
         }
 
         public static string ScripExecutionButtonTitle(bool showFullName, string element, string partner, string objectVariable, object[] args)
@@ -1365,6 +1382,16 @@ namespace StepBro.ConsoleSidekick.WinForms
             var log = new Log() { LogType = Log.Type.Normal, Text = text };
             m_pipe.Send(log);
             System.Diagnostics.Debug.WriteLine("ILogger.LogError: " + text);
+        }
+
+        void ILogger.LogCommSent(string text)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ILogger.LogCommReceived(string text)
+        {
+            throw new NotImplementedException();
         }
 
         void ILogger.LogSystem(string text)

@@ -23,11 +23,11 @@ namespace StepBro.Core.Addons
             throw new NotImplementedException();
         }
 
-        public IOutputFormatter Create(bool createHighLevelLogSections, ITextWriter writer = null)
+        public IOutputFormatter Create(OutputFormatOptions options, ITextWriter writer = null)
         {
             if (writer != null)
             {
-                return new Outputter(writer);
+                return new Outputter(options, writer);
             }
             else
             {
@@ -37,14 +37,17 @@ namespace StepBro.Core.Addons
 
         private class Outputter : IOutputFormatter
         {
-            readonly ITextWriter m_writer;
-            public Outputter(ITextWriter writer)
+            private OutputFormatOptions m_options;
+            private ITextWriter m_writer;
+            
+            public Outputter(OutputFormatOptions options, ITextWriter writer)
             {
+                m_options = options;
                 m_writer = writer;
             }
             public bool WriteLogEntry(LogEntry entry, DateTime zero)
             {
-                var line = entry.ToClearText(zero, false);
+                var line = m_options.UseLocalTime ? entry.ToClearText(entry.Timestamp.ToLocalTime().AsHMSm(), false) : entry.ToClearText(zero, false);
                 if (line != null)
                 {
                     m_writer.WriteLine(line);
@@ -56,6 +59,20 @@ namespace StepBro.Core.Addons
             public void WriteReport(DataReport report)
             {
                 throw new NotImplementedException();
+            }
+
+            public void Dispose()
+            {
+                if (m_writer != null)
+                {
+                    m_writer.Dispose();
+                    m_writer = null;
+                }
+            }
+
+            public void Flush()
+            {
+                m_writer.Flush();
             }
         }
     }

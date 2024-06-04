@@ -156,7 +156,16 @@ namespace StepBro.Core.Parser
                         return;
 
                     case SBExpressionType.TypeReference:
-                        m_errors.SymanticError(context.Start.Line, -1, false, $"\"{left.ToString()}\" should access a ctor or Create-function, but is not implemented.");
+                        List<Type> argumentTypes = new List<Type>();
+                        List<Expression> argumentExpressions = new List<Expression>();
+
+                        foreach (SBExpressionData cArg in arguments)
+                        {
+                            argumentTypes.Add(ResolveForGetOperation(cArg).DataType.Type);
+                            argumentExpressions.Add(ResolveForGetOperation(cArg).ExpressionCode);
+                        }
+
+                        m_expressionData.Push(new SBExpressionData(Expression.New(left.DataType.Type.GetConstructor(argumentTypes.ToArray()), argumentExpressions)));
                         return;
 
                     case SBExpressionType.Identifier:
@@ -818,22 +827,24 @@ namespace StepBro.Core.Parser
                             }
                             else
                             {
-                                string prefix = method.Name;
+                                string prefix = null;
                                 if (!String.IsNullOrEmpty(instanceName))
                                 {
-                                    prefix = instanceName + "." + prefix;
+                                    prefix = instanceName;
                                 }
                                 else if (method.DeclaringType != typeof(ScriptUtils))
                                 {
-                                    prefix = method.DeclaringType.Name + "." + prefix;
+                                    prefix = method.DeclaringType.Name;
                                 }
+                                var objectRef = (Expression)Expression.Constant(null, typeof(object));
+                                if (instance != null) objectRef = instance;
                                 var contextCreator = Expression.Call(
                                     s_CreateMethodCallContext,
                                     contextReference,
-                                    Expression.Constant(prefix));
+                                    Expression.Constant(prefix, typeof(string)),
+                                    objectRef,
+                                    Expression.Constant(method.Name));
                                 suggestedAssignmentsOut.Add(new SBExpressionData(contextCreator));
-
-                                //suggestedAssignmentsOut.Add(new SBExpressionData(m_currentProcedure.ContextReference));
                             }
                             continue;
                         }
@@ -933,13 +944,20 @@ namespace StepBro.Core.Parser
                                 suggestedAssignmentsOut.Add(new SBExpressionData(Expression.New(ctor, Expression.Constant((string)(argPicker.Pick().Value)))));
                             }
                         }
+                        else if (argPicker.Current.DataType.Type == p.ParameterType)
+                        {
+                            var a = ResolveForGetOperation(argPicker.Pick(), (TypeReference)p.ParameterType);
+                            suggestedAssignmentsOut.Add(a);
+                            continue;   // next parameter
+                        }
                         else if (IsParameterAssignableFromArgument(p, argPicker.Current))
                         {
                             var a = ResolveForGetOperation(argPicker.Pick(), (TypeReference)p.ParameterType);
+                            matchScore -= 5;
                             if (p.ParameterType == typeof(object))
                             {
                                 a = a.NewExpressionCode(Expression.Convert(a.ExpressionCode, typeof(object)));
-                                matchScore -= 10;    // Matching an object parameter is not as good as matching the exact same type.
+                                matchScore -= 5;    // Matching an object parameter is not as good as matching the exact same type.
                             }
                             suggestedAssignmentsOut.Add(a);
                             continue;   // next parameter
@@ -947,25 +965,26 @@ namespace StepBro.Core.Parser
                         else if (argPicker.Current.DataType.Type == typeof(Int64) && p.ParameterType.IsPrimitiveNarrowableIntType())
                         {
                             suggestedAssignmentsOut.Add(new SBExpressionData(Expression.Convert(argPicker.Pick().ExpressionCode, p.ParameterType)));
+                            matchScore -= 5;
                             continue;   // next parameter
                         }
                         else if (argPicker.Current.DataType.Type == typeof(Double) && p.ParameterType == typeof(Single))
                         {
                             suggestedAssignmentsOut.Add(new SBExpressionData(Expression.Convert(argPicker.Pick().ExpressionCode, p.ParameterType)));
-                            matchScore -= 5;    // Matching a 'single' is not as good as matching the exact same type.
+                            matchScore -= 20;    // Matching a 'single' is not as good as matching the exact same type.
                             continue;   // next parameter
                         }
                         else if (argPicker.Current.DataType.IsInt() && (p.ParameterType == typeof(Double) || p.ParameterType == typeof(Single)))
                         {
                             suggestedAssignmentsOut.Add(new SBExpressionData(Expression.Convert(argPicker.Pick().ExpressionCode, p.ParameterType)));
-                            matchScore -= 20;    // Matching an integer is not as good as matching the exact same type.
+                            matchScore -= 40;    // Matching an integer is not as good as matching the exact same type.
                             continue;   // next parameter
                         }
                         else if (argPicker.Current.DataType.Type == typeof(string) && p.ParameterType == typeof(Identifier))
                         {
                             suggestedAssignmentsOut.Add(
                                 new SBExpressionData(Expression.New(typeof(Identifier).GetConstructor(new Type[] { typeof(string) }), argPicker.Pick().ExpressionCode)));
-                            matchScore -= 20;    // Matching an integer is not as good as matching the exact same type.
+                            matchScore -= 40;    // Matching an integer is not as good as matching the exact same type.
                             continue;   // next parameter
                         }
                         else

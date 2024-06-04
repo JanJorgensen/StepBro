@@ -67,7 +67,7 @@ namespace StepBro.ExecutionHelper
 
             m_executionHelperClosedEventHandler = (sender, e) =>
             {
-                context.Logger.LogError("VISA closed unexpectedly");
+                context.Logger.LogError("ExecutionHelper closed unexpectedly");
             };
 
             m_executionHelperPipe.OnConnectionClosed += m_executionHelperClosedEventHandler;
@@ -187,6 +187,18 @@ namespace StepBro.ExecutionHelper
             return true;
         }
 
+        public bool SuspendAutosave()
+        {
+            m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.SuspendAutosave);
+            return true;
+        }
+
+        public bool ResumeAutosave()
+        {
+            m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.ResumeAutosave);
+            return true;
+        }
+
         bool WaitForAcknowledge(ICallContext context)
         {
             bool result = false;
@@ -231,10 +243,13 @@ namespace StepBro.ExecutionHelper
 
         public void Dispose()
         {
-            m_executionHelperPipe.OnConnectionClosed -= m_executionHelperClosedEventHandler;
-            if (m_executionHelperPipe.IsConnected())
+            if (m_executionHelperPipe != null)
             {
-                m_executionHelperPipe.Dispose();
+                m_executionHelperPipe.OnConnectionClosed -= m_executionHelperClosedEventHandler;
+                if (m_executionHelperPipe.IsConnected())
+                {
+                    m_executionHelperPipe.Dispose();
+                }
             }
         }
     }

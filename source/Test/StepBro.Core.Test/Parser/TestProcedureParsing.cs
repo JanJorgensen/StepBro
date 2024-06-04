@@ -83,8 +83,7 @@ namespace StepBroCoreTest.Parser
             catch
             {}
             Assert.AreEqual("Unresolved identifier: \"testObj\".", FileBuilder.LastInstance.Errors[0].Message);
-            Assert.AreEqual("INTERNAL ERROR. Error parsing 'await' operation.", FileBuilder.LastInstance.Errors[1].Message);
-            Assert.AreEqual(2, FileBuilder.LastInstance.Errors.ErrorCount);
+            Assert.AreEqual(1, FileBuilder.LastInstance.Errors.ErrorCount);
         }
 
 

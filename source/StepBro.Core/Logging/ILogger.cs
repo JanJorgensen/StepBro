@@ -32,6 +32,8 @@ namespace StepBro.Core.Logging
         void LogError(string text);
         void LogUserAction(string text);
         void LogSystem(string text);
+        void LogCommSent(string text);
+        void LogCommReceived(string text);
     }
 
     public delegate string LoggerDynamicLocationSource();

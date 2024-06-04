@@ -741,7 +741,18 @@ namespace StepBro.Core.Execution
             {
                 if (context != null && context.LoggingEnabled && context.Logger.IsDebugging)
                 {
-                    context.Log($"Getting dynamic property '{name}' on object of type '{instance.GetType().Name}'.");
+                    if (instance is INameable)
+                    {
+                        context.LogDetail($"Getting dynamic property '{name}' on '{((INameable)instance).Name}'.");
+                    }
+                    else if (instance is INamedObject)
+                    {
+                        context.LogDetail($"Getting dynamic property '{name}' on '{((INamedObject)instance).FullName}'.");
+                    }
+                    else
+                    {
+                        context.LogDetail($"Getting dynamic property '{name}' on object of type '{instance.GetType().Name}'.");
+                    }
                 }
                 var value = instance.GetProperty(context.EnterNewContext(instance.GetType().Name, false), name);
                 return (TExpected)System.Convert.ChangeType(value, typeof(TExpected));
@@ -777,7 +788,18 @@ namespace StepBro.Core.Execution
             {
                 if (context != null && context.LoggingEnabled && context.Logger.IsDebugging)
                 {
-                    context.Log($"Setting dynamic property '{name}' on object of type '{instance.GetType().Name}'.");
+                    if (instance is INameable)
+                    {
+                        context.LogDetail($"Setting dynamic property '{name}' on '{((INameable)instance).Name}'.");
+                    }
+                    else if (instance is INamedObject)
+                    {
+                        context.LogDetail($"Setting dynamic property '{name}' on '{((INamedObject)instance).FullName}'.");
+                    }
+                    else
+                    {
+                        context.LogDetail($"Setting dynamic property '{name}' on object of type '{instance.GetType().Name}'.");
+                    }
                 }
                 instance.SetProperty(context.EnterNewContext(instance.GetType().Name, false), name, value);
             }
@@ -956,13 +978,22 @@ namespace StepBro.Core.Execution
             return false;
         }
 
-        public static ICallContext CreateMethodCallContext(IScriptCallContext context, string locationPrefix)
+        public static ICallContext CreateMethodCallContext(IScriptCallContext context, string locationStatic, object locationObject, string locationFixed)
         {
+            string location = (locationObject != null && locationObject is INamedObject) ? ((INamedObject)locationObject).ShortName : locationStatic;
+            if (String.IsNullOrEmpty(location))
+            {
+                location = locationFixed;
+            }
+            else
+            {
+                location = location + "." + locationFixed;
+            }
             var newContext = new CallContext(
                 (ScriptCallContext)context,
                 CallEntry.Subsequent,
                 false,
-                ((ScriptCallContext)context).GetDynamicLogLocation() + " " + locationPrefix);  // TODO: set the last two arguments.
+                ((ScriptCallContext)context).GetDynamicLogLocation() + " " + location);  // TODO: set the last two arguments.
             return newContext;
         }
     }
