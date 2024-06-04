@@ -297,6 +297,34 @@ namespace StepBro.Core.Execution
             }
         }
 
+        [Public]
+        public static bool AppendTextToFile(string path, string text, bool addLineTerminator = true)
+        {
+            bool result = true;
+
+            using (StreamWriter sw = System.IO.File.AppendText(path))
+            {
+                try
+                {
+                    if (addLineTerminator)
+                    {
+                        sw.WriteLine(text);
+                    }
+                    else
+                    {
+                        sw.Write(text);
+                    }
+                }
+                catch
+                {
+                    // The write failed
+                    result = false;
+                }
+            }
+
+            return result;
+        }
+
 
         #region LineReader
 
