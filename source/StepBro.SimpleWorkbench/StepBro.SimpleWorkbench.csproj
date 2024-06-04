@@ -27,4 +27,12 @@
     <ProjectReference Include="..\StepBro.UI.WinForms\StepBro.UI.WinForms.csproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <ActiproVersion>24.1.0</ActiproVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ActiproSoftware.Controls.WinForms" Version="$(ActiproVersion)" />
+  </ItemGroup>
+
 </Project>
