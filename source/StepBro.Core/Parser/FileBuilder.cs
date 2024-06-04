@@ -891,7 +891,7 @@ namespace StepBro.Core.Parser
                                 throw new NotImplementedException();
                         }
                     }
-                    file.LastTypeScan = DateTime.Now;
+                    file.LastTypeScan = DateTime.UtcNow;
                 }
             }
             #endregion
@@ -997,7 +997,7 @@ namespace StepBro.Core.Parser
                     }
 
                     totalErrors += file.Errors.ErrorCount;
-                    file.LastParsing = DateTime.Now;
+                    file.LastParsing = DateTime.UtcNow;
                     if (file.Errors.ErrorCount == 0)
                     {
                         file.LastSuccessfulParsing = file.LastParsing;

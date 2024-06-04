@@ -12,7 +12,7 @@ namespace StepBro.Core.Data.Report
         private readonly Verdict m_verdict;
 
         public ExpectResultData(string location, string id, string expected, string actual, Verdict verdict) :
-            base(DateTime.Now, ReportDataType.ExpectResult)
+            base(DateTime.UtcNow, ReportDataType.ExpectResult)
         {
             m_location = location;
             m_id = id;

@@ -4,7 +4,7 @@ namespace StepBro.Core.Data.Report
 {
     public class TableData : ReportData
     {
-        public TableData() : base(DateTime.Now, ReportDataType.DataTable)
+        public TableData() : base(DateTime.UtcNow, ReportDataType.DataTable)
         { }
 
         public void Headers(params string[] headers)

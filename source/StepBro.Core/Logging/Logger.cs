@@ -31,7 +31,7 @@ namespace StepBro.Core.Logging
 
             m_oldest = new LogEntry(
                 UniqueInteger.GetLongDirectly(),
-                DateTime.Now,
+                DateTime.UtcNow,
                 System.Threading.Thread.CurrentThread.ManagedThreadId,
                 location,
                 starttext);
@@ -141,7 +141,6 @@ namespace StepBro.Core.Logging
                 entry = entry.Next;
             }
             return entry;
-
         }
 
         public ILogHistory<LogEntry> GetHistory()

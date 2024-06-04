@@ -32,7 +32,7 @@ namespace StepBro.Core.Logging
         protected DateTime m_timestamp;
         public DebugLogEntry()
         {
-            m_timestamp = DateTime.Now;
+            m_timestamp = DateTime.UtcNow;
         }
 
         public DateTime Timestamp { get { return m_timestamp; } }
