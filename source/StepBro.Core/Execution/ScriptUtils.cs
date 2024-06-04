@@ -313,7 +313,7 @@ namespace StepBro.Core.Execution
                     // The write failed
                     if (reportErrors)
                     {
-                        context.ReportError("AppendTextToFile failed.", exception: e);
+                        context.ReportError("Appending to file failed.", exception: e);
                     }
 
                     result = false;
