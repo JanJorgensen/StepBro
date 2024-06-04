@@ -325,7 +325,6 @@ namespace StepBro.Core.Execution
             return result;
         }
 
-
         #region LineReader
 
         [Public]
