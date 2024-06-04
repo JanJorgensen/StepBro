@@ -16,7 +16,7 @@ namespace StepBro.Core.Data
 
         public static TimeSpan TimeTill(DateTime time)
         {
-            return DateTime.Now.TimeTill(time);
+            return DateTime.UtcNow.TimeTill(time);
         }
 
         public static TimeSpan Multiply(this TimeSpan ts, long multiplier)

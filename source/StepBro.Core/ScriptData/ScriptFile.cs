@@ -50,7 +50,7 @@ namespace StepBro.Core.ScriptData
         {
             m_wasLoadedByNamespace = false;
             m_errors = new ErrorCollector(this, false);
-            m_lastFileChange = DateTime.Now;   // TODO: take this from file timestamp.
+            m_lastFileChange = DateTime.UtcNow;   // TODO: take this from file timestamp.
             m_parserFileStream = filestream;
             m_folderShortcuts = new FolderShortcutCollection(FolderShortcutOrigin.ScriptFile);
             if (!string.IsNullOrEmpty(filepath))

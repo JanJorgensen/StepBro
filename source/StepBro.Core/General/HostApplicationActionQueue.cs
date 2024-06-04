@@ -180,7 +180,7 @@ namespace StepBro.Core.General
                     this.ChangeState(TaskExecutionState.Running);
                     try
                     {
-                        m_startTime = DateTime.Now;
+                        m_startTime = DateTime.UtcNow;
                         m_taskFunction(m_context);
                         this.ChangeState(TaskExecutionState.Ended);
                     }
@@ -190,7 +190,7 @@ namespace StepBro.Core.General
                     }
                     finally
                     {
-                        m_endTime = DateTime.Now;
+                        m_endTime = DateTime.UtcNow;
                     }
                 }
             }
@@ -199,13 +199,13 @@ namespace StepBro.Core.General
             {
                 if (m_task == null)
                 {
-                    var entry = DateTime.Now;
+                    var entry = DateTime.UtcNow;
                     if (timeout == TimeSpan.MinValue)
                     {
                         while (m_task == null)
                         {
                             Thread.Sleep(10);
-                            //if (DateTime.Now > (entry + timeout)) throw new TimeoutException();
+                            //if (DateTime.UtcNow > (entry + timeout)) throw new TimeoutException();
                         }
                         return m_task.Wait(timeout);
                     }
@@ -217,13 +217,13 @@ namespace StepBro.Core.General
                     }
                     else
                     {
-                        var now = DateTime.Now;
+                        var now = DateTime.UtcNow;
                         while (m_task == null)
                         {
-                            if (DateTime.Now > (entry + timeout)) return false;
+                            if (DateTime.UtcNow > (entry + timeout)) return false;
                             Thread.Sleep(10);
                         }
-                        return m_task.Wait(DateTime.Now.TimeTill(entry + timeout));
+                        return m_task.Wait(DateTime.UtcNow.TimeTill(entry + timeout));
                     }
                 }
                 else

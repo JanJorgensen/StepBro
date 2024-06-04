@@ -88,7 +88,7 @@ namespace StepBro.Core.Logging
 
         public ILoggerScope LogEntering(string location, string text)
         {
-            var entry = m_logger.Log(m_scopeStartEntry, LogEntry.Type.Pre, DateTime.Now, m_threadID, location, text);
+            var entry = m_logger.Log(m_scopeStartEntry, LogEntry.Type.Pre, DateTime.UtcNow, m_threadID, location, text);
             return new LoggerScope(m_logger, entry);
         }
 
@@ -101,7 +101,7 @@ namespace StepBro.Core.Logging
 
         public ILoggerScope LogEntering(bool isHighLevel, string location, string text, LoggerDynamicLocationSource dynamicLocation)
         {
-            var entry = m_logger.Log(m_scopeStartEntry, isHighLevel ? LogEntry.Type.PreHighLevel : LogEntry.Type.Pre, DateTime.Now, m_threadID, location, text);
+            var entry = m_logger.Log(m_scopeStartEntry, isHighLevel ? LogEntry.Type.PreHighLevel : LogEntry.Type.Pre, DateTime.UtcNow, m_threadID, location, text);
             return new LoggerScope(m_logger, entry, dynamicLocation: dynamicLocation);
         }
 
@@ -161,7 +161,7 @@ namespace StepBro.Core.Logging
 
         internal LogEntry Log(LogEntry.Type type, string text)
         {
-            return m_logger.Log(m_scopeStartEntry, type, DateTime.Now, m_threadID, (type != LogEntry.Type.Post) ? m_dynamicLocation() : null, text);
+            return m_logger.Log(m_scopeStartEntry, type, DateTime.UtcNow, m_threadID, (type != LogEntry.Type.Post) ? m_dynamicLocation() : null, text);
         }
 
         public void EnteredParallelTask(string text)

@@ -127,12 +127,12 @@ namespace StepBro.Core.Execution
         {
             var logger = m_logger.LogEntering(true, "Script Execution", (m_targetTitle != null) ? m_targetTitle : m_targetProcedure.FullName, null);
             m_taskContext.Setup(logger, ContextLogOption.Normal, m_statusUpdateRoot, m_filesManager, m_taskManager);
-            m_start = DateTime.Now;
+            m_start = DateTime.UtcNow;
             this.SetState(TaskExecutionState.Running);
 
             m_returnValue = m_taskContext.CallProcedure(m_targetProcedure as IFileProcedure, m_arguments);
             this.SetState((m_taskContext.ExecutionExeception == null) ? TaskExecutionState.Ended : TaskExecutionState.EndedByException);
-            m_end = DateTime.Now;
+            m_end = DateTime.UtcNow;
             m_statusUpdateRoot.Dispose();
             logger.LogExit("Script execution ended. " + m_taskContext.Result.ResultText(m_returnValue));
         }

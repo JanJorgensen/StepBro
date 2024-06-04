@@ -350,7 +350,7 @@ namespace StepBro.Cmd
                                     if (keyInfo.Key == ConsoleKey.C)
                                     {
                                         Console.Clear();
-                                        zeroTime = DateTime.Now;
+                                        zeroTime = DateTime.UtcNow;
                                     }
                                     else if (keyInfo.Key == ConsoleKey.X)
                                     {
@@ -371,7 +371,7 @@ namespace StepBro.Cmd
                                         {
                                             case Sidekick.Messages.ShortCommand.ClearDisplay:
                                                 Console.Clear();
-                                                zeroTime = DateTime.Now;
+                                                zeroTime = DateTime.UtcNow;
                                                 break;
                                             case StepBro.Sidekick.Messages.ShortCommand.RequestClose:
                                                 m_next.Enqueue(StateOrCommand.Exit);
