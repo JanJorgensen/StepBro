@@ -219,10 +219,6 @@ namespace StepBro.Core.Parser
             {
                 m_variableInitializer = this.ResolveForGetOperation(stack.Pop(), targetType: m_variableType);
             }
-            else
-            {
-                m_variableInitializer = this.ResolveForGetOperation(new SBExpressionData(Expression.New(m_variableType.Type.GetConstructor(Type.EmptyTypes))), targetType: m_variableType);
-            }
 
             if (m_variableInitializer.IsError())
             {

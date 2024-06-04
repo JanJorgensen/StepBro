@@ -297,6 +297,37 @@ namespace StepBro.Core.Execution
             }
         }
 
+        [Public]
+        public static bool AppendTextToFile([Implicit] ICallContext context, string path, string text, bool reportErrors = false)
+        {
+            bool result = true;
+
+            using (StreamWriter sw = System.IO.File.AppendText(path))
+            {
+                try
+                {
+                    sw.Write(text);
+                }
+                catch (Exception e)
+                {
+                    // The write failed
+                    if (reportErrors)
+                    {
+                        context.ReportError("Appending to file failed.", exception: e);
+                    }
+
+                    result = false;
+                }
+            }
+
+            return result;
+        }
+
+        [Public]
+        public static bool AppendLineToFile([Implicit] ICallContext context, string path, string text, bool reportErrors = false)
+        {
+            return AppendTextToFile(context, path, text + Environment.NewLine, reportErrors);
+        }
 
         #region LineReader
 

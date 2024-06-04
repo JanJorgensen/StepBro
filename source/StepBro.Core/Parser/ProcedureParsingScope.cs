@@ -33,6 +33,8 @@ namespace StepBro.Core.Parser
 
         public LabelTarget BreakLabel { get; private set; } = null;
         public LabelTarget ContinueLabel { get; private set; } = null;
+        public bool ForConditionExists { get; set; } = false;
+        public bool ForUpdateExists { get; set; } = false;
         public Expression UsingVariableAssignment { get; set; }
 
         public void SetupForLoop()

@@ -11,7 +11,8 @@ namespace StepBro.VISABridge.Messages
         None,
         GetInstrumentList,
         SessionClosed,
-        Receive
+        Receive,
+        ReadLine
     }
 
     public class ConnectedInstruments

@@ -543,11 +543,29 @@ namespace StepBro.Core.Parser
             m_forCondition.Push(m_expressionData.Peek().Pop());
 
             m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-loop", ProcedureParsingScope.ScopeType.Block));
+            m_scopeStack.Peek().ForConditionExists = true;
         }
 
         public override void EnterForUpdate([NotNull] SBP.ForUpdateContext context)
         {
             m_expressionData.PushStackLevel("for-update");
+
+            // If no conditions are present, we create the scopestack here
+            if (!m_scopeStack.Peek().ForConditionExists)
+            {
+                m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-loop", ProcedureParsingScope.ScopeType.Block));
+            }
+
+            m_scopeStack.Peek().ForUpdateExists = true;
+        }
+
+        public override void ExitForControl([NotNull] ForControlContext context)
+        {
+            // If no conditions and no updates are present, we create the scopestack here
+            if (!m_scopeStack.Peek().ForConditionExists && !m_scopeStack.Peek().ForUpdateExists)
+            {
+                m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-loop", ProcedureParsingScope.ScopeType.Block));
+            }
         }
 
         public override void ExitForStatement([NotNull] SBP.ForStatementContext context)
@@ -558,11 +576,11 @@ namespace StepBro.Core.Parser
             var forInitVariables = m_forInitVariables.Pop();
 
             // Contains the expressions in the for-update part of the for-loop
-            var forUpdateExpressions = m_expressionData.PopStackLevel();
+            var forUpdateExpressions = (forLoopScope.ForUpdateExists ? m_expressionData.PopStackLevel() : new());
             var forInitExpressions = m_expressionData.PopStackLevel();
 
             // Contains the part of the for-loop that contains the condition
-            var condition = m_forCondition.Pop();
+            var condition = (forLoopScope.ForConditionExists ? m_forCondition.Pop() : new SBExpressionData(Expression.Constant(true)));
 
             var subStatements = forLoopScope.GetSubStatements();
             var attributes = forLoopScope.GetAttributes();
