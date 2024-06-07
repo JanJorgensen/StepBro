@@ -717,6 +717,80 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
+        public void FileParsing_TypeDefUseConstructorNarrowTwoAbstractions()
+        {
+            string f1 =
+                """
+                using System;
+
+                type TupleInts : Tuple<int, int>;
+                type TupleTest : TupleInts;
+
+                procedure TupleInts test()
+                {
+                    TupleInts a = testTuple();
+                    return a;
+                }
+
+                function TupleInts testTuple()
+                {
+                    TupleInts toReturn = TupleTest(5, 7);
+                    return toReturn;
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var typedef = files[0].ListElements().FirstOrDefault(p => p.Name == "TupleInts");
+            Assert.IsNotNull(typedef);
+            Assert.IsNotNull(typedef.DataType);
+            var procedure = files[0].ListElements().FirstOrDefault(p => p.Name == "test") as IFileProcedure;
+            Assert.IsNotNull(procedure);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            var result = taskContext.CallProcedure(procedure);
+            Assert.AreEqual(5, ((Tuple<long, long>)result).Item1);
+            Assert.AreEqual(7, ((Tuple<long, long>)result).Item2);
+        }
+
+        [TestMethod]
+        public void FileParsing_TypeDefUseConstructorBroadenTwoAbstractions()
+        {
+            string f1 =
+                """
+                using System;
+
+                type TupleInts : Tuple<int, int>;
+                type TupleTest : TupleInts;
+
+                procedure TupleInts test()
+                {
+                    TupleInts a = testTuple();
+                    return a;
+                }
+
+                function TupleInts testTuple()
+                {
+                    TupleTest toReturn = TupleInts(5, 7);
+                    return toReturn;
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+
+            // When we are assigning a broad type to a specific type we expect an error, like if we have
+            // List<int> a = new List<object>();
+            // We expect an error, this is the case in the code above.
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);
+            Assert.IsTrue(files[0].Errors[0].Message.Contains("incompatible type"));
+        }
+
+        [TestMethod]
         public void FileParsing_TypeDefUseConstructorTwoAbstractionsError()
         {
             string f1 =
