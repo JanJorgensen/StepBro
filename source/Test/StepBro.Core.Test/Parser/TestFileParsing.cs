@@ -774,6 +774,8 @@ namespace StepBroCoreTest.Parser
 
                 function TupleInts testTuple()
                 {
+                    // Here we try to assign TupleInts to a TupleTest variable, using a constructor
+                    // This is an error because TupleTest is narrower than TupleInts
                     TupleTest toReturn = TupleInts(5, 7);
                     return toReturn;
                 }
@@ -802,6 +804,8 @@ namespace StepBroCoreTest.Parser
 
                 procedure TupleTest test()
                 {
+                    // Here we try to assign TupleInts to a TupleTest variable using a function call
+                    // This is an error because TupleTest is narrower than TupleInts
                     TupleTest a = testTuple();
                     return a;
                 }
