@@ -478,9 +478,9 @@ namespace StepBroCoreTest.Parser
         {
             var f1 = new StringBuilder();
             f1.AppendLine("using MyTuple = System.Tuple<string, int>;");
-            f1.AppendLine("procedure string TopGetValue() {");
+            f1.AppendLine("procedure MyTuple TopGetValue() {");
             f1.AppendLine("    var data = MyTuple(\"Wombat\", 17);");
-            f1.AppendLine("    return data.Item1;");
+            f1.AppendLine("    return data;");
             f1.AppendLine("}");
 
             var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
@@ -494,7 +494,8 @@ namespace StepBroCoreTest.Parser
             var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
 
             var result = taskContext.CallProcedure(proc);
-            Assert.AreEqual("Bent", result);
+            Assert.AreEqual("Wombat", ((Tuple<string, long>)result).Item1);
+            Assert.AreEqual(17, ((Tuple<string, long>)result).Item2);
         }
 
         [TestMethod]
