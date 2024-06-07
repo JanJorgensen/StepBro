@@ -672,7 +672,7 @@ namespace StepBro.Core.Parser
             }
             else
             {
-                var type = left.NamespaceList.ListTypes(false).FirstOrDefault(ti => ti.Name == rightString);
+                var type = left.NamespaceList.ListTypes(false).FirstOrDefault(ti => ti.Name == rightString && !(ti.IsAbstract && ti.IsSealed));
                 if (type != null)
                 {
                     return new SBExpressionData(HomeType.Immediate, SBExpressionType.TypeReference, (TypeReference)type, token: right.Token);
