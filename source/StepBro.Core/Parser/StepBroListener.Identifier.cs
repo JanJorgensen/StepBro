@@ -672,6 +672,7 @@ namespace StepBro.Core.Parser
             }
             else
             {
+                // If the class is static we will not be adding it (At least for now) - Static classes have been giving issues in other cases and does not seem to be used
                 var type = left.NamespaceList.ListTypes(false).FirstOrDefault(ti => ti.Name == rightString && !(ti.IsAbstract && ti.IsSealed));
                 if (type != null)
                 {
