@@ -165,7 +165,14 @@ namespace StepBro.Core.Parser
                             argumentExpressions.Add(ResolveForGetOperation(cArg).ExpressionCode);
                         }
 
-                        m_expressionData.Push(new SBExpressionData(Expression.New(left.DataType.Type.GetConstructor(argumentTypes.ToArray()), argumentExpressions)));
+                        var expressionData = new SBExpressionData(Expression.New(left.DataType.Type.GetConstructor(argumentTypes.ToArray()), argumentExpressions));
+
+                        // left.DataType always contains the correct datatype.
+                        // We could have a typedef which means the constructor will utilize the base of the typedef making the constructors type not always the correct
+                        // one, so we override the datatype to ensure it is always correct.
+                        expressionData.DataType = left.DataType;
+
+                        m_expressionData.Push(expressionData);
                         return;
 
                     case SBExpressionType.Identifier:
