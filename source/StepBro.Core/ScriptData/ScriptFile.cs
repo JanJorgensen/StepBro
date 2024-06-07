@@ -793,6 +793,7 @@ namespace StepBro.Core.ScriptData
                             }
                             foreach (var type in ns.ListTypes(false))
                             {
+                                // If the class is static we will not be adding it (At least for now) - Static classes have been giving issues in other cases
                                 if (!(type.IsAbstract && type.IsSealed))
                                 {
                                     this.AddRootIdentifier(type.Name, new IdentifierInfo(type.Name, type.FullName, IdentifierType.DotNetType, new TypeReference(type), null));
