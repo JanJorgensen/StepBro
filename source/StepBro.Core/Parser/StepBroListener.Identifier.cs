@@ -672,7 +672,8 @@ namespace StepBro.Core.Parser
             }
             else
             {
-                var type = left.NamespaceList.ListTypes(false).FirstOrDefault(ti => ti.Name == rightString);
+                // If the class is static we will not be adding it (At least for now) - Static classes have been giving issues in other cases and does not seem to be used
+                var type = left.NamespaceList.ListTypes(false).FirstOrDefault(ti => ti.Name == rightString && !(ti.IsAbstract && ti.IsSealed));
                 if (type != null)
                 {
                     return new SBExpressionData(HomeType.Immediate, SBExpressionType.TypeReference, (TypeReference)type, token: right.Token);
