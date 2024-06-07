@@ -447,7 +447,7 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        public void FileParsing_TypeDefGeneric()
+        public void FileParsing_TypeDefGenericList()
         {
             var f1 = new StringBuilder();
             f1.AppendLine("using StringList = System.Collections.Generic.List<string>;");
@@ -465,6 +465,30 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual("topfile.sbs", files[0].FileName);
             Assert.AreEqual(0, files[0].Errors.ErrorCount);
             var proc = files[0].ListElements().First(p => p.Name == "MyProc") as IFileProcedure;
+            Assert.IsNotNull(proc);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            var result = taskContext.CallProcedure(proc);
+            Assert.AreEqual("Bent", result);
+        }
+
+        [TestMethod]
+        public void FileParsing_TypeDefGenericTuple()
+        {
+            var f1 = new StringBuilder();
+            f1.AppendLine("using MyTuple = System.Tuple<string, int>;");
+            f1.AppendLine("procedure string TopGetValue() {");
+            f1.AppendLine("    var data = MyTuple(\"Wombat\", 17);");
+            f1.AppendLine("    return data.Item1;");
+            f1.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("topfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual("topfile.sbs", files[0].FileName);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var proc = files[0].ListElements().First(p => p.Name == "TopGetValue") as IFileProcedure;
             Assert.IsNotNull(proc);
 
             var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
