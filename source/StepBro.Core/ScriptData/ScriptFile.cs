@@ -852,7 +852,7 @@ namespace StepBro.Core.ScriptData
             else
             {
                 // If any of the identifiers already in the list is the same as info, we do not add that to the list
-                if (!m_rootIdentifiers[name].Any(ident => ident == info))
+                if (m_rootIdentifiers[name].All(ident => ident != info))
                 {
                     m_rootIdentifiers[name].Add(info);
                 }
