@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Threading;
 using SharpCompress.Common;
 using StepBro.Core;
@@ -327,6 +329,50 @@ namespace StepBro.Core.Execution
         public static bool AppendLineToFile([Implicit] ICallContext context, string path, string text, bool reportErrors = false)
         {
             return AppendTextToFile(context, path, text + Environment.NewLine, reportErrors);
+        }
+
+        [Public]
+        public static bool SendMail([Implicit] ICallContext context, string from, string to, string mail = null, string password = null, string body = "StepBro has sent you a message", string subject = "Mail from StepBro", string smtpServer = "smtp.gmail.com", int smtpPort = 587, bool enableSsl = true)
+        {
+            bool result = true;
+
+            using (var message = new MailMessage())
+            {
+                message.To.Add(new MailAddress(to, to));
+                message.From = new MailAddress(from, from);
+                message.Subject = subject;
+                message.Body = body;
+                message.IsBodyHtml = false; // change to true if body msg is in html
+
+                using (var client = new SmtpClient(smtpServer))
+                {
+                    if (mail == null || password == null)
+                    {
+                        client.UseDefaultCredentials = true;
+                    }
+                    else
+                    {
+                        client.UseDefaultCredentials = false;
+                        client.Credentials = new NetworkCredential(mail, password);
+                    }
+                    
+                    client.Port = smtpPort;
+                    client.EnableSsl = enableSsl;
+
+                    try
+                    {
+                        client.Send(message); // Email sent
+                    }
+                    catch (Exception e)
+                    {
+                        // Email not sent, log exception
+                        context.ReportError(e.Message);
+                        result = false;
+                    }
+                }
+            }
+
+            return result;
         }
 
         #region LineReader
