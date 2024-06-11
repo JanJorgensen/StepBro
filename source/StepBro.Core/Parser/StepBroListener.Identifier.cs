@@ -382,9 +382,15 @@ namespace StepBro.Core.Parser
                 {
                     if (identifiers.Count > 1)
                     {
-                        string fileName = (m_file.FileName != null ? m_file.FileName : "");
-                        int lineNumber = (token != null ? token.Line : -1);
-                        throw new ParsingErrorException(fileName, lineNumber, identifier, $"More than one alternative.");
+                        foreach(IIdentifierInfo ident in identifiers)
+                        {
+                            if (ident != identifiers[0])
+                            {
+                                string fileName = (m_file.FileName != null ? m_file.FileName : "");
+                                int lineNumber = (token != null ? token.Line : -1);
+                                throw new ParsingErrorException(fileName, lineNumber, identifier, $"More than one alternative.");
+                            }
+                        }
                     }
                     return this.IdentifierToExpressionData(identifiers[0], token);
                 }
