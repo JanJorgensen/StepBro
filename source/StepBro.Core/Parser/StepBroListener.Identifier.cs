@@ -384,6 +384,9 @@ namespace StepBro.Core.Parser
                     {
                         foreach(IIdentifierInfo ident in identifiers)
                         {
+                            // Check if the identifier is identical to the first identifier.
+                            // If they are not identical, then there are at least 2 different definitions of this identifier
+                            // and we can conclude there is an error.
                             if (ident != identifiers[0])
                             {
                                 string fileName = (m_file.FileName != null ? m_file.FileName : "");
