@@ -331,61 +331,6 @@ namespace StepBro.Core.Execution
             return AppendTextToFile(context, path, text + Environment.NewLine, reportErrors);
         }
 
-        [Public]
-        public static bool SendMail(
-            [Implicit] ICallContext context,
-            string shownFromMailAddress,
-            string toMailAddress,
-            string accountMailAddress = null,
-            string accountPassword = null,
-            string bodyOfMessage = "StepBro has sent you a message",
-            string subjectOfMessage = "Mail from StepBro",
-            bool isBodyHTML = false,
-            string smtpServer = "smtp-mail.outlook.com",
-            int smtpPort = 587,
-            bool enableSsl = true)
-        {
-            bool result = true;
-
-            using (var message = new MailMessage())
-            {
-                message.To.Add(new MailAddress(toMailAddress, toMailAddress));
-                message.From = new MailAddress(shownFromMailAddress, shownFromMailAddress);
-                message.Subject = subjectOfMessage;
-                message.Body = bodyOfMessage;
-                message.IsBodyHtml = isBodyHTML; // change to true if body msg is in html
-
-                using (var client = new SmtpClient(smtpServer))
-                {
-                    if (accountMailAddress == null || accountPassword == null)
-                    {
-                        client.UseDefaultCredentials = true;
-                    }
-                    else
-                    {
-                        client.UseDefaultCredentials = false;
-                        client.Credentials = new NetworkCredential(accountMailAddress, accountPassword);
-                    }
-                    
-                    client.Port = smtpPort;
-                    client.EnableSsl = enableSsl;
-
-                    try
-                    {
-                        client.Send(message); // Email sent
-                    }
-                    catch (Exception e)
-                    {
-                        // Email not sent, log exception
-                        context.ReportError(e.Message);
-                        result = false;
-                    }
-                }
-            }
-
-            return result;
-        }
-
         #region LineReader
 
         [Public]
