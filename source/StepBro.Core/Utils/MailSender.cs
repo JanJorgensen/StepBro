@@ -30,6 +30,18 @@ namespace StepBro.Core.Utils
             ToMailAddress = toMailAddress;
         }
 
+        public MailSender(string shownFromMailAddress, string toMailAddress, string accountPassword) : this(shownFromMailAddress, toMailAddress)
+        {
+            AccountMailAddress = shownFromMailAddress;
+            AccountPassword = accountPassword;
+        }
+
+        public MailSender(string shownFromMailAddress, string toMailAddress, string accountMailAddress, string accountPassword) : this(shownFromMailAddress, toMailAddress)
+        {
+            AccountMailAddress = accountMailAddress;
+            AccountPassword = accountPassword;
+        }
+
         public MailSender(
             string shownFromMailAddress,
             string toMailAddress,
