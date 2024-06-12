@@ -336,8 +336,8 @@ namespace StepBro.Core.Execution
             [Implicit] ICallContext context,
             string shownFromMailAddress,
             string toMailAddress,
-            string actualFromMailAddress = null,
-            string mailPassword = null,
+            string accountMailAddress = null,
+            string accountPassword = null,
             string bodyOfMessage = "StepBro has sent you a message",
             string subjectOfMessage = "Mail from StepBro",
             bool isBodyHTML = false,
@@ -357,14 +357,14 @@ namespace StepBro.Core.Execution
 
                 using (var client = new SmtpClient(smtpServer))
                 {
-                    if (actualFromMailAddress == null || mailPassword == null)
+                    if (accountMailAddress == null || accountPassword == null)
                     {
                         client.UseDefaultCredentials = true;
                     }
                     else
                     {
                         client.UseDefaultCredentials = false;
-                        client.Credentials = new NetworkCredential(actualFromMailAddress, mailPassword);
+                        client.Credentials = new NetworkCredential(accountMailAddress, accountPassword);
                     }
                     
                     client.Port = smtpPort;
