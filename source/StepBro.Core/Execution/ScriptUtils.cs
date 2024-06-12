@@ -332,7 +332,7 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static bool SendMail([Implicit] ICallContext context, string from, string to, string mail = null, string password = null, string body = "StepBro has sent you a message", string subject = "Mail from StepBro", string smtpServer = "smtp.gmail.com", int smtpPort = 587, bool enableSsl = true)
+        public static bool SendMail([Implicit] ICallContext context, string from, string to, string mail = null, string password = null, string body = "StepBro has sent you a message", string subject = "Mail from StepBro", string smtpServer = "smtp-mail.outlook.com", int smtpPort = 587, bool enableSsl = true)
         {
             bool result = true;
 
