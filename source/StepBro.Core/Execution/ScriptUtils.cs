@@ -332,28 +332,39 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static bool SendMail([Implicit] ICallContext context, string from, string to, string mail = null, string password = null, string body = "StepBro has sent you a message", string subject = "Mail from StepBro", string smtpServer = "smtp-mail.outlook.com", int smtpPort = 587, bool enableSsl = true)
+        public static bool SendMail(
+            [Implicit] ICallContext context,
+            string shownFromMailAddress,
+            string toMailAddress,
+            string actualFromMailAddress = null,
+            string mailPassword = null,
+            string bodyOfMessage = "StepBro has sent you a message",
+            string subjectOfMessage = "Mail from StepBro",
+            bool isBodyHTML = false,
+            string smtpServer = "smtp-mail.outlook.com",
+            int smtpPort = 587,
+            bool enableSsl = true)
         {
             bool result = true;
 
             using (var message = new MailMessage())
             {
-                message.To.Add(new MailAddress(to, to));
-                message.From = new MailAddress(from, from);
-                message.Subject = subject;
-                message.Body = body;
-                message.IsBodyHtml = false; // change to true if body msg is in html
+                message.To.Add(new MailAddress(toMailAddress, toMailAddress));
+                message.From = new MailAddress(shownFromMailAddress, shownFromMailAddress);
+                message.Subject = subjectOfMessage;
+                message.Body = bodyOfMessage;
+                message.IsBodyHtml = isBodyHTML; // change to true if body msg is in html
 
                 using (var client = new SmtpClient(smtpServer))
                 {
-                    if (mail == null || password == null)
+                    if (actualFromMailAddress == null || mailPassword == null)
                     {
                         client.UseDefaultCredentials = true;
                     }
                     else
                     {
                         client.UseDefaultCredentials = false;
-                        client.Credentials = new NetworkCredential(mail, password);
+                        client.Credentials = new NetworkCredential(actualFromMailAddress, mailPassword);
                     }
                     
                     client.Port = smtpPort;
