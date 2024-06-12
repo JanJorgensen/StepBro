@@ -64,10 +64,11 @@ namespace StepBro.Core.Utils
             EnableSsl = enableSsl;
         }
 
-        public bool SendMail([Implicit] ICallContext context, string subject, string body)
+        public bool SendMail([Implicit] ICallContext context, string subject, string body, bool isBodyHtml = false)
         {
             SubjectOfMessage = subject;
             BodyOfMessage = body;
+            IsBodyHtml = isBodyHtml;
             return SendMail(context);
         }
 
