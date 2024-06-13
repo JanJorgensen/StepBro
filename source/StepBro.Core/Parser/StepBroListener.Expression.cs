@@ -494,8 +494,15 @@ namespace StepBro.Core.Parser
                     last = this.CastProcedureAssignmentArgumentIfNeeded(first.DataType, last);
                     if (CheckExpressionsForErrors(context, first, last))
                     {
-                        var result = op.Resolve(this, first, last);
-                        m_expressionData.Push(result);
+                        try
+                        {
+                            var result = op.Resolve(this, first, last);
+                            m_expressionData.Push(result);
+                        }
+                        catch(Exception ex)
+                        {
+                            m_errors.InternalError(first.Token.Line, first.Token.Column, $"Assignment between left: {first.DataType} and right: {last.DataType} failed with the exception message: {ex.Message}");
+                        }
                     }
                 }
                 else
