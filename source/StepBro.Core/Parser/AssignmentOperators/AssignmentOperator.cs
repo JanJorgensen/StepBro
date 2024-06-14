@@ -24,6 +24,8 @@ namespace StepBro.Core.Parser.AssignmentOperators
             switch (first.ReferencedType)
             {
                 case SBExpressionType.GlobalVariableReference:
+                    // Since ValueContainers are always made with exactly 1 generic type argument, and that
+                    // generic type argument always is the type of the underlying value, we can use that here.
                     var setGlobalVariableTyped = s_SetGlobalVariable.MakeGenericMethod(first.DataType.Type.GenericTypeArguments[0]);
                     IValueContainer valueContainer = (first.Value as FileVariable).VariableOwnerAccess.Container; // first;
                     return new SBExpressionData(Expression.Call(
