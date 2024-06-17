@@ -354,7 +354,7 @@ namespace StepBro.Core.Parser
 
                     output = new SBExpressionData(call);
                 }
-                else if (output.DataType.Type.IsContainer() && targetType != null && !targetType.Type.IsContainer())
+                else if (output.DataType.Type.IsContainer())
                 {
                     Expression expression = output.ExpressionCode;
                     var datatype = (TypeReference)output.DataType.Type.GenericTypeArguments[0];
