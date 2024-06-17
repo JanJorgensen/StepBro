@@ -306,28 +306,8 @@ namespace StepBro.Core.Execution
 
         public static void SetGlobalVariable<T>(IScriptCallContext context, int id, T value)
         {
-            if (context == null)
-            {
-                foreach (var file in ServiceManager.Global.Get<ILoadedFilesManager>().ListFiles<ScriptFile>())
-                {
-                    var container = file.TryGetVariableContainer<T>(id);
-                    if (container != null)
-                    {
-                        container.SetValue(value);
-                        return;
-                    }
-                }
-            }
-            else
-            {
-                var container = ((StepBro.Core.ScriptData.ScriptFile)context.Self.ParentFile).TryGetVariableContainer<T>(id);
-                if (container != null)
-                {
-                    container.SetValue(value);
-                    return;
-                }
-            }
-            context.ReportError(String.Format("INTERNAL ERROR: Could not find variable container with id = {0}.", id));
+            // GetGlobalVariable reports error if the variable can not be found
+            GetGlobalVariable<T>(context, id)?.SetValue(value);
         }
 
         public static IProcedureReference GetProcedure(IScriptCallContext context, int fileID, int procedureID)
