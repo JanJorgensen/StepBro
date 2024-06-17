@@ -304,6 +304,12 @@ namespace StepBro.Core.Execution
             return null;
         }
 
+        public static void SetGlobalVariable<T>(IScriptCallContext context, int id, T value)
+        {
+            // GetGlobalVariable reports error if the variable can not be found
+            GetGlobalVariable<T>(context, id)?.SetValue(value);
+        }
+
         public static IProcedureReference GetProcedure(IScriptCallContext context, int fileID, int procedureID)
         {
             IProcedureReference procedure = null;

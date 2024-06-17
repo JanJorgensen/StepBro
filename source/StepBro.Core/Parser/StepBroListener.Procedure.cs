@@ -1344,7 +1344,7 @@ namespace StepBro.Core.Parser
                 return;
             }
 
-            var code = exp.IsError() ? Expression.Constant("<EXPRESSION ERROR>") : exp.ExpressionCode;
+            var code = exp.IsError() ? Expression.Constant("<EXPRESSION ERROR>") : ResolveForGetOperation(exp).ExpressionCode;
 
             if (code != null)
             {
