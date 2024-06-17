@@ -91,12 +91,33 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
+        public void StaticMethodsWithDifferentSignatures()
+        {
+            // Test selection between two methods where one has no parameters, and the other a single 'params' parameter.
+            Assert.AreEqual(
+                "No parameters",
+                ParseAndRunExp<string>(nameof(MethodStaticParamsStringOrNone) + "()"));
+        }
+        [TestMethod]
+        public void InstanceMethodsWithDifferentSignatures()
+        {
+            // Test selection between two methods where one has no parameters, and the other a single 'params' parameter.
+            var result = ExpressionParser.Parse(
+                typeof(DummyClass).FullName + ".OneInstance.MethodInstanceParamsStringOrNone()");
+            Assert.IsTrue(result.IsExpression);
+            Assert.AreEqual(typeof(string), result.DataType.Type);
+
+            var value = Expression.Lambda<Func<string>>(result.ExpressionCode).Compile()();
+            Assert.AreEqual("Here, with no parameters", value);
+        }
+
+        [TestMethod]
         public void StaticMethodStringParams()
         {
             // First with no 'params' arguments. 
             Assert.AreEqual(
                 "F: Anders. Args: <none>",
-                ParseAndRunExp<string>("MethodStaticStringParamsString(\"Anders\")"));
+                ParseAndRunExp<string>(nameof(MethodStaticStringParamsString) + "(\"Anders\")"));
 
             // Then with a single 'params' argument.
             Assert.AreEqual(
