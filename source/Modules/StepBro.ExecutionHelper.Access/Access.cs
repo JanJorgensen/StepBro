@@ -163,11 +163,13 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
-        public bool LoadFile([Implicit] ICallContext context, string fileName)
+        public bool LoadFile([Implicit] ICallContext context, string fileName, bool reportError = true)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.LoadFile(Prefix + fileName));
 
-            bool result = WaitForAcknowledge(context);
+            // reportError is by default true, but can be turned off if we use LoadFile at the start of a script
+            // and it may not have been created yet
+            bool result = WaitForAcknowledge(context, reportError);
             return result;
         }
 
@@ -200,7 +202,7 @@ namespace StepBro.ExecutionHelper
             return true;
         }
 
-        bool WaitForAcknowledge(ICallContext context)
+        bool WaitForAcknowledge(ICallContext context, bool reportError = true)
         {
             bool result = false;
 
@@ -231,7 +233,10 @@ namespace StepBro.ExecutionHelper
             else if (input.Item1 == nameof(StepBro.ExecutionHelper.Messages.Error))
             {
                 var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.Error>(input.Item2);
-                context.ReportError(data.Message);
+                if (reportError)
+                {
+                    context.ReportError(data.Message);
+                }
                 result = false;
             }
             else

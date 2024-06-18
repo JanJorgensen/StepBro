@@ -470,7 +470,7 @@ namespace StepBro.Core.Parser
 
         private void ExitExpUnary(ParserRuleContext context, int type, bool opOnLeft)
         {
-            var input = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var input = this.ResolveIfIdentifier(m_expressionData.Peek().Pop(), true);
             if (CheckExpressionsForErrors(context, input))
             {
                 var op = UnaryOperators.UnaryOperatorBase.GetOperator(type);
