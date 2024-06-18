@@ -53,7 +53,7 @@ namespace StepBro.ExecutionHelper
 
             string[] args = Environment.GetCommandLineArgs();
 
-            if (args.Length != 2 || args[1] != "--from_stepbro")
+            if (args.Length != 2 || (args[1] != "-drsc" && args[1] != "--dont_run_startup_command"))
             {
                 RunOnStartup();
             }
