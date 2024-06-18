@@ -35,7 +35,8 @@ namespace StepBro.Core.Parser.UnaryOperators
                                         unaryOperatorGlobalVariableTyped,
                                         listener.m_currentProcedure?.ContextReferenceInternal,
                                         Expression.Constant(valueContainer.UniqueID),
-                                        Expression.Constant(SBP.OP_INC)));
+                                        Expression.Constant(SBP.OP_INC),
+                                        Expression.Constant(opOnLeft)));
                     }
                     break;
                 case SBExpressionType.Expression:

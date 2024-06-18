@@ -311,16 +311,14 @@ namespace StepBro.Core.Execution
             GetGlobalVariable<T>(context, id)?.SetValue(value);
         }
 
-        public static void UnaryOperatorGlobalVariable<T>(IScriptCallContext context, int id, int op)
+        public static T UnaryOperatorGlobalVariable<T>(IScriptCallContext context, int id, int op, bool opOnLeft)
         {
-            // Due to the nature of global variables, having the operator on left or right side of variable is the exact same.
-            // This is because global variables work through method calls behind the scenes, and method calls are always done
-            // before the rest of an operation.
-
             // GetGlobalVariable reports error if the variable can not be found
             var variable = GetGlobalVariable<T>(context, id);
             if (variable != null)
             {
+                // We save value before for opOnRight unary operations
+                var valueBefore = variable.GetTypedValue();
                 try
                 {
                     dynamic variableValue = variable.GetTypedValue();
@@ -336,12 +334,23 @@ namespace StepBro.Core.Execution
                             context.ReportError("Operator not supported on global variable.");
                             break;
                     }
+
+                    if (opOnLeft)
+                    {
+                        return variable.GetTypedValue();
+                    }
+                    else
+                    {
+                        return valueBefore;
+                    }
                 }
                 catch (Exception ex)
                 {
                     context.ReportError($"Error occured during unary operation of a global variable, with following exception message: {ex.Message}");
                 }
             }
+
+            return default;
         }
 
         public static IProcedureReference GetProcedure(IScriptCallContext context, int fileID, int procedureID)
