@@ -79,6 +79,7 @@ namespace StepBro.ExecutionHelper
                 {
                     AddToLogData($"RunOnStartup: {loadedData}");
                     // TODO: Run the command - Remember to do sanity checking, possibly by deserializing into an object that has the specific parameters we look for, i.e. filename, testlist, model, print_report etc.
+                    // System.Diagnostics.Process.Start("CMD.exe", "/C " + loadedData);
                 }
             }
         }
@@ -287,10 +288,11 @@ namespace StepBro.ExecutionHelper
 
                     using (FileStream fs = File.Create(fileName))
                     {
-                        var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
+                        var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave.Trim('\"'));
                         fs.Write(dataInFile, 0, dataInFile.Length);
                     }
                     AddToLogData($"Request: Set command run on startup to {data.Command}");
+                    m_pipe!.Send(ShortCommand.Acknowledge);
                 }
                 else
                 {
