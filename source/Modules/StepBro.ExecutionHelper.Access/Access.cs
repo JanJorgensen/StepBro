@@ -107,7 +107,7 @@ namespace StepBro.ExecutionHelper
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.GetVariable(Prefix + variableName));
 
-            object variable = -1;
+            object variable = -1L;
 
             int timeoutMs = 2500;
             Tuple<string, string> input = null;
