@@ -1,6 +1,8 @@
-﻿using System;
+﻿using StepBro.Core.Execution;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
@@ -9,6 +11,8 @@ namespace StepBro.Core.Parser.UnaryOperators
 {
     internal abstract class UnaryOperatorBase
     {
+        protected static MethodInfo s_UnaryOperatorGlobalVariable = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.UnaryOperatorGlobalVariable));
+
         private static IncreaseOperator g_IncOp = new IncreaseOperator();
         private static DecreaseOperator g_DecOp = new DecreaseOperator();
         private static NotOperator g_NotOp = new NotOperator();

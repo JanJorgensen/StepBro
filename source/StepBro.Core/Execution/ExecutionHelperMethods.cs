@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Execution
 {
@@ -308,6 +309,39 @@ namespace StepBro.Core.Execution
         {
             // GetGlobalVariable reports error if the variable can not be found
             GetGlobalVariable<T>(context, id)?.SetValue(value);
+        }
+
+        public static void UnaryOperatorGlobalVariable<T>(IScriptCallContext context, int id, int op)
+        {
+            // Due to the nature of global variables, having the operator on left or right side of variable is the exact same.
+            // This is because global variables work through method calls behind the scenes, and method calls are always done
+            // before the rest of an operation.
+
+            // GetGlobalVariable reports error if the variable can not be found
+            var variable = GetGlobalVariable<T>(context, id);
+            if (variable != null)
+            {
+                try
+                {
+                    dynamic variableValue = variable.GetTypedValue();
+                    switch (op)
+                    {
+                        case SBP.OP_INC:
+                            variable.SetValue(variableValue + 1);
+                            break;
+                        case SBP.OP_DEC:
+                            variable.SetValue(variableValue - 1);
+                            break;
+                        default:
+                            context.ReportError("Operator not supported on global variable.");
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    context.ReportError($"Error occured during unary operation of a global variable, with following exception message: {ex.Message}");
+                }
+            }
         }
 
         public static IProcedureReference GetProcedure(IScriptCallContext context, int fileID, int procedureID)
