@@ -234,31 +234,42 @@ namespace StepBro.ExecutionHelper
                     string loadedData = "";
                     AddToLogData($"Request: Load {fileName}");
 
-                    using (FileStream fs = File.Open(fileName, FileMode.Open, FileAccess.Read))
+                    try
                     {
-                        byte[] b = new byte[1024];
-                        UTF8Encoding temp = new UTF8Encoding(true);
-
-                        while (fs.Read(b, 0, b.Length) > 0)
+                        using (FileStream fs = File.Open(fileName, FileMode.Open, FileAccess.Read))
                         {
-                            loadedData += temp.GetString(b);
+                            byte[] b = new byte[1024];
+                            UTF8Encoding temp = new UTF8Encoding(true);
+
+                            while (fs.Read(b, 0, b.Length) > 0)
+                            {
+                                loadedData += temp.GetString(b);
+                            }
+
+                            int firstIndexOfNull = loadedData.IndexOf('\0');
+                            loadedData = loadedData.Substring(0, firstIndexOfNull);
                         }
 
-                        int firstIndexOfNull = loadedData.IndexOf('\0');
-                        loadedData = loadedData.Substring(0, firstIndexOfNull);
-                    }
-
-                    if (!String.IsNullOrEmpty(loadedData))
-                    {
-                        Dictionary<string, object>? loadedVariables = JsonSerializer.Deserialize<Dictionary<string, object>>(loadedData);
-                        if (loadedVariables != null)
+                        if (!String.IsNullOrEmpty(loadedData))
                         {
-                            AddToLogData($"Request: Load {fileName}");
-                            m_variables = loadedVariables;
+                            Dictionary<string, object>? loadedVariables = JsonSerializer.Deserialize<Dictionary<string, object>>(loadedData);
+                            if (loadedVariables != null)
+                            {
+                                AddToLogData($"Request: Load {fileName}");
+                                m_variables = loadedVariables;
+                            }
                         }
-                    }
 
-                    m_pipe!.Send(ShortCommand.Acknowledge);
+                        m_pipe!.Send(ShortCommand.Acknowledge);
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        m_pipe!.Send(new Error($"File with name: {fileName} not found!"));
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
                 }
                 else
                 {
