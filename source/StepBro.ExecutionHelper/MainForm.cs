@@ -51,7 +51,12 @@ namespace StepBro.ExecutionHelper
                 ReceivedData(e);
             };
 
-            RunOnStartup();
+            string[] args = Environment.GetCommandLineArgs();
+
+            if (args.Length != 2 || args[1] != "--from_stepbro")
+            {
+                RunOnStartup();
+            }
         }
 
         private void RunOnStartup()

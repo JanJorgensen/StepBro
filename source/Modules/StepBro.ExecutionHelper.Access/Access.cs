@@ -51,6 +51,7 @@ namespace StepBro.ExecutionHelper
             {
                 var executionHelper = new System.Diagnostics.Process();
                 executionHelper.StartInfo.FileName = Path.Combine(folder, "../StepBro.ExecutionHelper.exe"); //../ because ExecutionHelper is in the main bin folder and this is the Modules folder
+                executionHelper.StartInfo.Arguments = "--from_stepbro";
                 var m_executionHelperStarted = executionHelper.Start();
                 if (!m_executionHelperStarted)
                 {
