@@ -470,6 +470,11 @@ namespace StepBro.Core.Execution
             {
                 throw;  // Just pass this right through.
             }
+            catch (TargetInvocationException e)
+            {
+                context.ReportError("Exception in dynamic procedure call.", exception: e.InnerException);
+                return null;
+            }
             catch (Exception ex)
             {
                 context.ReportError("Exception in dynamic procedure call.", exception: ex);
