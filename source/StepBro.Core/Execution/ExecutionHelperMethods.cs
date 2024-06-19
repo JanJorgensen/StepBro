@@ -472,7 +472,7 @@ namespace StepBro.Core.Execution
             }
             catch (Exception ex)
             {
-                context.ReportError("Exception in dynamic procedure call.", exception: ex);
+                context.ReportError("Exception in dynamic procedure call.", exception: ex.InnerException);
                 return null;
             }
             finally
