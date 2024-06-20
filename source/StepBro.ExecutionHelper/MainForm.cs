@@ -126,6 +126,9 @@ namespace StepBro.ExecutionHelper
                     }
 
                     // TODO: Check if there is a windows update
+                    // TODO: If there is a windows update, temporarily add ExecutionHelper to run on startup
+                    //       of windows, in the current folder, so we can restart the stepbro script after
+                    //       a restart.
 
                     // Run the cmd set with "CommandToRun"
                     RunCommandSet();
