@@ -33,7 +33,7 @@ namespace StepBro.ExecutionHelper
             }
         }
 
-        public bool CreateExecutionHelper([Implicit] ICallContext context = null, bool closeWhenExecutionHelperCloses = false)
+        public bool CreateExecutionHelper([Implicit] ICallContext context = null, string arguments = "", bool closeWhenExecutionHelperCloses = false)
         {
             // If constructor with no arguments were used, we use the name of the instance instead
             if (Prefix == null)
@@ -51,6 +51,7 @@ namespace StepBro.ExecutionHelper
             {
                 var executionHelper = new System.Diagnostics.Process();
                 executionHelper.StartInfo.FileName = Path.Combine(folder, "../StepBro.ExecutionHelper.exe"); //../ because ExecutionHelper is in the main bin folder and this is the Modules folder
+                executionHelper.StartInfo.Arguments = arguments;
                 var m_executionHelperStarted = executionHelper.Start();
                 if (!m_executionHelperStarted)
                 {
@@ -172,9 +173,9 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
-        public bool SetCommandRunOnStartup([Implicit] ICallContext context, string command)
+        public bool SetCommandToRun([Implicit] ICallContext context, string command)
         {
-            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SetCommandRunOnStartup(command));
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SetCommandToRun(command));
 
             bool result = WaitForAcknowledge(context);
             return result;
@@ -198,6 +199,12 @@ namespace StepBro.ExecutionHelper
         public bool ResumeAutosave()
         {
             m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.ResumeAutosave);
+            return true;
+        }
+
+        public bool RunPeriodicCheck()
+        {
+            m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.RunPeriodicCheck);
             return true;
         }
 

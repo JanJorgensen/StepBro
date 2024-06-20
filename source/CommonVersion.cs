@@ -2,5 +2,5 @@ using System.Reflection;
 
 [assembly: AssemblyCompany("SchmutStein")]
 [assembly: AssemblyProduct("StepBro")]
-[assembly: AssemblyVersion("0.2.28")]
+[assembly: AssemblyVersion("0.2.29")]
 

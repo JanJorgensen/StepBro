@@ -12,7 +12,8 @@ namespace StepBro.ExecutionHelper
         private bool m_closeRequested = false;
         private Dictionary<string, object> m_variables = new Dictionary<string, object>();
         private bool m_shouldAutoSave = true;
-        private const string m_commandToRunOnStartupFileName = "CommandToRunOnStartup.sbd";
+        private const string m_executionHelperDataFolder = "ExecutionHelperDataFolder\\";
+        private const string m_commandToRunFileName = "CommandToRun.sbd";
         private const string m_logFileName = "ExecutionHelperLog";
         private string m_logData = "";
         private readonly object m_logLock = new object();
@@ -44,6 +45,8 @@ namespace StepBro.ExecutionHelper
 
             System.Diagnostics.Trace.WriteLine("Execution Helper STARTING!!");
 
+            System.IO.Directory.CreateDirectory(m_executionHelperDataFolder);
+
             m_pipe = Pipe.StartServer("StepBroExecutionHelper", null);
 
             m_pipe.ReceivedData += (sender, e) =>
@@ -51,12 +54,17 @@ namespace StepBro.ExecutionHelper
                 ReceivedData(e);
             };
 
-            RunOnStartup();
+            string[] args = Environment.GetCommandLineArgs();
+
+            if (!(args.Length == 2 && (args[1] == "-drc" || args[1] == "--dont_run_command")))
+            {
+                RunCommandSet();
+            }
         }
 
-        private void RunOnStartup()
+        private void RunCommandSet()
         {
-            string fileName = m_commandToRunOnStartupFileName;
+            string fileName = m_executionHelperDataFolder + m_commandToRunFileName;
             string loadedData = "";
 
             if (File.Exists(fileName))
@@ -77,8 +85,9 @@ namespace StepBro.ExecutionHelper
 
                 if (!String.IsNullOrEmpty(loadedData))
                 {
-                    AddToLogData($"RunOnStartup: {loadedData}");
+                    AddToLogData($"RunCommandSet: {loadedData}");
                     // TODO: Run the command - Remember to do sanity checking, possibly by deserializing into an object that has the specific parameters we look for, i.e. filename, testlist, model, print_report etc.
+                    // System.Diagnostics.Process.Start("CMD.exe", "/C " + loadedData);
                 }
             }
         }
@@ -107,6 +116,22 @@ namespace StepBro.ExecutionHelper
                 {
                     AddToLogData("Request: Resume Autosave");
                     m_shouldAutoSave = true;
+                }
+                else if (cmd == ShortCommand.RunPeriodicCheck)
+                {
+                    // Wait for the StepBro script to finish so we can run checks and restart it safely
+                    while (System.Diagnostics.Process.GetProcessesByName("stepbro").Length != 0)
+                    {
+                        Thread.Sleep(1); // Wait for 1 ms and check again
+                    }
+
+                    // TODO: Check if there is a windows update
+                    // TODO: If there is a windows update, temporarily add ExecutionHelper to run on startup
+                    //       of windows, in the current folder, so we can restart the stepbro script after
+                    //       a restart.
+
+                    // Run the cmd set with "CommandToRun"
+                    RunCommandSet();
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateOrSetVariable))
@@ -277,54 +302,64 @@ namespace StepBro.ExecutionHelper
                     m_pipe!.Send(new Error("Data in LoadFile is null."));
                 }
             }
-            else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.SetCommandRunOnStartup))
+            else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.SetCommandToRun))
             {
-                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.SetCommandRunOnStartup>(received.Item2);
+                var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.SetCommandToRun>(received.Item2);
                 if (data != null)
                 {
                     string dataToSave = JsonSerializer.Serialize<string>(data.Command);
-                    string fileName = "CommandToRunOnStartup.sbd";
+                    string backupFileName = m_executionHelperDataFolder + "backup_" + m_commandToRunFileName;
+                    string fileName = m_executionHelperDataFolder + m_commandToRunFileName;
                     if (File.Exists(fileName))
                     {
-                        if (File.Exists("backup_" + fileName))
+                        if (File.Exists(backupFileName))
                         {
-                            File.Delete("backup_" + fileName);
+                            File.Delete(backupFileName);
                         }
 
                         // We rename the old file to a backup in case we crash during writing
-                        // the new file or in case we accidentally save two files with the same name
-                        File.Move(fileName, "backup_" + fileName);
+                        File.Move(fileName, backupFileName);
                     }
 
                     using (FileStream fs = File.Create(fileName))
                     {
-                        var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave);
+                        var dataInFile = new UTF8Encoding(true).GetBytes(dataToSave.Trim('\"'));
                         fs.Write(dataInFile, 0, dataInFile.Length);
                     }
-                    AddToLogData($"Request: Set command run on startup to {data.Command}");
+                    AddToLogData($"Request: Set command to run to {data.Command}");
+                    m_pipe!.Send(ShortCommand.Acknowledge);
                 }
                 else
                 {
-                    AddToLogData($"Request: Set command run on startup FAILED, data is null");
-                    m_pipe!.Send(new Error("Data in SetCommandRunOnStartup is null."));
+                    AddToLogData($"Request: Set command to run FAILED, data is null");
+                    m_pipe!.Send(new Error("Data in SetCommandToRun is null."));
                 }
             }
         }
 
         private void SaveFile(string fileName, string dataToSave, bool shouldAppend = false)
         {
+            string[] pathIncludingFile = fileName.Split(["/", "\\"], StringSplitOptions.None);
+            string pathToFile = String.Join(String.Empty, pathIncludingFile.Take(pathIncludingFile.Length - 1));
+
+            if (!String.IsNullOrEmpty(pathToFile))
+            {
+                System.IO.Directory.CreateDirectory(pathToFile);
+            }
+
+            string fileNameWithoutPath = pathIncludingFile[^1];
             if (!shouldAppend)
             {
                 if (File.Exists(fileName))
                 {
-                    if (File.Exists("backup_" + fileName))
+                    if (File.Exists(pathToFile + "backup_" + fileNameWithoutPath))
                     {
-                        File.Delete("backup_" + fileName);
+                        File.Delete(pathToFile + "backup_" + fileNameWithoutPath);
                     }
 
                     // We rename the old file to a backup in case we crash during writing
                     // the new file or in case we accidentally save two files with the same name
-                    File.Move(fileName, "backup_" + fileName);
+                    File.Move(fileName, pathToFile + "backup_" + fileNameWithoutPath);
                 }
             }
 
@@ -355,7 +390,7 @@ namespace StepBro.ExecutionHelper
                 string dataToSave = JsonSerializer.Serialize<Dictionary<string, object>>(m_variables);
                 // Use a new save file name every hour, utilizing the functionality in SaveFile to overwrite
                 // existing filename
-                SaveFile("Autosave" + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".sbd", dataToSave);
+                SaveFile(m_executionHelperDataFolder + "Autosave" + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".sbd", dataToSave);
             }
 
             string localLogData = "";
@@ -364,7 +399,7 @@ namespace StepBro.ExecutionHelper
                 localLogData = m_logData;
                 m_logData = "";
             }
-            SaveFile(m_logFileName + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".sbd", localLogData, true);
+            SaveFile(m_executionHelperDataFolder + m_logFileName + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".sbd", localLogData, true);
         }
 
         private void AddToLogData(string data)
