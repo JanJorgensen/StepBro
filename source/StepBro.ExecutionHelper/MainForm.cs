@@ -87,7 +87,7 @@ namespace StepBro.ExecutionHelper
                 {
                     AddToLogData($"RunCommandSet: {loadedData}");
                     // TODO: Run the command - Remember to do sanity checking, possibly by deserializing into an object that has the specific parameters we look for, i.e. filename, testlist, model, print_report etc.
-                    System.Diagnostics.Process.Start("CMD.exe", "/C " + loadedData);
+                    // System.Diagnostics.Process.Start("CMD.exe", "/C " + loadedData);
                 }
             }
         }
