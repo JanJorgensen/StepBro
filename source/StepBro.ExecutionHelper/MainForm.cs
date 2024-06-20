@@ -12,7 +12,7 @@ namespace StepBro.ExecutionHelper
         private bool m_closeRequested = false;
         private Dictionary<string, object> m_variables = new Dictionary<string, object>();
         private bool m_shouldAutoSave = true;
-        private const string m_executionHelperDataFolder = "ExecutionHelperDataFolder\\";
+        private const string m_executionHelperDataFolder = "ExecutionHelperDataFolder";
         private const string m_commandToRunFileName = "CommandToRun.sbd";
         private const string m_logFileName = "ExecutionHelperLog";
         private string m_logData = "";
@@ -64,7 +64,7 @@ namespace StepBro.ExecutionHelper
 
         private void RunCommandSet()
         {
-            string fileName = m_executionHelperDataFolder + m_commandToRunFileName;
+            string fileName = System.IO.Path.Combine(m_executionHelperDataFolder, m_commandToRunFileName);
             string loadedData = "";
 
             if (File.Exists(fileName))
@@ -308,8 +308,8 @@ namespace StepBro.ExecutionHelper
                 if (data != null)
                 {
                     string dataToSave = JsonSerializer.Serialize<string>(data.Command);
-                    string backupFileName = m_executionHelperDataFolder + "backup_" + m_commandToRunFileName;
-                    string fileName = m_executionHelperDataFolder + m_commandToRunFileName;
+                    string backupFileName = System.IO.Path.Combine(m_executionHelperDataFolder, "backup_" + m_commandToRunFileName);
+                    string fileName = System.IO.Path.Combine(m_executionHelperDataFolder, m_commandToRunFileName);
                     if (File.Exists(fileName))
                     {
                         if (File.Exists(backupFileName))
@@ -340,7 +340,7 @@ namespace StepBro.ExecutionHelper
         private void SaveFile(string fileName, string dataToSave, bool shouldAppend = false)
         {
             string[] pathIncludingFile = fileName.Split(["/", "\\"], StringSplitOptions.None);
-            string pathToFile = String.Join(String.Empty, pathIncludingFile.Take(pathIncludingFile.Length - 1));
+            string pathToFile = System.IO.Path.Combine(pathIncludingFile.Take(pathIncludingFile.Length - 1).ToArray());
 
             if (!String.IsNullOrEmpty(pathToFile))
             {
@@ -352,14 +352,14 @@ namespace StepBro.ExecutionHelper
             {
                 if (File.Exists(fileName))
                 {
-                    if (File.Exists(pathToFile + "backup_" + fileNameWithoutPath))
+                    if (File.Exists(System.IO.Path.Combine(pathToFile, "backup_" + fileNameWithoutPath)))
                     {
-                        File.Delete(pathToFile + "backup_" + fileNameWithoutPath);
+                        File.Delete(System.IO.Path.Combine(pathToFile, "backup_" + fileNameWithoutPath));
                     }
 
                     // We rename the old file to a backup in case we crash during writing
                     // the new file or in case we accidentally save two files with the same name
-                    File.Move(fileName, pathToFile + "backup_" + fileNameWithoutPath);
+                    File.Move(fileName, System.IO.Path.Combine(pathToFile, "backup_" + fileNameWithoutPath));
                 }
             }
 
@@ -390,7 +390,7 @@ namespace StepBro.ExecutionHelper
                 string dataToSave = JsonSerializer.Serialize<Dictionary<string, object>>(m_variables);
                 // Use a new save file name every hour, utilizing the functionality in SaveFile to overwrite
                 // existing filename
-                SaveFile(m_executionHelperDataFolder + "Autosave" + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".sbd", dataToSave);
+                SaveFile(System.IO.Path.Combine(m_executionHelperDataFolder, "Autosave" + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".sbd"), dataToSave);
             }
 
             string localLogData = "";
@@ -399,7 +399,7 @@ namespace StepBro.ExecutionHelper
                 localLogData = m_logData;
                 m_logData = "";
             }
-            SaveFile(m_executionHelperDataFolder + m_logFileName + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".sbd", localLogData, true);
+            SaveFile(System.IO.Path.Combine(m_executionHelperDataFolder, m_logFileName + DateTime.Now.ToString("yyyy-MM-dd-HH") + ".sbd"), localLogData, true);
         }
 
         private void AddToLogData(string data)
