@@ -173,9 +173,9 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
-        public bool SetCommandRunOnStartup([Implicit] ICallContext context, string command)
+        public bool SetCommandToRun([Implicit] ICallContext context, string command)
         {
-            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SetCommandRunOnStartup(command));
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SetCommandToRun(command));
 
             bool result = WaitForAcknowledge(context);
             return result;
@@ -199,6 +199,12 @@ namespace StepBro.ExecutionHelper
         public bool ResumeAutosave()
         {
             m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.ResumeAutosave);
+            return true;
+        }
+
+        public bool RunPeriodicCheck()
+        {
+            m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.RunPeriodicCheck);
             return true;
         }
 
