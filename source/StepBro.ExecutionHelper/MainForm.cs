@@ -340,11 +340,11 @@ namespace StepBro.ExecutionHelper
         private void SaveFile(string fileName, string dataToSave, bool shouldAppend = false)
         {
             string[] pathIncludingFile = fileName.Split(["/", "\\"], StringSplitOptions.None);
-            string pathToFile = String.Join("\\", pathIncludingFile.Take(pathIncludingFile.Length - 1));
+            string pathToFile = System.IO.Path.Combine(pathIncludingFile.Take(pathIncludingFile.Length - 1).ToArray());
 
             if (!String.IsNullOrEmpty(pathToFile))
             {
-                pathToFile += "\\"; // Add the last \ to the file path
+                pathToFile += "/"; // Add the last / to the file path
                 System.IO.Directory.CreateDirectory(pathToFile);
             }
 
