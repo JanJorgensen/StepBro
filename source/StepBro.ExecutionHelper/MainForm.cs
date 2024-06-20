@@ -342,7 +342,10 @@ namespace StepBro.ExecutionHelper
             string[] pathIncludingFile = fileName.Split(["/", "\\"], StringSplitOptions.None);
             string pathToFile = String.Join(String.Empty, pathIncludingFile.Take(pathIncludingFile.Length - 1));
 
-            System.IO.Directory.CreateDirectory(pathToFile);
+            if (!String.IsNullOrEmpty(pathToFile))
+            {
+                System.IO.Directory.CreateDirectory(pathToFile);
+            }
 
             string fileNameWithoutPath = pathIncludingFile[^1];
             if (!shouldAppend)
