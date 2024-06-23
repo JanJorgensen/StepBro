@@ -67,7 +67,7 @@ namespace StepBro.UI.WinForms.Test
 
             customPanelContainer.SetCoreAccess(this);
 
-            m_lastLogEntrySeen = StepBroMain.Logger.GetOldestEntry();
+            m_lastLogEntrySeen = StepBroMain.Logger.GetLast();
             m_logZero = m_lastLogEntrySeen.Timestamp;
             AddLogEntry(m_lastLogEntrySeen);
         }

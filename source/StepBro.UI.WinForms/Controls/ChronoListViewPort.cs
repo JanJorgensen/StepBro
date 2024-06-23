@@ -1,9 +1,11 @@
-﻿using System;
+﻿using StepBro.Core.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static StepBro.UI.WinForms.Controls.ChronoListViewPort;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace StepBro.UI.WinForms.Controls
 {
@@ -13,6 +15,7 @@ namespace StepBro.UI.WinForms.Controls
         {
             int HorizontalScrollPosition { get; }
             DynamicViewSettings ViewSettings { get; }
+            Font NormalFont { get; }
         }
 
         public enum TimestampFormat
@@ -29,8 +32,8 @@ namespace StepBro.UI.WinForms.Controls
             private bool m_valueChanged = false;
             private DateTime m_zeroTime;
             private TimestampFormat m_timeFormat = TimestampFormat.Seconds;
-            private int m_timestampWidth = 0;
-            private int m_lineHeaderEnd = 0;
+            private int m_timestampWidth = 0;   // The width of the widest seen timestamp.
+            private int m_lineHeaderEnd = 0;    // The right side of the widest line header (timestamp and type)
 
             public bool ValueChanged()
             {
@@ -103,9 +106,15 @@ namespace StepBro.UI.WinForms.Controls
             }
         }
 
+        private object m_sync = new object();
+        private IChronoListViewer m_viewer = null;
+        private IElementIndexer<ChronoListViewEntry> m_source = null;
+        private ChronoListViewEntry[] m_viewEntries = new ChronoListViewEntry[200];
+        private int m_viewEntryCount = 0;
         private int m_horizontalScrollPosition = 0;
         private DynamicViewSettings m_viewSettings = new DynamicViewSettings();
-        private ChronoListViewEntry m_first = null;
+
+        private long m_topIndex = 0L;
 
         public ChronoListViewPort()
         {
@@ -119,6 +128,13 @@ namespace StepBro.UI.WinForms.Controls
             m_viewSettings.ZeroTime = DateTime.UtcNow;
         }
 
+        public void SetDataSource(IChronoListViewer viewer)
+        {
+            m_viewer = viewer;
+            m_source = viewer.Source;
+
+        }
+
         public int HorizontalScrollPosition
         {
             get { return m_horizontalScrollPosition; }
@@ -130,11 +146,53 @@ namespace StepBro.UI.WinForms.Controls
 
         public DynamicViewSettings ViewSettings { get { return m_viewSettings; } }
 
+        public Font NormalFont { get { return this.Font; } }
+
+
         protected override void OnPaint(PaintEventArgs e)
         {
-            System.Drawing.Graphics g = e.Graphics;
-            g.FillRectangle(Brushes.Black, e.ClipRectangle);
+            m_viewSettings.ZeroTime = m_viewer.ZeroTime;
+            //System.Drawing.Graphics g = e.Graphics;
+            e.Graphics.FillRectangle(Brushes.Black, e.ClipRectangle);
+            int y = 0;
+            var sourceState = m_source.GetState();
+            long lastIndex = sourceState.LastIndex;
+            if (lastIndex < 0L)
+            {
+                m_viewEntryCount = 0;
+                return;
+            }
 
+            var entryIndex = m_topIndex;
+            int viewIndex = 0;
+
+            Rectangle rect;
+
+            try
+            {
+                while (entryIndex <= lastIndex)
+                {
+                    var entry = m_source.Get(entryIndex);
+                    m_viewEntries[viewIndex] = entry;
+
+                    bool isSelected = false;
+                    rect = new Rectangle(m_horizontalScrollPosition, y, 10000, 20);
+                    if (isSelected)
+                    {
+                        e.Graphics.FillRectangle(Brushes.Blue, rect);
+                    }
+                    entry.DoPaint(e, this, ref rect, isSelected);
+
+                    entryIndex++;
+                    y += entry.Height;
+                    viewIndex++;
+                }
+                m_viewEntryCount = viewIndex;
+            }
+            catch
+            {
+
+            }
         }
     }
 }

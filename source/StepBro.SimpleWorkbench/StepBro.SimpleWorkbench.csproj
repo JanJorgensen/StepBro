@@ -3,27 +3,25 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <OutputPath>..\bin</OutputPath>
+    <PackageId>stepbro workbench</PackageId>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <Authors>Jan Jorgensen, Milton Lindof</Authors>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <Company>SchmutStein</Company>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="LogWindowNew.cs" />
-    <Compile Remove="LogWindowNew.Designer.cs" />
+    <EmbeddedResource Include="licenses.licx" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Remove="LogWindowNew.resx" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="LogWindowNew.cs" />
-    <None Include="LogWindowNew.Designer.cs" />
-    <None Include="LogWindowNew.resx" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
     <ProjectReference Include="..\StepBro.UI.WinForms\StepBro.UI.WinForms.csproj" />
   </ItemGroup>
 

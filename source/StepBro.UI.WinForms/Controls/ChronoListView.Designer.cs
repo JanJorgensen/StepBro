@@ -32,7 +32,7 @@
             hScrollBar = new HScrollBar();
             panelFillRight = new Panel();
             vScrollBar = new VScrollBar();
-            chronoListViewPort = new ChronoListViewPort();
+            viewPort = new ChronoListViewPort();
             panelHorizontal.SuspendLayout();
             SuspendLayout();
             // 
@@ -70,21 +70,24 @@
             vScrollBar.Size = new Size(17, 125);
             vScrollBar.TabIndex = 1;
             // 
-            // chronoListViewPort
+            // viewPort
             // 
-            chronoListViewPort.Dock = DockStyle.Fill;
-            chronoListViewPort.HorizontalScrollPosition = 0;
-            chronoListViewPort.Location = new Point(0, 0);
-            chronoListViewPort.Name = "chronoListViewPort";
-            chronoListViewPort.Size = new Size(493, 125);
-            chronoListViewPort.TabIndex = 2;
-            chronoListViewPort.Text = "ViewPort";
+            viewPort.BackColor = Color.Black;
+            viewPort.Dock = DockStyle.Fill;
+            viewPort.ForeColor = Color.White;
+            viewPort.HorizontalScrollPosition = 0;
+            viewPort.Location = new Point(0, 0);
+            viewPort.Name = "viewPort";
+            viewPort.Size = new Size(493, 125);
+            viewPort.TabIndex = 2;
+            viewPort.Text = "ViewPort";
+            viewPort.Click += chronoListViewPort_Click;
             // 
             // ChronoListView
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(chronoListViewPort);
+            Controls.Add(viewPort);
             Controls.Add(vScrollBar);
             Controls.Add(panelHorizontal);
             Name = "ChronoListView";
@@ -99,6 +102,6 @@
         private Panel panelFillRight;
         private HScrollBar hScrollBar;
         private VScrollBar vScrollBar;
-        private ChronoListViewPort chronoListViewPort;
+        private ChronoListViewPort viewPort;
     }
 }

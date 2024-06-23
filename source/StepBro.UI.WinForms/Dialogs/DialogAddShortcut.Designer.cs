@@ -1,4 +1,4 @@
-﻿namespace StepBro.ConsoleSidekick.WinForms
+﻿namespace StepBro.UI.WinForms
 {
     partial class DialogAddShortcut
     {

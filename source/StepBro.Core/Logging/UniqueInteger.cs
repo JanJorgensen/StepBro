@@ -21,5 +21,12 @@ namespace StepBro.Core.Logging
                 return m_nextLong++;
             }
         }
+        public static Tuple<DateTime, ulong> GetLongAndTimestamp()
+        {
+            lock (m_sync)
+            {
+                return new Tuple<DateTime, ulong>(DateTime.UtcNow, m_nextLong++);
+            }
+        }
     }
 }

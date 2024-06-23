@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Logging
 {
-    public interface ILogWalker
+    public interface IDerivedLogEntry : ILogEntry, ILogEntryReference
     {
-        ILogEntry GetFirst();
     }
 }

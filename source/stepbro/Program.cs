@@ -1188,7 +1188,7 @@ namespace StepBro.Cmd
 
         private static void LogDumpTask()
         {
-            var logEntry = StepBroMain.Logger.GetOldestEntry();
+            var logEntry = StepBroMain.Logger.GetFirst().Item2;
             zeroTime = logEntry.Timestamp;
             while (logEntry != null || m_activitiesRunning)
             {

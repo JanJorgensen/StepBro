@@ -81,7 +81,7 @@ namespace StepBro.Workbench
             IService panelManagerService;
             m_panelManager = new CustomPanelManager(out panelManagerService);
             // Initialize before the views start asking for the different services.
-            StepBroMain.Initialize(new IService[] { panelManagerService });
+            StepBroMain.Initialize([panelManagerService]);
 
             m_propertiesViewModel = new PropertiesViewModel();
             m_propertiesViewModel.IsOpen = true;

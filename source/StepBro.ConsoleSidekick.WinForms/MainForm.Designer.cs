@@ -87,7 +87,7 @@
             // toolStripMenuItemClearDisplay
             // 
             toolStripMenuItemClearDisplay.Name = "toolStripMenuItemClearDisplay";
-            toolStripMenuItemClearDisplay.Size = new Size(142, 22);
+            toolStripMenuItemClearDisplay.Size = new Size(180, 22);
             toolStripMenuItemClearDisplay.Text = "Clear Display";
             toolStripMenuItemClearDisplay.Click += toolStripMenuItemClearDisplay_Click;
             // 
@@ -95,7 +95,7 @@
             // 
             toolStripMenuItemShortcuts.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemDeleteShortcut, toolStripMenuItemDeleteAllShortcuts });
             toolStripMenuItemShortcuts.Name = "toolStripMenuItemShortcuts";
-            toolStripMenuItemShortcuts.Size = new Size(142, 22);
+            toolStripMenuItemShortcuts.Size = new Size(180, 22);
             toolStripMenuItemShortcuts.Text = "Shortcuts";
             // 
             // toolStripMenuItemDeleteShortcut
@@ -117,7 +117,7 @@
             // 
             toolStripMenuItemView.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemShownToolbars, toolStripMenuItemExeNoteInput });
             toolStripMenuItemView.Name = "toolStripMenuItemView";
-            toolStripMenuItemView.Size = new Size(142, 22);
+            toolStripMenuItemView.Size = new Size(180, 22);
             toolStripMenuItemView.Text = "View";
             toolStripMenuItemView.DropDownOpening += toolStripMenuItemView_DropDownOpening;
             // 
@@ -140,12 +140,12 @@
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(139, 6);
+            toolStripSeparator1.Size = new Size(177, 6);
             // 
             // toolStripMenuItemExit
             // 
             toolStripMenuItemExit.Name = "toolStripMenuItemExit";
-            toolStripMenuItemExit.Size = new Size(142, 22);
+            toolStripMenuItemExit.Size = new Size(180, 22);
             toolStripMenuItemExit.Text = "Exit";
             toolStripMenuItemExit.Click += toolStripMenuItemExit_Click;
             // 

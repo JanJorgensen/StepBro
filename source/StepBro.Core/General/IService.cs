@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using StepBro.Core.Data;
 using StepBro.Core.Tasks;
 
 namespace StepBro.Core
@@ -28,9 +30,9 @@ namespace StepBro.Core
         private class MyServiceInterface : IService
         {
             private TThis m_service;
-            private readonly Type[] m_dependencies;
+            private readonly List<Type> m_dependencies;
 
-            public MyServiceInterface(TThis service, string name, Type[] dependencies)
+            public MyServiceInterface(TThis service, string name, List<Type> dependencies)
             {
                 m_service = service;
                 this.Name = name;
@@ -112,7 +114,12 @@ namespace StepBro.Core
 
         public ServiceBase(string name, out IService serviceAccess, params Type[] dependencies)
         {
-            m_myInterface = new MyServiceInterface(this as TThis, name, dependencies);
+            m_myInterface = new MyServiceInterface(this as TThis, name, dependencies.ToList());
+            serviceAccess = m_myInterface as IService;
+        }
+        public ServiceBase(string name, out IService serviceAccess, List<Type> firstSetOfDependencies, params Type[] dependencies)
+        {
+            m_myInterface = new MyServiceInterface(this as TThis, name, firstSetOfDependencies.Concat(dependencies).ToList());
             serviceAccess = m_myInterface as IService;
         }
 
