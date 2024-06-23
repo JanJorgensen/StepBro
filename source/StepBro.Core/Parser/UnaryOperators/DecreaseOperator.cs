@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using StepBro.Core.Data;
 using System.Linq.Expressions;
+using StepBro.Core.ScriptData;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser.UnaryOperators
 {
@@ -21,6 +23,26 @@ namespace StepBro.Core.Parser.UnaryOperators
                 case SBExpressionType.Identifier:
                     break;
                 case SBExpressionType.GlobalVariableReference:
+                    if (input.IsValueType)
+                    {
+                        if (input.IsInt)
+                        {
+                            // Since ValueContainers are always made with exactly 1 generic type argument, and that
+                            // generic type argument always is the type of the underlying value, we can use that here.
+                            var unaryOperatorGlobalVariableTyped = s_UnaryOperatorGlobalVariable.MakeGenericMethod(input.DataType.Type.GenericTypeArguments[0]);
+                            IValueContainer valueContainer = (input.Value as FileVariable).VariableOwnerAccess.Container;
+                            return new SBExpressionData(Expression.Call(
+                                            unaryOperatorGlobalVariableTyped,
+                                            listener.m_currentProcedure?.ContextReferenceInternal,
+                                            Expression.Constant(valueContainer.UniqueID),
+                                            Expression.Constant(SBP.OP_DEC),
+                                            Expression.Constant(opOnLeft)));
+                        }
+                        else
+                        {
+                            throw new NotImplementedException();
+                        }
+                    }
                     break;
                 case SBExpressionType.Expression:
                 case SBExpressionType.LocalVariableReference:

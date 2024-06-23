@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Threading;
 using SharpCompress.Common;
 using StepBro.Core;
@@ -71,7 +73,7 @@ namespace StepBro.Core.Execution
                     bool pauseClicked = false;
                     reporter.AddActionButton("Skip Delay", b => { skipClicked |= b; return b; });
                     reporter.AddActionButton("Pause Delay", b => { pauseClicked |= b; return b; });
-                    var entry = DateTime.Now;
+                    var entry = DateTime.UtcNow;
                     var timeout = entry + time;
                     var timeLeft = time;
                     while (timeLeft > TimeSpan.Zero && !skipClicked)
@@ -93,7 +95,7 @@ namespace StepBro.Core.Execution
                             }
                             context.Logger.LogUserAction("    User terminated the delay pause.");
                         }
-                        timeLeft = DateTime.Now.TimeTill(timeout);
+                        timeLeft = DateTime.UtcNow.TimeTill(timeout);
                     }
                     if (skipClicked)
                     {
@@ -110,19 +112,19 @@ namespace StepBro.Core.Execution
         [Public]
         public static DateTime Now()
         {
-            return DateTime.Now;
+            return DateTime.UtcNow;
         }
 
         [Public]
         public static TimeSpan TimeTillNow(DateTime before)
         {
-            return DateTime.Now - before;
+            return DateTime.UtcNow - before;
         }
 
         [Public]
         public static TimeSpan TimeTill(DateTime time)
         {
-            return DateTime.Now.TimeTill(time);
+            return DateTime.UtcNow.TimeTill(time);
         }
 
         [Public]
@@ -222,7 +224,7 @@ namespace StepBro.Core.Execution
             }
             else
             {
-                return new ReportTestSummary(DateTime.Now);
+                return new ReportTestSummary(DateTime.UtcNow);
             }
         }
 
@@ -387,7 +389,7 @@ namespace StepBro.Core.Execution
             }
             else
             {
-                timeoutTime = DateTime.Now + timeout;
+                timeoutTime = DateTime.UtcNow + timeout;
             }
 
             var peaker = reader.Peak();
@@ -429,7 +431,7 @@ namespace StepBro.Core.Execution
                         }
                         last = entry;
                     }
-                } while (DateTime.Now.TimeTill(timeoutTime) > TimeSpan.Zero);
+                } while (DateTime.UtcNow.TimeTill(timeoutTime) > TimeSpan.Zero);
 
                 if (flushIfNotFound)
                 {
@@ -449,16 +451,16 @@ namespace StepBro.Core.Execution
             var comparer = StringUtils.CreateComparer(text);
             reader.DebugDump();
 
-            // If we do not want to match with the current entry
+            // If we do not want to match with the current entry.
             if (skipCurrent)
             {
                 reader.NextUnlessNewEntry();
             }
 
-            // As the purpose of Await is to wait for something in real time, we use DateTime.Now as our entry time
-            DateTime entry = DateTime.Now;
+            // As the purpose of Await is to wait for something in real time, we use DateTime.UtcNow as our entry time.
+            DateTime entry = DateTime.UtcNow;
 
-            // The latest time the timestamp is allowed to be
+            // The latest time the timestamp is allowed to be.
             DateTime to = (timeout == TimeSpan.MaxValue) ? DateTime.MaxValue : entry + timeout;
 
             //bool sleep = false;
@@ -484,7 +486,7 @@ namespace StepBro.Core.Execution
                     }
                     return result; // If we are here, we have found the result in the allotted time
                 }
-            } while (DateTime.Now.TimeTill(to) > TimeSpan.Zero); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
+            } while (DateTime.UtcNow.TimeTill(to) > TimeSpan.Zero); // We use DateTime.Now because we can not be sure that anything is in the log to give us a timestamp
 
             if (context != null)
             {

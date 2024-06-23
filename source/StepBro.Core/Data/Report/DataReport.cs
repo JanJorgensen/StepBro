@@ -101,7 +101,7 @@ namespace StepBro.Core
 
         public void AddSection([Implicit] ICallContext context, string header, string subheader = "")
         {
-            DateTime timestamp = DateTime.Now;
+            DateTime timestamp = DateTime.UtcNow;
             if (context != null && context.LoggingEnabled)
             {
                 var subheaderText = String.IsNullOrEmpty(subheader) ? "." : (", " + subheader);

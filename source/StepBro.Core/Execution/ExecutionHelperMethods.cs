@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Execution
 {
@@ -304,6 +305,54 @@ namespace StepBro.Core.Execution
             return null;
         }
 
+        public static void SetGlobalVariable<T>(IScriptCallContext context, int id, T value)
+        {
+            // GetGlobalVariable reports error if the variable can not be found
+            GetGlobalVariable<T>(context, id)?.SetValue(value);
+        }
+
+        public static T UnaryOperatorGlobalVariable<T>(IScriptCallContext context, int id, int op, bool opOnLeft)
+        {
+            // GetGlobalVariable reports error if the variable can not be found
+            var variable = GetGlobalVariable<T>(context, id);
+            if (variable != null)
+            {
+                // We save value before for opOnRight unary operations
+                var valueBefore = variable.GetTypedValue();
+                try
+                {
+                    dynamic variableValue = variable.GetTypedValue();
+                    switch (op)
+                    {
+                        case SBP.OP_INC:
+                            variable.SetValue(variableValue + 1);
+                            break;
+                        case SBP.OP_DEC:
+                            variable.SetValue(variableValue - 1);
+                            break;
+                        default:
+                            context.ReportError("Operator not supported on global variable.");
+                            break;
+                    }
+
+                    if (opOnLeft)
+                    {
+                        return variable.GetTypedValue();
+                    }
+                    else
+                    {
+                        return valueBefore;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    context.ReportError($"Error occured during unary operation of a global variable, with following exception message: {ex.Message}");
+                }
+            }
+
+            return default;
+        }
+
         public static IProcedureReference GetProcedure(IScriptCallContext context, int fileID, int procedureID)
         {
             IProcedureReference procedure = null;
@@ -420,6 +469,11 @@ namespace StepBro.Core.Execution
             catch (RequestEarlyExitException)
             {
                 throw;  // Just pass this right through.
+            }
+            catch (TargetInvocationException e)
+            {
+                context.ReportError("Exception in dynamic procedure call.", exception: e.InnerException);
+                return null;
             }
             catch (Exception ex)
             {

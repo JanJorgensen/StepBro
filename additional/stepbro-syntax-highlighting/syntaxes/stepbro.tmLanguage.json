@@ -56,7 +56,7 @@
                 },
                 {
                     "name": "keyword.other.stepbro",
-                    "match": "\\b(true|false|override|this)\\b"
+                    "match": "\\b(true|false|override|this|null|out)\\b"
                 },
                 {
                     "name": "keyword.other.partner.stepbro",

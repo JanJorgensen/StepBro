@@ -76,11 +76,11 @@ namespace StepBro.Core.Data
             {
                 if (m_first != null)
                 {
-                    if (m_first.Data.NextActionTime <= DateTime.Now)
+                    if (m_first.Data.NextActionTime <= DateTime.UtcNow)
                     {
                         return this.HandleDueEntry();
                     }
-                    TimeSpan timeout = m_first.Data.NextActionTime - DateTime.Now;
+                    TimeSpan timeout = m_first.Data.NextActionTime - DateTime.UtcNow;
                     if (maxTime < timeout) timeout = maxTime;
                     if (Monitor.Wait(m_sync, timeout))
                     {
@@ -100,13 +100,13 @@ namespace StepBro.Core.Data
 
         private T HandleDueEntry()
         {
-            if (m_first.Data.NextActionTime <= DateTime.Now)
+            if (m_first.Data.NextActionTime <= DateTime.UtcNow)
             {
                 var e = m_first;
                 m_first = m_first.Next;
                 if (e.Data.IsActive)
                 {
-                    if (e.Data.UpdateWhenHandling(DateTime.Now))
+                    if (e.Data.UpdateWhenHandling(DateTime.UtcNow))
                     {
                         this.InsertEntryInQueue(e);
                     }

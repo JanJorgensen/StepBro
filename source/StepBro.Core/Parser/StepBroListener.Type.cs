@@ -210,6 +210,10 @@ namespace StepBro.Core.Parser
                     }
                     else
                     {
+                        if (reportErrors)
+                        {
+                            m_errors.InternalError(token.Line, token.Column, "Parsing type failed. Either types is null or the referenced type is not generic.");
+                        }
                         return 1;
                     }
                 }

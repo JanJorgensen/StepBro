@@ -165,7 +165,14 @@ namespace StepBro.Core.Parser
                             argumentExpressions.Add(ResolveForGetOperation(cArg).ExpressionCode);
                         }
 
-                        m_expressionData.Push(new SBExpressionData(Expression.New(left.DataType.Type.GetConstructor(argumentTypes.ToArray()), argumentExpressions)));
+                        var expressionData = new SBExpressionData(Expression.New(left.DataType.Type.GetConstructor(argumentTypes.ToArray()), argumentExpressions));
+
+                        // left.DataType always contains the correct datatype.
+                        // We could have a typedef which means the constructor will utilize the base of the typedef making the constructors type not always the correct
+                        // one, so we override the datatype to ensure it is always correct.
+                        expressionData.DataType = left.DataType;
+
+                        m_expressionData.Push(expressionData);
                         return;
 
                     case SBExpressionType.Identifier:
@@ -803,9 +810,9 @@ namespace StepBro.Core.Parser
                     thisParameterHandled = true;
                     state = ArgumentInsertState.Initial;
                     if (IsParameterAssignableFromArgument(p, extensionInstanceData))
-                        matchScore += 5; // If we have the correct extension instance then it is more correct than a method that does not use the extension instance (This is a choice we have made)
+                        matchScore += 5; // If we have the correct extension instance then it is more correct than a method that does not use the extension instance (This is a choice we have made).
                     else
-                        matchScore -= 5; // If it is incorrect, we should not use it
+                        matchScore -= 5; // If it is incorrect, we should not use it.
                     continue;
                 }
                 else if (state == ArgumentInsertState.ProcedureContext)
@@ -1107,6 +1114,7 @@ namespace StepBro.Core.Parser
                         if (!p.ParameterType.IsArray) throw new Exception("Unexpected type of 'params' parameter; not an array.");
                         var t = p.ParameterType.GetElementType();
                         suggestedAssignmentsOut.Add(new SBExpressionData(Expression.NewArrayInit(t)));
+                        matchScore -= 5;    // In case there's another method with no more parameters, that would be a better choise.
                     }
                     else
                     {

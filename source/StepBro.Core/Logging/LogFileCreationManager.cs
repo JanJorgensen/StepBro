@@ -25,7 +25,7 @@ namespace StepBro.Core.Logging
             private bool m_stop = false;
             private bool m_awaitSilence = true;
             private System.Threading.Thread m_thread = null;
-            private DateTime m_zeroTime = DateTime.Now;
+            private DateTime m_zeroTime = DateTime.UtcNow;
 
             internal FileCreator(LogFileCreationManager parent, IOutputFormatter formatter)
             {

@@ -62,7 +62,7 @@ namespace StepBro.Core.Data
         {
             this.Type = type;
             this.ID = id;
-            this.Timestamp = DateTime.Now;
+            this.Timestamp = DateTime.UtcNow;
             Text = text;
             this._subStringIndex = subStringIndex;
             if (previous != null) previous.Next = this;

@@ -145,7 +145,7 @@ namespace StepBro.Core.Execution
             else
             {
                 m_loggerInsideScope = null;
-                m_startTime = DateTime.Now;
+                m_startTime = DateTime.UtcNow;
             }
         }
 
@@ -155,7 +155,7 @@ namespace StepBro.Core.Execution
             m_loggerInsideScope?.Dispose();
             m_loggerInside = null;
             m_loggerInsideScope = null;
-            m_endTime = DateTime.Now;
+            m_endTime = DateTime.UtcNow;
         }
 
         public void Dispose()

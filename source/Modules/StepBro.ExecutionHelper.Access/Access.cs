@@ -33,7 +33,7 @@ namespace StepBro.ExecutionHelper
             }
         }
 
-        public bool CreateExecutionHelper([Implicit] ICallContext context = null, bool closeWhenExecutionHelperCloses = false)
+        public bool CreateExecutionHelper([Implicit] ICallContext context = null, string arguments = "", bool closeWhenExecutionHelperCloses = false)
         {
             // If constructor with no arguments were used, we use the name of the instance instead
             if (Prefix == null)
@@ -51,6 +51,7 @@ namespace StepBro.ExecutionHelper
             {
                 var executionHelper = new System.Diagnostics.Process();
                 executionHelper.StartInfo.FileName = Path.Combine(folder, "../StepBro.ExecutionHelper.exe"); //../ because ExecutionHelper is in the main bin folder and this is the Modules folder
+                executionHelper.StartInfo.Arguments = arguments;
                 var m_executionHelperStarted = executionHelper.Start();
                 if (!m_executionHelperStarted)
                 {
@@ -107,7 +108,7 @@ namespace StepBro.ExecutionHelper
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.GetVariable(Prefix + variableName));
 
-            object variable = -1;
+            object variable = -1L;
 
             int timeoutMs = 2500;
             Tuple<string, string> input = null;
@@ -162,17 +163,19 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
-        public bool LoadFile([Implicit] ICallContext context, string fileName)
+        public bool LoadFile([Implicit] ICallContext context, string fileName, bool reportError = true)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.LoadFile(Prefix + fileName));
 
-            bool result = WaitForAcknowledge(context);
+            // reportError is by default true, but can be turned off if we use LoadFile at the start of a script
+            // and it may not have been created yet
+            bool result = WaitForAcknowledge(context, reportError);
             return result;
         }
 
-        public bool SetCommandRunOnStartup([Implicit] ICallContext context, string command)
+        public bool SetCommandToRun([Implicit] ICallContext context, string command)
         {
-            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SetCommandRunOnStartup(command));
+            m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SetCommandToRun(command));
 
             bool result = WaitForAcknowledge(context);
             return result;
@@ -199,7 +202,13 @@ namespace StepBro.ExecutionHelper
             return true;
         }
 
-        bool WaitForAcknowledge(ICallContext context)
+        public bool RunPeriodicCheck()
+        {
+            m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.RunPeriodicCheck);
+            return true;
+        }
+
+        bool WaitForAcknowledge(ICallContext context, bool reportError = true)
         {
             bool result = false;
 
@@ -230,7 +239,10 @@ namespace StepBro.ExecutionHelper
             else if (input.Item1 == nameof(StepBro.ExecutionHelper.Messages.Error))
             {
                 var data = JsonSerializer.Deserialize<StepBro.ExecutionHelper.Messages.Error>(input.Item2);
-                context.ReportError(data.Message);
+                if (reportError)
+                {
+                    context.ReportError(data.Message);
+                }
                 result = false;
             }
             else

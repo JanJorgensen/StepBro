@@ -50,7 +50,7 @@ namespace StepBro.Core.ScriptData
         {
             m_wasLoadedByNamespace = false;
             m_errors = new ErrorCollector(this, false);
-            m_lastFileChange = DateTime.Now;   // TODO: take this from file timestamp.
+            m_lastFileChange = DateTime.UtcNow;   // TODO: take this from file timestamp.
             m_parserFileStream = filestream;
             m_folderShortcuts = new FolderShortcutCollection(FolderShortcutOrigin.ScriptFile);
             if (!string.IsNullOrEmpty(filepath))
@@ -793,7 +793,11 @@ namespace StepBro.Core.ScriptData
                             }
                             foreach (var type in ns.ListTypes(false))
                             {
-                                this.AddRootIdentifier(type.Name, new IdentifierInfo(type.Name, type.FullName, IdentifierType.DotNetType, new TypeReference(type), null));
+                                // If the class is static we will not be adding it (At least for now) - Static classes have been giving issues in other cases and does not seem to be used
+                                if (!(type.IsAbstract && type.IsSealed))
+                                {
+                                    this.AddRootIdentifier(type.Name, new IdentifierInfo(type.Name, type.FullName, IdentifierType.DotNetType, new TypeReference(type), null));
+                                }
                             }
                         }
                         break;
@@ -847,7 +851,11 @@ namespace StepBro.Core.ScriptData
             }
             else
             {
-                m_rootIdentifiers[name].Add(info);
+                // Check all identifiers in the list, if any of them is the same as info, we do not add info to the list
+                if (m_rootIdentifiers[name].All(ident => ident != info))
+                {
+                    m_rootIdentifiers[name].Add(info);
+                }
             }
         }
 

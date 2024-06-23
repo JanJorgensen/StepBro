@@ -447,7 +447,7 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        public void FileParsing_TypeDefGeneric()
+        public void FileParsing_TypeDefGenericList()
         {
             var f1 = new StringBuilder();
             f1.AppendLine("using StringList = System.Collections.Generic.List<string>;");
@@ -471,6 +471,31 @@ namespace StepBroCoreTest.Parser
 
             var result = taskContext.CallProcedure(proc);
             Assert.AreEqual("Bent", result);
+        }
+
+        [TestMethod]
+        public void FileParsing_TypeDefGenericTuple()
+        {
+            var f1 = new StringBuilder();
+            f1.AppendLine("using MyTuple = System.Tuple<string, int>;");
+            f1.AppendLine("procedure MyTuple TopGetValue() {");
+            f1.AppendLine("    var data = MyTuple(\"Wombat\", 17);");
+            f1.AppendLine("    return data;");
+            f1.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("topfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual("topfile.sbs", files[0].FileName);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var proc = files[0].ListElements().First(p => p.Name == "TopGetValue") as IFileProcedure;
+            Assert.IsNotNull(proc);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            var result = taskContext.CallProcedure(proc);
+            Assert.AreEqual("Wombat", ((Tuple<string, long>)result).Item1);
+            Assert.AreEqual(17, ((Tuple<string, long>)result).Item2);
         }
 
         [TestMethod]
@@ -610,6 +635,197 @@ namespace StepBroCoreTest.Parser
 
             result = taskContext.CallProcedure(procedureMid);
             Assert.AreEqual(125L, result);
+        }
+
+        [TestMethod]
+        public void FileParsing_TypeDefUseConstructorOneAbstraction()
+        {
+            string f1 =
+                """
+                using System;
+
+                type TupleInts : Tuple<int, int>;
+
+                procedure TupleInts test()
+                {
+                    TupleInts a = testTuple();
+                    return a;
+                }
+
+                function TupleInts testTuple()
+                {
+                    TupleInts toReturn = TupleInts(5, 7);
+                    return toReturn;
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var typedef = files[0].ListElements().FirstOrDefault(p => p.Name == "TupleInts");
+            Assert.IsNotNull(typedef);
+            Assert.IsNotNull(typedef.DataType);
+            var procedure = files[0].ListElements().FirstOrDefault(p => p.Name == "test") as IFileProcedure;
+            Assert.IsNotNull(procedure);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            var result = taskContext.CallProcedure(procedure);
+            Assert.AreEqual(5, ((Tuple<long, long>)result).Item1);
+            Assert.AreEqual(7, ((Tuple<long, long>)result).Item2);
+        }
+
+        [TestMethod]
+        public void FileParsing_TypeDefUseConstructorTwoAbstractions()
+        {
+            string f1 =
+                """
+                using System;
+
+                type TupleInts : Tuple<int, int>;
+                type TupleTest : TupleInts;
+
+                procedure TupleInts test()
+                {
+                    TupleInts a = testTuple();
+                    return a;
+                }
+
+                function TupleTest testTuple()
+                {
+                    TupleTest toReturn = TupleTest(5, 7);
+                    return toReturn;
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var typedef = files[0].ListElements().FirstOrDefault(p => p.Name == "TupleInts");
+            Assert.IsNotNull(typedef);
+            Assert.IsNotNull(typedef.DataType);
+            var procedure = files[0].ListElements().FirstOrDefault(p => p.Name == "test") as IFileProcedure;
+            Assert.IsNotNull(procedure);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            var result = taskContext.CallProcedure(procedure);
+            Assert.AreEqual(5, ((Tuple<long, long>)result).Item1);
+            Assert.AreEqual(7, ((Tuple<long, long>)result).Item2);
+        }
+
+        [TestMethod]
+        public void FileParsing_TypeDefUseConstructorNarrowTwoAbstractions()
+        {
+            string f1 =
+                """
+                using System;
+
+                type TupleInts : Tuple<int, int>;
+                type TupleTest : TupleInts;
+
+                procedure TupleInts test()
+                {
+                    TupleInts a = testTuple();
+                    return a;
+                }
+
+                function TupleInts testTuple()
+                {
+                    TupleInts toReturn = TupleTest(5, 7);
+                    return toReturn;
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var typedef = files[0].ListElements().FirstOrDefault(p => p.Name == "TupleInts");
+            Assert.IsNotNull(typedef);
+            Assert.IsNotNull(typedef.DataType);
+            var procedure = files[0].ListElements().FirstOrDefault(p => p.Name == "test") as IFileProcedure;
+            Assert.IsNotNull(procedure);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            var result = taskContext.CallProcedure(procedure);
+            Assert.AreEqual(5, ((Tuple<long, long>)result).Item1);
+            Assert.AreEqual(7, ((Tuple<long, long>)result).Item2);
+        }
+
+        [TestMethod]
+        public void FileParsing_TypeDefUseConstructorBroadenTwoAbstractions()
+        {
+            string f1 =
+                """
+                using System;
+
+                type TupleInts : Tuple<int, int>;
+                type TupleTest : TupleInts;
+
+                procedure TupleInts test()
+                {
+                    TupleInts a = testTuple();
+                    return a;
+                }
+
+                function TupleInts testTuple()
+                {
+                    // Here we try to assign TupleInts to a TupleTest variable, using a constructor
+                    // This is an error because TupleTest is narrower than TupleInts
+                    TupleTest toReturn = TupleInts(5, 7);
+                    return toReturn;
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+
+            // When we are assigning a broad type to a specific type we expect an error, like if we have
+            // List<int> a = new List<object>();
+            // We expect an error, this is the case in the code above.
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);
+            Assert.IsTrue(files[0].Errors[0].Message.Contains("incompatible type"));
+        }
+
+        [TestMethod]
+        public void FileParsing_TypeDefUseConstructorTwoAbstractionsError()
+        {
+            string f1 =
+                """
+                using System;
+
+                type TupleInts : Tuple<int, int>;
+                type TupleTest : TupleInts;
+
+                procedure TupleTest test()
+                {
+                    // Here we try to assign TupleInts to a TupleTest variable using a function call
+                    // This is an error because TupleTest is narrower than TupleInts
+                    TupleTest a = testTuple();
+                    return a;
+                }
+
+                function TupleInts testTuple()
+                {
+                    TupleInts toReturn = TupleInts(5, 7);
+                    return toReturn;
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+
+            // When we are assigning a broad type to a specific type we expect an error, like if we have
+            // List<int> a = new List<object>();
+            // We expect an error, this is the case in the code above.
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);
+            Assert.IsTrue(files[0].Errors[0].Message.Contains("incompatible type"));
         }
 
 

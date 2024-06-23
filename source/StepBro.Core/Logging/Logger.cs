@@ -85,7 +85,7 @@ namespace StepBro.Core.Logging
 
             m_last = new LogEntry(
                 UniqueInteger.GetLongDirectly(),
-                DateTime.Now,
+                DateTime.UtcNow,
                 System.Threading.Thread.CurrentThread.ManagedThreadId,
                 location,
                 starttext);

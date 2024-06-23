@@ -187,6 +187,37 @@ namespace StepBroCoreTest.Data
         //public static long MethodStaticAWithOverload([Implicit] ICallContext context, long a = 7L, string b = "Nix") { return 7009; }   // Called with args: (n), this is the same as the above.
         #endregion
 
+        public static string MethodStaticParamsStringOrNone()
+        {
+            return "No parameters";
+        }
+        public static string MethodStaticParamsStringOrNone(params string[] parameters)
+        {
+            if (parameters != null && parameters.Length > 0)
+            {
+                return "Args: " + string.Join(", ", parameters);
+            }
+            else
+            {
+                return "Args: <none>";
+            }
+        }
+        public string MethodInstanceParamsStringOrNone()
+        {
+            return "Here, with no parameters";
+        }
+        public string MethodInstanceParamsStringOrNone(params string[] parameters)
+        {
+            if (parameters != null && parameters.Length > 0)
+            {
+                return "Args: " + string.Join(", ", parameters);
+            }
+            else
+            {
+                return "Args: <none>";
+            }
+        }
+
         public static string MethodStaticStringParamsString(string format, params string[] parameters)
         {
             if (parameters != null && parameters.Length > 0)
