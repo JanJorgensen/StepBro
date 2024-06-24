@@ -70,7 +70,13 @@ namespace StepBro.Core.Parser
 
         public override void ExitArguments([NotNull] SBP.ArgumentsContext context)
         {
-            m_arguments.Push(m_expressionData.PopStackLevel());
+            List<SBExpressionData> stackData = m_expressionData.PopStackLevel().ToList();
+            Stack<SBExpressionData> handledStackData = new Stack<SBExpressionData>();
+            for (int i = stackData.Count() - 1; i >= 0; i--) // Need to go through backwards because Stack -> List -> Stack
+            {
+                handledStackData.Push(ResolveForGetOperation(stackData[i]));
+            }
+            m_arguments.Push(handledStackData);
         }
 
         public override void EnterMethodArguments([NotNull] SBP.MethodArgumentsContext context)
