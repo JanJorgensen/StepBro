@@ -32,11 +32,12 @@ namespace StepBro.ExecutionHelper
         private EventHandler m_executionHelperClosedEventHandler = null;
 
         /// <summary>
-        /// Name of the Access variable, used if no prefix is set.
+        /// Name of the Access variable.
         /// </summary>
         public string Name { get; set; } = null;
         /// <summary>
         /// Prefix used for variable names and similar, so multiple accesses to the ExecutionHelper can have the same variable names.
+        /// If Name is set but Prefix is not set, Name will be used as a prefix.
         /// </summary>
         public string Prefix { get; set; } = null;
 
