@@ -11,16 +11,41 @@ using System.Threading;
 
 namespace StepBro.ExecutionHelper
 {
+    /// <summary>
+    /// Access class to Execution Helper.
+    /// This is used to bind the StepBro script to an instance of an ExecutionHelper executable running on the machine.
+    /// If no instance is running, it will automatically start an instance of ExecutionHelper, when <see cref="CreateExecutionHelper" /> is called.
+    /// </summary>
     public class Access : INameable, IDisposable
     {
+        /// <summary>
+        /// The pipe used to communicate with the ExecutionHelper instance.
+        /// </summary>
         private Pipe m_executionHelperPipe = null;
+        /// <summary>
+        /// Determines whether this script should stop if ExecutionHelper is closed.
+        /// </summary>
         private bool m_closeWhenExecutionHelperCloses = false;
+        /// <summary>
+        /// EventHandler to handle incoming messages from ExecutionHelper
+        /// </summary>
         private EventHandler m_executionHelperClosedEventHandler = null;
 
+        /// <summary>
+        /// Name of the Access variable, used if no prefix is set.
+        /// </summary>
         public string Name { get; set; } = null;
+        /// <summary>
+        /// Prefix used for variable names and similar, so multiple accesses to the ExecutionHelper can have the same variable names.
+        /// </summary>
         public string Prefix { get; set; } = null;
 
 
+
+        /// <summary>
+        /// ReceivedData is called when ExecutionHelper sends data to Access.
+        /// </summary>
+        /// <param name="message">A message from ExecutionHelper to Access</param>
         private void ReceivedData(Tuple<string, string> message)
         {
             if (message.Item1 == nameof(StepBro.ExecutionHelper.Messages.ShortCommand))
@@ -33,9 +58,16 @@ namespace StepBro.ExecutionHelper
             }
         }
 
+        /// <summary>
+        /// Used to create an ExecutionHelper instance and connect to it.
+        /// </summary>
+        /// <param name="context">Context variable</param>
+        /// <param name="arguments">Arguments sent to the ExecutionHelper instance, for example -drc to tell ExecutionHelper not to run a specified command</param>
+        /// <param name="closeWhenExecutionHelperCloses">Specifies whether the script should stop when ExecutionHelper is stopped</param>
+        /// <returns>True if ExecutionHelper was created/connected to properly, false otherwise</returns>
         public bool CreateExecutionHelper([Implicit] ICallContext context = null, string arguments = "", bool closeWhenExecutionHelperCloses = false)
         {
-            // If constructor with no arguments were used, we use the name of the instance instead
+            // If no prefix is set during construction, we use the name of the variable instead
             if (Prefix == null)
             {
                 Prefix = Name;
@@ -88,6 +120,13 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
+        /// <summary>
+        /// Creates or Sets the value of a variable on the ExecutionHelper side.
+        /// </summary>
+        /// <param name="context">Context variable</param>
+        /// <param name="variableName">Name of variable to create or set</param>
+        /// <param name="value">Value the variable should have</param>
+        /// <returns>True if successful</returns>
         public bool CreateOrSetVariable([Implicit] ICallContext context, string variableName, object value)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.CreateOrSetVariable(Prefix + variableName, value));
@@ -96,6 +135,12 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
+        /// <summary>
+        /// Increments a variable by 1.
+        /// </summary>
+        /// <param name="context">Context variable</param>
+        /// <param name="variableName">Variable to increment</param>
+        /// <returns>True if successful</returns>
         public bool IncrementVariable([Implicit] ICallContext context, string variableName)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.IncrementVariable(Prefix + variableName));
@@ -104,6 +149,13 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
+        /// <summary>
+        /// Gets the value of a variable.
+        /// </summary>
+        /// <param name="context">Context variable</param>
+        /// <param name="variableName">Name of variable to get value of</param>
+        /// <returns>Variable value</returns>
+        /// <exception cref="NotSupportedException">Exception thrown if the type of the variable is not supported (yet)</exception>
         public object GetVariable([Implicit] ICallContext context, string variableName)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.GetVariable(Prefix + variableName));
@@ -148,13 +200,19 @@ namespace StepBro.ExecutionHelper
                         variable = false;
                         break;
                     default:
-                        throw new Exception("Variable of kind: " + v.ValueKind.ToString() + " is not supported yet!");
+                        throw new NotSupportedException("Variable of kind: " + v.ValueKind.ToString() + " is not supported yet!");
                 }
             }
 
             return variable;
         }
 
+        /// <summary>
+        /// Saves variables to a file from ExecutionHelper so it can access them at a later point.
+        /// </summary>
+        /// <param name="context">Context variable</param>
+        /// <param name="fileName">Name of the file to save</param>
+        /// <returns>True if successful</returns>
         public bool SaveFile([Implicit] ICallContext context, string fileName)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SaveFile(Prefix + fileName));
@@ -163,6 +221,13 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
+        /// <summary>
+        /// Loads file into ExecutionHelper so it has updated variables from a file.
+        /// </summary>
+        /// <param name="context">Context variable</param>
+        /// <param name="fileName">Name of the file to load</param>
+        /// <param name="reportError">Whether we should give StepBro an error if the file could not be loaded (For example if it has not been created yet)</param>
+        /// <returns>True if successful</returns>
         public bool LoadFile([Implicit] ICallContext context, string fileName, bool reportError = true)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.LoadFile(Prefix + fileName));
@@ -173,6 +238,12 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
+        /// <summary>
+        /// Sets a command to run when <see cref="RunPeriodicCheck" /> is called.
+        /// </summary>
+        /// <param name="context">Context variable</param>
+        /// <param name="command">The command, as a string, for ExecutionHelper to run</param>
+        /// <returns>True if successful</returns>
         public bool SetCommandToRun([Implicit] ICallContext context, string command)
         {
             m_executionHelperPipe.Send(new StepBro.ExecutionHelper.Messages.SetCommandToRun(command));
@@ -181,6 +252,10 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
+        /// <summary>
+        /// Closes ExecutionHelper.
+        /// </summary>
+        /// <returns>True if successful</returns>
         public bool CloseApplication()
         {
             m_executionHelperPipe.OnConnectionClosed -= m_executionHelperClosedEventHandler;
@@ -190,24 +265,43 @@ namespace StepBro.ExecutionHelper
             return true;
         }
 
+        /// <summary>
+        /// Stops ExecutionHelper from autosaving.
+        /// </summary>
+        /// <returns>True if successful</returns>
         public bool SuspendAutosave()
         {
             m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.SuspendAutosave);
             return true;
         }
 
+        /// <summary>
+        /// Resumes autosaving in ExecutionHelper.
+        /// </summary>
+        /// <returns>True if successful</returns>
         public bool ResumeAutosave()
         {
             m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.ResumeAutosave);
             return true;
         }
 
+        /// <summary>
+        /// Tells ExecutionHelper to run a periodic check, for example for Windows Update or similar.
+        /// ExecutionHelper runs the command set by <see cref="SetCommandToRun(ICallContext, string)" /> after the check is done.
+        /// </summary>
+        /// <returns>True if successful</returns>
         public bool RunPeriodicCheck()
         {
             m_executionHelperPipe.Send(StepBro.ExecutionHelper.Messages.ShortCommand.RunPeriodicCheck);
             return true;
         }
 
+        /// <summary>
+        /// Waits for an "Acknowledge" from ExecutionHelper. Used for error handling.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="reportError"></param>
+        /// <returns>True if acknowledge was received within a timeout limit, false otherwise</returns>
         bool WaitForAcknowledge(ICallContext context, bool reportError = true)
         {
             bool result = false;
@@ -253,6 +347,9 @@ namespace StepBro.ExecutionHelper
             return result;
         }
 
+        /// <summary>
+        /// Disposes ExecutionHelper
+        /// </summary>
         public void Dispose()
         {
             if (m_executionHelperPipe != null)
