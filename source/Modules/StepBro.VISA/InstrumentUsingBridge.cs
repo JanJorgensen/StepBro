@@ -16,12 +16,31 @@ namespace StepBro.VISA
     /// </summary>
     public class Instrument : INameable, INamedObject, IDisposable
     {
+        /// <summary>
+        /// The resource we are communicating with.
+        /// </summary>
         private string m_resource = "";
+        /// <summary>
+        /// The name of this object.
+        /// </summary>
         private string m_name = "instrument";
+        /// <summary>
+        /// The pipe we use to communicate with VISA.
+        /// </summary>
         private static Pipe m_visaPipe = null;
+        /// <summary>
+        /// Whether the session is currently open.
+        /// </summary>
         private static bool m_sessionOpened = false;
+        /// <summary>
+        /// Event handler for when VISA closes.
+        /// </summary>
         private EventHandler m_visaClosedEventHandler = null;
 
+        /// <summary>
+        /// Event handler for when data is received over m_visaPipe.
+        /// </summary>
+        /// <param name="received">The data received</param>
         private void ReceivedData(Tuple<string, string> received)
         {
             switch (received.Item1)
@@ -64,20 +83,43 @@ namespace StepBro.VISA
             }
         }
 
+        /// <summary>
+        /// The resource we are communicating with.
+        /// </summary>
         public string Resource
         {
             get { return m_resource; }
             set { m_resource = value; }
         }
 
+        /// <summary>
+        /// The name of this object.
+        /// </summary>
         public string Name { get { return m_name; } set { m_name = value; } }
 
+        /// <summary>
+        /// The short name of this object.
+        /// </summary>
         public string ShortName { get { return this.Name; } }
 
+        /// <summary>
+        /// The full name of this object.
+        /// </summary>
         public string FullName { get { return this.Name; } }
 
+
+
+        /// <summary>
+        /// The max time that may elapse between asking VISA for some information and until VISA sends the information to us.
+        /// </summary>
         public TimeSpan ReadTimeout { get; set; } = TimeSpan.FromMilliseconds(2500);
 
+        /// <summary>
+        /// Open the pipe and connection to a resource.
+        /// </summary>
+        /// <param name="context">Context variable</param>
+        /// <param name="timeout">Max timeout</param>
+        /// <returns>True if connection was opened within the timeout limit</returns>
         public bool Open([Implicit] ICallContext context = null, TimeSpan timeout = new TimeSpan())
         {
             if (timeout.Equals(new TimeSpan()))
@@ -153,6 +195,11 @@ namespace StepBro.VISA
             return started;
         }
 
+        /// <summary>
+        /// Close a session.
+        /// </summary>
+        /// <param name="context">Context variable</param>
+        /// <param name="timeout">Max timeout</param>
         public void Close([Implicit] ICallContext context = null, TimeSpan timeout = new TimeSpan())
         {
             if (timeout.Equals(new TimeSpan()))
@@ -193,6 +240,13 @@ namespace StepBro.VISA
             }
         }
 
+        /// <summary>
+        /// Query a command to the VISA resource.
+        /// </summary>
+        /// <param name="context">Context variable</param>
+        /// <param name="command">Command to query</param>
+        /// <param name="timeout">Max timeout</param>
+        /// <returns>The result of the query</returns>
         public string Query([Implicit] ICallContext context, string command, TimeSpan timeout = new TimeSpan())
         {
             if (timeout.Equals(new TimeSpan()))
@@ -247,6 +301,13 @@ namespace StepBro.VISA
             return received;
         }
 
+        /// <summary>
+        /// Write a command to the VISA resource.
+        /// Will not automatically return the answer.
+        /// Use the <see cref="Read"/> method to get the answer.
+        /// </summary>
+        /// <param name="context">Context variable</param>
+        /// <param name="command">The command to send to the VISA resrouce</param>
         public void Write([Implicit] ICallContext context, string command)
         {
             if (m_sessionOpened)
@@ -259,6 +320,12 @@ namespace StepBro.VISA
             }
         }
 
+        /// <summary>
+        /// Reads an answer from the VISA resource.
+        /// </summary>
+        /// <param name="context">Context variable</param>
+        /// <param name="timeout">Max timeout</param>
+        /// <returns>The answer from the VISA resource.</returns>
         public string Read([Implicit] ICallContext context, TimeSpan timeout = new TimeSpan())
         {
             if (timeout.Equals(new TimeSpan()))
@@ -300,6 +367,12 @@ namespace StepBro.VISA
             return received;
         }
 
+        /// <summary>
+        /// Reads a single line in the data the resource is trying to send us.
+        /// </summary>
+        /// <param name="context">Context variable</param>
+        /// <param name="timeout">Max timeout</param>
+        /// <returns>A line of the data the resource is trying to send us</returns>
         public string ReadLine([Implicit] ICallContext context, TimeSpan timeout = new TimeSpan())
         {
             if (timeout.Equals(new TimeSpan()))
@@ -341,6 +414,12 @@ namespace StepBro.VISA
             return received;
         }
 
+        /// <summary>
+        /// Lists the resources connected to the PC.
+        /// </summary>
+        /// <param name="context">Context variable</param>
+        /// <param name="timeout">Max timeout</param>
+        /// <returns>Array of strings that contain the names of the resources</returns>
         public static string[] ListAvailableResources([Implicit] ICallContext context, TimeSpan timeout = new TimeSpan())
         {
             if (timeout.Equals(new TimeSpan()))
@@ -381,6 +460,9 @@ namespace StepBro.VISA
             return instruments;
         }
 
+        /// <summary>
+        /// Disposes the instrument object
+        /// </summary>
         public void Dispose()
         {
             m_visaPipe.OnConnectionClosed -= m_visaClosedEventHandler;
