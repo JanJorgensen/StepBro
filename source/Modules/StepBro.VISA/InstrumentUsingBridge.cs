@@ -17,7 +17,7 @@ namespace StepBro.VISA
     public class Instrument : INameable, INamedObject, IDisposable
     {
         /// <summary>
-        /// The resource we are communicating with.
+        /// The full name resource we are communicating with.
         /// </summary>
         private string m_resource = "";
         /// <summary>
