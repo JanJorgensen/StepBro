@@ -9,6 +9,11 @@ using System.Threading;
 
 namespace StepBro.VISA
 {
+    /// <summary>
+    /// Class to connect to an instrument using VISA
+    /// This is used to bind the StepBro script to an instrument utilizing the VISA protocol.
+    /// <seealso cref="https://www.ni.com//visa/default.htm" />
+    /// </summary>
     public class Instrument : INameable, INamedObject, IDisposable
     {
         private string m_resource = "";

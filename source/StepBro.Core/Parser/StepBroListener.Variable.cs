@@ -97,8 +97,15 @@ namespace StepBro.Core.Parser
                 else if (m_variableType.Type.IsClass)
                 {
                     var defaultConstructor = m_variableType.Type.GetConstructor(new Type[0]);
-                    var newExpression = Expression.New(defaultConstructor);
-                    m_variableInitializer = new SBExpressionData(newExpression);
+                    try
+                    {
+                        var newExpression = Expression.New(defaultConstructor);
+                        m_variableInitializer = new SBExpressionData(newExpression);
+                    }
+                    catch (ArgumentNullException)
+                    {
+                        m_errors.SymanticError(context.Start.Line, context.Start.Column, false, $"Type {m_variableType.Type.Name} does not have a default constructor");
+                    }
                 }
             }
         }
