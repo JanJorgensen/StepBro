@@ -14,7 +14,7 @@ namespace StepBro.Core.Logging
         }
         public static bool Normal(LogEntry entry)
         {
-            return entry.EntryType != LogEntry.Type.Post;
+            return entry.EntryType != LogEntry.Type.Post && (entry.Text != null || entry.Location != null);
         }
 
         public static bool NormalWithoutDetailedAndComm(LogEntry entry)
@@ -30,7 +30,7 @@ namespace StepBro.Core.Logging
                 case LogEntry.Type.Failure:
                 case LogEntry.Type.UserAction:
                 case LogEntry.Type.System:
-                    return true;
+                    return entry.Text != null || entry.Location != null;
                 case LogEntry.Type.Post:
                 case LogEntry.Type.Detail:
                 case LogEntry.Type.CommunicationOut:

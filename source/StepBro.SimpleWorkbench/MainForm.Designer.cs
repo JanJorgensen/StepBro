@@ -33,6 +33,8 @@ namespace StepBro.SimpleWorkbench
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             statusStrip = new StatusStrip();
+            toolStripDropDownButtonTestActions = new ToolStripDropDownButton();
+            toolStripMenuItemTestActionStartFileParsing = new ToolStripMenuItem();
             panelCustomToolstrips = new ToolBarHost();
             toolStripMain = new ToolStrip();
             toolStripMainMenu = new ToolStripDropDownButton();
@@ -68,17 +70,39 @@ namespace StepBro.SimpleWorkbench
             autoHideContainer3 = new ActiproSoftware.UI.WinForms.Controls.Docking.AutoHideContainer();
             autoHideTabStripPanel4 = new ActiproSoftware.UI.WinForms.Controls.Docking.AutoHideTabStripPanel();
             autoHideContainer4 = new ActiproSoftware.UI.WinForms.Controls.Docking.AutoHideContainer();
+            timerTest = new System.Windows.Forms.Timer(components);
+            toolStripStatusLabelApplicationTaskState = new ToolStripStatusLabel();
+            statusStrip.SuspendLayout();
             toolStripMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dockManager).BeginInit();
             SuspendLayout();
             // 
             // statusStrip
             // 
+            statusStrip.Items.AddRange(new ToolStripItem[] { toolStripStatusLabelApplicationTaskState, toolStripDropDownButtonTestActions });
             statusStrip.Location = new Point(0, 505);
             statusStrip.Name = "statusStrip";
             statusStrip.Size = new Size(1028, 22);
             statusStrip.TabIndex = 3;
             statusStrip.Text = "statusStrip";
+            // 
+            // toolStripDropDownButtonTestActions
+            // 
+            toolStripDropDownButtonTestActions.BackColor = Color.Khaki;
+            toolStripDropDownButtonTestActions.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripDropDownButtonTestActions.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemTestActionStartFileParsing });
+            toolStripDropDownButtonTestActions.Image = (Image)resources.GetObject("toolStripDropDownButtonTestActions.Image");
+            toolStripDropDownButtonTestActions.ImageTransparentColor = Color.Magenta;
+            toolStripDropDownButtonTestActions.Name = "toolStripDropDownButtonTestActions";
+            toolStripDropDownButtonTestActions.Size = new Size(83, 20);
+            toolStripDropDownButtonTestActions.Text = "Test Actions";
+            // 
+            // toolStripMenuItemTestActionStartFileParsing
+            // 
+            toolStripMenuItemTestActionStartFileParsing.Name = "toolStripMenuItemTestActionStartFileParsing";
+            toolStripMenuItemTestActionStartFileParsing.Size = new Size(180, 22);
+            toolStripMenuItemTestActionStartFileParsing.Text = "Parse Files";
+            toolStripMenuItemTestActionStartFileParsing.Click += toolStripMenuItemTestActionStartFileParsing_Click;
             // 
             // panelCustomToolstrips
             // 
@@ -358,6 +382,20 @@ namespace StepBro.SimpleWorkbench
             autoHideContainer4.Size = new Size(1016, 1);
             autoHideContainer4.TabIndex = 13;
             // 
+            // timerTest
+            // 
+            timerTest.Interval = 2000;
+            timerTest.Tick += timerTest_Tick;
+            // 
+            // toolStripStatusLabelApplicationTaskState
+            // 
+            toolStripStatusLabelApplicationTaskState.AutoSize = false;
+            toolStripStatusLabelApplicationTaskState.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripStatusLabelApplicationTaskState.Name = "toolStripStatusLabelApplicationTaskState";
+            toolStripStatusLabelApplicationTaskState.Size = new Size(100, 17);
+            toolStripStatusLabelApplicationTaskState.Text = "Working...";
+            toolStripStatusLabelApplicationTaskState.TextAlign = ContentAlignment.MiddleLeft;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
@@ -376,6 +414,8 @@ namespace StepBro.SimpleWorkbench
             Controls.Add(statusStrip);
             Name = "MainForm";
             Text = "StepBro Workbench";
+            statusStrip.ResumeLayout(false);
+            statusStrip.PerformLayout();
             toolStripMain.ResumeLayout(false);
             toolStripMain.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dockManager).EndInit();
@@ -420,5 +460,9 @@ namespace StepBro.SimpleWorkbench
         private ToolStripMenuItem viewPropertiesToolStripMenuItem;
         private ToolStripMenuItem helpToolStripMenuItem;
         private ToolStripMenuItem viewDocumentationBrowserToolStripMenuItem;
+        private System.Windows.Forms.Timer timerTest;
+        private ToolStripDropDownButton toolStripDropDownButtonTestActions;
+        private ToolStripMenuItem toolStripMenuItemTestActionStartFileParsing;
+        private ToolStripStatusLabel toolStripStatusLabelApplicationTaskState;
     }
 }

@@ -1,14 +1,22 @@
 using ActiproSoftware.UI.WinForms.Controls.Docking;
 using ActiproSoftware.UI.WinForms.Drawing;
 using StepBro.Core;
+using StepBro.Core.Api;
+using StepBro.Core.Controls;
+using StepBro.Core.Execution;
+using StepBro.Core.File;
 using StepBro.Core.General;
+using StepBro.Core.ScriptData;
+using StepBro.Core.Tasks;
+using StepBro.UI.WinForms;
 using StepBro.UI.WinForms.Controls;
 using System.Text;
+using static StepBro.Core.Host.HostApplicationTaskHandler;
 using StepBroMain = StepBro.Core.Main;
 
 namespace StepBro.SimpleWorkbench
 {
-    public partial class MainForm : Form
+    public partial class MainForm : FormWithHostApplicationTaskHandling
     {
         private int documentWindowIndex = 1;
         //private int toolWindowIndex = 1;
@@ -22,21 +30,42 @@ namespace StepBro.SimpleWorkbench
         private HostAccess m_hostAccess = null;
         private ILoadedFilesManager m_loadedFiles = null;
 
-        private ToolWindow toolWindowExecutionLog = null;
+        private ToolWindow m_toolWindowExecutionLog = null;
         private LogViewer m_logviewer = null;
-        //private Core.Controls.ParsingErrorListView parsingErrorListView;
+
+        private ToolWindow m_toolWindowParsingErrors = null;
+        private ParsingErrorListView m_errorsList = null;
+
+        private object m_applicationResourceUserObject = new object();
+        private Dictionary<string, ITextCommandInput> m_commandObjectDictionary = null;
+
+        // Script Execution
+        private IScriptExecution m_execution = null;
+
+        private IScriptFile m_file = null;
+        private IFileElement m_element = null;
+        private IPartner m_partner = null;
+        //private bool executionRequestSilent = false;
+        private string m_targetFile = null;
+        private string m_targetFileFullPath = null;
+        private string m_targetElement = null;
+        private string m_targetPartner = null;
+        private string m_targetObject = null;
+        private List<object> m_targetArguments = new List<object>();
+
 
         public MainForm()
         {
             InitializeComponent();
 
             toolStripMainMenu.Text = "\u2630";
+            this.StartUsingTaskHandlingTimer();
 
             //toolWindowProperties.Close();
             //toolWindowHelp.Close();
 
-            this.CreateTextDocument(null, "This is a read-only document.  Notice the lock context image in the tab.", true).Activate();
-            this.CreateTextDocument(null, null, false).Activate();
+            //this.CreateTextDocument(null, "This is a read-only document.  Notice the lock context image in the tab.", true).Activate();
+            //this.CreateTextDocument(null, null, false).Activate();
 
         }
 
@@ -55,13 +84,18 @@ namespace StepBro.SimpleWorkbench
             this.ParseCommandLineOptions();
 
             m_logviewer = new LogViewer();
-            toolWindowExecutionLog = new ToolWindow(dockManager, "Execution Log", "Execution Log", null, m_logviewer);
-            toolWindowExecutionLog.DockTo(dockManager, DockOperationType.RightOuter);
-            toolWindowExecutionLog.State = ToolWindowState.TabbedDocument;
+            m_toolWindowExecutionLog = new ToolWindow(dockManager, "ExecutionLogView", "Execution Log", null, m_logviewer);
+            m_toolWindowExecutionLog.DockTo(dockManager, DockOperationType.RightOuter);
+            m_toolWindowExecutionLog.State = ToolWindowState.TabbedDocument;
             m_logviewer.Setup();
+
+            m_errorsList = new ParsingErrorListView();
+            m_toolWindowParsingErrors = new ToolWindow(dockManager, "ErrorsView", "Errors", null, m_errorsList);
+            m_toolWindowParsingErrors.DockTo(dockManager, DockOperationType.BottomOuter);
 
             // TO BE DELETED
             dockManager.SaveCustomToolWindowLayoutData += DockManager_SaveCustomToolWindowLayoutData;
+            timerTest.Start();
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -91,6 +125,23 @@ namespace StepBro.SimpleWorkbench
             foreach (var line in sb.ToString().Split(System.Environment.NewLine))
             {
                 //if (!String.IsNullOrWhiteSpace(line)) ConsoleWriteLine(line);
+            }
+
+            m_targetFile = m_commandLineOptions.InputFile;
+            m_targetElement = m_commandLineOptions.TargetElement;
+            m_targetObject = m_commandLineOptions.TargetInstance;
+            m_targetPartner = m_commandLineOptions.TargetModel;
+            m_targetArguments = m_commandLineOptions?.Arguments.Select((a) => StepBroMain.ParseExpression(m_element?.ParentFile, a)).ToList();
+
+            if (!String.IsNullOrEmpty(m_targetFile))
+            {
+                this.StartFileLoading();
+                this.StartFileParsing();
+
+                if (!String.IsNullOrEmpty(m_targetElement))
+                {
+                    this.StartScriptExecution();
+                }
             }
         }
 
@@ -197,29 +248,144 @@ namespace StepBro.SimpleWorkbench
             return documentWindow;
         }
 
+        #region Application Tasks
+
+        protected override void OnTaskHandlingStateChanged(StateChange change, string workingText)
+        {
+            toolStripStatusLabelApplicationTaskState.Text = workingText;
+        }
+
+        private enum TaskNoState { Do }
+
+        private TaskAction FileLoadingTask(ref TaskNoState state, ref int index, ITaskStateReporting reporting)
+        {
+            m_targetFileFullPath = System.IO.Path.GetFullPath(m_targetFile);
+            try
+            {
+                m_file = StepBroMain.LoadScriptFile(m_applicationResourceUserObject, m_targetFileFullPath);
+                if (m_file == null)
+                {
+                    //retval = -1;
+                    //ConsoleWriteErrorLine("Error: Loading script file failed ( " + m_targetFileFullPath + " )");
+                }
+                else
+                {
+                    var shortcuts = ServiceManager.Global.Get<IFolderManager>();
+                    var projectShortcuts = new FolderShortcutCollection(FolderShortcutOrigin.Project);
+                    projectShortcuts.AddShortcut(StepBro.Core.Api.Constants.TOP_FILE_FOLDER_SHORTCUT, System.IO.Path.GetDirectoryName(m_file.FilePath), isResolved: true);
+                    shortcuts.AddSource(projectShortcuts);
+
+                    //m_next.Enqueue(StateOrCommand.ParseFiles);  // File has been loaded; start the parsing.
+                }
+            }
+            catch (Exception)
+            {
+                //retval = -1;
+                //ConsoleWriteErrorLine("Error: Loading script file failed: " + ex.GetType().Name + ", " + ex.Message);
+            }
+            return TaskAction.Finish;
+        }
+
+        private void StartFileLoading()
+        {
+            this.AddTask<TaskNoState>(FileLoadingTask, "Loading file", "Load script file.");
+        }
+
+        private enum FileParsingState { Init, Parse, Finish }
+
+        private TaskAction FileParsingTask(ref FileParsingState state, ref int index, ITaskStateReporting reporting)
+        {
+            switch (state)
+            {
+                case FileParsingState.Init:
+                    // TODO: Check whether file is loaded.
+
+                    state = FileParsingState.Parse;
+                    return TaskAction.ContinueOnWorkerThreadDomain;
+
+                case FileParsingState.Parse:
+                    var parsingSuccess = StepBroMain.ParseFiles(true);
+                    state = FileParsingState.Finish;
+                    break;
+
+                case FileParsingState.Finish:
+                    return TaskAction.Finish;
+
+                default:
+                    break;
+            }
+            return TaskAction.Continue;
+        }
+
+        private void StartFileParsing()
+        {
+            this.AddTask<FileParsingState>(FileParsingTask, "Parsing files", "Parse the script files.");
+        }
+
+        private enum ScriptExecutionState { Init, Parse, Finish }
+
+        private TaskAction ScriptExecutionTask(ref ScriptExecutionState state, ref int index, ITaskStateReporting reporting)
+        {
+            //switch (state)
+            //{
+            //    case ScriptExecutionState.Init:
+            //        // TODO: Check whether file is loaded.
+
+            //        state = FileParsingState.Parse;
+            //        return TaskAction.ContinueOnWorkerThreadDomain;
+
+            //    case FileParsingState.Parse:
+            //        var parsingSuccess = StepBroMain.ParseFiles(true);
+            //        state = FileParsingState.Finish;
+            //        break;
+
+            //    case FileParsingState.Finish:
+            //        return TaskAction.Finish;
+
+            //    default:
+            //        break;
+            //}
+            return TaskAction.Continue;
+        }
+
+        private void StartScriptExecution()
+        {
+            this.AddTask<ScriptExecutionState>(ScriptExecutionTask, "Executing script", "Execute script.");
+        }
+
+        #endregion
+
         #region View Menu
 
         private void toolStripMenuItemView_DropDownOpened(object sender, EventArgs e)
         {
-            //viewExecutionLogToolStripMenuItem.Checked = toolWindowExecutionLog.Active;
+            viewExecutionLogToolStripMenuItem.Checked = m_toolWindowExecutionLog.Active;
+            viewErrorsToolStripMenuItem.Checked = m_toolWindowExecutionLog.Active;
             //viewPropertiesToolStripMenuItem.Checked = toolWindowProperties.Active;
         }
 
         private void viewExecutionLogToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (viewExecutionLogToolStripMenuItem.Checked)
+            if (!viewExecutionLogToolStripMenuItem.Checked)
             {
-                toolWindowExecutionLog.Activate();
+                m_toolWindowExecutionLog.Activate();
             }
             else
             {
-                toolWindowExecutionLog.Close();
+                m_toolWindowExecutionLog.Close();
             }
         }
 
         private void viewErrorsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            if (!viewExecutionLogToolStripMenuItem.Checked)
+            {
+                m_toolWindowExecutionLog.Activate();
+            }
+            else
+            {
+                m_toolWindowExecutionLog.Close();
+            }
         }
 
         private void viewObjectCommandPromptToolStripMenuItem_Click(object sender, EventArgs e)
@@ -229,7 +395,7 @@ namespace StepBro.SimpleWorkbench
 
         private void viewPropertiesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (viewPropertiesToolStripMenuItem.Checked)
+            if (!viewPropertiesToolStripMenuItem.Checked)
             {
                 //toolWindowProperties.Activate();
             }
@@ -242,7 +408,7 @@ namespace StepBro.SimpleWorkbench
         #endregion
 
         #region Help Menu
-        
+
         private void viewDocumentationBrowserToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //toolWindowHelp.Activate();
@@ -268,5 +434,17 @@ namespace StepBro.SimpleWorkbench
         }
 
         #endregion
+
+        private void timerTest_Tick(object sender, EventArgs e)
+        {
+            timerTest.Stop();
+            //timerTest.Interval = 1500;
+            //StepBroMain.Logger.RootLogger.Log("Ello!!  - " + DateTime.Now.ToLongTimeString());
+        }
+
+        private void toolStripMenuItemTestActionStartFileParsing_Click(object sender, EventArgs e)
+        {
+            this.StartFileParsing();
+        }
     }
 }

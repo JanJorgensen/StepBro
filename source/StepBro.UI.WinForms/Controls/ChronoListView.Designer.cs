@@ -28,11 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             panelHorizontal = new Panel();
             hScrollBar = new HScrollBar();
             panelFillRight = new Panel();
             vScrollBar = new VScrollBar();
             viewPort = new ChronoListViewPort();
+            timerUpdate = new System.Windows.Forms.Timer(components);
             panelHorizontal.SuspendLayout();
             SuspendLayout();
             // 
@@ -49,10 +51,13 @@
             // hScrollBar
             // 
             hScrollBar.Dock = DockStyle.Bottom;
+            hScrollBar.LargeChange = 100;
             hScrollBar.Location = new Point(0, 8);
+            hScrollBar.Maximum = 2000;
             hScrollBar.Name = "hScrollBar";
             hScrollBar.Size = new Size(485, 17);
             hScrollBar.TabIndex = 1;
+            hScrollBar.Scroll += hScrollBar_Scroll;
             // 
             // panelFillRight
             // 
@@ -69,11 +74,13 @@
             vScrollBar.Name = "vScrollBar";
             vScrollBar.Size = new Size(17, 125);
             vScrollBar.TabIndex = 1;
+            vScrollBar.Scroll += vScrollBar_Scroll;
             // 
             // viewPort
             // 
             viewPort.BackColor = Color.Black;
             viewPort.Dock = DockStyle.Fill;
+            viewPort.Font = new Font("Courier New", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             viewPort.ForeColor = Color.White;
             viewPort.HorizontalScrollPosition = 0;
             viewPort.Location = new Point(0, 0);
@@ -82,6 +89,11 @@
             viewPort.TabIndex = 2;
             viewPort.Text = "ViewPort";
             viewPort.Click += chronoListViewPort_Click;
+            // 
+            // timerUpdate
+            // 
+            timerUpdate.Interval = 200;
+            timerUpdate.Tick += timerUpdate_Tick;
             // 
             // ChronoListView
             // 
@@ -103,5 +115,6 @@
         private HScrollBar hScrollBar;
         private VScrollBar vScrollBar;
         private ChronoListViewPort viewPort;
+        private System.Windows.Forms.Timer timerUpdate;
     }
 }

@@ -18,6 +18,8 @@ namespace StepBro.Core.Data
         /// <param name="entry">The entry/data to search for.</param>
         /// <returns>The index of the found entry, or the index of the entry </returns>
         long SearchForEntry(TPresentationEntry entry);
+        void SetTailMode(bool inTailMode);
+        bool InTailMode { get; }
     }
 
 
@@ -189,8 +191,7 @@ namespace StepBro.Core.Data
         protected DataCache<TPresentationEntry> m_cache;
         private DataWalker<TSourceEntry> m_sourceTipWalker = null;
         private DataWalker<TSourceEntry> m_sourceCacheWalker = null;
-        private bool m_tipMode = true;
-        //private long m_tipIndex = -1;
+        private bool m_tailMode = true;
 
         public PresentationListForListData(
             IDataListSource<TSourceEntry> source,
@@ -201,16 +202,19 @@ namespace StepBro.Core.Data
             m_cache = new DataCache<TPresentationEntry>(m_walkerSource, cacheSize, minimumCacheFill);
         }
 
-        public void SetTipMode(bool inTipMode)
+        public void SetTailMode(bool inTailMode)
         {
-            if (m_tipMode != inTipMode)
+            if (m_tailMode != inTailMode)
             {
-                m_tipMode = inTipMode;
-                if (m_tipMode)
+                m_tailMode = inTailMode;
+                if (m_tailMode)
                 {
                 }
             }
         }
+
+        public bool InTailMode { get { return m_tailMode; } }
+
 
         public abstract void CreatePresentationEntry(TSourceEntry entry, long sourceIndex, System.Action<TPresentationEntry> adder);
 
@@ -233,11 +237,11 @@ namespace StepBro.Core.Data
 
             var first = m_source.GetFirst();
             m_sourceCacheWalker = m_source.WalkFrom(first.Item1);
-            if (!m_tipMode)
+            if (!m_tailMode)
             {
                 m_sourceTipWalker = m_sourceCacheWalker.Dublicate();
             }
-            if (m_tipMode)
+            if (m_tailMode)
             {
                 this.Get(Int64.MaxValue);
             }
@@ -293,9 +297,9 @@ namespace StepBro.Core.Data
         /// <summary>
         /// Make the list check for new data in the source, run new data through the filter and update index of last known.
         /// </summary>
-        public void UpdateTip()
+        public void UpdateTail()
         {
-            if (m_tipMode)
+            if (m_tailMode)
             {
                 m_cache.Get(Int64.MaxValue);
             }
@@ -305,22 +309,5 @@ namespace StepBro.Core.Data
         {
             return -1L;
         }
-
-
-        //private void AddToCacheAndTip(TPresentationEntry entry)
-        //{
-        //    this.AddToTip(entry);
-        //    this.AddToCache(entry);
-        //}
-
-        //private void AddToCache(TPresentationEntry entry)
-        //{
-        //    m_cache.Add(entry);
-        //}
-
-        //private void AddToTip(TPresentationEntry entry)
-        //{
-        //    m_tipIndex++;
-        //}
     }
 }

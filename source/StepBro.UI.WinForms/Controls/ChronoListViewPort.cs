@@ -11,11 +11,13 @@ namespace StepBro.UI.WinForms.Controls
 {
     public class ChronoListViewPort : Control, IView
     {
+
         public interface IView
         {
             int HorizontalScrollPosition { get; }
             DynamicViewSettings ViewSettings { get; }
             Font NormalFont { get; }
+            Brush NormalTextColor { get; }
         }
 
         public enum TimestampFormat
@@ -33,7 +35,7 @@ namespace StepBro.UI.WinForms.Controls
             private DateTime m_zeroTime;
             private TimestampFormat m_timeFormat = TimestampFormat.Seconds;
             private int m_timestampWidth = 0;   // The width of the widest seen timestamp.
-            private int m_lineHeaderEnd = 0;    // The right side of the widest line header (timestamp and type)
+            private int m_lineHeaderWidth = 0;    // The right side of the widest line header (timestamp and type)
 
             public bool ValueChanged()
             {
@@ -51,7 +53,7 @@ namespace StepBro.UI.WinForms.Controls
             public void Reset()
             {
                 m_timestampWidth = 0;
-                m_lineHeaderEnd = 0;
+                m_lineHeaderWidth = 0;
             }
 
             public DateTime ZeroTime
@@ -92,14 +94,14 @@ namespace StepBro.UI.WinForms.Controls
                     }
                 }
             }
-            public int LineHeaderEnd
+            public int LineHeaderWidth
             {
-                get { return m_lineHeaderEnd; }
+                get { return m_lineHeaderWidth; }
                 set
                 {
-                    if (value != m_lineHeaderEnd)
+                    if (value != m_lineHeaderWidth)
                     {
-                        m_lineHeaderEnd = value;
+                        m_lineHeaderWidth = value;
                         m_valueChanged = true;
                     }
                 }
@@ -109,6 +111,7 @@ namespace StepBro.UI.WinForms.Controls
         private object m_sync = new object();
         private IChronoListViewer m_viewer = null;
         private IElementIndexer<ChronoListViewEntry> m_source = null;
+        private int m_lineHeight = 20;
         private ChronoListViewEntry[] m_viewEntries = new ChronoListViewEntry[200];
         private int m_viewEntryCount = 0;
         private int m_horizontalScrollPosition = 0;
@@ -116,8 +119,9 @@ namespace StepBro.UI.WinForms.Controls
 
         private long m_topIndex = 0L;
 
-        public ChronoListViewPort()
+        public ChronoListViewPort() : base()
         {
+            m_lineHeight = this.Font.Height;
             this.BackColor = Color.Black;
             this.ForeColor = Color.White;
             this.SetStyle(ControlStyles.Selectable, true);
@@ -132,7 +136,6 @@ namespace StepBro.UI.WinForms.Controls
         {
             m_viewer = viewer;
             m_source = viewer.Source;
-
         }
 
         public int HorizontalScrollPosition
@@ -148,51 +151,98 @@ namespace StepBro.UI.WinForms.Controls
 
         public Font NormalFont { get { return this.Font; } }
 
+        public Brush NormalTextColor { get { return Brushes.White; } }
+
+        public int MaxLinesVisible { get { return this.Height / m_lineHeight; } }
+
+        public void RequestUpdate(long topEntry, int horizontalScrollPosition)
+        {
+            System.Diagnostics.Debug.Assert(!this.InvokeRequired);
+            System.Diagnostics.Debug.WriteLine("ChronoListViewPort.RequestUpdate");
+            m_topIndex = topEntry;
+            m_horizontalScrollPosition = horizontalScrollPosition;
+            //this.Refresh();
+            this.Invalidate();
+        }
 
         protected override void OnPaint(PaintEventArgs e)
         {
+            Rectangle rect;
+            if (m_source == null)
+            {
+                m_viewEntryCount = 0;
+                return;
+            }
             m_viewSettings.ZeroTime = m_viewer.ZeroTime;
-            //System.Drawing.Graphics g = e.Graphics;
-            e.Graphics.FillRectangle(Brushes.Black, e.ClipRectangle);
-            int y = 0;
             var sourceState = m_source.GetState();
             long lastIndex = sourceState.LastIndex;
-            if (lastIndex < 0L)
+            if (m_source == null || lastIndex < 0L)
             {
                 m_viewEntryCount = 0;
                 return;
             }
 
-            var entryIndex = m_topIndex;
-            int viewIndex = 0;
-
-            Rectangle rect;
-
-            try
+            bool first = true;
+            while (first || m_viewSettings.ValueChanged())
             {
-                while (entryIndex <= lastIndex)
+                first = false;
+                int y = 0;
+                e.Graphics.FillRectangle(Brushes.Black, e.ClipRectangle);
+                var entryIndex = m_topIndex;
+                int viewIndex = 0;
+                try
                 {
-                    var entry = m_source.Get(entryIndex);
-                    m_viewEntries[viewIndex] = entry;
-
-                    bool isSelected = false;
-                    rect = new Rectangle(m_horizontalScrollPosition, y, 10000, 20);
-                    if (isSelected)
+                    while (entryIndex <= lastIndex)
                     {
-                        e.Graphics.FillRectangle(Brushes.Blue, rect);
+                        var entry = m_source.Get(entryIndex);
+                        m_viewEntries[viewIndex] = entry;
+
+                        var selectionState = EntrySelectionState.Not;
+                        rect = new Rectangle(m_horizontalScrollPosition, y, 10000, m_lineHeight);
+                        if (selectionState != EntrySelectionState.Not)
+                        {
+                            e.Graphics.FillRectangle(Brushes.Blue, rect);
+                        }
+                        entry.DoPaint(e, this, ref rect, selectionState);
+
+                        entryIndex++;
+                        y += m_lineHeight;
+                        viewIndex++;
                     }
-                    entry.DoPaint(e, this, ref rect, isSelected);
-
-                    entryIndex++;
-                    y += entry.Height;
-                    viewIndex++;
+                    m_viewEntryCount = viewIndex;
                 }
-                m_viewEntryCount = viewIndex;
-            }
-            catch
-            {
+                catch
+                {
 
+                }
             }
         }
+
+
+        protected override void OnFontChanged(EventArgs e)
+        {
+            base.OnFontChanged(e);
+            m_lineHeight = this.Font.Height;
+        }
+
+        #region Mouse
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+
+            if (!this.Focused)
+            {
+                this.Select();
+            }
+
+        }
+
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+        }
+
+        #endregion
     }
 }
