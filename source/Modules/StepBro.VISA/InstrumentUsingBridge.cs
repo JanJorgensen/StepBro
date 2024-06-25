@@ -415,11 +415,11 @@ namespace StepBro.VISA
         }
 
         /// <summary>
-        /// Lists the resources connected to the PC.
+        /// Lists the resources/instruments connected to the PC.
         /// </summary>
         /// <param name="context">Context variable</param>
         /// <param name="timeout">Max timeout</param>
-        /// <returns>Array of strings that contain the names of the resources</returns>
+        /// <returns>Array of strings that contain the names of the resources/instruments</returns>
         public static string[] ListAvailableResources([Implicit] ICallContext context, TimeSpan timeout = new TimeSpan())
         {
             if (timeout.Equals(new TimeSpan()))
