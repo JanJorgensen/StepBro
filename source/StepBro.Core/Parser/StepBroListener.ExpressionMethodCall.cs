@@ -70,12 +70,18 @@ namespace StepBro.Core.Parser
 
         public override void ExitArguments([NotNull] SBP.ArgumentsContext context)
         {
+            // We need to turn the stack into a list so we can iterate through it and keep the right order
+            // We need to get the data off the stack so we can use the "ResolveForGetOperation" method on it to make sure
+            // the variables are resolved. This is specifically for global variables as when they are not resolved
+            // they are VariableContainers which is not the same as the underlying type, and gives compile errors.
+
             List<SBExpressionData> stackData = m_expressionData.PopStackLevel().ToList();
             Stack<SBExpressionData> handledStackData = new Stack<SBExpressionData>();
             for (int i = stackData.Count() - 1; i >= 0; i--) // Need to go through backwards because Stack -> List -> Stack
             {
                 handledStackData.Push(ResolveForGetOperation(stackData[i]));
             }
+
             m_arguments.Push(handledStackData);
         }
 
