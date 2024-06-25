@@ -125,7 +125,11 @@ namespace StepBro.ExecutionHelper
                         Thread.Sleep(1); // Wait for 1 ms and check again
                     }
 
-                    // TODO: Check if there is a windows update
+                    // Check if there is a windows update, download and install it
+                    //  TODO: This has not been tested whether it automatically restarts the PC yet
+                    AddToLogData($"Checking if there is a Windows Update, if there is, update!");
+                    System.Diagnostics.Process.Start("CMD.exe", "/C UsoClient.exe StartInteractiveScan");
+
                     // TODO: If there is a windows update, temporarily add ExecutionHelper to run on startup
                     //       of windows, in the current folder, so we can restart the stepbro script after
                     //       a restart.
