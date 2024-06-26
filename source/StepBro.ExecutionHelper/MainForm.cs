@@ -1,5 +1,7 @@
 using StepBro.Core.IPC;
+using StepBro.Core.Parser.Grammar;
 using StepBro.ExecutionHelper.Messages;
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using System.Windows.Forms;
@@ -15,6 +17,7 @@ namespace StepBro.ExecutionHelper
         private const string m_executionHelperDataFolder = "ExecutionHelperDataFolder";
         private const string m_commandToRunFileName = "CommandToRun.sbd";
         private const string m_logFileName = "ExecutionHelperLog";
+        private string m_startupFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "StepbroExecutionHelperStartup.cmd");
         private string m_logData = "";
         private readonly object m_logLock = new object();
 
@@ -44,6 +47,14 @@ namespace StepBro.ExecutionHelper
             base.OnLoad(e);
 
             System.Diagnostics.Trace.WriteLine("Execution Helper STARTING!!");
+
+            AddToLogData("Execution Helper Starting...");
+
+            // Remove startup file so we do not open ExecutionHelper on reboot when not wanting to
+            if (System.IO.File.Exists(m_startupFile))
+            {
+                System.IO.File.Delete(m_startupFile);
+            }
 
             System.IO.Directory.CreateDirectory(m_executionHelperDataFolder);
 
@@ -125,13 +136,57 @@ namespace StepBro.ExecutionHelper
                         Thread.Sleep(1); // Wait for 1 ms and check again
                     }
 
-                    // TODO: Check if there is a windows update
-                    // TODO: If there is a windows update, temporarily add ExecutionHelper to run on startup
-                    //       of windows, in the current folder, so we can restart the stepbro script after
-                    //       a restart.
+                    // Check if there is a windows update, download and install it
+                    AddToLogData($"Starting downloading and installation of Windows Update if there are any!");
+                    System.Diagnostics.Process.Start("powershell.exe", "\"UsoClient.exe StartInteractiveScan\"");
 
-                    // Run the cmd set with "CommandToRun"
-                    RunCommandSet();
+                    AddToLogData($"Checking if we require a reboot because of Windows Update, if required, reboot!");
+                    string powershellCommandToCheckRebootRequired =
+                        """
+                        "
+                        if ((Get-Item 'HKLM:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired' -ea si) -ne $null) 
+                        {
+                            exit 1;
+                        }
+                        else
+                        {
+                            exit 0;
+                        }
+                        "
+                        """;
+                    var checkRebootProcess = System.Diagnostics.Process.Start("powershell.exe", powershellCommandToCheckRebootRequired);
+                    checkRebootProcess.WaitForExit();
+
+                    // TODO: This has not been tested if it actually works properly yet, as we have not had this running when an update should occur yet
+                    if(checkRebootProcess.ExitCode == 1)
+                    {
+                        // ExitCode 1 means we should reboot
+                        AddToLogData($"Setting up ExecutionHelper to startup after reboot and then rebooting!");
+
+                        try
+                        {
+                            // Setup ExecutionHelper to start after reboot
+                            var currentDirectory = Directory.GetCurrentDirectory();
+
+                            using (StreamWriter sw = new StreamWriter(m_startupFile))
+                            {
+                                sw.Write($"cd {currentDirectory} && stepbro.executionhelper.exe");
+                            }
+
+                            AddToLogData("Rebooting...");
+                            // Reboot in 1 second so we can get the last log data in the log
+                            System.Diagnostics.Process.Start("powershell.exe", "\"shutdown /r /t 1\"");
+                        }
+                        catch (Exception e)
+                        {
+                            AddToLogData("Exception occurred when trying to create or write to startup file or when trying to reboot: " + e.Message);
+                        }
+                    }
+                    else
+                    {
+                        // If we are not going to reboot, run the cmd set with "CommandToRun"
+                        RunCommandSet();
+                    }
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateOrSetVariable))
