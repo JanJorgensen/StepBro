@@ -98,7 +98,7 @@ namespace StepBro.ExecutionHelper
                 {
                     AddToLogData($"RunCommandSet: {loadedData}");
                     // TODO: Run the command - Remember to do sanity checking, possibly by deserializing into an object that has the specific parameters we look for, i.e. filename, testlist, model, print_report etc.
-                    System.Diagnostics.Process.Start("CMD.exe", "/C " + loadedData);
+                    // System.Diagnostics.Process.Start("CMD.exe", "/C " + loadedData);
                 }
             }
         }
@@ -182,9 +182,11 @@ namespace StepBro.ExecutionHelper
                             AddToLogData("Exception occurred when trying to create or write to startup file or when trying to reboot: " + e.Message);
                         }
                     }
-
-                    // Run the cmd set with "CommandToRun"
-                    RunCommandSet();
+                    else
+                    {
+                        // If we are not going to reboot, run the cmd set with "CommandToRun"
+                        RunCommandSet();
+                    }
                 }
             }
             else if (received.Item1 == nameof(StepBro.ExecutionHelper.Messages.CreateOrSetVariable))
