@@ -135,7 +135,6 @@ namespace StepBro.ExecutionHelper
                     }
 
                     // Check if there is a windows update, download and install it
-                    //  TODO: This has not been tested whether it automatically restarts the PC yet
                     AddToLogData($"Starting downloading and installation of Windows Update if there are any!");
                     System.Diagnostics.Process.Start("powershell.exe", "/C UsoClient.exe StartInteractiveScan");
 
@@ -154,6 +153,7 @@ namespace StepBro.ExecutionHelper
                     var checkRebootProcess = System.Diagnostics.Process.Start("powershell.exe", powershellCommandToCheckRebootRequired);
                     checkRebootProcess.WaitForExit();
 
+                    // TODO: This has not been tested if it actually works properly yet, as we have not had this running when an update should occur yet
                     if(checkRebootProcess.ExitCode == 1)
                     {
                         // ExitCode 1 means we should reboot
