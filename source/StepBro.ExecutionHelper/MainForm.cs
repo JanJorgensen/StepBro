@@ -17,7 +17,7 @@ namespace StepBro.ExecutionHelper
         private const string m_executionHelperDataFolder = "ExecutionHelperDataFolder";
         private const string m_commandToRunFileName = "CommandToRun.sbd";
         private const string m_logFileName = "ExecutionHelperLog";
-        private string m_startupFile = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + "StepbroExecutionHelperStartup.cmd";
+        private string m_startupFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "StepbroExecutionHelperStartup.cmd");
         private string m_logData = "";
         private readonly object m_logLock = new object();
 
@@ -47,6 +47,8 @@ namespace StepBro.ExecutionHelper
             base.OnLoad(e);
 
             System.Diagnostics.Trace.WriteLine("Execution Helper STARTING!!");
+
+            AddToLogData("Execution Helper Starting...");
 
             // Remove startup file so we do not open ExecutionHelper on reboot when not wanting to
             if (System.IO.File.Exists(m_startupFile))
@@ -96,7 +98,7 @@ namespace StepBro.ExecutionHelper
                 {
                     AddToLogData($"RunCommandSet: {loadedData}");
                     // TODO: Run the command - Remember to do sanity checking, possibly by deserializing into an object that has the specific parameters we look for, i.e. filename, testlist, model, print_report etc.
-                    // System.Diagnostics.Process.Start("CMD.exe", "/C " + loadedData);
+                    System.Diagnostics.Process.Start("CMD.exe", "/C " + loadedData);
                 }
             }
         }
@@ -161,16 +163,24 @@ namespace StepBro.ExecutionHelper
                         // ExitCode 1 means we should reboot
                         AddToLogData($"Setting up ExecutionHelper to startup after reboot and then rebooting!");
 
-                        // Setup ExecutionHelper to start after reboot
-                        var currentDirectory = Directory.GetCurrentDirectory();
-                        File.Create(m_startupFile);
-                        using (var sw = File.AppendText(m_startupFile))
+                        try
                         {
-                            sw.Write($"cd {currentDirectory}; stepbro.executionhelper.exe");
-                        }
+                            // Setup ExecutionHelper to start after reboot
+                            var currentDirectory = Directory.GetCurrentDirectory();
 
-                        // Reboot
-                        System.Diagnostics.Process.Start("powershell.exe", "\"shutdown /r /t 0\"");
+                            using (StreamWriter sw = new StreamWriter(m_startupFile))
+                            {
+                                sw.Write($"cd {currentDirectory}; stepbro.executionhelper.exe");
+                            }
+
+                            AddToLogData("Rebooting...");
+                            // Reboot in 1 second so we can get the last log data in the log
+                            System.Diagnostics.Process.Start("powershell.exe", "\"shutdown /r /t 1\"");
+                        }
+                        catch (Exception e)
+                        {
+                            AddToLogData("Exception occurred when trying to create or write to startup file or when trying to reboot: " + e.Message);
+                        }
                     }
 
                     // Run the cmd set with "CommandToRun"
