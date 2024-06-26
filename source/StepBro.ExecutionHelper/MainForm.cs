@@ -1,5 +1,7 @@
 using StepBro.Core.IPC;
+using StepBro.Core.Parser.Grammar;
 using StepBro.ExecutionHelper.Messages;
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using System.Windows.Forms;
@@ -15,6 +17,7 @@ namespace StepBro.ExecutionHelper
         private const string m_executionHelperDataFolder = "ExecutionHelperDataFolder";
         private const string m_commandToRunFileName = "CommandToRun.sbd";
         private const string m_logFileName = "ExecutionHelperLog";
+        private string m_startupFile = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + "StepbroExecutionHelperStartup.cmd";
         private string m_logData = "";
         private readonly object m_logLock = new object();
 
@@ -44,6 +47,12 @@ namespace StepBro.ExecutionHelper
             base.OnLoad(e);
 
             System.Diagnostics.Trace.WriteLine("Execution Helper STARTING!!");
+
+            // Remove startup file so we do not open ExecutionHelper on reboot when not wanting to
+            if (System.IO.File.Exists(m_startupFile))
+            {
+                System.IO.File.Delete(m_startupFile);
+            }
 
             System.IO.Directory.CreateDirectory(m_executionHelperDataFolder);
 
@@ -133,22 +142,34 @@ namespace StepBro.ExecutionHelper
                     AddToLogData($"Checking if we require a reboot because of Windows Update, if required, reboot!");
                     string powershellCommandToCheckRebootRequired =
                         """
-                        $rebootKey = Get-Item 'HKLM:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired' -ea si;
-                        $shouldReboot = $rebootKey -ne $null;
-                        if ($shouldReboot -eq $true)
+                        if (Get-Item 'HKLM:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired' -ea si -ne $null) 
                         {
-                            <# Setup ExecutionHelper to start after reboot #>
-                            
-
-                            <# Reboot #>
-                            shutdown /r /t 0;
+                            exit 1;
+                        }
+                        else
+                        {
+                            exit 0;
                         }
                         """;
-                    System.Diagnostics.Process.Start("powershell.exe", "/C " + powershellCommandToCheckRebootRequired);
+                    var checkRebootProcess = System.Diagnostics.Process.Start("powershell.exe", "/C " + powershellCommandToCheckRebootRequired);
+                    checkRebootProcess.WaitForExit();
 
-                    // TODO: If there is a windows update, temporarily add ExecutionHelper to run on startup
-                    //       of windows, in the current folder, so we can restart the stepbro script after
-                    //       a restart.
+                    if(checkRebootProcess.ExitCode == 1)
+                    {
+                        // ExitCode 1 means we should reboot
+                        AddToLogData($"Setting up ExecutionHelper to startup after reboot and then rebooting!");
+
+                        // Setup ExecutionHelper to start after reboot
+                        var currentDirectory = Directory.GetCurrentDirectory();
+                        File.Create(m_startupFile);
+                        using (var sw = File.AppendText(m_startupFile))
+                        {
+                            sw.Write($"cd {currentDirectory}; stepbro.executionhelper.exe");
+                        }
+
+                        // Reboot
+                        System.Diagnostics.Process.Start("powershell.exe", "/C shutdown /r /t 0");
+                    }
 
                     // Run the cmd set with "CommandToRun"
                     RunCommandSet();
