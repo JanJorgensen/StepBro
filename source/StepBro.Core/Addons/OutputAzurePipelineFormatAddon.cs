@@ -207,7 +207,11 @@ namespace StepBro.Core.Addons
                     // RENAME FILE SO WE DO NOT OVERWRITE REPORT
                     if (m_reportFileName != null)
                     {
-                        System.IO.File.Move("report.sbr", $"report-{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.sbr");
+                        if (m_reportFileName.Contains(System.IO.Path.DirectorySeparatorChar))
+                        {
+                            System.IO.Directory.CreateDirectory(Path.GetDirectoryName(m_reportFileName));
+                        }
+                        System.IO.File.Move("report.sbr", $"{m_reportFileName.Split(".sbr")[0]}-{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.sbr");
                     }
                 }
                 finally
