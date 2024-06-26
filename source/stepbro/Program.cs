@@ -993,9 +993,16 @@ namespace StepBro.Cmd
             {
                 if (m_commandLineOptions.ReportToFile != null)
                 {
-                    using (StreamWriter streamWriter = System.IO.File.AppendText("report.sbr"))
+                    try
                     {
-                        streamWriter.WriteLine($"--- BEGAN GENERATION AT {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")} ---\n");
+                        using (StreamWriter streamWriter = System.IO.File.AppendText("report.sbr"))
+                        {
+                            streamWriter.WriteLine($"--- BEGAN GENERATION AT {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")} ---\n");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        ConsoleWriteErrorLine("Error occurred when creating report file. The following exception was thrown: " + e.Message);
                     }
                 }
                 m_outputFormatter.WriteReport(createdReport, m_commandLineOptions.PrintReport, m_commandLineOptions.ReportToFile);
