@@ -32,7 +32,7 @@ namespace StepBro.Core.Addons
         /// </summary>
         /// <param name="report">The report data.</param>
         /// <param name="fileName">Filename, null if no report file should be generated.</param>
-        void WriteReport(DataReport report, string fileName = null);
+        void WriteReport(DataReport report, bool shouldLogReport = false, string fileName = null);
 
         /// <summary>
         /// Force writing all data to the underlying <seealso cref="ITextWriter"/> object.

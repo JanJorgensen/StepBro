@@ -30,6 +30,7 @@ namespace StepBro.Core.Addons
         private class Outputter : IOutputFormatter, ITextWriter
         {
             private string m_reportFileName = null;
+            private bool m_shouldLogReport = false;
             OutputFormatOptions m_options;
             readonly ITextWriter m_writer;
 
@@ -67,10 +68,11 @@ namespace StepBro.Core.Addons
                 return false;
             }
 
-            public void WriteReport(DataReport report, string fileName = null)
+            public void WriteReport(DataReport report, bool shouldLogReport = false, string fileName = null)
             {
                 // Use the filename provided, if it is null we will not write to a file
                 m_reportFileName = fileName;
+                m_shouldLogReport = shouldLogReport;
                 //bool oldCreateHighLevelLogSections = m_options.CreateHighLevelLogSections;
                 //m_options.CreateHighLevelLogSections = false;
                 try
@@ -287,7 +289,10 @@ namespace StepBro.Core.Addons
             // TODO: Utilize the CommandLineOptions.LogToFile option to log into a file here, as this writes the execution log as well
             void ITextWriter.Write(string text)
             {
-                System.Console.Write(text);
+                if (m_shouldLogReport)
+                {
+                    System.Console.Write(text);
+                }
 
                 if (m_reportFileName != null)
                 {
@@ -300,7 +305,10 @@ namespace StepBro.Core.Addons
 
             void ITextWriter.WriteLine(string text)
             {
-                System.Console.WriteLine(text);
+                if (m_shouldLogReport)
+                {
+                    System.Console.WriteLine(text);
+                }
 
                 if (m_reportFileName != null)
                 {

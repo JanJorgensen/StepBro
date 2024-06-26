@@ -989,7 +989,7 @@ namespace StepBro.Cmd
             }
             FlushBufferedConsoleOutput();
 
-            if (m_commandLineOptions.PrintReport && createdReport != null)
+            if ((m_commandLineOptions.PrintReport || m_commandLineOptions.ReportToFile != null) && createdReport != null)
             {
                 if (m_commandLineOptions.ReportToFile != null)
                 {
@@ -999,7 +999,7 @@ namespace StepBro.Cmd
                         fs.Write(generatedInfo, 0, generatedInfo.Length);
                     }
                 }
-                m_outputFormatter.WriteReport(createdReport, m_commandLineOptions.ReportToFile);
+                m_outputFormatter.WriteReport(createdReport, m_commandLineOptions.PrintReport, m_commandLineOptions.ReportToFile);
             }
             else
             {
