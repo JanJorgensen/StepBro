@@ -151,7 +151,7 @@ namespace StepBro.ExecutionHelper
                             exit 0;
                         }
                         """;
-                    var checkRebootProcess = System.Diagnostics.Process.Start("powershell.exe", "/C " + powershellCommandToCheckRebootRequired);
+                    var checkRebootProcess = System.Diagnostics.Process.Start("powershell.exe", powershellCommandToCheckRebootRequired);
                     checkRebootProcess.WaitForExit();
 
                     if(checkRebootProcess.ExitCode == 1)
@@ -168,7 +168,7 @@ namespace StepBro.ExecutionHelper
                         }
 
                         // Reboot
-                        System.Diagnostics.Process.Start("powershell.exe", "/C shutdown /r /t 0");
+                        System.Diagnostics.Process.Start("powershell.exe", "shutdown /r /t 0");
                     }
 
                     // Run the cmd set with "CommandToRun"
