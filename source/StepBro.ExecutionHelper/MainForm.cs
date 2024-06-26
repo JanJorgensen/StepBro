@@ -170,7 +170,7 @@ namespace StepBro.ExecutionHelper
 
                             using (StreamWriter sw = new StreamWriter(m_startupFile))
                             {
-                                sw.Write($"cd {currentDirectory}; stepbro.executionhelper.exe");
+                                sw.Write($"cd {currentDirectory} && stepbro.executionhelper.exe");
                             }
 
                             AddToLogData("Rebooting...");
