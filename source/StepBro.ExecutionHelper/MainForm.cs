@@ -136,12 +136,13 @@ namespace StepBro.ExecutionHelper
 
                     // Check if there is a windows update, download and install it
                     AddToLogData($"Starting downloading and installation of Windows Update if there are any!");
-                    System.Diagnostics.Process.Start("powershell.exe", "/C UsoClient.exe StartInteractiveScan");
+                    System.Diagnostics.Process.Start("powershell.exe", "\"UsoClient.exe StartInteractiveScan\"");
 
                     AddToLogData($"Checking if we require a reboot because of Windows Update, if required, reboot!");
                     string powershellCommandToCheckRebootRequired =
                         """
-                        if (Get-Item 'HKLM:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired' -ea si -ne $null) 
+                        "
+                        if ((Get-Item 'HKLM:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired' -ea si) -ne $null) 
                         {
                             exit 1;
                         }
@@ -149,6 +150,7 @@ namespace StepBro.ExecutionHelper
                         {
                             exit 0;
                         }
+                        "
                         """;
                     var checkRebootProcess = System.Diagnostics.Process.Start("powershell.exe", powershellCommandToCheckRebootRequired);
                     checkRebootProcess.WaitForExit();
@@ -168,7 +170,7 @@ namespace StepBro.ExecutionHelper
                         }
 
                         // Reboot
-                        System.Diagnostics.Process.Start("powershell.exe", "shutdown /r /t 0");
+                        System.Diagnostics.Process.Start("powershell.exe", "\"shutdown /r /t 0\"");
                     }
 
                     // Run the cmd set with "CommandToRun"
