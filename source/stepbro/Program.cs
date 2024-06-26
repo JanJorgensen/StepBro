@@ -993,10 +993,9 @@ namespace StepBro.Cmd
             {
                 if (m_commandLineOptions.ReportToFile != null)
                 {
-                    using (FileStream fs = System.IO.File.Create("report.sbr"))
+                    using (StreamWriter streamWriter = System.IO.File.AppendText("report.sbr"))
                     {
-                        byte[] generatedInfo = new UTF8Encoding(true).GetBytes($"--- BEGAN GENERATION AT {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")} ---\n");
-                        fs.Write(generatedInfo, 0, generatedInfo.Length);
+                        streamWriter.WriteLine($"--- BEGAN GENERATION AT {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")} ---\n");
                     }
                 }
                 m_outputFormatter.WriteReport(createdReport, m_commandLineOptions.PrintReport, m_commandLineOptions.ReportToFile);
