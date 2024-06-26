@@ -302,6 +302,7 @@ namespace StepBro.Core.Addons
                 }
             }
 
+            // TODO: Utilize the CommandLineOptions.LogToFile option to log into a file here, as this writes the execution log as well
             void ITextWriter.Write(string text)
             {
                 System.Console.Write(text);
