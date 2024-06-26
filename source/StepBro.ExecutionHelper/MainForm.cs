@@ -127,8 +127,24 @@ namespace StepBro.ExecutionHelper
 
                     // Check if there is a windows update, download and install it
                     //  TODO: This has not been tested whether it automatically restarts the PC yet
-                    AddToLogData($"Checking if there is a Windows Update, if there is, update!");
-                    System.Diagnostics.Process.Start("CMD.exe", "/C UsoClient.exe StartInteractiveScan");
+                    AddToLogData($"Starting downloading and installation of Windows Update if there are any!");
+                    System.Diagnostics.Process.Start("powershell.exe", "/C UsoClient.exe StartInteractiveScan");
+
+                    AddToLogData($"Checking if we require a reboot because of Windows Update, if required, reboot!");
+                    string powershellCommandToCheckRebootRequired =
+                        """
+                        $rebootKey = Get-Item 'HKLM:SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired' -ea si;
+                        $shouldReboot = $rebootKey -ne $null;
+                        if ($shouldReboot -eq $true)
+                        {
+                            <# Setup ExecutionHelper to start after reboot #>
+                            
+
+                            <# Reboot #>
+                            shutdown /r /t 0;
+                        }
+                        """;
+                    System.Diagnostics.Process.Start("powershell.exe", "/C " + powershellCommandToCheckRebootRequired);
 
                     // TODO: If there is a windows update, temporarily add ExecutionHelper to run on startup
                     //       of windows, in the current folder, so we can restart the stepbro script after
