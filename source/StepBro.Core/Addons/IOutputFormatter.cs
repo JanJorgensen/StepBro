@@ -31,7 +31,8 @@ namespace StepBro.Core.Addons
         /// Create a complete textual report.
         /// </summary>
         /// <param name="report">The report data.</param>
-        void WriteReport(DataReport report);
+        /// <param name="fileName">Filename, null if no report file should be generated.</param>
+        void WriteReport(DataReport report, string fileName = null);
 
         /// <summary>
         /// Force writing all data to the underlying <seealso cref="ITextWriter"/> object.

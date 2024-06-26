@@ -39,6 +39,7 @@ namespace StepBro.Core.Addons
 
         public class TextToConsoleFormatter : IOutputFormatter, ITextWriter
         {
+            private string m_reportFileName = null;
             OutputFormatOptions m_options;
             ITextWriter m_writer = null;
 
@@ -102,8 +103,10 @@ namespace StepBro.Core.Addons
                 return false;
             }
 
-            public void WriteReport(DataReport report)
+            public void WriteReport(DataReport report, string fileName = null)
             {
+                // Use the filename provided, if it is null we will not write to a file
+                m_reportFileName = fileName;
                 try
                 {
                     // WRITE GROUPS
@@ -231,7 +234,10 @@ namespace StepBro.Core.Addons
                     }
 
                     // RENAME FILE SO WE DO NOT OVERWRITE REPORT
-                    System.IO.File.Move("report.sbr", $"report-{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.sbr");
+                    if (m_reportFileName != null)
+                    {
+                        System.IO.File.Move("report.sbr", $"{m_reportFileName.Split(".sbr")[0]}-{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.sbr");
+                    }
                 }
                 catch (Exception)
                 {
@@ -300,9 +306,12 @@ namespace StepBro.Core.Addons
             {
                 System.Console.Write(text);
 
-                using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
+                if (m_reportFileName != null)
                 {
-                    sw.Write(text);
+                    using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
+                    {
+                        sw.Write(text);
+                    }
                 }
             }
 
@@ -310,9 +319,12 @@ namespace StepBro.Core.Addons
             {
                 System.Console.WriteLine(text);
 
-                using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
+                if (m_reportFileName != null)
                 {
-                    sw.WriteLine(text);
+                    using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
+                    {
+                        sw.WriteLine(text);
+                    }
                 }
             }
         }
