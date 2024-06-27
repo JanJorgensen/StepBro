@@ -577,12 +577,28 @@ namespace StepBro.Core.Parser
                 var op = context.op.Type;
                 // TODO: Check if operator is returned
 
-                // Call the reset expect value text method so we do not accidentally show wrong information
-                var valueResetExpectValueText = s_ResetExpectValueText.MakeGenericMethod(value.DataType.Type);
-                var expectedResetExpectValueText = s_ResetExpectValueText.MakeGenericMethod(expected.DataType.Type);
-                value = new SBExpressionData(Expression.Call(valueResetExpectValueText, m_currentProcedure.ContextReferenceInternal, value.ExpressionCode));
-                expected = new SBExpressionData(Expression.Call(expectedResetExpectValueText, m_currentProcedure.ContextReferenceInternal, expected.ExpressionCode));
+                if (m_isSimpleExpectWithValue)
+                {
+                    if (value.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
+                    {
+                        var valueSaverValue = s_SaveExpectValueText.MakeGenericMethod(value.DataType.Type);
+                        value = new SBExpressionData(Expression.Call(valueSaverValue, m_currentProcedure.ContextReferenceInternal, value.ExpressionCode, Expression.Constant("Left"), Expression.Constant(true)));
+                    }
 
+                    if (expected.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
+                    {
+                        var valueSaverExpected = s_SaveExpectValueText.MakeGenericMethod(expected.DataType.Type);
+                        expected = new SBExpressionData(Expression.Call(valueSaverExpected, m_currentProcedure.ContextReferenceInternal, expected.ExpressionCode, Expression.Constant("Right"), Expression.Constant(false)));
+                    }
+                }
+                else
+                {
+                    // Call the reset expect value text method so we do not accidentally show wrong information
+                    var valueResetExpectValueText = s_ResetExpectValueText.MakeGenericMethod(value.DataType.Type);
+                    var expectedResetExpectValueText = s_ResetExpectValueText.MakeGenericMethod(expected.DataType.Type);
+                    value = new SBExpressionData(Expression.Call(valueResetExpectValueText, m_currentProcedure.ContextReferenceInternal, value.ExpressionCode));
+                    expected = new SBExpressionData(Expression.Call(expectedResetExpectValueText, m_currentProcedure.ContextReferenceInternal, expected.ExpressionCode));
+                }
 
                 var result = SpecialOperators.EqualsWithToleranceOperator.Resolve(this, value, op, expected, tolerance);
                 m_expressionData.Push(result);
