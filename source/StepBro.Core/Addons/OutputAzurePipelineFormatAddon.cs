@@ -31,6 +31,7 @@ namespace StepBro.Core.Addons
         {
             private string m_reportFileName = null;
             private bool m_shouldLogReport = false;
+            private bool m_reportStarted = false;
             OutputFormatOptions m_options;
             readonly ITextWriter m_writer;
 
@@ -73,6 +74,7 @@ namespace StepBro.Core.Addons
                 // Use the filename provided, if it is null we will not write to a file
                 m_reportFileName = fileName;
                 m_shouldLogReport = shouldLogReport;
+                m_reportStarted = true;
                 //bool oldCreateHighLevelLogSections = m_options.CreateHighLevelLogSections;
                 //m_options.CreateHighLevelLogSections = false;
                 try
@@ -289,7 +291,9 @@ namespace StepBro.Core.Addons
             // TODO: Utilize the CommandLineOptions.LogToFile option to log into a file here, as this writes the execution log as well
             void ITextWriter.Write(string text)
             {
-                if (m_shouldLogReport)
+                // If report has not been started yet, it is ordinary writes to console
+                // i.e. Execution log when -v, -t, or -l is present
+                if (m_shouldLogReport || !m_reportStarted)
                 {
                     System.Console.Write(text);
                 }
@@ -305,7 +309,9 @@ namespace StepBro.Core.Addons
 
             void ITextWriter.WriteLine(string text)
             {
-                if (m_shouldLogReport)
+                // If report has not been started yet, it is ordinary writes to console
+                // i.e. Execution log when -v, -t, or -l is present
+                if (m_shouldLogReport || !m_reportStarted)
                 {
                     System.Console.WriteLine(text);
                 }
