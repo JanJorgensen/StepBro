@@ -995,6 +995,10 @@ namespace StepBro.Cmd
                 {
                     try
                     {
+                        // Delete an existing report.sbr file if it exists
+                        // as that would be from a previous broken run
+                        // File.Delete succeeds without throwing an error if the file does not exist
+                        System.IO.File.Delete("report.sbr");
                         using (StreamWriter streamWriter = System.IO.File.AppendText("report.sbr"))
                         {
                             streamWriter.WriteLine($"--- BEGAN GENERATION AT {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")} ---\n");
