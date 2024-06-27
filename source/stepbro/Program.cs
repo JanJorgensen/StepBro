@@ -989,14 +989,23 @@ namespace StepBro.Cmd
             }
             FlushBufferedConsoleOutput();
 
-            if (m_commandLineOptions.PrintReport && createdReport != null)
+            if ((m_commandLineOptions.PrintReport || m_commandLineOptions.ReportToFile != null) && createdReport != null)
             {
-                using (FileStream fs = System.IO.File.Create("report.sbr"))
+                if (m_commandLineOptions.ReportToFile != null)
                 {
-                    byte[] generatedInfo = new UTF8Encoding(true).GetBytes($"--- BEGAN GENERATION AT {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")} ---\n");
-                    fs.Write(generatedInfo, 0, generatedInfo.Length);
+                    try
+                    {
+                        using (StreamWriter streamWriter = System.IO.File.AppendText("report.sbr"))
+                        {
+                            streamWriter.WriteLine($"--- BEGAN GENERATION AT {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")} ---\n");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        ConsoleWriteErrorLine("Error occurred when creating report file. The following exception was thrown: " + e.Message);
+                    }
                 }
-                m_outputFormatter.WriteReport(createdReport);
+                m_outputFormatter.WriteReport(createdReport, m_commandLineOptions.PrintReport, m_commandLineOptions.ReportToFile);
             }
             else
             {

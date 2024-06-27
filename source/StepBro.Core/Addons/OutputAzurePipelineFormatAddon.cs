@@ -29,6 +29,8 @@ namespace StepBro.Core.Addons
 
         private class Outputter : IOutputFormatter, ITextWriter
         {
+            private string m_reportFileName = null;
+            private bool m_shouldLogReport = false;
             OutputFormatOptions m_options;
             readonly ITextWriter m_writer;
 
@@ -66,8 +68,11 @@ namespace StepBro.Core.Addons
                 return false;
             }
 
-            public void WriteReport(DataReport report)
+            public void WriteReport(DataReport report, bool shouldLogReport = false, string fileName = null)
             {
+                // Use the filename provided, if it is null we will not write to a file
+                m_reportFileName = fileName;
+                m_shouldLogReport = shouldLogReport;
                 //bool oldCreateHighLevelLogSections = m_options.CreateHighLevelLogSections;
                 //m_options.CreateHighLevelLogSections = false;
                 try
@@ -202,7 +207,14 @@ namespace StepBro.Core.Addons
                     }
 
                     // RENAME FILE SO WE DO NOT OVERWRITE REPORT
-                    System.IO.File.Move("report.sbr", $"report-{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.sbr");
+                    if (m_reportFileName != null)
+                    {
+                        if (m_reportFileName.Contains(System.IO.Path.DirectorySeparatorChar))
+                        {
+                            System.IO.Directory.CreateDirectory(Path.GetDirectoryName(m_reportFileName));
+                        }
+                        System.IO.File.Move("report.sbr", $"{m_reportFileName.Split(".sbr")[0]}-{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.sbr");
+                    }
                 }
                 finally
                 {
@@ -274,24 +286,36 @@ namespace StepBro.Core.Addons
                 }
             }
 
-
+            // TODO: Utilize the CommandLineOptions.LogToFile option to log into a file here, as this writes the execution log as well
             void ITextWriter.Write(string text)
             {
-                System.Console.Write(text);
-
-                using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
+                if (m_shouldLogReport)
                 {
-                    sw.Write(text);
+                    System.Console.Write(text);
+                }
+
+                if (m_reportFileName != null)
+                {
+                    using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
+                    {
+                        sw.Write(text);
+                    }
                 }
             }
 
             void ITextWriter.WriteLine(string text)
             {
-                System.Console.WriteLine(text);
-
-                using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
+                if (m_shouldLogReport)
                 {
-                    sw.WriteLine(text);
+                    System.Console.WriteLine(text);
+                }
+
+                if (m_reportFileName != null)
+                {
+                    using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
+                    {
+                        sw.WriteLine(text);
+                    }
                 }
             }
 

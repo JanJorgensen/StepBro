@@ -56,7 +56,7 @@ namespace StepBro.Core.Addons
                 return false;
             }
 
-            public void WriteReport(DataReport report)
+            public void WriteReport(DataReport report, bool shouldLogReport = false, string fileName = null)
             {
                 throw new NotImplementedException();
             }
