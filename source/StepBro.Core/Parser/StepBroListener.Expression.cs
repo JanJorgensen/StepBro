@@ -20,6 +20,7 @@ namespace StepBro.Core.Parser
     internal partial class StepBroListener
     {
         private static MethodInfo s_SaveExpectValueText = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.SaveExpectValueText));
+        private static MethodInfo s_ResetExpectValueText = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ResetExpectValueText));
         private static MethodInfo s_AwaitAsyncVoid = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.AwaitAsyncVoid));
         private static MethodInfo s_AwaitAsyncTyped = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.AwaitAsyncTyped));
         private static MethodInfo s_AwaitAsyncToTyped = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.AwaitAsyncToTyped));
@@ -422,6 +423,14 @@ namespace StepBro.Core.Parser
                                 last = new SBExpressionData(Expression.Call(valueSaverLast, m_currentProcedure.ContextReferenceInternal, last.ExpressionCode, Expression.Constant("Right"), Expression.Constant(false)));
                             }
                         }
+                        else
+                        {
+                            // Call the reset expect value text method so we do not accidentally show wrong information
+                            var firstResetExpectValueText = s_ResetExpectValueText.MakeGenericMethod(first.DataType.Type);
+                            var lastResetExpectValueText = s_ResetExpectValueText.MakeGenericMethod(last.DataType.Type);
+                            first = new SBExpressionData(Expression.Call(firstResetExpectValueText, m_currentProcedure.ContextReferenceInternal, first.ExpressionCode));
+                            last = new SBExpressionData(Expression.Call(lastResetExpectValueText, m_currentProcedure.ContextReferenceInternal, last.ExpressionCode));
+                        }
                         var result = op.Resolve(this, first, last);
                         System.Diagnostics.Debug.Assert(result != null);
                         m_expressionData.Push(result);
@@ -539,6 +548,16 @@ namespace StepBro.Core.Parser
                         last = new SBExpressionData(Expression.Call(valueSaverLast, m_currentProcedure.ContextReferenceInternal, last.ExpressionCode, Expression.Constant("Right"), Expression.Constant(false)));
                     }
                 }
+                else
+                {
+                    // Call the reset expect value text method so we do not accidentally show wrong information
+                    var firstResetExpectValueText = s_ResetExpectValueText.MakeGenericMethod(first.DataType.Type);
+                    var middleResetExpectValueText = s_ResetExpectValueText.MakeGenericMethod(middle.DataType.Type);
+                    var lastResetExpectValueText = s_ResetExpectValueText.MakeGenericMethod(last.DataType.Type);
+                    first = new SBExpressionData(Expression.Call(firstResetExpectValueText, m_currentProcedure.ContextReferenceInternal, first.ExpressionCode));
+                    middle = new SBExpressionData(Expression.Call(firstResetExpectValueText, m_currentProcedure.ContextReferenceInternal, middle.ExpressionCode));
+                    last = new SBExpressionData(Expression.Call(lastResetExpectValueText, m_currentProcedure.ContextReferenceInternal, last.ExpressionCode));
+                }
 
                 var op1 = context.op1.Type;
                 var op2 = context.op2.Type;
@@ -557,6 +576,14 @@ namespace StepBro.Core.Parser
             {
                 var op = context.op.Type;
                 // TODO: Check if operator is returned
+
+                // Call the reset expect value text method so we do not accidentally show wrong information
+                var valueResetExpectValueText = s_ResetExpectValueText.MakeGenericMethod(value.DataType.Type);
+                var expectedResetExpectValueText = s_ResetExpectValueText.MakeGenericMethod(expected.DataType.Type);
+                value = new SBExpressionData(Expression.Call(valueResetExpectValueText, m_currentProcedure.ContextReferenceInternal, value.ExpressionCode));
+                expected = new SBExpressionData(Expression.Call(expectedResetExpectValueText, m_currentProcedure.ContextReferenceInternal, expected.ExpressionCode));
+
+
                 var result = SpecialOperators.EqualsWithToleranceOperator.Resolve(this, value, op, expected, tolerance);
                 m_expressionData.Push(result);
             }
