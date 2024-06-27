@@ -31,6 +31,7 @@ namespace StepBro.Core.Addons
         /// Create a complete textual report.
         /// </summary>
         /// <param name="report">The report data.</param>
+        /// <param name="shouldLogReport">Whether report should be logged to console.</param>
         /// <param name="fileName">Filename, null if no report file should be generated.</param>
         void WriteReport(DataReport report, bool shouldLogReport = false, string fileName = null);
 
