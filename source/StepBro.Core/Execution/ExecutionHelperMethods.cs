@@ -957,17 +957,6 @@ namespace StepBro.Core.Execution
             return value;
         }
 
-        /// <summary>
-        /// Helper method to reset expect value text.
-        /// </summary>
-        /// <param name="context">Context variable</param>
-        public static T ResetExpectValueText<T>(IScriptCallContext context, T value)
-        {
-            context.ExpectStatementValue = "";
-
-            return value;
-        }
-
         public static void DisposeObject(IScriptCallContext context, IDisposable obj)
         {
             if (obj == null) throw new NotImplementedException();
