@@ -504,16 +504,16 @@ namespace StepBro.Core.Parser
                             // ArgumentExceptions are have shown to be semantic errors, not internal ones.
                             // If we find an ArgumentException that is an internal error, update this.
                             m_errors.SymanticError(context.Start.Line, context.Start.Column, false, $"Assignment failed: {ae.Message}");
-                            // Adding an empty expression to the expression data stack makes it possible
+                            // Adding an error expression to the expression data stack makes it possible
                             // to parse the rest of the script to catch further issues
-                            m_expressionData.Push(new SBExpressionData(Expression.Empty()));
+                            m_expressionData.Push(new SBExpressionData(HomeType.Immediate, SBExpressionType.ExpressionError));
                         }
                         catch (Exception e)
                         {
                             m_errors.InternalError(context.Start.Line, context.Start.Column, $"Assignment failed: {e.Message}");
-                            // Adding an empty expression to the expression data stack makes it possible
+                            // Adding an error expression to the expression data stack makes it possible
                             // to parse the rest of the script to catch further issues
-                            m_expressionData.Push(new SBExpressionData(Expression.Empty()));
+                            m_expressionData.Push(new SBExpressionData(HomeType.Immediate, SBExpressionType.ExpressionError));
                         }
                     }
                 }
