@@ -499,9 +499,21 @@ namespace StepBro.Core.Parser
                             var result = op.Resolve(this, first, last);
                             m_expressionData.Push(result);
                         }
-                        catch(Exception ex)
+                        catch (ArgumentException ae)
                         {
-                            m_errors.InternalError(first.Token.Line, first.Token.Column, $"Assignment between left: {first.DataType} and right: {last.DataType} failed with the exception message: {ex.Message}");
+                            // ArgumentExceptions are have shown to be semantic errors, not internal ones.
+                            // If we find an ArgumentException that is an internal error, update this.
+                            m_errors.SymanticError(context.Start.Line, context.Start.Column, false, $"Assignment failed: {ae.Message}");
+                            // Adding an error expression to the expression data stack makes it possible
+                            // to parse the rest of the script to catch further issues
+                            m_expressionData.Push(new SBExpressionData(HomeType.Immediate, SBExpressionType.ExpressionError));
+                        }
+                        catch (Exception e)
+                        {
+                            m_errors.InternalError(context.Start.Line, context.Start.Column, $"Assignment failed: {e.Message}");
+                            // Adding an error expression to the expression data stack makes it possible
+                            // to parse the rest of the script to catch further issues
+                            m_expressionData.Push(new SBExpressionData(HomeType.Immediate, SBExpressionType.ExpressionError));
                         }
                     }
                 }
@@ -557,6 +569,22 @@ namespace StepBro.Core.Parser
             {
                 var op = context.op.Type;
                 // TODO: Check if operator is returned
+
+                if (m_isSimpleExpectWithValue)
+                {
+                    if (value.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
+                    {
+                        var valueSaverValue = s_SaveExpectValueText.MakeGenericMethod(value.DataType.Type);
+                        value = new SBExpressionData(Expression.Call(valueSaverValue, m_currentProcedure.ContextReferenceInternal, value.ExpressionCode, Expression.Constant("Left"), Expression.Constant(true)));
+                    }
+
+                    if (expected.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
+                    {
+                        var valueSaverExpected = s_SaveExpectValueText.MakeGenericMethod(expected.DataType.Type);
+                        expected = new SBExpressionData(Expression.Call(valueSaverExpected, m_currentProcedure.ContextReferenceInternal, expected.ExpressionCode, Expression.Constant("Right"), Expression.Constant(false)));
+                    }
+                }
+
                 var result = SpecialOperators.EqualsWithToleranceOperator.Resolve(this, value, op, expected, tolerance);
                 m_expressionData.Push(result);
             }

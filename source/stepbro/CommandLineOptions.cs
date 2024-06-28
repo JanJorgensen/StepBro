@@ -29,7 +29,7 @@ namespace StepBro.Cmd
         [Option("save_log", Default = null, HelpText = "Saves the entire execution log in a text file in the specified folder.")]
         public string LogToFile { get; set; } = null;
 
-        [Option("save_report", Default = null, HelpText = "Saves the generated execution/test report(s) in a text file in the specified folder.")]
+        [Option("save_report", Default = null, HelpText = "Saves the generated execution/test report(s) in the specified file.")]
         public string ReportToFile { get; set; } = null;
 
         [Option("print_report", Default = false, HelpText = "Prints the generated execution/test report in the text format selected by the 'format' option.")]
