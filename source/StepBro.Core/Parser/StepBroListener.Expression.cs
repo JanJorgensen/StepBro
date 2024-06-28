@@ -557,6 +557,22 @@ namespace StepBro.Core.Parser
             {
                 var op = context.op.Type;
                 // TODO: Check if operator is returned
+
+                if (m_isSimpleExpectWithValue)
+                {
+                    if (value.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
+                    {
+                        var valueSaverValue = s_SaveExpectValueText.MakeGenericMethod(value.DataType.Type);
+                        value = new SBExpressionData(Expression.Call(valueSaverValue, m_currentProcedure.ContextReferenceInternal, value.ExpressionCode, Expression.Constant("Left"), Expression.Constant(true)));
+                    }
+
+                    if (expected.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
+                    {
+                        var valueSaverExpected = s_SaveExpectValueText.MakeGenericMethod(expected.DataType.Type);
+                        expected = new SBExpressionData(Expression.Call(valueSaverExpected, m_currentProcedure.ContextReferenceInternal, expected.ExpressionCode, Expression.Constant("Right"), Expression.Constant(false)));
+                    }
+                }
+
                 var result = SpecialOperators.EqualsWithToleranceOperator.Resolve(this, value, op, expected, tolerance);
                 m_expressionData.Push(result);
             }

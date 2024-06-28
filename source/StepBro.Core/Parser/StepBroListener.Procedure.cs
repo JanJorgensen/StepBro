@@ -1453,7 +1453,7 @@ namespace StepBro.Core.Parser
             m_isSimpleExpectWithValue = false;
             var expression = context.GetChild(context.ChildCount - 2).GetChild(1).GetChild(0) as SBP.ExpressionContext;
 
-            if (expression is SBP.ExpBinaryContext || expression is SBP.ExpBetweenContext)
+            if (expression is SBP.ExpBinaryContext || expression is SBP.ExpBetweenContext || expression is SBP.ExpEqualsWithToleranceContext)
             {
                 m_isSimpleExpectWithValue = true;
             }
