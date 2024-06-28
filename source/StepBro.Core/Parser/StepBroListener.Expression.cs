@@ -499,9 +499,21 @@ namespace StepBro.Core.Parser
                             var result = op.Resolve(this, first, last);
                             m_expressionData.Push(result);
                         }
-                        catch(Exception ex)
+                        catch (ArgumentException ae)
                         {
-                            m_errors.InternalError(first.Token.Line, first.Token.Column, $"Assignment between left: {first.DataType} and right: {last.DataType} failed with the exception message: {ex.Message}");
+                            // ArgumentExceptions are have shown to be semantic errors, not internal ones.
+                            // If we find an ArgumentException that is an internal error, update this.
+                            m_errors.SymanticError(context.Start.Line, context.Start.Column, false, $"Assignment failed: {ae.Message}");
+                            // Adding an empty expression to the expression data stack makes it possible
+                            // to parse the rest of the script to catch further issues
+                            m_expressionData.Push(new SBExpressionData(Expression.Empty()));
+                        }
+                        catch (Exception e)
+                        {
+                            m_errors.InternalError(context.Start.Line, context.Start.Column, $"Assignment failed: {e.Message}");
+                            // Adding an empty expression to the expression data stack makes it possible
+                            // to parse the rest of the script to catch further issues
+                            m_expressionData.Push(new SBExpressionData(Expression.Empty()));
                         }
                     }
                 }
