@@ -77,16 +77,16 @@ namespace StepBro.UI.WinForms.Controls
                 case LogEntry.Type.Async:
                 case LogEntry.Type.CommunicationOut:
                 case LogEntry.Type.CommunicationIn:
-                    return Brushes.LightGoldenrodYellow;
+                    return Brushes.DarkKhaki;
                 case LogEntry.Type.Error:
                 case LogEntry.Type.Failure:
-                    return Brushes.Red;
+                    return Brushes.OrangeRed;
                 case LogEntry.Type.UserAction:
-                    return Brushes.Blue;
+                    return Brushes.DeepSkyBlue;
                 case LogEntry.Type.Detail:
-                    return Brushes.DarkGray;
+                    return Brushes.LightGray;
                 case LogEntry.Type.System:
-                    return Brushes.LightBlue;
+                    return Brushes.Plum;
                 default:
                     return Brushes.White;
             }

@@ -1204,7 +1204,7 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         #region ICoreAccess
 
-        public int ExecutionsRunning => throw new NotImplementedException();
+        public bool ExecutionRunning => throw new NotImplementedException();
 
         IExecutionAccess ICoreAccess.StartExecution(string element, string model, string objectVariable, object[] args)
         {

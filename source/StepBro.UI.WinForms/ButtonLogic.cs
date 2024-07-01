@@ -176,7 +176,15 @@ namespace StepBro.UI.WinForms
                 List<object> arguments = m_startInfo.Arguments;
 
                 m_execution = m_coreAccess.StartExecution(element, partner, instance, (arguments != null) ? arguments.ToArray() : null);
-                m_execution.CurrentStateChanged += Execution_CurrentStateChanged;
+                if (m_execution != null)
+                {
+                    m_execution.CurrentStateChanged += Execution_CurrentStateChanged;
+                }
+                else
+                {
+                    this.SendCommand(ButtonCommand.Enable);
+                    this.SendCommand(ButtonCommand.ShowNormal);
+                }
                 System.Diagnostics.Debug.WriteLine("StartProcedure End");
             }
         }

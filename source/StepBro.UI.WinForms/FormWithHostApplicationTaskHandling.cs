@@ -30,7 +30,7 @@ namespace StepBro.UI.WinForms
         private MyTaskHandler m_taskHandler;
         private System.Windows.Forms.Timer m_timer = null;
         private StateChange m_taskWorkingState = StateChange.Idle;
-        private string m_taskWorkingText = "Idle";
+        private string m_taskWorkingText = "Ready";
         private int m_animationIndex = 0;
         private const int ANIMATION_STEPS = 4;
 
@@ -79,7 +79,7 @@ namespace StepBro.UI.WinForms
             switch (e.State)
             {
                 case StateChange.Idle:
-                    m_taskWorkingText = "Idle";
+                    m_taskWorkingText = "Ready";
                     m_taskWorkingState = StateChange.Idle;
                     this.UpdateTaskWorkingState();
                     if (m_timer != null && m_timer.Enabled)

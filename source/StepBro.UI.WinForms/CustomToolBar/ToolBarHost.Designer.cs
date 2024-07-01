@@ -28,31 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
-            toolStrip1 = new ToolStrip();
             SuspendLayout();
-            // 
-            // toolStrip1
-            // 
-            toolStrip1.BackColor = Color.PaleTurquoise;
-            toolStrip1.Location = new Point(0, 0);
-            toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(849, 25);
-            toolStrip1.TabIndex = 0;
-            toolStrip1.Text = "toolStrip1";
             // 
             // ToolBarHost
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(toolStrip1);
             Name = "ToolBarHost";
             Size = new Size(849, 193);
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
-
-        private ToolStrip toolStrip1;
     }
 }

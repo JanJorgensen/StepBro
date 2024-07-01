@@ -20,7 +20,6 @@ namespace StepBro.Core.Tasks
         /// As the Started state, but a request to await the start conditions has been made.
         /// </summary>
         AwaitingStartCondition,
-        ErrorStarting,
         /// <summary>
         /// Process  is confirmed to be running.
         /// </summary>
@@ -34,6 +33,7 @@ namespace StepBro.Core.Tasks
         StopRequested,
         KillRequested,
         Terminating,
+        ErrorStarting,
         Ended,
         EndedByException
     }

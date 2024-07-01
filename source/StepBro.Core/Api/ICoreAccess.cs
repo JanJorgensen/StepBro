@@ -18,9 +18,9 @@ namespace StepBro.Core.Api
         /// <returns>Interface to the started execution.</returns>
         IExecutionAccess StartExecution(string element, string model, string objectVariable, object[] args);
         /// <summary>
-        /// Gets tne number of currently running script execution threads.
+        /// Indicates whether an execution is currently running.
         /// </summary>
-        int ExecutionsRunning { get; }
+        bool ExecutionRunning { get; }
         /// <summary>
         ///  Executes the specified command on the specified object.
         /// </summary>
