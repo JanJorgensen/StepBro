@@ -102,7 +102,7 @@ namespace StepBro.Core.Addons
                         }
                     }
 
-                    if (onlySummary) // If we do not want to write anything more than the report, we skip the rest of the report writing
+                    if (!onlySummary) // If we do not want to write anything more than the report, we skip the rest of the report writing
                     {
                         Stack<string> indent = new Stack<string>();
                         indent.Push("");    // Root Indent.
