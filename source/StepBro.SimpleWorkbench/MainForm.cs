@@ -260,9 +260,10 @@ namespace StepBro.SimpleWorkbench
             if (this.ExecutionRunning)
             {
                 var result = MessageBox.Show(
+                    this,
                     "A script execution is already running." + Environment.NewLine + Environment.NewLine + "Would you like to put this new execution in queue?",
                     "StepBro - Starting script execution",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
                 if (result == DialogResult.No)
                 {
                     return null;
@@ -718,9 +719,12 @@ namespace StepBro.SimpleWorkbench
                             try
                             {
                                 var execution = StepBroMain.StartProcedureExecution(element, partner, targetArguments.ToArray());
-                                data.SetExecution(execution);
-
-                                this.AddElementExecutionToHistory(data.Element, data.Partner, data.Object, data.Arguments?.ToArray());
+                                if (execution != null)
+                                {
+                                    data.SetExecution(execution);
+                                    this.AddElementExecutionToHistory(data.Element, data.Partner, data.Object, data.Arguments?.ToArray());
+                                    toolStripButtonStopScriptExecution.Enabled = true;
+                                }
                             }
                             catch (TargetParameterCountException)
                             {
@@ -746,6 +750,7 @@ namespace StepBro.SimpleWorkbench
 
                 case ScriptExecutionState.Finish:
                     m_executionQueue.Dequeue();
+                    toolStripButtonStopScriptExecution.Enabled = false;
                     return TaskAction.Finish;
 
                 default:
@@ -1319,6 +1324,15 @@ namespace StepBro.SimpleWorkbench
         private void SetExtraFieldsSeparatorVisibility()
         {
             toolStripSeparatorExtraFields.Visible = toolStripTextBoxExeNote.Visible;
+        }
+
+        private void toolStripButtonStopScriptExecution_Click(object sender, EventArgs e)
+        {
+            if (m_executionQueue.Count > 0)
+            {
+                m_executionQueue.Peek().RequestStopExecution();
+                toolStripButtonStopScriptExecution.Enabled = false;
+            }
         }
     }
 }
