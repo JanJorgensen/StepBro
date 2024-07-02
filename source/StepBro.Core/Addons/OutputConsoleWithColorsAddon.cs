@@ -231,7 +231,10 @@ namespace StepBro.Core.Addons
                     // This is done at the end of the report on console so it is easier to get a quick overview
                     if (report.Summary != null)
                     {
-                        for (int i = 0; i < 3; i++) m_writer.WriteLine(""); // Empty lines
+                        if (!onlySummary) // If we have written other parts of the report, add 3 empty lines
+                        {
+                            for (int i = 0; i < 3; i++) m_writer.WriteLine(""); // Empty lines
+                        }
                         var summary = report.Summary;
                         m_writer.WriteLine("--- SUMMARY ---");
                         foreach (var result in summary.ListResults())
