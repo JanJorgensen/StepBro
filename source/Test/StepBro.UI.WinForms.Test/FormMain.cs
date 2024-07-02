@@ -45,7 +45,7 @@ namespace StepBro.UI.WinForms.Test
         private LogEntry m_lastLogEntrySeen = null;
         private DateTime m_logZero;
 
-        int ICoreAccess.ExecutionsRunning => throw new NotImplementedException();
+        bool ICoreAccess.ExecutionRunning => throw new NotImplementedException();
 
         public FormMain()
         {

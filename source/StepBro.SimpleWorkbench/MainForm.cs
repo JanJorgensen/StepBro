@@ -4,28 +4,20 @@ using StepBro.Core;
 using StepBro.Core.Api;
 using StepBro.Core.Controls;
 using StepBro.Core.Data;
-using StepBro.Core.Data.SerializationHelp;
-using StepBro.Core.Execution;
 using StepBro.Core.File;
 using StepBro.Core.General;
-using StepBro.Core.IPC;
-using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using System.Collections.ObjectModel;
 using StepBro.UI.WinForms;
 using StepBro.UI.WinForms.Controls;
-using System.Collections.Specialized;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Xml.Linq;
 using static StepBro.Core.Host.HostApplicationTaskHandler;
 using static StepBro.SimpleWorkbench.Shortcuts;
 using StepBroMain = StepBro.Core.Main;
-using Antlr4.Runtime.Misc;
 
 namespace StepBro.SimpleWorkbench
 {
