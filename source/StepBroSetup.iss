@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "StepBro"
-#define MyAppVersion "0.2.29"
+#define MyAppVersion "0.2.30"
 #define MyAppPublisher "SchmutStein"
 #define MyAppURL "http://www.schmutstein.com/"
 #define MyAppExeName "StepBro.Workbench.exe"
