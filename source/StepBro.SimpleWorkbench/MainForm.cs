@@ -54,6 +54,7 @@ namespace StepBro.SimpleWorkbench
 
         private object m_applicationResourceUserObject = new object();
         private Dictionary<string, ITextCommandInput> m_commandObjectDictionary = new Dictionary<string, ITextCommandInput>();
+        private object m_userShortcutItemTag = new object();
 
         // Script Execution
         //private IScriptExecution m_execution = null;
@@ -266,7 +267,14 @@ namespace StepBro.SimpleWorkbench
         {
             if (this.ExecutionRunning)
             {
-                return null;
+                var result = MessageBox.Show(
+                    "A script execution is already running." + Environment.NewLine + Environment.NewLine + "Would you like to put this new execution in queue?",
+                    "StepBro - Starting script execution",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.No)
+                {
+                    return null;
+                }
             }
 
             var executionData = new ScriptExecutionData(
@@ -769,11 +777,16 @@ namespace StepBro.SimpleWorkbench
 
         #endregion
 
+        private int GetIndexOfTopHistoryElement()
+        {
+            return toolStripSplitButtonRunScript.DropDownItems.IndexOf(toolStripSeparatorRunBeforeHistory) + 1;
+        }
+
         private void AddElementExecutionToHistory(string element, string partner, string objectVariable, object[] args)
         {
             var title = ScripExecutionButtonTitle(false, element, partner, objectVariable, args);
 
-            var first = toolStripSplitButtonRunScript.DropDownItems.IndexOf(toolStripSeparatorRunBeforeHistory) + 1;
+            var first = this.GetIndexOfTopHistoryElement();
             ScriptExecutionToolStripMenuItem found = null;
             int historyItemsCount = (toolStripSplitButtonRunScript.Tag != null) ? (int)toolStripSplitButtonRunScript.Tag : 0;
             if (historyItemsCount > 0)
@@ -960,28 +973,6 @@ namespace StepBro.SimpleWorkbench
             var container = (toolStripComboBoxTool.Items[toolStripComboBoxTool.SelectedIndex] as ComboboxItem).Value as IObjectContainer;
             this.ExecuteObjectCommand(container.FullName, command);
         }
-
-        //private void ObjectCommandExecutionEntry_ShortcutClick(object sender, EventArgs e)
-        //{
-        //    var executionEntry = sender as ObjectCommandToolStripMenuItem;
-        //    if (toolStripMenuItemDeleteShortcut.Checked)
-        //    {
-        //        var choise = MessageBox.Show(
-        //            this,
-        //            "Should the shortcut\r\n\r\n\"" + executionEntry.Text + "\"\r\n\r\nbe deleted?",
-        //            "StepBro - Deleting shortcut",
-        //            MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-        //        if (choise == DialogResult.Yes)
-        //        {
-        //            toolStripMain.Items.Remove(executionEntry);
-        //        }
-        //        toolStripMenuItemDeleteShortcut.Checked = false;
-        //    }
-        //    else
-        //    {
-        //        this.ExecuteCommand(executionEntry.Instance, executionEntry.Command);
-        //    }
-        //}
 
         #endregion
 
@@ -1187,6 +1178,155 @@ namespace StepBro.SimpleWorkbench
                 var executionEntry = toolStripSplitButtonRunScript.DropDownItems[first] as ScriptExecutionToolStripMenuItem;
                 this.StartExecution(true, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null);
             }
+        }
+
+        #region Execution Shortcuts
+
+        private void toolStripButtonAddShortcut_Click(object sender, EventArgs e)
+        {
+            bool procAvailable = toolStripSplitButtonRunScript.Tag != null;
+            bool commandAvailable = !String.IsNullOrEmpty(toolStripComboBoxToolCommand.Text);
+            if (procAvailable || commandAvailable)
+            {
+                ScriptExecutionToolStripMenuItem executionEntry = null;
+                string procDescription = "";
+                string procButtonText = "";
+                string commandDescription = "";
+                string commandButtonText = "";
+
+                if (procAvailable)
+                {
+                    var index = GetIndexOfTopHistoryElement();
+                    executionEntry = toolStripSplitButtonRunScript.DropDownItems[index] as ScriptExecutionToolStripMenuItem;
+                    procButtonText = ScripExecutionButtonTitle(false, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null);
+                    procDescription = procButtonText;
+                }
+                if (commandAvailable)
+                {
+                    commandButtonText = toolStripComboBoxToolCommand.Text;
+                    commandDescription = "On " + toolStripComboBoxTool.Text + ": " + commandButtonText;
+                }
+
+                var dialog = new DialogAddShortcut("Adding Shortcut", procDescription, commandDescription, procButtonText, commandButtonText);
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    if (dialog.ProcedureExecutionSelected)
+                    {
+                        this.AddProcedureShortcut(dialog.ButtonText, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject);
+                    }
+                    else
+                    {
+                        var item = toolStripComboBoxTool.Items[toolStripComboBoxTool.SelectedIndex] as ComboboxItem;
+                        var tool = (item.Value as IObjectContainer).FullName;
+                        this.AddObjectCommandShortcut(dialog.ButtonText, tool, toolStripComboBoxToolCommand.Text);
+                    }
+                }
+            }
+
+        }
+
+        private void AddProcedureShortcut(string text, string element, string partner, string instanceObject)
+        {
+            var shortcut = new ScriptExecutionToolStripMenuItem();
+            shortcut.Text = text;
+            shortcut.FileElement = element;
+            shortcut.Partner = partner;
+            shortcut.InstanceObject = instanceObject;
+            shortcut.Name = "toolStripMenuProcedure" + shortcut.Text.Replace(".", "Dot");
+            shortcut.Size = new Size(182, 22);
+            shortcut.Margin = new System.Windows.Forms.Padding(1, shortcut.Margin.Top, 1, shortcut.Margin.Bottom);
+            shortcut.BackColor = Color.PeachPuff;
+            shortcut.ToolTipText = null; // $"Run " + target;
+            shortcut.Tag = m_userShortcutItemTag;
+            shortcut.Click += FileElementExecutionEntry_ShortcutClick;
+
+            toolStripMenuItemDeleteShortcut.Enabled = true;
+            toolStripMenuItemDeleteAllShortcuts.Enabled = true;
+
+            toolStripMain.Items.Add(shortcut);
+        }
+
+        private void AddObjectCommandShortcut(string text, string instance, string command)
+        {
+            var shortcut = new ObjectCommandToolStripMenuItem();
+            shortcut.Text = text;
+            shortcut.Instance = instance;
+            shortcut.Command = command;
+            shortcut.Name = "toolStripMenuCommand" + text.Replace(".", "Dot");
+            shortcut.Size = new Size(182, 22);
+            shortcut.Margin = new System.Windows.Forms.Padding(1, shortcut.Margin.Top, 1, shortcut.Margin.Bottom);
+            shortcut.BackColor = Color.Lavender;
+            shortcut.ToolTipText = null; // $"Run " + target;
+            shortcut.Tag = m_userShortcutItemTag;
+            shortcut.Click += ObjectCommandExecutionEntry_ShortcutClick;
+
+            toolStripMenuItemDeleteShortcut.Enabled = true;
+            toolStripMenuItemDeleteAllShortcuts.Enabled = true;
+
+            toolStripMain.Items.Add(shortcut);
+        }
+
+        private void FileElementExecutionEntry_ShortcutClick(object sender, EventArgs e)
+        {
+            var executionEntry = sender as ScriptExecutionToolStripMenuItem;
+            if (toolStripMenuItemDeleteShortcut.Checked)
+            {
+                var choise = MessageBox.Show(
+                    this,
+                    "Should the shortcut\r\n\r\n\"" + executionEntry.Text + "\"\r\n\r\nbe deleted?",
+                    "StepBro - Deleting shortcut",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (choise == DialogResult.Yes)
+                {
+                    toolStripMain.Items.Remove(executionEntry);
+                }
+                toolStripMenuItemDeleteShortcut.Checked = false;
+            }
+            else
+            {
+                this.StartExecution(false, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null);
+            }
+        }
+
+        private void ObjectCommandExecutionEntry_ShortcutClick(object sender, EventArgs e)
+        {
+            var executionEntry = sender as ObjectCommandToolStripMenuItem;
+            if (toolStripMenuItemDeleteShortcut.Checked)
+            {
+                var choise = MessageBox.Show(
+                    this,
+                    "Should the shortcut\r\n\r\n\"" + executionEntry.Text + "\"\r\n\r\nbe deleted?",
+                    "StepBro - Deleting shortcut",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (choise == DialogResult.Yes)
+                {
+                    toolStripMain.Items.Remove(executionEntry);
+                }
+                toolStripMenuItemDeleteShortcut.Checked = false;
+            }
+            else
+            {
+                this.ExecuteObjectCommand(executionEntry.Instance, executionEntry.Command);
+            }
+        }
+
+
+        private void toolStripMenuItemDeleteAllShortcuts_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        #endregion
+
+        private void toolStripMenuItemExeNoteInput_CheckedChanged(object sender, EventArgs e)
+        {
+            toolStripTextBoxExeNote.Visible = toolStripMenuItemExeNoteInput.Checked;
+            this.SetExtraFieldsSeparatorVisibility();
+        }
+
+        private void SetExtraFieldsSeparatorVisibility()
+        {
+            toolStripSeparatorExtraFields.Visible = toolStripTextBoxExeNote.Visible;
         }
     }
 }
