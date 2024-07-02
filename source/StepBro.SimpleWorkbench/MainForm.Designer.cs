@@ -317,18 +317,18 @@ namespace StepBro.SimpleWorkbench
             // toolStripMenuItemRunByNamespace
             // 
             toolStripMenuItemRunByNamespace.Name = "toolStripMenuItemRunByNamespace";
-            toolStripMenuItemRunByNamespace.Size = new Size(180, 22);
+            toolStripMenuItemRunByNamespace.Size = new Size(160, 22);
             toolStripMenuItemRunByNamespace.Text = "By Namespace";
             // 
             // toolStripSeparatorRunBeforeHistory
             // 
             toolStripSeparatorRunBeforeHistory.Name = "toolStripSeparatorRunBeforeHistory";
-            toolStripSeparatorRunBeforeHistory.Size = new Size(177, 6);
+            toolStripSeparatorRunBeforeHistory.Size = new Size(157, 6);
             // 
             // toolStripSeparatorRunAfterHistory
             // 
             toolStripSeparatorRunAfterHistory.Name = "toolStripSeparatorRunAfterHistory";
-            toolStripSeparatorRunAfterHistory.Size = new Size(177, 6);
+            toolStripSeparatorRunAfterHistory.Size = new Size(157, 6);
             toolStripSeparatorRunAfterHistory.Visible = false;
             // 
             // toolStripTextBoxRunSearch
@@ -349,6 +349,7 @@ namespace StepBro.SimpleWorkbench
             toolStripButtonStopScriptExecution.Size = new Size(23, 22);
             toolStripButtonStopScriptExecution.Text = "S";
             toolStripButtonStopScriptExecution.ToolTipText = "Stop the running script execution";
+            toolStripButtonStopScriptExecution.Click += toolStripButtonStopScriptExecution_Click;
             // 
             // toolStripSeparatorExtraFields
             // 

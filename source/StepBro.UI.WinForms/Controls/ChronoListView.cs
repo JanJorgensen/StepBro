@@ -16,10 +16,15 @@ namespace StepBro.UI.WinForms.Controls
     {
         private IPresentationList<ChronoListViewEntry> m_source = null;
         private DateTime m_zeroTime;
-        private bool m_tailMode = true;
+        private bool m_headMode = true;
         private long m_topEntry = 0L;
         private long m_lastIndex = 0;
         private bool m_viewDirty = false;
+        private bool m_updateVerticalScroll = false;
+        private List<long> m_selectedEntries = new List<long>();
+        //private long m_currentEntry = -1L;
+        private long m_lastSingleSelectionEntry = -1L;
+        private long m_rangeSelectionEnd = -1L;
 
         public ChronoListView()
         {
@@ -39,30 +44,27 @@ namespace StepBro.UI.WinForms.Controls
             timerUpdate.Start();
         }
 
-        private void chronoListViewPort_Click(object sender, EventArgs e)
+        public bool HeadMode
         {
-
-        }
-
-        public bool TailMode
-        {
-            get { return m_tailMode; }
+            get { return m_headMode; }
             set
             {
-                if (m_tailMode != value)
+                if (m_headMode != value)
                 {
-                    m_tailMode = value;
-                    m_source.SetTailMode(m_tailMode);
-                    if (m_tailMode)
+                    m_headMode = value;
+                    m_source.SetHeadMode(m_headMode);
+                    if (m_headMode)
                     {
-                        viewPort.RequestUpdate(m_topEntry, 0 - hScrollBar.Value);
+                        m_lastSingleSelectionEntry = -1L;
+                        m_selectedEntries.Clear();
+                        this.RequestViewPortUpdate();
                         //logWindow.SetCurrentEntry(null, false, true);
                     }
                     else
                     {
 
                     }
-                    this.TailModeChanged?.Invoke(this, EventArgs.Empty);
+                    this.HeadModeChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -73,11 +75,11 @@ namespace StepBro.UI.WinForms.Controls
             this.RequestViewPortUpdate();
         }
 
-        public event EventHandler TailModeChanged;
+        public event EventHandler HeadModeChanged;
 
         private void timerUpdate_Tick(object sender, EventArgs e)
         {
-            if (m_source.InTailMode)
+            if (m_source.InHeadMode)
             {
                 m_source.Get(Int64.MaxValue);
                 var state = m_source.GetState();
@@ -85,8 +87,10 @@ namespace StepBro.UI.WinForms.Controls
                 {
                     m_lastIndex = state.LastIndex;
                     this.RequestViewPortUpdate();
+                    m_updateVerticalScroll = true;
                     vScrollBar.Maximum = Math.Max(0, (int)(state.EffectiveCount - viewPort.MaxLinesVisible));
                     vScrollBar.Value = (int)m_topEntry;
+                    m_updateVerticalScroll = false;
                 }
             }
         }
@@ -94,7 +98,10 @@ namespace StepBro.UI.WinForms.Controls
         private void RequestViewPortUpdate()
         {
             m_viewDirty = false;
-            m_topEntry = Math.Max(0L, m_lastIndex - (viewPort.MaxLinesVisible - 1L));
+            if (m_headMode)
+            {
+                m_topEntry = Math.Max(0L, m_lastIndex - (viewPort.MaxLinesVisible - 1L));
+            }
             viewPort.RequestUpdate(m_topEntry, 0 - hScrollBar.Value);
         }
 
@@ -105,7 +112,77 @@ namespace StepBro.UI.WinForms.Controls
 
         private void vScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
-            m_viewDirty = true;
+            if (!m_updateVerticalScroll)
+            {
+                this.HeadMode = false;
+                m_topEntry = vScrollBar.Value;
+                this.RequestViewPortUpdate();
+            }
+        }
+
+        #region Selection
+
+        public EntrySelectionState GetEntrySelectionState(long index)
+        {
+            if (m_selectedEntries.Count > 0 && m_selectedEntries.Contains(index))
+            {
+                return EntrySelectionState.Selected;
+            }
+            if (m_rangeSelectionEnd >= 0L)
+            {
+                if (m_lastSingleSelectionEntry < m_rangeSelectionEnd)
+                {
+                    if (index >= m_lastSingleSelectionEntry && index <= m_rangeSelectionEnd) return EntrySelectionState.Selected;
+                }
+                else
+                {
+                    if (index >= m_rangeSelectionEnd && index <= m_lastSingleSelectionEntry) return EntrySelectionState.Selected;
+                }
+            }
+            return EntrySelectionState.Not;
+        }
+
+        #endregion
+
+        private void viewPort_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.End)
+            {
+                this.HeadMode = true;
+            }
+            else if (e.Control && e.KeyCode == Keys.Home)
+            {
+                this.HeadMode = false;
+                m_topEntry = m_source.GetState().FirstIndex;
+                this.RequestViewPortUpdate();
+            }
+            else if (e.Control && e.KeyCode == Keys.A)
+            {
+                viewPort.Invalidate();
+            }
+            //else if (e.Control && e.KeyCode == Keys.C)
+            //{
+            //}
+        }
+
+        private void chronoListViewPort_Click(object sender, EventArgs e)
+        {
+            this.HeadMode = false;
+        }
+
+        private void viewPort_MouseDown(object sender, MouseEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("viewPort_MouseDown " + e.X + " " + e.Y);
+        }
+
+        private void viewPort_MouseUp(object sender, MouseEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("viewPort_MouseUp " + e.X + " " + e.Y);
+        }
+
+        private void viewPort_MouseMove(object sender, MouseEventArgs e)
+        {
+
         }
     }
 }

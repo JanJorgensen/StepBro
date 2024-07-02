@@ -82,7 +82,7 @@ namespace StepBro.Core.Test
             state = presentation.GetState();
             Assert.AreEqual(6775L, state.EffectiveCount);
 
-            presentation.UpdateTail();
+            presentation.UpdateHead();
             state = presentation.GetState();
             Assert.AreEqual(10298L, state.EffectiveCount);
 

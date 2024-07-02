@@ -18,8 +18,8 @@ namespace StepBro.Core.Data
         /// <param name="entry">The entry/data to search for.</param>
         /// <returns>The index of the found entry, or the index of the entry </returns>
         long SearchForEntry(TPresentationEntry entry);
-        void SetTailMode(bool inTailMode);
-        bool InTailMode { get; }
+        void SetHeadMode(bool inHeadMode);
+        bool InHeadMode { get; }
     }
 
 
@@ -58,6 +58,9 @@ namespace StepBro.Core.Data
             private DataWalker<TSourceEntry> m_sourceWalker;
             private System.Predicate<TSourceEntry> m_filter;
             private long m_currentIndex = -1L;
+            
+            // This queue is used to buffer up the entries created from checking the source.
+            // When checking one source entry, more than one presentation entry can be created.
             private Queue<TPresentationEntry> m_inHand = new Queue<TPresentationEntry>();
 
             public Walker(PresentationListForListData<TSourceEntry, TPresentationEntry> parent)
@@ -191,7 +194,7 @@ namespace StepBro.Core.Data
         protected DataCache<TPresentationEntry> m_cache;
         private DataWalker<TSourceEntry> m_sourceTipWalker = null;
         private DataWalker<TSourceEntry> m_sourceCacheWalker = null;
-        private bool m_tailMode = true;
+        private bool m_headMode = true;
 
         public PresentationListForListData(
             IDataListSource<TSourceEntry> source,
@@ -202,18 +205,18 @@ namespace StepBro.Core.Data
             m_cache = new DataCache<TPresentationEntry>(m_walkerSource, cacheSize, minimumCacheFill);
         }
 
-        public void SetTailMode(bool inTailMode)
+        public void SetHeadMode(bool inHeadMode)
         {
-            if (m_tailMode != inTailMode)
+            if (m_headMode != inHeadMode)
             {
-                m_tailMode = inTailMode;
-                if (m_tailMode)
+                m_headMode = inHeadMode;
+                if (m_headMode)
                 {
                 }
             }
         }
 
-        public bool InTailMode { get { return m_tailMode; } }
+        public bool InHeadMode { get { return m_headMode; } }
 
 
         public abstract void CreatePresentationEntry(TSourceEntry entry, long sourceIndex, System.Action<TPresentationEntry> adder);
@@ -237,11 +240,11 @@ namespace StepBro.Core.Data
 
             var first = m_source.GetFirst();
             m_sourceCacheWalker = m_source.WalkFrom(first.Item1);
-            if (!m_tailMode)
+            if (!m_headMode)
             {
                 m_sourceTipWalker = m_sourceCacheWalker.Dublicate();
             }
-            if (m_tailMode)
+            if (m_headMode)
             {
                 this.Get(Int64.MaxValue);
             }
@@ -297,9 +300,9 @@ namespace StepBro.Core.Data
         /// <summary>
         /// Make the list check for new data in the source, run new data through the filter and update index of last known.
         /// </summary>
-        public void UpdateTail()
+        public void UpdateHead()
         {
-            if (m_tailMode)
+            if (m_headMode)
             {
                 m_cache.Get(Int64.MaxValue);
             }

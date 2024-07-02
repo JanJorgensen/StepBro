@@ -197,9 +197,9 @@ namespace StepBro.UI.WinForms.Controls
                         var entry = m_source.Get(entryIndex);
                         m_viewEntries[viewIndex] = entry;
 
-                        var selectionState = EntrySelectionState.Not;
+                        var selectionState = m_viewer.GetEntrySelectionState(entryIndex);
                         rect = new Rectangle(m_horizontalScrollPosition, y, 10000, m_lineHeight);
-                        if (selectionState != EntrySelectionState.Not)
+                        if (selectionState >= EntrySelectionState.Selected)
                         {
                             e.Graphics.FillRectangle(Brushes.Blue, rect);
                         }
@@ -235,6 +235,9 @@ namespace StepBro.UI.WinForms.Controls
             {
                 this.Select();
             }
+
+
+            //if ()
 
         }
 

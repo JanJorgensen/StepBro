@@ -89,6 +89,10 @@
             viewPort.TabIndex = 2;
             viewPort.Text = "ViewPort";
             viewPort.Click += chronoListViewPort_Click;
+            viewPort.KeyDown += viewPort_KeyDown;
+            viewPort.MouseDown += viewPort_MouseDown;
+            viewPort.MouseMove += viewPort_MouseMove;
+            viewPort.MouseUp += viewPort_MouseUp;
             // 
             // timerUpdate
             // 

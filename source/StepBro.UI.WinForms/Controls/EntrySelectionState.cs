@@ -9,6 +9,7 @@ namespace StepBro.UI.WinForms.Controls
     public enum EntrySelectionState
     {
         Not,
+        Current,
         Selected,
         SelectedCurrent
     }

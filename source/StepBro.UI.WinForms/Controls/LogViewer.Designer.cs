@@ -48,7 +48,7 @@
             logView.Name = "logView";
             logView.Size = new Size(636, 204);
             logView.TabIndex = 1;
-            logView.TailMode = true;
+            logView.HeadMode = true;
             logView.ZeroTime = new DateTime(2024, 6, 24, 10, 25, 15, 655);
             // 
             // LogViewer
