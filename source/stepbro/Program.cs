@@ -989,7 +989,9 @@ namespace StepBro.Cmd
             }
             FlushBufferedConsoleOutput();
 
-            if ((m_commandLineOptions.PrintReport || m_commandLineOptions.ReportToFile != null) && createdReport != null)
+            if ((m_commandLineOptions.PrintReport ||
+                m_commandLineOptions.ReportToFile != null) && 
+                createdReport != null)
             {
                 if (m_commandLineOptions.ReportToFile != null)
                 {
@@ -1009,7 +1011,10 @@ namespace StepBro.Cmd
                         ConsoleWriteErrorLine("Error occurred when creating report file. The following exception was thrown: " + e.Message);
                     }
                 }
-                m_outputFormatter.WriteReport(createdReport, m_commandLineOptions.PrintReport, m_commandLineOptions.ReportToFile);
+                m_outputFormatter.WriteReport(createdReport,
+                    m_commandLineOptions.PrintReport,
+                    m_commandLineOptions.ReportToFile,
+                    m_commandLineOptions.ReportOnlySummary);
             }
             else
             {

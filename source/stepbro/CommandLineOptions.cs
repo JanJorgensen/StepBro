@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,6 +35,9 @@ namespace StepBro.Cmd
 
         [Option("print_report", Default = false, HelpText = "Prints the generated execution/test report in the text format selected by the 'format' option.")]
         public bool PrintReport { get; set; } = false;
+        
+        [Option("only_summary", Default = false, HelpText = "Used together with either --save_report and/or --print_report. Prints the generated test summary in the text format selected by the 'format' option.")]
+        public bool ReportOnlySummary { get; set; } = false;
 
         [Option("format", HelpText = "Format of the console output.")]
         public string OutputFormat { get; set; } = null;

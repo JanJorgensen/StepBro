@@ -105,7 +105,7 @@ namespace StepBro.Core.Addons
                 return false;
             }
 
-            public void WriteReport(DataReport report, bool shouldLogReport = false, string fileName = null)
+            public void WriteReport(DataReport report, bool shouldLogReport = false, string fileName = null, bool onlySummary = false)
             {
                 // Use the filename provided, if it is null we will not write to a file
                 m_reportFileName = fileName;
@@ -113,113 +113,116 @@ namespace StepBro.Core.Addons
                 m_reportStarted = true;
                 try
                 {
-                    // WRITE GROUPS
-                    bool firstGroup = true;
-                    foreach (var group in report.ListGroups())
+                    if (!onlySummary) // If we do not want to write anything more than the report, we skip this part
                     {
-                        // If it is not the first group, we write a couple empty lines to separate the groups
-                        if (firstGroup)
+                        // WRITE GROUPS
+                        bool firstGroup = true;
+                        foreach (var group in report.ListGroups())
                         {
-                            firstGroup = false;
-                        }
-                        else
-                        {
-                            for (int i = 0; i < 3; i++) m_writer.WriteLine(""); // Empty lines
-                        }
-
-                        m_writer.WriteLine($"--- GROUP: {group.Name} ---");
-                        if (!String.IsNullOrEmpty(group.Description))
-                        {
-                            m_writer.WriteLine($"Description:{group.Description}");
-                        }
-
-                        // WRITE RESULTS IN GROUP
-                        if (group.ListData().Count(d => d.Type == ReportDataType.ExpectResult || d.Type == ReportDataType.SimpleMeasurement || d.Type == ReportDataType.Exception) > 0)
-                        {
-                            if (group.ListData().Any(d => d.Type == ReportDataType.Section))
+                            // If it is not the first group, we write a couple empty lines to separate the groups
+                            if (firstGroup)
                             {
-                                var sections = new List<Tuple<ReportGroupSection, List<ReportData>>>();
-                                ReportGroupSection section = null;
-                                var sectionData = new List<ReportData>();
-                                foreach (var data in group.ListData())
-                                {
-                                    switch (data.Type)
-                                    {
-                                        case ReportDataType.Section:
-                                            if (sectionData.Count() > 0)
-                                            {
-                                                sections.Add(new Tuple<ReportGroupSection, List<ReportData>>(section, sectionData));
-                                            }
-                                            section = data as ReportGroupSection;
-                                            sectionData = new List<ReportData>();
-                                            continue;
-                                        case ReportDataType.ExpectResult:
-                                        case ReportDataType.SimpleMeasurement:
-                                        case ReportDataType.Exception:
-                                            sectionData.Add(data);
-                                            break;
-                                        case ReportDataType.TextLine:
-                                        case ReportDataType.DataTable:
-                                        case ReportDataType.TestSummary:
-                                        default:
-                                            break;
-                                    }
-                                }
-                                if (section != null && sectionData.Count > 0)   // Add last section, if not empty.
-                                {
-                                    sections.Add(new Tuple<ReportGroupSection, List<ReportData>>(section, sectionData));
-                                }
+                                firstGroup = false;
+                            }
+                            else
+                            {
+                                for (int i = 0; i < 3; i++) m_writer.WriteLine(""); // Empty lines
+                            }
 
-                                foreach (var sec in sections)
+                            m_writer.WriteLine($"--- GROUP: {group.Name} ---");
+                            if (!String.IsNullOrEmpty(group.Description))
+                            {
+                                m_writer.WriteLine($"Description:{group.Description}");
+                            }
+
+                            // WRITE RESULTS IN GROUP
+                            if (group.ListData().Count(d => d.Type == ReportDataType.ExpectResult || d.Type == ReportDataType.SimpleMeasurement || d.Type == ReportDataType.Exception) > 0)
+                            {
+                                if (group.ListData().Any(d => d.Type == ReportDataType.Section))
                                 {
-                                    if (sec.Item2 != null && sec.Item2.Count() > 0)     // Only if any data.
+                                    var sections = new List<Tuple<ReportGroupSection, List<ReportData>>>();
+                                    ReportGroupSection section = null;
+                                    var sectionData = new List<ReportData>();
+                                    foreach (var data in group.ListData())
                                     {
-                                        if (sec.Item1 != null)
+                                        switch (data.Type)
                                         {
-                                            m_writer.WriteLine($"Section - {sec.Item1.Header}");
+                                            case ReportDataType.Section:
+                                                if (sectionData.Count() > 0)
+                                                {
+                                                    sections.Add(new Tuple<ReportGroupSection, List<ReportData>>(section, sectionData));
+                                                }
+                                                section = data as ReportGroupSection;
+                                                sectionData = new List<ReportData>();
+                                                continue;
+                                            case ReportDataType.ExpectResult:
+                                            case ReportDataType.SimpleMeasurement:
+                                            case ReportDataType.Exception:
+                                                sectionData.Add(data);
+                                                break;
+                                            case ReportDataType.TextLine:
+                                            case ReportDataType.DataTable:
+                                            case ReportDataType.TestSummary:
+                                            default:
+                                                break;
                                         }
-                                        else
-                                        {
-                                            m_writer.WriteLine("");     // Empty line
-                                        }
-                                        this.WriteSection(sec.Item2);
                                     }
+                                    if (section != null && sectionData.Count > 0)   // Add last section, if not empty.
+                                    {
+                                        sections.Add(new Tuple<ReportGroupSection, List<ReportData>>(section, sectionData));
+                                    }
+
+                                    foreach (var sec in sections)
+                                    {
+                                        if (sec.Item2 != null && sec.Item2.Count() > 0)     // Only if any data.
+                                        {
+                                            if (sec.Item1 != null)
+                                            {
+                                                m_writer.WriteLine($"Section - {sec.Item1.Header}");
+                                            }
+                                            else
+                                            {
+                                                m_writer.WriteLine("");     // Empty line
+                                            }
+                                            this.WriteSection(sec.Item2);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    this.WriteSection(group.ListData().ToList());
                                 }
                             }
                             else
                             {
-                                this.WriteSection(group.ListData().ToList());
+                                m_writer.WriteLine("No data.");
                             }
-                        }
-                        else
-                        {
-                            m_writer.WriteLine("No data.");
-                        }
 
-                        m_writer.WriteLine("");     // Empty line
+                            m_writer.WriteLine("");     // Empty line
 
-                        // WRITE EXECUTION LOG
-                        if (group.LogEnd != null && group.LogEnd.Id != group.LogStart.Id)
-                        {
-                            m_writer.WriteLine("Execution Log:");
-
-                            var entry = group.LogStart;
-                            var endId = group.LogEnd.Id;
-                            var timeZero = entry.Timestamp;
-                            while (entry.Id <= endId)
+                            // WRITE EXECUTION LOG
+                            if (group.LogEnd != null && group.LogEnd.Id != group.LogStart.Id)
                             {
-                                WriteLogEntry(entry, timeZero);
-                                entry = entry.Next;
+                                m_writer.WriteLine("Execution Log:");
+
+                                var entry = group.LogStart;
+                                var endId = group.LogEnd.Id;
+                                var timeZero = entry.Timestamp;
+                                while (entry.Id <= endId)
+                                {
+                                    WriteLogEntry(entry, timeZero);
+                                    entry = entry.Next;
+                                }
                             }
-                        }
-                        else if (group.LogEnd == null) // If group.LogEnd is null, a fatal error has occurred during execution
-                        {
-                            m_writer.WriteLine("An error has occurred. Dumping log.");
-                            var entry = group.LogStart;
-                            while (entry != null)
+                            else if (group.LogEnd == null) // If group.LogEnd is null, a fatal error has occurred during execution
                             {
-                                WriteLogEntry(entry, entry.Timestamp);
-                                entry = entry.Next;
+                                m_writer.WriteLine("An error has occurred. Dumping log.");
+                                var entry = group.LogStart;
+                                while (entry != null)
+                                {
+                                    WriteLogEntry(entry, entry.Timestamp);
+                                    entry = entry.Next;
+                                }
                             }
                         }
                     }

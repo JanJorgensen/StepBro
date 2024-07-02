@@ -69,7 +69,7 @@ namespace StepBro.Core.Addons
                 return false;
             }
 
-            public void WriteReport(DataReport report, bool shouldLogReport = false, string fileName = null)
+            public void WriteReport(DataReport report, bool shouldLogReport = false, string fileName = null, bool onlySummary = false)
             {
                 // Use the filename provided, if it is null we will not write to a file
                 m_reportFileName = fileName;
@@ -98,6 +98,8 @@ namespace StepBro.Core.Addons
                         m_writer.WriteLine("##[endgroup]");
                         m_writer.WriteLine("");     // Empty line
                     }
+
+                    if (onlySummary) return; // If we do not want to write anything more than the report, we return here
 
                     Stack<string> indent = new Stack<string>();
                     indent.Push("");    // Root Indent.
