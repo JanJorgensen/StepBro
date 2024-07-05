@@ -757,24 +757,11 @@ namespace StepBro.Cmd
                                             {
                                                 if (element.ElementType is FileElementType.TestList)
                                                 {
-                                                    StringBuilder partners = new StringBuilder();
-
-                                                    // Find all the partners where first parameter is a "this" parameter that is also
-                                                    // a TestList
-                                                    foreach(var p in (element as ITestList).ListPartners()
-                                                        .Where(a => a.ProcedureReference.IsFirstParameterThisReference &&
-                                                                    a.ProcedureReference.Parameters[0].Value.Type == typeof(ITestList))
-                                                        .Select(a => a.Name).Distinct())
-                                                    {
-                                                        partners.Append(p).Append(", ");
-                                                    }
-
-                                                    // Remove last comma and add a dot
-                                                    if (partners.Length > 1)
-                                                    {
-                                                        partners.Remove(partners.Length - 2, 2);
-                                                        partners.Append('.');
-                                                    }
+                                                    var partners = String.Join(", ", 
+                                                                    (element as ITestList).ListPartners()
+                                                                    .Where(a => a.ProcedureReference.IsFirstParameterThisReference &&
+                                                                                a.ProcedureReference.Parameters[0].Value.Type == typeof(ITestList))
+                                                                    .Select(a => a.Name).Distinct());
 
                                                     // Write error message
                                                     if (partners.Length > 0)
