@@ -766,7 +766,7 @@ namespace StepBro.Cmd
                                                     // Write error message
                                                     if (partners.Length > 0)
                                                     {
-                                                        ConsoleWriteErrorLine($"Execution of a testlist can only be done through a partner. This testlist has the following partners: {partners}");
+                                                        ConsoleWriteErrorLine($"Execution of a testlist can only be done through a partner. This testlist has the following partners: {partners}.");
                                                     }
                                                     else
                                                     {
