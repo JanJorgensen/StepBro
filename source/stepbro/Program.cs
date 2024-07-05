@@ -755,7 +755,41 @@ namespace StepBro.Cmd
                                             }
                                             else
                                             {
-                                                ConsoleWriteErrorLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
+                                                if (element.ElementType is FileElementType.TestList)
+                                                {
+                                                    StringBuilder partners = new StringBuilder();
+
+                                                    // Find all the partners where first parameter is a "this" parameter that is also
+                                                    // a TestList
+                                                    foreach(var p in (element as ITestList).ListPartners()
+                                                        .Where(a => a.ProcedureReference.IsFirstParameterThisReference &&
+                                                                    a.ProcedureReference.Parameters[0].Value.Type == typeof(ITestList))
+                                                        .Select(a => a.Name).Distinct())
+                                                    {
+                                                        partners.Append(p).Append(", ");
+                                                    }
+
+                                                    // Remove last comma and add a dot
+                                                    if (partners.Length > 1)
+                                                    {
+                                                        partners.Remove(partners.Length - 2, 2);
+                                                        partners.Append('.');
+                                                    }
+
+                                                    // Write error message
+                                                    if (partners.Length > 0)
+                                                    {
+                                                        ConsoleWriteErrorLine($"Execution of a testlist can only be done through a partner. This testlist has the following partners: {partners}");
+                                                    }
+                                                    else
+                                                    {
+                                                        ConsoleWriteErrorLine($"Execution of a testlist can only be done through a partner.");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    ConsoleWriteErrorLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
+                                                }
                                                 error = true;
                                             }
                                         }
