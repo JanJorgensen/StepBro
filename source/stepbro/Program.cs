@@ -755,7 +755,28 @@ namespace StepBro.Cmd
                                             }
                                             else
                                             {
-                                                ConsoleWriteErrorLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
+                                                if (element.ElementType is FileElementType.TestList)
+                                                {
+                                                    var partners = String.Join(", ", 
+                                                                    (element as ITestList).ListPartners()
+                                                                    .Where(a => a.ProcedureReference.IsFirstParameterThisReference &&
+                                                                                a.ProcedureReference.Parameters[0].Value.Type == typeof(ITestList))
+                                                                    .Select(a => a.Name).Distinct());
+
+                                                    // Write error message
+                                                    if (partners.Length > 0)
+                                                    {
+                                                        ConsoleWriteErrorLine($"Execution of the \"{element.Name}\" testlist can only be done through a partner. This testlist has the following partners: {partners}.");
+                                                    }
+                                                    else
+                                                    {
+                                                        ConsoleWriteErrorLine($"Execution of the \"{element.Name}\" testlist can only be done through a partner.");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    ConsoleWriteErrorLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
+                                                }
                                                 error = true;
                                             }
                                         }
