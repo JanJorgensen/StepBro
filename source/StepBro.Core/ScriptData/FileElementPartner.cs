@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 
@@ -14,23 +15,11 @@ namespace StepBro.Core.ScriptData
             this.ProcedureReference = procedure;
         }
 
-        public IFileElement ParentElement
-        {
-            get;
-            private set;
-        }
+        public IFileElement ParentElement { get; private set; }
 
-        public string Name
-        {
-            get;
-            private set;
-        }
+        public string Name { get; private set; }
 
-        public string ProcedureName
-        {
-            get;
-            internal set;
-        }
+        public string ProcedureName { get; internal set; }
 
         public string FullName
         {
@@ -42,22 +31,26 @@ namespace StepBro.Core.ScriptData
             get { return IdentifierType.ElementPartner; }
         }
 
-        public TypeReference DataType
-        {
-            get;
-            internal set;
-        }
+        public TypeReference DataType { get; internal set; }
 
         public object Reference
         {
             get { return this.ProcedureReference; }
         }
 
-        public IFileProcedure ProcedureReference
+        public IFileProcedure ProcedureReference { get; internal set; }
+
+        public bool IsModel
         {
-            get;
-            internal set;
+            get
+            {
+                if (this.IsModelDirect) return true;
+                var basePartner = (this.ParentElement as FileElement)?.GetRootBaseElement().ListPartners().FirstOrDefault(p => p.Name == this.Name);
+                return (basePartner != null && basePartner.IsModel);
+            }
         }
+
+        internal bool IsModelDirect { get; set; } = false;
 
         private string ReferencedProcedure
         {
