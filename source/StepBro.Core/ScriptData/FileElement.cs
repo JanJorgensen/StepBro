@@ -259,7 +259,7 @@ namespace StepBro.Core.ScriptData
                         break;
                     case FileElementType.Using:
                     case FileElementType.Namespace:
-                    case FileElementType.EnumDeclaration:
+                    case FileElementType.EnumDefinition:
                     case FileElementType.ProcedureDeclaration:
                     case FileElementType.FileVariable:
                     case FileElementType.TestList:

@@ -27,6 +27,7 @@ namespace StepBro.Core.ScriptData
         private List<UsingData> m_namespaceUsings = new List<UsingData>();
         private List<UsingData> m_fileUsings = new List<UsingData>();
         private PropertyBlock m_fileProperties = null;
+        private List<FileConfigValue> m_fileConfigVariables = new List<FileConfigValue>();
         private List<FileVariable> m_fileScopeVariables = new List<FileVariable>();
         private List<FileVariable> m_fileScopeVariablesBefore = new List<FileVariable>();
         private List<FileElement> m_elements = new List<FileElement>();
@@ -67,11 +68,20 @@ namespace StepBro.Core.ScriptData
 
         protected override void DoDispose()
         {
-            foreach (var fileVariable in m_fileScopeVariables)
+            foreach (var variable in m_fileScopeVariables)
             {
-                fileVariable.VariableOwnerAccess.Dispose();
+                variable.VariableOwnerAccess.Dispose();
 
-                if (fileVariable is IDisposable fv)
+                if (variable is IDisposable fv)
+                {
+                    fv.Dispose();
+                }
+            }
+            foreach (var variable in m_fileConfigVariables)
+            {
+                variable.VariableOwnerAccess.Dispose();
+
+                if (variable is IDisposable fv)
                 {
                     fv.Dispose();
                 }
@@ -290,6 +300,19 @@ namespace StepBro.Core.ScriptData
             return true;
         }
 
+        internal int CreateOrGetConfigVariable(
+            string @namespace,
+            AccessModifier access,
+            string name,
+            TypeReference datatype,
+            bool @readonly,
+            int line,
+            int column,
+            object defaultValue)
+        {
+            return -1;
+        }
+
         private IValueContainerOwnerAccess TryGetVariable(int id)
         {
             foreach (var v in m_fileScopeVariables)
@@ -452,6 +475,21 @@ namespace StepBro.Core.ScriptData
                 }
             }
 
+            foreach (var v in m_fileConfigVariables)
+            {
+                if (v.ID == id)
+                {
+                    if (v.VariableOwnerAccess.Container is IValueContainer<T>)
+                    {
+                        return v.VariableOwnerAccess.Container as IValueContainer<T>;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"The data type for the variable is not the same as the specified type ({t.Name}).");
+                    }
+                }
+            }
+
             foreach (var uf in m_fileUsings)
             {
                 var file = uf.Identifier.Reference as ScriptFile;
@@ -492,6 +530,13 @@ namespace StepBro.Core.ScriptData
         public IEnumerable<IValueContainer> ListFileVariables()
         {
             foreach (var v in m_fileScopeVariables)
+            {
+                yield return v.VariableOwnerAccess.Container;
+            }
+        }
+        public IEnumerable<IValueContainer> ListConfigVariables()
+        {
+            foreach (var v in m_fileConfigVariables)
             {
                 yield return v.VariableOwnerAccess.Container;
             }
@@ -616,6 +661,10 @@ namespace StepBro.Core.ScriptData
 
         public IEnumerable<IFileElement> ListElements()
         {
+            foreach (var e in m_fileConfigVariables)
+            {
+                yield return e;
+            }
             foreach (var e in m_fileScopeVariables)
             {
                 yield return e;
