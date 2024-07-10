@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StepBro.Core.ScriptData;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace StepBro.SimpleWorkbench
 {
     internal class Shortcuts
     {
-        public static string ScripExecutionButtonTitle(bool showFullName, string element, string partner, string objectVariable, object[] args)
+        public static string ScripExecutionButtonTitle(bool showFullName, string element, string partner, bool partnerIsModel, string objectVariable, object[] args)
         {
             var elementName = (showFullName && String.IsNullOrEmpty(objectVariable)) ? element : element.Split('.').Last();
             if (!String.IsNullOrEmpty(objectVariable))
@@ -24,7 +25,14 @@ namespace StepBro.SimpleWorkbench
             }
             else if (!String.IsNullOrEmpty(partner))
             {
-                return elementName + "." + partner;
+                if (partnerIsModel)
+                {
+                    return elementName + " using '" + partner + "'";
+                }
+                else
+                {
+                    return elementName + "." + partner;
+                }
             }
             else
             {
@@ -36,7 +44,7 @@ namespace StepBro.SimpleWorkbench
         {
             public ScriptExecutionToolStripMenuItem() { }
 
-            public ScriptExecutionToolStripMenuItem(string element, string partner, string instanceObject)
+            public ScriptExecutionToolStripMenuItem(IFileElement element, string partner, string instanceObject)
             {
                 FileElement = element;
                 Partner = partner;
@@ -44,18 +52,19 @@ namespace StepBro.SimpleWorkbench
             }
 
             public bool ShowFullName { get; set; } = false;
-            public string FileElement { get; set; } = null;
+            public IFileElement FileElement { get; set; } = null;
             public string Partner { get; set; } = null;
+            public bool PartnerIsModel { get; set; } = false;
             public string InstanceObject { get; set; } = null;
 
             public void SetText()
             {
-                this.Text = ScripExecutionButtonTitle(this.ShowFullName, this.FileElement, this.Partner, this.InstanceObject, null);
+                this.Text = ScripExecutionButtonTitle(this.ShowFullName, this.FileElement.FullName, this.Partner, this.PartnerIsModel, this.InstanceObject, null);
             }
 
             public bool Equals(string element, string partner, string instanceObject)
             {
-                if (!String.Equals(element, this.FileElement, StringComparison.InvariantCulture)) return false;
+                if (!String.Equals(element, this.FileElement.FullName, StringComparison.InvariantCulture)) return false;
                 if (String.IsNullOrEmpty(partner) != String.IsNullOrEmpty(this.Partner)) return false;
                 if (!String.Equals(partner, this.Partner)) return false;
                 if (!String.Equals(instanceObject, this.InstanceObject)) return false;

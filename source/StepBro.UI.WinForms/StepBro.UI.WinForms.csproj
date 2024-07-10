@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Remove="Controls\LogViewer - Copy.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="ObjectPanel.cs" />
     <None Include="ObjectPanel.Designer.cs" />
   </ItemGroup>
@@ -30,6 +34,18 @@
 
   <ItemGroup>
     <Compile Update="CustomToolBar\ColumnSeparator.cs" />
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

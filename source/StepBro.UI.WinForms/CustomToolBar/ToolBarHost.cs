@@ -52,16 +52,6 @@ namespace StepBro.UI.WinForms.CustomToolBar
             int tabIndex = m_toolbars.Count;
             foreach (var tbData in m_toolbars)
             {
-                //var visibilityMenuItem = new ToolStripMenuItem();
-                //visibilityMenuItem.CheckOnClick = true;
-                //visibilityMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
-                //visibilityMenuItem.Size = new Size(180, 22);
-                //visibilityMenuItem.Text = tbData.Item1;
-                //visibilityMenuItem.Checked = !m_hiddenToolbars.Contains(tbData.Item1);
-                //visibilityMenuItem.CheckedChanged += (s, e) => { SetToolbarVisibility(((ToolStripMenuItem)s).Text, ((ToolStripMenuItem)s).Checked); };
-                //visibilityMenuItem.Tag = tbData.Item2;
-                //toolStripMenuItemShownToolbars.DropDownItems.Insert(0, visibilityMenuItem);
-
                 tbData.Item2.DefaultBackColor = (tabIndex % 2 == 0) ? SystemColors.Control : Color.Beige;
                 tbData.Item2.TabIndex = tabIndex--;
                 this.Controls.Add(tbData.Item2);
@@ -143,7 +133,16 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public IEnumerable<string> ListHiddenToolbars()
         {
-            yield break;
+            foreach (string toolbar in m_hiddenToolbars) yield return toolbar;
+        }
+
+        public bool IsToolbarHidden(string name)
+        {
+            foreach (string toolbar in m_hiddenToolbars)
+            {
+                if (String.Equals(name, toolbar, StringComparison.InvariantCulture)) return true;
+            }
+            return false;
         }
 
         private void UpdateToolbarVisibility()

@@ -18,6 +18,7 @@ using System.Text.Json.Serialization;
 using static StepBro.Core.Host.HostApplicationTaskHandler;
 using static StepBro.SimpleWorkbench.Shortcuts;
 using StepBroMain = StepBro.Core.Main;
+using StepBro.Core.Logging;
 
 namespace StepBro.SimpleWorkbench
 {
@@ -37,6 +38,7 @@ namespace StepBro.SimpleWorkbench
         private HostAccess m_hostAccess = null;
         private ILoadedFilesManager m_loadedFiles = null;
         private IDynamicObjectManager m_objectManager = null;
+        private ILogger m_mainLogger = null;
 
         private ToolWindow m_toolWindowExecutionLog = null;
         private LogViewer m_logviewer = null;
@@ -48,8 +50,8 @@ namespace StepBro.SimpleWorkbench
         private Dictionary<string, ITextCommandInput> m_commandObjectDictionary = new Dictionary<string, ITextCommandInput>();
         private object m_userShortcutItemTag = new object();
 
-        // Script Execution
-        //private IScriptExecution m_execution = null;
+        private bool m_userFileRead = false;
+        private string m_userFile = null;
 
         private string m_targetFile = null;
         private string m_targetFileFullPath = null;
@@ -129,6 +131,7 @@ namespace StepBro.SimpleWorkbench
             IService m_hostService = null;
             m_hostAccess = new HostAccess(out m_hostService);
             StepBroMain.Initialize(m_hostService);
+            m_mainLogger = StepBroMain.Logger.RootLogger.CreateSubLocation("StepBro.Workbench");
             m_loadedFiles = StepBroMain.GetLoadedFilesManager();
             m_loadedFiles.FileLoaded += LoadedFiles_FileLoaded;
             m_loadedFiles.FileClosed += LoadedFiles_FileClosed;
@@ -144,6 +147,8 @@ namespace StepBro.SimpleWorkbench
             m_logviewer.Setup();
 
             m_errorsList = new ParsingErrorListView();
+            m_errorsList.ParseFilesClicked += ErrorsList_ParseFilesClicked;
+            m_errorsList.AutoParseFilesChanged += ErrorsList_AutoParseFilesChanged;
             m_toolWindowParsingErrors = new ToolWindow(dockManager, "ErrorsView", "Errors", null, m_errorsList);
             m_toolWindowParsingErrors.DockTo(dockManager, DockOperationType.BottomOuter);
 
@@ -160,54 +165,10 @@ namespace StepBro.SimpleWorkbench
             var toolPersistFile = System.IO.Path.Combine(folder, "toollayout.xml");
             dockManager.SaveDocumentLayoutToFile(docPersistFile);
             dockManager.SaveToolWindowLayoutToFile(toolPersistFile);
-            var layout = dockManager.ToolWindowLayoutData;
+            var toolLayout = dockManager.ToolWindowLayoutData;
+            var docLayout = dockManager.DocumentLayoutData;
 
-
-            var userData = new UserDataCurrent();
-
-            var shortcuts = new List<UserDataCurrent.Shortcut>();
-            foreach (var shortcut in toolStripMain.Items.Cast<ToolStripItem>().Where(o => object.Equals(m_applicationResourceUserObject, o.Tag)))
-            {
-                if (shortcut is ScriptExecutionToolStripMenuItem)
-                {
-                    var typed = shortcut as ScriptExecutionToolStripMenuItem;
-                    var shortcutData = new UserDataCurrent.ProcedureShortcut();
-                    shortcutData.Text = typed.Text;
-                    shortcutData.Element = typed.FileElement;
-                    shortcutData.Partner = typed.Partner;
-                    shortcutData.Instance = typed.InstanceObject;
-                    shortcuts.Add(shortcutData);
-                }
-                else if (shortcut is ObjectCommandToolStripMenuItem)
-                {
-                    var typed = shortcut as ObjectCommandToolStripMenuItem;
-                    var shortcutData = new UserDataCurrent.ObjectCommandShortcut();
-                    shortcutData.Text = typed.Text;
-                    shortcutData.Instance = typed.Instance;
-                    shortcutData.Command = typed.Command;
-                    shortcuts.Add(shortcutData);
-                }
-            }
-            if (shortcuts.Count > 0)
-            {
-                userData.Shortcuts = shortcuts.ToArray();
-            }
-
-            userData.HiddenToolbars = (panelCustomToolstrips.ListHiddenToolbars().Count() > 0) ? panelCustomToolstrips.ListHiddenToolbars().ToArray() : null;
-
-            if (userData.Shortcuts != null || userData.PanelSettings != null || userData.HiddenToolbars != null)
-            {
-                JsonSerializerOptions options = new JsonSerializerOptions();
-                options.WriteIndented = true;
-                options.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-
-                // TODO: find solution for this ...
-                //using (FileStream createStream = File.Create(m_userFile))
-                //{
-                //    JsonSerializer.Serialize(createStream, userData, options);
-                //}
-            }
-
+            this.SaveUserSettings();
         }
 
         private void DockManager_SaveCustomToolWindowLayoutData(object sender, DockSaveCustomToolWindowLayoutDataEventArgs e)
@@ -238,10 +199,11 @@ namespace StepBro.SimpleWorkbench
                 {
                     var executionData = new ScriptExecutionData(
                         this,
-                        m_commandLineOptions.TargetElement,
+                        null,
                         m_commandLineOptions.TargetModel,
                         m_commandLineOptions.TargetInstance,
                         null);
+                    executionData.ElementName = m_commandLineOptions.TargetElement; // To be resolved.
                     if (m_commandLineOptions.Arguments != null)
                     {
                         executionData.UnparsedArguments = m_commandLineOptions.Arguments.ToList();
@@ -255,7 +217,120 @@ namespace StepBro.SimpleWorkbench
             }
         }
 
-        public IExecutionAccess StartExecution(bool addToHistory, string element, string partner, string objectVariable, object[] args)
+        #region User Settings Parsistance
+
+        private void UpdateUserDataFilePath()
+        {
+            // Change the extension
+            m_userFile = Path.Combine(Path.GetDirectoryName(m_targetFileFullPath), Path.GetFileNameWithoutExtension(m_targetFileFullPath)) + ".user.json";
+        }
+
+        private void SaveUserSettings()
+        {
+            var userData = new UserDataCurrent();
+
+            var shortcuts = new List<UserDataCurrent.Shortcut>();
+            foreach (var shortcut in toolStripMain.Items.Cast<ToolStripItem>().Where(o => object.Equals(m_userShortcutItemTag, o.Tag)))
+            {
+                if (shortcut is ScriptExecutionToolStripMenuItem)
+                {
+                    var typed = shortcut as ScriptExecutionToolStripMenuItem;
+                    var shortcutData = new UserDataCurrent.ProcedureShortcut();
+                    shortcutData.Text = typed.Text;
+                    shortcutData.Element = typed.FileElement.FullName;
+                    shortcutData.Partner = typed.Partner;
+                    shortcutData.Instance = typed.InstanceObject;
+                    shortcuts.Add(shortcutData);
+                }
+                else if (shortcut is ObjectCommandToolStripMenuItem)
+                {
+                    var typed = shortcut as ObjectCommandToolStripMenuItem;
+                    var shortcutData = new UserDataCurrent.ObjectCommandShortcut();
+                    shortcutData.Text = typed.Text;
+                    shortcutData.Instance = typed.Instance;
+                    shortcutData.Command = typed.Command;
+                    shortcuts.Add(shortcutData);
+                }
+            }
+            if (shortcuts.Count > 0)
+            {
+                userData.Shortcuts = shortcuts.ToArray();
+            }
+
+            var hiddenToolbars = panelCustomToolstrips.ListHiddenToolbars().ToArray();
+            userData.HiddenToolbars = (hiddenToolbars.Length > 0) ? hiddenToolbars : null;
+
+            if (userData.Shortcuts != null || userData.PanelSettings != null || userData.HiddenToolbars != null)
+            {
+                JsonSerializerOptions options = new JsonSerializerOptions();
+                options.WriteIndented = true;
+                options.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+
+                using (FileStream createStream = File.Create(m_userFile))
+                {
+                    JsonSerializer.Serialize(createStream, userData, options);
+                }
+            }
+
+        }
+
+        private void LoadUserSettings()
+        {
+            if (!m_userFileRead)
+            {
+                m_userFileRead = true;
+
+                if (File.Exists(m_userFile))
+                {
+                    var data = JsonSerializer.Deserialize<UserDataCurrent>(File.ReadAllText(m_userFile));
+                    if (data.Shortcuts != null)
+                    {
+                        foreach (var shortcut in data.Shortcuts)
+                        {
+                            if (shortcut is UserDataCurrent.ProcedureShortcut)
+                            {
+                                var typed = shortcut as UserDataCurrent.ProcedureShortcut;
+                                var found = m_fileElements.FirstOrDefault(e => String.Equals(typed.Element, e.FullName));
+                                if (found != null)
+                                {
+                                    var isPartnerModel = false;
+                                    if (!String.IsNullOrEmpty(typed.Partner))
+                                    {
+                                        var partner = found.ListPartners().FirstOrDefault(p => p.Name == typed.Partner); 
+                                        if (partner != null)
+                                        {
+                                            isPartnerModel = partner.IsModel;
+                                        }
+                                        else
+                                        {
+                                            continue;   // Just throw away, then.
+                                        }
+                                    }
+                                    this.AddProcedureShortcut(typed.Text, found, typed.Partner, isPartnerModel, typed.Instance);
+                                }
+                            }
+                            else if (shortcut is UserDataCurrent.ObjectCommandShortcut)
+                            {
+                                var typed = shortcut as UserDataCurrent.ObjectCommandShortcut;
+                                this.AddObjectCommandShortcut(typed.Text, typed.Instance, typed.Command);
+                            }
+                        }
+                    }
+                    if (data.HiddenToolbars != null && data.HiddenToolbars.Length > 0)
+                    {
+                        foreach (var hidden in data.HiddenToolbars)
+                        {
+                            panelCustomToolstrips.SetToolbarVisibility(hidden, false);
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+
+        public IExecutionAccess StartExecution(bool addToHistory, IFileElement element, string partner, string objectVariable, object[] args)
         {
             if (this.ExecutionRunning)
             {
@@ -288,17 +363,31 @@ namespace StepBro.SimpleWorkbench
             string objectInstanceText = String.IsNullOrEmpty(objectVariable) ? "" : (objectVariable.Split('.').Last() + ".");
             string partnertext = String.IsNullOrEmpty(partner) ? "" : (" @ " + partner);
             string noteText = String.IsNullOrEmpty(executionNote) ? "" : (" - \"" + executionNote + "\"");
-            string elementText = String.IsNullOrEmpty(objectInstanceText) ? element : element.Split('.').Last();
-            StepBroMain.Logger.RootLogger.LogUserAction("Request script execution: " + objectInstanceText + elementText + partnertext + noteText);
+            string elementText = String.IsNullOrEmpty(objectInstanceText) ? element.FullName : element.FullName.Split('.').Last();
+            m_mainLogger.LogUserAction("Request script execution: " + objectInstanceText + elementText + partnertext + noteText);
 
             return executionData;
         }
 
         #region ICoreAccess
 
-        public IExecutionAccess StartExecution(string element, string partner, string objectVariable, object[] args)
+        public IExecutionAccess StartExecution(string elementName, string partner, string objectVariable, object[] args)
         {
-            return this.StartExecution(true, element, partner, objectVariable, args);
+            if (String.IsNullOrEmpty(elementName))
+            {
+                m_mainLogger.LogError("Internal Error: File element name is empty.");
+                return null;
+            }
+            var element = StepBroMain.TryFindFileElement(elementName);
+            if (element != null)
+            {
+                return this.StartExecution(false, element, partner, objectVariable, args);
+            }
+            else
+            {
+                m_mainLogger.LogError("Could not find file element '" + elementName + "'.");
+                return null;
+            }
         }
 
         public bool ExecutionRunning
@@ -311,7 +400,7 @@ namespace StepBro.SimpleWorkbench
 
         public void ExecuteObjectCommand(string objectVariable, string command)
         {
-            StepBroMain.Logger.RootLogger.LogUserAction($"Request run '{objectVariable}' command \"{command}\"");
+            m_mainLogger.LogUserAction($"Request run '{objectVariable}' command \"{command}\"");
             var obj = m_commandObjectDictionary[objectVariable];
             if (obj.AcceptingCommands())
             {
@@ -321,7 +410,7 @@ namespace StepBro.SimpleWorkbench
             {
                 string errorMessage = $"'{objectVariable}' is not accepting commands. Did you forget to open or connect?";
 
-                StepBroMain.Logger.RootLogger.LogError(errorMessage);
+                m_mainLogger.LogError(errorMessage);
             }
         }
 
@@ -426,407 +515,20 @@ namespace StepBro.SimpleWorkbench
             return documentWindow;
         }
 
-        #region Application Tasks
+        #region Main Toolbar
 
-        protected override void OnTaskHandlingStateChanged(StateChange change, string workingText)
+        #region Errors View
+
+        private void ErrorsList_ParseFilesClicked(object sender, EventArgs e)
         {
-            toolStripStatusLabelApplicationTaskState.Text = workingText;
+            this.StartFileParsing();
         }
 
-        private enum TaskNoState { Do }
-
-        #region File Loading
-
-        private TaskAction FileLoadingTask(ref TaskNoState state, ref int index, ITaskStateReporting reporting)
+        private void ErrorsList_AutoParseFilesChanged(object sender, EventArgs e)
         {
-            m_targetFileFullPath = System.IO.Path.GetFullPath(m_targetFile);
-            try
-            {
-                m_file = StepBroMain.LoadScriptFile(m_applicationResourceUserObject, m_targetFileFullPath);
-                if (m_file == null)
-                {
-                    //retval = -1;
-                    //ConsoleWriteErrorLine("Error: Loading script file failed ( " + m_targetFileFullPath + " )");
-                }
-                else
-                {
-                    var shortcuts = ServiceManager.Global.Get<IFolderManager>();
-                    var projectShortcuts = new FolderShortcutCollection(FolderShortcutOrigin.Project);
-                    projectShortcuts.AddShortcut(StepBro.Core.Api.Constants.TOP_FILE_FOLDER_SHORTCUT, System.IO.Path.GetDirectoryName(m_file.FilePath), isResolved: true);
-                    shortcuts.AddSource(projectShortcuts);
-
-                    //m_next.Enqueue(StateOrCommand.ParseFiles);  // File has been loaded; start the parsing.
-                }
-            }
-            catch (Exception)
-            {
-                //retval = -1;
-                //ConsoleWriteErrorLine("Error: Loading script file failed: " + ex.GetType().Name + ", " + ex.Message);
-            }
-            return TaskAction.Finish;
-        }
-
-        private void StartFileLoading()
-        {
-            this.AddTask<TaskNoState>(FileLoadingTask, "Loading file", "Load script file.");
         }
 
         #endregion
-
-        #region File Parsing
-
-        private enum FileParsingState { Init, Parse, Errors, Finish }
-
-        private TaskAction FileParsingTask(ref FileParsingState state, ref int index, ITaskStateReporting reporting)
-        {
-            switch (state)
-            {
-                case FileParsingState.Init:
-                    // TODO: Check whether file is loaded.
-
-                    state = FileParsingState.Parse;
-                    return TaskAction.ContinueOnWorkerThreadDomain;
-
-                case FileParsingState.Parse:
-                    var parsingSuccess = StepBroMain.ParseFiles(true);
-                    if (parsingSuccess)
-                    {
-                        state = FileParsingState.Finish;
-                    }
-                    else
-                    {
-                        state = FileParsingState.Errors;
-                    }
-                    break;
-
-                case FileParsingState.Errors:
-                    {
-                        m_toolWindowExecutionLog.Activate();
-                    }
-                    return TaskAction.Finish;
-
-                case FileParsingState.Finish:
-                    this.UpdateAfterSuccessfulFileParsing();
-                    return TaskAction.Finish;
-
-                default:
-                    break;
-            }
-            return TaskAction.Continue;
-        }
-
-        private void StartFileParsing()
-        {
-            this.AddTask<FileParsingState>(FileParsingTask, "Parsing files", "Parse the script files.");
-        }
-
-        private void UpdateAfterSuccessfulFileParsing()
-        {
-            // Update list of variables containing objects with the ITextCommandInput interface.
-            var objects = m_objectManager.GetObjectCollection();
-            var commandObjectsContainers = objects.Where(o => o.Object is ITextCommandInput).ToList();
-            foreach (var o in commandObjectsContainers)
-            {
-                m_commandObjectDictionary[o.FullName] = o.Object as ITextCommandInput;    // Add or override.
-            }
-            // TODO: Udate the command target combo.
-
-
-            // Update the list of loaded script files.
-            var fileManager = StepBroMain.ServiceManager.Get<ILoadedFilesManager>();
-            var files = fileManager.ListFiles<IScriptFile>().ToList();
-
-
-            m_fileElements.Clear();
-            foreach (var e in files.SelectMany(f => f.ListElements()))
-            {
-                m_fileElements.Add(e);
-            }
-
-            foreach (var v in m_fileElements.Where(e => e.ElementType == FileElementType.FileVariable))
-            {
-                m_variableTypes[v.FullName] = v.DataType;
-            }
-
-
-            //for (int i = 0; i < files.Count; i++)
-            //{
-            //    var f = files[i];
-
-            //    m_fileElements = f.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration || e.ElementType == FileElementType.TestList).ToList();
-            //    //foreach (var e in elements)
-            //    //{
-            //    //    switch (e.ElementType)
-            //    //    {
-            //    //        case FileElementType.ProcedureDeclaration:
-            //    //            {
-            //    //                //elementData = new StepBro.Sidekick.Messages.Procedure();
-            //    //                //var procedureData = elementData as StepBro.Sidekick.Messages.Procedure;
-            //    //                //var p = e as IFileProcedure;
-            //    //                //if (p.Parameters.Length > 0 && p.IsFirstParameterThisReference)
-            //    //                //{
-            //    //                //    var par = p.Parameters[0];
-            //    //                //    (elementData as StepBro.Sidekick.Messages.Procedure).FirstParameterIsInstanceReference = true;
-
-            //    //                //    var instances = new List<string>();
-            //    //                //    foreach (var v in objects)
-            //    //                //    {
-            //    //                //        if (par.Value.IsAssignableFrom(variableTypes[v.FullName]))
-            //    //                //        {
-            //    //                //            instances.Add(v.FullName);
-            //    //                //        }
-            //    //                //    }
-            //    //                //    if (instances.Count > 0)
-            //    //                //    {
-            //    //                //        procedureData.CompatibleObjectInstances = instances.ToArray();
-            //    //                //    }
-            //    //                //}
-            //    //                //(elementData as StepBro.Sidekick.Messages.Procedure).Parameters = p.Parameters.Select(p => new StepBro.Sidekick.Messages.Parameter(p.Name, p.Value.TypeName())).ToArray();
-            //    //                //(elementData as StepBro.Sidekick.Messages.Procedure).ReturnType = p.ReturnType.TypeName();
-            //    //            }
-            //    //            break;
-            //    //        case FileElementType.TestList:
-            //    //            //elementData = new StepBro.Sidekick.Messages.TestList();
-            //    //            break;
-            //    //        default:
-            //    //            break;
-            //    //    }
-            //    //}
-            //}
-
-            foreach (var v in objects)
-            {
-                if (v.Object is StepBro.ToolBarCreator.ToolBar)
-                {
-                    var toolbar = v.Object as StepBro.ToolBarCreator.ToolBar;
-                    panelCustomToolstrips.AddOrSet(v.FullName, toolbar);
-                }
-                else if (v.Object is StepBro.PanelCreator.Panel)
-                {
-                    var panel = v.Object as StepBro.PanelCreator.Panel;
-                }
-            }
-
-            #region Update Command Objects
-
-            var selectedTool = toolStripComboBoxTool.SelectedItem as ComboboxItem;
-            toolStripComboBoxTool.Items.Clear();
-            int selection = 0;
-            int index = 0;
-
-            foreach (var v in objects)
-            {
-                if (v.Object is ITextCommandInput)
-                {
-                    var name = v.FullName.Split('.').Last();
-                    toolStripComboBoxTool.Items.Add(new ComboboxItem(name, v));
-                    if (selectedTool != null && name == selectedTool.Text)
-                    {
-                        selection = index;
-                    }
-                    index++;
-                }
-            }
-            if (toolStripComboBoxTool.Items.Count > 0)
-            {
-                toolStripComboBoxTool.Enabled = true;
-                toolStripComboBoxToolCommand.Enabled = true;
-                toolStripComboBoxTool.SelectedIndex = selection;
-                toolStripComboBoxTool.SelectionLength = 0;
-            }
-            else
-            {
-                toolStripComboBoxTool.Enabled = false;
-                toolStripComboBoxToolCommand.Enabled = false;
-            }
-
-            #endregion
-
-        }
-
-        #endregion
-
-        #region Script Execution
-
-        private enum ScriptExecutionState { Init, Running, Finish }
-
-        private TaskAction ScriptExecutionTask(ref ScriptExecutionState state, ref int index, ITaskStateReporting reporting)
-        {
-            switch (state)
-            {
-                case ScriptExecutionState.Init:
-                    {
-                        var data = m_executionQueue.Peek();
-                        var element = StepBroMain.TryFindFileElement(data.Element);
-                        if (element != null)
-                        {
-                            IPartner partner = null;
-                            List<object> targetArguments = null;
-                            if (data.UnparsedArguments != null)
-                            {
-                                targetArguments =
-                                    m_commandLineOptions?.Arguments.Select(
-                                        (a) => StepBroMain.ParseExpression(element.ParentFile, a)).ToList();
-                                data.Arguments = new List<object>(targetArguments); // Save a copy.
-                            }
-                            else if (data.Arguments != null && data.Arguments.Count > 0)
-                            {
-                                targetArguments = new List<object>(data.Arguments);
-                            }
-                            else
-                            {
-                                targetArguments = new List<object>();
-                            }
-
-                            if (!String.IsNullOrEmpty(data.Partner))
-                            {
-                                partner = element.ListPartners().First(p => String.Equals(data.Partner, p.Name, StringComparison.InvariantCultureIgnoreCase));
-                                if (partner == null)
-                                {
-                                    data.Errors.Add($"Error: The specified file element does not have a model named \"{data.Partner}\".");
-                                    return TaskAction.Cancel;
-                                }
-                            }
-                            else
-                            {
-                                if (element is IFileProcedure)
-                                {
-                                    var procedure = (IFileProcedure)element;
-
-                                    // NOTE: targetObject might be set, even if it should not be used.
-
-                                    if (!String.IsNullOrEmpty(data.Object) && procedure.IsFirstParameterThisReference)
-                                    {
-                                        var theObject = m_objectManager.GetObjectCollection().FirstOrDefault(v => string.Equals(v.FullName, data.Object, StringComparison.InvariantCulture));
-                                        if (theObject != null)
-                                        {
-                                            targetArguments.Insert(0, theObject.Object);
-                                        }
-                                        else
-                                        {
-                                            data.Errors.Add($"Error: Target object '{data.Object}' was not found in the list of global variables.");
-                                            return TaskAction.Cancel;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    data.Errors.Add($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
-                                    return TaskAction.Cancel;
-                                }
-                            }
-
-                            try
-                            {
-                                var execution = StepBroMain.StartProcedureExecution(element, partner, targetArguments.ToArray());
-                                if (execution != null)
-                                {
-                                    data.SetExecution(execution);
-                                    this.AddElementExecutionToHistory(data.Element, data.Partner, data.Object, data.Arguments?.ToArray());
-                                    toolStripButtonStopScriptExecution.Enabled = true;
-                                }
-                            }
-                            catch (TargetParameterCountException)
-                            {
-                                //ConsoleWriteErrorLine("Error: The number of arguments does not match the target procedure.");
-                            }
-                        }
-                        else
-                        {
-                            //ConsoleWriteErrorLine($"Error: File element named '{targetElement} was not found.");
-                        }
-
-                        state = ScriptExecutionState.Running;
-                    }
-                    return TaskAction.ContinueOnWorkerThreadDomain;
-
-                case ScriptExecutionState.Running:
-                    while (!m_executionQueue.Peek().State.HasEnded())
-                    {
-                        Thread.Sleep(200);
-                    }
-                    state = ScriptExecutionState.Finish;
-                    break;
-
-                case ScriptExecutionState.Finish:
-                    m_executionQueue.Dequeue();
-                    toolStripButtonStopScriptExecution.Enabled = false;
-                    return TaskAction.Finish;
-
-                default:
-                    break;
-            }
-            return TaskAction.Continue;
-        }
-
-        private void StartScriptExecution(ScriptExecutionData executionData)
-        {
-            m_executionQueue.Enqueue(executionData);
-            this.StartScriptExecution();
-        }
-        private void StartScriptExecution()
-        {
-            this.AddTask<ScriptExecutionState>(ScriptExecutionTask, "Executing script", "Execute script.");
-        }
-
-
-        #endregion
-
-        #endregion
-
-        private int GetIndexOfTopHistoryElement()
-        {
-            return toolStripSplitButtonRunScript.DropDownItems.IndexOf(toolStripSeparatorRunBeforeHistory) + 1;
-        }
-
-        private void AddElementExecutionToHistory(string element, string partner, string objectVariable, object[] args)
-        {
-            var title = ScripExecutionButtonTitle(false, element, partner, objectVariable, args);
-
-            var first = this.GetIndexOfTopHistoryElement();
-            ScriptExecutionToolStripMenuItem found = null;
-            int historyItemsCount = (toolStripSplitButtonRunScript.Tag != null) ? (int)toolStripSplitButtonRunScript.Tag : 0;
-            if (historyItemsCount > 0)
-            {
-                for (int i = 0; i < toolStripSplitButtonRunScript.DropDownItems.Count; i++)
-                {
-                    var exeItem = toolStripSplitButtonRunScript.DropDownItems[i] as ScriptExecutionToolStripMenuItem;
-                    if (exeItem == null) break;     // Stop here...
-                    if (exeItem.Equals(element, partner, objectVariable))
-                    {
-                        found = exeItem;
-                        toolStripSplitButtonRunScript.DropDownItems.RemoveAt(i);    // Remove it (to be inserted at the top).
-                        historyItemsCount--;
-                        break;
-                    }
-                }
-            }
-
-            toolStripSeparatorRunAfterHistory.Visible = true;
-
-            if (found == null)
-            {
-                found = new ScriptExecutionToolStripMenuItem();
-                found.FileElement = element;
-                found.Partner = partner;
-                found.InstanceObject = objectVariable;
-                found.ShowFullName = false;
-                found.SetText();
-                found.Tag = new object();
-                found.Click += FileElementExecutionEntry_Click;
-            }
-
-            historyItemsCount++;
-            toolStripSplitButtonRunScript.Text = found.Text;
-            toolStripSplitButtonRunScript.DropDownItems.Insert(first, found);   // Insert (or re-insert) at the top of the history list.
-            if (historyItemsCount > 25)
-            {
-                toolStripSplitButtonRunScript.DropDownItems.RemoveAt(first + historyItemsCount);
-                historyItemsCount--;
-            }
-            toolStripSplitButtonRunScript.Tag = historyItemsCount;
-            toolStripButtonAddShortcut.Enabled = true;
-        }
 
         #region View Menu
 
@@ -889,24 +591,339 @@ namespace StepBro.SimpleWorkbench
 
         #endregion
 
-        #region Loaded Script Files
+        #region Run Button and DropDown
 
-        private void LoadedFiles_FileLoaded(object sender, LoadedFileEventArgs args)
+        private void toolStripTextBoxRunSearch_TextChanged(object sender, EventArgs e)
         {
-
+            this.UpdateFileElementExecutionSearchResult();
         }
 
-        private void LoadedFiles_FileClosed(object sender, LoadedFileEventArgs args)
+        private void toolStripTextBoxRunSearch_KeyPress(object sender, KeyPressEventArgs e)
         {
-
+            if (e.KeyChar == '\r')
+            {
+                e.Handled = true;
+                // Make the textbox loose focus, to make the drop down items detect mouse hovering.
+                toolStripTextBoxRunSearch.Enabled = false;
+                toolStripTextBoxRunSearch.Enabled = true;
+            }
         }
 
-        private void File_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void toolStripSplitButtonRunScript_DropDownOpening(object sender, EventArgs e)
         {
+            this.UpdateFileElementExecutionSearchResult(); // In case files have changed.
+        }
 
+        private void UpdateFileElementExecutionSearchResult()
+        {
+            var s = toolStripTextBoxRunSearch.Text;
+            int first = toolStripSplitButtonRunScript.DropDownItems.IndexOf(toolStripTextBoxRunSearch) + 1;
+            while (toolStripSplitButtonRunScript.DropDownItems.Count > first)
+            {
+                toolStripSplitButtonRunScript.DropDownItems.RemoveAt(first);
+            }
+
+            if (m_fileElements != null && toolStripTextBoxRunSearch.Text.Length > 2)
+            {
+                var matches = m_fileElements.Where(
+                    e =>
+                        (e.ElementType == FileElementType.ProcedureDeclaration || e.ElementType == FileElementType.TestList) &&
+                        e.Name.Contains(s, StringComparison.InvariantCultureIgnoreCase)).ToList();
+
+                if (matches.Count > 0)
+                {
+                    var startExactMatches = new List<IFileElement>();
+                    var exactMatches = new List<IFileElement>();
+                    var startMatches = new List<IFileElement>();
+                    var otherExactMatches = new List<IFileElement>();
+                    foreach (var item in matches)
+                    {
+                        if (item.Name.StartsWith(s, StringComparison.InvariantCulture))
+                        {
+                            startExactMatches.Add(item);
+                        }
+                        else if (item.Name.Contains(s, StringComparison.InvariantCulture))
+                        {
+                            exactMatches.Add(item);
+                        }
+                        else if (item.Name.StartsWith(s, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            startMatches.Add(item);
+                        }
+                        else
+                        {
+                            otherExactMatches.Add(item);
+                        }
+                    }
+
+                    var sortedMatches = new List<IFileElement>();
+                    sortedMatches.AddRange(startExactMatches);
+                    sortedMatches.AddRange(exactMatches);
+                    sortedMatches.AddRange(startMatches);
+                    sortedMatches.AddRange(otherExactMatches);
+
+                    // TODO: Make dropdown list update entries on hover, as the user would expect.
+                    foreach (var element in sortedMatches)
+                    {
+                        if (element.ElementType == FileElementType.ProcedureDeclaration)
+                        {
+                            var entry = this.CreateProcedureShortcutMenu(element as IFileProcedure);
+                            toolStripSplitButtonRunScript.DropDownItems.Add(entry);
+                        }
+                        else if (element.ElementType == FileElementType.TestList)
+                        {
+                            var entry = this.CreateTestListShortcutMenu(element as ITestList);
+                            toolStripSplitButtonRunScript.DropDownItems.Add(entry);
+                        }
+                    }
+                }
+            }
+        }
+
+        ToolStripMenuItem CreateProcedureShortcutMenu(IFileProcedure procedure)
+        {
+            ToolStripMenuItem outputItem = null;
+            var partners = procedure.ListPartners().ToList();
+            var thisVariables = new List<string>();
+
+            if (procedure.Parameters.Length > 0 && procedure.IsFirstParameterThisReference)
+            {
+                var par = procedure.Parameters[0];
+                foreach (var v in m_objects)
+                {
+                    if (par.Value.IsAssignableFrom(m_variableTypes[v.FullName]))
+                    {
+                        thisVariables.Add(v.FullName);
+                    }
+                }
+            }
+
+            if (partners.Count > 0 || thisVariables.Count > 0)
+            {
+                outputItem = new ToolStripMenuItem();
+                outputItem.Name = "toolStripMenuProcedure" + procedure.Name;
+                outputItem.Size = new Size(182, 22);
+                outputItem.Text = procedure.Name;
+                outputItem.ToolTipText = null; // $"Procedure '{procedure.FullName}'";
+
+                if (partners != null && partners.Count > 0)
+                {
+                    var options = new List<IPartner>(partners);
+                    options.Insert(0, null); // Add the 'no partner' option.
+                    foreach (var partner in options)
+                    {
+                        var procedureExecutionOptionMenu = new ScriptExecutionToolStripMenuItem(procedure, (partner != null) ? partner.Name : null, null);
+                        procedureExecutionOptionMenu.Size = new Size(182, 22);
+                        if (partner != null)
+                        {
+                            procedureExecutionOptionMenu.Name = "toolStripMenuProcedure" + procedure.Name + "Dot" + partner.Name;
+                            if (partner.IsModel)
+                            {
+                                procedureExecutionOptionMenu.Text = procedure.Name + " using '" + partner.Name + "'";
+                            }
+                            else
+                            {
+                                procedureExecutionOptionMenu.Text = procedure.Name + "." + partner.Name;
+                            }
+                            procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}' partner '{partner.Name}'";
+                            var partnerProcedure = m_fileElements.Where(e => e is IFileProcedure).FirstOrDefault(p => p.FullName == partner.ProcedureReference.FullName) as IFileProcedure;
+                            if (partnerProcedure == null ||
+                                (partnerProcedure.Parameters != null && partnerProcedure.Parameters.Length > ((partnerProcedure.IsFirstParameterThisReference) ? 1 : 0)))   // TODO: Check whether that first parameter is the parent procedure.
+                            {
+                                procedureExecutionOptionMenu.Enabled = false;
+                            }
+                        }
+                        else
+                        {
+                            procedureExecutionOptionMenu.Name = "toolStripMenuProcedureOptionDirect" + procedure.Name;
+                            procedureExecutionOptionMenu.Text = procedure.Name;
+                            procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}'";
+                            if (procedure.Parameters != null && procedure.Parameters.Length > 0)
+                            {
+                                procedureExecutionOptionMenu.Enabled = false;
+                            }
+                        }
+                        procedureExecutionOptionMenu.Click += FileElementExecutionEntry_Click;
+                        outputItem.DropDownItems.Add(procedureExecutionOptionMenu);
+                    }
+                }
+                else if (thisVariables.Count > 0)
+                {
+                    foreach (var variable in thisVariables)
+                    {
+                        string shortName = variable.Split('.').Last();
+
+                        var procedureExecutionOptionMenu = new ScriptExecutionToolStripMenuItem(procedure, null, variable);
+                        procedureExecutionOptionMenu.Size = new Size(182, 22);
+                        procedureExecutionOptionMenu.Name = "toolStripMenuProcedure" + procedure.Name + "On" + variable.Replace(".", "Dot");
+                        procedureExecutionOptionMenu.SetText();
+                        procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}' partner '{partner.Name}'";
+                                                                         //procedureExecutionOptionMenu.Click += FileElementExecutionEntry_Click; // TODO
+                        if (procedure.Parameters == null || procedure.Parameters.Length > 1)     // TODO: Enable user to input the arguments.
+                        {
+                            procedureExecutionOptionMenu.Enabled = false;
+                        }
+                        outputItem.DropDownItems.Add(procedureExecutionOptionMenu);
+                    }
+                }
+                else
+                {
+                    var executionItem = outputItem as ScriptExecutionToolStripMenuItem;
+                    executionItem.FileElement = procedure;
+                    executionItem.SetText();
+                    if (procedure.Parameters != null && procedure.Parameters.Length > 0)     // TODO: Enable user to input the arguments.
+                    {
+                        executionItem.Enabled = false;
+                    }
+                    executionItem.Click += FileElementExecutionEntry_Click;
+                }
+            }
+            else
+            {
+                // No partners or instance object, just the direct procedure call.
+
+                var procedureMenu = new ScriptExecutionToolStripMenuItem(procedure, null, null);
+                procedureMenu.Size = new Size(182, 22);
+                procedureMenu.SetText();
+                procedureMenu.Name = "toolStripMenuProcedure" + procedure.FullName;
+                procedureMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}'";
+                if (procedure.Parameters != null && procedure.Parameters.Length > 0)
+                {
+                    procedureMenu.Enabled = false;
+                }
+                procedureMenu.Click += FileElementExecutionEntry_Click;
+                outputItem = procedureMenu;
+            }
+            return outputItem;
+        }
+
+        ToolStripMenuItem CreateTestListShortcutMenu(ITestList testlist)
+        {
+            ToolStripMenuItem outputItem = null;
+            var partners = testlist.ListPartners().ToList();
+
+            if (partners.Count > 0)
+            {
+                outputItem = new ToolStripMenuItem();
+                outputItem.Name = "toolStripMenuTestList" + testlist.Name;
+                outputItem.Size = new Size(182, 22);
+                outputItem.Text = testlist.Name;
+                outputItem.ToolTipText = null; // $"Procedure '{procedure.FullName}'";
+
+                if (partners != null && partners.Count > 0)
+                {
+                    foreach (var partner in partners)
+                    {
+                        var testlistExecutionOptionMenu = new ScriptExecutionToolStripMenuItem(testlist, (partner != null) ? partner.Name : null, null);
+                        testlistExecutionOptionMenu.Size = new Size(182, 22);
+                        if (partner != null)
+                        {
+                            testlistExecutionOptionMenu.Name = "toolStripMenuTestList" + testlist.Name + "Dot" + partner.Name;
+                            //procedureExecutionOptionMenu.Text = testlist.Name + "." + partner.Name;
+                            testlistExecutionOptionMenu.PartnerIsModel = partner.IsModel;
+                            testlistExecutionOptionMenu.SetText();
+                            testlistExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}' partner '{partner.Name}'";
+                            var partnerProcedure = partner.ProcedureReference; //m_fileElements.Where(e => e is ITestList).FirstOrDefault(p => p.FullName == partner.ProcedureReference.FullName) as IFileProcedure;
+                            if (partnerProcedure == null ||
+                                (partnerProcedure.Parameters != null && partnerProcedure.Parameters.Length > ((partnerProcedure.IsFirstParameterThisReference) ? 1 : 0)))   // TODO: Check whether that first parameter is the parent procedure.
+                            {
+                                testlistExecutionOptionMenu.Enabled = false;
+                            }
+                        }
+                        testlistExecutionOptionMenu.Click += FileElementExecutionEntry_Click;
+                        outputItem.DropDownItems.Add(testlistExecutionOptionMenu);
+                    }
+                }
+            }
+            return outputItem;
+        }
+
+        private void FileElementExecutionEntry_Click(object sender, EventArgs e)
+        {
+            var executionEntry = sender as ScriptExecutionToolStripMenuItem;
+            this.StartExecution(true, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null);
+        }
+
+        private void toolStripSplitButtonRunScript_ButtonClick(object sender, EventArgs e)
+        {
+            if (toolStripSplitButtonRunScript.Tag != null)
+            {
+                var first = toolStripSplitButtonRunScript.DropDownItems.IndexOf(toolStripSeparatorRunBeforeHistory) + 1;
+                var executionEntry = toolStripSplitButtonRunScript.DropDownItems[first] as ScriptExecutionToolStripMenuItem;
+                this.StartExecution(true, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null);
+            }
+        }
+
+        private int GetIndexOfTopHistoryElement()
+        {
+            return toolStripSplitButtonRunScript.DropDownItems.IndexOf(toolStripSeparatorRunBeforeHistory) + 1;
+        }
+
+        private void AddElementExecutionToHistory(IFileElement element, string partner, bool partnerIsModel, string objectVariable, object[] args)
+        {
+            var title = ScripExecutionButtonTitle(false, element.FullName, partner, partnerIsModel, objectVariable, args);
+
+            var first = this.GetIndexOfTopHistoryElement();
+            ScriptExecutionToolStripMenuItem found = null;
+            int historyItemsCount = (toolStripSplitButtonRunScript.Tag != null) ? (int)toolStripSplitButtonRunScript.Tag : 0;
+            if (historyItemsCount > 0)
+            {
+                var index = first;
+                for (int i = 0; i < historyItemsCount; i++)
+                {
+                    var exeItem = toolStripSplitButtonRunScript.DropDownItems[index] as ScriptExecutionToolStripMenuItem;
+                    if (exeItem == null) break;     // Stop here...
+                    if (exeItem.Equals(element.FullName, partner, objectVariable))
+                    {
+                        found = exeItem;
+                        toolStripSplitButtonRunScript.DropDownItems.RemoveAt(index);    // Remove it (to be inserted at the top).
+                        historyItemsCount--;
+                        break;
+                    }
+                    else
+                    {
+                        index++;
+                    }
+                }
+            }
+
+            toolStripSeparatorRunAfterHistory.Visible = true;
+
+            if (found == null)
+            {
+                found = new ScriptExecutionToolStripMenuItem();
+                found.FileElement = element;
+                found.Partner = partner;
+                found.PartnerIsModel = partnerIsModel;
+                found.InstanceObject = objectVariable;
+                found.ShowFullName = false;
+                found.SetText();
+                found.Tag = new object();
+                found.Click += FileElementExecutionEntry_Click;
+            }
+
+            historyItemsCount++;
+            toolStripSplitButtonRunScript.Text = found.Text;
+            toolStripSplitButtonRunScript.DropDownItems.Insert(first, found);   // Insert (or re-insert) at the top of the history list.
+            if (historyItemsCount > 25)
+            {
+                toolStripSplitButtonRunScript.DropDownItems.RemoveAt(first + historyItemsCount);
+                historyItemsCount--;
+            }
+            toolStripSplitButtonRunScript.Tag = historyItemsCount;
+            toolStripButtonAddShortcut.Enabled = true;
         }
 
         #endregion
+
+        private void toolStripButtonStopScriptExecution_Click(object sender, EventArgs e)
+        {
+            if (m_executionQueue.Count > 0)
+            {
+                m_executionQueue.Peek().RequestStopExecution();
+                toolStripButtonStopScriptExecution.Enabled = false;
+            }
+        }
 
         #region USER INTERACTION - COMMANDS
 
@@ -973,210 +990,6 @@ namespace StepBro.SimpleWorkbench
 
         #endregion
 
-        #region USER INTERACTION - EXECUTION
-
-        private void FileElementExecutionEntry_Click(object sender, EventArgs e)
-        {
-            var executionEntry = sender as ScriptExecutionToolStripMenuItem;
-            this.StartExecution(true, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null);
-        }
-
-        private void toolStripTextBoxRunSearch_TextChanged(object sender, EventArgs e)
-        {
-            this.UpdateFileElementExecutionSearchResult();
-        }
-
-        private void toolStripSplitButtonRunScript_DropDownOpening(object sender, EventArgs e)
-        {
-            this.UpdateFileElementExecutionSearchResult();
-        }
-
-        private void UpdateFileElementExecutionSearchResult()
-        {
-            var s = toolStripTextBoxRunSearch.Text;
-            int first = toolStripSplitButtonRunScript.DropDownItems.IndexOf(toolStripTextBoxRunSearch) + 1;
-            while (toolStripSplitButtonRunScript.DropDownItems.Count > first)
-            {
-                toolStripSplitButtonRunScript.DropDownItems.RemoveAt(first);
-            }
-
-            if (m_fileElements != null && toolStripTextBoxRunSearch.Text.Length > 2)
-            {
-                var matches = m_fileElements.Where(
-                    e =>
-                        (e.ElementType == FileElementType.ProcedureDeclaration || e.ElementType == FileElementType.TestList) &&
-                        e.Name.Contains(s, StringComparison.InvariantCultureIgnoreCase)).ToList();
-
-                if (matches.Count > 0)
-                {
-                    var startExactMatches = new List<IFileElement>();
-                    var exactMatches = new List<IFileElement>();
-                    var startMatches = new List<IFileElement>();
-                    var otherExactMatches = new List<IFileElement>();
-                    foreach (var item in matches)
-                    {
-                        if (item.Name.StartsWith(s, StringComparison.InvariantCulture))
-                        {
-                            startExactMatches.Add(item);
-                        }
-                        else if (item.Name.Contains(s, StringComparison.InvariantCulture))
-                        {
-                            exactMatches.Add(item);
-                        }
-                        else if (item.Name.StartsWith(s, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            startMatches.Add(item);
-                        }
-                        else
-                        {
-                            otherExactMatches.Add(item);
-                        }
-                    }
-
-                    var sortedMatches = new List<IFileElement>();
-                    sortedMatches.AddRange(startExactMatches);
-                    sortedMatches.AddRange(exactMatches);
-                    sortedMatches.AddRange(startMatches);
-                    sortedMatches.AddRange(otherExactMatches);
-
-                    foreach (var element in sortedMatches)
-                    {
-                        if (element.ElementType == FileElementType.ProcedureDeclaration)
-                        {
-                            toolStripSplitButtonRunScript.DropDownItems.Add(this.CreateProcedureShortcutMenu(element as IFileProcedure));
-                        }
-                    }
-                }
-            }
-        }
-
-        ToolStripMenuItem CreateProcedureShortcutMenu(IFileProcedure procedure)
-        {
-            ToolStripMenuItem outputItem = null;
-            var partners = procedure.ListPartners().ToList();
-            var thisVariables = new List<string>();
-
-            if (procedure.Parameters.Length > 0 && procedure.IsFirstParameterThisReference)
-            {
-                var par = procedure.Parameters[0];
-                foreach (var v in m_objects)
-                {
-                    if (par.Value.IsAssignableFrom(m_variableTypes[v.FullName]))
-                    {
-                        thisVariables.Add(v.FullName);
-                    }
-                }
-            }
-
-            if (partners.Count > 0 || thisVariables.Count > 0)
-            {
-                outputItem = new ToolStripMenuItem();
-                outputItem.Name = "toolStripMenuProcedure" + procedure.Name;
-                outputItem.Size = new Size(182, 22);
-                outputItem.Text = procedure.Name;
-                outputItem.ToolTipText = null; // $"Procedure '{procedure.FullName}'";
-
-                if (partners != null && partners.Count > 0)
-                {
-                    var options = new List<IPartner>(partners);
-                    options.Insert(0, null); // Add the 'no partner' option.
-                    foreach (var partner in options)
-                    {
-                        var procedureExecutionOptionMenu = new ScriptExecutionToolStripMenuItem(procedure.FullName, (partner != null) ? partner.Name : null, null);
-                        procedureExecutionOptionMenu.Size = new Size(182, 22);
-                        if (partner != null)
-                        {
-                            procedureExecutionOptionMenu.Name = "toolStripMenuProcedure" + procedure.Name + "Dot" + partner.Name;
-                            procedureExecutionOptionMenu.Text = procedure.Name + "." + partner.Name;
-                            procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}' partner '{partner.Name}'";
-                            var partnerProcedure = m_fileElements.Where(e => e is IFileProcedure).FirstOrDefault(p => p.FullName == partner.ProcedureReference.FullName) as IFileProcedure;
-                            if (partnerProcedure == null ||
-                                (partnerProcedure.Parameters != null && partnerProcedure.Parameters.Length > ((partnerProcedure.IsFirstParameterThisReference) ? 1 : 0)))   // TODO: Check whether that first parameter is the parent procedure.
-                            {
-                                procedureExecutionOptionMenu.Enabled = false;
-                            }
-                        }
-                        else
-                        {
-                            procedureExecutionOptionMenu.Name = "toolStripMenuProcedureOptionDirect" + procedure.Name;
-                            procedureExecutionOptionMenu.Text = procedure.Name;
-                            procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}'";
-                            if (procedure.Parameters != null && procedure.Parameters.Length > 0)
-                            {
-                                procedureExecutionOptionMenu.Enabled = false;
-                            }
-                        }
-                        procedureExecutionOptionMenu.Click += FileElementExecutionEntry_Click;
-                        outputItem.DropDownItems.Add(procedureExecutionOptionMenu);
-                    }
-                }
-                else if (thisVariables.Count > 0)
-                {
-                    foreach (var variable in thisVariables)
-                    {
-                        string shortName = variable.Split('.').Last();
-
-                        var procedureExecutionOptionMenu = new ScriptExecutionToolStripMenuItem(procedure.FullName, null, variable);
-                        procedureExecutionOptionMenu.Size = new Size(182, 22);
-                        procedureExecutionOptionMenu.Name = "toolStripMenuProcedure" + procedure.Name + "On" + variable.Replace(".", "Dot");
-                        procedureExecutionOptionMenu.SetText();
-                        procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}' partner '{partner.Name}'";
-                                                                         //procedureExecutionOptionMenu.Click += FileElementExecutionEntry_Click; // TODO
-                        if (procedure.Parameters == null || procedure.Parameters.Length > 1)     // TODO: Enable user to input the arguments.
-                        {
-                            procedureExecutionOptionMenu.Enabled = false;
-                        }
-                        outputItem.DropDownItems.Add(procedureExecutionOptionMenu);
-                    }
-                }
-                else
-                {
-                    var executionItem = outputItem as ScriptExecutionToolStripMenuItem;
-                    executionItem.FileElement = procedure.FullName;
-                    executionItem.SetText();
-                    if (procedure.Parameters != null && procedure.Parameters.Length > 0)     // TODO: Enable user to input the arguments.
-                    {
-                        executionItem.Enabled = false;
-                    }
-                    executionItem.Click += FileElementExecutionEntry_Click;
-                }
-            }
-            else
-            {
-                // No partners or instance object, just the direct procedure call.
-
-                var procedureMenu = new ScriptExecutionToolStripMenuItem(procedure.FullName, null, null);
-                procedureMenu.Size = new Size(182, 22);
-                procedureMenu.SetText();
-                procedureMenu.Name = "toolStripMenuProcedure" + procedure.FullName;
-                procedureMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}'";
-                if (procedure.Parameters != null && procedure.Parameters.Length > 0)
-                {
-                    procedureMenu.Enabled = false;
-                }
-                procedureMenu.Click += FileElementExecutionEntry_Click;
-                outputItem = procedureMenu;
-            }
-            return outputItem;
-        }
-
-        #endregion
-
-        private void toolStripMenuItemTestActionStartFileParsing_Click(object sender, EventArgs e)
-        {
-            this.StartFileParsing();
-        }
-
-        private void toolStripSplitButtonRunScript_ButtonClick(object sender, EventArgs e)
-        {
-            if (toolStripSplitButtonRunScript.Tag != null)
-            {
-                var first = toolStripSplitButtonRunScript.DropDownItems.IndexOf(toolStripSeparatorRunBeforeHistory) + 1;
-                var executionEntry = toolStripSplitButtonRunScript.DropDownItems[first] as ScriptExecutionToolStripMenuItem;
-                this.StartExecution(true, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null);
-            }
-        }
-
         #region Execution Shortcuts
 
         private void toolStripButtonAddShortcut_Click(object sender, EventArgs e)
@@ -1195,7 +1008,7 @@ namespace StepBro.SimpleWorkbench
                 {
                     var index = GetIndexOfTopHistoryElement();
                     executionEntry = toolStripSplitButtonRunScript.DropDownItems[index] as ScriptExecutionToolStripMenuItem;
-                    procButtonText = ScripExecutionButtonTitle(false, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null);
+                    procButtonText = ScripExecutionButtonTitle(false, executionEntry.FileElement.FullName, executionEntry.Partner, executionEntry.PartnerIsModel, executionEntry.InstanceObject, null);
                     procDescription = procButtonText;
                 }
                 if (commandAvailable)
@@ -1209,7 +1022,12 @@ namespace StepBro.SimpleWorkbench
                 {
                     if (dialog.ProcedureExecutionSelected)
                     {
-                        this.AddProcedureShortcut(dialog.ButtonText, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject);
+                        this.AddProcedureShortcut(
+                            dialog.ButtonText,
+                            executionEntry.FileElement,
+                            executionEntry.Partner,
+                            executionEntry.PartnerIsModel,
+                            executionEntry.InstanceObject);
                     }
                     else
                     {
@@ -1222,12 +1040,13 @@ namespace StepBro.SimpleWorkbench
 
         }
 
-        private void AddProcedureShortcut(string text, string element, string partner, string instanceObject)
+        private void AddProcedureShortcut(string text, IFileElement element, string partner, bool partnerIsModel, string instanceObject)
         {
             var shortcut = new ScriptExecutionToolStripMenuItem();
             shortcut.Text = text;
             shortcut.FileElement = element;
             shortcut.Partner = partner;
+            shortcut.PartnerIsModel = partnerIsModel;
             shortcut.InstanceObject = instanceObject;
             shortcut.Name = "toolStripMenuProcedure" + shortcut.Text.Replace(".", "Dot");
             shortcut.Size = new Size(182, 22);
@@ -1326,12 +1145,387 @@ namespace StepBro.SimpleWorkbench
             toolStripSeparatorExtraFields.Visible = toolStripTextBoxExeNote.Visible;
         }
 
-        private void toolStripButtonStopScriptExecution_Click(object sender, EventArgs e)
+        #endregion
+
+        #region Application Tasks
+
+        protected override void OnTaskHandlingStateChanged(StateChange change, string workingText)
         {
-            if (m_executionQueue.Count > 0)
+            toolStripStatusLabelApplicationTaskState.Text = workingText;
+        }
+
+        private enum TaskNoState { Do }
+
+        #region File Loading
+
+        private TaskAction FileLoadingTask(ref TaskNoState state, ref int index, ITaskStateReporting reporting)
+        {
+            m_targetFileFullPath = System.IO.Path.GetFullPath(m_targetFile);
+            try
             {
-                m_executionQueue.Peek().RequestStopExecution();
-                toolStripButtonStopScriptExecution.Enabled = false;
+                m_file = StepBroMain.LoadScriptFile(m_applicationResourceUserObject, m_targetFileFullPath);
+                if (m_file == null)
+                {
+                    //retval = -1;
+                    //ConsoleWriteErrorLine("Error: Loading script file failed ( " + m_targetFileFullPath + " )");
+                }
+                else
+                {
+                    var shortcuts = ServiceManager.Global.Get<IFolderManager>();
+                    var projectShortcuts = new FolderShortcutCollection(FolderShortcutOrigin.Project);
+                    projectShortcuts.AddShortcut(StepBro.Core.Api.Constants.TOP_FILE_FOLDER_SHORTCUT, System.IO.Path.GetDirectoryName(m_file.FilePath), isResolved: true);
+                    shortcuts.AddSource(projectShortcuts);
+
+                    this.UpdateUserDataFilePath();
+                }
+            }
+            catch (Exception ex)
+            {
+                m_mainLogger.LogError("Loading script file failed: " + ex.GetType().Name + ", " + ex.Message);
+            }
+            return TaskAction.Finish;
+        }
+
+        private void StartFileLoading()
+        {
+            this.AddTask<TaskNoState>(FileLoadingTask, "Loading file", "Load script file.");
+        }
+
+        #endregion
+
+        #region File Parsing
+
+        private enum FileParsingState { Init, Parse, Errors, Finish }
+
+        private TaskAction FileParsingTask(ref FileParsingState state, ref int index, ITaskStateReporting reporting)
+        {
+            switch (state)
+            {
+                case FileParsingState.Init:
+                    if (m_file == null)
+                    {
+                        return TaskAction.Cancel;
+                    }
+
+                    state = FileParsingState.Parse;
+                    return TaskAction.ContinueOnWorkerThreadDomain;
+
+                case FileParsingState.Parse:
+                    var parsingSuccess = StepBroMain.ParseFiles(true);
+                    if (parsingSuccess)
+                    {
+                        state = FileParsingState.Finish;
+                    }
+                    else
+                    {
+                        state = FileParsingState.Errors;
+                    }
+                    break;
+
+                case FileParsingState.Errors:
+                    {
+                        m_toolWindowExecutionLog.Activate();
+                    }
+                    return TaskAction.Finish;
+
+                case FileParsingState.Finish:
+                    this.UpdateAfterSuccessfulFileParsing();
+                    return TaskAction.Finish;
+
+                default:
+                    break;
+            }
+            return TaskAction.Continue;
+        }
+
+        private void StartFileParsing()
+        {
+            this.AddTask<FileParsingState>(FileParsingTask, "Parsing files", "Parse the script files.");
+        }
+
+        private void UpdateAfterSuccessfulFileParsing()
+        {
+            // Update the list of loaded script files.
+            var fileManager = StepBroMain.ServiceManager.Get<ILoadedFilesManager>();
+            var files = fileManager.ListFiles<IScriptFile>().ToList();
+
+            // Update list of variables containing objects with the ITextCommandInput interface.
+            var objects = m_objectManager.GetObjectCollection();
+            var commandObjectsContainers = objects.Where(o => o.Object is ITextCommandInput).ToList();
+            foreach (var o in commandObjectsContainers)
+            {
+                m_commandObjectDictionary[o.FullName] = o.Object as ITextCommandInput;    // Add or override.
+            }
+
+
+            m_fileElements.Clear();
+            foreach (var e in files.SelectMany(f => f.ListElements()))
+            {
+                m_fileElements.Add(e);
+            }
+
+            foreach (var v in m_fileElements.Where(e => e.ElementType == FileElementType.FileVariable))
+            {
+                m_variableTypes[v.FullName] = v.DataType;
+            }
+
+            var namespaces = m_fileElements.Select(e => NamespaceFromFullName(e.FullName)).Distinct().ToList();
+
+            foreach (var v in objects)
+            {
+                if (v.Object is StepBro.ToolBarCreator.ToolBar)
+                {
+                    var toolbar = v.Object as StepBro.ToolBarCreator.ToolBar;
+                    panelCustomToolstrips.AddOrSet(v.FullName, toolbar);
+                }
+                else if (v.Object is StepBro.PanelCreator.Panel)
+                {
+                    var panel = v.Object as StepBro.PanelCreator.Panel;
+                }
+            }
+
+            #region Update Command Objects
+
+            var selectedTool = toolStripComboBoxTool.SelectedItem as ComboboxItem;
+            toolStripComboBoxTool.Items.Clear();
+            int selection = 0;
+            int index = 0;
+
+            foreach (var v in objects)
+            {
+                if (v.Object is ITextCommandInput)
+                {
+                    var name = v.FullName.Split('.').Last();
+                    toolStripComboBoxTool.Items.Add(new ComboboxItem(name, v));
+                    if (selectedTool != null && name == selectedTool.Text)
+                    {
+                        selection = index;
+                    }
+                    index++;
+                }
+            }
+            if (toolStripComboBoxTool.Items.Count > 0)
+            {
+                toolStripComboBoxTool.Enabled = true;
+                toolStripComboBoxToolCommand.Enabled = true;
+                toolStripComboBoxTool.SelectedIndex = selection;
+                toolStripComboBoxTool.SelectionLength = 0;
+            }
+            else
+            {
+                toolStripComboBoxTool.Enabled = false;
+                toolStripComboBoxToolCommand.Enabled = false;
+            }
+
+            #endregion
+
+            this.LoadUserSettings(); // Now ready to load the user settings (in case they have not been loaded yet).
+        }
+
+        #endregion
+
+        #region Script Execution
+
+        private enum ScriptExecutionState { Init, Running, Finish }
+
+        private TaskAction ScriptExecutionTask(ref ScriptExecutionState state, ref int index, ITaskStateReporting reporting)
+        {
+            switch (state)
+            {
+                case ScriptExecutionState.Init:
+                    {
+                        if (m_file == null || StepBroMain.LastParsingErrorCount > 0)
+                        {
+                            return TaskAction.Cancel;
+                        }
+                        var data = m_executionQueue.Peek();
+                        var element = data.Element;
+                        if (element == null)
+                        {
+                            element = StepBroMain.TryFindFileElement(data.ElementName);
+                        }
+                        if (element != null)
+                        {
+                            data.Element = element;     // Save the reference.
+                            IPartner partner = null;
+                            List<object> targetArguments = null;
+                            if (data.UnparsedArguments != null)
+                            {
+                                targetArguments =
+                                    m_commandLineOptions?.Arguments.Select(
+                                        (a) => StepBroMain.ParseExpression(element.ParentFile, a)).ToList();
+                                data.Arguments = new List<object>(targetArguments); // Save a copy.
+                            }
+                            else if (data.Arguments != null && data.Arguments.Count > 0)
+                            {
+                                targetArguments = new List<object>(data.Arguments);
+                            }
+                            else
+                            {
+                                targetArguments = new List<object>();
+                            }
+
+                            if (!String.IsNullOrEmpty(data.Partner))
+                            {
+                                partner = element.ListPartners().First(p => String.Equals(data.Partner, p.Name, StringComparison.InvariantCultureIgnoreCase));
+                                if (partner == null)
+                                {
+                                    data.Errors.Add($"Error: The specified file element does not have a partner named \"{data.Partner}\".");
+                                    return TaskAction.Cancel;
+                                }
+                            }
+                            else
+                            {
+                                if (element is IFileProcedure)
+                                {
+                                    var procedure = (IFileProcedure)element;
+
+                                    // NOTE: targetObject might be set, even if it should not be used.
+
+                                    if (!String.IsNullOrEmpty(data.Object) && procedure.IsFirstParameterThisReference)
+                                    {
+                                        var theObject = m_objectManager.GetObjectCollection().FirstOrDefault(v => string.Equals(v.FullName, data.Object, StringComparison.InvariantCulture));
+                                        if (theObject != null)
+                                        {
+                                            targetArguments.Insert(0, theObject.Object);
+                                        }
+                                        else
+                                        {
+                                            data.Errors.Add($"Error: Target object '{data.Object}' was not found in the list of global variables.");
+                                            return TaskAction.Cancel;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    data.Errors.Add($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
+                                    return TaskAction.Cancel;
+                                }
+                            }
+
+                            try
+                            {
+                                var execution = StepBroMain.StartProcedureExecution(element, partner, targetArguments.ToArray());
+                                if (execution != null)
+                                {
+                                    data.SetExecution(execution);
+                                    if (data.AddToHistory)
+                                    {
+                                        this.AddElementExecutionToHistory(
+                                            data.Element,
+                                            data.Partner,
+                                            (partner != null) ? partner.IsModel : false,
+                                            data.Object,
+                                            data.Arguments?.ToArray());
+                                    }
+                                    toolStripButtonStopScriptExecution.Enabled = true;
+                                }
+                            }
+                            catch (TargetParameterCountException)
+                            {
+                                //ConsoleWriteErrorLine("Error: The number of arguments does not match the target procedure.");
+                            }
+                        }
+                        else
+                        {
+                            //ConsoleWriteErrorLine($"Error: File element named '{targetElement} was not found.");
+                        }
+
+                        state = ScriptExecutionState.Running;
+                    }
+                    return TaskAction.ContinueOnWorkerThreadDomain;
+
+                case ScriptExecutionState.Running:
+                    while (!m_executionQueue.Peek().State.HasEnded())
+                    {
+                        Thread.Sleep(200);
+                    }
+                    state = ScriptExecutionState.Finish;
+                    break;
+
+                case ScriptExecutionState.Finish:
+                    m_executionQueue.Dequeue();
+                    toolStripButtonStopScriptExecution.Enabled = false;
+                    return TaskAction.Finish;
+
+                default:
+                    break;
+            }
+            return TaskAction.Continue;
+        }
+
+        private void StartScriptExecution(ScriptExecutionData executionData)
+        {
+            m_executionQueue.Enqueue(executionData);
+            this.StartScriptExecution();
+        }
+        private void StartScriptExecution()
+        {
+            this.AddTask<ScriptExecutionState>(ScriptExecutionTask, "Executing script", "Execute script.");
+        }
+
+
+        #endregion
+
+        #endregion
+
+        #region Loaded Script Files
+
+        private void LoadedFiles_FileLoaded(object sender, LoadedFileEventArgs args)
+        {
+
+        }
+
+        private void LoadedFiles_FileClosed(object sender, LoadedFileEventArgs args)
+        {
+
+        }
+
+        private void File_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+
+        }
+
+        #endregion
+
+        private void toolStripMenuItemTestActionStartFileParsing_Click(object sender, EventArgs e)
+        {
+            this.StartFileParsing();
+        }
+
+
+        #region Utils
+
+        private static string NamespaceFromFullName(string name)
+        {
+            var parts = name.Split('.');
+            if (parts.Length == 1) return "";
+            else return parts[0];
+        }
+
+        private static string NameFromFullName(string name)
+        {
+            var parts = name.Split('.');
+            if (parts.Length == 1) return name;
+            else return string.Join('.', parts.Skip(1));
+        }
+
+        #endregion
+
+        private void viewToolbarsToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            viewToolbarsToolStripMenuItem.DropDownItems.Clear();
+            foreach (var toolbar in panelCustomToolstrips.ListToolbars())
+            {
+                var visibilityMenuItem = new ToolStripMenuItem();
+                visibilityMenuItem.CheckOnClick = true;
+                visibilityMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
+                visibilityMenuItem.Size = new Size(180, 22);
+                visibilityMenuItem.Text = toolbar.Item1;
+                visibilityMenuItem.Checked = !panelCustomToolstrips.IsToolbarHidden(toolbar.Item1);
+                visibilityMenuItem.CheckedChanged += (s, e) => { panelCustomToolstrips.SetToolbarVisibility(((ToolStripMenuItem)s).Text, ((ToolStripMenuItem)s).Checked); };
+                visibilityMenuItem.Tag = toolbar.Item2;
+                viewToolbarsToolStripMenuItem.DropDownItems.Insert(0, visibilityMenuItem);
             }
         }
     }

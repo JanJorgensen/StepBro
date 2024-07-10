@@ -1,5 +1,6 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Execution;
+using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using System;
 using System.CodeDom.Compiler;
@@ -16,7 +17,7 @@ namespace StepBro.SimpleWorkbench
         private IScriptExecution m_execution;
         private TaskExecutionState m_state = TaskExecutionState.StartRequested;
 
-        public ScriptExecutionData(MainForm parent, string element, string partner, string @object, object[] arguments)
+        public ScriptExecutionData(MainForm parent, IFileElement element, string partner, string @object, object[] arguments)
         {
             m_parent = parent;
             m_state = TaskExecutionState.Created;
@@ -25,8 +26,10 @@ namespace StepBro.SimpleWorkbench
             this.Object = @object;
             this.Arguments = arguments?.ToList();
         }
-        public string Element { get; set; } = null;
+        public IFileElement Element { get; set; } = null;
+        public string ElementName { get; set; } = null;
         public string Partner { get; set; } = null;
+        public bool PartnerIsModel { get; set; } = false;
         public string Object { get; set; } = null;
         public List<object> Arguments { get; set; } = null;
         public List<string> UnparsedArguments { get; set; } = null;

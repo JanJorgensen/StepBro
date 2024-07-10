@@ -17,7 +17,7 @@ namespace StepBro.UI.WinForms.Controls
     {
         private class PresentationList : PresentationListForListData<LogEntry, ChronoListViewEntry>
         {
-            public PresentationList(IDataListSource<LogEntry> source) : 
+            public PresentationList(IDataListSource<LogEntry> source) :
                 base(source, 1000000, 50)
             {
             }
@@ -34,10 +34,13 @@ namespace StepBro.UI.WinForms.Controls
         }
 
         private PresentationList m_presentationList = null;
+        private int m_visibleLevels = 1000;
 
         public LogViewer()
         {
             InitializeComponent();
+            this.UpdatePresentationLevels();
+            toolStripButtonFollowHead.Text = "\u23EC";
         }
 
         public void Setup()
@@ -47,6 +50,31 @@ namespace StepBro.UI.WinForms.Controls
             m_presentationList.Get(Int64.MaxValue);
             logView.ZeroTime = StepBro.Core.Main.Logger.GetFirst().Item2.Timestamp;
             logView.Setup(m_presentationList);
+        }
+
+        private void UpdatePresentationLevels()
+        {
+            toolStripDropDownButtonDisplayLevels.Text = "∞";
+        }
+
+        private void toolStripMenuItemDisplayLevel_CheckedChanged(object sender, EventArgs e)
+        {
+            if (((ToolStripMenuItem)sender).Checked)
+            {
+                int choise = -1;
+                if (sender == toolStripMenuItemLevels2) { choise = 2; toolStripDropDownButtonDisplayLevels.Text = "2"; } else toolStripMenuItemLevels2.Checked = false;
+                if (sender == toolStripMenuItemLevels3) { choise = 3; toolStripDropDownButtonDisplayLevels.Text = "3"; } else toolStripMenuItemLevels3.Checked = false;
+                if (sender == toolStripMenuItemLevels4) { choise = 4; toolStripDropDownButtonDisplayLevels.Text = "4"; } else toolStripMenuItemLevels4.Checked = false;
+                if (sender == toolStripMenuItemLevels5) { choise = 5; toolStripDropDownButtonDisplayLevels.Text = "5"; } else toolStripMenuItemLevels5.Checked = false;
+                if (sender == toolStripMenuItemLevels6) { choise = 6; toolStripDropDownButtonDisplayLevels.Text = "6"; } else toolStripMenuItemLevels6.Checked = false;
+                if (sender == toolStripMenuItemLevelsAll) { choise = 1000; toolStripDropDownButtonDisplayLevels.Text = "∞"; } else toolStripMenuItemLevelsAll.Checked = false;
+                m_visibleLevels = choise;
+            }
+        }
+
+        private void toolStripButtonFollowHead_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

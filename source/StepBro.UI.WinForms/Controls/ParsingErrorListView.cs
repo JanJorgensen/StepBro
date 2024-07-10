@@ -8,6 +8,7 @@ namespace StepBro.Core.Controls
     public partial class ParsingErrorListView : UserControl
     {
         private ILoadedFilesManager m_fileManager;
+        private bool m_autoParseFiles = false;
 
         public ParsingErrorListView()
         {
@@ -21,6 +22,20 @@ namespace StepBro.Core.Controls
                 foreach (var file in m_fileManager.ListFiles<IScriptFile>())
                 {
                     file.Errors.EventListChanged += this.Errors_EventListChanged;
+                }
+            }
+        }
+
+        public bool AutoParseFiles
+        {
+            get { return m_autoParseFiles; }
+            set
+            {
+                if (value != m_autoParseFiles)
+                {
+                    m_autoParseFiles = value;
+                    toolStripButtonAutoParseFiles.Checked = value;
+                    this.AutoParseFilesChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -111,5 +126,22 @@ namespace StepBro.Core.Controls
         public delegate void DoubleClickLineEventHandler(object sender, DoubleClickLineEventArgs args);
 
         public event DoubleClickLineEventHandler DoubleClickedLine;
+
+        public event EventHandler ParseFilesClicked;
+        public event EventHandler AutoParseFilesChanged;
+
+        private void toolStripButtonParseFiles_Click(object sender, EventArgs e)
+        {
+            this.ParseFilesClicked?.Invoke(this, new EventArgs());
+        }
+
+        private void toolStripButtonAutoParseFiles_CheckedChanged(object sender, EventArgs e)
+        {
+            if (toolStripButtonParseFiles.Checked != m_autoParseFiles)
+            {
+                m_autoParseFiles = toolStripButtonParseFiles.Checked;
+                this.AutoParseFilesChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
     }
 }
