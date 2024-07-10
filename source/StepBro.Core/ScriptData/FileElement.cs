@@ -358,8 +358,10 @@ namespace StepBro.Core.ScriptData
             if (type != null &&
                 (type.Equals("partner", StringComparison.InvariantCulture) ||
                 type.Equals("partner model", StringComparison.InvariantCulture) ||
-                //type.Equals("partner new", StringComparison.InvariantCulture) ||
-                type.Equals("partner override", StringComparison.InvariantCulture)))
+                type.Equals("model", StringComparison.InvariantCulture) ||
+                type.Equals("partner override", StringComparison.InvariantCulture) ||
+                type.Equals("model override", StringComparison.InvariantCulture)))
+                //type.Equals("partner new", StringComparison.InvariantCulture)))
             {
                 string referenceName = null;
                 if (value is string)

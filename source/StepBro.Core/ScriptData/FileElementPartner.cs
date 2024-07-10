@@ -46,6 +46,10 @@ namespace StepBro.Core.ScriptData
             {
                 if (this.IsModelDirect) return true;
                 var basePartner = (this.ParentElement as FileElement)?.GetRootBaseElement().ListPartners().FirstOrDefault(p => p.Name == this.Name);
+                if (basePartner != null && Object.ReferenceEquals(basePartner, this))
+                {
+                    basePartner = null;
+                }
                 return (basePartner != null && basePartner.IsModel);
             }
         }
