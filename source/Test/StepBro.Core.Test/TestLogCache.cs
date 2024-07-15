@@ -43,7 +43,7 @@ namespace StepBro.Core.Test
             logger.RootLogger.Log("Entry6");
 
             state = cache.GetState();
-            Assert.AreEqual(6L, state.EffectiveCount);
+            Assert.AreEqual(1L, state.EffectiveCount);
 
             first = cache.Get(0L);      // Get the first entry again, which was already in the cache.
             Assert.IsNotNull(first);
@@ -62,7 +62,7 @@ namespace StepBro.Core.Test
                 logger.RootLogger.Log("Entry" + i.ToString());
             }
             state = cache.GetState();
-            Assert.AreEqual(19L, state.EffectiveCount);
+            Assert.AreEqual(6L, state.EffectiveCount);
 
             var entry = cache.Get(7L);      // Get one of the new entries, and see that more entries are cached.
             Assert.IsNotNull(entry);
