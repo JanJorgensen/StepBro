@@ -5,17 +5,19 @@ namespace StepBro.Core.Logging
 {
     public class Logger : /*LogStorage<LogEntry>, */IDisposable, IDataListSource<LogEntry> //, IElementIndexer<LogEntry>
     {
-        private class LogWalker : DataWalker<LogEntry>
+        private class LogWalker : IDataWalker<LogEntry>
         {
             private Logger m_parent;
             private LogEntry m_current;
             private long m_currentIndex;
+            private string m_name;
 
             public LogWalker(Logger parent, LogEntry current, long currentIndex)
             {
                 m_parent = parent;
                 m_current = current;
                 m_currentIndex = currentIndex;
+                m_name = "LoggerWalker";
             }
 
             public LogEntry CurrentEntry { get { return m_current; } }
@@ -41,9 +43,16 @@ namespace StepBro.Core.Logging
                 return m_current.Next != null;
             }
 
-            public DataWalker<LogEntry> Dublicate()
+            public IDataWalker<LogEntry> Dublicate()
             {
-                return new LogWalker(m_parent, m_current, m_currentIndex);
+                var walker = new LogWalker(m_parent, m_current, m_currentIndex);
+                walker.m_name = m_name + "Derived";
+                return walker;
+            }
+
+            public override string ToString()
+            {
+                return "Logger.LogWalker " + m_name + " @ " + m_currentIndex;
             }
         }
 
@@ -292,7 +301,7 @@ namespace StepBro.Core.Logging
             }
         }
 
-        public DataWalker<LogEntry> WalkFrom(long first)
+        public IDataWalker<LogEntry> WalkFrom(long first)
         {
             if (first < 0) first = m_history.FirstIndex;
             var entry = m_history.Get(first);

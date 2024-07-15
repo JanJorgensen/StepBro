@@ -116,8 +116,11 @@ namespace StepBro.UI.WinForms.Controls
         private int m_viewEntryCount = 0;
         private int m_horizontalScrollPosition = 0;
         private DynamicViewSettings m_viewSettings = new DynamicViewSettings();
+        private Point m_mouseDownLocation = new Point();
+        private DateTime m_lastViewScroll = DateTime.MinValue;
 
         private long m_topIndex = 0L;
+        private long m_lastShown = -1L;
 
         public ChronoListViewPort() : base()
         {
@@ -138,6 +141,25 @@ namespace StepBro.UI.WinForms.Controls
             m_source = viewer.Source;
         }
 
+        public class MouseOnLineEventArgs : MouseEventArgs
+        {
+            private readonly int m_line;
+            private readonly long m_index;
+
+            public MouseOnLineEventArgs(MouseEventArgs args, int line, long index) : base(args.Button, args.Clicks, args.X, args.Y, args.Delta)
+            {
+                m_line = line;
+                m_index = index;
+            }
+
+            public int Line { get { return m_line; } }
+            public long Index { get { return m_index; } }
+        }
+        public delegate void MouseOnLineEventHandler(object sender, MouseOnLineEventArgs e);
+
+        public event MouseOnLineEventHandler MouseDownOnLine;
+        public event MouseOnLineEventHandler MouseUpOnLine;
+
         public int HorizontalScrollPosition
         {
             get { return m_horizontalScrollPosition; }
@@ -154,11 +176,28 @@ namespace StepBro.UI.WinForms.Controls
         public Brush NormalTextColor { get { return Brushes.White; } }
 
         public int MaxLinesVisible { get { return this.Height / m_lineHeight; } }
+        public int MaxLinesPartlyVisible { get { return (this.Height + (m_lineHeight - 1)) / m_lineHeight; } }
+
+        public long TopEntryIndex { get { return m_topIndex; } }
+        public long LastShownEntryIndex { get { return m_lastShown; } }
+
+        public DateTime LastViewScrollTime {  get { return m_lastViewScroll; } }
+
+        public bool ViewJustScrolled { get { return (DateTime.UtcNow - m_lastViewScroll) < TimeSpan.FromMilliseconds(500); } }
+
+        public bool IsViewFilled()
+        {
+            return (m_viewEntryCount >= this.MaxLinesPartlyVisible);
+        }
 
         public void RequestUpdate(long topEntry, int horizontalScrollPosition)
         {
             System.Diagnostics.Debug.Assert(!this.InvokeRequired);
             System.Diagnostics.Debug.WriteLine("ChronoListViewPort.RequestUpdate");
+            if (topEntry != m_topIndex)
+            {
+                m_lastViewScroll = DateTime.UtcNow;
+            }
             m_topIndex = topEntry;
             m_horizontalScrollPosition = horizontalScrollPosition;
             //this.Refresh();
@@ -190,11 +229,14 @@ namespace StepBro.UI.WinForms.Controls
                 e.Graphics.FillRectangle(Brushes.Black, e.ClipRectangle);
                 var entryIndex = m_topIndex;
                 int viewIndex = 0;
+                long lastShown = 0;
                 try
                 {
                     while (entryIndex <= lastIndex)
                     {
                         var entry = m_source.Get(entryIndex);
+                        if (entry == null) break;
+                        lastShown = entryIndex;
                         m_viewEntries[viewIndex] = entry;
 
                         var selectionState = m_viewer.GetEntrySelectionState(entryIndex);
@@ -203,12 +245,18 @@ namespace StepBro.UI.WinForms.Controls
                         {
                             e.Graphics.FillRectangle(Brushes.Blue, rect);
                         }
+                        if (selectionState == EntrySelectionState.Current || selectionState == EntrySelectionState.SelectedCurrent)
+                        {
+                            e.Graphics.DrawLine(Pens.White, 0, y - 1, this.ClientRectangle.Right, y - 1);
+                            e.Graphics.DrawLine(Pens.White, 0, y + m_lineHeight, this.ClientRectangle.Right, y + m_lineHeight);
+                        }
                         entry.DoPaint(e, this, ref rect, selectionState);
 
                         entryIndex++;
                         y += m_lineHeight;
                         viewIndex++;
                     }
+                    m_lastShown = lastShown;
                     m_viewEntryCount = viewIndex;
                 }
                 catch
@@ -230,7 +278,11 @@ namespace StepBro.UI.WinForms.Controls
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-
+            var line = (e.Location.Y / m_lineHeight);
+            var index = m_topIndex + line;
+            if (index > m_lastShown) index = -1L;
+            //e.Location;
+            this.MouseDownOnLine?.Invoke(this, new MouseOnLineEventArgs(e, line, index));
             if (!this.Focused)
             {
                 this.Select();

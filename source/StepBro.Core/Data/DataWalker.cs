@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Data
 {
-    public interface DataWalker<TEntry>
+    public interface IDataWalker<TEntry>
     {
         TEntry GetNext();
         bool HasMore();
@@ -17,7 +17,7 @@ namespace StepBro.Core.Data
         /// Create a DataWalker at the same current location.
         /// </summary>
         /// <returns>New DataWalker object.</returns>
-        DataWalker<TEntry> Dublicate();
+        IDataWalker<TEntry> Dublicate();
     }
 
     public interface IDataWalkerSource<TEntry>
@@ -25,10 +25,10 @@ namespace StepBro.Core.Data
         IndexerStateSnapshot GetState();
 
         /// <summary>
-        /// Create an <see cref="DataWalker"/> object that starts at the specified index.
+        /// Create an <see cref="IDataWalker<>"/> object that starts at the specified index.
         /// </summary>
         /// <param name="start">The start index for the walker object.</param>
         /// <returns>A walker object.</returns>
-        DataWalker<TEntry> WalkFrom(long start = -1L);
+        IDataWalker<TEntry> WalkFrom(long start = -1L);
     }
 }

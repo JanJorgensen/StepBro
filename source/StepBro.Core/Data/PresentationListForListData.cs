@@ -20,6 +20,7 @@ namespace StepBro.Core.Data
         long SearchForEntry(TPresentationEntry entry);
         void SetHeadMode(bool inHeadMode);
         bool InHeadMode { get; }
+        public void UpdateHead();
     }
 
 
@@ -42,7 +43,7 @@ namespace StepBro.Core.Data
                 return m_parent.GetState();
             }
 
-            public DataWalker<TPresentationEntry> WalkFrom(long start)
+            public IDataWalker<TPresentationEntry> WalkFrom(long start)
             {
                 if (start < 0L) start = 0;
                 System.Diagnostics.Debug.Assert(start == 0);    // Other values not supported yet.
@@ -52,13 +53,14 @@ namespace StepBro.Core.Data
             }
         }
 
-        private class Walker : DataWalker<TPresentationEntry>
+        private class Walker : IDataWalker<TPresentationEntry>
         {
             private PresentationListForListData<TSourceEntry, TPresentationEntry> m_parent;
-            private DataWalker<TSourceEntry> m_sourceWalker;
+            private IDataWalker<TSourceEntry> m_sourceWalker;
             private System.Predicate<TSourceEntry> m_filter;
             private long m_currentIndex = -1L;
-            
+            private string m_name;
+
             // This queue is used to buffer up the entries created from checking the source.
             // When checking one source entry, more than one presentation entry can be created.
             private Queue<TPresentationEntry> m_inHand = new Queue<TPresentationEntry>();
@@ -68,18 +70,20 @@ namespace StepBro.Core.Data
                 m_parent = parent;
                 m_sourceWalker = m_parent.m_source.WalkFrom();
                 m_filter = m_parent.m_filter;
+                m_name = "Walker";
             }
 
             private Walker(Walker other)
             {
                 m_parent = other.m_parent;
-                m_sourceWalker = (DataWalker<TSourceEntry>)other.Dublicate();
+                m_sourceWalker = (IDataWalker<TSourceEntry>)other.m_sourceWalker.Dublicate();
                 m_filter = other.m_filter;
                 m_currentIndex = other.m_currentIndex;
                 foreach (var item in other.m_inHand)
                 {
                     m_inHand.Enqueue(item);
                 }
+                m_name = other.m_name + "Derived";
             }
 
             public TPresentationEntry CurrentEntry
@@ -182,18 +186,25 @@ namespace StepBro.Core.Data
                 return (m_inHand.Count > 1 || SearchNext());
             }
 
-            public DataWalker<TPresentationEntry> Dublicate()
+            public IDataWalker<TPresentationEntry> Dublicate()
             {
                 return new Walker(this);
             }
+
+            public override string ToString()
+            {
+                return m_name + " @ " + m_currentIndex.ToString();
+            }
         }
 
+        private object m_sync = new object();
         private IDataListSource<TSourceEntry> m_source;
         private WalkerSource m_walkerSource;
         private System.Predicate<TSourceEntry> m_filter;
         protected DataCache<TPresentationEntry> m_cache;
-        private DataWalker<TSourceEntry> m_sourceTipWalker = null;
-        private DataWalker<TSourceEntry> m_sourceCacheWalker = null;
+        //private IDataWalker<TSourceEntry> m_sourceCacheWalker = null;
+        private IDataWalker<TPresentationEntry> m_tipWalker = null;  // When "sniffing the tip" to know how many "known" entries in the presentation.
+        private long m_lastKnownPresentationIndex = -1L;
         private bool m_headMode = true;
 
         public PresentationListForListData(
@@ -203,15 +214,27 @@ namespace StepBro.Core.Data
             m_source = source;
             m_walkerSource = new WalkerSource(this);
             m_cache = new DataCache<TPresentationEntry>(m_walkerSource, cacheSize, minimumCacheFill);
+            //m_sourceCacheWalker = m_source.CurrentWalker;
         }
 
         public void SetHeadMode(bool inHeadMode)
         {
-            if (m_headMode != inHeadMode)
+            lock (m_sync)
             {
-                m_headMode = inHeadMode;
-                if (m_headMode)
+                if (m_headMode != inHeadMode)
                 {
+                    m_headMode = inHeadMode;
+                    if (m_headMode)
+                    {
+                        m_tipWalker = null;
+                    }
+                    else
+                    {
+                        // Start walking from the end of the cache.
+                        var cacheState = m_cache.GetState();
+                        m_lastKnownPresentationIndex = cacheState.LastIndex;
+                        m_tipWalker = m_cache.CurrentWalker.Dublicate();
+                    }
                 }
             }
         }
@@ -239,10 +262,10 @@ namespace StepBro.Core.Data
             m_cache.Clear();
 
             var first = m_source.GetFirst();
-            m_sourceCacheWalker = m_source.WalkFrom(first.Item1);
+            //m_sourceCacheWalker = m_source.WalkFrom(first.Item1);
             if (!m_headMode)
             {
-                m_sourceTipWalker = m_sourceCacheWalker.Dublicate();
+                m_tipWalker = m_cache.CurrentWalker.Dublicate();
             }
             if (m_headMode)
             {
@@ -276,25 +299,30 @@ namespace StepBro.Core.Data
 
         public TPresentationEntry Get(long index)
         {
+            // The reading of the presentation list will always go through the cache.
+            // When not in head-mode, the index should never be higher than the last known entry.
             // Preconditions: Tip has been checked/updated (and maybe cache updated).
             return m_cache.Get(index);
         }
 
         public IndexerStateSnapshot GetState()
         {
-            //if (m_tipMode)
+            if (m_headMode)
             {
-                var cacheState = m_cache.CachedRange();
-                long count = (cacheState.Item1 >= 0) ? ((cacheState.Item2 - cacheState.Item1) + 1) : 0;
+                var cacheRange = m_cache.CachedRange();
+                long count = (cacheRange.Item1 >= 0) ? ((cacheRange.Item2 - cacheRange.Item1) + 1) : 0;
                 return new IndexerStateSnapshot(
-                    (count > 0) ? 0L : -1L,
-                    cacheState.Item2,
-                    (count > 0) ? (cacheState.Item2 + 1L) : 0L);
+                    (count > 0) ? 0L : -1L,         // The presentation list will always start from zero.
+                    cacheRange.Item2,
+                    (count > 0) ? (cacheRange.Item2 + 1L) : 0L);
             }
-            //else
-            //{
-            //    throw new NotImplementedException();
-            //}
+            else
+            {
+                return new IndexerStateSnapshot(
+                    (m_lastKnownPresentationIndex >= 0L) ? 0L : -1L,
+                    m_lastKnownPresentationIndex,
+                    (m_lastKnownPresentationIndex >= 0L) ? m_lastKnownPresentationIndex + 1L : 0L);
+            }
         }
 
         /// <summary>
@@ -302,9 +330,20 @@ namespace StepBro.Core.Data
         /// </summary>
         public void UpdateHead()
         {
-            if (m_headMode)
+            lock (m_sync)
             {
-                m_cache.Get(Int64.MaxValue);
+                if (m_headMode)
+                {
+                    m_cache.Get(Int64.MaxValue);
+                }
+                else
+                {
+                    while (m_tipWalker.HasMore())
+                    {
+                        m_tipWalker.GetNext();
+                    }
+                    m_lastKnownPresentationIndex = m_tipWalker.CurrentIndex;
+                }
             }
         }
 

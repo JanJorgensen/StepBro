@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +17,7 @@ namespace StepBro.Core.Data
         private long m_lastCachedIndex = -1L;
         private long m_firstCachedLocation = -1L;
         private TEntry[] m_cache;
-        private DataWalker<TEntry> m_walker = null;
+        private IDataWalker<TEntry> m_walker = null;
 
         public DataCache(IDataWalkerSource<TEntry> source, uint cacheSize = 200, uint minimumCacheFill = 20)
         {
@@ -25,6 +26,8 @@ namespace StepBro.Core.Data
             m_cacheSize = cacheSize;
             m_minimumCacheFill = minimumCacheFill;
         }
+
+        public IDataWalker<TEntry> CurrentWalker { get { return m_walker; } }
 
         internal Tuple<long, long> CachedRange()
         {
@@ -192,7 +195,9 @@ namespace StepBro.Core.Data
 
         public IndexerStateSnapshot GetState()
         {
-            return m_source.GetState();
+            // Returning the state of the cache.
+            // The caller should know that the cache might not contain all entries of the cache source.
+            return new IndexerStateSnapshot(m_firstCachedIndex, m_lastCachedIndex, m_lastCachedIndex - m_firstCachedIndex + 1);
         }
     }
 }

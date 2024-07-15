@@ -74,7 +74,12 @@ namespace StepBro.UI.WinForms.Controls
 
         private void toolStripButtonFollowHead_CheckedChanged(object sender, EventArgs e)
         {
+            logView.HeadMode = toolStripButtonFollowHead.Checked;
+        }
 
+        private void logView_HeadModeChanged(object sender, EventArgs e)
+        {
+            toolStripButtonFollowHead.Checked = logView.HeadMode;
         }
     }
 }

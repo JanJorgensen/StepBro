@@ -14,13 +14,14 @@ namespace StepBro.UI.WinForms.Controls
 {
     public partial class ChronoListView : UserControl, IChronoListViewer
     {
-        private IPresentationList<ChronoListViewEntry> m_source = null;
+        private IPresentationList<ChronoListViewEntry> m_presentationSource = null;
         private DateTime m_zeroTime;
         private bool m_headMode = true;
         private long m_topEntry = 0L;
         private long m_lastIndex = 0;
         private bool m_viewDirty = false;
         private bool m_updateVerticalScroll = false;
+        private long m_currentEntry = -1L;
         private List<long> m_selectedEntries = new List<long>();
         //private long m_currentEntry = -1L;
         private long m_lastSingleSelectionEntry = -1L;
@@ -31,15 +32,16 @@ namespace StepBro.UI.WinForms.Controls
             InitializeComponent();
             panelHorizontal.Height = vScrollBar.Width;
             m_zeroTime = DateTime.UtcNow;
+            viewPort.MouseWheel += ViewPort_MouseWheel;
         }
 
         public DateTime ZeroTime { get { return m_zeroTime; } set { m_zeroTime = value; } }
 
-        public IElementIndexer<ChronoListViewEntry> Source { get { return m_source; } }
+        public IElementIndexer<ChronoListViewEntry> Source { get { return m_presentationSource; } }
 
         public void Setup(IPresentationList<ChronoListViewEntry> source)
         {
-            m_source = source;
+            m_presentationSource = source;
             viewPort.SetDataSource(this);
             timerUpdate.Start();
         }
@@ -52,13 +54,14 @@ namespace StepBro.UI.WinForms.Controls
                 if (m_headMode != value)
                 {
                     m_headMode = value;
-                    m_source.SetHeadMode(m_headMode);
+                    m_presentationSource.SetHeadMode(m_headMode);
                     if (m_headMode)
                     {
                         m_lastSingleSelectionEntry = -1L;
+                        m_currentEntry = -1L;
                         m_selectedEntries.Clear();
+                        m_presentationSource.UpdateHead();
                         this.RequestViewPortUpdate();
-                        //logWindow.SetCurrentEntry(null, false, true);
                     }
                     else
                     {
@@ -73,25 +76,41 @@ namespace StepBro.UI.WinForms.Controls
         {
             base.OnSizeChanged(e);
             this.RequestViewPortUpdate();
+            if (m_presentationSource != null)
+            {
+                this.UpdateVerticalScrollbar(m_presentationSource.GetState().EffectiveCount);
+            }
+        }
+
+        private void UpdateVerticalScrollbar(long entryCount)
+        {
+            m_updateVerticalScroll = true;
+            vScrollBar.Maximum = Math.Max(0, (int)(entryCount - (viewPort.MaxLinesVisible - 10)));
+            if (m_presentationSource.InHeadMode || !viewPort.IsViewFilled())
+            {
+                this.RequestViewPortUpdate();
+            }
+            if (m_presentationSource.InHeadMode)
+            {
+                vScrollBar.Value = (int)m_topEntry;
+            }
+            m_updateVerticalScroll = false;
         }
 
         public event EventHandler HeadModeChanged;
 
         private void timerUpdate_Tick(object sender, EventArgs e)
         {
-            if (m_source.InHeadMode)
+            m_presentationSource.UpdateHead();
+            var state = m_presentationSource.GetState();
+            if (m_viewDirty || state.LastIndex != m_lastIndex)
             {
-                m_source.Get(Int64.MaxValue);
-                var state = m_source.GetState();
-                if (m_viewDirty || state.LastIndex != m_lastIndex)
+                m_lastIndex = state.LastIndex;
+                if (m_presentationSource.InHeadMode || !viewPort.IsViewFilled())
                 {
-                    m_lastIndex = state.LastIndex;
                     this.RequestViewPortUpdate();
-                    m_updateVerticalScroll = true;
-                    vScrollBar.Maximum = Math.Max(0, (int)(state.EffectiveCount - viewPort.MaxLinesVisible));
-                    vScrollBar.Value = (int)m_topEntry;
-                    m_updateVerticalScroll = false;
                 }
+                this.UpdateVerticalScrollbar(state.EffectiveCount);
             }
         }
 
@@ -124,22 +143,30 @@ namespace StepBro.UI.WinForms.Controls
 
         public EntrySelectionState GetEntrySelectionState(long index)
         {
+            var selectionState = EntrySelectionState.Not;
             if (m_selectedEntries.Count > 0 && m_selectedEntries.Contains(index))
             {
-                return EntrySelectionState.Selected;
+                selectionState = EntrySelectionState.Selected;
             }
-            if (m_rangeSelectionEnd >= 0L)
+            else
             {
-                if (m_lastSingleSelectionEntry < m_rangeSelectionEnd)
+                if (m_rangeSelectionEnd >= 0L)
                 {
-                    if (index >= m_lastSingleSelectionEntry && index <= m_rangeSelectionEnd) return EntrySelectionState.Selected;
-                }
-                else
-                {
-                    if (index >= m_rangeSelectionEnd && index <= m_lastSingleSelectionEntry) return EntrySelectionState.Selected;
+                    if (m_lastSingleSelectionEntry < m_rangeSelectionEnd)
+                    {
+                        if (index >= m_lastSingleSelectionEntry && index <= m_rangeSelectionEnd) selectionState = EntrySelectionState.Selected; ;
+                    }
+                    else
+                    {
+                        if (index >= m_rangeSelectionEnd && index <= m_lastSingleSelectionEntry) selectionState = EntrySelectionState.Selected; ;
+                    }
                 }
             }
-            return EntrySelectionState.Not;
+            if (index == m_currentEntry)
+            {
+                selectionState = (selectionState == EntrySelectionState.Selected) ? EntrySelectionState.SelectedCurrent : EntrySelectionState.Current;
+            }
+            return selectionState;
         }
 
         #endregion
@@ -153,7 +180,7 @@ namespace StepBro.UI.WinForms.Controls
             else if (e.Control && e.KeyCode == Keys.Home)
             {
                 this.HeadMode = false;
-                m_topEntry = m_source.GetState().FirstIndex;
+                m_topEntry = m_presentationSource.GetState().FirstIndex;
                 this.RequestViewPortUpdate();
             }
             else if (e.Control && e.KeyCode == Keys.A)
@@ -165,9 +192,122 @@ namespace StepBro.UI.WinForms.Controls
             //}
         }
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (viewPort.Focused)
+            {
+                if (keyData == Keys.Up)
+                {
+                    if (m_currentEntry > 0)
+                    {
+                        m_currentEntry--;
+                    }
+                    m_selectedEntries.Clear();
+                    m_selectedEntries.Add(m_currentEntry);
+                    if (m_currentEntry < m_topEntry)
+                    {
+                        m_topEntry = m_currentEntry;
+                    }
+                    m_updateVerticalScroll = true;
+                    vScrollBar.Value = (int)m_topEntry;
+                    m_updateVerticalScroll = false;
+                    this.RequestViewPortUpdate();
+                    return true;
+                }
+                if (keyData == Keys.Down)
+                {
+                    if (m_currentEntry < m_presentationSource.GetState().LastIndex)
+                    {
+                        m_currentEntry++;
+                    }
+                    m_selectedEntries.Clear();
+                    m_selectedEntries.Add(m_currentEntry);
+                    if (m_currentEntry >= m_topEntry + viewPort.MaxLinesVisible)
+                    {
+                        m_topEntry = m_currentEntry - (viewPort.MaxLinesVisible - 1);
+                    }
+                    m_updateVerticalScroll = true;
+                    vScrollBar.Value = (int)m_topEntry;
+                    m_updateVerticalScroll = false;
+                    this.RequestViewPortUpdate();
+                    return true;
+                }
+                //else if (keyData == Keys.Down)
+                //{
+                //    FormattedLogEntry e = null;
+                //    if (logWindow.CurrentEntry != null)
+                //    {
+                //        e = logWindow.CurrentEntry;
+                //    }
+                //    else if (logWindow.TopEntry != null)
+                //    {
+                //        e = logWindow.TopEntry;
+                //    }
+                //    else
+                //    {
+                //        return true;
+                //    }
+                //    this.SetCurrentEntry(
+                //       e.TryGetEntryAt(1, true, m_logOwner.Last.Index, logWindow.DisplayEntryFilterPredicate),
+                //       true);
+                //    return true;
+                //}
+                //else if (keyData == Keys.Left)
+                //{
+                //    return true;
+                //}
+                //else if (keyData == Keys.Right)
+                //{
+                //    return true;
+                //}
+                //else if (keyData == Keys.PageUp)
+                //{
+                //    FormattedLogEntry e = null;
+                //    if (logWindow.CurrentEntry != null)
+                //    {
+                //        e = logWindow.CurrentEntry;
+                //    }
+                //    else if (logWindow.TopEntry != null)
+                //    {
+                //        e = logWindow.TopEntry;
+                //    }
+                //    else
+                //    {
+                //        return true;
+                //    }
+                //    e = e.TryGetEntryAt(0 - logWindow.MaxLinesInView, true, m_first.Index, logWindow.DisplayEntryFilterPredicate);
+                //    this.SetCurrentEntry(e, true);
+                //    return true;
+                //}
+                //else if (keyData == Keys.PageDown)
+                //{
+                //    FormattedLogEntry e = null;
+                //    if (logWindow.CurrentEntry != null)
+                //    {
+                //        e = logWindow.CurrentEntry;
+                //    }
+                //    else if (logWindow.TopEntry != null)
+                //    {
+                //        e = logWindow.TopEntry;
+                //    }
+                //    else
+                //    {
+                //        return true;
+                //    }
+                //    e = e.TryGetEntryAt(logWindow.MaxLinesInView, true, m_logOwner.Last.Index, logWindow.DisplayEntryFilterPredicate);
+                //    this.SetCurrentEntry(e, true);
+                //    return true;
+                //}
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
         private void chronoListViewPort_Click(object sender, EventArgs e)
         {
-            this.HeadMode = false;
+            //if (this.HeadMode)
+            //{
+            //    this.HeadMode = false;
+            //}
         }
 
         private void viewPort_MouseDown(object sender, MouseEventArgs e)
@@ -183,6 +323,63 @@ namespace StepBro.UI.WinForms.Controls
         private void viewPort_MouseMove(object sender, MouseEventArgs e)
         {
 
+        }
+
+        private void viewPort_MouseDownOnLine(object sender, MouseOnLineEventArgs e)
+        {
+            if (Control.ModifierKeys == Keys.None)
+            {
+                if (!this.HeadMode || !viewPort.ViewJustScrolled)
+                {
+                    this.HeadMode = false;
+                    m_selectedEntries.Clear();
+                    if (e.Index >= 0L)
+                    {
+                        m_selectedEntries.Add(e.Index);
+                        m_currentEntry = e.Index;
+                    }
+                    this.RequestViewPortUpdate();
+                }
+                else
+                {
+                    this.HeadMode = false;
+                }
+            }
+        }
+
+        private void viewPort_MouseUpOnLine(object sender, MouseOnLineEventArgs e)
+        {
+
+        }
+
+        private void ViewPort_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (this.HeadMode)
+            {
+                this.HeadMode = false;
+            }
+            if (e.Delta > 0)    // Up?
+            {
+                if (m_topEntry > 0)
+                {
+                    m_topEntry = Math.Max(0L, m_topEntry - 3L);
+                    m_updateVerticalScroll = true;
+                    vScrollBar.Value = (int)m_topEntry;
+                    m_updateVerticalScroll = false;
+                    this.RequestViewPortUpdate();
+                }
+            }
+            else
+            {
+                if (m_topEntry < vScrollBar.Maximum)
+                {
+                    m_topEntry = Math.Min(vScrollBar.Maximum, m_topEntry + 3L);
+                    m_updateVerticalScroll = true;
+                    vScrollBar.Value = (int)m_topEntry;
+                    m_updateVerticalScroll = false;
+                    this.RequestViewPortUpdate();
+                }
+            }
         }
     }
 }

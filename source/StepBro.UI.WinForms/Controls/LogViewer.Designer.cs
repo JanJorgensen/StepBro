@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LogViewer));
             toolStrip1 = new ToolStrip();
             toolStripDropDownButtonDisplayLevels = new ToolStripDropDownButton();
             toolStripMenuItemLevels2 = new ToolStripMenuItem();
@@ -55,7 +54,6 @@
             // 
             toolStripDropDownButtonDisplayLevels.DisplayStyle = ToolStripItemDisplayStyle.Text;
             toolStripDropDownButtonDisplayLevels.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemLevels2, toolStripMenuItemLevels3, toolStripMenuItemLevels4, toolStripMenuItemLevels5, toolStripMenuItemLevels6, toolStripMenuItemLevelsAll });
-            toolStripDropDownButtonDisplayLevels.Image = (Image)resources.GetObject("toolStripDropDownButtonDisplayLevels.Image");
             toolStripDropDownButtonDisplayLevels.ImageTransparentColor = Color.Magenta;
             toolStripDropDownButtonDisplayLevels.Name = "toolStripDropDownButtonDisplayLevels";
             toolStripDropDownButtonDisplayLevels.Size = new Size(26, 22);
@@ -117,7 +115,6 @@
             toolStripButtonFollowHead.AutoToolTip = false;
             toolStripButtonFollowHead.CheckOnClick = true;
             toolStripButtonFollowHead.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            toolStripButtonFollowHead.Image = (Image)resources.GetObject("toolStripButtonFollowHead.Image");
             toolStripButtonFollowHead.ImageTransparentColor = Color.Magenta;
             toolStripButtonFollowHead.Name = "toolStripButtonFollowHead";
             toolStripButtonFollowHead.Size = new Size(23, 22);
@@ -135,6 +132,7 @@
             logView.Size = new Size(636, 204);
             logView.TabIndex = 1;
             logView.ZeroTime = new DateTime(2024, 6, 24, 10, 25, 15, 655);
+            logView.HeadModeChanged += logView_HeadModeChanged;
             // 
             // LogViewer
             // 

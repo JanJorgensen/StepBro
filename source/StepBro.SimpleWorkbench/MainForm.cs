@@ -116,6 +116,7 @@ namespace StepBro.SimpleWorkbench
             toolStripButtonAddShortcut.Text = "\u2795";
             this.StartUsingTaskHandlingTimer();
             panelCustomToolstrips.Setup(this);
+            this.Size = new System.Drawing.Size(1200, 800);
             //toolWindowProperties.Close();
             //toolWindowHelp.Close();
 

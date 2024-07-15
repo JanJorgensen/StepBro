@@ -88,6 +88,8 @@
             viewPort.Size = new Size(493, 125);
             viewPort.TabIndex = 2;
             viewPort.Text = "ViewPort";
+            viewPort.MouseDownOnLine += viewPort_MouseDownOnLine;
+            viewPort.MouseUpOnLine += viewPort_MouseUpOnLine;
             viewPort.Click += chronoListViewPort_Click;
             viewPort.KeyDown += viewPort_KeyDown;
             viewPort.MouseDown += viewPort_MouseDown;

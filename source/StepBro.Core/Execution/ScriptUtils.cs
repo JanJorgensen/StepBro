@@ -495,7 +495,7 @@ namespace StepBro.Core.Execution
                 {
                     readerName = "log reader";
                 }
-                context.ReportFailure($"No entry matching \"{text}\" was found in {readerName}.");
+                context.ReportFailure($"No entry matching \"{text}\" was found in {readerName}. Verdict: Fail");
             }
 
             return String.Empty; // Return empty string instead of null to ensure we do not get null reference exceptions
