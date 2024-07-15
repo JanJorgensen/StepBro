@@ -116,6 +116,7 @@
             toolStripButtonAutoParseFiles.Name = "toolStripButtonAutoParseFiles";
             toolStripButtonAutoParseFiles.Size = new Size(94, 22);
             toolStripButtonAutoParseFiles.Text = "Auto Parse Files";
+            toolStripButtonAutoParseFiles.Visible = false;
             toolStripButtonAutoParseFiles.CheckedChanged += toolStripButtonAutoParseFiles_CheckedChanged;
             // 
             // ParsingErrorListView

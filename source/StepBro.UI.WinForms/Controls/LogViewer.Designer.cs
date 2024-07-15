@@ -58,12 +58,13 @@
             toolStripDropDownButtonDisplayLevels.Name = "toolStripDropDownButtonDisplayLevels";
             toolStripDropDownButtonDisplayLevels.Size = new Size(26, 22);
             toolStripDropDownButtonDisplayLevels.Text = "8";
+            toolStripDropDownButtonDisplayLevels.Visible = false;
             // 
             // toolStripMenuItemLevels2
             // 
             toolStripMenuItemLevels2.CheckOnClick = true;
             toolStripMenuItemLevels2.Name = "toolStripMenuItemLevels2";
-            toolStripMenuItemLevels2.Size = new Size(120, 22);
+            toolStripMenuItemLevels2.Size = new Size(180, 22);
             toolStripMenuItemLevels2.Text = "2 levels";
             toolStripMenuItemLevels2.CheckedChanged += toolStripMenuItemDisplayLevel_CheckedChanged;
             // 
@@ -71,7 +72,7 @@
             // 
             toolStripMenuItemLevels3.CheckOnClick = true;
             toolStripMenuItemLevels3.Name = "toolStripMenuItemLevels3";
-            toolStripMenuItemLevels3.Size = new Size(120, 22);
+            toolStripMenuItemLevels3.Size = new Size(180, 22);
             toolStripMenuItemLevels3.Text = "3 levels";
             toolStripMenuItemLevels3.CheckedChanged += toolStripMenuItemDisplayLevel_CheckedChanged;
             // 
@@ -79,7 +80,7 @@
             // 
             toolStripMenuItemLevels4.CheckOnClick = true;
             toolStripMenuItemLevels4.Name = "toolStripMenuItemLevels4";
-            toolStripMenuItemLevels4.Size = new Size(120, 22);
+            toolStripMenuItemLevels4.Size = new Size(180, 22);
             toolStripMenuItemLevels4.Text = "4 levels";
             toolStripMenuItemLevels4.CheckedChanged += toolStripMenuItemDisplayLevel_CheckedChanged;
             // 
@@ -87,7 +88,7 @@
             // 
             toolStripMenuItemLevels5.CheckOnClick = true;
             toolStripMenuItemLevels5.Name = "toolStripMenuItemLevels5";
-            toolStripMenuItemLevels5.Size = new Size(120, 22);
+            toolStripMenuItemLevels5.Size = new Size(180, 22);
             toolStripMenuItemLevels5.Text = "5 levels";
             toolStripMenuItemLevels5.CheckedChanged += toolStripMenuItemDisplayLevel_CheckedChanged;
             // 
@@ -95,7 +96,7 @@
             // 
             toolStripMenuItemLevels6.CheckOnClick = true;
             toolStripMenuItemLevels6.Name = "toolStripMenuItemLevels6";
-            toolStripMenuItemLevels6.Size = new Size(120, 22);
+            toolStripMenuItemLevels6.Size = new Size(180, 22);
             toolStripMenuItemLevels6.Text = "6 levels";
             toolStripMenuItemLevels6.CheckedChanged += toolStripMenuItemDisplayLevel_CheckedChanged;
             // 
@@ -105,7 +106,7 @@
             toolStripMenuItemLevelsAll.CheckOnClick = true;
             toolStripMenuItemLevelsAll.CheckState = CheckState.Checked;
             toolStripMenuItemLevelsAll.Name = "toolStripMenuItemLevelsAll";
-            toolStripMenuItemLevelsAll.Size = new Size(120, 22);
+            toolStripMenuItemLevelsAll.Size = new Size(180, 22);
             toolStripMenuItemLevelsAll.Text = "All levels";
             toolStripMenuItemLevelsAll.CheckedChanged += toolStripMenuItemDisplayLevel_CheckedChanged;
             // 
