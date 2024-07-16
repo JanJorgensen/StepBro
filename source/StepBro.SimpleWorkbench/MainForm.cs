@@ -1194,6 +1194,7 @@ namespace StepBro.SimpleWorkbench
                     this.UpdateUserDataFilePath();
 
                     this.CreateTextDocument(m_targetFileFullPath, null, false).Activate();
+                    m_toolWindowExecutionLog.Activate();    // Stay focused on the execution log view.
                 }
             }
             catch (Exception ex)
