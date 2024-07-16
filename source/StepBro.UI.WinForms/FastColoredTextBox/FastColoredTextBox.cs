@@ -1835,7 +1835,7 @@ namespace FastColoredTextBoxNS
         public new void Invalidate()
         {
             if (InvokeRequired)
-                BeginInvoke(new MethodInvoker(Invalidate));
+                BeginInvoke(new System.Windows.Forms.MethodInvoker(Invalidate));
             else
                 base.Invalidate();
         }
@@ -2348,7 +2348,7 @@ namespace FastColoredTextBoxNS
         {
             if(InvokeRequired)
             {
-                BeginInvoke(new MethodInvoker(()=>ResetTimer(timer)));
+                BeginInvoke(new System.Windows.Forms.MethodInvoker(()=>ResetTimer(timer)));
                 return;
             }
             timer.Stop();
@@ -3403,14 +3403,14 @@ namespace FastColoredTextBoxNS
                 PerformLayout();
 
             if (IsHandleCreated)
-                BeginInvoke((MethodInvoker)OnScrollbarsUpdated);
+                BeginInvoke((System.Windows.Forms.MethodInvoker)OnScrollbarsUpdated);
         }
 
         private void OnMagicUpdateScrollBars()
         {
             if (this.InvokeRequired)
             {
-                Invoke(new MethodInvoker(OnMagicUpdateScrollBars));
+                Invoke(new System.Windows.Forms.MethodInvoker(OnMagicUpdateScrollBars));
             }
             else
             {

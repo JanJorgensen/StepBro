@@ -476,6 +476,13 @@ namespace StepBro.SimpleWorkbench
                     }
                 default:
                     {
+
+                        FastColoredTextBoxNS.FastColoredTextBox textBoxFast = new FastColoredTextBoxNS.FastColoredTextBox();
+                        textBoxFast.BorderStyle = BorderStyle.None;
+                        textBoxFast.ReadOnly = readOnly;
+                        textBoxFast.ShowScrollBars = true;
+                        textBoxFast.WordWrap = false;
+
                         // Create a TextBox for the document
                         RichTextBox textBox = new RichTextBox();
                         textBox.Multiline = true;
@@ -488,14 +495,21 @@ namespace StepBro.SimpleWorkbench
 
                         // If no data was passed in, generate some
                         if (fileName == null)
+                        {
                             fileName = String.Format("Document{0}.txt", documentWindowIndex++);
-                        if (text == null)
-                            text = "Visit our web site to learn more about Actipro WinForms Studio or our other controls:\r\nhttps://www.actiprosoftware.com/\r\n\r\nThis document was created at " + DateTime.Now.ToString() + ".";
+                            if (text == null)
+                                text = "Visit our web site to learn more about Actipro WinForms Studio or our other controls:\r\nhttps://www.actiprosoftware.com/\r\n\r\nThis document was created at " + DateTime.Now.ToString() + ".";
+                        }
+                        else
+                        {
+                            textBoxFast.OpenFile(fileName);
+                        }
 
                         // Create the document window
                         textBox.Text = text;
+                        textBoxFast.Text = text;
                         textBox.TextChanged += new EventHandler(this.textBox_TextChanged);
-                        documentWindow = new DocumentWindow(dockManager, fileName, Path.GetFileName(fileName), 3, textBox);
+                        documentWindow = new DocumentWindow(dockManager, fileName, Path.GetFileName(fileName), 3, textBoxFast);
                         if (fileName != null)
                         {
                             documentWindow.FileName = fileName;
@@ -1178,6 +1192,8 @@ namespace StepBro.SimpleWorkbench
                     shortcuts.AddSource(projectShortcuts);
 
                     this.UpdateUserDataFilePath();
+
+                    this.CreateTextDocument(m_targetFileFullPath, null, false).Activate();
                 }
             }
             catch (Exception ex)
