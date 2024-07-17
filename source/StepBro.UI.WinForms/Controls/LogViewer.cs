@@ -33,7 +33,112 @@ namespace StepBro.UI.WinForms.Controls
             }
         }
 
+        private class PresentationListSearchingForFirstSource : PresentationListForListData<LogEntry, ChronoListViewEntry>
+        {
+            private class EmptySource : IDataListSource<LogEntry>
+            {
+                public LogEntry Get(long index)
+                {
+                    return null;
+                }
+
+                public Tuple<long, LogEntry> GetFirst()
+                {
+                    return new Tuple<long, LogEntry>(-1L, null);
+                }
+
+                public LogEntry GetLast()
+                {
+                    return null;
+                }
+
+                public IndexerStateSnapshot GetState()
+                {
+                    return new IndexerStateSnapshot(-1L, -1L, 0L);
+                }
+
+                public IDataWalker<LogEntry> WalkFrom(long start = -1)
+                {
+                    return null;
+                }
+            }
+
+            private LogViewer m_parent;
+            private IDataListSource<LogEntry> m_source;
+            private long m_lastBefore;
+
+            public PresentationListSearchingForFirstSource(LogViewer parent, IDataListSource<LogEntry> source, long lastBefore) :
+                base(new EmptySource(), 100, 10)
+            {
+                m_parent = parent;
+                m_source = source;
+                m_lastBefore = lastBefore;
+            }
+
+            public override void CreatePresentationEntry(LogEntry entry, long sourceIndex, Action<ChronoListViewEntry> adder)
+            {
+            }
+
+            public override LogEntry PresentationToSource(ChronoListViewEntry entry)
+            {
+                return null;
+            }
+
+            public override void UpdateHead()
+            {
+                if (m_source.GetState().LastIndex > m_lastBefore)
+                {
+                    m_parent.SetupZeroStart();
+                }
+            }
+        }
+
+        private class NewLogStart : IDataListSource<LogEntry>
+        {
+            private IDataListSource<LogEntry> m_source;
+            private LogEntry m_firstEntry;
+            private long m_firstIndex;
+
+            public NewLogStart(IDataListSource<LogEntry> source, LogEntry first, long firstIndex)
+            {
+                m_source = source;
+                m_firstEntry = first;
+                m_firstIndex = firstIndex;
+            }
+
+            public Tuple<long, LogEntry> GetFirst()
+            {
+                return new Tuple<long, LogEntry>(m_firstIndex, m_firstEntry);
+            }
+
+            public LogEntry GetLast()
+            {
+                return m_source.GetLast();
+            }
+
+            public IndexerStateSnapshot GetState()
+            {
+                var sourceState = m_source.GetState();
+                return new IndexerStateSnapshot(m_firstIndex, sourceState.LastIndex, sourceState.LastIndex - m_firstIndex + 1L);
+            }
+
+            public IDataWalker<LogEntry> WalkFrom(long start = -1)
+            {
+                if (start < 0L) start = m_firstIndex;
+                return m_source.WalkFrom(start);
+            }
+
+            public LogEntry Get(long index)
+            {
+                return m_source.Get(index);
+            }
+        }
+
+
+        private IDataListSource<LogEntry> m_source = null;
         private PresentationList m_presentationList = null;
+        private long m_lastEntryBeforeClear = -1L;
+        private NewLogStart m_zeroStartSource = null;
         private int m_visibleLevels = 1000;
 
         public LogViewer()
@@ -45,7 +150,8 @@ namespace StepBro.UI.WinForms.Controls
 
         public void Setup()
         {
-            m_presentationList = new PresentationList(StepBro.Core.Main.Logger);
+            m_source = StepBro.Core.Main.Logger;
+            m_presentationList = new PresentationList(m_source);
             m_presentationList.Reset(LogFilters.Normal, Int64.MaxValue);
             m_presentationList.Get(Int64.MaxValue);
             logView.ZeroTime = StepBro.Core.Main.Logger.GetFirst().Item2.Timestamp;
@@ -80,6 +186,24 @@ namespace StepBro.UI.WinForms.Controls
         private void logView_HeadModeChanged(object sender, EventArgs e)
         {
             toolStripButtonFollowHead.Checked = logView.HeadMode;
+        }
+
+        private void toolStripButtonClear_Click(object sender, EventArgs e)
+        {
+            m_lastEntryBeforeClear = m_source.GetState().LastIndex;
+            var startSearcher = new PresentationListSearchingForFirstSource(this, m_source, m_lastEntryBeforeClear);
+            logView.Setup(startSearcher);
+        }
+
+        private void SetupZeroStart()
+        {
+            var zeroTime = m_source.Get(m_lastEntryBeforeClear + 1L).Timestamp;
+            m_zeroStartSource = new NewLogStart(m_source, m_source.Get(m_lastEntryBeforeClear + 1L), m_lastEntryBeforeClear + 1L);
+            m_presentationList = new PresentationList(m_zeroStartSource);
+            m_presentationList.Reset(LogFilters.Normal, Int64.MaxValue);    // TODO: Set current filter.
+            m_presentationList.Get(Int64.MaxValue);
+            logView.ZeroTime = zeroTime;
+            logView.Setup(m_presentationList);
         }
     }
 }

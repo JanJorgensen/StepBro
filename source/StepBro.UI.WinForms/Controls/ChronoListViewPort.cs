@@ -1,7 +1,9 @@
-﻿using StepBro.Core.Data;
+﻿using FastColoredTextBoxNS;
+using StepBro.Core.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static StepBro.UI.WinForms.Controls.ChronoListViewPort;
@@ -281,7 +283,6 @@ namespace StepBro.UI.WinForms.Controls
             var line = (e.Location.Y / m_lineHeight);
             var index = m_topIndex + line;
             if (index > m_lastShown) index = -1L;
-            //e.Location;
             this.MouseDownOnLine?.Invoke(this, new MouseOnLineEventArgs(e, line, index));
             if (!this.Focused)
             {
@@ -296,6 +297,10 @@ namespace StepBro.UI.WinForms.Controls
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
+            var line = (e.Location.Y / m_lineHeight);
+            var index = m_topIndex + line;
+            if (index > m_lastShown) index = -1L;
+            this.MouseUpOnLine?.Invoke(this, new MouseOnLineEventArgs(e, line, index));
         }
 
         #endregion

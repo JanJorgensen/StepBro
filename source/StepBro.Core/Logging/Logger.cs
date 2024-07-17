@@ -3,7 +3,7 @@ using System;
 
 namespace StepBro.Core.Logging
 {
-    public class Logger : /*LogStorage<LogEntry>, */IDisposable, IDataListSource<LogEntry> //, IElementIndexer<LogEntry>
+    public class Logger : IDisposable, IDataListSource<LogEntry>
     {
         private class LogWalker : IDataWalker<LogEntry>
         {
@@ -68,14 +68,9 @@ namespace StepBro.Core.Logging
         }
 
         private readonly object m_sync;
-        //private long m_firstIndex = 0;      // The history index of the first entry currently known. This will only change when entries are disposed.
-        //private long m_lastIndex = 0;
-        //private LogEntry m_first = null;
         private LogEntry m_last = null;
         public uint BLOCK_SIZE = 2000;
         public uint BLOCK_COUNT = 5000;
-        //public LogEntry[] m_blockStarts;        // The saved entry references for shorter search time.
-        //public uint m_blockIndex = 0;           // The block currently being used (added to).
         private HistoryController m_history;
         internal IProtectedLogger m_rootScope;
         private Predicate<LogEntry> m_breaker = null;
@@ -89,17 +84,12 @@ namespace StepBro.Core.Logging
             m_outputfile = outputFile;
             m_directLogToFile = directLogToFile && !String.IsNullOrEmpty(outputFile);
 
-            //m_blockStarts = new LogEntry[BLOCK_COUNT];
-            //for (int i = 0; i < BLOCK_COUNT; i++) m_blockStarts[i] = null;
-
             m_last = new LogEntry(
                 UniqueInteger.GetLongDirectly(),
                 DateTime.UtcNow,
                 System.Threading.Thread.CurrentThread.ManagedThreadId,
                 location,
                 starttext);
-            //m_last = m_first;
-            //m_blockStarts[0] = m_first;
             m_history = new HistoryController(m_sync, BLOCK_SIZE, BLOCK_COUNT);
             m_history.NotifyNew(m_last);
             m_rootScope = new LoggerScope(this, m_last, out m_rootScopeService);
@@ -113,22 +103,6 @@ namespace StepBro.Core.Logging
             {
                 m_last = new LogEntry(m_last, parent, type, UniqueInteger.GetLongDirectly(), timestamp, thread, location, text);
                 m_history.NotifyNew(m_last);
-                //if ((++m_lastIndex % BLOCK_SIZE) == 0)
-                //{
-                //    m_blockIndex = (m_blockIndex + 1) % BLOCK_COUNT;
-                //    if (++m_blockIndex >= BLOCK_COUNT)
-                //    {
-                //        m_blockIndex = 0;
-                //    }
-                //    if (m_blockStarts[m_blockIndex] != null)
-                //    {
-                //        // Loose the connection to the oldest block to avoid using all memory.
-                //        m_first = m_blockStarts[m_blockIndex];
-                //        m_firstIndex += BLOCK_SIZE;
-                //    }
-                //    m_blockStarts[m_blockIndex] = m_last;
-                //}
-
                 if (m_breaker != null && m_breaker(m_last))
                 {
                     this.BreakHere();
@@ -192,103 +166,6 @@ namespace StepBro.Core.Logging
             return m_history.Get(index);
         }
 
-        //public ILogHistory<LogEntry> GetHistory()
-        //{
-        //    return new HistoryAccess(this, 1000, 50);
-        //}
-
-        //private class HistoryAccess : ILogHistory<LogEntry>
-        //{
-        //    private uint m_cacheSize;
-        //    private uint m_minimumCacheFill;
-        //    private Logger m_parent;
-        //    private ulong m_firstCachedIndex = UInt64.MaxValue;
-        //    private ulong m_lastCachedIndex = UInt64.MaxValue;
-        //    private ulong m_firstCachedLocation = 0UL;
-        //    private LogEntry[] m_cache;
-
-        //    public HistoryAccess(Logger parent, uint cacheSize = 200, uint minimumCacheFill = 20)
-        //    {
-        //        m_parent = parent;
-        //        m_cache = new LogEntry[cacheSize];
-        //        m_cacheSize = cacheSize;
-        //        m_minimumCacheFill = minimumCacheFill;
-        //    }
-
-        //    public object this[long index] => throw new NotImplementedException();
-
-        //    public LogEntry Get(ulong index)
-        //    {
-        //        if (m_firstCachedIndex == UInt64.MaxValue || index < m_firstCachedIndex)
-        //        {
-        //            return Reset(index);
-        //        }
-        //        else if (index > m_lastCachedIndex)
-        //        {
-        //            IndexerStateSnapshot indexer = this.GetState();
-        //            if (index > indexer.LastIndex) return null;
-        //            if (index < (ulong)(m_lastCachedIndex + m_cacheSize))
-        //            {
-        //                var lastLocation = ((m_lastCachedIndex - m_firstCachedIndex) + m_firstCachedLocation) % m_cacheSize;
-        //                var entry = m_cache[lastLocation];
-        //                LogEntry returnEntry = null;
-        //                var end = index + (m_minimumCacheFill - 1);
-        //                entry = entry.Next;
-        //                while (m_lastCachedIndex < end && entry != null)
-        //                {
-        //                    m_lastCachedIndex++;
-        //                    lastLocation = (lastLocation + 1) % m_cacheSize;
-        //                    m_cache[lastLocation] = entry;
-        //                    if (lastLocation == m_firstCachedLocation)
-        //                    {
-        //                        m_firstCachedLocation = (m_firstCachedLocation + 1) % m_cacheSize;
-        //                        m_firstCachedIndex++;
-        //                    }
-
-        //                    if (m_lastCachedIndex == index) returnEntry = entry;
-        //                    entry = entry.Next;
-        //                }
-        //                return returnEntry;
-        //            }
-        //            else
-        //            {
-        //                return Reset(index);
-        //            }
-        //        }
-        //        return m_cache[((index - m_firstCachedIndex) + m_firstCachedLocation) % m_cacheSize];
-        //    }
-
-        //    private LogEntry Reset(ulong index)
-        //    {
-        //        var entry = m_parent.Get(index);
-        //        if (entry != null)
-        //        {
-        //            m_firstCachedIndex = index;
-        //            m_firstCachedLocation = 0;
-        //            for (int i = 0; i < m_minimumCacheFill && entry != null; i++)
-        //            {
-        //                m_cache[i] = entry;
-        //                m_lastCachedIndex = index++;
-        //                entry = entry.Next;
-        //            }
-        //            entry = m_cache[0];
-        //        }
-        //        else
-        //        {
-        //            m_firstCachedIndex = m_lastCachedIndex = UInt64.MaxValue;
-        //        }
-        //        return entry;
-        //    }
-
-        //    public IndexerStateSnapshot GetState()
-        //    {
-        //        lock (m_parent.m_sync)
-        //        {
-        //            return new IndexerStateSnapshot(m_parent.m_firstIndex, m_parent.m_lastIndex, (m_parent.m_lastIndex - m_parent.m_firstIndex) + 1UL);
-        //        }
-        //    }
-        //}
-
         internal static Logger Root(ILogger logger)
         {
             if (logger is LoggerScope)
@@ -315,18 +192,13 @@ namespace StepBro.Core.Logging
             }
         }
 
-        //public DataWalker<LogEntry> WalkFrom(LogEntry first)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
         public IndexerStateSnapshot GetState()
         {
             lock (m_sync)
             {
                 var first = m_history.FirstIndex;
                 var last = m_history.LastIndex;
-                if (first < 0L) return new IndexerStateSnapshot(first, last, 0L);
+                if (first < 0L) return new IndexerStateSnapshot(-1L, -1L, 0L);
                 else return new IndexerStateSnapshot(first, last, last - first + 1);
             }
         }

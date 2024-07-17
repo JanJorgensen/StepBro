@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Data;
+using StepBro.Core.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -217,6 +218,8 @@ namespace StepBro.Core.Data
             //m_sourceCacheWalker = m_source.CurrentWalker;
         }
 
+        public IDataListSource<TSourceEntry> Source { get { return m_source; } }
+
         public void SetHeadMode(bool inHeadMode)
         {
             lock (m_sync)
@@ -328,7 +331,7 @@ namespace StepBro.Core.Data
         /// <summary>
         /// Make the list check for new data in the source, run new data through the filter and update index of last known.
         /// </summary>
-        public void UpdateHead()
+        public virtual void UpdateHead()
         {
             lock (m_sync)
             {

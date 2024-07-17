@@ -42,6 +42,7 @@ namespace StepBro.UI.WinForms.Controls
         public void Setup(IPresentationList<ChronoListViewEntry> source)
         {
             m_presentationSource = source;
+            m_topEntry = 0;
             viewPort.SetDataSource(this);
             timerUpdate.Start();
         }
@@ -139,6 +140,84 @@ namespace StepBro.UI.WinForms.Controls
             }
         }
 
+        public string Copy(/*SelectedItemsOperationChoise itemsChoise*/)
+        {
+            string newline = System.Environment.NewLine;
+            System.Windows.Forms.Clipboard.Clear();
+            StringBuilder text = new StringBuilder(0x10000);
+            //switch (itemsChoise)
+            //{
+            //    case SelectedItemsOperationChoise.OnlySelected:
+            //        {
+            //            bool first = true;
+            //            DateTime lastTime = DateTime.MinValue;
+            //            foreach (FormattedLogEntry e in this.GetSelectedEntries())
+            //            {
+            //                if (first)
+            //                {
+            //                    lastTime = e.TimeStamp;
+            //                    first = false;
+            //                }
+            //                text.Append(e.GetPrintableString(lastTime, 8, m_timestampType, m_zeroTime, m_firstSelectedTime));
+            //                text.Append(newline);
+            //                lastTime = e.TimeStamp;
+            //            }
+            //        }
+            //        break;
+            //    case SelectedItemsOperationChoise.AllInSelectedRange:
+            //        {
+            //            int first, last;
+            //            this.GetSelectionBounds(out first, out last);
+            //            FormattedLogEntry entry = m_topEntry;
+            //            bool isFirst = true;
+            //            DateTime lastTime = DateTime.MinValue;
+            //            for (int i = first; i <= last; i++)
+            //            {
+            //                entry = FormattedLogEntry.GetEntry(entry, i);
+            //                if (isFirst)
+            //                {
+            //                    lastTime = entry.TimeStamp;
+            //                    isFirst = false;
+            //                }
+            //                text.Append(entry.GetPrintableString(lastTime, 8, m_timestampType, m_zeroTime, m_firstSelectedTime));
+            //                text.Append(newline);
+            //                lastTime = entry.TimeStamp;
+            //            }
+            //        }
+            //        break;
+            //    case SelectedItemsOperationChoise.OnlyCurrentItem:
+            //        if (m_currentEntry != null)
+            //        {
+            //            text.Append(m_currentEntry.GetPrintableString(m_currentEntry.TimeStamp, 8, m_timestampType, m_zeroTime, m_firstSelectedTime));
+            //        }
+            //        break;
+            //    case SelectedItemsOperationChoise.AllInView:
+            //        {
+            //            bool first = true;
+            //            DateTime lastTime = DateTime.MinValue;
+            //            FormattedLogEntry e = m_viewer.FirstKnownEntry;
+            //            while (e != null)
+            //            {
+            //                if (first)
+            //                {
+            //                    lastTime = e.TimeStamp;
+            //                    first = false;
+            //                }
+            //                text.Append(e.GetPrintableString(lastTime, 8, m_timestampType, m_zeroTime, m_firstSelectedTime));
+            //                text.Append(newline);
+            //                lastTime = e.TimeStamp;
+            //                e = e.Next;
+            //            }
+            //        }
+            //        break;
+            //    default:
+            //        break;
+            //}
+            string s = text.ToString();
+            System.Windows.Forms.Clipboard.SetText(s);
+            return s;
+        }
+
         #region Selection
 
         public EntrySelectionState GetEntrySelectionState(long index)
@@ -187,9 +266,9 @@ namespace StepBro.UI.WinForms.Controls
             {
                 viewPort.Invalidate();
             }
-            //else if (e.Control && e.KeyCode == Keys.C)
-            //{
-            //}
+            else if (e.Control && e.KeyCode == Keys.C)
+            {
+            }
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

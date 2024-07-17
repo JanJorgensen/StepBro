@@ -193,7 +193,7 @@ namespace StepBro.SimpleWorkbench
 
             if (!String.IsNullOrEmpty(m_targetFile))
             {
-                this.StartFileLoading();
+                this.StartScriptFileLoading();
                 this.StartFileParsing();
 
                 if (!String.IsNullOrEmpty(m_commandLineOptions.TargetElement))
@@ -1171,9 +1171,9 @@ namespace StepBro.SimpleWorkbench
 
         private enum TaskNoState { Do }
 
-        #region File Loading
+        #region Script File Loading
 
-        private TaskAction FileLoadingTask(ref TaskNoState state, ref int index, ITaskStateReporting reporting)
+        private TaskAction ScriptFileLoadingTask(ref TaskNoState state, ref int index, ITaskStateReporting reporting)
         {
             m_targetFileFullPath = System.IO.Path.GetFullPath(m_targetFile);
             try
@@ -1204,9 +1204,9 @@ namespace StepBro.SimpleWorkbench
             return TaskAction.Finish;
         }
 
-        private void StartFileLoading()
+        private void StartScriptFileLoading()
         {
-            this.AddTask<TaskNoState>(FileLoadingTask, "Loading file", "Load script file.");
+            this.AddTask<TaskNoState>(ScriptFileLoadingTask, "Loading script file", "Load script file.");
         }
 
         #endregion
