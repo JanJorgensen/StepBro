@@ -34,8 +34,8 @@ namespace FastColoredTextBoxNS
 
         #region Additional properties
 
-        public abstract void Add(int lineIndex, string bookmarkName);
         public abstract void Add(int lineIndex);
+        public abstract void Add(int lineIndex, object group);
         public abstract bool Contains(int lineIndex);
         public abstract bool Remove(int lineIndex);
         public abstract Bookmark GetBookmark(int i);
@@ -119,14 +119,14 @@ namespace FastColoredTextBoxNS
                 yield return item;
         }
 
-        public override void Add(int lineIndex, string bookmarkName)
-        {
-            Add(new Bookmark(tb, bookmarkName ?? "Bookmark " + counter, lineIndex));
-        }
-
         public override void Add(int lineIndex)
         {
-            Add(new Bookmark(tb, "Bookmark " + counter, lineIndex));
+            Add(new Bookmark(tb, lineIndex, null));
+        }
+
+        public override void Add(int lineIndex, object group)
+        {
+            Add(new Bookmark(tb, lineIndex, group));
         }
 
         public override void Clear()
@@ -216,15 +216,23 @@ namespace FastColoredTextBoxNS
         /// <summary>
         /// Name of bookmark
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null;
         /// <summary>
         /// Line index
         /// </summary>
-        public int LineIndex {get; set; }
+        public int LineIndex { get; set; }
         /// <summary>
         /// Color of bookmark sign
         /// </summary>
         public Color Color { get; set; }
+        /// <summary>
+        /// Object reference that identifies the bookmark type or group.
+        /// </summary>
+        public object Group { get; set; } = null;
+        /// <summary>
+        /// Indicates whether the bookmark should be shown in the editor.
+        /// </summary>
+        public bool IsVisible { get; set; } = true;
 
         /// <summary>
         /// Scroll textbox to the bookmark
@@ -236,21 +244,23 @@ namespace FastColoredTextBoxNS
             TB.Invalidate();
         }
 
-        public Bookmark(FastColoredTextBox tb, string name, int lineIndex)
+        public Bookmark(FastColoredTextBox tb, int lineIndex, object group)
         {
             this.TB = tb;
-            this.Name = name;
             this.LineIndex = lineIndex;
+            this.Group = group;
             Color = tb.BookmarkColor;
         }
 
         public virtual void Paint(Graphics gr, Rectangle lineRect)
         {
-            var size = TB.CharHeight - 1;
+            var fieldSize = TB.CharHeight - 3;
+            var size = (fieldSize * 2) / ((this.Group == null) ? 3 : 3);
+            var offset = (fieldSize - size) / 2;
             using (var brush = new LinearGradientBrush(new Rectangle(0, lineRect.Top, size, size), Color.White, Color, 45))
-                gr.FillEllipse(brush, 0, lineRect.Top, size, size);
+                gr.FillEllipse(brush, offset, lineRect.Top + offset, size, size);
             using (var pen = new Pen(Color))
-                gr.DrawEllipse(pen, 0, lineRect.Top, size, size);
+                gr.DrawEllipse(pen, offset, lineRect.Top + offset, size, size);
         }
     }
 }

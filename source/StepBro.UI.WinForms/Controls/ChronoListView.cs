@@ -23,7 +23,6 @@ namespace StepBro.UI.WinForms.Controls
         private bool m_updateVerticalScroll = false;
         private long m_currentEntry = -1L;
         private List<long> m_selectedEntries = new List<long>();
-        //private long m_currentEntry = -1L;
         private long m_lastSingleSelectionEntry = -1L;
         private long m_rangeSelectionEnd = -1L;
 

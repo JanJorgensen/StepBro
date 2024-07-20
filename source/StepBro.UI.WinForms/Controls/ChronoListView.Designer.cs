@@ -80,7 +80,7 @@
             // 
             viewPort.BackColor = Color.Black;
             viewPort.Dock = DockStyle.Fill;
-            viewPort.Font = new Font("Courier New", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            viewPort.Font = new Font("Consolas", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             viewPort.ForeColor = Color.White;
             viewPort.HorizontalScrollPosition = 0;
             viewPort.Location = new Point(0, 0);

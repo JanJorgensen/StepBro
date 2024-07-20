@@ -124,7 +124,7 @@
       <DependentUpon>DummyPropertyWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="FileExplorer.cs">
-      <SubType>Form</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="FileExplorer.Designer.cs">
       <DependentUpon>FileExplorer.cs</DependentUpon>

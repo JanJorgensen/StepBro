@@ -19,6 +19,7 @@ using static StepBro.Core.Host.HostApplicationTaskHandler;
 using static StepBro.SimpleWorkbench.Shortcuts;
 using StepBroMain = StepBro.Core.Main;
 using StepBro.Core.Logging;
+using FastColoredTextBoxNS;
 
 namespace StepBro.SimpleWorkbench
 {
@@ -41,12 +42,15 @@ namespace StepBro.SimpleWorkbench
         private ILogger m_mainLogger = null;
 
         private ToolWindow m_toolWindowExecutionLog = null;
+        private ToolWindow m_toolWindowFileExplorer = null;
         private LogViewer m_logviewer = null;
+        private FileExplorer m_fileExplorer = null;
 
         private ToolWindow m_toolWindowParsingErrors = null;
         private ParsingErrorListView m_errorsList = null;
 
-        private object m_applicationResourceUserObject = new object();
+        private object m_hostDependancyObject = new object();
+        private object m_topScriptFileDependancyObject = new object();
         private Dictionary<string, ITextCommandInput> m_commandObjectDictionary = new Dictionary<string, ITextCommandInput>();
         private object m_userShortcutItemTag = new object();
 
@@ -146,6 +150,13 @@ namespace StepBro.SimpleWorkbench
             m_toolWindowExecutionLog.DockTo(dockManager, DockOperationType.RightOuter);
             m_toolWindowExecutionLog.State = ToolWindowState.TabbedDocument;
             m_logviewer.Setup();
+
+            m_fileExplorer = new FileExplorer();
+            m_fileExplorer.HostDependancyObject = m_hostDependancyObject;
+            m_fileExplorer.HostTopFileDependancyObject = m_topScriptFileDependancyObject;
+            m_fileExplorer.FileSelectionChanged += FileExplorer_FileSelectionChanged;
+            m_toolWindowFileExplorer = new ToolWindow(dockManager, "FileExplorerView", "File Explorer", null, m_fileExplorer);
+            m_toolWindowFileExplorer.DockTo(dockManager, DockOperationType.RightOuter);
 
             m_errorsList = new ParsingErrorListView();
             m_errorsList.ParseFilesClicked += ErrorsList_ParseFilesClicked;
@@ -297,7 +308,7 @@ namespace StepBro.SimpleWorkbench
                                     var isPartnerModel = false;
                                     if (!String.IsNullOrEmpty(typed.Partner))
                                     {
-                                        var partner = found.ListPartners().FirstOrDefault(p => p.Name == typed.Partner); 
+                                        var partner = found.ListPartners().FirstOrDefault(p => p.Name == typed.Partner);
                                         if (partner != null)
                                         {
                                             isPartnerModel = partner.IsModel;
@@ -428,6 +439,36 @@ namespace StepBro.SimpleWorkbench
                 documentWindow.Modified = ((RichTextBox)sender).Modified;
         }
 
+        private DocumentWindow OpenLoadedFile(ILoadedFile file)
+        {
+            FastColoredTextBoxNS.FastColoredTextBox editor = new FastColoredTextBoxNS.FastColoredTextBox();
+            editor.Font = new Font("Consolas", 9.75f);
+            editor.BorderStyle = BorderStyle.None;
+            editor.ReadOnly = false;
+            editor.ShowScrollBars = true;
+            editor.WordWrap = false;
+            editor.MouseMove += Editor_MouseMove;
+
+            DocumentWindow window = null;
+            try
+            {
+                editor.OpenFile(file.FilePath);
+
+                file.RegisterDependant(m_hostDependancyObject); // Used by editor now.
+
+                //textBox.TextChanged += new EventHandler(this.textBox_TextChanged);
+                window = new DocumentWindow(dockManager, file.FilePath, Path.GetFileName(file.FilePath), 3, editor);
+                window.FileName = file.FilePath;
+                window.FileType = String.Format("Text File (*{0})", Path.GetExtension(file.FilePath).ToLower());
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return window;
+        }
+
         private DocumentWindow CreateTextDocument(string fileName, string text, bool readOnly)
         {
             DocumentWindow documentWindow;
@@ -478,10 +519,12 @@ namespace StepBro.SimpleWorkbench
                     {
 
                         FastColoredTextBoxNS.FastColoredTextBox textBoxFast = new FastColoredTextBoxNS.FastColoredTextBox();
+                        textBoxFast.Font = new Font("Consolas", 9.75f);
                         textBoxFast.BorderStyle = BorderStyle.None;
                         textBoxFast.ReadOnly = readOnly;
                         textBoxFast.ShowScrollBars = true;
                         textBoxFast.WordWrap = false;
+                        textBoxFast.MouseMove += Editor_MouseMove;
 
                         // Create a TextBox for the document
                         RichTextBox textBox = new RichTextBox();
@@ -531,6 +574,8 @@ namespace StepBro.SimpleWorkbench
         }
 
         #region Main Toolbar
+
+        #region Main Menu
 
         #region Errors View
 
@@ -602,6 +647,13 @@ namespace StepBro.SimpleWorkbench
         private void viewDocumentationBrowserToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //toolWindowHelp.Activate();
+        }
+
+        #endregion
+
+        private void toolStripMenuItemExit_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
 
         #endregion
@@ -1178,7 +1230,7 @@ namespace StepBro.SimpleWorkbench
             m_targetFileFullPath = System.IO.Path.GetFullPath(m_targetFile);
             try
             {
-                m_file = StepBroMain.LoadScriptFile(m_applicationResourceUserObject, m_targetFileFullPath);
+                m_file = StepBroMain.LoadScriptFile(m_topScriptFileDependancyObject, m_targetFileFullPath);
                 if (m_file == null)
                 {
                     //retval = -1;
@@ -1193,8 +1245,8 @@ namespace StepBro.SimpleWorkbench
 
                     this.UpdateUserDataFilePath();
 
-                    this.CreateTextDocument(m_targetFileFullPath, null, false).Activate();
-                    m_toolWindowExecutionLog.Activate();    // Stay focused on the execution log view.
+                    //this.CreateTextDocument(m_targetFileFullPath, null, false).Activate();
+                    //m_toolWindowExecutionLog.Activate();    // Stay focused on the execution log view.
                 }
             }
             catch (Exception ex)
@@ -1544,6 +1596,38 @@ namespace StepBro.SimpleWorkbench
                 visibilityMenuItem.CheckedChanged += (s, e) => { panelCustomToolstrips.SetToolbarVisibility(((ToolStripMenuItem)s).Text, ((ToolStripMenuItem)s).Checked); };
                 visibilityMenuItem.Tag = toolbar.Item2;
                 viewToolbarsToolStripMenuItem.DropDownItems.Insert(0, visibilityMenuItem);
+            }
+        }
+
+        void Editor_MouseMove(object sender, MouseEventArgs e)
+        {
+            var tb = sender as FastColoredTextBox;
+            var place = tb.PointToPlace(e.Location);
+            var r = new FastColoredTextBoxNS.Range(tb, place, place);
+
+            string text = r.GetFragment("[a-zA-Z._]").Text;
+            //lbWordUnderMouse.Text = text;
+        }
+
+        private void FileExplorer_FileSelectionChanged(object sender, FileExplorer.FileSelectionEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("FileSelectionChanged: " + e.File.FileName + " - " + e.Selection.ToString());
+
+            if (e.Selection == FileExplorer.FileSelectionEventArgs.SelectionType.Activated)
+            {
+                foreach (TabbedMdiWindow docWindow in dockManager.ActiveDocuments)
+                {
+                    if (docWindow.Tag != null && Object.ReferenceEquals(e.File, docWindow.Tag))
+                    {
+                        docWindow.Activate();
+                        return;
+                    }
+                }
+
+                // Not found; so open the file now, please!
+                var window = this.OpenLoadedFile(e.File);
+                window.Activate();
+                window.Select();
             }
         }
     }

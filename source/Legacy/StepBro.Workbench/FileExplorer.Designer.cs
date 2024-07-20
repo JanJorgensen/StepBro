@@ -45,8 +45,6 @@ namespace StepBro.Workbench
             this.treeView.SelectedImageIndex = 0;
             this.treeView.Size = new System.Drawing.Size(311, 371);
             this.treeView.TabIndex = 0;
-            this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
-            this.treeView.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_NodeMouseDoubleClick);
             // 
             // imageList
             // 
@@ -74,15 +72,8 @@ namespace StepBro.Workbench
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.ClientSize = new System.Drawing.Size(311, 396);
             this.Controls.Add(this.treeView);
-            this.DockAreas = ((WeifenLuo.WinFormsUI.Docking.DockAreas)((((WeifenLuo.WinFormsUI.Docking.DockAreas.DockLeft | WeifenLuo.WinFormsUI.Docking.DockAreas.DockRight) 
-            | WeifenLuo.WinFormsUI.Docking.DockAreas.DockTop) 
-            | WeifenLuo.WinFormsUI.Docking.DockAreas.DockBottom)));
-            this.HideOnClose = true;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FileExplorer";
             this.Padding = new System.Windows.Forms.Padding(0, 24, 0, 1);
-            this.ShowHint = WeifenLuo.WinFormsUI.Docking.DockState.DockRight;
-            this.TabText = "File Explorer";
             this.Text = "File Exeplorer";
             this.ResumeLayout(false);
 
