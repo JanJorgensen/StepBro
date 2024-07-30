@@ -120,6 +120,7 @@ namespace StepBro.UI.WinForms.Controls
                     SelectedImageIndex = 0,
                     Text = "Loaded Files"
                 };
+
                 treeView.Nodes.Add(loadedFilesNode);
                 foreach (var file in m_fileManager.ListFiles<ILoadedFile>())
                 {
@@ -134,10 +135,6 @@ namespace StepBro.UI.WinForms.Controls
                             Text = file.FileName,
                             ToolTipText = file.FilePath
                         };
-                        if (this.HostDependancyObject != null && file.IsDependantOf(this.HostDependancyObject))
-                        {
-                            fileNode.NodeFont = m_bold;
-                        }
                         loadedFilesNode.Nodes.Add(fileNode);
 
                         if (toolStripButtonShowElements.Checked)
@@ -162,7 +159,36 @@ namespace StepBro.UI.WinForms.Controls
             }
             finally
             {
+                UpdateNodeStates();
                 treeView.EndUpdate();
+            }
+        }
+
+        public void UpdateNodeStates()
+        {
+            foreach (TreeNode node in treeView.Nodes)
+            {
+                this.UpdateNodeStates(node);
+            }
+        }
+
+        private void UpdateNodeStates(TreeNode node)
+        {
+            if (node.Tag is ILoadedFile file)
+            {
+                if (this.HostDependancyObject != null && file.IsDependantOf(this.HostDependancyObject))
+                {
+                    node.NodeFont = m_bold;
+                }
+                else
+                {
+                    node.NodeFont = this.Font;
+                }
+            }
+
+            foreach (TreeNode child in node.Nodes)
+            {
+                this.UpdateNodeStates(child);
             }
         }
 

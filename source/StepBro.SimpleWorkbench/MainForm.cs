@@ -35,7 +35,6 @@ namespace StepBro.SimpleWorkbench
 
         private bool m_settingCommandCombo = false;
 
-        //private HostAccess m_hostAccess;
         private CommandLineOptions m_commandLineOptions = null;
         private HostAccess m_hostAccess = null;
         private ILoadedFilesManager m_loadedFiles = null;
@@ -1627,6 +1626,7 @@ namespace StepBro.SimpleWorkbench
                     var window = this.OpenLoadedFile(e.NodeData as ILoadedFile);
                     window.Activate();
                     window.Select();
+                    m_fileExplorer.UpdateNodeStates();
                 }
                 else if (e.NodeData is IFileElement)
                 {
@@ -1650,6 +1650,15 @@ namespace StepBro.SimpleWorkbench
         private void dockManager_WindowClosed(object sender, TabbedMdiWindowEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("WindowClosed: Key={0}; Type={1}", e.TabbedMdiWindow.Key, e.TabbedMdiWindow.DockObjectType);
+
+            if (e.TabbedMdiWindow.DockObjectType == DockObjectType.DocumentWindow)
+            {
+                if (e.TabbedMdiWindow.Tag is ILoadedFile file)
+                {
+                    file.UnregisterDependant(m_hostDependancyObject);
+                    m_fileExplorer.UpdateNodeStates();
+                }
+            }
         }
     }
 }
