@@ -1602,6 +1602,25 @@ namespace StepBro.SimpleWorkbench
             //lbWordUnderMouse.Text = text;
         }
 
+        private DocumentWindow OpenOrActivateFileEditor(ILoadedFile file)
+        {
+            foreach (TabbedMdiWindow docWindow in dockManager.ActiveDocuments)
+            {
+                if (docWindow.Tag != null && Object.ReferenceEquals(file, docWindow.Tag))
+                {
+                    docWindow.Activate();
+                    return docWindow as DocumentWindow;
+                }
+            }
+
+            // Not found; so open the file now, please!
+            var window = this.OpenLoadedFile(file as ILoadedFile);
+            window.Activate();
+            window.Select();
+            m_fileExplorer.UpdateNodeStates();
+            return window;
+        }
+
         private void FileExplorer_FileSelectionChanged(object sender, FileExplorer.SelectionEventArgs e)
         {
             if (e.NodeData != null)
@@ -1611,25 +1630,15 @@ namespace StepBro.SimpleWorkbench
 
             if (e.Selection == FileExplorer.SelectionEventArgs.SelectionType.Activated)
             {
-                if (e.NodeData is ILoadedFile)
+                if (e.NodeData is ILoadedFile file)
                 {
-                    foreach (TabbedMdiWindow docWindow in dockManager.ActiveDocuments)
-                    {
-                        if (docWindow.Tag != null && Object.ReferenceEquals(e.NodeData, docWindow.Tag))
-                        {
-                            docWindow.Activate();
-                            return;
-                        }
-                    }
-
-                    // Not found; so open the file now, please!
-                    var window = this.OpenLoadedFile(e.NodeData as ILoadedFile);
-                    window.Activate();
-                    window.Select();
-                    m_fileExplorer.UpdateNodeStates();
+                    this.OpenOrActivateFileEditor(file);
                 }
-                else if (e.NodeData is IFileElement)
+                else if (e.NodeData is IFileElement element)
                 {
+                    var window = this.OpenOrActivateFileEditor(element.ParentFile);
+                    var editor = window.Controls[0] as FastColoredTextBox;
+                    editor.SetSelectedLine(element.Line);
                 }
             }
         }
