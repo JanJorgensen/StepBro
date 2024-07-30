@@ -48,11 +48,11 @@ namespace StepBro.UI.WinForms.Controls
             m_bold = new Font(this.Font, FontStyle.Bold);
             if (StepBro.Core.Main.IsInitialized)
             {
+                StepBro.Core.Main.ParsingCompleted += Main_ParsingCompleted;
                 m_fileManager = StepBro.Core.Main.GetService<ILoadedFilesManager>();
                 m_fileManager.FileLoaded += this.FileManager_FileLoaded;
                 m_fileManager.FileClosed += this.FileManager_FileClosed;
                 refreshTimer.Stop();
-                refreshTimer.Start();
             }
         }
 
@@ -74,9 +74,17 @@ namespace StepBro.UI.WinForms.Controls
         [Description("Notifies changes in the current file node selection.")]
         public event EventHandler<SelectionEventArgs> SelectionChanged;
 
-        private void FileManager_FileLoaded(object sender, LoadedFileEventArgs args)
+        private void Main_ParsingCompleted(object sender, EventArgs e)
         {
             this.RestartTimer();
+        }
+
+        private void FileManager_FileLoaded(object sender, LoadedFileEventArgs args)
+        {
+            if (args.File is not IScriptFile)   // Don't refresh at script file loading; wait for the file parsing to finish.
+            {
+                this.RestartTimer();
+            }
         }
 
         private void FileManager_FileClosed(object sender, LoadedFileEventArgs args)

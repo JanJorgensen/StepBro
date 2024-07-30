@@ -328,6 +328,7 @@ namespace StepBro.Core
                 {
                     logger = m_logRootScope.LogEntering(true, "StepBro.Main.FileParsing", "Starting file parsing", null);
                     m_lastParsingErrorCount = FileBuilder.ParseFiles(m_serviceManagerAdmin.Manager, logger, (IScriptFile)null);
+                    ParsingCompleted?.Invoke(null, EventArgs.Empty);
                 }
                 finally
                 {
