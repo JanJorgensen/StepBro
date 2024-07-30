@@ -20,6 +20,7 @@ using static StepBro.SimpleWorkbench.Shortcuts;
 using StepBroMain = StepBro.Core.Main;
 using StepBro.Core.Logging;
 using FastColoredTextBoxNS;
+using System.Windows.Forms;
 
 namespace StepBro.SimpleWorkbench
 {
@@ -154,7 +155,7 @@ namespace StepBro.SimpleWorkbench
             m_fileExplorer = new FileExplorer();
             m_fileExplorer.HostDependancyObject = m_hostDependancyObject;
             m_fileExplorer.HostTopFileDependancyObject = m_topScriptFileDependancyObject;
-            m_fileExplorer.FileSelectionChanged += FileExplorer_FileSelectionChanged;
+            m_fileExplorer.SelectionChanged += FileExplorer_FileSelectionChanged;
             m_toolWindowFileExplorer = new ToolWindow(dockManager, "FileExplorerView", "File Explorer", null, m_fileExplorer);
             m_toolWindowFileExplorer.DockTo(dockManager, DockOperationType.RightOuter);
 
@@ -429,14 +430,14 @@ namespace StepBro.SimpleWorkbench
 
         #endregion
 
-        private void textBox_TextChanged(object sender, System.EventArgs e)
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (ignoreTextChangedEvent)
                 return;
 
-            DocumentWindow documentWindow = ((RichTextBox)sender).Parent as DocumentWindow;
+            DocumentWindow documentWindow = ((FastColoredTextBox)sender).Parent as DocumentWindow;
             if (documentWindow != null)
-                documentWindow.Modified = ((RichTextBox)sender).Modified;
+                documentWindow.Modified = ((FastColoredTextBox)sender).IsChanged;
         }
 
         private DocumentWindow OpenLoadedFile(ILoadedFile file)
@@ -447,7 +448,6 @@ namespace StepBro.SimpleWorkbench
             editor.ReadOnly = false;
             editor.ShowScrollBars = true;
             editor.WordWrap = false;
-            editor.MouseMove += Editor_MouseMove;
 
             DocumentWindow window = null;
             try
@@ -456,12 +456,15 @@ namespace StepBro.SimpleWorkbench
 
                 file.RegisterDependant(m_hostDependancyObject); // Used by editor now.
 
-                //textBox.TextChanged += new EventHandler(this.textBox_TextChanged);
                 window = new DocumentWindow(dockManager, file.FilePath, Path.GetFileName(file.FilePath), 3, editor);
+                window.Tag = file;
                 window.FileName = file.FilePath;
                 window.FileType = String.Format("Text File (*{0})", Path.GetExtension(file.FilePath).ToLower());
+
+                editor.MouseMove += Editor_MouseMove;
+                editor.TextChanged += TextBox_TextChanged;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -526,16 +529,6 @@ namespace StepBro.SimpleWorkbench
                         textBoxFast.WordWrap = false;
                         textBoxFast.MouseMove += Editor_MouseMove;
 
-                        // Create a TextBox for the document
-                        RichTextBox textBox = new RichTextBox();
-                        textBox.Multiline = true;
-                        textBox.Font = new Font("Courier New", 10);
-                        textBox.BorderStyle = BorderStyle.None;
-                        textBox.HideSelection = false;
-                        textBox.ReadOnly = readOnly;
-                        textBox.ScrollBars = RichTextBoxScrollBars.Both;
-                        textBox.WordWrap = false;
-
                         // If no data was passed in, generate some
                         if (fileName == null)
                         {
@@ -549,9 +542,8 @@ namespace StepBro.SimpleWorkbench
                         }
 
                         // Create the document window
-                        textBox.Text = text;
                         textBoxFast.Text = text;
-                        textBox.TextChanged += new EventHandler(this.textBox_TextChanged);
+                        textBoxFast.TextChanged += TextBox_TextChanged;
                         documentWindow = new DocumentWindow(dockManager, fileName, Path.GetFileName(fileName), 3, textBoxFast);
                         if (fileName != null)
                         {
@@ -1543,7 +1535,6 @@ namespace StepBro.SimpleWorkbench
 
         private void LoadedFiles_FileLoaded(object sender, LoadedFileEventArgs args)
         {
-
         }
 
         private void LoadedFiles_FileClosed(object sender, LoadedFileEventArgs args)
@@ -1553,7 +1544,10 @@ namespace StepBro.SimpleWorkbench
 
         private void File_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            if (e.PropertyName == nameof(ILoadedFile.RegisteredDependantsCount))
+            {
 
+            }
         }
 
         #endregion
@@ -1609,26 +1603,53 @@ namespace StepBro.SimpleWorkbench
             //lbWordUnderMouse.Text = text;
         }
 
-        private void FileExplorer_FileSelectionChanged(object sender, FileExplorer.FileSelectionEventArgs e)
+        private void FileExplorer_FileSelectionChanged(object sender, FileExplorer.SelectionEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("FileSelectionChanged: " + e.File.FileName + " - " + e.Selection.ToString());
-
-            if (e.Selection == FileExplorer.FileSelectionEventArgs.SelectionType.Activated)
+            if (e.NodeData != null)
             {
-                foreach (TabbedMdiWindow docWindow in dockManager.ActiveDocuments)
-                {
-                    if (docWindow.Tag != null && Object.ReferenceEquals(e.File, docWindow.Tag))
-                    {
-                        docWindow.Activate();
-                        return;
-                    }
-                }
-
-                // Not found; so open the file now, please!
-                var window = this.OpenLoadedFile(e.File);
-                window.Activate();
-                window.Select();
+                System.Diagnostics.Debug.WriteLine("FileSelectionChanged: " + e.NodeData.ToString() + " - " + e.Selection.ToString());
             }
+
+            if (e.Selection == FileExplorer.SelectionEventArgs.SelectionType.Activated)
+            {
+                if (e.NodeData is ILoadedFile)
+                {
+                    foreach (TabbedMdiWindow docWindow in dockManager.ActiveDocuments)
+                    {
+                        if (docWindow.Tag != null && Object.ReferenceEquals(e.NodeData, docWindow.Tag))
+                        {
+                            docWindow.Activate();
+                            return;
+                        }
+                    }
+
+                    // Not found; so open the file now, please!
+                    var window = this.OpenLoadedFile(e.NodeData as ILoadedFile);
+                    window.Activate();
+                    window.Select();
+                }
+                else if (e.NodeData is IFileElement)
+                {
+                }
+            }
+        }
+
+        private void dockManager_WindowClosing(object sender, TabbedMdiWindowClosingEventArgs e)
+        {
+            //// If a document is being closed and it has been modified...
+            //if ((!ignoreModifiedDocumentClose) && (e.TabbedMdiWindow is DocumentWindow documentWindow))
+            //{
+            //    if (!HandleDocumentClosing(documentWindow))
+            //        e.Cancel = true;
+            //}
+
+            System.Diagnostics.Debug.WriteLine("WindowClosing: Key={0}; Type={1}; Reason={2}; Cancel={3}",
+                e.TabbedMdiWindow.Key, e.TabbedMdiWindow.DockObjectType, e.Reason, e.Cancel);
+        }
+
+        private void dockManager_WindowClosed(object sender, TabbedMdiWindowEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("WindowClosed: Key={0}; Type={1}", e.TabbedMdiWindow.Key, e.TabbedMdiWindow.DockObjectType);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace StepBro.SimpleWorkbench
 
         public override IEnumerable<NamedData<object>> ListHostCodeModuleInstances()
         {
-            //yield return new NamedData<object>("Host.Console", m_app);
+            // TODO: yield return new NamedData<object>("Host.Console", m_app);
             yield break;
         }
 

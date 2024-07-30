@@ -186,10 +186,6 @@ namespace StepBro.CAN
 
         public IChannel GetChannel([Implicit] ICallContext context, int index)
         {
-            //if (context != null)
-            //{
-            //    context.Logger.Log("GetChannel", index.ToString());
-            //}
             if (index != 0) throw new ArgumentOutOfRangeException("index");
 
             return m_onlyChannel;
@@ -246,17 +242,13 @@ namespace StepBro.CAN
 
         public void Setup([Implicit] ICallContext context, Baudrate baudrate, ChannelMode mode)
         {
-            //if (context != null && context.LoggingEnabled)
-            //{
-            //    context.Logger.Log("Setup", $"( {baudrate}, {mode} )");
-            //}
             m_baudrate = baudrate;
             m_mode = mode;
             if (m_open && m_receiverThread == null)
             {
                 m_receiverThread = new Thread(new ThreadStart(this.ReceiveThreadHandler));
                 m_receiverThread.Start();
-                //Core.Main.ServiceManager.Get<>
+                // TODO: Register task/thread.
             }
         }
 

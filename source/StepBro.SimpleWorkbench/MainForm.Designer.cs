@@ -145,7 +145,7 @@ namespace StepBro.SimpleWorkbench
             // toolStripMenuItemFile
             // 
             toolStripMenuItemFile.Name = "toolStripMenuItemFile";
-            toolStripMenuItemFile.Size = new Size(180, 22);
+            toolStripMenuItemFile.Size = new Size(179, 22);
             toolStripMenuItemFile.Text = "&File";
             toolStripMenuItemFile.Visible = false;
             // 
@@ -153,7 +153,7 @@ namespace StepBro.SimpleWorkbench
             // 
             toolStripMenuItemView.DropDownItems.AddRange(new ToolStripItem[] { viewExecutionLogToolStripMenuItem, viewErrorsToolStripMenuItem, viewPropertiesToolStripMenuItem, toolStripSeparator3, viewObjectCommandPromptToolStripMenuItem, toolStripMenuItemExeNoteInput, toolStripSeparator2, viewToolbarsToolStripMenuItem });
             toolStripMenuItemView.Name = "toolStripMenuItemView";
-            toolStripMenuItemView.Size = new Size(180, 22);
+            toolStripMenuItemView.Size = new Size(179, 22);
             toolStripMenuItemView.Text = "&View";
             toolStripMenuItemView.DropDownOpened += toolStripMenuItemView_DropDownOpened;
             // 
@@ -224,20 +224,20 @@ namespace StepBro.SimpleWorkbench
             // 
             shortcutsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemDeleteShortcut, toolStripMenuItemDeleteAllShortcuts });
             shortcutsToolStripMenuItem.Name = "shortcutsToolStripMenuItem";
-            shortcutsToolStripMenuItem.Size = new Size(180, 22);
+            shortcutsToolStripMenuItem.Size = new Size(179, 22);
             shortcutsToolStripMenuItem.Text = "Execution Shortcuts";
             // 
             // toolStripMenuItemDeleteShortcut
             // 
             toolStripMenuItemDeleteShortcut.CheckOnClick = true;
             toolStripMenuItemDeleteShortcut.Name = "toolStripMenuItemDeleteShortcut";
-            toolStripMenuItemDeleteShortcut.Size = new Size(180, 22);
+            toolStripMenuItemDeleteShortcut.Size = new Size(174, 22);
             toolStripMenuItemDeleteShortcut.Text = "Delete shortcut";
             // 
             // toolStripMenuItemDeleteAllShortcuts
             // 
             toolStripMenuItemDeleteAllShortcuts.Name = "toolStripMenuItemDeleteAllShortcuts";
-            toolStripMenuItemDeleteAllShortcuts.Size = new Size(180, 22);
+            toolStripMenuItemDeleteAllShortcuts.Size = new Size(174, 22);
             toolStripMenuItemDeleteAllShortcuts.Text = "Delete all shortcuts";
             toolStripMenuItemDeleteAllShortcuts.Click += toolStripMenuItemDeleteAllShortcuts_Click;
             // 
@@ -245,7 +245,7 @@ namespace StepBro.SimpleWorkbench
             // 
             helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { viewDocumentationBrowserToolStripMenuItem });
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            helpToolStripMenuItem.Size = new Size(180, 22);
+            helpToolStripMenuItem.Size = new Size(179, 22);
             helpToolStripMenuItem.Text = "&Help";
             helpToolStripMenuItem.Visible = false;
             // 
@@ -260,12 +260,12 @@ namespace StepBro.SimpleWorkbench
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(177, 6);
+            toolStripSeparator1.Size = new Size(176, 6);
             // 
             // toolStripMenuItemExit
             // 
             toolStripMenuItemExit.Name = "toolStripMenuItemExit";
-            toolStripMenuItemExit.Size = new Size(180, 22);
+            toolStripMenuItemExit.Size = new Size(179, 22);
             toolStripMenuItemExit.Text = "E&xit";
             toolStripMenuItemExit.Click += toolStripMenuItemExit_Click;
             // 
@@ -391,6 +391,8 @@ namespace StepBro.SimpleWorkbench
             dockManager.DocumentMdiStyle = ActiproSoftware.UI.WinForms.Controls.Docking.DocumentMdiStyle.Tabbed;
             dockManager.HostContainerControl = this;
             dockManager.TabbedMdiMaximumTabExtent = 250;
+            dockManager.WindowClosed += dockManager_WindowClosed;
+            dockManager.WindowClosing += dockManager_WindowClosing;
             // 
             // autoHideTabStripPanel1
             // 

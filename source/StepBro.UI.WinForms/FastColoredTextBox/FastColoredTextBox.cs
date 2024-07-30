@@ -526,14 +526,14 @@ namespace FastColoredTextBoxNS
         public bool IsChanged
         {
             get { return isChanged; }
-            set
-            {
-                if (!value)
-                    //clear line's IsChanged property
-                    lines.ClearIsChanged();
-
-                isChanged = value;
-            }
+        }
+        
+        public void SetChanged(bool value)
+        {
+            if (!value)
+                //clear line's IsChanged property
+                lines.ClearIsChanged();
+            isChanged = value;
         }
 
         /// <summary>
@@ -1139,12 +1139,12 @@ namespace FastColoredTextBoxNS
                 {
                     InitTextSource(CreateTextSource());
                     lines.InsertLine(0, TextSource.CreateLine());
-                    IsChanged = false;
+                    this.SetChanged(false);
                 }
                 else
                 {
                     InitTextSource(SourceTextBox.TextSource);
-                    isChanged = false;
+                    this.SetChanged(false);
                 }
                 Invalidate();
             }
@@ -6101,7 +6101,7 @@ namespace FastColoredTextBoxNS
 #endif
             CancelToolTip();
             ClearHints();
-            IsChanged = true;
+            this.SetChanged(true);
             TextVersion++;
             MarkLinesAsChanged(args.ChangedRange);
             ClearFoldingState(args.ChangedRange);
@@ -7517,14 +7517,14 @@ window.status = ""#print"";
                 InitTextSource(ts);
                 Text = File.ReadAllText(fileName, enc);
                 ClearUndo();
-                IsChanged = false;
+                this.SetChanged(false);
                 OnVisibleRangeChanged();
             }
             catch
             {
                 InitTextSource(CreateTextSource());
                 lines.InsertLine(0, TextSource.CreateLine());
-                IsChanged = false;
+                this.SetChanged(false);
                 throw;
             }
             Selection.Start = Place.Empty;
@@ -7548,7 +7548,7 @@ window.status = ""#print"";
             {
                 InitTextSource(CreateTextSource());
                 lines.InsertLine(0, TextSource.CreateLine());
-                IsChanged = false;
+                this.SetChanged(false);
                 throw;
             }
         }
@@ -7565,7 +7565,7 @@ window.status = ""#print"";
             {
                 InitTextSource(fts);
                 fts.OpenFile(fileName, enc);
-                IsChanged = false;
+                this.SetChanged(false);
                 OnVisibleRangeChanged();
             }
             catch
@@ -7573,7 +7573,7 @@ window.status = ""#print"";
                 fts.CloseFile();
                 InitTextSource(CreateTextSource());
                 lines.InsertLine(0, TextSource.CreateLine());
-                IsChanged = false;
+                this.SetChanged(false);
                 throw;
             }
             Invalidate();
@@ -7591,7 +7591,7 @@ window.status = ""#print"";
 
                 InitTextSource(CreateTextSource());
                 lines.InsertLine(0, TextSource.CreateLine());
-                IsChanged = false;
+                this.SetChanged(false);
                 Invalidate();
             }
         }
@@ -7604,7 +7604,7 @@ window.status = ""#print"";
         public void SaveToFile(string fileName, Encoding enc)
         {
             lines.SaveToFile(fileName, enc);
-            IsChanged = false;
+            this.SetChanged(false);
             OnVisibleRangeChanged();
             UpdateScrollbars();
         }
@@ -7682,9 +7682,13 @@ window.status = ""#print"";
         {
             TextSource.Manager.ExecuteCommand(new RemoveLinesCommand(TextSource, iLines));
             if (iLines.Count > 0)
-                IsChanged = true;
+            {
+                this.SetChanged(true);
+            }
             if (LinesCount == 0)
+            {
                 Text = "";
+            }
             NeedRecalc();
             Invalidate();
         }
@@ -7699,7 +7703,7 @@ window.status = ""#print"";
             OnTextChanged();
             Selection.Start = Place.Empty;
             DoCaretVisible();
-            IsChanged = false;
+            this.SetChanged(false);
             ClearUndo();
         }
 

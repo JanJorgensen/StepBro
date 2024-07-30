@@ -18,7 +18,9 @@ namespace StepBro.UI.WinForms.Controls
 
         private ILoadedFilesManager m_fileManager;
         private Font m_bold = null;
-        private ILoadedFile m_currentSelection = null;
+        private object m_currentSelection = null;
+        private bool m_isDoubleClick = false;
+        private ImageList m_imageList = null;
 
         public FileExplorer()
         {
@@ -31,6 +33,18 @@ namespace StepBro.UI.WinForms.Controls
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+
+            m_imageList = new ImageList();
+            m_imageList.Images.Add(Properties.Resources.Folder);
+            m_imageList.Images.Add(Properties.Resources.AnyFile);
+            m_imageList.Images.Add(Properties.Resources.ScriptFile);
+            m_imageList.Images.Add(Properties.Resources.TopScriptFile);
+            m_imageList.Images.Add(Properties.Resources.Namespace);
+            m_imageList.Images.Add(Properties.Resources.TestList);
+            m_imageList.Images.Add(Properties.Resources.Procedure);
+            m_imageList.Images.Add(Properties.Resources.Variable);
+            treeView.ImageList = m_imageList;
+
             m_bold = new Font(this.Font, FontStyle.Bold);
             if (StepBro.Core.Main.IsInitialized)
             {
@@ -42,23 +56,23 @@ namespace StepBro.UI.WinForms.Controls
             }
         }
 
-        public class FileSelectionEventArgs : EventArgs
+        public class SelectionEventArgs : EventArgs
         {
             public enum SelectionType { Selected, Unselected, Activated }
 
-            public FileSelectionEventArgs(ILoadedFile file, SelectionType selection)
+            public SelectionEventArgs(object nodeData, SelectionType selection)
             {
-                this.File = file;
+                this.NodeData = nodeData;
                 this.Selection = selection;
             }
 
-            public ILoadedFile File { get; private set; }
+            public object NodeData { get; private set; }
             public SelectionType Selection { get; private set; }
         }
 
         [Browsable(true)]
         [Description("Notifies changes in the current file node selection.")]
-        public event EventHandler<FileSelectionEventArgs> FileSelectionChanged;
+        public event EventHandler<SelectionEventArgs> SelectionChanged;
 
         private void FileManager_FileLoaded(object sender, LoadedFileEventArgs args)
         {
@@ -125,6 +139,11 @@ namespace StepBro.UI.WinForms.Controls
                             fileNode.NodeFont = m_bold;
                         }
                         loadedFilesNode.Nodes.Add(fileNode);
+
+                        if (toolStripButtonShowElements.Checked)
+                        {
+                            this.AddElementsToFileNode(file as IScriptFile, fileNode);
+                        }
                     }
                     else
                     {
@@ -147,17 +166,46 @@ namespace StepBro.UI.WinForms.Controls
             }
         }
 
+        private void AddElementsToFileNode(IScriptFile file, TreeNode fileNode)
+        {
+            if (file is IScriptFile)
+            {
+                foreach (var element in file.ListElements().Where(e =>
+                    e.ElementType == FileElementType.ProcedureDeclaration ||
+                    e.ElementType == FileElementType.TestList ||
+                    e.ElementType == FileElementType.FileVariable))
+                {
+                    var image = 0;
+                    switch (element.ElementType)
+                    {
+                        case FileElementType.ProcedureDeclaration: image = 6; break;
+                        case FileElementType.TestList: image = 5; break;
+                        case FileElementType.FileVariable: image = 7; break;
+                        default: break;
+                    }
+                    var elementNode = new TreeNode
+                    {
+                        ImageIndex = image,
+                        SelectedImageIndex = image,
+                        Text = element.Name
+                    };
+                    elementNode.Tag = element;
+                    fileNode.Nodes.Add(elementNode);
+                }
+            }
+        }
+
         private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            this.FileSelectionChanged?.Invoke(this, new FileSelectionEventArgs(m_currentSelection, FileSelectionEventArgs.SelectionType.Activated));
+            this.SelectionChanged?.Invoke(this, new SelectionEventArgs(e.Node.Tag, SelectionEventArgs.SelectionType.Activated));
         }
 
         private void TreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            if (e.Node != null && e.Node.Tag != null && e.Node.Tag is ILoadedFile)
+            if (e.Node != null)
             {
-                m_currentSelection = e.Node.Tag as ILoadedFile;
-                this.FileSelectionChanged?.Invoke(this, new FileSelectionEventArgs(m_currentSelection, FileSelectionEventArgs.SelectionType.Selected));
+                m_currentSelection = e.Node.Tag;
+                this.SelectionChanged?.Invoke(this, new SelectionEventArgs(m_currentSelection, SelectionEventArgs.SelectionType.Selected));
             }
         }
 
@@ -165,9 +213,42 @@ namespace StepBro.UI.WinForms.Controls
         {
             if (m_currentSelection != null)
             {
-                this.FileSelectionChanged?.Invoke(this, new FileSelectionEventArgs(m_currentSelection, FileSelectionEventArgs.SelectionType.Unselected));
+                this.SelectionChanged?.Invoke(this, new SelectionEventArgs(m_currentSelection, SelectionEventArgs.SelectionType.Unselected));
                 m_currentSelection = null;
             }
+        }
+
+        private void toolStripButtonShowFiles_CheckedChanged(object sender, EventArgs e)
+        {
+            this.UpdateTree();
+            toolStripButtonShowElements.Enabled = toolStripButtonShowFiles.Checked;
+            toolStripButtonShowFiles.Enabled = toolStripButtonShowElements.Checked;
+        }
+
+        private void toolStripButtonShowElements_CheckedChanged(object sender, EventArgs e)
+        {
+            this.UpdateTree();
+            toolStripButtonShowElements.Enabled = toolStripButtonShowFiles.Checked;
+            toolStripButtonShowFiles.Enabled = toolStripButtonShowElements.Checked;
+        }
+
+        private void treeView_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            if (m_isDoubleClick && e.Action == TreeViewAction.Expand)
+                e.Cancel = true;
+            m_isDoubleClick = false;
+        }
+
+        private void treeView_BeforeCollapse(object sender, TreeViewCancelEventArgs e)
+        {
+            if (m_isDoubleClick && e.Action == TreeViewAction.Collapse)
+                e.Cancel = true;
+            m_isDoubleClick = false;
+        }
+
+        private void treeView_MouseDown(object sender, MouseEventArgs e)
+        {
+            m_isDoubleClick = e.Clicks > 1;
         }
     }
 }

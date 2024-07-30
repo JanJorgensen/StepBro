@@ -61,7 +61,6 @@ namespace StepBro.Core.Data
                     m_lastCachedIndex++;
                     lastLocation = (lastLocation + 1) % m_cacheSize;
                     var entry = m_walker.GetNext();
-                    //System.Diagnostics.Debug.WriteLine("Add to cache: " + entry.ToString());
                     m_cache[lastLocation] = entry;
                     if (lastLocation == m_firstCachedLocation)
                     {
@@ -78,46 +77,6 @@ namespace StepBro.Core.Data
                 return m_cache[((index - m_firstCachedIndex) + m_firstCachedLocation) % m_cacheSize];
             }
         }
-
-        //public TEntry Get(long index)
-        //{
-        //    if (m_firstCachedIndex < 0L || index < m_firstCachedIndex)
-        //    {
-        //        return Reset(index);
-        //    }
-        //    else if (index > m_lastCachedIndex)
-        //    {
-        //        if (index > m_walker.LastKnownIndex && !m_walker.HasMore()) return null;
-        //        if (index < (m_lastCachedIndex + m_cacheSize))  // Short jump from the current cached entries?
-        //        {
-        //            var lastLocation = ((m_lastCachedIndex - m_firstCachedIndex) + m_firstCachedLocation) % m_cacheSize;
-        //            //var entry = m_cache[lastLocation];
-        //            TEntry returnEntry = null;  // Not found yet.
-        //            var end = index + (m_minimumCacheFill - 1);
-        //            //entry = entry.Next;
-        //            while (m_lastCachedIndex < end && m_walker.HasMore())
-        //            {
-        //                m_lastCachedIndex++;
-        //                lastLocation = (lastLocation + 1) % m_cacheSize;
-        //                m_cache[lastLocation] = m_walker.GetNext();
-        //                if (lastLocation == m_firstCachedLocation)
-        //                {
-        //                    m_firstCachedLocation = (m_firstCachedLocation + 1) % m_cacheSize;
-        //                    m_firstCachedIndex++;
-        //                }
-
-        //                if (m_lastCachedIndex == index) returnEntry = m_walker.CurrentEntry;
-        //            }
-        //            return returnEntry;
-        //        }
-        //        else
-        //        {
-        //            // Long jump; discard current and re-read.
-        //            return Reset(index);
-        //        }
-        //    }
-        //    return m_cache[((index - m_firstCachedIndex) + m_firstCachedLocation) % m_cacheSize];
-        //}
 
         private bool Reset()
         {
@@ -140,58 +99,12 @@ namespace StepBro.Core.Data
             }
         }
 
-        //private TEntry Reset(long index)
-        //{
-        //    m_walker = m_source.WalkFrom(Math.Max(0L, (index - m_cacheSize / 4)));  // Start from 1/4 of the sice of the cache before the specified entry.   
-        //    if (m_walker != null)
-        //    {
-        //        m_firstCachedIndex = index;
-        //        m_firstCachedLocation = 0;
-        //        for (int i = 0; i < m_minimumCacheFill; i++)
-        //        {
-        //            m_cache[i] = m_walker.CurrentEntry;
-        //            m_lastCachedIndex = index++;
-        //            if (m_walker.HasMore()) m_walker.GetNext();
-        //            else break;
-        //        }
-        //        return m_cache[0];
-        //    }
-        //    else
-        //    {
-        //        m_firstCachedIndex = m_lastCachedIndex = -1L;
-        //    }
-        //    return null;
-        //}
-
         public void Clear(long indexBeforeAdding = -1L)
         {
             m_firstCachedIndex = indexBeforeAdding;
             m_lastCachedIndex = indexBeforeAdding;
             m_firstCachedLocation = -1L;
         }
-
-        //public void Add(TEntry entry)
-        //{
-        //    if (m_firstCachedIndex < 0L || m_firstCachedLocation < 0L)
-        //    {
-        //        m_firstCachedIndex++;
-        //        m_lastCachedIndex = m_firstCachedIndex;
-        //        m_firstCachedLocation = 0L;
-        //        m_cache[m_firstCachedLocation] = entry;
-        //    }
-        //    else
-        //    {
-        //        var lastLocation = ((m_lastCachedIndex - m_firstCachedIndex) + m_firstCachedLocation) % m_cacheSize;
-        //        lastLocation = (lastLocation + 1) % m_cacheSize;
-        //        m_lastCachedIndex++;
-        //        m_cache[lastLocation] = entry;
-        //        if (lastLocation == m_firstCachedLocation)
-        //        {
-        //            m_firstCachedLocation = (m_firstCachedLocation + 1) % m_cacheSize;
-        //            m_firstCachedIndex++;
-        //        }
-        //    }
-        //}
 
         public IndexerStateSnapshot GetState()
         {
