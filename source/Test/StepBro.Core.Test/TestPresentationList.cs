@@ -89,11 +89,6 @@ namespace StepBro.Core.Test
             cacheRange = presentation.Cache.CachedRange();
             Assert.AreEqual(298L, cacheRange.Item1);
             Assert.AreEqual(10297L, cacheRange.Item2);
-
-            //presentation.Reset(filter, 0L);
-
-            //Assert.AreEqual(0L, firstPresented.Item1);
-            //Assert.AreEqual("Go!", firstPresented.Item2.LogEntry.Text);
         }
     }
 }
