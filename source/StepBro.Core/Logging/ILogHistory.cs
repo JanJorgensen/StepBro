@@ -9,11 +9,12 @@ namespace StepBro.Core.Logging
 {
     public interface ILogEntry
     {
+        bool HasId { get; }
         ulong Id { get; }
         DateTime Timestamp { get; }
     }
 
-    public interface ILogHistory<T> : IElementIndexer<T> where T : ILogEntry
-    {
-    }
+    //public interface ILogHistory<T> : IElementIndexer<T> where T : ILogEntry
+    //{
+    //}
 }

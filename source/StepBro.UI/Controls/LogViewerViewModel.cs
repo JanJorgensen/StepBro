@@ -267,12 +267,12 @@ namespace StepBro.UI.Controls
             else if (dt > Time10s) timestampExtra = " style=\"color:red;\"";
             else if (dt > Time1s) timestampExtra = " style=\"color:orange;\"";
 
-            Microsoft.AspNetCore.Html.HtmlString ht = new Microsoft.AspNetCore.Html.HtmlString(type);
-            Microsoft.AspNetCore.Html.HtmlString hm = new Microsoft.AspNetCore.Html.HtmlString(message);
-            type = ht.ToString();
-            message = hm.ToString();
-            string indent = (entry.IndentLevel > 0) ? $"<div id=\"xq3_i{entry.IndentLevel}\">-</div>" : "";
-            file.WriteLine($"<div id=\"line\"><div id=\"xq1\"{timestampExtra}>{timestamp}</div><div id=\"xq2\"{typeExtra}>{type}</div>{indent}<div id=\"xq3_{entry.IndentLevel}\"{messageExtra}>{message}</div></div>");
+            //Microsoft.AspNetCore.Html.HtmlString ht = new Microsoft.AspNetCore.Html.HtmlString(type);
+            //Microsoft.AspNetCore.Html.HtmlString hm = new Microsoft.AspNetCore.Html.HtmlString(message);
+            //type = ht.ToString();
+            //message = hm.ToString();
+            //string indent = (entry.IndentLevel > 0) ? $"<div id=\"xq3_i{entry.IndentLevel}\">-</div>" : "";
+            //file.WriteLine($"<div id=\"line\"><div id=\"xq1\"{timestampExtra}>{timestamp}</div><div id=\"xq2\"{typeExtra}>{type}</div>{indent}<div id=\"xq3_{entry.IndentLevel}\"{messageExtra}>{message}</div></div>");
 
             return true;
         }

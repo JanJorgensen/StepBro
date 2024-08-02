@@ -18,6 +18,8 @@ namespace StepBro.Core.Host
     public interface IHost
     {
         HostType Type { get; }
+        void LogUserAction(string text);
+        void LogSystem(string text);
         IEnumerable<Type> ListHostCodeModuleTypes();
         IEnumerable<NamedData<object>> ListHostCodeModuleInstances();
     }

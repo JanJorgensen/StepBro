@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows.Forms;
+using StepBro.UI.WinForms;
 
 namespace StepBro.ConsoleSidekick.WinForms
 {
@@ -1203,7 +1204,7 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         #region ICoreAccess
 
-        public int ExecutionsRunning => throw new NotImplementedException();
+        public bool ExecutionRunning => throw new NotImplementedException();
 
         IExecutionAccess ICoreAccess.StartExecution(string element, string model, string objectVariable, object[] args)
         {

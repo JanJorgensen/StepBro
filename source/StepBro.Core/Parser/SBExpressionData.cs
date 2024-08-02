@@ -332,7 +332,7 @@ namespace StepBro.Core.Parser
                 case SBExpressionType.Namespace:
                     break;
                 case SBExpressionType.Constant:
-                    this.m_value = NarrowTypeByCasting(Value);
+                    this.m_value = NarrowTypeByCasting(this.Value);
                     if (m_value != null)
                     {
                         t = (TypeReference)m_value.GetType();

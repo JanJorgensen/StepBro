@@ -377,5 +377,83 @@ namespace StepBroCoreTest.Execution
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
         }
+
+        [TestMethod]
+        public void TestProcedurePartnerModel()
+        {
+            var f1 = new StringBuilder();
+            f1.AppendLine("procedure void Action() :");
+            f1.AppendLine("    partner model Loop : LoopAction;");
+            f1.AppendLine("procedure void Proc() : Action");
+            f1.AppendLine("{");
+            f1.AppendLine("    log (\"Proc Was Called\");");
+            f1.AppendLine("}");
+            f1.AppendLine("procedure void LoopAction(this Action proc)");
+            f1.AppendLine("{");
+            f1.AppendLine("    proc();");
+            f1.AppendLine("    proc();");
+            f1.AppendLine("    proc();");
+            f1.AppendLine("    proc();");
+            f1.AppendLine("}");
+            f1.AppendLine("public procedure void Run()");
+            f1.AppendLine("{");
+            f1.AppendLine("   Proc.Loop();");
+            f1.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("topfile.sbs", f1.ToString()));
+
+            Assert.AreEqual(1, files.Length);
+            var file1 = files[0];
+            Assert.AreEqual(0, file1.Errors.ErrorCount);
+            Assert.AreEqual(4, file1.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
+
+            var action = file1.ListElements().First(p => p.Name == "Action") as IFileProcedure;
+            Assert.IsNotNull(action);
+            Assert.AreEqual(1, action.ListPartners().Count());
+            IPartner loopPartner = action.ListPartners().First();
+            Assert.IsTrue(loopPartner.IsModel);
+
+            var proc = file1.ListElements().First(p => p.Name == "Proc") as IFileProcedure;
+            Assert.IsNotNull(proc);
+
+            var procLooper = file1.ListElements().First(p => p.Name == "LoopAction") as IFileProcedure;
+            Assert.IsNotNull(procLooper);
+
+            var procRun = file1.ListElements().First(p => p.Name == "Run") as IFileProcedure;
+            Assert.IsNotNull(procRun);
+
+            Exception exeException = null;
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+            try
+            {
+                taskContext.CallProcedure(procRun);
+            }
+            catch (Exception ex)
+            {
+                exeException = ex;
+            }
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+            if (exeException != null) throw exeException;
+
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - topfile.Run - <no arguments>");
+            log.ExpectNext("2 - Pre - 16 topfile.LoopAction - <no arguments>");
+            log.ExpectNext("3 - Pre - 9 topfile.Proc - <no arguments>");
+            log.ExpectNext("4 - Normal - 5 Log - Proc Was Called");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - 10 topfile.Proc - <no arguments>");
+            log.ExpectNext("4 - Normal - 5 Log - Proc Was Called");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - 11 topfile.Proc - <no arguments>");
+            log.ExpectNext("4 - Normal - 5 Log - Proc Was Called");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Pre - 12 topfile.Proc - <no arguments>");
+            log.ExpectNext("4 - Normal - 5 Log - Proc Was Called");
+            log.ExpectNext("4 - Post");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
     }
 }

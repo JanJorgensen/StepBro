@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OutputPath>..\bin</OutputPath>
+    <PackageId>stepbro workbench</PackageId>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <Authors>Jan Jorgensen, Milton Lindof</Authors>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <Company>SchmutStein</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="licenses.licx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
+    <ProjectReference Include="..\StepBro.UI.WinForms\StepBro.UI.WinForms.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <ActiproVersion>24.1.0</ActiproVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ActiproSoftware.Controls.WinForms" Version="$(ActiproVersion)" />
+  </ItemGroup>
+
+</Project>

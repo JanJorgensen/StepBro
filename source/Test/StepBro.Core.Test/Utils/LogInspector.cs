@@ -12,7 +12,7 @@ namespace StepBroCoreTest.Utils
     public class LogInspector : StepBro.Utils.SequenceInspector<string>
     {
         public LogInspector(Logger logger, bool dump = false) :
-            base(ListEntries(logger.GetOldestEntry()).Select(LogEntryToString))
+            base(ListEntries(logger.GetFirst().Item2).Select(LogEntryToString))
         {
             this.SetExpectFailureAction(FailureHandler);
         }
