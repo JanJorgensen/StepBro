@@ -35,6 +35,7 @@ namespace StepBro.SimpleWorkbench
             statusStrip = new StatusStrip();
             toolStripStatusLabelApplicationTaskState = new ToolStripStatusLabel();
             toolStripDropDownButtonTestActions = new ToolStripDropDownButton();
+            toolStripStatusLabelExecutionResult = new ToolStripStatusLabel();
             panelCustomToolstrips = new ToolBarHost();
             toolStripMain = new ToolStrip();
             toolStripMainMenu = new ToolStripDropDownButton();
@@ -86,7 +87,7 @@ namespace StepBro.SimpleWorkbench
             // 
             // statusStrip
             // 
-            statusStrip.Items.AddRange(new ToolStripItem[] { toolStripStatusLabelApplicationTaskState, toolStripDropDownButtonTestActions });
+            statusStrip.Items.AddRange(new ToolStripItem[] { toolStripStatusLabelApplicationTaskState, toolStripDropDownButtonTestActions, toolStripStatusLabelExecutionResult });
             statusStrip.Location = new Point(0, 505);
             statusStrip.Name = "statusStrip";
             statusStrip.Size = new Size(1028, 22);
@@ -112,6 +113,16 @@ namespace StepBro.SimpleWorkbench
             toolStripDropDownButtonTestActions.Size = new Size(83, 20);
             toolStripDropDownButtonTestActions.Text = "Test Actions";
             toolStripDropDownButtonTestActions.Visible = false;
+            // 
+            // toolStripStatusLabelExecutionResult
+            // 
+            toolStripStatusLabelExecutionResult.AutoSize = false;
+            toolStripStatusLabelExecutionResult.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripStatusLabelExecutionResult.Name = "toolStripStatusLabelExecutionResult";
+            toolStripStatusLabelExecutionResult.Size = new Size(780, 17);
+            toolStripStatusLabelExecutionResult.Spring = true;
+            toolStripStatusLabelExecutionResult.TextAlign = ContentAlignment.MiddleLeft;
+            toolStripStatusLabelExecutionResult.Click += toolStripStatusLabelExecutionResult_Click;
             // 
             // panelCustomToolstrips
             // 
@@ -545,5 +556,6 @@ namespace StepBro.SimpleWorkbench
         private ToolStripMenuItem toolStripMenuItemDeleteAllShortcuts;
         private ToolStripMenuItem toolStripMenuItemExeNoteInput;
         private ToolStripMenuItem toolStripMenuItemToolbarsDummyEntry;
+        private ToolStripStatusLabel toolStripStatusLabelExecutionResult;
     }
 }

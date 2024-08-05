@@ -229,7 +229,7 @@ namespace StepBro.SimpleWorkbench
             }
         }
 
-        #region User Settings Parsistance
+        #region User Settings Persistance
 
         private void UpdateUserDataFilePath()
         {
@@ -1395,6 +1395,7 @@ namespace StepBro.SimpleWorkbench
             {
                 case ScriptExecutionState.Init:
                     {
+                        toolStripStatusLabelExecutionResult.Text = String.Empty;
                         if (m_file == null || StepBroMain.LastParsingErrorCount > 0)
                         {
                             return TaskAction.Cancel;
@@ -1497,7 +1498,7 @@ namespace StepBro.SimpleWorkbench
                     return TaskAction.ContinueOnWorkerThreadDomain;
 
                 case ScriptExecutionState.Running:
-                    while (!m_executionQueue.Peek().State.HasEnded())
+                    while (!m_executionQueue.Peek().Execution.Task.Ended())
                     {
                         Thread.Sleep(200);
                     }
@@ -1505,8 +1506,30 @@ namespace StepBro.SimpleWorkbench
                     break;
 
                 case ScriptExecutionState.Finish:
-                    m_executionQueue.Dequeue();
-                    toolStripButtonStopScriptExecution.Enabled = false;
+                    {
+                        var executionJob = m_executionQueue.Dequeue();
+                        toolStripButtonStopScriptExecution.Enabled = false;
+
+                        var result = executionJob.Execution.Result;
+                        var createdReport = executionJob.Execution.Report;
+                        if (result.ProcedureResult != null && !String.IsNullOrEmpty(result.ProcedureResult.Description))
+                        {
+                            toolStripStatusLabelExecutionResult.Text = result.ResultText();
+                        }
+                        else
+                        {
+                            if (executionJob.Partner == null &&
+                                executionJob.Element is IFileProcedure &&
+                                !(executionJob.Element as IFileProcedure).ReturnType.Equals(TypeReference.TypeVoid))
+                            {
+                                toolStripStatusLabelExecutionResult.Text = "Result: " + StringUtils.ObjectToString(result.ReturnValue, true);
+                            }
+                            else
+                            {
+                                toolStripStatusLabelExecutionResult.Text = "No execution result";
+                            }
+                        }
+                    }
                     return TaskAction.Finish;
 
                 default:
@@ -1668,6 +1691,11 @@ namespace StepBro.SimpleWorkbench
                     m_fileExplorer.UpdateNodeStates();
                 }
             }
+        }
+
+        private void toolStripStatusLabelExecutionResult_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

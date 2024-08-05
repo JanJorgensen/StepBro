@@ -231,7 +231,10 @@ namespace StepBro.UI.WinForms.Controls
 
         private void treeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            this.SelectionChanged?.Invoke(this, new SelectionEventArgs(e.Node.Tag, SelectionEventArgs.SelectionType.Activated));
+            if (e.Button == MouseButtons.Left)
+            {
+                this.SelectionChanged?.Invoke(this, new SelectionEventArgs(e.Node.Tag, SelectionEventArgs.SelectionType.Activated));
+            }
         }
 
         private void TreeView_AfterSelect(object sender, TreeViewEventArgs e)
