@@ -25,6 +25,7 @@ namespace StepBro.Core.ScriptData
         private Expression m_bodyCode = null;
         private int m_nextTestStepIndex = 1;
         private Delegate m_runtimeProcedure = null;
+        private object m_lastReturnValue = null;
 
         public FileProcedure(
             IScriptFile file,
@@ -42,7 +43,7 @@ namespace StepBro.Core.ScriptData
             //m_parametersInternal.Add(new IdentifierInfo("callcontext", "callcontext", IdentifierType.Parameter, delegatetype, m_callContextParameter));
             m_returnLabel = Expression.Label();
             this.LogOption = logOption;
-            this.Flags = 
+            this.Flags =
                 (this.Flags & ProcedureFlags.SeparateStateLevel) |
                 (separateStateLevel ? ProcedureFlags.SeparateStateLevel : ProcedureFlags.None);
         }
@@ -168,6 +169,20 @@ namespace StepBro.Core.ScriptData
         public ProcedureFlags Flags { get; internal set; }
 
         public ContextLogOption LogOption { get; set; }
+
+        public object LastReturnValue
+        {
+            get
+            {
+                return m_lastReturnValue;
+            }
+        }
+
+        internal T OnReturn<T>(T value)
+        {
+            m_lastReturnValue = value;
+            return value;
+        }
 
         public bool HasBody { get; internal set; } = false;
 
@@ -376,6 +391,11 @@ namespace StepBro.Core.ScriptData
             if (name.Equals("NoSubResultInheritance"))
             {
                 this.Flags |= ProcedureFlags.NoSubResultInheritance;
+                return true;
+            }
+            if (name.Equals("UIAction"))
+            {
+                this.Flags |= ProcedureFlags.FreeParameters;
                 return true;
             }
             return base.ParsePropertyBlockFlag(name);

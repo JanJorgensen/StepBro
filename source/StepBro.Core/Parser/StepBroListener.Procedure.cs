@@ -1251,10 +1251,12 @@ namespace StepBro.Core.Parser
             {
                 code = Expression.Call(
                     code,
-                    code.Type.GetMethod("GetTypedValue"),
+                    code.Type.GetMethod(nameof(IValueContainer<int>.GetTypedValue)),    // Note: 'int' is just used to make compiler happy.
                     Expression.Convert(Expression.Constant(null), typeof(Logging.ILogger)));
             }
 
+            var procedureReference = Expression.Convert(Expression.Property(m_currentProcedure.ContextReferenceInternal, nameof(IScriptCallContext.Self)), typeof(FileProcedure));
+            code = Expression.Call(procedureReference, nameof(FileProcedure.OnReturn), new Type[] { code.Type }, code);
 
             m_scopeStack.Peek().AddStatementCode(Expression.Return(m_currentProcedure.ReturnLabel, code));
         }
