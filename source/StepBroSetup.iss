@@ -68,9 +68,6 @@ Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environmen
 Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench"; ValueType: none; ValueName: ""; ValueData: ""; Flags: uninsdeletekey
 ; Specify icon for the menu item:
 ; Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\images\shortcut.ico"; Flags: uninsdeletekey
-; Add separator before and after the menu item:
-; Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench"; ValueType: string; ValueName: "SeparatorBefore"; ValueData: ""; Flags: uninsdeletekey
-; Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench"; ValueType: string; ValueName: "SeparatorAfter"; ValueData: ""; Flags: uninsdeletekey
 ; Define command for the menu item:
 Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}""  ""%1"""; Flags: uninsdeletekey
     
