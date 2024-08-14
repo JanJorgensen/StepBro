@@ -16,7 +16,7 @@ namespace StepBro.Core.Test
             var loggerState = logger.GetState();
             Assert.AreEqual(1L, loggerState.EffectiveCount);
             var cacheState = cache.GetState();
-            Assert.AreEqual(1L, cacheState.EffectiveCount);
+            Assert.AreEqual(0L, cacheState.EffectiveCount);
             var range = cache.CachedRange();
             Assert.AreEqual(-1L, range.Item1);
             Assert.AreEqual(-1L, range.Item2);
