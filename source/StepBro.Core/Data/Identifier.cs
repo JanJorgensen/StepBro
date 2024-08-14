@@ -12,7 +12,7 @@ namespace StepBro.Core.Data
     public struct Identifier
     {
         /// <summary>
-        /// The name if the identifier.
+        /// The name of the identifier.
         /// </summary>
         public string Name;
         /// <summary>

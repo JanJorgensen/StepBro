@@ -110,7 +110,8 @@ namespace StepBro.Core.Data
         {
             // Returning the state of the cache.
             // The caller should know that the cache might not contain all entries of the cache source.
-            return new IndexerStateSnapshot(m_firstCachedIndex, m_lastCachedIndex, m_lastCachedIndex - m_firstCachedIndex + 1);
+            var count = (m_firstCachedIndex >= 0) ? (m_lastCachedIndex - m_firstCachedIndex + 1) : 0L;
+            return new IndexerStateSnapshot(m_firstCachedIndex, m_lastCachedIndex, count);
         }
     }
 }

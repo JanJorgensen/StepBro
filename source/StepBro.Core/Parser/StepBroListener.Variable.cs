@@ -229,7 +229,14 @@ namespace StepBro.Core.Parser
 
             if (m_variableInitializer.IsError())
             {
-                m_errors.UnresolvedIdentifier(m_variableInitializer.Token.Line, m_variableInitializer.Token.Column, m_variableInitializer.Value as string);
+                if (m_variableInitializer.Token != null)
+                {
+                    m_errors.UnresolvedIdentifier(m_variableInitializer.Token.Line, m_variableInitializer.Token.Column, m_variableInitializer.Value as string);
+                }
+                else
+                {
+                    m_errors.UnresolvedIdentifier(context.Start.Line, context.Start.Column, m_variableInitializer.Value as string);
+                }
             }
         }
     }

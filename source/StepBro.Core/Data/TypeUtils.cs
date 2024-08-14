@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StepBro.Core.Parser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -59,6 +60,53 @@ namespace StepBro.Core.Data
                     return false;
             }
             return true;
+        }
+
+        public static object TryConvert(this object value, Type targetType)
+        {
+            if (value == null)
+            {
+                if (targetType.IsByRefLike) return null;
+                else throw new ArgumentException("The type '" + targetType.Name + "' cannot be a null reference.");
+            }
+            else
+            {
+                if (value.GetType().Equals(targetType))
+                {
+                    return value;
+                }
+                if (targetType == typeof(Int32))
+                {
+                    return Convert.ToInt32(value);
+                }
+                else if (targetType == typeof(Int64))
+                {
+                    return Convert.ToInt64(value);
+                }
+                else if (targetType.IsEnum)
+                {
+                    if (value is Identifier)
+                    {
+                        return Enum.Parse(targetType, ((Identifier)value).Name);
+                    }
+                    else if (value is string)
+                    {
+                        return Enum.Parse(targetType, (string)value);
+                    }
+                    else if (value is Int32 || value is Int64)
+                    {
+                        return Enum.ToObject(targetType, Convert.ToInt32(value));
+                    }
+                    else
+                    {
+                        throw new ArgumentException("The specified value cannot be converted to an '" + targetType.Name + "' enum value.");
+                    }
+                }
+                else
+                {
+                    throw new NotImplementedException("The specified type cannot be converted to an '" + targetType.Name + "' type.");
+                }
+            }
         }
 
         public static bool IsDelegate(this Type type)

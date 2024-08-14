@@ -40,6 +40,8 @@ namespace StepBro.SimpleWorkbench
             toolStripMain = new ToolStrip();
             toolStripMainMenu = new ToolStripDropDownButton();
             toolStripMenuItemFile = new ToolStripMenuItem();
+            toolStripMenuItemFileOpen = new ToolStripMenuItem();
+            toolStripMenuItemFileSave = new ToolStripMenuItem();
             toolStripMenuItemView = new ToolStripMenuItem();
             viewExecutionLogToolStripMenuItem = new ToolStripMenuItem();
             viewErrorsToolStripMenuItem = new ToolStripMenuItem();
@@ -119,7 +121,7 @@ namespace StepBro.SimpleWorkbench
             toolStripStatusLabelExecutionResult.AutoSize = false;
             toolStripStatusLabelExecutionResult.DisplayStyle = ToolStripItemDisplayStyle.Text;
             toolStripStatusLabelExecutionResult.Name = "toolStripStatusLabelExecutionResult";
-            toolStripStatusLabelExecutionResult.Size = new Size(780, 17);
+            toolStripStatusLabelExecutionResult.Size = new Size(863, 17);
             toolStripStatusLabelExecutionResult.Spring = true;
             toolStripStatusLabelExecutionResult.TextAlign = ContentAlignment.MiddleLeft;
             toolStripStatusLabelExecutionResult.Click += toolStripStatusLabelExecutionResult_Click;
@@ -151,20 +153,38 @@ namespace StepBro.SimpleWorkbench
             toolStripMainMenu.ImageTransparentColor = Color.Magenta;
             toolStripMainMenu.Name = "toolStripMainMenu";
             toolStripMainMenu.Size = new Size(31, 22);
-            toolStripMainMenu.Text = "M";
+            toolStripMainMenu.Text = "☰";
             // 
             // toolStripMenuItemFile
             // 
+            toolStripMenuItemFile.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemFileOpen, toolStripMenuItemFileSave });
             toolStripMenuItemFile.Name = "toolStripMenuItemFile";
-            toolStripMenuItemFile.Size = new Size(179, 22);
+            toolStripMenuItemFile.Size = new Size(180, 22);
             toolStripMenuItemFile.Text = "&File";
-            toolStripMenuItemFile.Visible = false;
+            toolStripMenuItemFile.DropDownOpening += toolStripMenuItemFile_DropDownOpening;
+            // 
+            // toolStripMenuItemFileOpen
+            // 
+            toolStripMenuItemFileOpen.Enabled = false;
+            toolStripMenuItemFileOpen.Name = "toolStripMenuItemFileOpen";
+            toolStripMenuItemFileOpen.ShortcutKeys = Keys.Control | Keys.O;
+            toolStripMenuItemFileOpen.Size = new Size(180, 22);
+            toolStripMenuItemFileOpen.Text = "Open...";
+            toolStripMenuItemFileOpen.Click += toolStripMenuItemFileOpen_Click;
+            // 
+            // toolStripMenuItemFileSave
+            // 
+            toolStripMenuItemFileSave.Name = "toolStripMenuItemFileSave";
+            toolStripMenuItemFileSave.ShortcutKeys = Keys.Control | Keys.S;
+            toolStripMenuItemFileSave.Size = new Size(180, 22);
+            toolStripMenuItemFileSave.Text = "Save";
+            toolStripMenuItemFileSave.Click += toolStripMenuItemFileSave_Click;
             // 
             // toolStripMenuItemView
             // 
             toolStripMenuItemView.DropDownItems.AddRange(new ToolStripItem[] { viewExecutionLogToolStripMenuItem, viewErrorsToolStripMenuItem, viewPropertiesToolStripMenuItem, toolStripSeparator3, viewObjectCommandPromptToolStripMenuItem, toolStripMenuItemExeNoteInput, toolStripSeparator2, viewToolbarsToolStripMenuItem });
             toolStripMenuItemView.Name = "toolStripMenuItemView";
-            toolStripMenuItemView.Size = new Size(179, 22);
+            toolStripMenuItemView.Size = new Size(180, 22);
             toolStripMenuItemView.Text = "&View";
             toolStripMenuItemView.DropDownOpened += toolStripMenuItemView_DropDownOpened;
             // 
@@ -235,7 +255,7 @@ namespace StepBro.SimpleWorkbench
             // 
             shortcutsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemDeleteShortcut, toolStripMenuItemDeleteAllShortcuts });
             shortcutsToolStripMenuItem.Name = "shortcutsToolStripMenuItem";
-            shortcutsToolStripMenuItem.Size = new Size(179, 22);
+            shortcutsToolStripMenuItem.Size = new Size(180, 22);
             shortcutsToolStripMenuItem.Text = "Execution Shortcuts";
             // 
             // toolStripMenuItemDeleteShortcut
@@ -256,7 +276,7 @@ namespace StepBro.SimpleWorkbench
             // 
             helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { viewDocumentationBrowserToolStripMenuItem });
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            helpToolStripMenuItem.Size = new Size(179, 22);
+            helpToolStripMenuItem.Size = new Size(180, 22);
             helpToolStripMenuItem.Text = "&Help";
             helpToolStripMenuItem.Visible = false;
             // 
@@ -271,12 +291,12 @@ namespace StepBro.SimpleWorkbench
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(176, 6);
+            toolStripSeparator1.Size = new Size(177, 6);
             // 
             // toolStripMenuItemExit
             // 
             toolStripMenuItemExit.Name = "toolStripMenuItemExit";
-            toolStripMenuItemExit.Size = new Size(179, 22);
+            toolStripMenuItemExit.Size = new Size(180, 22);
             toolStripMenuItemExit.Text = "E&xit";
             toolStripMenuItemExit.Click += toolStripMenuItemExit_Click;
             // 
@@ -557,5 +577,7 @@ namespace StepBro.SimpleWorkbench
         private ToolStripMenuItem toolStripMenuItemExeNoteInput;
         private ToolStripMenuItem toolStripMenuItemToolbarsDummyEntry;
         private ToolStripStatusLabel toolStripStatusLabelExecutionResult;
+        private ToolStripMenuItem toolStripMenuItemFileOpen;
+        private ToolStripMenuItem toolStripMenuItemFileSave;
     }
 }

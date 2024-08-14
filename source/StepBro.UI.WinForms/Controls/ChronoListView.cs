@@ -276,6 +276,10 @@ namespace StepBro.UI.WinForms.Controls
             {
                 if (keyData == Keys.Up)
                 {
+                    if (m_currentEntry < 0)
+                    {
+                        return true;    // Nothing shown; just skip. 
+                    }
                     if (m_currentEntry > 0)
                     {
                         m_currentEntry--;
@@ -294,6 +298,10 @@ namespace StepBro.UI.WinForms.Controls
                 }
                 if (keyData == Keys.Down)
                 {
+                    if (m_currentEntry < 0)
+                    {
+                        return true;    // Nothing shown; just skip. 
+                    }
                     if (m_currentEntry < m_presentationSource.GetState().LastIndex)
                     {
                         m_currentEntry++;

@@ -13,8 +13,8 @@ namespace StepBro.UI.WinForms.CustomToolBar
         private bool m_visible = true;
         private ICoreAccess m_coreAccess = null;
         private bool m_settingVisibility = false;
-        private List<Tuple<string, ToolBar>> m_addedToolbars = new List<Tuple<string, ToolBar>>();
-        private List<Tuple<string, ToolBar>> m_shownToolbars = new List<Tuple<string, ToolBar>>();
+        private List<ToolBar> m_addedToolbars = new List<ToolBar>();
+        private List<ToolBar> m_shownToolbars = new List<ToolBar>();
         private List<string> m_hiddenToolbars = new List<string>();
 
         public ToolBarHost()
@@ -33,43 +33,48 @@ namespace StepBro.UI.WinForms.CustomToolBar
         {
             System.Diagnostics.Debug.WriteLine("Add toolbar: " + toolbar.Name);
             ToolBar toolBar = null;
-            var existing = m_addedToolbars.Where(t => t.Item1 == name).FirstOrDefault();
+            var existing = m_addedToolbars.Where(t => t.Name == name).FirstOrDefault();
             if (existing != null)
             {
-                toolBar = existing.Item2;
+                toolBar = existing;
             }
             else
             {
                 toolBar = new ToolBar(m_coreAccess);
-                m_addedToolbars.Add(new Tuple<string, ToolBar>(name, toolBar));
+                toolBar.Name = name;
+                m_addedToolbars.Add(toolBar);
+                toolBar.VisibleChanged += ToolBar_VisibleChanged;
             }
 
             toolBar.Setup(StepBro.Core.Main.RootLogger, name, toolbar.Definition);
+            toolbar.SetToolBarReference(toolBar);
 
             this.Controls.Clear();
 
             m_shownToolbars = m_addedToolbars.ToList();     // New list, to be sorted by display order.
 
-            m_shownToolbars.Sort((l, r) => (1000000 - r.Item2.Index).CompareTo(1000000 - l.Item2.Index));    // Toolbars with same index in reading order from script, otherwise use after index order.
+            m_shownToolbars.Sort((l, r) => (1000000 - r.Index).CompareTo(1000000 - l.Index));    // Toolbars with same index in reading order from script, otherwise use after index order.
             m_shownToolbars.Reverse();
 
             int tabIndex = m_shownToolbars.Count;
+            m_settingVisibility = true;
             foreach (var tbData in m_shownToolbars)
             {
-                tbData.Item2.DefaultBackColor = (tabIndex % 2 == 0) ? SystemColors.Control : Color.Beige;
-                tbData.Item2.TabIndex = tabIndex--;
-                this.Controls.Add(tbData.Item2);
+                tbData.DefaultBackColor = (tabIndex % 2 == 0) ? SystemColors.Control : Color.Beige;
+                tbData.TabIndex = tabIndex--;
+                this.Controls.Add(tbData);
             }
+            m_settingVisibility = false;
 
             if (m_shownToolbars.Count > 0)
             {
-                m_shownToolbars[0].Item2.AdjustColumns();
+                m_shownToolbars[0].AdjustSizesAndColumns();
             }
 
             this.AdjustHeight();
         }
 
-        public IEnumerable<Tuple<string, ToolBar>> ListToolbars()
+        public IEnumerable<ToolBar> ListToolbars()
         {
             foreach (var toolbar in m_shownToolbars) yield return toolbar;
         }
@@ -97,6 +102,16 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
+        #region ToolBar Visibility
+
+        private void ToolBar_VisibleChanged(object sender, EventArgs e)
+        {
+            if (!m_settingVisibility && sender is ToolBar toolbar)
+            {
+                SetToolbarVisibility(toolbar.Name, toolbar.Visible);
+            }
+        }
+
         protected override void OnVisibleChanged(EventArgs e)
         {
             base.OnVisibleChanged(e);
@@ -104,7 +119,6 @@ namespace StepBro.UI.WinForms.CustomToolBar
             {
                 m_visible = this.Visible;
             }
-
         }
 
         public void SetToolbarVisibility(string name, bool visible)
@@ -160,11 +174,11 @@ namespace StepBro.UI.WinForms.CustomToolBar
             {
                 foreach (var tb in m_shownToolbars)
                 {
-                    bool visible = !m_hiddenToolbars.Contains(tb.Item1);
-                    tb.Item2.Visible = visible;
+                    bool visible = !m_hiddenToolbars.Contains(tb.Name);
+                    tb.Visible = visible;
                     if (bottomVisible == null && visible)
                     {
-                        bottomVisible = tb.Item2;
+                        bottomVisible = tb;
                     }
                 }
                 if (bottomVisible != null)
@@ -176,5 +190,6 @@ namespace StepBro.UI.WinForms.CustomToolBar
             this.Height += missingHeight;
         }
 
+        #endregion
     }
 }

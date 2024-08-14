@@ -280,6 +280,7 @@ namespace StepBro.UI.WinForms.Controls
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
+            m_mouseDownLocation = e.Location;
             var line = (e.Location.Y / m_lineHeight);
             var index = m_topIndex + line;
             if (index > m_lastShown) index = -1L;

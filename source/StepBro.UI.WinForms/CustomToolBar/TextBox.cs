@@ -1,48 +1,52 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Execution;
 using StepBro.ToolBarCreator;
+using StepBro.UI.WinForms.Controls;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static StepBro.UI.WinForms.ButtonLogic;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
-    internal class ToolStripDropDownMenu : ToolStripDropDownButton, IToolBarElement, IMenu, IMenuItemHost
+    internal class TextBox : ToolStripTextBoxWithAutoWidth, IToolBarElement
     {
         private IToolBarElement m_parent;
         private ICoreAccess m_coreAccess = null;
-        private Dictionary<string, object> m_commonChildFields = null;
+        private Color m_normalBack;
 
-        public ToolStripDropDownMenu(IToolBarElement parent, ICoreAccess coreAccess, string name) : base()
+        public TextBox(IToolBarElement parent, ICoreAccess coreAccess, string name) : base()
         {
+            Debug.Assert(parent != null);
             m_parent = parent;
             m_coreAccess = coreAccess;
+            m_normalBack = this.BackColor;
             this.Margin = new Padding(1, Margin.Top, 1, Margin.Bottom);
             this.Name = name;
-            this.Text = name;
         }
 
-        internal void SetChildProperty(string name, object value)
+        protected override void OnBackColorChanged(EventArgs e)
         {
-            if (m_commonChildFields == null)
-            {
-                m_commonChildFields = new Dictionary<string, object>();
-            }
-            m_commonChildFields[name] = value;
+            //if (!m_setupFromLogic)
+            //{
+            //    m_normalBack = this.BackColor;
+            //}
         }
 
-        public void SetTitle(string title)
-        {
-            this.Text = title;
-        }
+        //protected override void OnTextChanged(EventArgs e)
+        //{
+        //    base.OnTextChanged(e);
 
-        public void Add(ToolStripMenuItem item)
-        {
-            this.DropDownItems.Add(item);
-        }
-
-        public void Add(ToolStripTextBox item)
-        {
-            this.DropDownItems.Add(item);
-        }
+        //    var preferredWidth = this.GetPreferredWidth();
+        //    if (m_maxWidth > 0 && this.AutoSize == false && this.Width < preferredWidth)
+        //    {
+        //        this.SetWidth(preferredWidth);
+        //    }
+        //}
 
         #region IToolBarElement
 
@@ -52,20 +56,20 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public string PropertyName => throw new NotImplementedException();
 
-        public string ElementName => throw new NotImplementedException();
+        public string ElementName { get { return this.Name; } }
 
-        public string ElementType => throw new NotImplementedException();
+        public string ElementType { get { return "Button"; } }
 
         public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
 
         public IEnumerable<IToolBarElement> GetChilds()
         {
-            throw new NotImplementedException();
+            yield break;
         }
 
         public object GetProperty([Implicit] ICallContext context, string property)
         {
-            throw new NotImplementedException();
+            return ToolBar.GetElementPropertyValue(this, context, property);
         }
 
         public object GetValue([Implicit] ICallContext context)
@@ -75,7 +79,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public void SetProperty([Implicit] ICallContext context, string property, object value)
         {
-            throw new NotImplementedException();
+            ToolBar.SetElementPropertyValue(this, context, property, value);
         }
 
         public bool SetValue([Implicit] ICallContext context, object value)
@@ -90,11 +94,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public object TryGetChildProperty(string name)
         {
-            if (m_commonChildFields != null && m_commonChildFields.ContainsKey(name))
-            {
-                return m_commonChildFields[name];
-            }
-            return m_parent.TryGetChildProperty(name);
+            return null;
         }
 
         #endregion

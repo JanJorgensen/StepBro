@@ -21,6 +21,7 @@ using StepBroMain = StepBro.Core.Main;
 using StepBro.Core.Logging;
 using FastColoredTextBoxNS;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace StepBro.SimpleWorkbench
 {
@@ -114,7 +115,6 @@ namespace StepBro.SimpleWorkbench
         {
             InitializeComponent();
 
-            toolStripMainMenu.Text = "\u2630";
             toolStripButtonRunCommand.Text = "\u23F5";
             toolStripButtonStopScriptExecution.Text = "\u23F9";
             toolStripButtonAddShortcut.Text = "\u2795";
@@ -158,9 +158,12 @@ namespace StepBro.SimpleWorkbench
             m_toolWindowFileExplorer = new ToolWindow(dockManager, "FileExplorerView", "File Explorer", null, m_fileExplorer);
             m_toolWindowFileExplorer.DockTo(dockManager, DockOperationType.RightOuter);
 
+            dockManager.ImageList = FileExplorer.Images;
+
             m_errorsList = new ParsingErrorListView();
             m_errorsList.ParseFilesClicked += ErrorsList_ParseFilesClicked;
             m_errorsList.AutoParseFilesChanged += ErrorsList_AutoParseFilesChanged;
+            m_errorsList.DoubleClickedLine += ErrorsList_DoubleClickedLine;
             m_toolWindowParsingErrors = new ToolWindow(dockManager, "ErrorsView", "Errors", null, m_errorsList);
             m_toolWindowParsingErrors.DockTo(dockManager, DockOperationType.BottomOuter);
 
@@ -342,45 +345,6 @@ namespace StepBro.SimpleWorkbench
         #endregion
 
 
-        public IExecutionAccess StartExecution(bool addToHistory, IFileElement element, string partner, string objectVariable, object[] args)
-        {
-            if (this.ExecutionRunning)
-            {
-                var result = MessageBox.Show(
-                    this,
-                    "A script execution is already running." + Environment.NewLine + Environment.NewLine + "Would you like to put this new execution in queue?",
-                    "StepBro - Starting script execution",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
-                if (result == DialogResult.No)
-                {
-                    return null;
-                }
-            }
-
-            var executionData = new ScriptExecutionData(
-                this,
-                element,
-                partner,
-                objectVariable,
-                args?.ToArray());
-            executionData.AddToHistory = addToHistory;
-            this.StartScriptExecution(executionData);
-
-            string executionNote = null;
-            if (toolStripTextBoxExeNote.Visible)
-            {
-                executionNote = toolStripTextBoxExeNote.Text;
-            }
-
-            string objectInstanceText = String.IsNullOrEmpty(objectVariable) ? "" : (objectVariable.Split('.').Last() + ".");
-            string partnertext = String.IsNullOrEmpty(partner) ? "" : (" @ " + partner);
-            string noteText = String.IsNullOrEmpty(executionNote) ? "" : (" - \"" + executionNote + "\"");
-            string elementText = String.IsNullOrEmpty(objectInstanceText) ? element.FullName : element.FullName.Split('.').Last();
-            m_mainLogger.LogUserAction("Request script execution: " + objectInstanceText + elementText + partnertext + noteText);
-
-            return executionData;
-        }
-
         #region ICoreAccess
 
         public IExecutionAccess StartExecution(string elementName, string partner, string objectVariable, object[] args)
@@ -429,154 +393,43 @@ namespace StepBro.SimpleWorkbench
 
         #endregion
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (ignoreTextChangedEvent)
-                return;
-
-            DocumentWindow documentWindow = ((FastColoredTextBox)sender).Parent as DocumentWindow;
-            if (documentWindow != null)
-                documentWindow.Modified = ((FastColoredTextBox)sender).IsChanged;
-        }
-
-        private DocumentWindow OpenLoadedFile(ILoadedFile file)
-        {
-            FastColoredTextBoxNS.FastColoredTextBox editor = new FastColoredTextBoxNS.FastColoredTextBox();
-            editor.Font = new Font("Consolas", 9.75f);
-            editor.BorderStyle = BorderStyle.None;
-            editor.ReadOnly = false;
-            editor.ShowScrollBars = true;
-            editor.WordWrap = false;
-
-            DocumentWindow window = null;
-            try
-            {
-                editor.OpenFile(file.FilePath);
-
-                file.RegisterDependant(m_hostDependancyObject); // Used by editor now.
-
-                window = new DocumentWindow(dockManager, file.FilePath, Path.GetFileName(file.FilePath), 3, editor);
-                window.Tag = file;
-                window.FileName = file.FilePath;
-                window.FileType = String.Format("Text File (*{0})", Path.GetExtension(file.FilePath).ToLower());
-
-                editor.MouseMove += Editor_MouseMove;
-                editor.TextChanged += TextBox_TextChanged;
-            }
-            catch (Exception)
-            {
-
-            }
-
-            return window;
-        }
-
-        private DocumentWindow CreateTextDocument(string fileName, string text, bool readOnly)
-        {
-            DocumentWindow documentWindow;
-
-            // If the document is already open, show a message
-            if (dockManager.DocumentWindows[fileName] != null)
-            {
-                dockManager.DocumentWindows[fileName].Activate();
-                MessageBox.Show(this, String.Format("The file '{0}' is already open.", fileName), "File Already Open", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return dockManager.DocumentWindows[fileName];
-            }
-
-            // Determine the type of file
-            string fileType = "Text";
-            if (fileName != null)
-            {
-                switch (Path.GetExtension(fileName).ToLower())
-                {
-                    case ".bmp":
-                    case ".gif":
-                    case ".ico":
-                    case ".jpg":
-                    case ".png":
-                        fileType = "Image";
-                        readOnly = true;
-                        break;
-                }
-            }
-
-            switch (fileType)
-            {
-                case "Image":
-                    {
-                        // Create a PictureBox for the document
-                        PictureBox pictureBox = new PictureBox();
-                        pictureBox.Image = Image.FromFile(fileName);
-
-                        // Create the document window
-                        documentWindow = new DocumentWindow(dockManager, fileName, Path.GetFileName(fileName), 4, pictureBox);
-                        if (fileName != null)
-                        {
-                            documentWindow.FileName = fileName;
-                            documentWindow.FileType = String.Format("Image File (*{0})", Path.GetExtension(fileName).ToLower());
-                        }
-                        break;
-                    }
-                default:
-                    {
-
-                        FastColoredTextBoxNS.FastColoredTextBox textBoxFast = new FastColoredTextBoxNS.FastColoredTextBox();
-                        textBoxFast.Font = new Font("Consolas", 9.75f);
-                        textBoxFast.BorderStyle = BorderStyle.None;
-                        textBoxFast.ReadOnly = readOnly;
-                        textBoxFast.ShowScrollBars = true;
-                        textBoxFast.WordWrap = false;
-                        textBoxFast.MouseMove += Editor_MouseMove;
-
-                        // If no data was passed in, generate some
-                        if (fileName == null)
-                        {
-                            fileName = String.Format("Document{0}.txt", documentWindowIndex++);
-                            if (text == null)
-                                text = "Visit our web site to learn more about Actipro WinForms Studio or our other controls:\r\nhttps://www.actiprosoftware.com/\r\n\r\nThis document was created at " + DateTime.Now.ToString() + ".";
-                        }
-                        else
-                        {
-                            textBoxFast.OpenFile(fileName);
-                        }
-
-                        // Create the document window
-                        textBoxFast.Text = text;
-                        textBoxFast.TextChanged += TextBox_TextChanged;
-                        documentWindow = new DocumentWindow(dockManager, fileName, Path.GetFileName(fileName), 3, textBoxFast);
-                        if (fileName != null)
-                        {
-                            documentWindow.FileName = fileName;
-                            documentWindow.FileType = String.Format("Text File (*{0})", Path.GetExtension(fileName).ToLower());
-                        }
-                        break;
-                    }
-            }
-
-            if (readOnly)
-            {
-                // Load a read-only context image
-                documentWindow.ContextImage = ActiproSoftware.Products.Docking.AssemblyInfo.Instance.GetImage(
-                    ActiproSoftware.Products.Docking.ImageResource.ContextReadOnly,
-                    DpiHelper.GetDpiScale(this));
-            }
-
-            return documentWindow;
-        }
-
         #region Main Toolbar
 
         #region Main Menu
 
-        #region Errors View
+        #region File Menu
 
-        private void ErrorsList_ParseFilesClicked(object sender, EventArgs e)
+        private void toolStripMenuItemFile_DropDownOpening(object sender, EventArgs e)
         {
-            this.StartFileParsing();
+            if (dockManager.SelectedDocument is DocumentWindow window && dockManager.SelectedDocument.Tag is ILoadedFile file)
+            {
+                if (window.Controls[0] is FastColoredTextBoxNS.FastColoredTextBox editor)
+                {
+                    toolStripMenuItemFileSave.Enabled = editor.IsChanged;
+                }
+            }
+            else
+            {
+                toolStripMenuItemFileSave.Enabled = false;
+            }
         }
 
-        private void ErrorsList_AutoParseFilesChanged(object sender, EventArgs e)
+        private void toolStripMenuItemFileOpen_Click(object sender, EventArgs e)
         {
+
+        }
+
+        private void toolStripMenuItemFileSave_Click(object sender, EventArgs e)
+        {
+            if (dockManager.SelectedDocument is DocumentWindow window &&
+                window.Controls[0] is FastColoredTextBoxNS.FastColoredTextBox editor &&
+                editor.IsChanged &&
+                dockManager.SelectedDocument.Tag is ILoadedFile file)
+            {
+                File.WriteAllText(file.FilePath, editor.Text);
+                editor.SetChanged(false);
+                window.Modified = false;
+            }
         }
 
         #endregion
@@ -628,6 +481,23 @@ namespace StepBro.SimpleWorkbench
             else
             {
                 //toolWindowProperties.Close();
+            }
+        }
+
+        private void viewToolbarsToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            viewToolbarsToolStripMenuItem.DropDownItems.Clear();
+            foreach (var toolbar in panelCustomToolstrips.ListToolbars())
+            {
+                var visibilityMenuItem = new ToolStripMenuItem();
+                visibilityMenuItem.CheckOnClick = true;
+                visibilityMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
+                visibilityMenuItem.Size = new Size(180, 22);
+                visibilityMenuItem.Text = toolbar.Name;
+                visibilityMenuItem.Checked = !panelCustomToolstrips.IsToolbarHidden(toolbar.Name);
+                visibilityMenuItem.CheckedChanged += (s, e) => { panelCustomToolstrips.SetToolbarVisibility(((ToolStripMenuItem)s).Text, ((ToolStripMenuItem)s).Checked); };
+                visibilityMenuItem.Tag = toolbar;
+                viewToolbarsToolStripMenuItem.DropDownItems.Insert(0, visibilityMenuItem);
             }
         }
 
@@ -1205,6 +1075,258 @@ namespace StepBro.SimpleWorkbench
 
         #endregion
 
+        #region Editor
+
+        private DocumentWindow OpenLoadedFile(ILoadedFile file)
+        {
+            FastColoredTextBoxNS.FastColoredTextBox editor = new FastColoredTextBoxNS.FastColoredTextBox();
+            editor.Font = new Font("Consolas", 9.75f);
+            editor.BorderStyle = BorderStyle.None;
+            editor.ReadOnly = false;
+            editor.ShowScrollBars = true;
+            editor.WordWrap = false;
+
+            DocumentWindow window = null;
+            try
+            {
+                editor.OpenFile(file.FilePath);
+
+                file.RegisterDependant(m_hostDependancyObject); // Used by editor now.
+
+                window = new DocumentWindow(dockManager, file.FilePath, Path.GetFileName(file.FilePath), 2, editor);
+                window.Tag = file;
+                window.FileName = file.FilePath;
+                window.FileType = String.Format("Text File (*{0})", Path.GetExtension(file.FilePath).ToLower());
+
+                editor.MouseMove += Editor_MouseMove;
+                editor.TextChanged += TextBox_TextChanged;
+            }
+            catch (Exception)
+            {
+
+            }
+
+            return window;
+        }
+
+        private DocumentWindow OpenOrActivateFileEditor(ILoadedFile file, int line = -1)
+        {
+            foreach (TabbedMdiWindow docWindow in dockManager.ActiveDocuments)
+            {
+                if (docWindow.Tag != null && Object.ReferenceEquals(file, docWindow.Tag))
+                {
+                    docWindow.Activate();
+                    return docWindow as DocumentWindow;
+                }
+            }
+
+            // Not found; so open the file now, please!
+            var window = this.OpenLoadedFile(file as ILoadedFile);
+            window.Activate();
+            window.Select();
+            m_fileExplorer.UpdateNodeStates();
+
+            if (line >= 0)
+            {
+                var editor = window.Controls[0] as FastColoredTextBox;
+                editor.SetSelectedLine(line);
+            }
+
+            return window;
+        }
+
+        private DocumentWindow CreateTextDocument(string fileName, string text, bool readOnly)
+        {
+            DocumentWindow documentWindow;
+
+            // If the document is already open, show a message
+            if (dockManager.DocumentWindows[fileName] != null)
+            {
+                dockManager.DocumentWindows[fileName].Activate();
+                MessageBox.Show(this, String.Format("The file '{0}' is already open.", fileName), "File Already Open", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return dockManager.DocumentWindows[fileName];
+            }
+
+            // Determine the type of file
+            string fileType = "Text";
+            if (fileName != null)
+            {
+                switch (Path.GetExtension(fileName).ToLower())
+                {
+                    case ".bmp":
+                    case ".gif":
+                    case ".ico":
+                    case ".jpg":
+                    case ".png":
+                        fileType = "Image";
+                        readOnly = true;
+                        break;
+                }
+            }
+
+            switch (fileType)
+            {
+                case "Image":
+                    {
+                        // Create a PictureBox for the document
+                        PictureBox pictureBox = new PictureBox();
+                        pictureBox.Image = Image.FromFile(fileName);
+
+                        // Create the document window
+                        documentWindow = new DocumentWindow(dockManager, fileName, Path.GetFileName(fileName), 4, pictureBox);
+                        if (fileName != null)
+                        {
+                            documentWindow.FileName = fileName;
+                            documentWindow.FileType = String.Format("Image File (*{0})", Path.GetExtension(fileName).ToLower());
+                        }
+                        break;
+                    }
+                default:
+                    {
+
+                        FastColoredTextBoxNS.FastColoredTextBox textBoxFast = new FastColoredTextBoxNS.FastColoredTextBox();
+                        textBoxFast.Font = new Font("Consolas", 9.75f);
+                        textBoxFast.BorderStyle = BorderStyle.None;
+                        textBoxFast.ReadOnly = readOnly;
+                        textBoxFast.ShowScrollBars = true;
+                        textBoxFast.WordWrap = false;
+                        textBoxFast.MouseMove += Editor_MouseMove;
+
+                        // If no data was passed in, generate some
+                        if (fileName == null)
+                        {
+                            fileName = String.Format("Document{0}.txt", documentWindowIndex++);
+                            if (text == null)
+                                text = "Visit our web site to learn more about Actipro WinForms Studio or our other controls:\r\nhttps://www.actiprosoftware.com/\r\n\r\nThis document was created at " + DateTime.Now.ToString() + ".";
+                        }
+                        else
+                        {
+                            textBoxFast.OpenFile(fileName);
+                        }
+
+                        // Create the document window
+                        textBoxFast.Text = text;
+                        textBoxFast.TextChanged += TextBox_TextChanged;
+                        documentWindow = new DocumentWindow(dockManager, fileName, Path.GetFileName(fileName), 3, textBoxFast);
+                        if (fileName != null)
+                        {
+                            documentWindow.FileName = fileName;
+                            documentWindow.FileType = String.Format("Text File (*{0})", Path.GetExtension(fileName).ToLower());
+                        }
+                        break;
+                    }
+            }
+
+            if (readOnly)
+            {
+                // Load a read-only context image
+                documentWindow.ContextImage = ActiproSoftware.Products.Docking.AssemblyInfo.Instance.GetImage(
+                    ActiproSoftware.Products.Docking.ImageResource.ContextReadOnly,
+                    DpiHelper.GetDpiScale(this));
+            }
+
+            return documentWindow;
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (ignoreTextChangedEvent)
+                return;
+
+            DocumentWindow documentWindow = ((FastColoredTextBox)sender).Parent as DocumentWindow;
+            if (documentWindow != null)
+                documentWindow.Modified = ((FastColoredTextBox)sender).IsChanged;
+        }
+
+        void Editor_MouseMove(object sender, MouseEventArgs e)
+        {
+            var tb = sender as FastColoredTextBox;
+            var place = tb.PointToPlace(e.Location);
+            var r = new FastColoredTextBoxNS.Range(tb, place, place);
+
+            string text = r.GetFragment("[a-zA-Z._]").Text;
+            //lbWordUnderMouse.Text = text;
+        }
+
+        #endregion
+
+        #region Views
+
+        #region Tools and Documents
+
+        private void dockManager_WindowClosing(object sender, TabbedMdiWindowClosingEventArgs e)
+        {
+            //// If a document is being closed and it has been modified...
+            //if ((!ignoreModifiedDocumentClose) && (e.TabbedMdiWindow is DocumentWindow documentWindow))
+            //{
+            //    if (!HandleDocumentClosing(documentWindow))
+            //        e.Cancel = true;
+            //}
+
+            System.Diagnostics.Debug.WriteLine("WindowClosing: Key={0}; Type={1}; Reason={2}; Cancel={3}",
+                e.TabbedMdiWindow.Key, e.TabbedMdiWindow.DockObjectType, e.Reason, e.Cancel);
+        }
+
+        private void dockManager_WindowClosed(object sender, TabbedMdiWindowEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("WindowClosed: Key={0}; Type={1}", e.TabbedMdiWindow.Key, e.TabbedMdiWindow.DockObjectType);
+
+            if (e.TabbedMdiWindow.DockObjectType == DockObjectType.DocumentWindow)
+            {
+                if (e.TabbedMdiWindow.Tag is ILoadedFile file)
+                {
+                    file.UnregisterDependant(m_hostDependancyObject);
+                    m_fileExplorer.UpdateNodeStates();
+                }
+            }
+        }
+
+        #endregion
+
+        #region Errors View
+
+        private void ErrorsList_ParseFilesClicked(object sender, EventArgs e)
+        {
+            this.StartFileParsing();
+        }
+
+        private void ErrorsList_AutoParseFilesChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void ErrorsList_DoubleClickedLine(object sender, ParsingErrorListView.DoubleClickLineEventArgs args)
+        {
+            this.OpenOrActivateFileEditor(args.File, args.Line);
+        }
+
+        #endregion
+
+        #region File Explorer View
+
+        private void FileExplorer_FileSelectionChanged(object sender, FileExplorer.SelectionEventArgs e)
+        {
+            if (e.NodeData != null)
+            {
+                System.Diagnostics.Debug.WriteLine("FileSelectionChanged: " + e.NodeData.ToString() + " - " + e.Selection.ToString());
+            }
+
+            if (e.Selection == FileExplorer.SelectionEventArgs.SelectionType.Activated)
+            {
+                if (e.NodeData is ILoadedFile file)
+                {
+                    this.OpenOrActivateFileEditor(file);
+                }
+                else if (e.NodeData is IFileElement element)
+                {
+                    this.OpenOrActivateFileEditor(element.ParentFile, element.Line);
+                }
+            }
+        }
+
+        #endregion
+
+        #endregion
+
         #region Application Tasks
 
         protected override void OnTaskHandlingStateChanged(StateChange change, string workingText)
@@ -1215,6 +1337,23 @@ namespace StepBro.SimpleWorkbench
         private enum TaskNoState { Do }
 
         #region Script File Loading
+
+        private void LoadedFiles_FileLoaded(object sender, LoadedFileEventArgs args)
+        {
+        }
+
+        private void LoadedFiles_FileClosed(object sender, LoadedFileEventArgs args)
+        {
+
+        }
+
+        private void File_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ILoadedFile.RegisteredDependantsCount))
+            {
+
+            }
+        }
 
         private TaskAction ScriptFileLoadingTask(ref TaskNoState state, ref int index, ITaskStateReporting reporting)
         {
@@ -1387,6 +1526,45 @@ namespace StepBro.SimpleWorkbench
 
         #region Script Execution
 
+        public IExecutionAccess StartExecution(bool addToHistory, IFileElement element, string partner, string objectVariable, object[] args)
+        {
+            if (this.ExecutionRunning)
+            {
+                var result = MessageBox.Show(
+                    this,
+                    "A script execution is already running." + Environment.NewLine + Environment.NewLine + "Would you like to put this new execution in queue?",
+                    "StepBro - Starting script execution",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+                if (result == DialogResult.No)
+                {
+                    return null;
+                }
+            }
+
+            var executionData = new ScriptExecutionData(
+                this,
+                element,
+                partner,
+                objectVariable,
+                args?.ToArray());
+            executionData.AddToHistory = addToHistory;
+            this.StartScriptExecution(executionData);
+
+            string executionNote = null;
+            if (toolStripTextBoxExeNote.Visible)
+            {
+                executionNote = toolStripTextBoxExeNote.Text;
+            }
+
+            string objectInstanceText = String.IsNullOrEmpty(objectVariable) ? "" : (objectVariable.Split('.').Last() + ".");
+            string partnertext = String.IsNullOrEmpty(partner) ? "" : (" @ " + partner);
+            string noteText = String.IsNullOrEmpty(executionNote) ? "" : (" - \"" + executionNote + "\"");
+            string elementText = String.IsNullOrEmpty(objectInstanceText) ? element.FullName : element.FullName.Split('.').Last();
+            m_mainLogger.LogUserAction("Request script execution: " + objectInstanceText + elementText + partnertext + noteText);
+
+            return executionData;
+        }
+
         private enum ScriptExecutionState { Init, Running, Finish }
 
         private TaskAction ScriptExecutionTask(ref ScriptExecutionState state, ref int index, ITaskStateReporting reporting)
@@ -1553,33 +1731,6 @@ namespace StepBro.SimpleWorkbench
 
         #endregion
 
-        #region Loaded Script Files
-
-        private void LoadedFiles_FileLoaded(object sender, LoadedFileEventArgs args)
-        {
-        }
-
-        private void LoadedFiles_FileClosed(object sender, LoadedFileEventArgs args)
-        {
-
-        }
-
-        private void File_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(ILoadedFile.RegisteredDependantsCount))
-            {
-
-            }
-        }
-
-        #endregion
-
-        private void toolStripMenuItemTestActionStartFileParsing_Click(object sender, EventArgs e)
-        {
-            this.StartFileParsing();
-        }
-
-
         #region Utils
 
         private static string NamespaceFromFullName(string name)
@@ -1597,101 +1748,6 @@ namespace StepBro.SimpleWorkbench
         }
 
         #endregion
-
-        private void viewToolbarsToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
-        {
-            viewToolbarsToolStripMenuItem.DropDownItems.Clear();
-            foreach (var toolbar in panelCustomToolstrips.ListToolbars())
-            {
-                var visibilityMenuItem = new ToolStripMenuItem();
-                visibilityMenuItem.CheckOnClick = true;
-                visibilityMenuItem.DisplayStyle = ToolStripItemDisplayStyle.Text;
-                visibilityMenuItem.Size = new Size(180, 22);
-                visibilityMenuItem.Text = toolbar.Item1;
-                visibilityMenuItem.Checked = !panelCustomToolstrips.IsToolbarHidden(toolbar.Item1);
-                visibilityMenuItem.CheckedChanged += (s, e) => { panelCustomToolstrips.SetToolbarVisibility(((ToolStripMenuItem)s).Text, ((ToolStripMenuItem)s).Checked); };
-                visibilityMenuItem.Tag = toolbar.Item2;
-                viewToolbarsToolStripMenuItem.DropDownItems.Insert(0, visibilityMenuItem);
-            }
-        }
-
-        void Editor_MouseMove(object sender, MouseEventArgs e)
-        {
-            var tb = sender as FastColoredTextBox;
-            var place = tb.PointToPlace(e.Location);
-            var r = new FastColoredTextBoxNS.Range(tb, place, place);
-
-            string text = r.GetFragment("[a-zA-Z._]").Text;
-            //lbWordUnderMouse.Text = text;
-        }
-
-        private DocumentWindow OpenOrActivateFileEditor(ILoadedFile file)
-        {
-            foreach (TabbedMdiWindow docWindow in dockManager.ActiveDocuments)
-            {
-                if (docWindow.Tag != null && Object.ReferenceEquals(file, docWindow.Tag))
-                {
-                    docWindow.Activate();
-                    return docWindow as DocumentWindow;
-                }
-            }
-
-            // Not found; so open the file now, please!
-            var window = this.OpenLoadedFile(file as ILoadedFile);
-            window.Activate();
-            window.Select();
-            m_fileExplorer.UpdateNodeStates();
-            return window;
-        }
-
-        private void FileExplorer_FileSelectionChanged(object sender, FileExplorer.SelectionEventArgs e)
-        {
-            if (e.NodeData != null)
-            {
-                System.Diagnostics.Debug.WriteLine("FileSelectionChanged: " + e.NodeData.ToString() + " - " + e.Selection.ToString());
-            }
-
-            if (e.Selection == FileExplorer.SelectionEventArgs.SelectionType.Activated)
-            {
-                if (e.NodeData is ILoadedFile file)
-                {
-                    this.OpenOrActivateFileEditor(file);
-                }
-                else if (e.NodeData is IFileElement element)
-                {
-                    var window = this.OpenOrActivateFileEditor(element.ParentFile);
-                    var editor = window.Controls[0] as FastColoredTextBox;
-                    editor.SetSelectedLine(element.Line);
-                }
-            }
-        }
-
-        private void dockManager_WindowClosing(object sender, TabbedMdiWindowClosingEventArgs e)
-        {
-            //// If a document is being closed and it has been modified...
-            //if ((!ignoreModifiedDocumentClose) && (e.TabbedMdiWindow is DocumentWindow documentWindow))
-            //{
-            //    if (!HandleDocumentClosing(documentWindow))
-            //        e.Cancel = true;
-            //}
-
-            System.Diagnostics.Debug.WriteLine("WindowClosing: Key={0}; Type={1}; Reason={2}; Cancel={3}",
-                e.TabbedMdiWindow.Key, e.TabbedMdiWindow.DockObjectType, e.Reason, e.Cancel);
-        }
-
-        private void dockManager_WindowClosed(object sender, TabbedMdiWindowEventArgs e)
-        {
-            System.Diagnostics.Debug.WriteLine("WindowClosed: Key={0}; Type={1}", e.TabbedMdiWindow.Key, e.TabbedMdiWindow.DockObjectType);
-
-            if (e.TabbedMdiWindow.DockObjectType == DockObjectType.DocumentWindow)
-            {
-                if (e.TabbedMdiWindow.Tag is ILoadedFile file)
-                {
-                    file.UnregisterDependant(m_hostDependancyObject);
-                    m_fileExplorer.UpdateNodeStates();
-                }
-            }
-        }
 
         private void toolStripStatusLabelExecutionResult_Click(object sender, EventArgs e)
         {

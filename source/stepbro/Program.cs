@@ -1094,6 +1094,7 @@ namespace StepBro.Cmd
             public ExecutionScopeData(IExecutionScopeStatus status, int level)
             {
                 m_id = UniqueInteger.GetLongProtected();
+                m_level = level;
                 m_status = status;
                 m_status.UITag = this;
                 m_status.PropertyChanged += Status_PropertyChanged;

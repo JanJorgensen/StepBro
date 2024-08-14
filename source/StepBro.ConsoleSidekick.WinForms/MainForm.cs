@@ -1032,7 +1032,7 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             if (m_customToolStrips.Count > 0)
             {
-                m_customToolStrips[0].Item2.AdjustColumns();
+                m_customToolStrips[0].Item2.AdjustSizesAndColumns();
             }
             else
             {

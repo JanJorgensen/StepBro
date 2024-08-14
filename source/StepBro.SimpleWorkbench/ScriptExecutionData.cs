@@ -81,7 +81,11 @@ namespace StepBro.SimpleWorkbench
         {
             if (!this.State.HasEnded())
             {
-                m_execution.Task.RequestStop();
+                var task = m_execution?.Task;
+                if (task != null)
+                {
+                    task.RequestStop();
+                }
             }
         }
 

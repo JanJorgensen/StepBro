@@ -43,6 +43,7 @@ namespace StepBro.UI.WinForms
         {
             void CommandHandler(ButtonCommand command);
             void BeginInvoke(Action action);
+            bool Checked { get; set; }
         }
 
         public void UpdateMode()
@@ -233,6 +234,17 @@ namespace StepBro.UI.WinForms
                 string instance = m_startInfo.TargetObject;
                 if (instance == null) { instance = m_parentControl.ParentElement.TryGetChildProperty("Instance") as string; }
                 m_coreAccess.ExecuteObjectCommand(instance, m_startInfo.ObjectCommand);
+            }
+            else if (m_mode == Mode.CheckOnClick)
+            {
+                if (m_parentControl.Checked)
+                {
+                    this.SendCommand(ButtonCommand.SetChecked);
+                }
+                else
+                {
+                    this.SendCommand(ButtonCommand.SetUnchecked);
+                }
             }
         }
 

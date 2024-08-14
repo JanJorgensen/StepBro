@@ -20,20 +20,10 @@ namespace StepBro.UI.WinForms.Controls
         private Font m_bold = null;
         private object m_currentSelection = null;
         private bool m_isDoubleClick = false;
-        private ImageList m_imageList = null;
+        private static ImageList m_imageList = null;
 
-        public FileExplorer()
+        static FileExplorer()
         {
-            InitializeComponent();
-        }
-
-        public object HostTopFileDependancyObject { get; set; } = null;
-        public object HostDependancyObject { get; set; } = null;
-
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
-
             m_imageList = new ImageList();
             m_imageList.Images.Add(Properties.Resources.Folder);
             m_imageList.Images.Add(Properties.Resources.AnyFile);
@@ -43,6 +33,22 @@ namespace StepBro.UI.WinForms.Controls
             m_imageList.Images.Add(Properties.Resources.TestList);
             m_imageList.Images.Add(Properties.Resources.Procedure);
             m_imageList.Images.Add(Properties.Resources.Variable);
+        }
+
+        public FileExplorer()
+        {
+            InitializeComponent();
+        }
+
+        public static ImageList Images { get { return m_imageList; } }
+
+        public object HostTopFileDependancyObject { get; set; } = null;
+        public object HostDependancyObject { get; set; } = null;
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
             treeView.ImageList = m_imageList;
 
             m_bold = new Font(this.Font, FontStyle.Bold);

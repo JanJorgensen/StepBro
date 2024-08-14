@@ -5,8 +5,10 @@ using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using StepBro.ToolBarCreator;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using static StepBro.Core.Data.PropertyBlockDecoder;
 using static StepBro.UI.WinForms.WinFormsPropertyBlockDecoder;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
@@ -18,6 +20,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
         int m_index = 1000;
         private static PropertyBlockDecoder.Block<object, ToolBar> m_decoder = null;
         private Dictionary<string, object> m_commonChildFields = null;
+        private static bool m_adjustingSizes = false;
 
         public ToolBar() : base()
         {
@@ -49,18 +52,25 @@ namespace StepBro.UI.WinForms.CustomToolBar
             var buttonElements = new Element[] {
                 new ValueColor<Button>("Color", (b, c) => { b.BackColor = c; return null; }),
                 new ValueString<Button>("Text", (b, v) => { b.Text = v.ValueAsString(); return null; }),
+                new ValueInt<Button>("MaxWidth", (b, v) => { b.MaxWidth = (int)(long)v.Value; b.AutoSize = false; return null; }),
+                new ValueString<Button>("WidthGroup", (b, v) => { b.WidthGroup = v.ValueAsString(); return null; }),
                 new ValueString<Button>("Instance", "Object", (b, v) => { b.Instance = v.ValueAsString(); return null; }),
                 new ValueString<Button>("Procedure", "Element", (b, v) => { b.Procedure = v.ValueAsString(); return null; }),
                 new ValueString<Button>("Partner", "Model", (b, v) => { b.Partner = v.ValueAsString(); return null; }),
                 new Value<Button>("Arg", "Argument", (b, a) => { b.AddToArguments(a.Value); return null; }),
                 new PropertyBlockDecoder.Array<Button>("Args", "Arguments", (b, a) => { b.AddToArguments(a); return null; }),
-                new Flag <Button>("Stoppable", (b, f) => { b.SetStoppable(); return null; }),
+                new Flag<Button>("Stoppable", (b, f) => { b.SetStoppable(); return null; }),
                 new Flag<Button>("StopOnButtonRelease", (b, f) => { b.SetStopOnButtonRelease(); return null; }),
                 new ValueString<Button>("Command", (b, v) => { b.ObjectCommand = v.ValueAsString(); return null; }),
-                new Flag<Button>("CheckOnClick", (b, f) => { b.SetCheckOnClick(); return null; })
+                new Flag<Button>("CheckOnClick", (b, f) => { b.SetCheckOnClick(); return null; }),
+                new Flag<Button>("CheckArg", (b, f) => { /* TODO */ return null; }),
+                new ValueString<Button>("CheckedText", (b, v) => { /* TODO */ return null; }),
+                new ValueString<Button>("UncheckedText", (b, v) => { /* TODO */ return null; }),
+                new ValueString<Button>("EnabledSource", (b, v) => { /* TODO */ return null; }),
+                new ValueString<Button>("DisabledSource", (b, v) => { /* TODO */ return null; })
             };
-            var procButton = new Block<IMenuItemHost, Button>(
-                "Button", /* TODO: Remove when all scripts are using "Button" instead. */ "ProcedureActivationButton",
+            var button = new Block<IMenuItemHost, Button>(
+                "Button",
                 (m, n) =>
                 {
                     var button = new Button(m as IToolBarElement, m_coreAccess, n);
@@ -71,18 +81,30 @@ namespace StepBro.UI.WinForms.CustomToolBar
                 },
                 buttonElements);
 
-            // TODO: Remove when all scripts are using "Button" instead.
-            var objCmdButton = new Block<IMenuItemHost, Button>(
-                "ObjectCommandButton",
+            var textboxElements = new Element[] {
+                new ValueColor<TextBox>("Color", (t, c) => { t.BackColor = c; return null; }),
+                new ValueString<TextBox>("Text", (t, v) => { t.Text = v.ValueAsString(); return null; }),
+                new ValueInt<TextBox>("MaxWidth", (t, v) => { t.MaxWidth = (int)(long)v.Value; t.AutoSize = false; return null; }),
+                new ValueString<TextBox>("WidthGroup", (t, v) => { t.WidthGroup = v.ValueAsString(); return null; }),
+                new Flag<TextBox>("ReadOnly", (t, f) => { t.ReadOnly = true; return null; }),
+                new ValueString<Button>("Instance", "Object", (t, v) => { t.Instance = v.ValueAsString(); return null; }),
+                new ValueString<TextBox>("Property", (t, v) => { /* TODO */ return null; }),
+                new ValueString<TextBox>("ProcedureOutput", (t, v) => { /* TODO */ return null; }),
+                new ValueString<TextBox>("EnabledSource", (t, v) => { /* TODO */ return null; }),
+                new ValueString<TextBox>("DisabledSource", (t, v) => { /* TODO */ return null; })
+            };
+
+            var textbox = new Block<IMenuItemHost, CustomToolBar.TextBox>(
+                "TextBox",
                 (m, n) =>
                 {
-                    var button = new Button(m as IToolBarElement, m_coreAccess, n);
-                    m.Add(button);
-                    button.Size = new Size(23, 20);
-                    button.AutoSize = true;
-                    return button;
+                    var tb = new CustomToolBar.TextBox(m as IToolBarElement, m_coreAccess, n);
+                    m.Add(tb);
+                    tb.Size = new Size(60, 22);
+                    tb.AutoSize = true;
+                    return tb;
                 },
-                buttonElements);
+                textboxElements);
 
             var menuTitle = new ValueString<IMenu>("Text", "Title", (m, v) => { m.SetTitle(v.ValueAsString()); return null; });
 
@@ -96,7 +118,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     return menu;
                 });
             subMenu.SetChilds(
-                menuTitle, subMenu, procButton, objCmdButton,
+                menuTitle, subMenu, button,
                 new ValueString<ToolStripMenuSubMenu>("Instance", (m, v) => { m.SetChildProperty("Instance", v.ValueAsString()); return null; }),
                 new ValueString<ToolStripMenuSubMenu>("Procedure", "Element", (m, v) => { m.SetChildProperty("Element", v.ValueAsString()); return null; }),
                 new ValueString<ToolStripMenuSubMenu>("Partner", "Model", (m, v) => { m.SetChildProperty("Partner", v.ValueAsString()); return null; }),
@@ -112,7 +134,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     return menu;
                 });
             toolbarMenu.SetChilds(
-                menuTitle, subMenu, procButton, objCmdButton,
+                menuTitle, subMenu, button, textbox,
                 new ValueString<ToolStripDropDownMenu>("Instance", (m, v) => { m.SetChildProperty("Instance", v.ValueAsString()); return null; }),
                 new ValueString<ToolStripDropDownMenu>("Procedure", "Element", (m, v) => { m.SetChildProperty("Element", v.ValueAsString()); return null; }),
                 new ValueString<ToolStripDropDownMenu>("Partner", "Model", (m, v) => { m.SetChildProperty("Partner", v.ValueAsString()); return null; }),
@@ -157,7 +179,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                         return null;
                     }),
                     new ValueString<ToolBar>("Instance", (t, v) => { t.SetChildProperty("Instance", v.ValueAsString()); return null; }),
-                    toolbarMenu, procButton, objCmdButton
+                    toolbarMenu, button, textbox
                 );
         }
 
@@ -202,9 +224,76 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
-        public void AdjustColumns()
+
+        protected override void OnControlAdded(ControlEventArgs e)
         {
+            base.OnControlAdded(e);
+            e.Control.SizeChanged += Control_SizeChanged;
+            System.Diagnostics.Debug.WriteLine("Added control: " + e.Control.GetType().FullName);
+        }
+
+        private void Control_SizeChanged(object sender, EventArgs e)
+        {
+            var item = sender as ToolStripItem;
+            if (item is null)
+            {
+                var parent = (sender as Control).Parent;
+                System.Diagnostics.Debug.WriteLine("Control Size Changed: " + parent.GetType().FullName);
+                //item = (sender as ToolStripControlHost).Control as Tool
+            }
+        }
+
+        protected override void OnItemAdded(ToolStripItemEventArgs e)
+        {
+            base.OnItemAdded(e);
+            //e.Item.Si
+        }
+
+        protected override void OnLayoutCompleted(EventArgs e)
+        {
+            base.OnLayoutCompleted(e);
+            if (!m_adjustingSizes)
+            {
+                //if (sender is IResizeable sizeableControl)
+                {
+                    //if (!String.IsNullOrEmpty(sizeableControl.WidthGroup))
+                    {
+                        //this.AdjustSizesAndColumns();
+                    }
+                }
+            }
+        }
+
+        public void AdjustSizesAndColumns()
+        {
+            if (this.Parent == null) return;
+            m_adjustingSizes = true;
             var toolbars = this.Parent.Controls.Cast<Control>().Where(c => c is ToolBar).Cast<ToolBar>().ToList();
+
+            #region Adjust items width 'WidthGroup'
+
+            var widthGroupSizes = new Dictionary<string, int>();
+            var widthGroupedItems = new List<IResizeable>();
+
+            toolbars.ForEach(
+                toolbar =>
+                {
+                    widthGroupedItems.AddRange(toolbar.Items.Cast<ToolStripItem>().Where(i => i is IResizeable && !String.IsNullOrEmpty((i as IResizeable).WidthGroup)).Cast<IResizeable>());
+                });
+            widthGroupedItems.ForEach(item => 
+                {
+                    var v = widthGroupSizes.ContainsKey(item.WidthGroup) ? widthGroupSizes[item.WidthGroup] : 0;
+                    widthGroupSizes[item.WidthGroup] = Math.Max(v, (item as ToolStripItem).Width);
+                });
+            widthGroupedItems.ForEach(item =>
+            {
+                if ((item as ToolStripItem).Width < widthGroupSizes[item.WidthGroup])
+                {
+                    item.SetWidth(widthGroupSizes[item.WidthGroup]);
+                }
+            });
+
+            #endregion
 
             var titleLabels = toolbars.Where(t => t.Items[0] is Label && ((Label)t.Items[0]).Name.Equals("title", StringComparison.InvariantCultureIgnoreCase)).Select(t => t.Items[0]).Cast<Label>().ToList();
             int widest = 0;
@@ -237,6 +326,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     handledColumns.Add(column.Name);
                 }
             }
+            m_adjustingSizes = false;
         }
 
         public void Clear()
@@ -278,6 +368,59 @@ namespace StepBro.UI.WinForms.CustomToolBar
             this.Items.Add(item);
         }
 
+        public void Add(ToolStripTextBox item)
+        {
+            this.Items.Add(item);
+        }
+
+        private static System.Reflection.PropertyInfo GetElementProperty(object @object, ICallContext context, string property)
+        {
+            var propAccess = @object.GetType().GetProperty(property, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.FlattenHierarchy);
+            if (propAccess == null)
+            {
+                context.ReportError("Property not found.");
+            }
+            return propAccess;
+        }
+
+        internal static object GetElementPropertyValue(object @object, ICallContext context, string property)
+        {
+            object returnValue = null;
+            var propAccess = GetElementProperty(@object, context, property);
+
+            var action = () =>
+            {
+                if (propAccess != null)
+                {
+                    returnValue = propAccess.GetValue(@object);
+                }
+                else returnValue = null;
+            };
+
+            @object.InvokeAction(action);
+
+            return returnValue;
+        }
+
+        internal static void SetElementPropertyValue(object @object, ICallContext context, string property, object value)
+        {
+            var propAccess = GetElementProperty(@object, context, property);
+
+            var action = () =>
+            {
+                try
+                {
+                    propAccess.SetValue(@object, value.TryConvert(propAccess.PropertyType), null);
+                }
+                catch (Exception ex)
+                {
+                    context.ReportError("Error setting property.", exception: ex);
+                }
+            };
+
+            @object.InvokeAction(action);
+        }
+
         #region IToolBarElement
 
         public uint Id => throw new NotImplementedException();
@@ -300,7 +443,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public object GetProperty([Implicit] ICallContext context, string property)
         {
-            throw new NotImplementedException();
+            return GetElementPropertyValue(this, context, property);
         }
 
         public object GetValue([Implicit] ICallContext context)
@@ -310,7 +453,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public void SetProperty([Implicit] ICallContext context, string property, object value)
         {
-            throw new NotImplementedException();
+            SetElementPropertyValue(this, context, property, value);
         }
 
         public bool SetValue([Implicit] ICallContext context, object value)
