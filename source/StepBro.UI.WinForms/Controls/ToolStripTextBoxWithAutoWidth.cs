@@ -104,6 +104,7 @@ namespace StepBro.UI.WinForms.Controls
             this.AutoSize = false;
             if (m_maxWidth > 0) width = Math.Min(m_maxWidth, width);
             this.Size = new Size(width, this.Height);
+            this.Parent.Invalidate();
         }
 
         public int GetPreferredWidth()

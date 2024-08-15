@@ -74,6 +74,7 @@ namespace StepBro.ToolBarCreator
             var textbox = new PropertyBlockDecoder.Block<object, object>("TextBox",
                 color, text, instance, maxWidth, widthGroup,
                 new PropertyBlockDecoder.Flag<object>("ReadOnly"),
+                new PropertyBlockDecoder.Flag<object>("RightAligned"),
                 new PropertyBlockDecoder.ValueString<object>("Property"),
                 new PropertyBlockDecoder.ValueString<object>("ProcedureOutput"),
                 new PropertyBlockDecoder.ValueString<object>("EnabledSource"),

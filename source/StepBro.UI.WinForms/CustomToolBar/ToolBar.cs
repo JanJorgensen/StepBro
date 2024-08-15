@@ -87,6 +87,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                 new ValueInt<TextBox>("MaxWidth", (t, v) => { t.MaxWidth = (int)(long)v.Value; t.AutoSize = false; return null; }),
                 new ValueString<TextBox>("WidthGroup", (t, v) => { t.WidthGroup = v.ValueAsString(); return null; }),
                 new Flag<TextBox>("ReadOnly", (t, f) => { t.ReadOnly = true; return null; }),
+                new Flag<TextBox>("RightAligned", (t, f) => { t.TextBoxTextAlign = HorizontalAlignment.Right; return null; }),
                 new ValueString<Button>("Instance", "Object", (t, v) => { t.Instance = v.ValueAsString(); return null; }),
                 new ValueString<TextBox>("Property", (t, v) => { /* TODO */ return null; }),
                 new ValueString<TextBox>("ProcedureOutput", (t, v) => { /* TODO */ return null; }),

@@ -14,6 +14,7 @@ namespace StepBro.Core.Logging
         private static LoggerScope m_root = null;
         private Logger m_logger;
         private readonly LogEntry m_scopeStartEntry;
+        private LogEntry m_scopeEndEntry = null;
         private DisposeOption m_disposeOption;
         private int m_threadID = -1;
         private string m_location;
@@ -113,8 +114,8 @@ namespace StepBro.Core.Logging
             }
             else
             {
-                this.Log(LogEntry.Type.Post, text);
                 m_disposeOption = DisposeOption.DisposedOrEnded;
+                m_scopeEndEntry = this.Log(LogEntry.Type.Post, text);
             }
         }
 
@@ -181,6 +182,11 @@ namespace StepBro.Core.Logging
         public ILogEntry FirstLogEntryInScope
         {
             get { return m_scopeStartEntry; }
+        }
+
+        public ILogEntry LastLogEntryInScope
+        {
+            get { return m_scopeEndEntry; }
         }
 
         public bool ErrorsLogged { get { return m_errorsLogged; } }

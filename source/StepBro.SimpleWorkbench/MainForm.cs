@@ -22,6 +22,10 @@ using StepBro.Core.Logging;
 using FastColoredTextBoxNS;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using StepBro.UI.WinForms.Dialogs;
+using StepBro.Core.Addons;
+using System.IO;
+using System.IO.Pipes;
 
 namespace StepBro.SimpleWorkbench
 {
@@ -67,6 +71,10 @@ namespace StepBro.SimpleWorkbench
         private Dictionary<string, TypeReference> m_variableTypes = new Dictionary<string, TypeReference>();
 
         private Queue<ScriptExecutionData> m_executionQueue = new Queue<ScriptExecutionData>();
+
+        private string m_selectedOutputAddon = OutputSimpleCleartextAddon.Name;
+        private static IOutputFormatterTypeAddon m_outputAddon = null;
+        private IOutputFormatter m_outputFormatter = null;
 
         //private IFileElement m_element = null;
         //private IPartner m_partner = null;
@@ -169,6 +177,18 @@ namespace StepBro.SimpleWorkbench
 
             // TO BE DELETED
             dockManager.SaveCustomToolWindowLayoutData += DockManager_SaveCustomToolWindowLayoutData;
+
+
+            m_outputAddon = StepBroMain.GetService<Core.Api.IAddonManager>().TryGetAddon<IOutputFormatterTypeAddon>(m_selectedOutputAddon);
+            if (m_outputAddon == null)
+            {
+                //ConsoleWriteErrorLine("Error: Output format \'" + selectedOutputAddon + "\' was not found.");
+                var available = String.Join(", ", StepBroMain.GetService<Core.Api.IAddonManager>().Addons.Where(a => a is IOutputFormatterTypeAddon).Select(a => a.ShortName));
+                //ConsoleWriteErrorLine("    Available options: " + available);
+                //retval = -1;
+                //throw new ExitException();
+            }
+
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -429,6 +449,40 @@ namespace StepBro.SimpleWorkbench
                 File.WriteAllText(file.FilePath, editor.Text);
                 editor.SetChanged(false);
                 window.Modified = false;
+            }
+        }
+
+        private void toolStripMenuItemSaveLogNow_Click(object sender, EventArgs e)
+        {
+            var folder = Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "StepBro Log Files");
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+            var dialog = new DialogSaveExecutionLog(folder);
+            var result = dialog.ShowDialog(this);
+            if (result == DialogResult.OK)
+            {
+                OutputFormatOptions options = new OutputFormatOptions { CreateHighLevelLogSections = true, UseLocalTime = true };
+
+                var filename = "Log" + DateTime.Now.ToFileName() + ".txt";      // TODO: Make formatter supply the file extension.
+                var filepath = Path.Combine(folder, filename);
+
+                using (StreamWriter fileStream = new StreamWriter(filepath, false))
+                {
+                    using (var writer = new TextFileWriter(fileStream))
+                    {
+                        m_outputFormatter = m_outputAddon.Create(options, writer);
+
+                        var logEntry = StepBroMain.Logger.GetFirst().Item2;
+                        var zeroTime = logEntry.Timestamp;
+                        while (logEntry != null)
+                        {
+                            m_outputFormatter.WriteLogEntry(logEntry, zeroTime);
+                            logEntry = logEntry.Next;
+                        }
+                    }
+                }
             }
         }
 
