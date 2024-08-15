@@ -17,6 +17,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\CommonVersion.cs" Link="CommonVersion.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="licenses.licx" />
   </ItemGroup>
 
