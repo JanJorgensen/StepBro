@@ -8,15 +8,15 @@ namespace StepBro.Core.Data
 {
     public struct IndexerStateSnapshot
     {
-        public IndexerStateSnapshot(ulong first, ulong last, ulong count)
+        public IndexerStateSnapshot(long first, long last, long count)
         {
             this.FirstIndex = first;
             this.LastIndex = last;
             this.EffectiveCount = count;
         }
-        public ulong FirstIndex { get; private set; }
-        public ulong LastIndex { get; private set; }
-        public ulong EffectiveCount { get; private set; }
+        public long FirstIndex { get; private set; }
+        public long LastIndex { get; private set; }
+        public long EffectiveCount { get; private set; }
     }
 
     public interface IElementIndexer
@@ -27,6 +27,6 @@ namespace StepBro.Core.Data
 
     public interface IElementIndexer<T> : IElementIndexer
     {
-        T Get(ulong index);
+        T Get(long index);
     }
 }

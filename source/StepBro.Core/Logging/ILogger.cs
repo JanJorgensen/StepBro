@@ -52,6 +52,7 @@ namespace StepBro.Core.Logging
         void EnteredParallelTask(string text);
         void LogExit(string text);
         ILogEntry FirstLogEntryInScope { get; }
+        ILogEntry LastLogEntryInScope { get; }
         /// <summary>
         /// Indicates whether any errors were logged directly in this scope.
         /// </summary>

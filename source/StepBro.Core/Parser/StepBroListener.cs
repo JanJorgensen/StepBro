@@ -26,6 +26,7 @@ namespace StepBro.Core.Parser
         protected ErrorCollector m_errors;
         protected Api.IAddonManager m_addonManager;
         protected ScriptFile m_file;
+        private FileElementType m_elementType = FileElementType.Unknown;
         private FileElement m_currentFileElement = null;    // The file element currently being parsed.
         private Stack<ElementType> m_currentElementType = new Stack<ElementType>();
         protected AccessModifier m_fileElementModifier = AccessModifier.None;
@@ -213,6 +214,54 @@ namespace StepBro.Core.Parser
             // TODO: set the override type for the current file element (variable). Use m_name.
         }
 
+        public override void EnterConstVariable([NotNull] SBP.ConstVariableContext context)
+        {
+        }
+
+        public override void ExitConstType([NotNull] SBP.ConstTypeContext context)
+        {
+            m_elementType = context.GetText().Equals("const", StringComparison.InvariantCultureIgnoreCase) ?
+                FileElementType.Const :
+                FileElementType.Config;
+        }
+
+        public override void ExitConstVariable([NotNull] SBP.ConstVariableContext context)
+        {
+            TypeReference type = m_variableType;
+
+            if (type.Type == typeof(VarSpecifiedType))
+            {
+                type = m_variableInitializer.DataType;
+            }
+            else
+            {
+                if (!type.Type.IsAssignableFrom(m_variableInitializer.DataType.Type))
+                {
+                    m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Assignment of incompatible type.");
+                    return;
+                }
+            }
+            if (m_elementType == FileElementType.Const)
+            {
+                if (m_variableInitializer.IsConstant)
+                {
+                    m_file.AddElement(new FileConstant(m_file, AccessModifier.Public, context.Start.Line, m_currentNamespace, m_variableName, m_variableInitializer.Value));
+                }
+                else
+                {
+                    m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Assignment expression is not a constant value.");
+                    return;
+                }
+            }
+            else if (m_elementType == FileElementType.Config)
+            {
+                var id = m_file.CreateOrGetConfigVariable(
+                    m_currentNamespace, m_fileElementModifier, m_variableName, type, false,
+                    context.Start.Line, context.Start.Column, null);
+                m_file.SetFileVariableModifier(id, m_fileElementModifier);
+            }
+        }
+
         public override void EnterFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)
         {
             m_variableModifier = VariableModifier.Static;
@@ -230,13 +279,14 @@ namespace StepBro.Core.Parser
             if (m_variables.Count != 0)
             {
                 var variable = m_variables[0];
-                if (type == (TypeReference)typeof(VarSpecifiedType))
+                if (type.Type == typeof(VarSpecifiedType))
                 {
                     type = variable.Type;
                 }
                 if (!type.Type.IsAssignableFrom(variable.Initializer.DataType.Type))
                 {
-                    throw new NotImplementedException("Variable assignment of incompatible type.");
+                    m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Assignment of incompatible type.");
+                    return;
                 }
                 var codeHash = context.GetText().GetHashCode();
                 var id = m_file.CreateOrGetFileVariable(

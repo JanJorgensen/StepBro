@@ -259,7 +259,7 @@ namespace StepBro.Core.ScriptData
                         break;
                     case FileElementType.Using:
                     case FileElementType.Namespace:
-                    case FileElementType.EnumDeclaration:
+                    case FileElementType.EnumDefinition:
                     case FileElementType.ProcedureDeclaration:
                     case FileElementType.FileVariable:
                     case FileElementType.TestList:
@@ -357,8 +357,11 @@ namespace StepBro.Core.ScriptData
             System.Diagnostics.Debug.Assert(!String.IsNullOrWhiteSpace(name));
             if (type != null &&
                 (type.Equals("partner", StringComparison.InvariantCulture) ||
-                type.Equals("partner new", StringComparison.InvariantCulture) ||
-                type.Equals("partner override", StringComparison.InvariantCulture)))
+                type.Equals("partner model", StringComparison.InvariantCulture) ||
+                type.Equals("model", StringComparison.InvariantCulture) ||
+                type.Equals("partner override", StringComparison.InvariantCulture) ||
+                type.Equals("model override", StringComparison.InvariantCulture)))
+                //type.Equals("partner new", StringComparison.InvariantCulture)))
             {
                 string referenceName = null;
                 if (value is string)
@@ -371,7 +374,7 @@ namespace StepBro.Core.ScriptData
                 }
                 else
                 {
-                    throw new ParsingErrorException(line, name, "Value is not a string or an identifier.");
+                    throw new ParsingErrorException(line, name, "The partner value must be a procedure reference.");
                 }
 
                 var referenceElement = listener.TryGetFileElementInScope(referenceName);
@@ -379,7 +382,7 @@ namespace StepBro.Core.ScriptData
                 {
                     if (referenceElement is IFileProcedure)
                     {
-                        if (this.ElementType == FileElementType.Override)
+                        if (this.ElementType == FileElementType.Override)   // If an "override element" set/change the partner reference in the base file element.
                         {
                             var baseElement = this.GetRootBaseElement();
                             if (baseElement != null)
@@ -398,7 +401,12 @@ namespace StepBro.Core.ScriptData
                         }
                         else
                         {
-                            m_partners.Add(new FileElementPartner(this, name, referenceName, referenceElement as IFileProcedure));
+                            var partner = new FileElementPartner(this, name, referenceName, referenceElement as IFileProcedure);
+                            if (type.Contains("model", StringComparison.InvariantCulture))
+                            {
+                                partner.IsModelDirect = true;
+                            }
+                            m_partners.Add(partner);
                         }
                     }
                     else

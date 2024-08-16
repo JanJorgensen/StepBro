@@ -36,7 +36,7 @@ fileElements : fileElement* ;
 fileElement 
     :	attributes? elementModifier?
         (	enumDeclaration 
-        |	configDeclaration 
+        |	constVariable 
         |   fileVariable
         |   procedureOrFunction
         |	testlist
@@ -97,6 +97,9 @@ fileVariable
     |   elementModifier? variableType variableDeclarator SEMICOLON                                                          #FileVariableSimple
     ;
 
+constType : CONST | CONFIG ;
+constVariable : elementModifier? constType variableType variableDeclaratorId ASSIGNMENT variableInitializer SEMICOLON ;
+
 ctorClassType : type ;
 
 ctorArguments : arguments ;
@@ -112,9 +115,6 @@ enumParent : identifierOrQualified ;
 enumBody : OPEN_BRACE enumValues? CLOSE_BRACE ;
 enumValues : enumValue (COMMA enumValue)* COMMA? ;
 enumValue : IDENTIFIER (ASSIGNMENT (INTEGER_LITERAL | HexLiteral)) ? ;
-
-// CONFIGURATION DATA
-configDeclaration : CONFIG IDENTIFIER elementPropertyblock ;
 
 // TESTLIST
 

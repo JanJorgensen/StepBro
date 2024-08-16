@@ -81,7 +81,7 @@ namespace StepBro.Workbench
             IService panelManagerService;
             m_panelManager = new CustomPanelManager(out panelManagerService);
             // Initialize before the views start asking for the different services.
-            StepBroMain.Initialize(new IService[] { panelManagerService });
+            StepBroMain.Initialize([panelManagerService]);
 
             m_propertiesViewModel = new PropertiesViewModel();
             m_propertiesViewModel.IsOpen = true;
@@ -1096,7 +1096,7 @@ namespace StepBro.Workbench
                                     if (element is IFileProcedure)
                                     {
                                         m_executionTargetResolved = new Tuple<IFileElement, string>(element, null);
-                                        m_mainScriptExecution = StepBro.Core.Main.StartProcedureExecution(element as IFileProcedure);
+                                        m_mainScriptExecution = StepBro.Core.Main.StartProcedureExecution(element as IFileProcedure, null);
                                         m_mainScriptExecution.Task.CurrentStateChanged += MainScriptExecution_CurrentStateChanged;
                                         this.UpdateCommandStates();
                                     }
@@ -1135,7 +1135,6 @@ namespace StepBro.Workbench
                 case TaskExecutionState.Created:
                     Invoke(OnScriptExecutionStarted);
                     break;
-                case TaskExecutionState.Started:
                 case TaskExecutionState.AwaitingStartCondition:
                     break;
                 case TaskExecutionState.Running:
@@ -1198,7 +1197,7 @@ namespace StepBro.Workbench
             {
                 this.OpenCustomPanel(param);
             });
-            var dynamicObjects = StepBroMain.GetService<IDynamicObjectManager>().ListKnownObjects().ToList();
+            var dynamicObjects = StepBroMain.GetService<IDynamicObjectManager>().GetObjectCollection().ToList();
             m_creatableCustomPanels.BeginUpdate();
             m_creatableCustomPanels.Clear();
             foreach (var pt in m_panelManager.ListPanelTypes())

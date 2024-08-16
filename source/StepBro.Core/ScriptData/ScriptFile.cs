@@ -27,6 +27,7 @@ namespace StepBro.Core.ScriptData
         private List<UsingData> m_namespaceUsings = new List<UsingData>();
         private List<UsingData> m_fileUsings = new List<UsingData>();
         private PropertyBlock m_fileProperties = null;
+        private List<FileConfigValue> m_fileConfigVariables = new List<FileConfigValue>();
         private List<FileVariable> m_fileScopeVariables = new List<FileVariable>();
         private List<FileVariable> m_fileScopeVariablesBefore = new List<FileVariable>();
         private List<FileElement> m_elements = new List<FileElement>();
@@ -50,7 +51,7 @@ namespace StepBro.Core.ScriptData
         {
             m_wasLoadedByNamespace = false;
             m_errors = new ErrorCollector(this, false);
-            m_lastFileChange = DateTime.Now;   // TODO: take this from file timestamp.
+            m_lastFileChange = DateTime.UtcNow;   // TODO: take this from file timestamp.
             m_parserFileStream = filestream;
             m_folderShortcuts = new FolderShortcutCollection(FolderShortcutOrigin.ScriptFile);
             if (!string.IsNullOrEmpty(filepath))
@@ -67,11 +68,20 @@ namespace StepBro.Core.ScriptData
 
         protected override void DoDispose()
         {
-            foreach (var fileVariable in m_fileScopeVariables)
+            foreach (var variable in m_fileScopeVariables)
             {
-                fileVariable.VariableOwnerAccess.Dispose();
+                variable.VariableOwnerAccess.Dispose();
 
-                if (fileVariable is IDisposable fv)
+                if (variable is IDisposable fv)
+                {
+                    fv.Dispose();
+                }
+            }
+            foreach (var variable in m_fileConfigVariables)
+            {
+                variable.VariableOwnerAccess.Dispose();
+
+                if (variable is IDisposable fv)
                 {
                     fv.Dispose();
                 }
@@ -290,6 +300,19 @@ namespace StepBro.Core.ScriptData
             return true;
         }
 
+        internal int CreateOrGetConfigVariable(
+            string @namespace,
+            AccessModifier access,
+            string name,
+            TypeReference datatype,
+            bool @readonly,
+            int line,
+            int column,
+            object defaultValue)
+        {
+            return -1;
+        }
+
         private IValueContainerOwnerAccess TryGetVariable(int id)
         {
             foreach (var v in m_fileScopeVariables)
@@ -452,6 +475,21 @@ namespace StepBro.Core.ScriptData
                 }
             }
 
+            foreach (var v in m_fileConfigVariables)
+            {
+                if (v.ID == id)
+                {
+                    if (v.VariableOwnerAccess.Container is IValueContainer<T>)
+                    {
+                        return v.VariableOwnerAccess.Container as IValueContainer<T>;
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"The data type for the variable is not the same as the specified type ({t.Name}).");
+                    }
+                }
+            }
+
             foreach (var uf in m_fileUsings)
             {
                 var file = uf.Identifier.Reference as ScriptFile;
@@ -492,6 +530,13 @@ namespace StepBro.Core.ScriptData
         public IEnumerable<IValueContainer> ListFileVariables()
         {
             foreach (var v in m_fileScopeVariables)
+            {
+                yield return v.VariableOwnerAccess.Container;
+            }
+        }
+        public IEnumerable<IValueContainer> ListConfigVariables()
+        {
+            foreach (var v in m_fileConfigVariables)
             {
                 yield return v.VariableOwnerAccess.Container;
             }
@@ -616,6 +661,10 @@ namespace StepBro.Core.ScriptData
 
         public IEnumerable<IFileElement> ListElements()
         {
+            foreach (var e in m_fileConfigVariables)
+            {
+                yield return e;
+            }
             foreach (var e in m_fileScopeVariables)
             {
                 yield return e;
@@ -793,7 +842,11 @@ namespace StepBro.Core.ScriptData
                             }
                             foreach (var type in ns.ListTypes(false))
                             {
-                                this.AddRootIdentifier(type.Name, new IdentifierInfo(type.Name, type.FullName, IdentifierType.DotNetType, new TypeReference(type), null));
+                                // If the class is static we will not be adding it (At least for now) - Static classes have been giving issues in other cases and does not seem to be used
+                                if (!(type.IsAbstract && type.IsSealed))
+                                {
+                                    this.AddRootIdentifier(type.Name, new IdentifierInfo(type.Name, type.FullName, IdentifierType.DotNetType, new TypeReference(type), null));
+                                }
                             }
                         }
                         break;
@@ -847,7 +900,11 @@ namespace StepBro.Core.ScriptData
             }
             else
             {
-                m_rootIdentifiers[name].Add(info);
+                // Check all identifiers in the list, if any of them is the same as info, we do not add info to the list
+                if (m_rootIdentifiers[name].All(ident => ident != info))
+                {
+                    m_rootIdentifiers[name].Add(info);
+                }
             }
         }
 

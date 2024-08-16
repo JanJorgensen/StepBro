@@ -12,7 +12,7 @@ namespace StepBro.Cmd
 {
     public class HostAccess : StepBro.Core.Host.HostAccessBase<HostAccess>
     {
-        public HostAccess(out IService serviceAccess) : base("Host", out serviceAccess, typeof(ILogger))
+        public HostAccess(out IService serviceAccess) : base("Host", out serviceAccess)
         {
         }
 

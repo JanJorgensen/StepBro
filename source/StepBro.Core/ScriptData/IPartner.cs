@@ -13,5 +13,6 @@ namespace StepBro.Core.ScriptData
         IFileElement ParentElement { get; }
         string ProcedureName { get; }
         IFileProcedure ProcedureReference { get; }
+        bool IsModel { get; }
     }
 }

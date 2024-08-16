@@ -17,7 +17,7 @@ namespace StepBro.Core.Logging
             /// <summary>
             /// Entering a new scope.
             /// </summary>
-            Pre, 
+            Pre,
             /// <summary>
             /// Entrring a new high level scope.
             /// </summary>
@@ -25,7 +25,7 @@ namespace StepBro.Core.Logging
             /// <summary>
             /// Exit of the current scope.
             /// </summary>
-            Post, 
+            Post,
             /// <summary>
             /// Details from the parallell task just entered.
             /// </summary>
@@ -33,7 +33,7 @@ namespace StepBro.Core.Logging
             /// <summary>
             /// Information of a more detailed nature, that typically are not necessary for documenting a test execution.
             /// </summary>
-            Detail, 
+            Detail,
             /// <summary>
             /// Information logged on a separate thread and not synchronized with the general execution thred.
             /// </summary>
@@ -45,9 +45,9 @@ namespace StepBro.Core.Logging
             /// <summary>
             /// Communication in to (received by) the automation system.
             /// </summary>
-            CommunicationIn, Error, 
-            Failure, 
-            UserAction, 
+            CommunicationIn, Error,
+            Failure,
+            UserAction,
             System
         }
 
@@ -95,6 +95,8 @@ namespace StepBro.Core.Logging
         public LogEntry Parent { get { return m_parent; } }
 
         public Type EntryType { get { return m_type; } }
+
+        public bool HasId { get { return true; } }
 
         public ulong Id { get { return m_id; } }
 

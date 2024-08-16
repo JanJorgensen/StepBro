@@ -1251,10 +1251,12 @@ namespace StepBro.Core.Parser
             {
                 code = Expression.Call(
                     code,
-                    code.Type.GetMethod("GetTypedValue"),
+                    code.Type.GetMethod(nameof(IValueContainer<int>.GetTypedValue)),    // Note: 'int' is just used to make compiler happy.
                     Expression.Convert(Expression.Constant(null), typeof(Logging.ILogger)));
             }
 
+            var procedureReference = Expression.Convert(Expression.Property(m_currentProcedure.ContextReferenceInternal, nameof(IScriptCallContext.Self)), typeof(FileProcedure));
+            code = Expression.Call(procedureReference, nameof(FileProcedure.OnReturn), new Type[] { code.Type }, code);
 
             m_scopeStack.Peek().AddStatementCode(Expression.Return(m_currentProcedure.ReturnLabel, code));
         }
@@ -1344,7 +1346,7 @@ namespace StepBro.Core.Parser
                 return;
             }
 
-            var code = exp.IsError() ? Expression.Constant("<EXPRESSION ERROR>") : exp.ExpressionCode;
+            var code = exp.IsError() ? Expression.Constant("<EXPRESSION ERROR>") : ResolveForGetOperation(exp).ExpressionCode;
 
             if (code != null)
             {
@@ -1453,7 +1455,7 @@ namespace StepBro.Core.Parser
             m_isSimpleExpectWithValue = false;
             var expression = context.GetChild(context.ChildCount - 2).GetChild(1).GetChild(0) as SBP.ExpressionContext;
 
-            if (expression is SBP.ExpBinaryContext || expression is SBP.ExpBetweenContext)
+            if (expression is SBP.ExpBinaryContext || expression is SBP.ExpBetweenContext || expression is SBP.ExpEqualsWithToleranceContext)
             {
                 m_isSimpleExpectWithValue = true;
             }

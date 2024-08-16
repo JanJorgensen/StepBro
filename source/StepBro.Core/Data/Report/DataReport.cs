@@ -79,7 +79,7 @@ namespace StepBro.Core
             {
                 if (context != null && context.Logger is LoggerScope)
                 {
-                    var end = ((LoggerScope)context.Logger).Logger.GetNewestEntry();
+                    var end = ((LoggerScope)context.Logger).Logger.GetLast();
                     m_currentGroup.Lock(end);
                 }
                 else
@@ -101,7 +101,7 @@ namespace StepBro.Core
 
         public void AddSection([Implicit] ICallContext context, string header, string subheader = "")
         {
-            DateTime timestamp = DateTime.Now;
+            DateTime timestamp = DateTime.UtcNow;
             if (context != null && context.LoggingEnabled)
             {
                 var subheaderText = String.IsNullOrEmpty(subheader) ? "." : (", " + subheader);
@@ -203,7 +203,7 @@ namespace StepBro.Core
                 {
                     if (context != null && context.Logger is LoggerScope)
                     {
-                        var end = ((LoggerScope)context.Logger).Logger.GetNewestEntry();
+                        var end = ((LoggerScope)context.Logger).Logger.GetLast();
                         m_currentGroup.Lock(end);
                     }
                     else

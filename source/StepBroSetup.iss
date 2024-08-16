@@ -2,10 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "StepBro"
-#define MyAppVersion "0.2.26"
+#define MyAppVersion "1.0.0"
 #define MyAppPublisher "SchmutStein"
 #define MyAppURL "http://www.schmutstein.com/"
-#define MyAppExeName "StepBro.Workbench.exe"
+#define MyAppExeName "StepBro.SimpleWorkbench.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -64,6 +64,13 @@ Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environmen
     ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}\bin"; \
     Check: NeedsAddPath(ExpandConstant('{app}\bin'))
 
+; Add 'My PDF Editor' menu item to the Shell menu for PDF files:
+Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench"; ValueType: none; ValueName: ""; ValueData: ""; Flags: uninsdeletekey
+; Specify icon for the menu item:
+; Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\images\shortcut.ico"; Flags: uninsdeletekey
+; Define command for the menu item:
+Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}""  ""%1"""; Flags: uninsdeletekey
+    
 [Code]
 function NeedsAddPath(Param: string): boolean;
 var

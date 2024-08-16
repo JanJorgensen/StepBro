@@ -43,6 +43,7 @@ namespace StepBro.UI.WinForms
         {
             void CommandHandler(ButtonCommand command);
             void BeginInvoke(Action action);
+            bool Checked { get; set; }
         }
 
         public void UpdateMode()
@@ -176,7 +177,15 @@ namespace StepBro.UI.WinForms
                 List<object> arguments = m_startInfo.Arguments;
 
                 m_execution = m_coreAccess.StartExecution(element, partner, instance, (arguments != null) ? arguments.ToArray() : null);
-                m_execution.CurrentStateChanged += Execution_CurrentStateChanged;
+                if (m_execution != null)
+                {
+                    m_execution.CurrentStateChanged += Execution_CurrentStateChanged;
+                }
+                else
+                {
+                    this.SendCommand(ButtonCommand.Enable);
+                    this.SendCommand(ButtonCommand.ShowNormal);
+                }
                 System.Diagnostics.Debug.WriteLine("StartProcedure End");
             }
         }
@@ -225,6 +234,17 @@ namespace StepBro.UI.WinForms
                 string instance = m_startInfo.TargetObject;
                 if (instance == null) { instance = m_parentControl.ParentElement.TryGetChildProperty("Instance") as string; }
                 m_coreAccess.ExecuteObjectCommand(instance, m_startInfo.ObjectCommand);
+            }
+            else if (m_mode == Mode.CheckOnClick)
+            {
+                if (m_parentControl.Checked)
+                {
+                    this.SendCommand(ButtonCommand.SetChecked);
+                }
+                else
+                {
+                    this.SendCommand(ButtonCommand.SetUnchecked);
+                }
             }
         }
 

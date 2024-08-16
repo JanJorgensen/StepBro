@@ -88,7 +88,7 @@ namespace StepBro.Core.Execution
             long progressMax,
             Func<long, string> progressFormatter)
         {
-            m_startTime = DateTime.Now;
+            m_startTime = DateTime.UtcNow;
             m_parent = parent;
             m_stateStack = stateStack;
             m_level = level;

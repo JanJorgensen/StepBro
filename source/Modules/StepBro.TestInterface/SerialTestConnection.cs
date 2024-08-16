@@ -307,7 +307,7 @@ namespace StepBro.TestInterface
 
         private List<RemoteProcedureInfo> m_remoteProcedures = new List<RemoteProcedureInfo>();
 
-        public SerialTestConnection([ObjectName] string objectName = "<a SerialPort>")
+        public SerialTestConnection([ObjectName] string objectName = "<a SerialTestConnection>")
         {
             m_name = objectName;
             m_instanceID = rnd.Next(1000000);
@@ -1033,7 +1033,8 @@ namespace StepBro.TestInterface
         private void DoSendDirect(string text)
         {
             AddToLog(LogType.Sent, 0, text);
-            DebugLogEntry.Register(new DebugLogEntryString("Send: " + text));
+            // The following line can be enabled if debugging the communication.
+            //DebugLogEntry.Register(new DebugLogEntryString("Send: " + text));
             m_stream.Write(null, text + m_stream.NewLine);
         }
 

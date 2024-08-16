@@ -97,8 +97,8 @@ namespace StepBro.Core.Parser
         }
 
         public SBExpressionData ResolveIfIdentifier(
-            SBExpressionData input, 
-            bool inFunctionScope, 
+            SBExpressionData input,
+            bool inFunctionScope,
             TypeReference targetType = null,
             Func<IIdentifierInfo, bool> predicate = null)
         {
@@ -141,21 +141,6 @@ namespace StepBro.Core.Parser
                 foreach (var scopeIdentifier in m_scopeStack.Peek().KnownIdentifiers())
                 {
                     if (scopeIdentifier.Name == name) return scopeIdentifier;
-                }
-            }
-            return null;
-        }
-
-        public IIdentifierInfo TryGetFileVariable(string name)
-        {
-            if (m_file != null)
-            {
-                foreach (var v in m_file.ListFileVariables())
-                {
-                    if (v.Name == name)
-                    {
-                        return v;
-                    }
                 }
             }
             return null;
@@ -218,9 +203,9 @@ namespace StepBro.Core.Parser
         }
 
         private SBExpressionData ResolveQualifiedIdentifier(
-            string identifier, 
-            bool inFunctionScope, 
-            bool reportUnresolved = false, 
+            string identifier,
+            bool inFunctionScope,
+            bool reportUnresolved = false,
             IToken token = null,
             Func<IIdentifierInfo, bool> predicate = null)
         {
@@ -252,9 +237,9 @@ namespace StepBro.Core.Parser
         }
 
         private SBExpressionData ResolveSingleIdentifier(
-            string identifier, 
-            bool inFunctionScope, 
-            bool reportUnresolved = false, 
+            string identifier,
+            bool inFunctionScope,
+            bool reportUnresolved = false,
             IToken token = null,
             Func<IIdentifierInfo, bool> predicate = null)
         {
@@ -461,6 +446,15 @@ namespace StepBro.Core.Parser
                 var element = identifier as IFileElement;
                 switch (element.ElementType)
                 {
+                    case FileElementType.Const:
+                        result = new SBExpressionData(
+                            HomeType.Immediate,
+                            SBExpressionType.Constant,
+                            element.DataType,
+                            Expression.Constant(((FileConstant)element).Value), ((FileConstant)element).Value);
+                        break;
+                    case FileElementType.Config:
+                        throw new NotImplementedException();
                     case FileElementType.ProcedureDeclaration:
                         {
                             var procedure = element as FileProcedure;
@@ -672,7 +666,8 @@ namespace StepBro.Core.Parser
             }
             else
             {
-                var type = left.NamespaceList.ListTypes(false).FirstOrDefault(ti => ti.Name == rightString);
+                // If the class is static we will not be adding it (At least for now) - Static classes have been giving issues in other cases and does not seem to be used
+                var type = left.NamespaceList.ListTypes(false).FirstOrDefault(ti => ti.Name == rightString && !(ti.IsAbstract && ti.IsSealed));
                 if (type != null)
                 {
                     return new SBExpressionData(HomeType.Immediate, SBExpressionType.TypeReference, (TypeReference)type, token: right.Token);

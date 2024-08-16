@@ -75,6 +75,7 @@ namespace StepBro.Core
                     m.AddAssembly(typeof(DateTime).Assembly, false);
                     m.AddAssembly(typeof(Enumerable).Assembly, false);
                     m.AddAssembly(typeof(Math).Assembly, false);
+                    m.AddAssembly(typeof(System.Text.RegularExpressions.Regex).Assembly, false);
                     m.AddAssembly(AddonManager.StepBroCoreAssembly, true);
                     var modulesFolder = Path.Combine(Path.GetDirectoryName(typeof(AddonManager).Assembly.Location), "Modules");
                     var modulesListFile = Path.Combine(modulesFolder, Constants.PLUGINS_LIST_FILE);
@@ -327,6 +328,7 @@ namespace StepBro.Core
                 {
                     logger = m_logRootScope.LogEntering(true, "StepBro.Main.FileParsing", "Starting file parsing", null);
                     m_lastParsingErrorCount = FileBuilder.ParseFiles(m_serviceManagerAdmin.Manager, logger, (IScriptFile)null);
+                    ParsingCompleted?.Invoke(null, EventArgs.Empty);
                 }
                 finally
                 {

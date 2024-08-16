@@ -301,6 +301,20 @@ namespace StepBro.Core.Parser
             return builder.File.ListFileVariables().FirstOrDefault() as IValueContainer<T>;
         }
 
+        internal static IValueContainer<T> ParseConfigValue<T>(string content)
+        {
+            var builder = FileBuilder.Create(content);
+            builder.Listener.PrepareForExpressionParsing("StepBroFileBuilder.ParseExpression");
+            var context = builder.Parser.constVariable();
+
+            var walker = new ParseTreeWalker();
+            walker.Walk(builder.Listener, context);
+
+            if (builder.Errors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
+
+            return builder.File.ListConfigVariables().FirstOrDefault() as IValueContainer<T>;
+        }
+
         internal static IFileProcedure ParseProcedureExpectNoErrors(params string[] content)
         {
             var builder = ParseProcedure(null, new string[] { }, null, content);
@@ -836,7 +850,7 @@ namespace StepBro.Core.Parser
                                 file.SetNamespace(element.Name);
                                 throw new Exception();
                             //break;
-                            case FileElementType.EnumDeclaration:
+                            case FileElementType.EnumDefinition:
                                 break;
                             case FileElementType.ProcedureDeclaration:
                                 {
@@ -891,7 +905,7 @@ namespace StepBro.Core.Parser
                                 throw new NotImplementedException();
                         }
                     }
-                    file.LastTypeScan = DateTime.Now;
+                    file.LastTypeScan = DateTime.UtcNow;
                 }
             }
             #endregion
@@ -997,7 +1011,7 @@ namespace StepBro.Core.Parser
                     }
 
                     totalErrors += file.Errors.ErrorCount;
-                    file.LastParsing = DateTime.Now;
+                    file.LastParsing = DateTime.UtcNow;
                     if (file.Errors.ErrorCount == 0)
                     {
                         file.LastSuccessfulParsing = file.LastParsing;

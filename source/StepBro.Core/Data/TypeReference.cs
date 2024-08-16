@@ -116,6 +116,20 @@ namespace StepBro.Core.Data
 
         public static explicit operator TypeReference(Type b) => new TypeReference(b);
 
+        public static TypeReference GetSimpleTypeReference(System.Type type)
+        {
+            if (type == typeof(void)) return TypeVoid;
+            if (type == typeof(bool)) return TypeBool;
+            if (type == typeof(string)) return TypeString;
+            if (type == typeof(Int32)) return TypeInt32;
+            if (type == typeof(Int64)) return TypeInt64;
+            if (type == typeof(double)) return TypeDouble;
+            if (type == typeof(DateTime)) return TypeDateTime;
+            if (type == typeof(TimeSpan)) return TypeTimeSpan;
+            if (type == typeof(Verdict)) return TypeVerdict;
+            throw new NotSupportedException();
+        }
+
         public static TypeReference TypeVoid { get; } = new TypeReference(typeof(void));
         public static TypeReference TypeBool { get; } = new TypeReference(typeof(bool));
         public static TypeReference TypeString { get; } = new TypeReference(typeof(string));

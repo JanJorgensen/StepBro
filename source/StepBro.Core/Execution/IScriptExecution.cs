@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 
@@ -17,6 +18,8 @@ namespace StepBro.Core.Execution
         ReadOnlyObservableCollection<IExecutionScopeStatus> StateStack { get; }
 
         IExecutionResult Result { get; }
+        LogEntry FirstLogEntry { get; }
+        LogEntry LastLogEntry { get; }
         DataReport Report { get; }
     }
 }

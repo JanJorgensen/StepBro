@@ -50,26 +50,39 @@ namespace StepBro.ToolBarCreator
         {
             var color = new PropertyBlockDecoder.ValueString<object>("Color");
             var text = new PropertyBlockDecoder.ValueString<object>("Text");
-            var instance = new PropertyBlockDecoder.ValueString<object>("Instance");
-            var procedure = new PropertyBlockDecoder.ValueString<object>("Procedure", "Element");
+            var maxWidth = new PropertyBlockDecoder.ValueInt<object>("MaxWidth");
+            var widthGroup = new PropertyBlockDecoder.ValueInt<object>("WidthGroup");
+            var instance = new PropertyBlockDecoder.ValueString<object>("Instance", "Object");
+            var fileElement = new PropertyBlockDecoder.ValueString<object>("Procedure", "Element");
 
-            var procButton = new PropertyBlockDecoder.Block<object, object>("Button", "ProcedureActivationButton",
-                color, text, instance,
-                new PropertyBlockDecoder.ValueString<object>("Procedure", "Element"),
+            var button = new PropertyBlockDecoder.Block<object, object>("Button",
+                color, text, instance, fileElement, maxWidth, widthGroup,
                 new PropertyBlockDecoder.ValueString<object>("Partner"),
                 new PropertyBlockDecoder.Value<object>("Arg", "Argument"),
                 new PropertyBlockDecoder.Array<object>("Args", "Arguments"),
                 new PropertyBlockDecoder.Flag<object>("Stoppable"),
                 new PropertyBlockDecoder.Flag<object>("StopOnButtonRelease"),
-                new PropertyBlockDecoder.ValueString<object>("Command")
+                new PropertyBlockDecoder.ValueString<object>("Command"),
+                new PropertyBlockDecoder.Flag<object>("CheckOnClick"),
+                new PropertyBlockDecoder.Flag<object>("CheckArg"),
+                new PropertyBlockDecoder.ValueString<object>("CheckedText"),
+                new PropertyBlockDecoder.ValueString<object>("UncheckedText"),
+                new PropertyBlockDecoder.ValueString<object>("EnabledSource"),
+                new PropertyBlockDecoder.ValueString<object>("DisabledSource")
                 );
-            var objCmdButton = new PropertyBlockDecoder.Block<object, object>("ObjectCommandButton",
-                color, text, instance,
-                new PropertyBlockDecoder.ValueString<object>("Command")
+
+            var textbox = new PropertyBlockDecoder.Block<object, object>("TextBox",
+                color, text, instance, maxWidth, widthGroup,
+                new PropertyBlockDecoder.Flag<object>("ReadOnly"),
+                new PropertyBlockDecoder.Flag<object>("RightAligned"),
+                new PropertyBlockDecoder.ValueString<object>("Property"),
+                new PropertyBlockDecoder.ValueString<object>("ProcedureOutput"),
+                new PropertyBlockDecoder.ValueString<object>("EnabledSource"),
+                new PropertyBlockDecoder.ValueString<object>("DisabledSource")
                 );
 
             var menu = new PropertyBlockDecoder.Block<object, object>("Menu");
-            menu.SetChilds(menu, procButton, objCmdButton, instance);
+            menu.SetChilds(menu, button, instance);
 
             var root = new PropertyBlockDecoder.Block<object, object>
                 (
@@ -78,7 +91,7 @@ namespace StepBro.ToolBarCreator
                     new PropertyBlockDecoder.ValueInt<object>("Index"),
                     new PropertyBlockDecoder.Flag<object>("Separator"),
                     new PropertyBlockDecoder.Flag<object>("ColumnSeparator"),
-                    menu, procButton, objCmdButton, instance
+                    menu, button, textbox, instance
                 );
             root.DecodeData(data, null, errors);
         }
@@ -90,11 +103,11 @@ namespace StepBro.ToolBarCreator
 
         public void SetToolBarReference(IToolBarElement panel)
         {
-            //m_mainPanelElement = panel;
+            m_toolbarElement = panel;
         }
 
         public PropertyBlock Definition { get { return m_definition; } }
-        public IToolBarElement MainPanelElement { get { return m_toolbarElement; } }
+        public IToolBarElement UI { get { return m_toolbarElement; } }
 
 
         private static IToolBarElement TryGetElement(IToolBarElement element, string name, bool isRooted, out string field)
@@ -150,59 +163,58 @@ namespace StepBro.ToolBarCreator
 
         public override object GetProperty([Implicit] ICallContext context, string name)
         {
-            //if (m_mainPanelElement != null)
-            //{
-            //    string field;
-            //    var element = TryGetElement(m_mainPanelElement, name, false, out field);
-            //    if (element != null)
-            //    {
-            //        if (field != null)
-            //        {
-            //            return element.GetProperty(context, field);
-            //        }
-            //        else
-            //        {
-            //            context.ReportError($"No property has been specified in the property-path '{name}'.");
-            //        }
-            //    }
-            //    else
-            //    {
-            //        context.ReportError($"The specified GUI element for '{name}' was not found.");
-            //    }
-            //}
-            //else
-            //{
-            //    context.ReportError("No GUI panel has been created or registered.");
-            //}
+            if (m_toolbarElement != null)
+            {
+                string field;
+                var element = TryGetElement(m_toolbarElement, name, false, out field);
+                if (element != null)
+                {
+                    if (field != null)
+                    {
+                        return element.GetProperty(context, field);
+                    }
+                    else
+                    {
+                        return element;
+                    }
+                }
+                else
+                {
+                    // Then try the toolbar itself.
+                    return m_toolbarElement.GetProperty(context, name);
+                }
+            }
+            else
+            {
+                context.ReportError("No GUI panel has been created or registered.");
+            }
             return null;
         }
 
         public override void SetProperty([Implicit] ICallContext context, string name, object value)
         {
-            //if (m_mainPanelElement != null)
-            //{
-            //    string field;
-            //    var element = TryGetElement(m_mainPanelElement, name, false, out field);
-            //    if (element != null)
-            //    {
-            //        if (field != null)
-            //        {
-            //            element.SetProperty(context, field, value);
-            //        }
-            //        else
-            //        {
-            //            context.ReportError($"No property has been specified in the property-path '{name}'.");
-            //        }
-            //    }
-            //    else
-            //    {
-            //        context.ReportError($"The specified GUI element for '{name}' was not found.");
-            //    }
-            //}
-            //else
-            //{
-            //    context.ReportError("No GUI panel has been created or registered.");
-            //}
+            if (m_toolbarElement != null)
+            {
+                string field;
+                var element = TryGetElement(m_toolbarElement, name, false, out field);
+                if (element != null)
+                {
+                    if (field != null)
+                    {
+                        element.SetProperty(context, field, value);
+                    }
+                    else
+                    {
+                        context.ReportError($"No property has been specified in the property-path '{name}'.");
+                    }
+                }
+                else
+                {
+                    // Then try the toolbar itself.
+                    m_toolbarElement.SetProperty(context, name, value);
+                }
+            }
+            // else, just ignore.
         }
 
         public void DumpPanelElements([Implicit] ICallContext context)

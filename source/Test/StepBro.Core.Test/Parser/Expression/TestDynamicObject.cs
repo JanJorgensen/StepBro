@@ -97,11 +97,11 @@ namespace StepBroCoreTest.Parser
         [TestMethod, Ignore]    // Identifier as a type has not been implemented yet.
         public void CallDynamicMethodReturningIdentifier()
         {
-            Assert.AreEqual(true, ParseAndRun<Identifier>(
-                "obj.Christianson()",
-                nameof(DummyDynamicObject) + " obj = " + nameof(DummyDynamicObject) + ".NewInitialized();",
-                varDummyClass: true));
-            Assert.AreEqual(0, ExecutionHelper.RuntimeErrors.Errors.Count);
+            //Assert.AreEqual(true, ParseAndRun<Identifier>(
+            //    "obj.Christianson()",
+            //    nameof(DummyDynamicObject) + " obj = " + nameof(DummyDynamicObject) + ".NewInitialized();",
+            //    varDummyClass: true));
+            //Assert.AreEqual(0, ExecutionHelper.RuntimeErrors.Errors.Count);
         }
 
         [TestMethod]

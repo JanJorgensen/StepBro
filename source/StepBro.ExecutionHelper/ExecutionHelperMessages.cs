@@ -13,7 +13,8 @@ namespace StepBro.ExecutionHelper.Messages
         CloseConnection,
         Acknowledge,
         SuspendAutosave,
-        ResumeAutosave
+        ResumeAutosave,
+        RunPeriodicCheck
     }
 
     public class Error
@@ -90,9 +91,9 @@ namespace StepBro.ExecutionHelper.Messages
         public string FileName { get; set; }
     }
 
-    public class SetCommandRunOnStartup
+    public class SetCommandToRun
     {
-        public SetCommandRunOnStartup(string command)
+        public SetCommandToRun(string command)
         {
             this.Command = command;
         }

@@ -25,7 +25,7 @@ namespace StepBro.Core.Logging
             private bool m_stop = false;
             private bool m_awaitSilence = true;
             private System.Threading.Thread m_thread = null;
-            private DateTime m_zeroTime = DateTime.Now;
+            private DateTime m_zeroTime = DateTime.UtcNow;
 
             internal FileCreator(LogFileCreationManager parent, IOutputFormatter formatter)
             {
@@ -44,10 +44,10 @@ namespace StepBro.Core.Logging
 
             private void LoggerThread()
             {
-                LogEntry entry = StepBro.Core.Main.Logger.GetOldestEntry();
+                LogEntry entry = StepBro.Core.Main.Logger.GetLast();
                 if (!m_includePast)
                 {
-                    entry = StepBro.Core.Main.Logger.GetNewestEntry();
+                    entry = StepBro.Core.Main.Logger.GetFirst().Item2;
                     // Start at the beginning of a scope.
                     while (entry.Parent != null && entry.Parent.Parent != null)
                     {

@@ -1,4 +1,5 @@
 ﻿using Peak.Can.Basic;
+using Peak.Can.Basic.BackwardCompatibility;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
@@ -42,7 +43,7 @@ namespace StepBro.CAN
         [Public]
         public IAdapter GetAdapter([Implicit] ICallContext context, string identification = "")
         {
-            if (context != null) context.Logger.Log("GetAdapter", identification);
+            if (context != null) context.Logger.Log("GetAdapter: " + identification);
             if (String.IsNullOrEmpty(identification)) return this.GetAdapter(context, "USBBUS1");
             foreach (var a in g_adapters)
             {
@@ -185,10 +186,6 @@ namespace StepBro.CAN
 
         public IChannel GetChannel([Implicit] ICallContext context, int index)
         {
-            if (context != null)
-            {
-                context.Logger.Log("GetChannel", index.ToString());
-            }
             if (index != 0) throw new ArgumentOutOfRangeException("index");
 
             return m_onlyChannel;
@@ -245,17 +242,13 @@ namespace StepBro.CAN
 
         public void Setup([Implicit] ICallContext context, Baudrate baudrate, ChannelMode mode)
         {
-            if (context != null && context.LoggingEnabled)
-            {
-                context.Logger.Log("Setup", $"( {baudrate}, {mode} )");
-            }
             m_baudrate = baudrate;
             m_mode = mode;
             if (m_open && m_receiverThread == null)
             {
                 m_receiverThread = new Thread(new ThreadStart(this.ReceiveThreadHandler));
                 m_receiverThread.Start();
-                //Core.Main.ServiceManager.Get<>
+                // TODO: Register task/thread.
             }
         }
 
@@ -334,7 +327,7 @@ namespace StepBro.CAN
                 {
                     if (context != null && context.LoggingEnabled)
                     {
-                        context.Logger.Log("Open", "Opened successfully");
+                        context.Logger.Log("Opened successfully");
                     }
                     m_open = true;
 
@@ -349,7 +342,7 @@ namespace StepBro.CAN
                 }
                 else
                 {
-                    if (context != null) context.Logger.LogError("PCAN", "Open failed");
+                    if (context != null) context.Logger.LogError("Open failed");
                 }
             }
             return false;
@@ -527,7 +520,7 @@ namespace StepBro.CAN
             {
                 if (context != null)
                 {
-                    context.ReportError(description: "There are already a receiver named \"" + name + "\".");
+                    context.ReportError("There are already a receiver named \"" + name + "\".");
                 }
                 return null;
             }
@@ -535,7 +528,7 @@ namespace StepBro.CAN
             {
                 if (context != null && context.LoggingEnabled)
                 {
-                    context.Logger.Log("PCANChannel.CreateReceiveQueue", "Registered receive queue named \"" + name + "\".");
+                    context.Logger.Log("Registered receive queue named \"" + name + "\".");
                 }
                 var q = new ReceiveQueue(name, filter);
                 m_receivers.Insert(m_receivers.Count - 1, q);
@@ -549,7 +542,7 @@ namespace StepBro.CAN
             {
                 if (context != null)
                 {
-                    context.ReportError(description: "There are already a receiver named \"" + name + "\".");
+                    context.ReportError("There are already a receiver named \"" + name + "\".");
                 }
                 return null;
             }
@@ -557,7 +550,7 @@ namespace StepBro.CAN
             {
                 if (context != null && context.LoggingEnabled)
                 {
-                    context.Logger.Log("PCANChannel.CreateStatusReceiver", "Registered status receiver named \"" + name + "\".");
+                    context.Logger.Log("Registered status receiver named \"" + name + "\".");
                 }
                 var s = new ReceivedStatus(name, filter);
                 m_receivers.Insert(m_receivers.Count - 1, s);

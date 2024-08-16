@@ -23,7 +23,8 @@ namespace StepBro.Core.ScriptData
         /// The result from called sub-procedures will not affect procedure result directly.
         /// </summary>
         NoSubResultInheritance = 0x20,
-        FreeParameters = 0x40
+        FreeParameters = 0x40,
+        UIAction = 0x80
     }
     public interface IFileProcedure : IFileElement
     {
@@ -33,6 +34,7 @@ namespace StepBro.Core.ScriptData
         IProcedureReference ProcedureReference { get; }
         ProcedureFlags Flags { get; }
         ContextLogOption LogOption { get; }
+        object LastReturnValue { get; }
         //bool SeparateStateLevel { get; }
         //bool IsFunction { get; }
         //bool IsBreakpointOnLine(int line);

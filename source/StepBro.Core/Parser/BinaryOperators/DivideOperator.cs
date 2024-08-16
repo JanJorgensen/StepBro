@@ -89,10 +89,18 @@ namespace StepBro.Core.Parser.BinaryOperators
                     }
                     else if (first.IsTimespan && last.IsDecimal)
                     {
-                        var method = typeof(StepBro.Core.Data.TimeUtils).GetMethod("Divide", new Type[] { typeof(TimeSpan), typeof(double) });
+                        var method = typeof(System.TimeSpan).GetMethod("Divide", [typeof(double)]);
                         return new SBExpressionData(Expression.Call(
-                            method,
                             first.ExpressionCode,
+                            method,
+                            last.ExpressionCode));
+                    }
+                    else if (first.IsTimespan && last.IsTimespan)
+                    {
+                        var method = typeof(System.TimeSpan).GetMethod("Divide", [typeof(TimeSpan)]);
+                        return new SBExpressionData(Expression.Call(
+                            first.ExpressionCode,
+                            method,
                             last.ExpressionCode));
                     }
                     else

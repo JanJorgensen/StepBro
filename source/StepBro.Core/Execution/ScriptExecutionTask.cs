@@ -15,7 +15,8 @@ namespace StepBro.Core.Execution
         private Task m_task = null;
         private TaskExecutionState m_currentState = TaskExecutionState.Created;
         private readonly object m_sync = new object();
-        private ILoggerScope m_logger;
+        private ILoggerScope m_loggerOuterScope;
+        private ILoggerScope m_loggerExecutionScope = null;
         private ScriptTaskContext m_taskContext;
         private ExecutionScopeStatusUpdater m_statusUpdateRoot;
         private ObservableCollection<IExecutionScopeStatus> m_executionStateStack;
@@ -25,8 +26,6 @@ namespace StepBro.Core.Execution
         private readonly string m_targetTitle;
         private IFileProcedure m_targetProcedure;
         private readonly object[] m_arguments;
-        private DateTime m_start = DateTime.MinValue;
-        private DateTime m_end = DateTime.MinValue;
         private object m_returnValue = null;
 
         public ITaskControl Task { get { return this as ITaskControl; } }
@@ -51,7 +50,7 @@ namespace StepBro.Core.Execution
 
         ProcedureResult IExecutionResult.ProcedureResult { get { return m_taskContext.Result; } }
 
-        TimeSpan IExecutionResult.ExecutionTime { get { return m_end - m_start; } }
+        TimeSpan IExecutionResult.ExecutionTime { get { return m_loggerExecutionScope.LastLogEntryInScope.Timestamp - m_loggerExecutionScope.FirstLogEntryInScope.Timestamp; } }
 
         Exception IExecutionResult.Exception { get { return m_taskContext.ExecutionExeception; } }
 
@@ -59,9 +58,12 @@ namespace StepBro.Core.Execution
 
         public IFileElement TargetElement { get { return m_targetProcedure; } }
 
-        DateTime ITaskControl.StartTime { get { return m_start; } }
+        DateTime ITaskControl.StartTime { get { return m_loggerExecutionScope.FirstLogEntryInScope.Timestamp; } }
 
-        DateTime ITaskControl.EndTime { get { return m_end; } }
+        DateTime ITaskControl.EndTime { get { return m_loggerExecutionScope.LastLogEntryInScope.Timestamp; } }
+
+        public LogEntry FirstLogEntry { get { return (LogEntry)m_loggerExecutionScope.FirstLogEntryInScope; } }
+        public LogEntry LastLogEntry { get { return (LogEntry)m_loggerExecutionScope.LastLogEntryInScope; } }
 
         public ScriptExecutionTask(
             ILoggerScope logger,
@@ -71,7 +73,7 @@ namespace StepBro.Core.Execution
             string targetTitle,
             object[] arguments)
         {
-            m_logger = logger;
+            m_loggerOuterScope = logger;
             m_filesManager = filesManager;
             m_taskManager = taskManager;
             m_targetProcedure = targetProcedure;
@@ -125,16 +127,14 @@ namespace StepBro.Core.Execution
 
         private void ProcedureExecutionTask()
         {
-            var logger = m_logger.LogEntering(true, "Script Execution", (m_targetTitle != null) ? m_targetTitle : m_targetProcedure.FullName, null);
-            m_taskContext.Setup(logger, ContextLogOption.Normal, m_statusUpdateRoot, m_filesManager, m_taskManager);
-            m_start = DateTime.Now;
+            m_loggerExecutionScope = m_loggerOuterScope.LogEntering(true, "Script Execution", (m_targetTitle != null) ? m_targetTitle : m_targetProcedure.FullName, null);
+            m_taskContext.Setup(m_loggerExecutionScope, ContextLogOption.Normal, m_statusUpdateRoot, m_filesManager, m_taskManager);
             this.SetState(TaskExecutionState.Running);
 
             m_returnValue = m_taskContext.CallProcedure(m_targetProcedure as IFileProcedure, m_arguments);
             this.SetState((m_taskContext.ExecutionExeception == null) ? TaskExecutionState.Ended : TaskExecutionState.EndedByException);
-            m_end = DateTime.Now;
             m_statusUpdateRoot.Dispose();
-            logger.LogExit("Script execution ended. " + m_taskContext.Result.ResultText(m_returnValue));
+            m_loggerExecutionScope.LogExit("Script execution ended. " + m_taskContext.Result.ResultText(m_returnValue));
         }
 
         bool ITaskControl.RequestPause()

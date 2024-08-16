@@ -350,7 +350,7 @@ namespace StepBro.Cmd
                                     if (keyInfo.Key == ConsoleKey.C)
                                     {
                                         Console.Clear();
-                                        zeroTime = DateTime.Now;
+                                        zeroTime = DateTime.UtcNow;
                                     }
                                     else if (keyInfo.Key == ConsoleKey.X)
                                     {
@@ -371,7 +371,7 @@ namespace StepBro.Cmd
                                         {
                                             case Sidekick.Messages.ShortCommand.ClearDisplay:
                                                 Console.Clear();
-                                                zeroTime = DateTime.Now;
+                                                zeroTime = DateTime.UtcNow;
                                                 break;
                                             case StepBro.Sidekick.Messages.ShortCommand.RequestClose:
                                                 m_next.Enqueue(StateOrCommand.Exit);
@@ -755,7 +755,28 @@ namespace StepBro.Cmd
                                             }
                                             else
                                             {
-                                                ConsoleWriteErrorLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
+                                                if (element.ElementType is FileElementType.TestList)
+                                                {
+                                                    var partners = String.Join(", ", 
+                                                                    (element as ITestList).ListPartners()
+                                                                    .Where(a => a.ProcedureReference.IsFirstParameterThisReference &&
+                                                                                a.ProcedureReference.Parameters[0].Value.Type == typeof(ITestList))
+                                                                    .Select(a => a.Name).Distinct());
+
+                                                    // Write error message
+                                                    if (partners.Length > 0)
+                                                    {
+                                                        ConsoleWriteErrorLine($"Execution of the \"{element.Name}\" testlist can only be done through a partner. This testlist has the following partners: {partners}.");
+                                                    }
+                                                    else
+                                                    {
+                                                        ConsoleWriteErrorLine($"Execution of the \"{element.Name}\" testlist can only be done through a partner.");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    ConsoleWriteErrorLine($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
+                                                }
                                                 error = true;
                                             }
                                         }
@@ -989,14 +1010,27 @@ namespace StepBro.Cmd
             }
             FlushBufferedConsoleOutput();
 
-            if (m_commandLineOptions.PrintReport && createdReport != null)
+            if ((m_commandLineOptions.PrintReport || m_commandLineOptions.ReportToFile != null) && createdReport != null)
             {
-                using (FileStream fs = System.IO.File.Create("report.sbr"))
+                if (m_commandLineOptions.ReportToFile != null)
                 {
-                    byte[] generatedInfo = new UTF8Encoding(true).GetBytes($"--- BEGAN GENERATION AT {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")} ---\n");
-                    fs.Write(generatedInfo, 0, generatedInfo.Length);
+                    try
+                    {
+                        // Delete an existing report.sbr file if it exists
+                        // as that would be from a previous broken run
+                        // File.Delete succeeds without throwing an error if the file does not exist
+                        System.IO.File.Delete("report.sbr");
+                        using (StreamWriter streamWriter = System.IO.File.AppendText("report.sbr"))
+                        {
+                            streamWriter.WriteLine($"--- BEGAN GENERATION AT {DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")} ---\n");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        ConsoleWriteErrorLine("Error occurred when creating report file. The following exception was thrown: " + e.Message);
+                    }
                 }
-                m_outputFormatter.WriteReport(createdReport);
+                m_outputFormatter.WriteReport(createdReport, m_commandLineOptions.PrintReport, m_commandLineOptions.ReportToFile);
             }
             else
             {
@@ -1060,6 +1094,7 @@ namespace StepBro.Cmd
             public ExecutionScopeData(IExecutionScopeStatus status, int level)
             {
                 m_id = UniqueInteger.GetLongProtected();
+                m_level = level;
                 m_status = status;
                 m_status.UITag = this;
                 m_status.PropertyChanged += Status_PropertyChanged;
@@ -1188,7 +1223,7 @@ namespace StepBro.Cmd
 
         private static void LogDumpTask()
         {
-            var logEntry = StepBroMain.Logger.GetOldestEntry();
+            var logEntry = StepBroMain.Logger.GetFirst().Item2;
             zeroTime = logEntry.Timestamp;
             while (logEntry != null || m_activitiesRunning)
             {

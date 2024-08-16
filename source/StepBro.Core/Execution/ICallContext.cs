@@ -85,12 +85,12 @@ namespace StepBro.Core.Execution
         static public bool Await(this ICallContext context, System.Threading.Tasks.Task task, TimeSpan timeout, CancellationTokenSource cancellation)
         {
             var logger = (context != null) ? context.Logger : StepBro.Core.Main.Logger.RootLogger;
-            var start = DateTime.Now;
+            var start = DateTime.UtcNow;
             while (true)
             {
                 if (task.IsCompleted) return true;
                 var stopRequested = (context != null) ? context.StopRequested() : false;
-                if (DateTime.Now - start > timeout || stopRequested)
+                if (DateTime.UtcNow - start > timeout || stopRequested)
                 {
                     if (stopRequested)
                     {

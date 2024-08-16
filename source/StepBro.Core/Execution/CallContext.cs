@@ -135,13 +135,13 @@ namespace StepBro.Core.Execution
                 throw new Exception();
             }
             m_childContext = new CallContext(this, location);
-            m_childContext.Disposing += M_childContext_Disposing;
+            m_childContext.Disposing += ChildContext_Disposing;
             return m_childContext;
         }
 
-        private void M_childContext_Disposing(object sender, EventArgs e)
+        private void ChildContext_Disposing(object sender, EventArgs e)
         {
-            m_childContext.Disposing -= M_childContext_Disposing;
+            m_childContext.Disposing -= ChildContext_Disposing;
             m_childContext = null;
         }
 

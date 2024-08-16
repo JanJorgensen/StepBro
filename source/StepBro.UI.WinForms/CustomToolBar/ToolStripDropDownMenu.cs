@@ -39,6 +39,11 @@ namespace StepBro.UI.WinForms.CustomToolBar
             this.DropDownItems.Add(item);
         }
 
+        public void Add(ToolStripTextBox item)
+        {
+            this.DropDownItems.Add(item);
+        }
+
         #region IToolBarElement
 
         public uint Id => throw new NotImplementedException();
