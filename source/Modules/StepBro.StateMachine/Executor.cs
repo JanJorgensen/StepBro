@@ -139,6 +139,7 @@ namespace StepBro.StateMachine
             public void Dispose()
             {
                 this.Instance = null;
+                this.Next = null;
             }
         }
 
@@ -331,9 +332,16 @@ namespace StepBro.StateMachine
 
         public void Reset([Implicit] ICallContext context)
         {
+            m_currentEvent = null;
             m_instances.Clear();
             m_highPriorityEvents.Clear();
             m_lowPriorityEvents.Clear();
+            while (m_nextTimer != null)
+            {
+                var next = m_nextTimer.Next;
+                m_nextTimer.Dispose();
+                m_nextTimer = next;
+            }
         }
 
         public void CreateStateMachine([Implicit] ICallContext context, StateMachineDefinition type, Identifier name, ArgumentList arguments)
