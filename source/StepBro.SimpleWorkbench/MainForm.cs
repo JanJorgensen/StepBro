@@ -1165,27 +1165,35 @@ namespace StepBro.SimpleWorkbench
 
         private DocumentWindow OpenOrActivateFileEditor(ILoadedFile file, int line = -1)
         {
+            DocumentWindow window = null;
+            
             foreach (TabbedMdiWindow docWindow in dockManager.ActiveDocuments)
             {
                 if (docWindow.Tag != null && Object.ReferenceEquals(file, docWindow.Tag))
                 {
-                    docWindow.Activate();
-                    return docWindow as DocumentWindow;
+                    window = docWindow as DocumentWindow;
+                    break;
                 }
             }
 
-            // Not found; so open the file now, please!
-            var window = this.OpenLoadedFile(file as ILoadedFile);
-            window.Activate();
-            window.Select();
-            m_fileExplorer.UpdateNodeStates();
-
-            if (line >= 0)
+            if (window == null)
             {
-                var editor = window.Controls[0] as FastColoredTextBox;
-                editor.SetSelectedLine(line);
+                // Not found; so open the file now, please!
+                window = this.OpenLoadedFile(file as ILoadedFile);
+                m_fileExplorer.UpdateNodeStates();
             }
 
+            if (window != null)
+            {
+                window.Activate();
+                window.Select();
+
+                if (line >= 0)
+                {
+                    var editor = window.Controls[0] as FastColoredTextBox;
+                    editor.SetSelectedLine(line);
+                }
+            }
             return window;
         }
 
@@ -1350,7 +1358,7 @@ namespace StepBro.SimpleWorkbench
 
         private void ErrorsList_DoubleClickedLine(object sender, ParsingErrorListView.DoubleClickLineEventArgs args)
         {
-            this.OpenOrActivateFileEditor(args.File, args.Line);
+            this.OpenOrActivateFileEditor(args.File, args.Line + 1);
         }
 
         #endregion
