@@ -150,13 +150,17 @@ namespace StepBro.StateMachine
                         else if (v.SpecifiedTypeName == "timespan")
                         {
                             TimeSpan value = TimeSpan.Zero;
-                            if (v.Value.GetType() == typeof(Identifier) && ((Identifier)v.Value).Name.Equals("default"))
+                            if (v.Value.GetType() == typeof(TimeSpan))
+                            {
+                                value = (TimeSpan)v.Value;
+                            }
+                            else if (v.Value.GetType() == typeof(Identifier) && ((Identifier)v.Value).Name.Equals("default"))
                             {
                                 value = TimeSpan.Zero;
                             }
                             else
                             {
-                                return "Not implemented: value for datetime.";
+                                return "Not implemented: value for timespan.";
                             }
                             m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(TimeSpan), value)));
                         }

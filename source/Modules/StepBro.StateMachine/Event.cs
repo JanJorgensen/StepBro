@@ -12,6 +12,7 @@ namespace StepBro.StateMachine
         Exit,
         PollTimer,
         Timer,
-        ExternalEvent
+        ExternalEvent,
+        StopRequested
     }
 }
