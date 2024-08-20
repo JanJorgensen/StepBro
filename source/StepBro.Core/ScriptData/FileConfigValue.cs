@@ -38,6 +38,7 @@ namespace StepBro.Core.ScriptData
             {
                 vcOwnerAccess = VariableContainer.Create(@namespace, name, type, readOnly: true);
                 System.Diagnostics.Debug.WriteLine($"Creating config value \"{name}\" (in {file.FileName}), with ID {vcOwnerAccess.Container.UniqueID}");
+                vcOwnerAccess.File = file;
                 vcOwnerAccess.FileLine = line;
                 vcOwnerAccess.FileColumn = column;
                 //vcOwnerAccess.CodeHash = codeHash;

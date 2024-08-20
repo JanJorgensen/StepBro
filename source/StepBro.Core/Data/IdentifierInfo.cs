@@ -52,6 +52,8 @@ namespace StepBro.Core.Data
         IdentifierType Type { get; }
         TypeReference DataType { get; }
         object Reference { get; }
+        string SourceFile { get; }
+        int SourceLine { get; }
     }
 
     public class IdentifierInfo : IIdentifierInfo
@@ -61,6 +63,8 @@ namespace StepBro.Core.Data
         public IdentifierType Type { get; private set; }
         public TypeReference DataType { get; private set; }
         public object Reference { get; private set; }
+        public string SourceFile { get; internal set; } = null;
+        public int SourceLine { get; internal set; } = -1;
 
         public IdentifierInfo(string name, string fullName, IdentifierType type, TypeReference dataType, object reference)
         {

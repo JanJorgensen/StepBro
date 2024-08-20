@@ -439,7 +439,7 @@ namespace StepBro.Core.Parser
             }
             else if (identifier.Type == IdentifierType.Variable || identifier.Type == IdentifierType.Parameter || identifier.Type == IdentifierType.LambdaParameter)
             {
-                result = new SBExpressionData(HomeType.Immediate, SBExpressionType.LocalVariableReference, (TypeReference)identifier.DataType, (Expression)identifier.Reference);
+                result = new SBExpressionData(HomeType.Immediate, SBExpressionType.LocalVariableReference, (TypeReference)identifier.DataType, (Expression)identifier.Reference, identifier);
             }
             else if (identifier.Type == IdentifierType.FileElement)
             {

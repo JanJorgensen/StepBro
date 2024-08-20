@@ -202,6 +202,10 @@ namespace StepBro.Core.ScriptData
             }
         }
 
+        string IIdentifierInfo.SourceFile { get { return m_parentFile.FilePath; } }
+        
+        int IIdentifierInfo.SourceLine { get { return m_line; } }
+
         public int UniqueID
         {
             get
@@ -395,13 +399,13 @@ namespace StepBro.Core.ScriptData
                                 }
                                 else
                                 {
-                                    baseElement.m_partners.Add(new FileElementPartner(this, name, referenceName, referenceElement as IFileProcedure));
+                                    baseElement.m_partners.Add(new FileElementPartner(this, name, referenceName, referenceElement as IFileProcedure, line));
                                 }
                             }
                         }
                         else
                         {
-                            var partner = new FileElementPartner(this, name, referenceName, referenceElement as IFileProcedure);
+                            var partner = new FileElementPartner(this, name, referenceName, referenceElement as IFileProcedure, line);
                             if (type.Contains("model", StringComparison.InvariantCulture))
                             {
                                 partner.IsModelDirect = true;

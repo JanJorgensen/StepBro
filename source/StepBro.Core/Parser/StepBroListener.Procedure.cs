@@ -528,7 +528,7 @@ namespace StepBro.Core.Parser
                 }
 
                 var scope = m_scopeStack.Peek();
-                var v = scope.AddVariable(variable.Name, type, null, EntryModifiers.Private);
+                var v = scope.AddVariable(variable.Name, type, null, EntryModifiers.Private, m_file.FilePath, context.Start.Line);
                 // Needs to be a stack for each scope so we don't initialize variables in incorrect scopes
                 m_forInitVariables.Peek().Add(Expression.Assign(v.VariableExpression, variable.Initializer.ExpressionCode));
             }
@@ -636,7 +636,8 @@ namespace StepBro.Core.Parser
                 CreateStatementVariableName(context, "forLoop_index"),
                 TypeReference.TypeInt64,
                 new SBExpressionData(Expression.Constant(0L)),
-                EntryModifiers.Private);
+                EntryModifiers.Private,
+                null, -1);
             loopExpressions.Add(Expression.Increment(varLoopIndex.VariableExpression));     // index++; therefore index = 1 inside and after first iteration.
 
             // TODO: Add some logging, interactive break check, timeout and other stuff
@@ -681,7 +682,8 @@ namespace StepBro.Core.Parser
                             CreateStatementVariableName(context, "forLoop_TimeoutTime"),
                             TypeReference.TypeDateTime,
                             new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
-                            EntryModifiers.Private);
+                            EntryModifiers.Private,
+                            null, -1);
                     }
                     else if (property.Is("Stoppable", PropertyBlockEntryType.Flag))
                     {
@@ -726,7 +728,8 @@ namespace StepBro.Core.Parser
                             CreateStatementVariableName(context, "forLoop_EntryTime"),
                             TypeReference.TypeDateTime,
                             new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
-                            EntryModifiers.Private);
+                            EntryModifiers.Private,
+                            null, -1);
 
             var loggingEnabled = Expression.Property(
                     Expression.Convert(m_currentProcedure.ContextReferenceInternal, typeof(ICallContext)),
@@ -873,7 +876,8 @@ namespace StepBro.Core.Parser
                 CreateStatementVariableName(context, "whileLoop_index"),
                 TypeReference.TypeInt64,
                 new SBExpressionData(Expression.Constant(0L)),
-                EntryModifiers.Private);
+                EntryModifiers.Private,
+                null, -1);
             loopExpressions.Add(Expression.Increment(varLoopIndex.VariableExpression));     // index++; therefore index = 1 inside and after first iteration.
 
             // TODO: Add some logging, interactive break check, timeout and other stuff
@@ -918,7 +922,8 @@ namespace StepBro.Core.Parser
                             CreateStatementVariableName(context, "whileLoop_TimeoutTime"),
                             TypeReference.TypeDateTime,
                             new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
-                            EntryModifiers.Private);
+                            EntryModifiers.Private,
+                            null, -1);
                     }
                     else if (property.Is("Stoppable", PropertyBlockEntryType.Flag))
                     {
@@ -963,7 +968,8 @@ namespace StepBro.Core.Parser
                             CreateStatementVariableName(context, "whileLoop_EntryTime"),
                             TypeReference.TypeDateTime,
                             new SBExpressionData(Expression.Field(null, typeof(DateTime).GetField("MinValue"))),
-                            EntryModifiers.Private);
+                            EntryModifiers.Private,
+                            null, -1);
 
             var loggingEnabled = Expression.Property(
                     Expression.Convert(m_currentProcedure.ContextReferenceInternal, typeof(ICallContext)),
@@ -1104,7 +1110,7 @@ namespace StepBro.Core.Parser
                 scopeCode = subStatements[0].GetOnlyStatementCode();
             }
 
-            var usingVariable = m_scopeStack.Peek().AddVariable("usingVariable_" + context.Start.Line.ToString(), new TypeReference(typeof(IDisposable)), null, EntryModifiers.Private);
+            var usingVariable = m_scopeStack.Peek().AddVariable("usingVariable_" + context.Start.Line.ToString(), new TypeReference(typeof(IDisposable)), null, EntryModifiers.Private, null, -1);
             var variableAssignment = m_scopeStack.Peek().UsingVariableAssignment;
             var usingVariableAssignment = Expression.Assign(usingVariable.VariableExpression, variableAssignment);
 
@@ -1176,7 +1182,7 @@ namespace StepBro.Core.Parser
                 }
 
                 var scope = m_scopeStack.Peek();
-                var v = scope.AddVariable(m_variableName, m_variableType, null, EntryModifiers.Private);
+                var v = scope.AddVariable(m_variableName, m_variableType, null, EntryModifiers.Private, m_file.FilePath, context.Start.Line);
                 usingExpression = Expression.Assign(v.VariableExpression, m_variableInitializer.ExpressionCode);
 
                 m_variableName = null;
@@ -1576,12 +1582,12 @@ namespace StepBro.Core.Parser
                     if (m_scopeStack.Peek().StatementCount > 0)
                     {
                         var scope = m_scopeStack.Peek();
-                        var v = scope.AddVariable(variable.Name, type, null, EntryModifiers.Private);
+                        var v = scope.AddVariable(variable.Name, type, null, EntryModifiers.Private, m_file.FilePath, context.Start.Line /* TODO: correct */);
                         scope.AddStatementCode(Expression.Assign(v.VariableExpression, variable.Initializer.ExpressionCode));
                     }
                     else
                     {
-                        m_scopeStack.Peek().AddVariable(variable.Name, type, variable.Initializer, EntryModifiers.Private);
+                        m_scopeStack.Peek().AddVariable(variable.Name, type, variable.Initializer, EntryModifiers.Private, m_file.FilePath, context.Start.Line /* TODO: correct */);
                     }
                 }
             }

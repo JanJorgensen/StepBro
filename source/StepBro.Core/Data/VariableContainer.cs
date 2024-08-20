@@ -16,6 +16,7 @@ namespace StepBro.Core.Data
         VariableContainerAction DataResetter { get; set; }
         VariableContainerAction DataCreator { get; set; }
         VariableContainerAction DataInitializer { get; set; }
+        IScriptFile File { get; set; }
         int FileLine { get; set; }
         int FileColumn { get; set; }
         int CodeHash { get; set; }
@@ -38,6 +39,7 @@ namespace StepBro.Core.Data
             public OwnerAccessor(VariableContainer<T> container)
             {
                 m_container = container;
+                m_container.m_owner = this;
             }
 
             public IValueContainer Container
@@ -71,6 +73,7 @@ namespace StepBro.Core.Data
             public VariableContainerAction DataCreator { get; set; } = null;
             public VariableContainerAction DataInitializer { get; set; } = null;
 
+            public IScriptFile File { get; set; }
             public int FileLine { get; set; }
             public int FileColumn { get; set; }
             public int CodeHash { get; set; }
@@ -108,6 +111,7 @@ namespace StepBro.Core.Data
         }
         #endregion
 
+        private OwnerAccessor m_owner;
         private readonly string m_namespace;
         private readonly string m_name;
         private readonly TypeReference m_declaredType;
@@ -228,6 +232,10 @@ namespace StepBro.Core.Data
                 return this;
             }
         }
+
+        public string SourceFile { get; internal set; } = null;
+
+        public int SourceLine { get; internal set; } = -1;
 
         object IObjectContainer.Object { get { return m_value; } }
 

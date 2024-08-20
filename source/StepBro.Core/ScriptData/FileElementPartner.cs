@@ -7,12 +7,13 @@ namespace StepBro.Core.ScriptData
 {
     internal class FileElementPartner : IPartner
     {
-        public FileElementPartner(IFileElement parent, string name, string referenceName, IFileProcedure procedure)
+        public FileElementPartner(IFileElement parent, string name, string referenceName, IFileProcedure procedure, int line)
         {
             this.ParentElement = parent;
             this.Name = name;
             this.ProcedureName = referenceName;
             this.ProcedureReference = procedure;
+            this.SourceLine = line;
         }
 
         public IFileElement ParentElement { get; private set; }
@@ -37,6 +38,10 @@ namespace StepBro.Core.ScriptData
         {
             get { return this.ProcedureReference; }
         }
+
+        public string SourceFile { get { return this.ParentElement.ParentFile.FilePath; } }
+
+        public int SourceLine { get; private set; }
 
         public IFileProcedure ProcedureReference { get; internal set; }
 

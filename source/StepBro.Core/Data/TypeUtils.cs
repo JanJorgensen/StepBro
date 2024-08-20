@@ -1,4 +1,5 @@
-﻿using StepBro.Core.Parser;
+﻿using StepBro.Core.Execution;
+using StepBro.Core.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -128,6 +129,21 @@ namespace StepBro.Core.Data
                 var gta = type.GetGenericArguments();
                 var args = String.Join(", ", gta.Select(ga => ga.TypeName()));
                 return $"{gtd}<{args}>";
+            }
+            else return type.Name;
+        }
+
+        public static string TypeNameSimple(this Type type)
+        {
+            if (type.IsConstructedGenericType)
+            {
+                if (type.GetGenericTypeDefinition() == typeof(IProcedureReference<>))
+                {
+                    return "procedure reference";
+                }
+                var gtd = type.GetGenericTypeDefinition().Name;
+                gtd = gtd.Substring(0, gtd.IndexOf('`'));
+                return "gtd";
             }
             else return type.Name;
         }
