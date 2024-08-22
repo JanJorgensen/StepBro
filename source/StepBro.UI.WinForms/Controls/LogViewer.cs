@@ -10,7 +10,6 @@ using System.Windows.Forms;
 using StepBro.Core.Logging;
 using StepBro.Core.Data;
 using StepBro.Core;
-using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 
 namespace StepBro.UI.WinForms.Controls
 {
