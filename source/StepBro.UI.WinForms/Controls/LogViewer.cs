@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using StepBro.Core.Logging;
 using StepBro.Core.Data;
 using StepBro.Core;
+using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 
 namespace StepBro.UI.WinForms.Controls
 {
@@ -136,10 +137,11 @@ namespace StepBro.UI.WinForms.Controls
 
 
         private IDataListSource<LogEntry> m_source = null;
-        private PresentationList m_presentationList = null;
+        private PresentationListForListData<LogEntry, ChronoListViewEntry> m_presentationList = null;
         private long m_lastEntryBeforeClear = -1L;
         private NewLogStart m_zeroStartSource = null;
         private int m_visibleLevels = 1000;
+        private Predicate<LogEntry>[] m_filter = null;
 
         public LogViewer()
         {
@@ -152,10 +154,37 @@ namespace StepBro.UI.WinForms.Controls
         {
             m_source = StepBro.Core.Main.Logger;
             m_presentationList = new PresentationList(m_source);
-            m_presentationList.Reset(LogFilters.Normal, Int64.MaxValue);
-            m_presentationList.Get(Int64.MaxValue);
+            this.CreateFilter();
             logView.ZeroTime = StepBro.Core.Main.Logger.GetFirst().Item2.Timestamp;
             logView.Setup(m_presentationList);
+        }
+
+        private bool LevelFilter(LogEntry entry)
+        {
+            return (entry.IndentLevel < m_visibleLevels);
+        }
+
+        private bool CombinedFilter(LogEntry entry)
+        {
+            foreach (var f in m_filter)
+            {
+                if (f(entry) == false) return false;
+            }
+            return true;
+        }
+
+        private void CreateFilter()
+        {
+            var filter = new List<Predicate<LogEntry>>();
+            if (m_visibleLevels < 1000)
+            {
+                filter.Add(this.LevelFilter);
+            }
+            filter.Add(LogFilters.Normal);
+            m_filter = filter.ToArray();
+
+            m_presentationList.Reset(this.CombinedFilter, Int64.MaxValue);
+            m_presentationList.Get(Int64.MaxValue);
         }
 
         private void UpdatePresentationLevels()
@@ -174,7 +203,12 @@ namespace StepBro.UI.WinForms.Controls
                 if (sender == toolStripMenuItemLevels5) { choise = 5; toolStripDropDownButtonDisplayLevels.Text = "5"; } else toolStripMenuItemLevels5.Checked = false;
                 if (sender == toolStripMenuItemLevels6) { choise = 6; toolStripDropDownButtonDisplayLevels.Text = "6"; } else toolStripMenuItemLevels6.Checked = false;
                 if (sender == toolStripMenuItemLevelsAll) { choise = 1000; toolStripDropDownButtonDisplayLevels.Text = "∞"; } else toolStripMenuItemLevelsAll.Checked = false;
-                m_visibleLevels = choise;
+                if (choise != m_visibleLevels)
+                {
+                    m_visibleLevels = choise;
+                    this.CreateFilter();
+                    logView.Setup(m_presentationList);
+                }
             }
         }
 
@@ -191,17 +225,18 @@ namespace StepBro.UI.WinForms.Controls
         private void toolStripButtonClear_Click(object sender, EventArgs e)
         {
             m_lastEntryBeforeClear = m_source.GetState().LastIndex;
-            var startSearcher = new PresentationListSearchingForFirstSource(this, m_source, m_lastEntryBeforeClear);
-            logView.Setup(startSearcher);
+            m_presentationList = new PresentationListSearchingForFirstSource(this, m_source, m_lastEntryBeforeClear);
+            logView.Setup(m_presentationList);
         }
 
         private void SetupZeroStart()
         {
+            bool headMode = m_presentationList.InHeadMode;
             var zeroTime = m_source.Get(m_lastEntryBeforeClear + 1L).Timestamp;
             m_zeroStartSource = new NewLogStart(m_source, m_source.Get(m_lastEntryBeforeClear + 1L), m_lastEntryBeforeClear + 1L);
             m_presentationList = new PresentationList(m_zeroStartSource);
-            m_presentationList.Reset(LogFilters.Normal, Int64.MaxValue);    // TODO: Set current filter.
-            m_presentationList.Get(Int64.MaxValue);
+            m_presentationList.SetHeadMode(headMode);
+            this.CreateFilter();
             logView.ZeroTime = zeroTime;
             logView.Setup(m_presentationList);
         }

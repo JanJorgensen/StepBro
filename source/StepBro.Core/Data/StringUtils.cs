@@ -56,6 +56,10 @@ namespace StepBro.Core.Data
         {
             return time.ToString("yyyyMMdd_HHmmss") + ((extension != null) ? ("." + extension) : "");
         }
+        public static string ToGeneralFormat(this DateTime time)
+        {
+            return time.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+        }
 
         public static bool TryParseLiteral(this string value, out object literal)
         {
@@ -284,6 +288,7 @@ namespace StepBro.Core.Data
             var t = value.GetType();
             if (t == typeof(string)) return "\"" + ((string)value).EscapeString() + "\"";
             if (t == typeof(Identifier)) return identifierBare ? ((Identifier)value).Name : ("'" + ((Identifier)value).Name + "'");
+            if (t == typeof(DateTime)) return ((DateTime)value).ToGeneralFormat();
             if (t == typeof(ArgumentList))
             {
                 var list = value as ArgumentList;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StepBro.Core.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -107,5 +108,45 @@ namespace StepBro.Core.Logging
         public string Location { get { return m_location; } }
 
         public string Text { get { return m_text; } }
+
+        #region Persisting 
+
+        public string ToPersistanceString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(m_id.ToString());
+            sb.Append('\t');
+            sb.Append((m_parent != null) ? m_parent.m_id.ToString() : "-");
+            sb.Append('\t');
+            sb.Append(m_threadId.ToString());
+            sb.Append('\t');
+            sb.Append(m_timestamp.Ticks.ToString());
+            sb.Append('\t');
+            sb.Append(m_type.ToString());
+            if (!String.IsNullOrEmpty(m_location))
+            {
+                sb.Append("\t\"");
+                sb.Append(m_location.EscapeString());
+                sb.Append('\"');
+            }
+            else
+            {
+                sb.Append("\t-");
+            }
+            if (!String.IsNullOrEmpty(m_text))
+            {
+                sb.Append("\t\"");
+                sb.Append(m_text.EscapeString());
+                sb.Append("\"");
+            }
+            else
+            {
+                sb.Append("\t-");
+            }
+
+            return sb.ToString();
+        }
+
+        #endregion
     }
 }

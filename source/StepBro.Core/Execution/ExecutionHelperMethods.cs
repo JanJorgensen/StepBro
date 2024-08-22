@@ -43,9 +43,16 @@ namespace StepBro.Core.Execution
         public static string ObjectToString(object value)
         {
             if (value == null) return "<null>";
-            else if (value.GetType() != typeof(string) && value.GetType() != typeof(object) && typeof(IEnumerable).IsAssignableFrom(value.GetType()))
+
+            var t = value.GetType();
+
+            if (t != typeof(string) && t != typeof(object) && typeof(IEnumerable).IsAssignableFrom(t))
             {
                 return StringUtils.ListToString((IEnumerable)value);
+            }
+            else if (t == typeof(DateTime))
+            {
+                return ((DateTime)value).ToGeneralFormat(); ;
             }
             else
             {

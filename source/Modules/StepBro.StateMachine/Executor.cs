@@ -254,7 +254,7 @@ namespace StepBro.StateMachine
                     timer.StateTransitionIndex = m_instance.StateTransitionNumber;
                 }
                 context.Logger.Log(
-                    "Start timer '" + name + "' at " + t.ToLocalTime().ToString() + " (" + ((long)((t - now).TotalMilliseconds)).ToString() + "ms from now)");
+                    "Start timer '" + name + "' at " + t.ToGeneralFormat() + " (" + ((long)((t - now).TotalMilliseconds)).ToString() + "ms from now)");
                 m_executor.AddTimer(timer);
             }
 

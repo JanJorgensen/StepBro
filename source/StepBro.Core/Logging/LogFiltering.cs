@@ -14,7 +14,24 @@ namespace StepBro.Core.Logging
         }
         public static bool Normal(LogEntry entry)
         {
-            return entry.EntryType != LogEntry.Type.Post && (entry.Text != null || entry.Location != null);
+            return (entry.EntryType != LogEntry.Type.Post || entry.IndentLevel < 3) && (entry.Text != null || entry.Location != null);
+        }
+
+        public static bool Level2Max(LogEntry entry)
+        {
+            return (entry.IndentLevel < 2);
+        }
+        public static bool Level3Max(LogEntry entry)
+        {
+            return (entry.IndentLevel < 3);
+        }
+        public static bool Level4Max(LogEntry entry)
+        {
+            return (entry.IndentLevel < 4);
+        }
+        public static bool Level5Max(LogEntry entry)
+        {
+            return (entry.IndentLevel < 5);
         }
 
         public static bool NormalWithoutDetailedAndComm(LogEntry entry)

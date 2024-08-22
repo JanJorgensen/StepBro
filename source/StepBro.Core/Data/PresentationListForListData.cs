@@ -236,7 +236,7 @@ namespace StepBro.Core.Data
                         // Start walking from the end of the cache.
                         var cacheState = m_cache.GetState();
                         m_lastKnownPresentationIndex = cacheState.LastIndex;
-                        m_tipWalker = m_cache.CurrentWalker.Dublicate();
+                        m_tipWalker = m_cache.CurrentWalker?.Dublicate();
                     }
                 }
             }

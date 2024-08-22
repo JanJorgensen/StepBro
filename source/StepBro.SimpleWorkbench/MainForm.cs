@@ -115,7 +115,8 @@ namespace StepBro.SimpleWorkbench
             public Shortcut[] Shortcuts { get; set; } = null;
             public PanelSetting[] PanelSettings { get; set; } = null;
             public string[] HiddenToolbars { get; set; } = null;
-
+            //public System.Xml.XmlDocument ToolLayout { get; set; } = null;
+            //public System.Xml.XmlDocument DocumentLayout { get; set; } = null;
         }
 
 
@@ -263,6 +264,8 @@ namespace StepBro.SimpleWorkbench
         private void SaveUserSettings()
         {
             var userData = new UserDataCurrent();
+            //userData.ToolLayout = dockManager.ToolWindowLayoutData;
+            //userData.DocumentLayout = dockManager.DocumentLayoutData;
 
             var shortcuts = new List<UserDataCurrent.Shortcut>();
             foreach (var shortcut in toolStripMain.Items.Cast<ToolStripItem>().Where(o => object.Equals(m_userShortcutItemTag, o.Tag)))

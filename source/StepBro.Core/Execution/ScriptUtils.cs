@@ -173,7 +173,7 @@ namespace StepBro.Core.Execution
         {
             if (String.IsNullOrEmpty(prefix)) throw new ArgumentException(nameof(prefix));
             string folder = GetOutputFileFolder();
-            string filename = prefix + time.ToFileName() + ((String.IsNullOrEmpty(postfix)) ? "" : postfix) + "." + extension;
+            string filename = prefix + time.ToLocalTime().ToFileName() + ((String.IsNullOrEmpty(postfix)) ? "" : postfix) + "." + extension;
             return System.IO.Path.Combine(folder, filename);
         }
 
@@ -265,13 +265,21 @@ namespace StepBro.Core.Execution
         public static ILogFileCreator StartCreatingLogFile(
             [Implicit] ICallContext context,
             string filename,
-            string format = "SimpleCleartext",
+            string format = null,
             bool includePast = false)
         {
             var manager = StepBro.Core.Main.GetService<ILogFileCreationManager>();
             if (String.IsNullOrEmpty(format))
             {
-                format = "SimpleCleartext";
+                var extension = System.IO.Path.GetExtension(filename);
+                if (extension.Equals("sbl", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    format = OutputStepBroPersistanceAddon.Name;
+                }
+                else
+                {
+                    format = OutputSimpleCleartextAddon.Name;
+                }
             }
 
             try
