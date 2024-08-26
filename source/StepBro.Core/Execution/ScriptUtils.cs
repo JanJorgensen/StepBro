@@ -272,7 +272,7 @@ namespace StepBro.Core.Execution
             if (String.IsNullOrEmpty(format))
             {
                 var extension = System.IO.Path.GetExtension(filename);
-                if (extension.Equals("sbl", StringComparison.InvariantCultureIgnoreCase))
+                if (extension.Equals(Constants.STEPBRO_PERSISTANCE_LOG_FILE_EXTENSION, StringComparison.InvariantCultureIgnoreCase))
                 {
                     format = OutputStepBroPersistanceAddon.Name;
                 }
