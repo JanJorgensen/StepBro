@@ -377,6 +377,7 @@ namespace StepBro.Core.Data
 
         public static string ToClearText(this LogEntry entry, string timestamp, bool forceShow = false, bool showErrorAndFailType = true)
         {
+            if (entry.EntryType == LogEntry.Type.Special) return null;
             StringBuilder text = new(1000);
             text.Append(timestamp);
             text.Append(new string(' ', 1 + entry.IndentLevel * 3));

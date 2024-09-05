@@ -31,6 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LogViewer));
             toolStrip1 = new ToolStrip();
             toolStripButtonClear = new ToolStripButton();
+            toolStripSeparator1 = new ToolStripSeparator();
             toolStripDropDownButtonDisplayLevels = new ToolStripDropDownButton();
             toolStripMenuItemLevels2 = new ToolStripMenuItem();
             toolStripMenuItemLevels3 = new ToolStripMenuItem();
@@ -39,14 +40,15 @@
             toolStripMenuItemLevels6 = new ToolStripMenuItem();
             toolStripMenuItemLevelsAll = new ToolStripMenuItem();
             toolStripButtonFollowHead = new ToolStripButton();
+            toolStripDropDownButtonLoggers = new ToolStripDropDownButton();
+            toolStripMenuItemSpecialLoggersNoneAvailable = new ToolStripMenuItem();
             logView = new ChronoListView();
-            toolStripSeparator1 = new ToolStripSeparator();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // toolStrip1
             // 
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButtonClear, toolStripSeparator1, toolStripDropDownButtonDisplayLevels, toolStripButtonFollowHead });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButtonClear, toolStripSeparator1, toolStripDropDownButtonDisplayLevels, toolStripButtonFollowHead, toolStripDropDownButtonLoggers });
             toolStrip1.Location = new Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new Size(636, 25);
@@ -64,6 +66,11 @@
             toolStripButtonClear.ToolTipText = "Hide the execution log befroe now.";
             toolStripButtonClear.Click += toolStripButtonClear_Click;
             // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(6, 25);
+            // 
             // toolStripDropDownButtonDisplayLevels
             // 
             toolStripDropDownButtonDisplayLevels.DisplayStyle = ToolStripItemDisplayStyle.Text;
@@ -78,7 +85,7 @@
             // 
             toolStripMenuItemLevels2.CheckOnClick = true;
             toolStripMenuItemLevels2.Name = "toolStripMenuItemLevels2";
-            toolStripMenuItemLevels2.Size = new Size(180, 22);
+            toolStripMenuItemLevels2.Size = new Size(120, 22);
             toolStripMenuItemLevels2.Text = "2 levels";
             toolStripMenuItemLevels2.CheckedChanged += toolStripMenuItemDisplayLevel_CheckedChanged;
             // 
@@ -86,7 +93,7 @@
             // 
             toolStripMenuItemLevels3.CheckOnClick = true;
             toolStripMenuItemLevels3.Name = "toolStripMenuItemLevels3";
-            toolStripMenuItemLevels3.Size = new Size(180, 22);
+            toolStripMenuItemLevels3.Size = new Size(120, 22);
             toolStripMenuItemLevels3.Text = "3 levels";
             toolStripMenuItemLevels3.CheckedChanged += toolStripMenuItemDisplayLevel_CheckedChanged;
             // 
@@ -94,7 +101,7 @@
             // 
             toolStripMenuItemLevels4.CheckOnClick = true;
             toolStripMenuItemLevels4.Name = "toolStripMenuItemLevels4";
-            toolStripMenuItemLevels4.Size = new Size(180, 22);
+            toolStripMenuItemLevels4.Size = new Size(120, 22);
             toolStripMenuItemLevels4.Text = "4 levels";
             toolStripMenuItemLevels4.CheckedChanged += toolStripMenuItemDisplayLevel_CheckedChanged;
             // 
@@ -102,7 +109,7 @@
             // 
             toolStripMenuItemLevels5.CheckOnClick = true;
             toolStripMenuItemLevels5.Name = "toolStripMenuItemLevels5";
-            toolStripMenuItemLevels5.Size = new Size(180, 22);
+            toolStripMenuItemLevels5.Size = new Size(120, 22);
             toolStripMenuItemLevels5.Text = "5 levels";
             toolStripMenuItemLevels5.CheckedChanged += toolStripMenuItemDisplayLevel_CheckedChanged;
             // 
@@ -110,7 +117,7 @@
             // 
             toolStripMenuItemLevels6.CheckOnClick = true;
             toolStripMenuItemLevels6.Name = "toolStripMenuItemLevels6";
-            toolStripMenuItemLevels6.Size = new Size(180, 22);
+            toolStripMenuItemLevels6.Size = new Size(120, 22);
             toolStripMenuItemLevels6.Text = "6 levels";
             toolStripMenuItemLevels6.CheckedChanged += toolStripMenuItemDisplayLevel_CheckedChanged;
             // 
@@ -120,7 +127,7 @@
             toolStripMenuItemLevelsAll.CheckOnClick = true;
             toolStripMenuItemLevelsAll.CheckState = CheckState.Checked;
             toolStripMenuItemLevelsAll.Name = "toolStripMenuItemLevelsAll";
-            toolStripMenuItemLevelsAll.Size = new Size(180, 22);
+            toolStripMenuItemLevelsAll.Size = new Size(120, 22);
             toolStripMenuItemLevelsAll.Text = "All levels";
             toolStripMenuItemLevelsAll.CheckedChanged += toolStripMenuItemDisplayLevel_CheckedChanged;
             // 
@@ -137,6 +144,26 @@
             toolStripButtonFollowHead.ToolTipText = "Jump to and follow the end.";
             toolStripButtonFollowHead.CheckedChanged += toolStripButtonFollowHead_CheckedChanged;
             // 
+            // toolStripDropDownButtonLoggers
+            // 
+            toolStripDropDownButtonLoggers.Alignment = ToolStripItemAlignment.Right;
+            toolStripDropDownButtonLoggers.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripDropDownButtonLoggers.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemSpecialLoggersNoneAvailable });
+            toolStripDropDownButtonLoggers.Image = (Image)resources.GetObject("toolStripDropDownButtonLoggers.Image");
+            toolStripDropDownButtonLoggers.ImageTransparentColor = Color.Magenta;
+            toolStripDropDownButtonLoggers.Name = "toolStripDropDownButtonLoggers";
+            toolStripDropDownButtonLoggers.Size = new Size(62, 22);
+            toolStripDropDownButtonLoggers.Text = "Loggers";
+            toolStripDropDownButtonLoggers.DropDownOpening += toolStripDropDownButtonLoggers_DropDownOpening;
+            // 
+            // toolStripMenuItemSpecialLoggersNoneAvailable
+            // 
+            toolStripMenuItemSpecialLoggersNoneAvailable.CheckOnClick = true;
+            toolStripMenuItemSpecialLoggersNoneAvailable.Enabled = false;
+            toolStripMenuItemSpecialLoggersNoneAvailable.Name = "toolStripMenuItemSpecialLoggersNoneAvailable";
+            toolStripMenuItemSpecialLoggersNoneAvailable.Size = new Size(180, 22);
+            toolStripMenuItemSpecialLoggersNoneAvailable.Text = "<none available>";
+            // 
             // logView
             // 
             logView.Dock = DockStyle.Fill;
@@ -148,11 +175,6 @@
             logView.TabIndex = 1;
             logView.ZeroTime = new DateTime(2024, 6, 24, 10, 25, 15, 655);
             logView.HeadModeChanged += logView_HeadModeChanged;
-            // 
-            // toolStripSeparator1
-            // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(6, 25);
             // 
             // LogViewer
             // 
@@ -182,5 +204,7 @@
         private ToolStripButton toolStripButtonFollowHead;
         private ToolStripButton toolStripButtonClear;
         private ToolStripSeparator toolStripSeparator1;
+        private ToolStripDropDownButton toolStripDropDownButtonLoggers;
+        private ToolStripMenuItem toolStripMenuItemSpecialLoggersNoneAvailable;
     }
 }

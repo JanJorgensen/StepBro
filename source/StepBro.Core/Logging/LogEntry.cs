@@ -9,18 +9,18 @@ namespace StepBro.Core.Logging
 {
     public class LogEntry : ILogEntry
     {
-        public enum Type
+        public enum Type : UInt32
         {
             /// <summary>
             /// Normal information about a unning task in the current scope.
             /// </summary>
-            Normal,
+            Normal = 0x00,
             /// <summary>
             /// Entering a new scope.
             /// </summary>
             Pre,
             /// <summary>
-            /// Entrring a new high level scope.
+            /// Entering a new high level scope.
             /// </summary>
             PreHighLevel,
             /// <summary>
@@ -46,10 +46,15 @@ namespace StepBro.Core.Logging
             /// <summary>
             /// Communication in to (received by) the automation system.
             /// </summary>
-            CommunicationIn, Error,
+            CommunicationIn, 
+            Error,
             Failure,
             UserAction,
-            System
+            System,
+            /// <summary>
+            /// A special kind of information, where only the source knows how to show/decode/understand the data.
+            /// </summary>
+            Special = 0x100
         }
 
         private LogEntry m_next = null;

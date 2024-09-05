@@ -42,7 +42,7 @@ namespace StepBro.Core.Logging
                 case LogEntry.Type.Pre:
                 case LogEntry.Type.PreHighLevel:
                 case LogEntry.Type.TaskEntry:
-                case LogEntry.Type.Async:
+                //case LogEntry.Type.Async:
                 case LogEntry.Type.Error:
                 case LogEntry.Type.Failure:
                 case LogEntry.Type.UserAction:
@@ -52,6 +52,7 @@ namespace StepBro.Core.Logging
                 case LogEntry.Type.Detail:
                 case LogEntry.Type.CommunicationOut:
                 case LogEntry.Type.CommunicationIn:
+                case LogEntry.Type.Special:
                 default:
                     return false;
             }

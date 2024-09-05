@@ -24,6 +24,7 @@ namespace StepBro.Core
         private static ServiceManager.IServiceManagerAdministration m_serviceManagerAdmin = null;
         private static Logger m_mainLogger = null;
         private static ILoggerScope m_logRootScope = null;
+        private static ISpecialLoggerService m_specialLoggerService = null;
         private static ILoadedFilesManager m_loadedFilesManager = null;
         private static IConfigurationFileManager m_configurationFileManager = null;
         private static ITextFileSystem m_textFileSystem = null;
@@ -58,6 +59,9 @@ namespace StepBro.Core
             m_mainLogger = new Logger("", false, "StepBro", "Main logger created");
             IService service = m_mainLogger.RootScopeService;
             m_logRootScope = m_mainLogger.RootLogger as ILoggerScope;
+            m_serviceManagerAdmin.Manager.Register(service);
+
+            m_specialLoggerService = new SpecialLoggerService(out service, m_mainLogger);
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_loadedFilesManager = new LoadedFilesManager(out service);

@@ -24,7 +24,15 @@ namespace StepBro.UI.WinForms.Controls
 
             public override void CreatePresentationEntry(LogEntry entry, long sourceIndex, Action<ChronoListViewEntry> adder)
             {
-                adder(new LogViewEntry(entry, sourceIndex));
+                if ((entry.EntryType & LogEntry.Type.Special) != LogEntry.Type.Special)
+                {
+                    adder(new LogViewEntry(entry, sourceIndex));
+                }
+                else
+                {
+                    adder(new LogViewEntrySpecial(entry, sourceIndex));     // TODO: Get reference to the special handler for this data type.
+                    // TODO: Maybe the special handler could throw in a decoded/translated entry.
+                }
             }
 
             public override LogEntry PresentationToSource(ChronoListViewEntry entry)
@@ -238,6 +246,36 @@ namespace StepBro.UI.WinForms.Controls
             this.CreateFilter();
             logView.ZeroTime = zeroTime;
             logView.Setup(m_presentationList);
+        }
+
+        private void toolStripDropDownButtonLoggers_DropDownOpening(object sender, EventArgs e)
+        {
+            toolStripDropDownButtonLoggers.DropDownItems.Clear();
+            var specialLogging = Core.Main.GetService<ISpecialLoggerService>();
+
+            foreach (var logger in specialLogging.ListLoggers())
+            {
+                var item = new ToolStripMenuItem();
+                item.CheckOnClick = true;
+                item.Checked = logger.Enabled;
+                item.Name = "toolStripMenuItemSpecialLogger" + logger.Name;
+                item.Size = new Size(180, 22);
+                item.Text = logger.Name;
+                item.Tag = logger;
+                item.CheckedChanged += Item_CheckedChanged;
+            }
+
+            if (toolStripDropDownButtonLoggers.DropDownItems.Count == 0)
+            {
+                toolStripDropDownButtonLoggers.DropDownItems.Add(toolStripMenuItemSpecialLoggersNoneAvailable);
+            }
+        }
+
+        private void Item_CheckedChanged(object sender, EventArgs e)
+        {
+            var item = (ToolStripMenuItem)sender;
+            var logger = (ISpecialLogging)item.Tag;
+            logger.Enabled = item.Checked;
         }
     }
 }
