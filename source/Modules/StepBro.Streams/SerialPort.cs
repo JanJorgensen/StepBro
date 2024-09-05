@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Management;
+using System.Security.AccessControl;
 
 namespace StepBro.Streams
 {
@@ -90,54 +91,25 @@ namespace StepBro.Streams
         OnePointFive = 3
     }
 
-    class ArrayFifoChar : ArrayFifo<char>
-    {
-        public ArrayFifoChar(int size = 16384) : base(size) { }
-
-        public override string DataToString(char[] block, int start, int length)
-        {
-            return (new String(block.Skip(start).Take(length).ToArray())).Replace('\r', '^').Replace('\n', '^');
-        }
-
-        public override string ValueString(char value)
-        {
-            if (value < 32) value = '^';
-            return value.ToString();
-        }
-    }
-
     [Public]
     public class SerialPort : Stream, INameable
     {
         public delegate void OpenPortFailureExplorer(ICallContext context, Exception ex);
         private static OpenPortFailureExplorer s_OpenPortFailureExplorer = null;
 
-        private string m_objectName;
         private System.IO.Ports.SerialPort m_port;
         private long m_dataReceivedCounter = 0L;
-        private ILogger m_asyncLogger = null;
+        //private ILogger m_asyncLogger = null;
+        private ISpecialLogging m_specialLogging = null;
         private bool m_reportOverrun = false;
 
-        public SerialPort([ObjectName] string objectName = "<a SerialPort>")
+        public SerialPort([ObjectName] string objectName = "<a SerialPort>") : base(objectName)
         {
             m_port = new System.IO.Ports.SerialPort();
             m_port.ErrorReceived += this.Port_ErrorReceived;
             m_port.Encoding = Encoding.Latin1;
-            m_objectName = objectName;
-            m_asyncLogger = Core.Main.GetService<ILogger>().LogEntering(m_objectName, "Create SerialPort");
         }
 
-        [ObjectName]
-        public string Name
-        {
-            get { return m_objectName; }
-            set
-            {
-                if (String.IsNullOrWhiteSpace(value)) throw new ArgumentException();
-                if (m_objectName != null) throw new InvalidOperationException("The object is already named.");
-                m_objectName = value;
-            }
-        }
         internal System.IO.Ports.SerialPort Port { get { return m_port; } }
         public long DataReceivedCounter { get { return m_dataReceivedCounter; } }
         public string PortName { get { return m_port.PortName; } set { m_port.PortName = value; } }
@@ -164,7 +136,8 @@ namespace StepBro.Streams
         {
             if (m_reportOverrun || e.EventType != System.IO.Ports.SerialError.Overrun)
             {
-                m_asyncLogger.LogError(e.EventType.ToString());
+                //m_asyncLogger.LogError(e.EventType.ToString());
+                m_specialLogging.LogError(e.EventType.ToString());
             }
         }
 
@@ -181,6 +154,11 @@ namespace StepBro.Streams
             try
             {
                 m_port.Open();
+                if (m_specialLogging == null)
+                {
+                    //m_asyncLogger = Core.Main.GetService<ILogger>().LogEntering(this.Name, null);
+                    m_specialLogging = Core.Main.GetService<ISpecialLoggerService>().CreateSpecialLogger(this);
+                }
             }
             catch (Exception ex)
             {
@@ -190,8 +168,6 @@ namespace StepBro.Streams
                 }
                 if (context != null && context.LoggingEnabled)
                 {
-
-
                     using (ManagementClass i_Entity = new ManagementClass("Win32_PnPEntity"))
                     {
                         foreach (ManagementObject i_Inst in i_Entity.GetInstances())
@@ -276,7 +252,12 @@ namespace StepBro.Streams
 
         public override string ReadLineDirect()
         {
-            return m_port.ReadLine();
+            var line = m_port.ReadLine();
+            if (m_specialLogging != null && m_specialLogging.Enabled)
+            {
+                m_specialLogging.LogSent(line);
+            }
+            return line;
         }
 
         public override void DiscardInBuffer()

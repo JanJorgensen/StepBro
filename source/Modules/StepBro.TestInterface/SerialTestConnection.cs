@@ -12,26 +12,21 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static StepBro.Core.Data.LogLineData;
 
 namespace StepBro.TestInterface
 {
     public class SerialTestConnection :
-        AvailabilityBase,
+        TextLineCommunicator,
         IConnection,
         IRemoteProcedures,
-        INameable,
-        INamedObject,
         ISettableFromPropertyBlock,
         INotifyPropertyChanged,
-        ILogLineParent,
-        ITextCommandInput
+        ILogLineParent
     {
         private class CommandData : IAsyncResult<object>, IObjectFaultDescriptor
         {
             public enum CommandState { InQueue, Running, EndResponseReceived, EndTimeout, EndResponseError, EndResultFormatError }
             private ILogger m_logger = null;
-            private readonly DateTime m_start;
             private DateTime m_activated = DateTime.MinValue;
             private TimeSpan m_timeoutTimeSpan;
             private DateTime m_timeoutTime = DateTime.MinValue;
@@ -48,7 +43,6 @@ namespace StepBro.TestInterface
             public CommandData(ILogger logger, string command, TimeSpan timeout, Type expectedDataType) : base()
             {
                 m_logger = logger;
-                m_start = DateTime.Now;
                 m_command = command;
                 m_timeoutTimeSpan = timeout;
                 m_expectedReturnType = expectedDataType;
@@ -282,176 +276,53 @@ namespace StepBro.TestInterface
             }
         }
 
-        private readonly object m_sync = new object();
-        private string m_name = null;
-        private Stream m_stream = null;
         private ILogger m_mainLogger = null;
         private LogLineData m_firstLogLine = null;
-        private LogLineData m_lastLogLine = null;
         private object m_eventLogSync = new object();
-        private LogLineData m_lastEventLogLine = null;
         private LogLineLineReader m_asyncLogLineReader = null;
         private readonly Queue<string> m_events = new Queue<string>();
         private readonly Queue<string> m_responseLines = new Queue<string>();
-        private Task m_receiverTask = null;
-        private bool m_stopReceiver = false;
         private readonly AutoResetEvent m_newResponseDataEvent;
         private readonly Queue<CommandData> m_commandQueue = new Queue<CommandData>();
         private CommandData m_currentExecutingCommand = null;
         private string m_nextResponse = null;
-        private readonly long m_instanceID;
-        private static Random rnd = new Random(DateTime.Now.GetHashCode());
         private Dictionary<string, string> m_loopbackAnswers = null;
         private List<Tuple<string, string>> m_uiCommands = null;
         private List<string> m_setupCommands = null;
 
         private List<RemoteProcedureInfo> m_remoteProcedures = new List<RemoteProcedureInfo>();
 
-        public SerialTestConnection([ObjectName] string objectName = "<a SerialTestConnection>")
+        public SerialTestConnection([ObjectName] string objectName = "<a SerialTestConnection>") : base(objectName)
         {
-            m_name = objectName;
-            m_instanceID = rnd.Next(1000000);
             m_newResponseDataEvent = new AutoResetEvent(false);
             SetupDebugCommands();
-            m_mainLogger = StepBro.Core.Main.RootLogger.CreateSubLocation(m_name);
         }
 
         protected override void DoDispose(bool disposing)
         {
-            this.Close(null);
-            this.Stream = null;
+            base.DoDispose(disposing);
             if (m_asyncLogLineReader != null)
             {
                 m_asyncLogLineReader = null;
             }
         }
 
-        [ObjectName]
-        public string Name
+        protected override void OnNameChanged()
         {
-            get { return m_name; }
-            set
-            {
-                if (String.IsNullOrWhiteSpace(value)) throw new ArgumentException();
-                if (m_name != null) throw new InvalidOperationException("The object is already named.");
-                m_name = value;
-                m_mainLogger = StepBro.Core.Main.RootLogger.CreateSubLocation(m_name);  // Create new scope.
-            }
-        }
-
-        string INamedObject.ShortName { get { return m_name; } }
-        string INamedObject.FullName { get { return m_name; } }
-
-        public string DisplayName { get { return (m_name != null) ? m_name : "SerialTestConnection"; } }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void NotifyPropertyChanged(string name)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            m_mainLogger = StepBro.Core.Main.RootLogger.CreateSubLocation(this.Name);
         }
 
         #region Properties
-
-        public Stream Stream
-        {
-            get { return m_stream; }
-            set
-            {
-                if (!Object.ReferenceEquals(value, m_stream))
-                {
-                    if (m_stream != null)
-                    {
-                        m_stream.IsOpenChanged -= m_stream_IsOpenChanged;
-                        m_stream = null;
-                    }
-                    if (value != null)
-                    {
-                        m_stream = value;
-                        m_stream.Encoding = new ASCIIEncoding();
-                        m_stream.NewLine = "\r";
-                        m_stream.IsOpenChanged += m_stream_IsOpenChanged;
-                        m_stream.ReadTimeout = 500;
-                    }
-                }
-            }
-        }
-
-        private void m_stream_IsOpenChanged(object sender, EventArgs e)
-        {
-            if (!m_stream.IsOpen)
-            {
-                this.NotifyPropertyChanged(nameof(IsOpen));
-            }
-        }
 
         public char EventLineChar { get; set; } = '!';
         public char ResponseEndLineChar { get; set; } = ':';
         public char ResponseMultiLineChar { get; set; } = '*';
         public string ResponseErrorPrefix { get; set; } = ":ERROR";
         public TimeSpan CommandResponseTimeout { get; set; } = TimeSpan.FromMilliseconds(5000);
-        public long InstanceID { get { return m_instanceID; } }
         public bool AsyncLogFlushOnSendCommand { get; set; } = true;
         public bool NoFlushOnNextCommand { get; set; } = false;
 
         #endregion
-
-        #region IConnection
-
-        [Obsolete]
-        public bool IsConnected
-        {
-            get { return this.IsOpen; }
-        }
-        public bool IsOpen
-        {
-            get { return m_stream != null && m_stream.IsOpen && !m_receiverTask.IsFaulted; }
-        }
-
-        [Obsolete]
-        public bool Connect([Implicit] ICallContext context)
-        {
-            return this.Open(context);
-        }
-
-        public bool Open([Implicit] ICallContext context)
-        {
-            if (m_stream.IsOpen || m_stream.Open(context))
-            {
-                if (m_receiverTask == null)
-                {
-                    m_stopReceiver = false;
-                    m_receiverTask = new Task(
-                        ReceiverTask,
-                        TaskCreationOptions.LongRunning | TaskCreationOptions.DenyChildAttach);
-                    context.TaskManager.RegisterTask(m_receiverTask);
-                    m_receiverTask.Start();
-                }
-                return true;
-            }
-            else return false;
-        }
-
-        [Obsolete]
-        public bool Disconnect([Implicit] ICallContext context)
-        {
-            return this.Close(context);
-        }
-
-        public bool Close([Implicit] ICallContext context)
-        {
-            if (m_receiverTask != null && !m_receiverTask.IsCompleted)
-            {
-                m_stopReceiver = true;
-                m_receiverTask.Wait();      // Important, to avoid having two running tasks if connecting again soon. 
-            }
-            if (m_stream != null)
-            {
-                m_stream.Close(context);
-            }
-            m_receiverTask = null;
-            return true;
-        }
 
         public IParametersAccess Parameters { get { throw new NotImplementedException(); } }
 
@@ -498,13 +369,8 @@ namespace StepBro.TestInterface
             return EnqueueCommand(commandData);
         }
 
-        public void SendDirect([Implicit] ICallContext context, string text)
+        protected override void PreSend(ICallContext context, string text)
         {
-            if (!m_stream.IsOpen)
-            {
-                context.Logger.LogError("Stream is not opened.");
-                return;
-            }
             if (AsyncLogFlushOnSendCommand && !NoFlushOnNextCommand)
             {
                 AsyncLog.Flush();
@@ -515,24 +381,15 @@ namespace StepBro.TestInterface
             {
                 context.Logger.Log("SendDirect: \"" + text + "\"");
             }
-            DoSendDirect(text);
         }
 
-        bool ITextCommandInput.AcceptingCommands()
+        protected override void EnqueueCommand(string command)
         {
-            return this.IsStillValid && this.IsOpen;
-        }
-
-        void ITextCommandInput.ExecuteCommand(string command)
-        {
-            if (!m_stream.IsOpen)
-            {
-                m_mainLogger.LogError("Stream is not opened.");
-                return;
-            }
             var commandData = new CommandData(m_mainLogger, command, this.CommandResponseTimeout, null);
-            EnqueueCommand(commandData);
+            this.EnqueueCommand(commandData);
         }
+
+        #region Setup Commands
 
         public void ClearSetupCommands([Implicit] ICallContext context)
         {
@@ -624,6 +481,8 @@ namespace StepBro.TestInterface
             }
             return last;    // Return the last command to allow caller to wait until all commands have been executed.
         }
+
+        #endregion
 
         public IAsyncResult<bool> UpdateInterfaceData([Implicit] ICallContext context = null)
         {
@@ -823,8 +682,6 @@ namespace StepBro.TestInterface
             }
         }
 
-        #endregion
-
         #region IRemoteProcedures
 
         public IAsyncResult<object> Invoke(RemoteProcedureInfo procedure, params object[] arguments)
@@ -861,130 +718,56 @@ namespace StepBro.TestInterface
 
         #endregion
 
-        private void AddToLog(LogType type, uint id, string text)
+        #region Receiver
+
+        protected override void OnReceiverThreadLoop()
         {
-            try
+            lock (m_sync)
             {
-                System.Diagnostics.Debug.WriteLine($"TESTCONNECTION {type} {id}: {text}");
-                m_lastLogLine = new LogLineData(m_lastLogLine, type, id, text, 1); // First character of Serial Connection messages should be ignored
-                if (m_firstLogLine == null)
+                if (m_currentExecutingCommand != null)
                 {
-                    m_firstLogLine = m_lastLogLine;
+                    var to = (m_currentExecutingCommand.TimeoutTime - DateTime.Now).Ticks / TimeSpan.TicksPerMillisecond;
+                    if (to <= 0)
+                    {
+                        m_currentExecutingCommand.SetTimeoutResult();
+                        OnEndCommand();
+                    }
                 }
-                switch (type)
-                {
-                    case LogType.ReceivedEnd:
-                    case LogType.ReceivedPartial:
-                    case LogType.ReceivedError:
-                        if (m_mainLogger != null)
-                        {
-                            m_mainLogger.LogCommReceived(text);
-                        }
-                        else if (m_currentExecutingCommand != null)
-                        {
-                            var logger = m_currentExecutingCommand?.Logger;
-                            if (logger != null)
-                            {
-                                logger.LogDetail("Received: " + text);
-                            }
-                        }
-                        break;
-                    case LogType.ReceivedAsync:
-                        if (m_mainLogger != null)
-                        {
-                            m_mainLogger.LogCommReceived(text);
-                        }
-                        if (m_asyncLogLineReader != null)
-                        {
-                            lock (m_eventLogSync)
-                            {
-                                m_lastEventLogLine = new LogLineData(m_lastEventLogLine, type, id, text, 1); // First character of Serial Connection messages should be ignored
-                                m_asyncLogLineReader.NotifyNew(m_lastEventLogLine);
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                LinesAdded?.Invoke(this, new LogLineEventArgs(m_lastLogLine));
-            }
-            catch (Exception ex)
-            {
-                StepBro.Core.Main.RootLogger.LogError($"SerialTestConnection.AddToLog unexpected error. Exception: {ex}");
             }
         }
 
-        private void ReceiverTask()
+        protected override void OnTextLineReceived(string line)
         {
-            while (!m_stopReceiver)
+            if (m_mainLogger != null) m_mainLogger.LogCommReceived(line);
+            if (line[0] == EventLineChar)
             {
-                lock (m_sync)
+                m_events.Enqueue(line.Substring(1));
+                while (m_events.Count > 1000)
+                {
+                    m_events.Dequeue();     // Ensure queue buffer is not eating all memory.
+                }
+            }
+            else
+            {
+                if (line[0] == ResponseMultiLineChar)
                 {
                     if (m_currentExecutingCommand != null)
                     {
-                        var to = (m_currentExecutingCommand.TimeoutTime - DateTime.Now).Ticks / TimeSpan.TicksPerMillisecond;
-                        if (to <= 0)
-                        {
-                            m_currentExecutingCommand.SetTimeoutResult();
-                            AddToLog(LogType.ReceivedError, 0, "<timeout>");
-                            OnEndCommand();
-                        }
+                        m_responseLines.Enqueue(line.Substring(1));
                     }
                 }
-
-                string line = null;
-
-                try
+                else if (line[0] == ResponseEndLineChar)
                 {
-                    line = m_stream.ReadLineDirect();
-                }
-                catch { }
-                
-                if (line != null && line.Length > 0)
-                {
-                    if (line[0] == EventLineChar)
+                    if (m_currentExecutingCommand != null)
                     {
-                        lock (m_sync)
+                        try
                         {
-                            AddToLog(LogType.ReceivedAsync, 0, new string(line));
+                            m_currentExecutingCommand.SetResult(line, m_responseLines.ToArray());
                         }
-                        m_events.Enqueue(line.Substring(1));
-                        while (m_events.Count > 1000)
+                        finally
                         {
-                            m_events.Dequeue();     // Ensure queue buffer is not eating all memory.
                         }
-                    }
-                    else
-                    {
-                        if (line[0] == ResponseMultiLineChar)
-                        {
-                            lock (m_sync)
-                            {
-                                AddToLog(LogType.ReceivedPartial, 0, new string(line));
-                            }
-                            if (m_currentExecutingCommand != null)
-                            {
-                                m_responseLines.Enqueue(line.Substring(1));
-                            }
-                        }
-                        else if (line[0] == ResponseEndLineChar)
-                        {
-                            lock (m_sync)
-                            {
-                                AddToLog((line.StartsWith(ResponseErrorPrefix)) ? LogType.ReceivedError : LogType.ReceivedEnd, 0, line);
-                            }
-                            if (m_currentExecutingCommand != null)
-                            {
-                                try
-                                {
-                                    m_currentExecutingCommand.SetResult(line, m_responseLines.ToArray());
-                                }
-                                finally
-                                {
-                                }
-                                OnEndCommand();
-                            }
-                        }
+                        OnEndCommand();
                     }
                 }
             }
@@ -1002,6 +785,8 @@ namespace StepBro.TestInterface
                 }
             }
         }
+
+        #endregion
 
         private CommandData EnqueueCommand(CommandData command)
         {
@@ -1028,14 +813,6 @@ namespace StepBro.TestInterface
             else if (command.Logger != null) command.Logger.LogCommSent(commandstring);
             m_currentExecutingCommand = command;
             DoSendDirect(commandstring);
-        }
-
-        private void DoSendDirect(string text)
-        {
-            AddToLog(LogType.Sent, 0, text);
-            // The following line can be enabled if debugging the communication.
-            //DebugLogEntry.Register(new DebugLogEntryString("Send: " + text));
-            m_stream.Write(null, text + m_stream.NewLine);
         }
 
         private static string ArgumentToCommandString(object arg)

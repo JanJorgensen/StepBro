@@ -6,7 +6,7 @@
     <OutputPath>..\..\bin\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <RootNamespace>StepBro.Core.Test</RootNamespace>
+    <RootNamespace>StepBroCoreTest</RootNamespace>
     <AssemblyName>StepBro.Core.Test</AssemblyName>
     <InvariantGlobalization>true</InvariantGlobalization>
     <Configurations>Debug;Release;DebugAll;ReleaseAll</Configurations>
