@@ -4,23 +4,23 @@ namespace StepBro.Core.Data
 {
     public class AvailabilityBase : IAvailability
     {
-        public bool IsStillValid { get { return !disposedValue; } }
+        public bool IsStillValid { get { return !m_isDisposed; } }
 
         public event EventHandler Disposing;
         public event EventHandler Disposed;
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool m_isDisposed = false; // To detect redundant calls
 
         protected void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!m_isDisposed)
             {
                 this.Disposing?.Invoke(this, EventArgs.Empty);
 
                 this.DoDispose(disposing);
+                m_isDisposed = true;
 
-                disposedValue = true;
                 this.Disposed?.Invoke(this, EventArgs.Empty);
             }
         }
