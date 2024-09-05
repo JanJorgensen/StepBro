@@ -99,8 +99,8 @@ namespace StepBro.Streams
 
         private System.IO.Ports.SerialPort m_port;
         private long m_dataReceivedCounter = 0L;
-        //private ILogger m_asyncLogger = null;
-        private ISpecialLogging m_specialLogging = null;
+        private ILogger m_asyncLogger = null;
+        //private ISpecialLogging m_specialLogging = null;
         private bool m_reportOverrun = false;
 
         public SerialPort([ObjectName] string objectName = "<a SerialPort>") : base(objectName)
@@ -136,8 +136,8 @@ namespace StepBro.Streams
         {
             if (m_reportOverrun || e.EventType != System.IO.Ports.SerialError.Overrun)
             {
-                //m_asyncLogger.LogError(e.EventType.ToString());
-                m_specialLogging.LogError(e.EventType.ToString());
+                m_asyncLogger.LogError(e.EventType.ToString());
+                //m_specialLogging.LogError(e.EventType.ToString());
             }
         }
 
@@ -154,11 +154,11 @@ namespace StepBro.Streams
             try
             {
                 m_port.Open();
-                if (m_specialLogging == null)
-                {
-                    //m_asyncLogger = Core.Main.GetService<ILogger>().LogEntering(this.Name, null);
-                    m_specialLogging = Core.Main.GetService<ISpecialLoggerService>().CreateSpecialLogger(this);
-                }
+                m_asyncLogger = Core.Main.GetService<ILogger>().LogEntering(this.Name, null);
+                //if (m_specialLogging == null)
+                //{
+                //    m_specialLogging = Core.Main.GetService<ISpecialLoggerService>().CreateSpecialLogger(this);
+                //}
             }
             catch (Exception ex)
             {
@@ -242,6 +242,10 @@ namespace StepBro.Streams
                     }
                     context.Logger.Log(s);
                 }
+                //if (m_specialLogging != null && m_specialLogging.Enabled)
+                //{
+                //    m_specialLogging.LogSent(text);
+                //}
                 m_port.Write(text);
             }
             else
@@ -253,10 +257,10 @@ namespace StepBro.Streams
         public override string ReadLineDirect()
         {
             var line = m_port.ReadLine();
-            if (m_specialLogging != null && m_specialLogging.Enabled)
-            {
-                m_specialLogging.LogSent(line);
-            }
+            //if (m_specialLogging != null && m_specialLogging.Enabled)
+            //{
+            //    m_specialLogging.LogReceived(line);
+            //}
             return line;
         }
 
