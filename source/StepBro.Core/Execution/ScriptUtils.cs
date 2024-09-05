@@ -128,9 +128,24 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static byte[] ToByteArray(this List<long> input)
+        public static ByteArray ToByteArray(this List<long> input)
         {
-            return input.ConvertAll(v => (byte)(ulong)v).ToArray();
+            return new ByteArray(input.ConvertAll(v => (byte)(ulong)v).ToArray());
+        }
+        [Public]
+        public static ByteArray ToByteArray(this List<int> input)
+        {
+            return new ByteArray(input.ConvertAll(v => (byte)(uint)v).ToArray());
+        }
+        [Public]
+        public static ByteArray ToByteArray(this List<uint> input)
+        {
+            return new ByteArray(input.ConvertAll(v => (byte)v).ToArray());
+        }
+        [Public]
+        public static ByteArray ToByteArray(this byte[] array, int start = 0, int length = -1)
+        {
+            return new ByteArray(array, start, length);
         }
 
         [Public]

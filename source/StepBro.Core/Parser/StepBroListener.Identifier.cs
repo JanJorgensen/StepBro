@@ -766,6 +766,18 @@ namespace StepBro.Core.Parser
                     m_errors.SymanticError(right.Token.Line, right.Token.Column, false, $"More than one property with same name: \"{rightString}\".");
                     return null;
                 }
+                var nestedTypes = leftType.GetNestedTypes().Where(nt => String.Equals(nt.Name, rightString, StringComparison.InvariantCulture)).ToArray();
+                if (nestedTypes.Length == 1)
+                {
+                    return new SBExpressionData(
+                        HomeType.Immediate,
+                        SBExpressionType.TypeReference,             // Expression type
+                        (TypeReference)nestedTypes[0],              // Data type
+                        null,                                       // No expression to a type.
+                        nestedTypes[0],                             // Reference to the type info
+                        token: right.Token);
+                }
+
                 return null;    // None found
             }
             else

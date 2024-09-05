@@ -427,7 +427,7 @@ namespace StepBro.Core.Parser
 
             if (file.Errors.ErrorCount > 0) throw new ParsingErrorException(file.Errors[0].Line, "PARSING ERROR", file.Errors[0].Message);
 
-            //file?.InitializeFileVariables();
+            file?.InitializeFileVariables((ILogger)null);
             return file;
         }
 
