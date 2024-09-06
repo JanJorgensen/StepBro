@@ -381,15 +381,15 @@ namespace StepBro.Core.Data
             StringBuilder text = new(1000);
             text.Append(timestamp);
             text.Append(new string(' ', 1 + entry.IndentLevel * 3));
-            string type = entry.EntryType switch
+            string type = (entry.EntryType & LogEntry.Type.FlagFilter) switch
             {
-                LogEntry.Type.Async => "<A> ",
-                LogEntry.Type.CommunicationOut => "                                <Out> ",
-                LogEntry.Type.CommunicationIn => "                                <In>  ",
-                LogEntry.Type.TaskEntry => "TaskEntry - ",
-                LogEntry.Type.Error => showErrorAndFailType ? "Error - " : "",
+                LogEntry.Type.Async =>                          "<A> ",
+                LogEntry.Type.CommunicationOut =>               "                                <Out> ",
+                LogEntry.Type.CommunicationIn =>                "                                <In>  ",
+                LogEntry.Type.TaskEntry =>                      "TaskEntry - ",
+                LogEntry.Type.Error => showErrorAndFailType ?   "Error - " : "",
                 LogEntry.Type.Failure => showErrorAndFailType ? "Fail - " : "",
-                LogEntry.Type.UserAction => "UserAction - ",
+                LogEntry.Type.UserAction =>                     "UserAction - ",
                 _ => ""
             };
             text.Append(type);

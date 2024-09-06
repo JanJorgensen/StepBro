@@ -55,6 +55,7 @@ namespace StepBro.Core.Logging
             Failure,
             UserAction,
             System,
+            FlagFilter = 0xFF,
             /// <summary>
             /// A special kind of information, where only the source knows how to show/decode/understand the data.
             /// </summary>

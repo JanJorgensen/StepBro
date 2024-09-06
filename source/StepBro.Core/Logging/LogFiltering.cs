@@ -14,6 +14,7 @@ namespace StepBro.Core.Logging
         }
         public static bool Normal(LogEntry entry)
         {
+            if (entry.EntryType == LogEntry.Type.Component) return false;
             return (entry.EntryType != LogEntry.Type.Post || entry.IndentLevel < 3) && (entry.Text != null || entry.Location != null);
         }
 
@@ -42,12 +43,13 @@ namespace StepBro.Core.Logging
                 case LogEntry.Type.Pre:
                 case LogEntry.Type.PreHighLevel:
                 case LogEntry.Type.TaskEntry:
-                //case LogEntry.Type.Async:
+                case LogEntry.Type.Async:
                 case LogEntry.Type.Error:
                 case LogEntry.Type.Failure:
                 case LogEntry.Type.UserAction:
                 case LogEntry.Type.System:
                     return entry.Text != null || entry.Location != null;
+                case LogEntry.Type.Component:
                 case LogEntry.Type.Post:
                 case LogEntry.Type.Detail:
                 case LogEntry.Type.CommunicationOut:
