@@ -251,7 +251,7 @@ namespace StepBro.UI.WinForms.Controls
         private void toolStripDropDownButtonLoggers_DropDownOpening(object sender, EventArgs e)
         {
             toolStripDropDownButtonLoggers.DropDownItems.Clear();
-            var specialLogging = Core.Main.GetService<ISpecialLoggerService>();
+            var specialLogging = Core.Main.GetService<IComponentLoggerService>();
 
             foreach (var logger in specialLogging.ListLoggers())
             {
@@ -274,7 +274,7 @@ namespace StepBro.UI.WinForms.Controls
         private void Item_CheckedChanged(object sender, EventArgs e)
         {
             var item = (ToolStripMenuItem)sender;
-            var logger = (ISpecialLogging)item.Tag;
+            var logger = (IComponentLogging)item.Tag;
             logger.Enabled = item.Checked;
         }
     }

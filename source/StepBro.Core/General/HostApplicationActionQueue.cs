@@ -163,7 +163,7 @@ namespace StepBro.Core.General
             {
                 try
                 {
-                    m_logger.EnteredParallelTask(this.Title);
+                    this.SetTaskLogger(m_logger.LogEntering("Starting Application Task", this.Title));
                     this.ExecuteTaskFunction(m_context);
                     m_logger.LogExit("Ended successfully");
                 }
@@ -292,7 +292,6 @@ namespace StepBro.Core.General
             {
                 this.TaskStarted?.Invoke(this, EventArgs.Empty);
                 var taskData = data as TaskData;
-                taskData.SetTaskLogger(m_logger.LogEntering("Starting Application Task", taskData.Title));
                 taskData.RunTask();
             }
             finally

@@ -100,7 +100,7 @@ namespace StepBro.Streams
         private System.IO.Ports.SerialPort m_port;
         private long m_dataReceivedCounter = 0L;
         private ILogger m_asyncLogger = null;
-        //private ISpecialLogging m_specialLogging = null;
+        //private IComponentLogging m_componentLogging = null;
         private bool m_reportOverrun = false;
 
         public SerialPort([ObjectName] string objectName = "<a SerialPort>") : base(objectName)
@@ -137,7 +137,7 @@ namespace StepBro.Streams
             if (m_reportOverrun || e.EventType != System.IO.Ports.SerialError.Overrun)
             {
                 m_asyncLogger.LogError(e.EventType.ToString());
-                //m_specialLogging.LogError(e.EventType.ToString());
+                //m_componentLogging.LogError(e.EventType.ToString());
             }
         }
 
@@ -154,7 +154,7 @@ namespace StepBro.Streams
             try
             {
                 m_port.Open();
-                m_asyncLogger = Core.Main.GetService<ILogger>().LogEntering(this.Name, null);
+                m_asyncLogger = ((ILoggerScope)Core.Main.GetService<ILogger>()).LogEntering(LogEntry.Type.Component, this.Name, null, null);
                 //if (m_specialLogging == null)
                 //{
                 //    m_specialLogging = Core.Main.GetService<ISpecialLoggerService>().CreateSpecialLogger(this);

@@ -40,6 +40,10 @@ namespace StepBro.Core.Logging
             /// </summary>
             Async,
             /// <summary>
+            /// Information related to a specific software component or device.
+            /// </summary>
+            Component,
+            /// <summary>
             /// Communication out of (sent from) the automation system.
             /// </summary>
             CommunicationOut,

@@ -6,7 +6,7 @@ using System;
 namespace StepBro.Streams
 {
     [Public]
-    public abstract class Stream : IDisposable, ISpecialLoggerSource
+    public abstract class Stream : IDisposable, IComponentLoggerSource
     {
         private bool m_isDisposed = false;
         private string m_objectName;
@@ -152,11 +152,11 @@ namespace StepBro.Streams
 
         #region SpecialLogger
 
-        string ISpecialLoggerSource.Name { get { return this.Name; } }
+        string IComponentLoggerSource.Name { get { return this.Name; } }
 
-        bool ISpecialLoggerSource.Enabled { get { return m_specialLoggerEnabled; } }
+        bool IComponentLoggerSource.Enabled { get { return m_specialLoggerEnabled; } }
 
-        bool ISpecialLoggerSource.SetEnabled(bool value)
+        bool IComponentLoggerSource.SetEnabled(bool value)
         {
             if (value != m_specialLoggerEnabled)
             {

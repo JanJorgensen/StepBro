@@ -73,11 +73,6 @@ namespace StepBroCoreTest.Mocks
 
         string ILogger.Location => throw new NotImplementedException();
 
-        void ILoggerScope.EnteredParallelTask(string text)
-        {
-            throw new NotImplementedException();
-        }
-
         ILogEntry ILogger.Log(string text)
         {
             throw new NotImplementedException();
@@ -98,7 +93,7 @@ namespace StepBroCoreTest.Mocks
             throw new NotImplementedException();
         }
 
-        ILoggerScope ILoggerScope.LogEntering(bool isHighLevel, string location, string text, LoggerDynamicLocationSource dynamicLocation)
+        ILoggerScope ILoggerScope.LogEntering(LogEntry.Type type, string location, string text, LoggerDynamicLocationSource dynamicLocation)
         {
             throw new NotImplementedException();
         }

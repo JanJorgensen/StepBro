@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Logging
 {
-    public interface ISpecialLoggerSource
+    public interface IComponentLoggerSource
     {
         string Name { get; }
         /// <summary>
@@ -18,13 +18,13 @@ namespace StepBro.Core.Logging
         bool Enabled { get; }
     }
 
-    public interface ISpecialLoggerService
+    public interface IComponentLoggerService
     {
-        ISpecialLogging CreateSpecialLogger(ISpecialLoggerSource source);
-        IEnumerable<ISpecialLogging> ListLoggers();
+        IComponentLogging CreateComponentLogger(IComponentLoggerSource source);
+        IEnumerable<IComponentLogging> ListLoggers();
     }
 
-    public interface ISpecialLogging : IDisposable
+    public interface IComponentLogging : IDisposable
     {
         bool Enabled { get; set; }
         event EventHandler EnabledChanged;
@@ -35,13 +35,13 @@ namespace StepBro.Core.Logging
         DateTime LogError(string text);
     }
 
-    internal class SpecialLoggerService : ServiceBase<ISpecialLoggerService, SpecialLoggerService>, ISpecialLoggerService
+    internal class ComponentLoggerService : ServiceBase<IComponentLoggerService, ComponentLoggerService>, IComponentLoggerService
     {
-        private class Logger : ISpecialLogging
+        private class Logger : IComponentLogging
         {
-            ISpecialLoggerSource m_source;
+            IComponentLoggerSource m_source;
 
-            public Logger(ISpecialLoggerSource source)
+            public Logger(IComponentLoggerSource source)
             {
                 m_source = source;
             }
@@ -93,20 +93,20 @@ namespace StepBro.Core.Logging
         StepBro.Core.Logging.Logger m_mainLogger;
         private List<Logger> m_loggers = new List<Logger>();
 
-        public SpecialLoggerService(out IService serviceAccess, StepBro.Core.Logging.Logger logger) :
-            base("SpecialLoggerService", out serviceAccess)
+        public ComponentLoggerService(out IService serviceAccess, StepBro.Core.Logging.Logger logger) :
+            base("ComponentLoggerService", out serviceAccess)
         {
             m_mainLogger = logger;
         }
 
-        public ISpecialLogging CreateSpecialLogger(ISpecialLoggerSource source)
+        public IComponentLogging CreateComponentLogger(IComponentLoggerSource source)
         {
             var logger = new Logger(source);
             m_loggers.Add(logger);
-            return logger as ISpecialLogging;
+            return logger as IComponentLogging;
         }
 
-        public IEnumerable<ISpecialLogging> ListLoggers()
+        public IEnumerable<IComponentLogging> ListLoggers()
         {
             foreach (var logger in m_loggers) { yield return logger; }
         }

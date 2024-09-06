@@ -131,7 +131,7 @@ namespace StepBro.Core.Execution
                 var isHighlevel = m_parentContext?.m_nextCallHighLevelType != null;
                 var textPrefix = isHighlevel ? (m_parentContext.m_nextCallHighLevelType + " - ") : "";
                 m_loggerInsideScope = m_loggerOnEntry.LogEntering(
-                    isHighlevel,
+                    isHighlevel ? LogEntry.Type.PreHighLevel : LogEntry.Type.Pre,
                     ((m_parentContext != null) ? m_parentContext.m_currentStatementLine.ToString() + " " : "")  + (m_isDynamicCall ? "<DYNAMIC CALL> " : "") + m_procedure.FullName,
                     textPrefix + argText.ToString(),
                     new LoggerDynamicLocationSource(this.GetDynamicLogLocation));

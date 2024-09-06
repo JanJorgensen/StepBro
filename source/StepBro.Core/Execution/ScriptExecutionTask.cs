@@ -127,7 +127,7 @@ namespace StepBro.Core.Execution
 
         private void ProcedureExecutionTask()
         {
-            m_loggerExecutionScope = m_loggerOuterScope.LogEntering(true, "Script Execution", (m_targetTitle != null) ? m_targetTitle : m_targetProcedure.FullName, null);
+            m_loggerExecutionScope = m_loggerOuterScope.LogEntering(LogEntry.Type.TaskEntry, "Script Execution", (m_targetTitle != null) ? m_targetTitle : m_targetProcedure.FullName, null);
             m_taskContext.Setup(m_loggerExecutionScope, ContextLogOption.Normal, m_statusUpdateRoot, m_filesManager, m_taskManager);
             this.SetState(TaskExecutionState.Running);
 

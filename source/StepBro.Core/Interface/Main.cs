@@ -24,7 +24,7 @@ namespace StepBro.Core
         private static ServiceManager.IServiceManagerAdministration m_serviceManagerAdmin = null;
         private static Logger m_mainLogger = null;
         private static ILoggerScope m_logRootScope = null;
-        private static ISpecialLoggerService m_specialLoggerService = null;
+        private static IComponentLoggerService m_specialLoggerService = null;
         private static ILoadedFilesManager m_loadedFilesManager = null;
         private static IConfigurationFileManager m_configurationFileManager = null;
         private static ITextFileSystem m_textFileSystem = null;
@@ -61,7 +61,7 @@ namespace StepBro.Core
             m_logRootScope = m_mainLogger.RootLogger as ILoggerScope;
             m_serviceManagerAdmin.Manager.Register(service);
 
-            m_specialLoggerService = new SpecialLoggerService(out service, m_mainLogger);
+            m_specialLoggerService = new ComponentLoggerService(out service, m_mainLogger);
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_loadedFilesManager = new LoadedFilesManager(out service);
@@ -330,7 +330,7 @@ namespace StepBro.Core
                 ILoggerScope logger = null;
                 try
                 {
-                    logger = m_logRootScope.LogEntering(true, "StepBro.Main.FileParsing", "Starting file parsing", null);
+                    logger = m_logRootScope.LogEntering(LogEntry.Type.PreHighLevel, "StepBro.Main.FileParsing", "Starting file parsing", null);
                     m_lastParsingErrorCount = FileBuilder.ParseFiles(m_serviceManagerAdmin.Manager, logger, (IScriptFile)null);
                     ParsingCompleted?.Invoke(null, EventArgs.Empty);
                 }
