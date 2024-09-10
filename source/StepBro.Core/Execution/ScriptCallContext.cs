@@ -251,7 +251,7 @@ namespace StepBro.Core.Execution
         {
             get
             {
-                throw new NotImplementedException();
+                return StepBro.Core.Main.ServiceManager.Get<IHost>();
             }
         }
 

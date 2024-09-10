@@ -13,5 +13,7 @@ namespace StepBro.UI.WinForms.Controls
         IElementIndexer<ChronoListViewEntry> Source { get; }
 
         EntrySelectionState GetEntrySelectionState(long index);
+        bool GetSearchMatchState(long index);
+
     }
 }

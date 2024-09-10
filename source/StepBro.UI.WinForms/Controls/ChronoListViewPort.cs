@@ -247,6 +247,10 @@ namespace StepBro.UI.WinForms.Controls
                         {
                             e.Graphics.FillRectangle(Brushes.Blue, rect);
                         }
+                        else if (m_viewer.GetSearchMatchState(entryIndex))
+                        {
+                            e.Graphics.FillRectangle(Brushes.Purple, rect);
+                        }
                         if (selectionState == EntrySelectionState.Current || selectionState == EntrySelectionState.SelectedCurrent)
                         {
                             e.Graphics.DrawLine(Pens.White, 0, y - 1, this.ClientRectangle.Right, y - 1);

@@ -1,4 +1,5 @@
-﻿using StepBro.Core.Data;
+﻿using StepBro.Core.Api;
+using StepBro.Core.Data;
 using StepBro.Core.General;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
@@ -82,7 +83,7 @@ namespace StepBro.Core.Execution
 
             m_taskContext = new ScriptTaskContext();
             m_executionStateStack = new ObservableCollection<IExecutionScopeStatus>();
-            m_statusUpdateRoot = new ExecutionScopeStatusUpdater(null, m_executionStateStack, 0, "Script Execution", default(TimeSpan), -1L, null);
+            m_statusUpdateRoot = new ExecutionScopeStatusUpdater(null, m_executionStateStack, 0, Constants.STEPBRO_SCRIPT_EXECUTION_LOG_LOCATION, default(TimeSpan), -1L, null);
         }
 
         public void ExecuteSynchronous()
@@ -127,7 +128,7 @@ namespace StepBro.Core.Execution
 
         private void ProcedureExecutionTask()
         {
-            m_loggerExecutionScope = m_loggerOuterScope.LogEntering(LogEntry.Type.TaskEntry, "Script Execution", (m_targetTitle != null) ? m_targetTitle : m_targetProcedure.FullName, null);
+            m_loggerExecutionScope = m_loggerOuterScope.LogEntering(LogEntry.Type.TaskEntry, Constants.STEPBRO_SCRIPT_EXECUTION_LOG_LOCATION, (m_targetTitle != null) ? m_targetTitle : m_targetProcedure.FullName, null);
             m_taskContext.Setup(m_loggerExecutionScope, ContextLogOption.Normal, m_statusUpdateRoot, m_filesManager, m_taskManager);
             this.SetState(TaskExecutionState.Running);
 

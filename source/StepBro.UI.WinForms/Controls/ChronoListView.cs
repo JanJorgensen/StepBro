@@ -25,6 +25,7 @@ namespace StepBro.UI.WinForms.Controls
         private List<long> m_selectedEntries = new List<long>();
         private long m_lastSingleSelectionEntry = -1L;
         private long m_rangeSelectionEnd = -1L;
+        private Predicate<long> m_searchMatchChecker = null;
 
         public ChronoListView()
         {
@@ -37,6 +38,8 @@ namespace StepBro.UI.WinForms.Controls
         public DateTime ZeroTime { get { return m_zeroTime; } set { m_zeroTime = value; } }
 
         public IElementIndexer<ChronoListViewEntry> Source { get { return m_presentationSource; } }
+
+        public long TopEntry { get { return m_topEntry; } }
 
         public void Setup(IPresentationList<ChronoListViewEntry> source)
         {
@@ -112,6 +115,11 @@ namespace StepBro.UI.WinForms.Controls
                 }
                 this.UpdateVerticalScrollbar(state.EffectiveCount);
             }
+        }
+
+        public void RequestViewUpdate()
+        {
+            this.RequestViewPortUpdate();
         }
 
         private void RequestViewPortUpdate()
@@ -217,6 +225,17 @@ namespace StepBro.UI.WinForms.Controls
             return s;
         }
 
+        public void SetupSearchMatchChecker(Predicate<long> matchChecker)
+        {
+            m_searchMatchChecker = matchChecker;
+            this.RequestViewPortUpdate();
+        }
+
+        public bool GetSearchMatchState(long index)
+        {
+            return m_searchMatchChecker != null && m_searchMatchChecker(index);
+        }
+
         #region Selection
 
         public EntrySelectionState GetEntrySelectionState(long index)
@@ -245,6 +264,35 @@ namespace StepBro.UI.WinForms.Controls
                 selectionState = (selectionState == EntrySelectionState.Selected) ? EntrySelectionState.SelectedCurrent : EntrySelectionState.Current;
             }
             return selectionState;
+        }
+
+        public long CurrentEntry { get { return m_currentEntry; } }
+
+        public void SetCurrentEntry(long index, bool setSelection)
+        {
+            m_currentEntry = index;
+            if (setSelection)
+            {
+                m_selectedEntries.Clear();
+                m_selectedEntries.Add(index);
+            }
+
+            if (index < m_topEntry || index > (m_topEntry + (viewPort.MaxLinesVisible - 2)))
+            {
+                if (index < m_topEntry)
+                {
+                    m_topEntry = Math.Max(0L, index - 4L);      // Set selection in top.
+                }
+                else
+                {
+                    m_topEntry = Math.Max(0L, index - (viewPort.MaxLinesVisible - 5));  // Set selection in bottom.
+                }
+                m_updateVerticalScroll = true;
+                vScrollBar.Value = (int)m_topEntry;
+                m_updateVerticalScroll = false;
+            }
+
+            this.RequestViewPortUpdate();
         }
 
         #endregion
@@ -448,22 +496,30 @@ namespace StepBro.UI.WinForms.Controls
             {
                 if (m_topEntry > 0)
                 {
-                    m_topEntry = Math.Max(0L, m_topEntry - 3L);
-                    m_updateVerticalScroll = true;
-                    vScrollBar.Value = (int)m_topEntry;
-                    m_updateVerticalScroll = false;
-                    this.RequestViewPortUpdate();
+                    try
+                    {
+                        m_topEntry = Math.Max(0L, m_topEntry - 3L);
+                        m_updateVerticalScroll = true;
+                        vScrollBar.Value = (int)m_topEntry;
+                        m_updateVerticalScroll = false;
+                        this.RequestViewPortUpdate();
+                    }
+                    finally { }
                 }
             }
             else
             {
                 if (m_topEntry < vScrollBar.Maximum)
                 {
-                    m_topEntry = Math.Min(vScrollBar.Maximum, m_topEntry + 3L);
-                    m_updateVerticalScroll = true;
-                    vScrollBar.Value = (int)m_topEntry;
-                    m_updateVerticalScroll = false;
-                    this.RequestViewPortUpdate();
+                    try
+                    {
+                        m_topEntry = Math.Min(vScrollBar.Maximum, m_topEntry + 3L);
+                        m_updateVerticalScroll = true;
+                        vScrollBar.Value = (int)m_topEntry;
+                        m_updateVerticalScroll = false;
+                        this.RequestViewPortUpdate();
+                    }
+                    finally { }
                 }
             }
         }

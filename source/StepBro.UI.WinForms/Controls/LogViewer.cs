@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using StepBro.Core.Logging;
+﻿using StepBro.Core.Logging;
 using StepBro.Core.Data;
-using StepBro.Core;
+using StepBro.Core.Api;
+using System.Windows.Navigation;
+using System;
 
 namespace StepBro.UI.WinForms.Controls
 {
@@ -142,6 +135,7 @@ namespace StepBro.UI.WinForms.Controls
             }
         }
 
+        private delegate bool SkipChecker(LogEntry entry);
 
         private IDataListSource<LogEntry> m_source = null;
         private PresentationListForListData<LogEntry, ChronoListViewEntry> m_presentationList = null;
@@ -149,12 +143,21 @@ namespace StepBro.UI.WinForms.Controls
         private NewLogStart m_zeroStartSource = null;
         private int m_visibleLevels = 1000;
         private Predicate<LogEntry>[] m_filter = null;
+        private ToolStripMenuItem m_selectedSkipOption = null;
 
         public LogViewer()
         {
             InitializeComponent();
             this.UpdatePresentationLevels();
             toolStripButtonFollowHead.Text = "\u23EC";
+            toolStripButtonSkipPrevious.Text = "\u23EB";
+            toolStripButtonSkipNext.Text = "\u23EC";
+            toolStripButtonClearSearch.Text = "\u2716";
+            SetupSkipChoises(toolStripMenuItemSkipError);
+            toolStripMenuItemSkipSearchMatches.Tag = (object)(SkipChecker)this.SearchMatching;
+            toolStripMenuItemSkipError.Tag = (object)(SkipChecker)this.SkipErrorMatching;
+            toolStripMenuItemSkipScriptExecutionStart.Tag = (object)(SkipChecker)this.SkipExecutionStartMatching;
+            toolStripMenuItemSkipMeasurement.Tag = (object)(SkipChecker)this.SkipMeasurementMatching;
         }
 
         public void Setup()
@@ -164,6 +167,8 @@ namespace StepBro.UI.WinForms.Controls
             this.CreateFilter();
             logView.ZeroTime = StepBro.Core.Main.Logger.GetFirst().Item2.Timestamp;
             logView.Setup(m_presentationList);
+            logView.SetupSearchMatchChecker(this.SearchMatchChecker);
+            this.SetupFromHeadMode();
         }
 
         private bool LevelFilter(LogEntry entry)
@@ -226,7 +231,15 @@ namespace StepBro.UI.WinForms.Controls
 
         private void logView_HeadModeChanged(object sender, EventArgs e)
         {
+            this.SetupFromHeadMode();
+        }
+
+        private void SetupFromHeadMode()
+        {
             toolStripButtonFollowHead.Checked = logView.HeadMode;
+
+            toolStripButtonSkipPrevious.Enabled = !logView.HeadMode;
+            toolStripButtonSkipNext.Enabled = !logView.HeadMode;
         }
 
         private void toolStripButtonClear_Click(object sender, EventArgs e)
@@ -277,5 +290,221 @@ namespace StepBro.UI.WinForms.Controls
             var logger = (IComponentLogging)item.Tag;
             logger.Enabled = item.Checked;
         }
+
+        #region Searching
+
+        private bool SearchMatchChecker(long index)
+        {
+            if (toolStripTextBoxQuickSearch.Text.Length < 2) return false;
+            return this.SearchMatching(m_presentationList.Get(index).DataObject as LogEntry);
+        }
+
+        private void toolStripTextBoxQuickSearch_TextChanged(object sender, EventArgs e)
+        {
+            var text = toolStripTextBoxQuickSearch.Text;
+            if (!String.IsNullOrEmpty(text))
+            {
+                SetupSkipChoises(toolStripMenuItemSkipSearchMatches);
+            }
+            toolStripButtonClearSearch.Visible = !String.IsNullOrEmpty(text);
+            if (toolStripTextBoxQuickSearch.Text.Length < 2)
+            {
+                toolStripDropDownButtonQuickSearchOptions.Text = "Search";
+            }
+            else
+            {
+                toolStripDropDownButtonQuickSearchOptions.Text = "Search: " + this.CountSearchMatches();
+
+            }
+            logView.RequestViewUpdate();
+        }
+
+        private void toolStripButtonClearSearch_Click(object sender, EventArgs e)
+        {
+            toolStripTextBoxQuickSearch.Text = String.Empty;
+        }
+
+        private int CountSearchMatches()
+        {
+            var state = m_presentationList.GetState();
+            var entryIndex = state.FirstIndex;
+            int count = 0;
+
+            while (true)
+            {
+                var entry = m_presentationList.Get(entryIndex);
+                if (entry == null) break;
+                if (this.SearchMatching(entry.DataObject as LogEntry)) count++;
+                entryIndex++;
+            }
+            return count;
+        }
+
+        #endregion
+
+        #region Skipping
+
+        private void SetupSkipChoises(ToolStripMenuItem selected)
+        {
+            if (!Object.ReferenceEquals(selected, m_selectedSkipOption))
+            {
+                m_selectedSkipOption = selected;
+                toolStripDropDownButtonSkipSelection.Text = selected.Text;
+
+                var choises = new ToolStripMenuItem[] {
+                    toolStripMenuItemSkipSearchMatches,
+                    toolStripMenuItemSkipError ,
+                    toolStripMenuItemSkipScriptExecutionStart ,
+                    toolStripMenuItemSkipMeasurement };
+
+                foreach (ToolStripMenuItem item in choises)
+                {
+                    item.Checked = Object.Equals(selected, item);
+                }
+            }
+        }
+
+        private void toolStripButtonSkipPrevious_Click(object sender, EventArgs e)
+        {
+            this.DoSkipSearch(false);
+        }
+
+        private void toolStripButtonSkipNext_Click(object sender, EventArgs e)
+        {
+            this.DoSkipSearch(true);
+        }
+
+        private void DoSkipSearch(bool forward)
+        {
+            var checker = (SkipChecker)m_selectedSkipOption.Tag;
+
+            var state = m_presentationList.GetState();
+            var entryIndex = state.FirstIndex;
+
+            var focusEntry = logView.CurrentEntry;
+            if (focusEntry < 0L)
+            {
+                focusEntry = logView.TopEntry;
+            }
+
+            long firstFound = -1L;
+            long lastFound = -1L;
+            long found = -1L;
+
+            while (true)
+            {
+                var entry = m_presentationList.Get(entryIndex);
+                if (entry != null)
+                {
+                    bool match = checker(entry.DataObject as LogEntry);
+                    if (match)  // FOUND A MATCH
+                    {
+                        System.Diagnostics.Debug.WriteLine("Found " + entry.DataObject.ToString());
+                        if (firstFound < 0L) firstFound = entryIndex;
+
+                        if (forward && entryIndex > focusEntry)
+                        {
+                            found = entryIndex;
+                            break;
+                        }
+                    }
+
+                    if (!forward)
+                    {
+                        if (lastFound >= 0L && lastFound < focusEntry && entryIndex >= focusEntry)
+                        {
+                            // The last entry found was the one we were looking for.
+                            found = lastFound;
+                            break;
+                        }
+                    }
+
+                    if (match) lastFound = entryIndex;  // Set now, to allow checking for previous first, when focus is on a matching entry.
+                }
+                else break;
+
+                entryIndex++;
+            }
+
+            if (found < 0L)
+            {
+                if (toolStripMenuItemSkipWrapAround.Checked)
+                {
+                    if (forward)
+                    {
+                        if (firstFound >= 0L && firstFound < focusEntry)
+                        {
+                            found = firstFound;
+                        }
+                    }
+                    else
+                    {
+                        if (lastFound >= 0L && lastFound > focusEntry)
+                        {
+                            found = lastFound;
+                        }
+                    }
+                }
+            }
+
+            if (found >= 0L)
+            {
+                logView.SetCurrentEntry(found, true);
+            }
+        }
+
+        private void toolStripMenuItemSkipSearchMatches_Click(object sender, EventArgs e)
+        {
+            SetupSkipChoises(toolStripMenuItemSkipSearchMatches);
+        }
+
+        private void toolStripMenuItemSkipError_Click(object sender, EventArgs e)
+        {
+            SetupSkipChoises(toolStripMenuItemSkipError);
+        }
+
+        private void toolStripMenuItemSkipScriptExecutionStart_Click(object sender, EventArgs e)
+        {
+            SetupSkipChoises(toolStripMenuItemSkipScriptExecutionStart);
+        }
+
+        private void toolStripMenuItemSkipMeasurement_Click(object sender, EventArgs e)
+        {
+            SetupSkipChoises(toolStripMenuItemSkipMeasurement);
+        }
+
+        private void toolStripMenuItemSkipWrapAround_CheckedChanged(object sender, EventArgs e)
+        {
+            // Maybe do nothing; The menu item can be read by the skip operation.
+        }
+
+        private bool SearchMatching(LogEntry entry)
+        {
+            var text = toolStripTextBoxQuickSearch.Text;
+            if (String.IsNullOrEmpty(text)) return false;
+            if (entry == null) return false;
+            if (entry.Location != null && entry.Location.Contains(text, StringComparison.InvariantCultureIgnoreCase)) return true;
+            if (entry.Text != null && entry.Text.Contains(text, StringComparison.InvariantCultureIgnoreCase)) return true;
+            return false;
+        }
+
+        private bool SkipErrorMatching(LogEntry entry)
+        {
+            return (entry != null) && (entry.EntryType & LogEntry.Type.FlagFilter) == LogEntry.Type.Error;
+        }
+
+        private bool SkipExecutionStartMatching(LogEntry entry)
+        {
+            return (entry != null) &&
+                (entry.EntryType & LogEntry.Type.FlagFilter) == LogEntry.Type.TaskEntry &&
+                entry.Location.StartsWith(Constants.STEPBRO_SCRIPT_EXECUTION_LOG_LOCATION, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        private bool SkipMeasurementMatching(LogEntry entry)
+        {
+            return false;
+        }
+
+        #endregion
     }
 }
