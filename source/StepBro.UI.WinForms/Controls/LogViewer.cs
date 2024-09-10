@@ -1,7 +1,6 @@
 ﻿using StepBro.Core.Logging;
 using StepBro.Core.Data;
 using StepBro.Core.Api;
-using System.Windows.Navigation;
 using System;
 
 namespace StepBro.UI.WinForms.Controls
