@@ -21,11 +21,12 @@ namespace StepBro.UI.WinForms.Controls
         private long m_lastIndex = 0;
         private bool m_viewDirty = false;
         private bool m_updateVerticalScroll = false;
-        private long m_currentEntry = -1L;
+        private long m_currentEntryIndex = -1L;
+        private ChronoListViewEntry m_currentEntry = null;
         private List<long> m_selectedEntries = new List<long>();
         private long m_lastSingleSelectionEntry = -1L;
         private long m_rangeSelectionEnd = -1L;
-        private Predicate<long> m_searchMatchChecker = null;
+        private Func<long, ChronoListViewEntry, long, ChronoListViewEntry, EntryMarkState> m_searchMatchChecker = null;
 
         public ChronoListView()
         {
@@ -61,8 +62,7 @@ namespace StepBro.UI.WinForms.Controls
                     if (m_headMode)
                     {
                         m_lastSingleSelectionEntry = -1L;
-                        m_currentEntry = -1L;
-                        m_selectedEntries.Clear();
+                        this.SetCurrentEntryInternal(-1L, false, true, false);
                         m_presentationSource.UpdateHead();
                         this.RequestViewPortUpdate();
                     }
@@ -93,6 +93,7 @@ namespace StepBro.UI.WinForms.Controls
             {
                 this.RequestViewPortUpdate();
             }
+            m_topEntry = Math.Min(m_topEntry, vScrollBar.Maximum);
             if (m_presentationSource.InHeadMode)
             {
                 vScrollBar.Value = (int)m_topEntry;
@@ -117,9 +118,14 @@ namespace StepBro.UI.WinForms.Controls
             }
         }
 
-        public void RequestViewUpdate()
+        public void RequestViewUpdate(bool entryCountMightHaveChanged)
         {
             this.RequestViewPortUpdate();
+            if (entryCountMightHaveChanged)
+            {
+                var state = m_presentationSource.GetState();
+                this.UpdateVerticalScrollbar(state.EffectiveCount);
+            }
         }
 
         private void RequestViewPortUpdate()
@@ -225,25 +231,21 @@ namespace StepBro.UI.WinForms.Controls
             return s;
         }
 
-        public void SetupSearchMatchChecker(Predicate<long> matchChecker)
+        public void SetupSearchMatchChecker(Func<long, ChronoListViewEntry, long, ChronoListViewEntry, EntryMarkState> matchChecker)
         {
             m_searchMatchChecker = matchChecker;
             this.RequestViewPortUpdate();
         }
 
-        public bool GetSearchMatchState(long index)
+        public EntryMarkState GetEntryMarkState(long index, ChronoListViewEntry entry)
         {
-            return m_searchMatchChecker != null && m_searchMatchChecker(index);
-        }
-
-        #region Selection
-
-        public EntrySelectionState GetEntrySelectionState(long index)
-        {
-            var selectionState = EntrySelectionState.Not;
-            if (m_selectedEntries.Count > 0 && m_selectedEntries.Contains(index))
+            var selectionState = EntryMarkState.None;
+            if (m_selectedEntries.Count > 0)
             {
-                selectionState = EntrySelectionState.Selected;
+                if (m_selectedEntries.Contains(index))
+                {
+                    selectionState |= EntryMarkState.Selected;
+                }
             }
             else
             {
@@ -251,48 +253,76 @@ namespace StepBro.UI.WinForms.Controls
                 {
                     if (m_lastSingleSelectionEntry < m_rangeSelectionEnd)
                     {
-                        if (index >= m_lastSingleSelectionEntry && index <= m_rangeSelectionEnd) selectionState = EntrySelectionState.Selected; ;
+                        if (index >= m_lastSingleSelectionEntry && index <= m_rangeSelectionEnd) selectionState |= EntryMarkState.Selected; ;
                     }
                     else
                     {
-                        if (index >= m_rangeSelectionEnd && index <= m_lastSingleSelectionEntry) selectionState = EntrySelectionState.Selected; ;
+                        if (index >= m_rangeSelectionEnd && index <= m_lastSingleSelectionEntry) selectionState |= EntryMarkState.Selected; ;
                     }
                 }
             }
-            if (index == m_currentEntry)
+            if (index == m_currentEntryIndex)
             {
-                selectionState = (selectionState == EntrySelectionState.Selected) ? EntrySelectionState.SelectedCurrent : EntrySelectionState.Current;
+                selectionState |= EntryMarkState.Current;
             }
+            if (m_searchMatchChecker != null) selectionState |= m_searchMatchChecker(index, entry, m_currentEntryIndex, m_currentEntry);
+
             return selectionState;
         }
 
-        public long CurrentEntry { get { return m_currentEntry; } }
+        #region Selection
 
-        public void SetCurrentEntry(long index, bool setSelection)
+        public long CurrentEntry { get { return m_currentEntryIndex; } }
+
+        public void SetCurrentEntry(long index, bool setSelection, bool clearCurrentSelection = true)
         {
-            m_currentEntry = index;
+            this.SetCurrentEntryInternal(index, setSelection, clearCurrentSelection, true);
+        }
+
+        private void SetCurrentEntryInternal(long index, bool setSelection, bool clearCurrentSelection, bool updateView)
+        {
+            if (clearCurrentSelection)
+            {
+                m_selectedEntries.Clear();
+            }
+
+            m_currentEntryIndex = index;
+            if (m_currentEntryIndex >= 0)
+            {
+                m_currentEntry = m_presentationSource.Get(m_currentEntryIndex);
+            }
+            else
+            {
+                m_currentEntry = null;
+            }
             if (setSelection)
             {
                 m_selectedEntries.Clear();
-                m_selectedEntries.Add(index);
+                if (index >= 0L)
+                {
+                    m_selectedEntries.Add(index);
+                }
             }
 
-            if (index < m_topEntry || index > (m_topEntry + (viewPort.MaxLinesVisible - 2)))
+            if (updateView)
             {
-                if (index < m_topEntry)
+                if (index >= 0 && (index < m_topEntry || index > (m_topEntry + (viewPort.MaxLinesVisible - 2))))
                 {
-                    m_topEntry = Math.Max(0L, index - 4L);      // Set selection in top.
+                    if (index < m_topEntry)
+                    {
+                        m_topEntry = Math.Max(0L, index - 4L);      // Set selection in top.
+                    }
+                    else
+                    {
+                        m_topEntry = Math.Max(0L, index - (viewPort.MaxLinesVisible - 5));  // Set selection in bottom.
+                    }
+                    m_updateVerticalScroll = true;
+                    vScrollBar.Value = (int)m_topEntry;
+                    m_updateVerticalScroll = false;
                 }
-                else
-                {
-                    m_topEntry = Math.Max(0L, index - (viewPort.MaxLinesVisible - 5));  // Set selection in bottom.
-                }
-                m_updateVerticalScroll = true;
-                vScrollBar.Value = (int)m_topEntry;
-                m_updateVerticalScroll = false;
-            }
 
-            this.RequestViewPortUpdate();
+                this.RequestViewPortUpdate();
+            }
         }
 
         #endregion
@@ -324,19 +354,17 @@ namespace StepBro.UI.WinForms.Controls
             {
                 if (keyData == Keys.Up)
                 {
-                    if (m_currentEntry < 0)
+                    if (m_currentEntryIndex < 0)
                     {
                         return true;    // Nothing shown; just skip. 
                     }
-                    if (m_currentEntry > 0)
+                    if (m_currentEntryIndex > 0)
                     {
-                        m_currentEntry--;
+                        this.SetCurrentEntryInternal(--m_currentEntryIndex, true, true, false);
                     }
-                    m_selectedEntries.Clear();
-                    m_selectedEntries.Add(m_currentEntry);
-                    if (m_currentEntry < m_topEntry)
+                    if (m_currentEntryIndex < m_topEntry)
                     {
-                        m_topEntry = m_currentEntry;
+                        m_topEntry = m_currentEntryIndex;
                     }
                     m_updateVerticalScroll = true;
                     vScrollBar.Value = (int)m_topEntry;
@@ -346,19 +374,17 @@ namespace StepBro.UI.WinForms.Controls
                 }
                 if (keyData == Keys.Down)
                 {
-                    if (m_currentEntry < 0)
+                    if (m_currentEntryIndex < 0)
                     {
                         return true;    // Nothing shown; just skip. 
                     }
-                    if (m_currentEntry < m_presentationSource.GetState().LastIndex)
+                    if (m_currentEntryIndex < m_presentationSource.GetState().LastIndex)
                     {
-                        m_currentEntry++;
+                        this.SetCurrentEntryInternal(++m_currentEntryIndex, true, true, false);
                     }
-                    m_selectedEntries.Clear();
-                    m_selectedEntries.Add(m_currentEntry);
-                    if (m_currentEntry >= m_topEntry + viewPort.MaxLinesVisible)
+                    if (m_currentEntryIndex >= m_topEntry + viewPort.MaxLinesVisible)
                     {
-                        m_topEntry = m_currentEntry - (viewPort.MaxLinesVisible - 1);
+                        m_topEntry = m_currentEntryIndex - (viewPort.MaxLinesVisible - 1);
                     }
                     m_updateVerticalScroll = true;
                     vScrollBar.Value = (int)m_topEntry;
@@ -466,12 +492,7 @@ namespace StepBro.UI.WinForms.Controls
                 if (!this.HeadMode || !viewPort.ViewJustScrolled)
                 {
                     this.HeadMode = false;
-                    m_selectedEntries.Clear();
-                    if (e.Index >= 0L)
-                    {
-                        m_selectedEntries.Add(e.Index);
-                        m_currentEntry = e.Index;
-                    }
+                    this.SetCurrentEntry(e.Index, true);
                     this.RequestViewPortUpdate();
                 }
                 else

@@ -56,7 +56,7 @@
             toolStripTextBoxQuickSearch = new ToolStripTextBox();
             toolStripButtonClearSearch = new ToolStripButton();
             toolStripDropDownButtonQuickSearchOptions = new ToolStripDropDownButton();
-            toolStripMenuItemQuickSearchSkipBetween = new ToolStripMenuItem();
+            toolStripMenuItemQuickSearchMarkMatching = new ToolStripMenuItem();
             toolStripMenuItemQuickSearchFilter = new ToolStripMenuItem();
             logView = new ChronoListView();
             toolStrip1.SuspendLayout();
@@ -153,6 +153,7 @@
             toolStripButtonFollowHead.AutoToolTip = false;
             toolStripButtonFollowHead.CheckOnClick = true;
             toolStripButtonFollowHead.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButtonFollowHead.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             toolStripButtonFollowHead.ImageTransparentColor = Color.Magenta;
             toolStripButtonFollowHead.Name = "toolStripButtonFollowHead";
             toolStripButtonFollowHead.Size = new Size(23, 22);
@@ -288,19 +289,22 @@
             // toolStripDropDownButtonQuickSearchOptions
             // 
             toolStripDropDownButtonQuickSearchOptions.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            toolStripDropDownButtonQuickSearchOptions.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemQuickSearchSkipBetween, toolStripMenuItemQuickSearchFilter });
+            toolStripDropDownButtonQuickSearchOptions.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemQuickSearchMarkMatching, toolStripMenuItemQuickSearchFilter });
             toolStripDropDownButtonQuickSearchOptions.Image = (Image)resources.GetObject("toolStripDropDownButtonQuickSearchOptions.Image");
             toolStripDropDownButtonQuickSearchOptions.ImageTransparentColor = Color.Magenta;
             toolStripDropDownButtonQuickSearchOptions.Name = "toolStripDropDownButtonQuickSearchOptions";
             toolStripDropDownButtonQuickSearchOptions.Size = new Size(55, 22);
             toolStripDropDownButtonQuickSearchOptions.Text = "Search";
             // 
-            // toolStripMenuItemQuickSearchSkipBetween
+            // toolStripMenuItemQuickSearchMarkMatching
             // 
-            toolStripMenuItemQuickSearchSkipBetween.CheckOnClick = true;
-            toolStripMenuItemQuickSearchSkipBetween.Name = "toolStripMenuItemQuickSearchSkipBetween";
-            toolStripMenuItemQuickSearchSkipBetween.Size = new Size(217, 22);
-            toolStripMenuItemQuickSearchSkipBetween.Text = "Mark matches";
+            toolStripMenuItemQuickSearchMarkMatching.Checked = true;
+            toolStripMenuItemQuickSearchMarkMatching.CheckOnClick = true;
+            toolStripMenuItemQuickSearchMarkMatching.CheckState = CheckState.Checked;
+            toolStripMenuItemQuickSearchMarkMatching.Name = "toolStripMenuItemQuickSearchMarkMatching";
+            toolStripMenuItemQuickSearchMarkMatching.Size = new Size(217, 22);
+            toolStripMenuItemQuickSearchMarkMatching.Text = "Mark matches";
+            toolStripMenuItemQuickSearchMarkMatching.CheckedChanged += toolStripMenuItemQuickSearchMarkMatching_CheckedChanged;
             // 
             // toolStripMenuItemQuickSearchFilter
             // 
@@ -308,6 +312,7 @@
             toolStripMenuItemQuickSearchFilter.Name = "toolStripMenuItemQuickSearchFilter";
             toolStripMenuItemQuickSearchFilter.Size = new Size(217, 22);
             toolStripMenuItemQuickSearchFilter.Text = "Hide non-matching entries";
+            toolStripMenuItemQuickSearchFilter.CheckedChanged += toolStripMenuItemQuickSearchFilter_CheckedChanged;
             // 
             // logView
             // 
@@ -366,6 +371,6 @@
         private ToolStripMenuItem toolStripMenuItemQuickSearchFilter;
         private ToolStripMenuItem toolStripMenuItemSkipSearchMatches;
         private ToolStripButton toolStripButtonClearSearch;
-        private ToolStripMenuItem toolStripMenuItemQuickSearchSkipBetween;
+        private ToolStripMenuItem toolStripMenuItemQuickSearchMarkMatching;
     }
 }

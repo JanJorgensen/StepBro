@@ -10,7 +10,7 @@ namespace StepBro.UI.WinForms.Controls
     public abstract class ChronoListViewEntry
     {
         public abstract object DataObject { get; }
-        public abstract void DoPaint(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntrySelectionState selected);
+        public abstract void DoPaint(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntryMarkState selected);
 
 
         public static int GetWidth(System.Drawing.Graphics graphics, Font font, string s)

@@ -119,6 +119,13 @@ namespace StepBro.Core.Logging
 
         public string Text { get { return m_text; } }
 
+        public bool IsParentOf(LogEntry other, bool recursive)
+        {
+            if (other.m_parent == null) return false;
+            if (Object.ReferenceEquals(other.m_parent, this)) return true;
+            return (recursive) ? this.IsParentOf(other.m_parent, true) : false;
+        }
+
         #region Persisting 
 
         public string ToPersistanceString()

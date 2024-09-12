@@ -183,7 +183,7 @@ namespace StepBro.UI.WinForms.Controls
         public long TopEntryIndex { get { return m_topIndex; } }
         public long LastShownEntryIndex { get { return m_lastShown; } }
 
-        public DateTime LastViewScrollTime {  get { return m_lastViewScroll; } }
+        public DateTime LastViewScrollTime { get { return m_lastViewScroll; } }
 
         public bool ViewJustScrolled { get { return (DateTime.UtcNow - m_lastViewScroll) < TimeSpan.FromMilliseconds(500); } }
 
@@ -241,17 +241,23 @@ namespace StepBro.UI.WinForms.Controls
                         lastShown = entryIndex;
                         m_viewEntries[viewIndex] = entry;
 
-                        var selectionState = m_viewer.GetEntrySelectionState(entryIndex);
+                        var selectionState = m_viewer.GetEntryMarkState(entryIndex, entry);
                         rect = new Rectangle(m_horizontalScrollPosition, y, 10000, m_lineHeight);
-                        if (selectionState >= EntrySelectionState.Selected)
+                        if ((selectionState & EntryMarkState.Selected) != EntryMarkState.None)
                         {
                             e.Graphics.FillRectangle(Brushes.Blue, rect);
+                            if ((selectionState & EntryMarkState.SearchMatch) != EntryMarkState.None)
+                            {
+                                var r = new Rectangle(m_horizontalScrollPosition, y + 1, this.ViewSettings.TimeStampWidth + 2, m_lineHeight - 1);
+                                e.Graphics.FillRectangle(Brushes.Purple, r);
+                            }
                         }
-                        else if (m_viewer.GetSearchMatchState(entryIndex))
+                        else if ((selectionState & EntryMarkState.SearchMatch) != EntryMarkState.None)
                         {
-                            e.Graphics.FillRectangle(Brushes.Purple, rect);
+                            var r = new Rectangle(m_horizontalScrollPosition, y + 1, 10000, m_lineHeight - 1);
+                            e.Graphics.FillRectangle(Brushes.Purple, r);
                         }
-                        if (selectionState == EntrySelectionState.Current || selectionState == EntrySelectionState.SelectedCurrent)
+                        if ((selectionState & EntryMarkState.Current) != EntryMarkState.None)
                         {
                             e.Graphics.DrawLine(Pens.White, 0, y - 1, this.ClientRectangle.Right, y - 1);
                             e.Graphics.DrawLine(Pens.White, 0, y + m_lineHeight, this.ClientRectangle.Right, y + m_lineHeight);

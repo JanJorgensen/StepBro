@@ -143,6 +143,8 @@ namespace StepBro.UI.WinForms.Controls
         private int m_visibleLevels = 1000;
         private Predicate<LogEntry>[] m_filter = null;
         private ToolStripMenuItem m_selectedSkipOption = null;
+        private bool m_enoughCharsInSearchText = false;
+        private bool m_markSearchMatches = true;
 
         public LogViewer()
         {
@@ -152,7 +154,7 @@ namespace StepBro.UI.WinForms.Controls
             toolStripButtonSkipPrevious.Text = "\u23EB";
             toolStripButtonSkipNext.Text = "\u23EC";
             toolStripButtonClearSearch.Text = "\u2716";
-            SetupSkipChoises(toolStripMenuItemSkipError);
+            this.SetupSkipChoises(toolStripMenuItemSkipError);
             toolStripMenuItemSkipSearchMatches.Tag = (object)(SkipChecker)this.SearchMatching;
             toolStripMenuItemSkipError.Tag = (object)(SkipChecker)this.SkipErrorMatching;
             toolStripMenuItemSkipScriptExecutionStart.Tag = (object)(SkipChecker)this.SkipExecutionStartMatching;
@@ -166,7 +168,7 @@ namespace StepBro.UI.WinForms.Controls
             this.CreateFilter();
             logView.ZeroTime = StepBro.Core.Main.Logger.GetFirst().Item2.Timestamp;
             logView.Setup(m_presentationList);
-            logView.SetupSearchMatchChecker(this.SearchMatchChecker);
+            logView.SetupSearchMatchChecker(this.SearchMarkMatchChecker);
             this.SetupFromHeadMode();
         }
 
@@ -192,6 +194,10 @@ namespace StepBro.UI.WinForms.Controls
                 filter.Add(this.LevelFilter);
             }
             filter.Add(LogFilters.Normal);
+            if (toolStripMenuItemQuickSearchFilter.Checked && toolStripTextBoxQuickSearch.Text.Length > 1)
+            {
+                filter.Add(this.SearchMatching);
+            }
             m_filter = filter.ToArray();
 
             m_presentationList.Reset(this.CombinedFilter, Int64.MaxValue);
@@ -219,6 +225,7 @@ namespace StepBro.UI.WinForms.Controls
                     m_visibleLevels = choise;
                     this.CreateFilter();
                     logView.Setup(m_presentationList);
+                    logView.RequestViewUpdate(true);
                 }
             }
         }
@@ -292,10 +299,38 @@ namespace StepBro.UI.WinForms.Controls
 
         #region Searching
 
-        private bool SearchMatchChecker(long index)
+        /// <summary>
+        /// Indicates whether the specified log entry should be marked in the view as a search match.
+        /// </summary>
+        /// <param name="index">The view entry index.</param>
+        /// <param name="entry"></param>
+        /// <param name="curentIndex"></param>
+        /// <param name="currentEntry"></param>
+        /// <returns>Whether to mark as a match.</returns>
+        private EntryMarkState SearchMarkMatchChecker(
+            long index, ChronoListViewEntry entry, 
+            long curentIndex, ChronoListViewEntry currentEntry)
         {
-            if (toolStripTextBoxQuickSearch.Text.Length < 2) return false;
-            return this.SearchMatching(m_presentationList.Get(index).DataObject as LogEntry);
+            var markings = EntryMarkState.None;
+            if (m_markSearchMatches && toolStripTextBoxQuickSearch.Text.Length > 1)
+            {
+                if (this.SearchMatching(m_presentationList.Get(index).DataObject as LogEntry))
+                {
+                    markings |= EntryMarkState.SearchMatch;
+                }
+            }
+            if (currentEntry != null && entry.DataObject is LogEntry logEntry && currentEntry.DataObject is LogEntry currentLogEntry)
+            {
+                if (Object.ReferenceEquals(logEntry.Parent, currentLogEntry.Parent))
+                {
+                    markings |= EntryMarkState.Sibling;
+                }
+                if (logEntry.IsParentOf(currentLogEntry, true))
+                {
+                    markings |= EntryMarkState.Parent;
+                }
+            }
+            return markings;
         }
 
         private void toolStripTextBoxQuickSearch_TextChanged(object sender, EventArgs e)
@@ -306,16 +341,25 @@ namespace StepBro.UI.WinForms.Controls
                 SetupSkipChoises(toolStripMenuItemSkipSearchMatches);
             }
             toolStripButtonClearSearch.Visible = !String.IsNullOrEmpty(text);
+            bool enoughChars = false;
             if (toolStripTextBoxQuickSearch.Text.Length < 2)
             {
                 toolStripDropDownButtonQuickSearchOptions.Text = "Search";
             }
             else
             {
+                enoughChars = true;
                 toolStripDropDownButtonQuickSearchOptions.Text = "Search: " + this.CountSearchMatches();
-
             }
-            logView.RequestViewUpdate();
+            bool entryCountMightHaveChanged = false;
+            if (toolStripMenuItemQuickSearchFilter.Checked && (enoughChars || (enoughChars != m_enoughCharsInSearchText)))
+            {
+                this.CreateFilter();
+                logView.Setup(m_presentationList);
+                entryCountMightHaveChanged = true;
+            }
+            m_enoughCharsInSearchText = enoughChars;
+            logView.RequestViewUpdate(entryCountMightHaveChanged);
         }
 
         private void toolStripButtonClearSearch_Click(object sender, EventArgs e)
@@ -337,6 +381,29 @@ namespace StepBro.UI.WinForms.Controls
                 entryIndex++;
             }
             return count;
+        }
+
+        private void toolStripMenuItemQuickSearchMarkMatching_CheckedChanged(object sender, EventArgs e)
+        {
+            m_markSearchMatches = toolStripMenuItemQuickSearchMarkMatching.Checked;
+            if (m_markSearchMatches)
+            {
+                toolStripMenuItemQuickSearchFilter.Checked = false;
+                this.CreateFilter();
+                logView.Setup(m_presentationList);
+                logView.RequestViewUpdate(true);
+            }
+        }
+
+        private void toolStripMenuItemQuickSearchFilter_CheckedChanged(object sender, EventArgs e)
+        {
+            if (toolStripMenuItemQuickSearchFilter.Checked)
+            {
+                toolStripMenuItemQuickSearchMarkMatching.Checked = false;
+                this.CreateFilter();
+                logView.Setup(m_presentationList);
+                logView.RequestViewUpdate(true);
+            }
         }
 
         #endregion

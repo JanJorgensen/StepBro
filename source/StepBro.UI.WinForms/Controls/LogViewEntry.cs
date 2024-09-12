@@ -13,6 +13,9 @@ namespace StepBro.UI.WinForms.Controls
         protected LogEntry m_entry;
         protected long m_sourceIndex;
 
+        private static Pen s_parentPen = new Pen(Color.Orange, 3.0f);
+        private static Pen s_siblingPen = new Pen(Color.Yellow, 1.0f);
+
         public LogViewEntry(LogEntry entry, long index) : base()
         {
             m_entry = entry;
@@ -48,9 +51,9 @@ namespace StepBro.UI.WinForms.Controls
             return m_entry.Text;
         }
 
-        protected override void PaintRest(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntrySelectionState selected)
+        protected override void PaintRest(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntryMarkState markings)
         {
-            var color = (selected != EntrySelectionState.Not) ? Brushes.White : GetDefaultEntryTypeColor(m_entry.EntryType);
+            var color = ((markings & EntryMarkState.Selected) != EntryMarkState.None) ? Brushes.White : GetDefaultEntryTypeColor(m_entry.EntryType);
 
             string headerText = this.GetHeaderText();
             var width = view.ViewSettings.LineHeaderWidth;
@@ -61,6 +64,15 @@ namespace StepBro.UI.WinForms.Controls
                 view.ViewSettings.LineHeaderWidth = width;
             }
             rect.X += width + 4 + (m_entry.IndentLevel * 40);
+
+            if ((markings & EntryMarkState.Parent) != EntryMarkState.None)
+            {
+                pe.Graphics.DrawLine(s_parentPen, new Point(rect.X - 3, rect.Top), new Point(rect.X - 3, rect.Bottom));
+            }
+            if ((markings & EntryMarkState.Sibling) != EntryMarkState.None)
+            {
+                pe.Graphics.DrawLine(s_siblingPen, new Point(rect.X - 3, rect.Top), new Point(rect.X - 3, rect.Bottom));
+            }
 
             var location = this.GetLocationText();
             var text = this.GetDetailsText();

@@ -12,7 +12,7 @@ namespace StepBro.UI.WinForms.Controls
     {
         public abstract DateTime TimeStamp { get; }
 
-        public override void DoPaint(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntrySelectionState selected)
+        public override void DoPaint(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntryMarkState selected)
         {
             var width = view.ViewSettings.TimeStampWidth;
             var timestamp = this.TimeStamp.ToSecondsTimestamp(view.ViewSettings.ZeroTime);
@@ -27,6 +27,6 @@ namespace StepBro.UI.WinForms.Controls
             this.PaintRest(pe, view, ref rect, selected);
         }
 
-        protected abstract void PaintRest(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntrySelectionState selected);
+        protected abstract void PaintRest(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntryMarkState selected);
     }
 }
