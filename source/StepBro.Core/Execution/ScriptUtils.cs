@@ -216,7 +216,10 @@ namespace StepBro.Core.Execution
             try
             {
                 internalContext.AddReport(report);
-                (StepBro.Core.Main.GetService<IReportManager>() as ReportManager).AddReport(report);
+                if (StepBro.Core.Main.ServiceManager.State == ServiceManager.ServiceManagerState.Started)
+                {
+                    (StepBro.Core.Main.GetService<IReportManager>() as ReportManager)?.AddReport(report);
+                }
                 return report;
             }
             catch
