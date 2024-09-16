@@ -248,6 +248,32 @@ namespace StepBro.UI.WinForms.Controls
             toolStripButtonSkipNext.Enabled = !logView.HeadMode;
         }
 
+        public void JumpTo(LogEntry logEntry, bool clearSelection)
+        {
+            try
+            {
+                var state = m_presentationList.GetState();
+                var entryIndex = state.FirstIndex;
+
+                while (true)
+                {
+                    var entry = m_presentationList.Get(entryIndex);
+                    if (entry != null)
+                    {
+                        if (Object.ReferenceEquals(entry.DataObject, logEntry))
+                        {
+                            logView.HeadMode = false;
+                            logView.SetCurrentEntry(entryIndex, clearSelection);
+                        }
+                    }
+                    else break;
+
+                    entryIndex++;
+                }
+            }
+            finally { }
+        }
+
         private void toolStripButtonClear_Click(object sender, EventArgs e)
         {
             m_lastEntryBeforeClear = m_source.GetState().LastIndex;
@@ -308,7 +334,7 @@ namespace StepBro.UI.WinForms.Controls
         /// <param name="currentEntry"></param>
         /// <returns>Whether to mark as a match.</returns>
         private EntryMarkState SearchMarkMatchChecker(
-            long index, ChronoListViewEntry entry, 
+            long index, ChronoListViewEntry entry,
             long curentIndex, ChronoListViewEntry currentEntry)
         {
             var markings = EntryMarkState.None;
@@ -442,81 +468,85 @@ namespace StepBro.UI.WinForms.Controls
 
         private void DoSkipSearch(bool forward)
         {
-            var checker = (SkipChecker)m_selectedSkipOption.Tag;
-
-            var state = m_presentationList.GetState();
-            var entryIndex = state.FirstIndex;
-
-            var focusEntry = logView.CurrentEntry;
-            if (focusEntry < 0L)
+            try
             {
-                focusEntry = logView.TopEntry;
-            }
+                var checker = (SkipChecker)m_selectedSkipOption.Tag;
 
-            long firstFound = -1L;
-            long lastFound = -1L;
-            long found = -1L;
+                var state = m_presentationList.GetState();
+                var entryIndex = state.FirstIndex;
 
-            while (true)
-            {
-                var entry = m_presentationList.Get(entryIndex);
-                if (entry != null)
+                var focusEntry = logView.CurrentEntry;
+                if (focusEntry < 0L)
                 {
-                    bool match = checker(entry.DataObject as LogEntry);
-                    if (match)  // FOUND A MATCH
-                    {
-                        System.Diagnostics.Debug.WriteLine("Found " + entry.DataObject.ToString());
-                        if (firstFound < 0L) firstFound = entryIndex;
-
-                        if (forward && entryIndex > focusEntry)
-                        {
-                            found = entryIndex;
-                            break;
-                        }
-                    }
-
-                    if (!forward)
-                    {
-                        if (lastFound >= 0L && lastFound < focusEntry && entryIndex >= focusEntry)
-                        {
-                            // The last entry found was the one we were looking for.
-                            found = lastFound;
-                            break;
-                        }
-                    }
-
-                    if (match) lastFound = entryIndex;  // Set now, to allow checking for previous first, when focus is on a matching entry.
+                    focusEntry = logView.TopEntry;
                 }
-                else break;
 
-                entryIndex++;
-            }
+                long firstFound = -1L;
+                long lastFound = -1L;
+                long found = -1L;
 
-            if (found < 0L)
-            {
-                if (toolStripMenuItemSkipWrapAround.Checked)
+                while (true)
                 {
-                    if (forward)
+                    var entry = m_presentationList.Get(entryIndex);
+                    if (entry != null)
                     {
-                        if (firstFound >= 0L && firstFound < focusEntry)
+                        bool match = checker(entry.DataObject as LogEntry);
+                        if (match)  // FOUND A MATCH
                         {
-                            found = firstFound;
+                            System.Diagnostics.Debug.WriteLine("Found " + entry.DataObject.ToString());
+                            if (firstFound < 0L) firstFound = entryIndex;
+
+                            if (forward && entryIndex > focusEntry)
+                            {
+                                found = entryIndex;
+                                break;
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (lastFound >= 0L && lastFound > focusEntry)
+
+                        if (!forward)
                         {
-                            found = lastFound;
+                            if (lastFound >= 0L && lastFound < focusEntry && entryIndex >= focusEntry)
+                            {
+                                // The last entry found was the one we were looking for.
+                                found = lastFound;
+                                break;
+                            }
+                        }
+
+                        if (match) lastFound = entryIndex;  // Set now, to allow checking for previous first, when focus is on a matching entry.
+                    }
+                    else break;
+
+                    entryIndex++;
+                }
+
+                if (found < 0L)
+                {
+                    if (toolStripMenuItemSkipWrapAround.Checked)
+                    {
+                        if (forward)
+                        {
+                            if (firstFound >= 0L && firstFound < focusEntry)
+                            {
+                                found = firstFound;
+                            }
+                        }
+                        else
+                        {
+                            if (lastFound >= 0L && lastFound > focusEntry)
+                            {
+                                found = lastFound;
+                            }
                         }
                     }
                 }
-            }
 
-            if (found >= 0L)
-            {
-                logView.SetCurrentEntry(found, true);
+                if (found >= 0L)
+                {
+                    logView.SetCurrentEntry(found, true);
+                }
             }
+            finally { }
         }
 
         private void toolStripMenuItemSkipSearchMatches_Click(object sender, EventArgs e)

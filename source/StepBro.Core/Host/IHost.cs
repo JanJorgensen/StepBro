@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using StepBro.Core.Data;
+using StepBro.Core.Execution;
 
 namespace StepBro.Core.Host
 {
@@ -22,5 +23,8 @@ namespace StepBro.Core.Host
         void LogSystem(string text);
         IEnumerable<Type> ListHostCodeModuleTypes();
         IEnumerable<NamedData<object>> ListHostCodeModuleInstances();
+
+        bool SupportsUserInteraction { get; }
+        UserInteraction SetupUserInteraction(ICallContext context, string header);
     }
 }

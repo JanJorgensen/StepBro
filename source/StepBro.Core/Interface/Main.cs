@@ -1,5 +1,6 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
+using StepBro.Core.Data.Report;
 using StepBro.Core.Execution;
 using StepBro.Core.File;
 using StepBro.Core.General;
@@ -19,7 +20,6 @@ namespace StepBro.Core
     public static class Main
     {
         private static int m_initIndex = 0;
-        public static readonly string StepBroFileExtension = "sbs";
         private static bool m_initialized = false;
         private static ServiceManager.IServiceManagerAdministration m_serviceManagerAdmin = null;
         private static Logger m_mainLogger = null;
@@ -29,13 +29,12 @@ namespace StepBro.Core
         private static IConfigurationFileManager m_configurationFileManager = null;
         private static ITextFileSystem m_textFileSystem = null;
         private static IAddonManager m_addonManager = null;
-        //private static ILogSinkManager m_logSinkManager = null;
         private static TaskManager m_taskManager = null;
         private static HostApplicationActionQueue m_hostActions = null;
-        //private static List<ScriptFile> m_loadedFiles = new List<ScriptFile>();
         private static ScriptExecutionManager m_scriptExecutionManager = null;
         private static DynamicObjectManager m_dynamicObjectManager = null;
         private static LogFileCreationManager m_logFileCreationManager = null;
+        private static IReportManager m_reportManager = null;
         private static UICalculator m_uiCalculator = null;
         private static FolderManager m_folderShortcuts = null;
         //private static readonly object m_mainObject = new object();
@@ -108,9 +107,6 @@ namespace StepBro.Core
                 out service);
             m_serviceManagerAdmin.Manager.Register(service);
 
-            //m_logSinkManager = new LogSinkManager(out service);
-            //m_serviceManagerAdmin.Manager.Register(service);
-
             m_taskManager = new TaskManager(out service);
             m_serviceManagerAdmin.Manager.Register(service);
 
@@ -124,6 +120,9 @@ namespace StepBro.Core
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_logFileCreationManager = new LogFileCreationManager(out service);
+            m_serviceManagerAdmin.Manager.Register(service);
+
+            m_reportManager = new ReportManager(out service);
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_uiCalculator = new UICalculator(out service);

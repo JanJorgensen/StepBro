@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StepBro.Core;
+using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
@@ -429,7 +430,7 @@ namespace StepBroCoreTest
             f.AppendLine("   return 9;");                     // This should not be used; default (0) should be returned
             f.AppendLine("}");
 
-            var file = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly, new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()))[0];
+            var file = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly, new Tuple<string, string>("myfile" + Constants.STEPBRO_FILE_EXTENSION, f.ToString()))[0];
             var procedure = file.ListElements().First(p => p.Name == "MyProc") as IFileProcedure;
 
             var taskContext = ExecutionHelper.ExeContext();
@@ -456,7 +457,7 @@ namespace StepBroCoreTest
             f.AppendLine("   return 11;");                  // This should not be used; default (0) should be returned
             f.AppendLine("}");
 
-            var file = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly, new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()))[0];
+            var file = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly, new Tuple<string, string>("myfile" + Constants.STEPBRO_FILE_EXTENSION, f.ToString()))[0];
             var procedure = file.ListElements().First(p => p.Name == "MyProc") as IFileProcedure;
 
             var taskContext = ExecutionHelper.ExeContext();
@@ -489,7 +490,7 @@ namespace StepBroCoreTest
                 }
                 """;
 
-            var file = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly, new Tuple<string, string>("myfile." + Main.StepBroFileExtension, fileContent))[0];
+            var file = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly, new Tuple<string, string>("myfile" + Constants.STEPBRO_FILE_EXTENSION, fileContent))[0];
             var procedure = file.ListElements().First(p => p.Name == "MyProc") as IFileProcedure;
 
             var taskContext = ExecutionHelper.ExeContext();

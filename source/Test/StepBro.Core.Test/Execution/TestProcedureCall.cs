@@ -10,7 +10,7 @@ using StepBro.Core.ScriptData;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using StepBroCoreTest.Utils;
-using StepBro.Core;
+using StepBro.Core.Api;
 
 namespace StepBroCoreTest
 {
@@ -321,7 +321,7 @@ namespace StepBroCoreTest
                 }
                 """;
 
-            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile." + Main.StepBroFileExtension, content))[0];
+            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile" + Constants.STEPBRO_FILE_EXTENSION, content))[0];
 
 
             Assert.AreEqual(3, file.ListElements().Count());

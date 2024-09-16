@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StepBro.Core;
+using StepBro.Core.Api;
 using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
@@ -30,7 +31,7 @@ namespace StepBroCoreTest.Execution
             f.AppendLine("   log (\"After\");");
             f.AppendLine("}");
 
-            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()))[0];
+            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile" + Constants.STEPBRO_FILE_EXTENSION, f.ToString()))[0];
 
             Assert.AreEqual(3, file.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
             var procedure = file.ListElements().First(p => p.Name == "ExecuteIt") as IFileProcedure;
@@ -97,7 +98,7 @@ namespace StepBroCoreTest.Execution
             f.AppendLine("   }");
             f.AppendLine("}");
 
-            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()))[0];
+            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile" + Constants.STEPBRO_FILE_EXTENSION, f.ToString()))[0];
 
             Assert.AreEqual(1, file.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
             var list = file["AllTests"] as ITestList;
@@ -502,10 +503,10 @@ namespace StepBroCoreTest.Execution
             f.AppendLine("}");
 
             var files = FileBuilder.ParseFiles((ILogger)null,
-                new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()),
-                new Tuple<string, string>("TestFramework." + Main.StepBroFileExtension, CreateTestFrameworkFile()));
-            var myfile = files.First(file => file.FileName == "myfile." + Main.StepBroFileExtension);
-            var framework = files.First(file => file.FileName == "TestFramework." + Main.StepBroFileExtension);
+                new Tuple<string, string>("myfile" + Constants.STEPBRO_FILE_EXTENSION, f.ToString()),
+                new Tuple<string, string>("TestFramework" + Constants.STEPBRO_FILE_EXTENSION, CreateTestFrameworkFile()));
+            var myfile = files.First(file => file.FileName == "myfile" + Constants.STEPBRO_FILE_EXTENSION);
+            var framework = files.First(file => file.FileName == "TestFramework" + Constants.STEPBRO_FILE_EXTENSION);
 
             Assert.AreEqual(4, myfile.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
             Assert.AreEqual(1, myfile.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
@@ -614,10 +615,10 @@ namespace StepBroCoreTest.Execution
             f.AppendLine("}");
 
             var files = FileBuilder.ParseFiles((ILogger)null,
-                new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()),
-                new Tuple<string, string>("TestFramework." + Main.StepBroFileExtension, CreateTestFrameworkFile()));
-            var myfile = files.First(file => file.FileName == "myfile." + Main.StepBroFileExtension);
-            var framework = files.First(file => file.FileName == "TestFramework." + Main.StepBroFileExtension);
+                new Tuple<string, string>("myfile" + Constants.STEPBRO_FILE_EXTENSION, f.ToString()),
+                new Tuple<string, string>("TestFramework" + Constants.STEPBRO_FILE_EXTENSION, CreateTestFrameworkFile()));
+            var myfile = files.First(file => file.FileName == "myfile" + Constants.STEPBRO_FILE_EXTENSION);
+            var framework = files.First(file => file.FileName == "TestFramework" + Constants.STEPBRO_FILE_EXTENSION);
 
             Assert.AreEqual(9, myfile.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
             Assert.AreEqual(1, myfile.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());
@@ -734,13 +735,13 @@ namespace StepBroCoreTest.Execution
             tf.AppendLine("public function int DummyFunc(){ return 729; }");
 
             var files = FileBuilder.ParseFiles((ILogger)null, typeof(DummyClass).Assembly,
-                new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()),
-                new Tuple<string, string>("SomeTool." + Main.StepBroFileExtension, tf.ToString()),
-                new Tuple<string, string>("SpecialTest." + Main.StepBroFileExtension, CreateSpecialTestFile()),
-                new Tuple<string, string>("TestFramework." + Main.StepBroFileExtension, CreateTestFrameworkFile()));
-            var myfile = files.First(file => file.FileName == "myfile." + Main.StepBroFileExtension);
-            var special = files.First(file => file.FileName == "SpecialTest." + Main.StepBroFileExtension);
-            var framework = files.First(file => file.FileName == "TestFramework." + Main.StepBroFileExtension);
+                new Tuple<string, string>("myfile" + Constants.STEPBRO_FILE_EXTENSION, f.ToString()),
+                new Tuple<string, string>("SomeTool" + Constants.STEPBRO_FILE_EXTENSION, tf.ToString()),
+                new Tuple<string, string>("SpecialTest" + Constants.STEPBRO_FILE_EXTENSION, CreateSpecialTestFile()),
+                new Tuple<string, string>("TestFramework" + Constants.STEPBRO_FILE_EXTENSION, CreateTestFrameworkFile()));
+            var myfile = files.First(file => file.FileName == "myfile" + Constants.STEPBRO_FILE_EXTENSION);
+            var special = files.First(file => file.FileName == "SpecialTest" + Constants.STEPBRO_FILE_EXTENSION);
+            var framework = files.First(file => file.FileName == "TestFramework" + Constants.STEPBRO_FILE_EXTENSION);
 
             Assert.AreEqual(7, myfile.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
             Assert.AreEqual(1, myfile.ListElements().Where(e => e.ElementType == FileElementType.TestList).Count());

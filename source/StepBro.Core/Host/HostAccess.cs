@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using StepBro.Core.Data;
 using StepBro.Core.Tasks;
 using StepBro.Core.Logging;
+using StepBro.Core.Execution;
 
 namespace StepBro.Core.Host
 {
@@ -36,5 +37,15 @@ namespace StepBro.Core.Host
         {
             m_logger.LogUserAction(text);
         }
+
+        public virtual bool SupportsUserInteraction { get { return false; } }
+
+
+        public virtual UserInteraction SetupUserInteraction(ICallContext context, string header)
+        {
+            context.ReportError("The used host application dors not support user ainteraction from scripts.");
+            return null;
+        }
+
     }
 }

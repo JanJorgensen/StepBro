@@ -25,6 +25,7 @@ namespace StepBro.Core.Api
         public static readonly string CURRENT_FILE_FOLDER_SHORTCUT = "this";
         public static readonly string TOP_FILE_FOLDER_SHORTCUT = "TopFolder";
         public static readonly string STEPBRO_OUTPUT_FOLDER_SHORTCUT = "STEPBRO_OUTPUT_FOLDER";
+        public static readonly string STEPBRO_FILE_EXTENSION = ".sbs";
         public static readonly string STEPBRO_PERSISTANCE_LOG_FILE_EXTENSION = ".sbl";
         public static readonly string STEPBRO_SCRIPT_EXECUTION_LOG_LOCATION = "Script Execution";
     }

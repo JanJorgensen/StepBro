@@ -14,9 +14,12 @@ namespace StepBro.Core.Addons
 
         public string FullName { get { return "OutputFormatter." + this.ShortName; } }
 
-        public string Description { get { return "Converts log entry to a no-loss StepBro persistance format (*.sbl files)."; } }
+        public string Description { get { return "Converts execution log or report to a no-loss StepBro persistance format (*.sbl or *.sbr files)."; } }
 
         public OutputType FormatterType { get { return OutputType.Text; } }
+
+        public string LogFileExtension { get { return "sbl"; } }
+        public string ReportFileExtension { get { return "sbr"; } }
 
         public IOutputFormatter Create()
         {

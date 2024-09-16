@@ -14,6 +14,8 @@ namespace StepBro.Core.Addons
     public interface IOutputFormatterTypeAddon : IAddon
     {
         OutputType FormatterType { get; }
+        string LogFileExtension { get; }
+        string ReportFileExtension { get; }
         IOutputFormatter Create(OutputFormatOptions options, ITextWriter writer = null);
     }
 

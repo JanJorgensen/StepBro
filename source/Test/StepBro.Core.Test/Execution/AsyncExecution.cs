@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StepBro.Core;
+using StepBro.Core.Api;
 using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
@@ -30,7 +31,7 @@ namespace StepBroCoreTest.Execution
                 var file = FileBuilder.ParseFiles(
                     StepBro.Core.Main.ServiceManager,
                     StepBro.Core.Main.GetService<ILogger>(),
-                    new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()))[0];
+                    new Tuple<string, string>("myfile" + Constants.STEPBRO_FILE_EXTENSION, f.ToString()))[0];
 
                 Assert.AreEqual(1, file.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
                 var procedure = file.ListElements().First(p => p.Name == "Main") as IFileProcedure;

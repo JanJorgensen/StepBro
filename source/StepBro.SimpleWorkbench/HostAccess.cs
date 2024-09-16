@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StepBro.Core.Execution;
 
 namespace StepBro.SimpleWorkbench
 {
@@ -27,6 +28,13 @@ namespace StepBro.SimpleWorkbench
         public override IEnumerable<Type> ListHostCodeModuleTypes()
         {
             yield break;
+        }
+
+        public override bool SupportsUserInteraction {  get { return true; } }
+
+        public override UserInteraction SetupUserInteraction(ICallContext context, string header)
+        {
+            return null;
         }
     }
 }

@@ -20,12 +20,8 @@ using static StepBro.SimpleWorkbench.Shortcuts;
 using StepBroMain = StepBro.Core.Main;
 using StepBro.Core.Logging;
 using FastColoredTextBoxNS;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using StepBro.UI.WinForms.Dialogs;
 using StepBro.Core.Addons;
-using System.IO;
-using System.IO.Pipes;
 
 namespace StepBro.SimpleWorkbench
 {
@@ -47,9 +43,11 @@ namespace StepBro.SimpleWorkbench
         private ILogger m_mainLogger = null;
 
         private ToolWindow m_toolWindowExecutionLog = null;
-        private ToolWindow m_toolWindowFileExplorer = null;
         private LogViewer m_logviewer = null;
+        private ToolWindow m_toolWindowFileExplorer = null;
         private FileExplorer m_fileExplorer = null;
+        private ToolWindow m_toolWindowReportOverview = null;
+        private TestReportOverview m_reportOverview = null;
 
         private ToolWindow m_toolWindowParsingErrors = null;
         private ParsingErrorListView m_errorsList = null;
@@ -175,6 +173,13 @@ namespace StepBro.SimpleWorkbench
             m_errorsList.DoubleClickedLine += ErrorsList_DoubleClickedLine;
             m_toolWindowParsingErrors = new ToolWindow(dockManager, "ErrorsView", "Errors", null, m_errorsList);
             m_toolWindowParsingErrors.DockTo(dockManager, DockOperationType.BottomOuter);
+
+            m_reportOverview = new TestReportOverview();
+            m_reportOverview.DoubleClickedResult += ReportOverview_DoubleClickedResult;
+            m_reportOverview.DoubleClickedGroup += ReportOverview_DoubleClickedGroup;
+            m_toolWindowReportOverview = new ToolWindow(dockManager, "ReportOverviewView", "Report Overview", null, m_reportOverview);
+            m_toolWindowReportOverview.DockTo(dockManager, DockOperationType.LeftOuter);
+            m_toolWindowReportOverview.Close();
 
             // TO BE DELETED
             dockManager.SaveCustomToolWindowLayoutData += DockManager_SaveCustomToolWindowLayoutData;
@@ -468,7 +473,7 @@ namespace StepBro.SimpleWorkbench
             {
                 OutputFormatOptions options = new OutputFormatOptions { CreateHighLevelLogSections = true, UseLocalTime = true };
 
-                var filename = "Log" + DateTime.Now.ToFileName() + ".txt";      // TODO: Make formatter supply the file extension.
+                var filename = "Log" + DateTime.Now.ToFileName() + "." + m_outputAddon.LogFileExtension;
                 var filepath = Path.Combine(folder, filename);
 
                 using (StreamWriter fileStream = new StreamWriter(filepath, false))
@@ -514,14 +519,19 @@ namespace StepBro.SimpleWorkbench
 
         private void viewErrorsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!viewExecutionLogToolStripMenuItem.Checked)
+            if (!viewErrorsToolStripMenuItem.Checked)
             {
-                m_toolWindowExecutionLog.Activate();
+                m_toolWindowParsingErrors.Activate();
             }
             else
             {
-                m_toolWindowExecutionLog.Close();
+                m_toolWindowParsingErrors.Close();
             }
+        }
+
+        private void viewReportOverviewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            m_toolWindowReportOverview.Activate();
         }
 
         private void viewObjectCommandPromptToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1169,7 +1179,7 @@ namespace StepBro.SimpleWorkbench
         private DocumentWindow OpenOrActivateFileEditor(ILoadedFile file, int line = -1)
         {
             DocumentWindow window = null;
-            
+
             foreach (TabbedMdiWindow docWindow in dockManager.ActiveDocuments)
             {
                 if (docWindow.Tag != null && Object.ReferenceEquals(file, docWindow.Tag))
@@ -1386,6 +1396,36 @@ namespace StepBro.SimpleWorkbench
                     this.OpenOrActivateFileEditor(element.ParentFile, element.Line);
                 }
             }
+        }
+
+        #endregion
+
+        #region Test Report Overview View
+
+        private void ReportOverview_DoubleClickedGroup(object sender, TestReportOverview.DoubleClickGroupEventArgs args)
+        {
+            m_logviewer.JumpTo(args.Group.LogStart, true);
+        }
+
+        private void ReportOverview_DoubleClickedResult(object sender, TestReportOverview.DoubleClickResultEventArgs args)
+        {
+            var log = args.Data.Group.LogStart;
+
+            if (args.Data.Result.Verdict >= Verdict.Fail)
+            {
+                var failEntry = log;
+                while (failEntry != null)
+                {
+                    if (failEntry.EntryType == LogEntry.Type.Error)
+                    {
+                        log = failEntry;    // Use this entry.
+                        break;
+                    }
+                    failEntry = failEntry.Next;
+                }
+            }
+
+            m_logviewer.JumpTo(log, true);
         }
 
         #endregion

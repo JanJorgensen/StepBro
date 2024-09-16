@@ -14,6 +14,7 @@ using StepBro.Core.Data.Report;
 using StepBro.Core.File;
 using StepBro.Core.Logging;
 using static StepBro.Core.Data.StringUtils;
+using StepBro.Core.Host;
 
 namespace StepBro.Core.Execution
 {
@@ -193,11 +194,19 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
+        public static UserInteraction SetupUserInteraction([Implicit] ICallContext context, string header)
+        {
+            return context.HostApplication.SetupUserInteraction(context, header);
+        }
+
+        [Public]
         public static void NextProcedureIsHighLevel([Implicit] ICallContext context, string type)
         {
             var internalContext = ToScriptContext(context);
             internalContext.SetNextProcedureAsHighLevel(type);
         }
+
+        #region Reporting
 
         [Public]
         public static DataReport StartReport([Implicit] ICallContext context, string type, string title)
@@ -207,6 +216,7 @@ namespace StepBro.Core.Execution
             try
             {
                 internalContext.AddReport(report);
+                (StepBro.Core.Main.GetService<IReportManager>() as ReportManager).AddReport(report);
                 return report;
             }
             catch
@@ -276,6 +286,10 @@ namespace StepBro.Core.Execution
                 //throw new ExitException();
             }
         }
+
+        #endregion
+
+        #region Logging
 
         public static ILogFileCreator StartCreatingLogFile(
             [Implicit] ICallContext context,
@@ -353,6 +367,8 @@ namespace StepBro.Core.Execution
         {
             return AppendTextToFile(context, path, text + Environment.NewLine, reportErrors);
         }
+
+        #endregion
 
         #region LineReader
 

@@ -52,6 +52,7 @@ namespace StepBro.SimpleWorkbench
             viewExecutionLogToolStripMenuItem = new ToolStripMenuItem();
             viewErrorsToolStripMenuItem = new ToolStripMenuItem();
             viewPropertiesToolStripMenuItem = new ToolStripMenuItem();
+            viewReportOverviewToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator3 = new ToolStripSeparator();
             viewObjectCommandPromptToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItemExeNoteInput = new ToolStripMenuItem();
@@ -228,7 +229,7 @@ namespace StepBro.SimpleWorkbench
             // 
             // toolStripMenuItemView
             // 
-            toolStripMenuItemView.DropDownItems.AddRange(new ToolStripItem[] { viewExecutionLogToolStripMenuItem, viewErrorsToolStripMenuItem, viewPropertiesToolStripMenuItem, toolStripSeparator3, viewObjectCommandPromptToolStripMenuItem, toolStripMenuItemExeNoteInput, toolStripSeparator2, viewToolbarsToolStripMenuItem });
+            toolStripMenuItemView.DropDownItems.AddRange(new ToolStripItem[] { viewExecutionLogToolStripMenuItem, viewErrorsToolStripMenuItem, viewPropertiesToolStripMenuItem, viewReportOverviewToolStripMenuItem, toolStripSeparator3, viewObjectCommandPromptToolStripMenuItem, toolStripMenuItemExeNoteInput, toolStripSeparator2, viewToolbarsToolStripMenuItem });
             toolStripMenuItemView.Name = "toolStripMenuItemView";
             toolStripMenuItemView.Size = new Size(180, 22);
             toolStripMenuItemView.Text = "&View";
@@ -254,6 +255,13 @@ namespace StepBro.SimpleWorkbench
             viewPropertiesToolStripMenuItem.Size = new Size(212, 22);
             viewPropertiesToolStripMenuItem.Text = "Properties";
             viewPropertiesToolStripMenuItem.Click += viewPropertiesToolStripMenuItem_Click;
+            // 
+            // viewReportOverviewToolStripMenuItem
+            // 
+            viewReportOverviewToolStripMenuItem.Name = "viewReportOverviewToolStripMenuItem";
+            viewReportOverviewToolStripMenuItem.Size = new Size(212, 22);
+            viewReportOverviewToolStripMenuItem.Text = "Report Overview";
+            viewReportOverviewToolStripMenuItem.Click += viewReportOverviewToolStripMenuItem_Click;
             // 
             // toolStripSeparator3
             // 
@@ -631,5 +639,6 @@ namespace StepBro.SimpleWorkbench
         private ToolStripMenuItem toolStripMenuItemSaveLogLongOnly;
         private ToolStripMenuItem toolStripMenuItemSaveLogNow;
         private ToolStripSeparator toolStripSeparator5;
+        private ToolStripMenuItem viewReportOverviewToolStripMenuItem;
     }
 }
