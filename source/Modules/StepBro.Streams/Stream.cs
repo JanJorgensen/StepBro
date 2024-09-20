@@ -13,7 +13,7 @@ namespace StepBro.Streams
     [Public]
     public abstract class Stream : AvailabilityBase, IComponentLoggerSource, INotifyPropertyChanged, ITextCommandInput
     {
-        public delegate void LineReceivedHandler(string line);
+        public delegate bool LineReceivedHandler(string line);
 
         protected readonly object m_sync = new object();
         private string m_objectName;
@@ -262,11 +262,7 @@ namespace StepBro.Streams
                         {
                             m_asyncLogger.LogCommReceived(line);
                         }
-                        if (m_lineReceiver != null)
-                        {
-                            m_lineReceiver(line);
-                        }
-                        else
+                        if (m_lineReceiver == null || !m_lineReceiver(line))
                         {
                             lock (m_sync)
                             {

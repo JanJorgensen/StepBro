@@ -861,7 +861,7 @@ namespace StepBro.TestInterface
             }
         }
 
-        private void OnTextLineReceived(string line)
+        private bool OnTextLineReceived(string line)
         {
             //if (m_mainLogger != null) m_mainLogger.LogCommReceived(line);
             if (line[0] == EventLineChar)
@@ -898,7 +898,9 @@ namespace StepBro.TestInterface
                         OnEndCommand();
                     }
                 }
+                else return false;
             }
+            return true;
         }
 
         private void OnEndCommand()
