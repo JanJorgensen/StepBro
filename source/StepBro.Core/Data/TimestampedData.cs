@@ -19,14 +19,30 @@ namespace StepBro.Core.Data
             m_data = data;
         }
 
-        public DateTime TimeStamp { get { return m_time; } }
+        public DateTime Timestamp { get { return m_time; } }
 
         public T Data { get { return m_data; } }
     }
 
     [Public]
-    public class TimestampedString : TimestampedData<string>
+    public class TimestampedString : TimestampedData<string>, ILineReaderEntry
     {
         public TimestampedString(DateTime time, string value) : base(time, value) { }
+
+        public string Text { get { return this.Data; } }
+    }
+
+    public class LinkedTimestampedString : TimestampedString
+    {
+        private LinkedTimestampedString m_next = null;
+        public LinkedTimestampedString(LinkedTimestampedString previous, DateTime timestamp, string value) : base(timestamp, value)
+        {
+            if (previous != null)
+            {
+                previous.m_next = this;
+            }
+        }
+
+        public LinkedTimestampedString Next { get { return m_next; } }
     }
 }

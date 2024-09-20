@@ -12,16 +12,19 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace StepBro.TestInterface
 {
     public class SerialTestConnection :
-        TextLineCommunicator,
+        AvailabilityBase,
         IConnection,
         IRemoteProcedures,
+        INameable,
+        INamedObject,
         ISettableFromPropertyBlock,
         INotifyPropertyChanged,
-        ILogLineParent
+        ITextCommandInput
     {
         private class CommandData : IAsyncResult<object>, IObjectFaultDescriptor
         {
@@ -276,11 +279,13 @@ namespace StepBro.TestInterface
             }
         }
 
+        private readonly object m_sync = new object();
+        private string m_name = null;
+        private Stream m_stream = null;
         private ILogger m_mainLogger = null;
-        private LogLineData m_firstLogLine = null;
+        private LinkedTimestampedString m_lastEventLogLine = null;
         private object m_eventLogSync = new object();
-        private LogLineLineReader m_asyncLogLineReader = null;
-        private readonly Queue<string> m_events = new Queue<string>();
+        private TimestampedStringLineReader m_asyncLogLineReader = null;
         private readonly Queue<string> m_responseLines = new Queue<string>();
         private readonly AutoResetEvent m_newResponseDataEvent;
         private readonly Queue<CommandData> m_commandQueue = new Queue<CommandData>();
@@ -292,28 +297,89 @@ namespace StepBro.TestInterface
 
         private List<RemoteProcedureInfo> m_remoteProcedures = new List<RemoteProcedureInfo>();
 
-        public SerialTestConnection([ObjectName] string objectName = "<a SerialTestConnection>") : base(objectName)
+        public SerialTestConnection([ObjectName] string objectName = "<a SerialTestConnection>")
         {
+            m_name = objectName;
             m_newResponseDataEvent = new AutoResetEvent(false);
             SetupDebugCommands();
+            m_mainLogger = StepBro.Core.Main.RootLogger.CreateSubLocation(m_name);
         }
 
         protected override void DoDispose(bool disposing)
         {
-            base.DoDispose(disposing);
+            this.Close(null);
+            this.Stream = null;
             if (m_asyncLogLineReader != null)
             {
                 m_asyncLogLineReader = null;
             }
+
         }
 
-        protected override void OnNameChanged()
+        [ObjectName]
+        public string Name
         {
-            m_mainLogger = StepBro.Core.Main.RootLogger.CreateSubLocation(this.Name);
+            get { return m_name; }
+            set
+            {
+                if (String.IsNullOrWhiteSpace(value)) throw new ArgumentException();
+                if (m_name != null) throw new InvalidOperationException("The object is already named.");
+                m_name = value;
+                this.NotifyPropertyChanged(nameof(this.Name));
+            }
         }
+
+        string INamedObject.ShortName { get { return m_name; } }
+        string INamedObject.FullName { get { return m_name; } }
+
+        public string DisplayName { get { return (m_name != null) ? m_name : this.GetType().Name; } }
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
 
         #region Properties
 
+        public Stream Stream
+        {
+            get { return m_stream; }
+            set
+            {
+                if (!Object.ReferenceEquals(value, m_stream))
+                {
+                    if (m_stream != null)
+                    {
+                        m_stream.OnLineReceiverTaskLoop -= OnReceiverThreadLoop;
+                        m_stream.SetupLineReceiver(null);
+                        m_stream.IsOpenChanged -= m_stream_IsOpenChanged;
+                        m_stream = null;
+                    }
+                    if (value != null)
+                    {
+                        m_stream = value;
+                        m_stream.Encoding = Encoding.Latin1;
+                        m_stream.NewLine = "\r";
+                        m_stream.ReadTimeout = 500;
+                        m_stream.IsOpenChanged += m_stream_IsOpenChanged;
+                        m_stream.OnLineReceiverTaskLoop += OnReceiverThreadLoop;
+                        m_stream.SetupLineReceiver(this.OnTextLineReceived);
+                    }
+                }
+            }
+        }
+
+        private void m_stream_IsOpenChanged(object sender, EventArgs e)
+        {
+            if (!m_stream.IsOpen)
+            {
+                this.NotifyPropertyChanged(nameof(IsOpen));
+            }
+        }
         public char EventLineChar { get; set; } = '!';
         public char ResponseEndLineChar { get; set; } = ':';
         public char ResponseMultiLineChar { get; set; } = '*';
@@ -321,6 +387,50 @@ namespace StepBro.TestInterface
         public TimeSpan CommandResponseTimeout { get; set; } = TimeSpan.FromMilliseconds(5000);
         public bool AsyncLogFlushOnSendCommand { get; set; } = true;
         public bool NoFlushOnNextCommand { get; set; } = false;
+
+        #endregion
+
+        #region IConnection
+
+        [Obsolete]
+        public bool IsConnected
+        {
+            get { return this.IsOpen; }
+        }
+        public bool IsOpen
+        {
+            get { return m_stream != null && m_stream.IsOpen; }
+        }
+
+        [Obsolete]
+        public bool Connect([Implicit] ICallContext context)
+        {
+            return this.Open(context);
+        }
+
+        public bool Open([Implicit] ICallContext context)
+        {
+            if (m_stream.IsOpen || m_stream.Open(context))
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        [Obsolete]
+        public bool Disconnect([Implicit] ICallContext context)
+        {
+            return this.Close(context);
+        }
+
+        public bool Close([Implicit] ICallContext context)
+        {
+            if (m_stream != null)
+            {
+                m_stream.Close(context);
+            }
+            return true;
+        }
 
         #endregion
 
@@ -369,8 +479,13 @@ namespace StepBro.TestInterface
             return EnqueueCommand(commandData);
         }
 
-        protected override void PreSend(ICallContext context, string text)
+        public void SendDirect([Implicit] ICallContext context, string text)
         {
+            if (!m_stream.IsOpen)
+            {
+                context.Logger.LogError("Stream is not opened.");
+                return;
+            }
             if (AsyncLogFlushOnSendCommand && !NoFlushOnNextCommand)
             {
                 AsyncLog.Flush();
@@ -381,12 +496,22 @@ namespace StepBro.TestInterface
             {
                 context.Logger.Log("SendDirect: \"" + text + "\"");
             }
+            DoSendDirect(text);
         }
 
-        protected override void EnqueueCommand(string command)
+        bool ITextCommandInput.AcceptingCommands()
         {
+            return this.IsStillValid && this.IsOpen;
+        }
+        void ITextCommandInput.ExecuteCommand(string command)
+        {
+            if (!m_stream.IsOpen)
+            {
+                m_mainLogger.LogError("Stream is not opened.");
+                return;
+            }
             var commandData = new CommandData(m_mainLogger, command, this.CommandResponseTimeout, null);
-            this.EnqueueCommand(commandData);
+            EnqueueCommand(commandData);
         }
 
         #region Setup Commands
@@ -720,7 +845,7 @@ namespace StepBro.TestInterface
 
         #region Receiver
 
-        protected override void OnReceiverThreadLoop()
+        private void OnReceiverThreadLoop(object sender, EventArgs e)
         {
             lock (m_sync)
             {
@@ -736,15 +861,18 @@ namespace StepBro.TestInterface
             }
         }
 
-        protected override void OnTextLineReceived(string line)
+        private void OnTextLineReceived(string line)
         {
-            if (m_mainLogger != null) m_mainLogger.LogCommReceived(line);
+            //if (m_mainLogger != null) m_mainLogger.LogCommReceived(line);
             if (line[0] == EventLineChar)
             {
-                m_events.Enqueue(line.Substring(1));
-                while (m_events.Count > 1000)
+                if (m_asyncLogLineReader != null)
                 {
-                    m_events.Dequeue();     // Ensure queue buffer is not eating all memory.
+                    lock (m_eventLogSync)
+                    {
+                        m_lastEventLogLine = new LinkedTimestampedString(m_lastEventLogLine, DateTime.UtcNow, line.Substring(1)); // First character of Serial Connection messages should be ignored
+                        m_asyncLogLineReader.NotifyNew(m_lastEventLogLine);
+                    }
                 }
             }
             else
@@ -809,10 +937,13 @@ namespace StepBro.TestInterface
             var commandstring = command.GetAndMarkActive();
             m_loopbackAnswers?.TryGetValue(commandstring, out commandstring);
             if (m_nextResponse != null) commandstring = m_nextResponse;
-            if (m_mainLogger != null) m_mainLogger.LogCommSent(commandstring);
-            else if (command.Logger != null) command.Logger.LogCommSent(commandstring);
+            if (command.Logger != null) command.Logger.LogCommSent(commandstring);
             m_currentExecutingCommand = command;
             DoSendDirect(commandstring);
+        }
+        private void DoSendDirect(string text)
+        {
+            m_stream.Write(null, text + m_stream.NewLine);
         }
 
         private static string ArgumentToCommandString(object arg)
@@ -921,23 +1052,16 @@ namespace StepBro.TestInterface
 
         private RemoteProcedureInfo LastProc { get { return m_remoteProcedures[m_remoteProcedures.Count - 1]; } }
 
-        #region LogLineSource
-
-        public LogLineData FirstEntry { get { return m_firstLogLine; } }
-
-        public event LogLineAddEventHandler LinesAdded;
-
         public ILineReader AsyncLog
         {
             get
             {
                 if (m_asyncLogLineReader == null)
                 {
-                    m_asyncLogLineReader = new LogLineLineReader(this, null, m_eventLogSync);
+                    m_asyncLogLineReader = new TimestampedStringLineReader(this, null, m_eventLogSync);
                 }
                 return m_asyncLogLineReader;
             }
         }
-        #endregion
     }
 }

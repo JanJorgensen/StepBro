@@ -2,37 +2,44 @@
 using StepBro.Core.Data;
 using StepBro.Core.Logging;
 using System;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
+using System.ComponentModel;
+using System.IO;
+using System.ComponentModel.Design;
 
 namespace StepBro.Streams
 {
     [Public]
-    public abstract class Stream : IDisposable, IComponentLoggerSource
+    public abstract class Stream : AvailabilityBase, IComponentLoggerSource, INotifyPropertyChanged, ITextCommandInput
     {
-        private bool m_isDisposed = false;
+        public delegate void LineReceivedHandler(string line);
+
+        protected readonly object m_sync = new object();
         private string m_objectName;
+        private ILogger m_asyncLogger = null;
+        private bool m_commLogging = true;
         private bool m_specialLoggerEnabled = false;
+        private Task m_lineReceiverTask = null;
+        private bool m_stopReceiver = false;
+        private ConcurrentQueue<TimestampedString> m_lineReceiveQueue = null;
+        private LineReceivedHandler m_lineReceiver = null;
 
         public Stream([ObjectName] string objectName = "<a Stream>")
         {
             m_objectName = objectName;
         }
 
-        public void Dispose()
+        #region INotifyPropertyChanged
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void NotifyPropertyChanged(string name)
         {
-            if (!m_isDisposed)
-            {
-                try
-                {
-                    this.DoDispose();
-                }
-                finally
-                {
-                    m_isDisposed = true;
-                }
-            }
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        protected virtual void DoDispose() { }
+        #endregion
 
         [ObjectName]
         public string Name
@@ -45,7 +52,6 @@ namespace StepBro.Streams
                 m_objectName = value;
             }
         }
-
 
         public virtual string NewLine
         {
@@ -64,6 +70,81 @@ namespace StepBro.Streams
         }
 
         public virtual int ReadTimeout { get { return 10000; } set { } }
+
+        protected ILogger Logger { get { return m_asyncLogger; } }
+
+        public bool CommLogging
+        {
+            get { return m_commLogging; }
+            set { m_commLogging = value; }
+        }
+
+        public bool UseTextLineMode
+        {
+            get
+            {
+                // 'Line Mode' is enabled is either a line receiver has been set up, or an line receive queue is created.
+                return (m_lineReceiver != null || m_lineReceiveQueue != null);
+            }
+            set
+            {
+                if (value != this.UseTextLineMode)
+                {
+                    if (value)
+                    {
+                        if (m_lineReceiver == null)
+                        {
+                            this.SetupLineReceiveQueue();
+                        }
+                        if (this.IsOpen)
+                        {
+                            this.StartTextLineReceiverTask();
+                        }
+                    }
+                    else
+                    {
+                        this.StopTextLineReceiverTask();
+                        this.SetupLineReceiver(null);       // First this,
+                        this.DeleteLineReceiveQueue();      // .. then this.
+                    }
+                }
+            }
+        }
+
+        private void SetupLineReceiveQueue()
+        {
+            if (m_lineReceiveQueue == null)
+            {
+                m_lineReceiveQueue = new ConcurrentQueue<TimestampedString>();
+            }
+        }
+
+        private void DeleteLineReceiveQueue()
+        {
+            if (m_lineReceiveQueue != null)
+            {
+                lock (m_sync)
+                {
+                    var q = m_lineReceiveQueue;
+                    m_lineReceiveQueue = null;
+                    q.Clear();
+                }
+            }
+        }
+
+        public void SetupLineReceiver(LineReceivedHandler receiver)
+        {
+            if (receiver != null)
+            {
+                m_lineReceiver = receiver;
+                this.DeleteLineReceiveQueue();      // The queue is not used, then.
+            }
+            else
+            {
+                this.SetupLineReceiveQueue();
+                m_lineReceiver = null;
+            }
+        }
 
         protected abstract string GetTargetIdentification();
         protected abstract void SetEncoding(System.Text.Encoding encoding);
@@ -86,6 +167,10 @@ namespace StepBro.Streams
             }
             else
             {
+                if (m_asyncLogger == null)
+                {
+                    m_asyncLogger = ((ILoggerScope)Core.Main.GetService<ILogger>()).LogEntering(LogEntry.Type.Component, this.Name, null, null);
+                }
                 if (context != null && context.LoggingEnabled) context.Logger.Log($"Open ({this.GetTargetIdentification()})");
                 try
                 {
@@ -95,6 +180,12 @@ namespace StepBro.Streams
                     {
                         this.IsOpenChanged?.Invoke(this, EventArgs.Empty);
                     }
+
+                    if (this.UseTextLineMode)
+                    {
+                        this.StartTextLineReceiverTask();
+                    }
+
                     return result;
                 }
                 catch (Exception ex)
@@ -113,13 +204,105 @@ namespace StepBro.Streams
             if (context != null && context.LoggingEnabled) context.Logger.Log("Close");
             var wasOpen = this.IsOpen;
             this.DoClose(context);
+
+            this.StopTextLineReceiverTask();
+            if (m_lineReceiveQueue != null)
+            {
+                m_lineReceiveQueue.Clear();
+            }
+
             if (this.IsOpen != wasOpen)
             {
                 this.IsOpenChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 
+        private void StartTextLineReceiverTask()
+        {
+            if (m_lineReceiverTask == null)
+            {
+                m_stopReceiver = false;
+                m_lineReceiverTask = new Task(
+                    LineReceiverTask,
+                    TaskCreationOptions.LongRunning | TaskCreationOptions.DenyChildAttach);
+                var taskManager = StepBro.Core.Main.GetService<StepBro.Core.Tasks.TaskManager>();
+                taskManager.RegisterTask(m_lineReceiverTask);
+                m_lineReceiverTask.Start();
+            }
+        }
+
+        private void StopTextLineReceiverTask()
+        {
+            if (m_lineReceiverTask != null)
+            {
+                if (m_lineReceiverTask != null && !m_lineReceiverTask.IsCompleted)
+                {
+                    m_stopReceiver = true;
+                    m_lineReceiverTask.Wait();      // Important, to avoid having two running tasks if connecting again soon. 
+                }
+                m_lineReceiverTask = null;
+            }
+        }
+
+        public event EventHandler OnLineReceiverTaskLoop;
+
+        private void LineReceiverTask()
+        {
+            while (!m_stopReceiver)
+            {
+                this.OnLineReceiverTaskLoop?.Invoke(this, EventArgs.Empty);
+
+                string line = null;
+                try
+                {
+                    line = this.ReadLineDirect();
+                    if (line != null && line.Length > 0)
+                    {
+                        if (m_commLogging && m_asyncLogger != null)
+                        {
+                            m_asyncLogger.LogCommReceived(line);
+                        }
+                        if (m_lineReceiver != null)
+                        {
+                            m_lineReceiver(line);
+                        }
+                        else
+                        {
+                            lock (m_sync)
+                            {
+                                if (m_lineReceiveQueue != null)
+                                {
+                                    m_lineReceiveQueue.Enqueue(new TimestampedString(DateTime.UtcNow, line));
+                                }
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
         public abstract void Write([Implicit] StepBro.Core.Execution.ICallContext context, string text);
+
+        public void WriteLine([Implicit] StepBro.Core.Execution.ICallContext context, string text)
+        {
+            if (m_commLogging)
+            {
+                if (context != null)
+                {
+                    if (context.LoggingEnabled)
+                    {
+                        context.Logger.LogCommSent(text);
+                    }
+                }
+                else if (m_asyncLogger != null)
+                {
+                    m_asyncLogger.LogCommSent(text);
+                }
+            }
+            this.Write(context, text + this.NewLine);
+        }
+
         public abstract string ReadLineDirect();
 
         public string ReadLine([Implicit] StepBro.Core.Execution.ICallContext context, TimeSpan timeout)
@@ -136,6 +319,10 @@ namespace StepBro.Streams
                         {
                             context.Logger.Log("ReadLine : " + StringUtils.ObjectToString(line));
                         }
+                        if (this.CommLogging && m_asyncLogger != null)
+                        {
+                            m_asyncLogger.LogCommReceived(line);
+                        }
                         return line;
                     }
                     catch { }
@@ -149,6 +336,46 @@ namespace StepBro.Streams
         }
 
         public abstract void DiscardInBuffer();
+
+        public bool TryDequeue(out TimestampedString received)
+        {
+            if (m_lineReceiveQueue != null)
+            {
+                return m_lineReceiveQueue.TryDequeue(out received);
+            }
+            else
+            {
+                received = null;
+                return false;
+            }
+        }
+
+        public string TryDequeue()
+        {
+            if (m_lineReceiveQueue != null)
+            {
+                TimestampedString received;
+                if (m_lineReceiveQueue.TryDequeue(out received))
+                {
+                    return received.Data;
+                }
+            }
+            return null;
+        }
+
+        bool ITextCommandInput.AcceptingCommands()
+        {
+            return this.IsStillValid && this.IsOpen;
+        }
+
+        void ITextCommandInput.ExecuteCommand(string command)
+        {
+            if (!this.IsOpen)
+            {
+                return;
+            }
+            this.Write(null, command + this.NewLine);
+        }
 
         #region SpecialLogger
 

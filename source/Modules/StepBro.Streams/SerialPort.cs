@@ -11,83 +11,28 @@ using System.Security.AccessControl;
 
 namespace StepBro.Streams
 {
-    //
-    // Summary:
-    //     Specifies the control protocol used in establishing a serial port communication
-    //     for a System.IO.Ports.SerialPort object.
     public enum Handshake
     {
-        //
-        // Summary:
-        //     No control is used for the handshake.
         None = 0,
-        //
-        // Summary:
-        //     The XON/XOFF software control protocol is used. The XOFF control is sent to stop
-        //     the transmission of data. The XON control is sent to resume the transmission.
-        //     These software controls are used instead of Request to Send (RTS) and Clear to
-        //     Send (CTS) hardware controls.
         XOnXOff = 1,
-        //
-        // Summary:
-        //     Request-to-Send (RTS) hardware flow control is used. RTS signals that data is
-        //     available for transmission. If the input buffer becomes full, the RTS line will
-        //     be set to false. The RTS line will be set to true when more room becomes available
-        //     in the input buffer.
         RequestToSend = 2,
-        //
-        // Summary:
-        //     Both the Request-to-Send (RTS) hardware control and the XON/XOFF software controls
-        //     are used.
         RequestToSendXOnXOff = 3
     }
-    //
-    // Summary:
-    //     Specifies the parity bit for a System.IO.Ports.SerialPort object.
+    
     public enum Parity
     {
-        //
-        // Summary:
-        //     No parity check occurs.
         None = 0,
-        //
-        // Summary:
-        //     Sets the parity bit so that the count of bits set is an odd number.
         Odd = 1,
-        //
-        // Summary:
-        //     Sets the parity bit so that the count of bits set is an even number.
         Even = 2,
-        //
-        // Summary:
-        //     Leaves the parity bit set to 1.
         Mark = 3,
-        //
-        // Summary:
-        //     Leaves the parity bit set to 0.
         Space = 4
     }
-    //
-    // Summary:
-    //     Specifies the number of stop bits used on the System.IO.Ports.SerialPort object.
+    
     public enum StopBits
     {
-        //
-        // Summary:
-        //     No stop bits are used. This value is not supported by the System.IO.Ports.SerialPort.StopBits
-        //     property.
         None = 0,
-        //
-        // Summary:
-        //     One stop bit is used.
         One = 1,
-        //
-        // Summary:
-        //     Two stop bits are used.
         Two = 2,
-        //
-        // Summary:
-        //     1.5 stop bits are used.
         OnePointFive = 3
     }
 
@@ -99,7 +44,6 @@ namespace StepBro.Streams
 
         private System.IO.Ports.SerialPort m_port;
         private long m_dataReceivedCounter = 0L;
-        private ILogger m_asyncLogger = null;
         private IComponentLogging m_componentLogging = null;
         private bool m_reportOverrun = false;
 
@@ -108,6 +52,7 @@ namespace StepBro.Streams
             m_port = new System.IO.Ports.SerialPort();
             m_port.ErrorReceived += this.Port_ErrorReceived;
             m_port.Encoding = Encoding.Latin1;
+            m_port.ReadTimeout = 500;
         }
 
         internal System.IO.Ports.SerialPort Port { get { return m_port; } }
@@ -136,13 +81,14 @@ namespace StepBro.Streams
         {
             if (m_reportOverrun || e.EventType != System.IO.Ports.SerialError.Overrun)
             {
-                m_asyncLogger.LogError(e.EventType.ToString());
+                this.Logger.LogError(e.EventType.ToString());
                 //m_componentLogging.LogError(e.EventType.ToString());
             }
         }
 
-        protected override void DoDispose()
+        protected override void DoDispose(bool disposing)
         {
+            base.DoDispose(disposing);
             m_port.Close();
             m_port.Dispose();
             m_port = null;
@@ -154,7 +100,6 @@ namespace StepBro.Streams
             try
             {
                 m_port.Open();
-                m_asyncLogger = ((ILoggerScope)Core.Main.GetService<ILogger>()).LogEntering(LogEntry.Type.Component, this.Name, null, null);
                 if (m_componentLogging == null)
                 {
                     m_componentLogging = Core.Main.GetService<IComponentLoggerService>().CreateComponentLogger(this);
@@ -229,9 +174,13 @@ namespace StepBro.Streams
         {
             if (m_port.IsOpen)
             {
-                if (context != null && context.LoggingEnabled)
+                if (this.CommLogging)
                 {
-                    var s = text.Trim(' ', '\r', '\n', '\t').EscapeString();
+                    this.Logger.LogCommSent(text.EscapeString());
+                }
+                else if (context != null && context.LoggingEnabled)
+                {
+                    var s = text.EscapeString();
                     if (s.Length > 120)
                     {
                         s = "Write \"" + s.Substring(0, 120) + "\"...";
@@ -257,7 +206,7 @@ namespace StepBro.Streams
         public override string ReadLineDirect()
         {
             var line = m_port.ReadLine();
-            m_asyncLogger?.LogCommReceived(line);
+            //m_asyncLogger?.LogCommReceived(line);
             //if (m_specialLogging != null && m_specialLogging.Enabled)
             //{
             //    m_specialLogging.LogReceived(line);
