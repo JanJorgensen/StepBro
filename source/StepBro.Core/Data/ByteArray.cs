@@ -17,10 +17,10 @@ namespace StepBro.Core.Data
         public int Start { get; private set; }
         public int Length { get; private set; }
 
-        public ByteArray(byte[] data, int start = -1, int length = -1)
+        public ByteArray(byte[] data, int start = 0, int length = -1)
         {
             m_data = data;
-            this.Start = (start >= 0) ? start : 0;
+            this.Start = start;
             this.Length = (length >= 0) ? length : data.Length - this.Start;
         }
 
@@ -55,6 +55,37 @@ namespace StepBro.Core.Data
                 return true;
             }
             return base.Equals(obj);
+        }
+
+        public void Append(byte[] data, int start = 0, int length = -1)
+        {
+            if (length < 0) { length = data.Length - start; }
+            int min = this.Length + length;
+            int size = m_data.Length - this.Start;
+            while (size < min)
+            {
+                size <<= 1;
+            }
+            var newArray = new byte[size];
+            Array.Copy(m_data, this.Start, newArray, 0, this.Length);       // Copy existing.
+            Array.Copy(data, start, newArray, this.Length, length);   // Copy addition.
+            m_data = newArray;
+            this.Start = 0;
+            this.Length += length;
+        }
+
+        public void Append(ByteArray data, int start = 0, int length = -1)
+        {
+            if (length < 0) { length = data.Length; }
+            this.Append(data.m_data, data.Start + start, length);
+        }
+
+        public ByteArray Sub(int start, int length = -1)
+        {
+            if (start >= this.Length) throw new ArgumentOutOfRangeException(nameof(start));
+            if (length > (this.Length - start)) throw new ArgumentOutOfRangeException(nameof(length));
+            if (length < 0) length = this.Length - start;
+            return new ByteArray(m_data, start + this.Start, length);
         }
 
         public static implicit operator ByteArray(byte[] data)

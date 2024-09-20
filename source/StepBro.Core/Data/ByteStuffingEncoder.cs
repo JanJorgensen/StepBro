@@ -1,6 +1,7 @@
 ﻿using StepBro.Core.Api;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -81,7 +82,7 @@ namespace StepBro.Core.Data
         }
 
 
-        public ByteArray DecodeEscapedData(byte[] data, int index = 0, int length = -1)
+        public ByteArray Decode(byte[] data, int index = 0, int length = -1)
         {
             if (length < 0) length = data.Length - index;
 
@@ -104,7 +105,14 @@ namespace StepBro.Core.Data
 
             return new ByteArray(result, 0, j);
         }
-        public ByteArray CreateEscapedData(byte[] data, int index = 0, int length = -1)
+
+        public ByteArray Decode(ByteArray input, int index = 0, int length = -1)
+        {
+            if (length < 0) length = input.Length - index;
+            return this.Decode(input.Data, index + input.Start, length);
+        }
+
+        public ByteArray Encode(byte[] data, int index = 0, int length = -1)
         {
             if (length < 0) length = data.Length - index;
 
@@ -127,20 +135,36 @@ namespace StepBro.Core.Data
 
             return new ByteArray(result, 0, j);
         }
-    }
 
-    [Public]
-    public static class ByteStuffingHelp
-    {
-        public static ByteArray Encode(this ByteArray input, ByteStuffingEncoder encoder, int index = 0, int length = -1)
+        public ByteArray Encode(ByteArray input, int index = 0, int length = -1)
         {
             if (length < 0) length = input.Length - index;
-            return encoder.CreateEscapedData(input.Data, index + input.Start, length);
+            return this.Encode(input.Data, index + input.Start, length);
         }
-        public static ByteArray Decode(this ByteArray input, ByteStuffingEncoder encoder, int index = 0, int length = -1)
+
+        public ByteArray Encode(ByteArray input, int dataStart, int encodeStart, int dataLength, int encodeLength)
         {
-            if (length < 0) length = input.Length - index;
-            return encoder.DecodeEscapedData(input.Data, index + input.Start, length);
+            if (dataLength < 0) dataLength = input.Length - dataStart;
+            if (encodeLength < 0) encodeLength = input.Length - encodeStart;
+            if (encodeStart < dataStart) throw new ArgumentException(nameof(encodeStart));
+            if (encodeLength > dataLength) throw new ArgumentException(nameof(encodeLength));
+
+            var encoded = this.Encode(input.Data, input.Start + encodeStart, encodeLength);
+            if (dataStart < encodeStart || dataLength > encodeLength)
+            {
+                var fullMessage = new ByteArray(new byte[dataLength * 2], 0, 0);
+                if (dataStart < encodeStart)
+                {
+                    fullMessage.Append(input.Data, input.Start + dataStart, encodeStart - dataStart);
+                }
+                fullMessage.Append(encoded);
+                if ((encodeStart + encodeLength) < dataLength)
+                {
+                    fullMessage.Append(input.Data, input.Start + encodeStart + encodeLength, dataLength - (encodeLength - encodeStart));
+                }
+                return fullMessage;
+            }
+            else return encoded;
         }
     }
 }

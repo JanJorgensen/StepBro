@@ -25,6 +25,12 @@ namespace StepBro.Core.Data
 
         public int WriteIndex { get { return m_writeIndex; } }
 
+        public ByteArray GetResult(int start = 0, int length = -1)
+        {
+            if (length < 0) length = m_writeIndex - start;
+            return new ByteArray(m_data, start, length);
+        }
+
         #region Basic Functionality
 
         public bool Skip(int size)
@@ -92,6 +98,11 @@ namespace StepBro.Core.Data
 
         public void WriteUInt8(byte value)
         {
+            this.WriteByte(value);
+        }
+
+        public void WriteByte(byte value)
+        {
             this.ReserveSpace(1);
             m_data[m_writeIndex++] = value;
         }
@@ -110,6 +121,12 @@ namespace StepBro.Core.Data
             this.ReserveSpace(size);
             Array.Copy(source, sourceOffset, m_data, m_writeIndex, size);
             m_writeIndex += size;
+        }
+        public void WriteBlock(ByteArray data)
+        {
+            this.ReserveSpace(data.Length);
+            Array.Copy(data.Data, data.Start, m_data, m_writeIndex, data.Length);
+            m_writeIndex += data.Length;
         }
     }
 }

@@ -82,23 +82,47 @@ namespace StepBroCoreTest
         }
 
         [TestMethod]
-        public void TestByteStuffingEncoder()
+        public void TestByteStuffingEncoderSimple()
         {
             var f = """
-                StepBro.Core.Data.ByteStuffingEncoder byteStuffing = StepBro.Core.Data.ByteStuffingEncoder(0xF8, 0x0D, 0xF6, 0xF8, 0xF8);
+                StepBro.Core.Data.ByteStuffingEncoder byteStuffing = StepBro.Core.Data.ByteStuffingEncoder(0xF8, 0x00, 0xF4, 0x0D, 0xF6, 0xF8, 0xF8);
                 StepBro.Core.Data.BinaryEncoding binaryEncoding = StepBro.Core.Data.BinaryEncoding(StepBro.Core.Data.BinaryEncoding.Endianness.LittleEndian);
 
                 procedure void TestEncoding()
                 {
                     var data1 = "00 01 02 03 0A 0B 0C 0D 0E 0F 10 11 F7 F8 F9 FA".FromHexStringToByteArray();
-                    var encoded = data1.Encode(byteStuffing);
+                    var encoded = byteStuffing.Encode(data1);
                     var encodedHex = encoded.ToHexString(" ");
-                    expect (encodedHex == "00 01 02 03 0A 0B 0C F8 F6 0E 0F 10 11 F7 F8 F8 F9 FA");
+                    expect (encodedHex == "F8 F4 01 02 03 0A 0B 0C F8 F6 0E 0F 10 11 F7 F8 F8 F9 FA");
 
-                    var data2 = "00 01 02 03 0A 0B 0C F8 F6 0E 0F 10 11 F7 F8 F8 F9 FA".FromHexStringToByteArray();
-                    var decoded = data2.Decode(byteStuffing);
+                    var data2 = "F8 F4 01 02 03 0A 0B 0C F8 F6 0E 0F 10 11 F7 F8 F8 F9 FA".FromHexStringToByteArray();
+                    var decoded = byteStuffing.Decode(data2);
                     var decodedHex = decoded.ToHexString(" ");
                     expect (decodedHex == "00 01 02 03 0A 0B 0C 0D 0E 0F 10 11 F7 F8 F9 FA");
+                }
+            """;
+            var file = FileBuilder.ParseFile(null, f.ToString());
+            Assert.AreEqual(0, file.Errors.ErrorCount);
+            var procedure = file.GetFileElement<IFileProcedure>("TestEncoding");
+
+            var taskContext = ExecutionHelper.ExeContext();
+            var result = taskContext.CallProcedure(procedure);
+            Assert.AreEqual(Verdict.Pass, taskContext.Result.Verdict);
+        }
+
+        [TestMethod]
+        public void TestByteStuffingEncoderPartly()
+        {
+            var f = """
+                StepBro.Core.Data.ByteStuffingEncoder byteStuffing = StepBro.Core.Data.ByteStuffingEncoder(0xF8, 0x00, 0xF4, 0x0D, 0xF6, 0xF8, 0xF8);
+                StepBro.Core.Data.BinaryEncoding binaryEncoding = StepBro.Core.Data.BinaryEncoding(StepBro.Core.Data.BinaryEncoding.Endianness.LittleEndian);
+
+                procedure void TestEncoding()
+                {
+                    var data1 = "00 F8 02 03 0A 0B 0C 0D 0E 0F 10 11 F7 F8 F9 FA".FromHexStringToByteArray();
+                    var encoded = byteStuffing.Encode(data1, 0, 3, -1, -1);
+                    var encodedHex = encoded.ToHexString(" ");
+                    expect (encodedHex == "00 F8 02 03 0A 0B 0C F8 F6 0E 0F 10 11 F7 F8 F8 F9 FA");
                 }
             """;
             var file = FileBuilder.ParseFile(null, f.ToString());
