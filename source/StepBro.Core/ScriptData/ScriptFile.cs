@@ -38,6 +38,7 @@ namespace StepBro.Core.ScriptData
         //private DateTime m_lastParsing = DateTime.MinValue;
         private FolderShortcutCollection m_folderShortcuts = null;
         private List<FolderConfiguration> m_folderConfigs = new List<FolderConfiguration>();
+        private List<Tuple<int, string>> m_documentComments = null;
         private bool m_allFolderConfigsRead = false;
 
         /// <summary>
@@ -120,6 +121,16 @@ namespace StepBro.Core.ScriptData
                     }
                 }
             }
+        }
+
+        public IEnumerable<Tuple<int, string>> ListDocumentComments()
+        {
+            return m_documentComments;
+        }
+
+        internal void SetDocumentComments(List<Tuple<int, string>> comments)
+        {
+            m_documentComments = comments;
         }
 
         public IErrorCollector Errors { get { return m_errors; } }
@@ -331,6 +342,7 @@ namespace StepBro.Core.ScriptData
             string name,
             TypeReference datatype,
             bool @readonly,
+            int lineFileElementAssociatedData,
             int line,
             int column,
             int codeHash,
@@ -371,6 +383,7 @@ namespace StepBro.Core.ScriptData
                 {
                     SetFileVariableCustomData(existing, customSetupData);
                 }
+                existing.LineAssociatedData = lineFileElementAssociatedData;
                 return existing.ID;
             }
 
@@ -383,6 +396,7 @@ namespace StepBro.Core.ScriptData
             {
                 SetFileVariableCustomData(vc, customSetupData);
             }
+            vc.LineAssociatedData = lineFileElementAssociatedData;
             m_fileScopeVariables.Add(vc);
             this.ObjectContainerListChanged?.Invoke(this, EventArgs.Empty);
             return vc.ID;

@@ -28,6 +28,7 @@ namespace StepBro.Core.Parser
         protected ScriptFile m_file;
         private FileElementType m_elementType = FileElementType.Unknown;
         private FileElement m_currentFileElement = null;    // The file element currently being parsed.
+        private int m_lineFileElementAssociatedData = -1;
         private Stack<ElementType> m_currentElementType = new Stack<ElementType>();
         protected AccessModifier m_fileElementModifier = AccessModifier.None;
         protected IToken m_elementStart = null;
@@ -143,6 +144,7 @@ namespace StepBro.Core.Parser
             m_lastElementPropertyBlock = null;
             m_fileElementModifier = AccessModifier.Public;    // Default is 'public'.
             m_currentFileElement = null;
+            m_lineFileElementAssociatedData = context.Start.Line;
 
             m_fileElementAttributes = m_lastAttributes;
             m_lastAttributes = null;
@@ -168,6 +170,11 @@ namespace StepBro.Core.Parser
                     m_currentFileElement.DocReference = reference.ValueAsString();
                 }
             }
+            if (m_currentFileElement != null)
+            {
+                m_currentFileElement.LineAssociatedData = m_lineFileElementAssociatedData;
+            }
+            m_currentFileElement = null;
         }
 
         public override void EnterElementModifier([NotNull] SBP.ElementModifierContext context)
@@ -291,7 +298,7 @@ namespace StepBro.Core.Parser
                 var codeHash = context.GetText().GetHashCode();
                 var id = m_file.CreateOrGetFileVariable(
                     m_currentNamespace, m_fileElementModifier, variable.Name, type, false,
-                    context.Start.Line, context.Start.Column, codeHash,
+                    m_lineFileElementAssociatedData, context.Start.Line, context.Start.Column, codeHash,
                     CreateVariableContainerValueAssignAction(variable.Initializer.ExpressionCode));
                 m_file.SetFileVariableModifier(id, m_fileElementModifier);
             }
@@ -400,7 +407,7 @@ namespace StepBro.Core.Parser
             var codeHash = context.GetText().GetHashCode();
             var id = m_file.CreateOrGetFileVariable(
                 m_currentNamespace, m_fileElementModifier, m_variableName, m_variableType, true,
-                context.Start.Line, context.Start.Column, codeHash,
+                m_lineFileElementAssociatedData, context.Start.Line, context.Start.Column, codeHash,
                 resetter: resetAction,
                 creator: createAction,
                 initializer: initAction,

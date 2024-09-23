@@ -27,5 +27,6 @@ namespace StepBro.Core.ScriptData
         IEnumerable<IFileElement> ListElements();
         IErrorCollector Errors { get; }
         IFolderShortcutsSource FolderShortcuts { get; }
+        IEnumerable<Tuple<int, string>> ListDocumentComments();
     }
 }

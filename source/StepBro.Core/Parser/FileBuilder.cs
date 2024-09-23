@@ -1,10 +1,12 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Tree;
+using MediatR;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.File;
 using StepBro.Core.General;
+using StepBro.Core.Language;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
@@ -15,6 +17,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
+using Lexer = StepBro.Core.Parser.Grammar.StepBroLexer;
 
 namespace StepBro.Core.Parser
 {
@@ -549,7 +552,7 @@ namespace StepBro.Core.Parser
                 file.ResetBeforeParsing();
                 file.MarkForTypeScanning();
                 ITokenSource lexer = new Grammar.StepBroLexer(file.GetParserFileStream(services.Get<ITextFileSystem>()));
-                ITokenStream tokens = new CommonTokenStream(lexer);
+                var tokens = new CommonTokenStream(lexer);
                 var parser = new SBP(tokens);
                 parser.RemoveErrorListeners();
                 (file.Errors as ErrorCollector).Clear();
@@ -562,6 +565,17 @@ namespace StepBro.Core.Parser
                 {
                     file.SetNamespace(System.IO.Path.GetFileNameWithoutExtension(file.FileName));
                 }
+
+                var docComments = new List<Tuple<int,string>>();
+                foreach (var token in tokens.GetTokens())
+                {
+                    // token.Type == Lexer.DOC_COMMENT_INDENTED || 
+                    if (token.Type == Lexer.DOC_COMMENT)
+                    {
+                        docComments.Add(new Tuple<int, string>(token.Line, token.Text));
+                    }
+                }
+                file.SetDocumentComments(docComments);
 
                 var visitor = new StepBroTypeVisitor();
                 visitor.Visit(context);

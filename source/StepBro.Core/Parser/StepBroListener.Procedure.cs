@@ -80,6 +80,7 @@ namespace StepBro.Core.Parser
 
         private void ExitProcedureParsing()
         {
+            m_currentFileElement = m_currentProcedure;
             m_lastProcedure = m_currentProcedure;
             if (m_file != null)
             {

@@ -106,6 +106,11 @@ namespace StepBroCoreTest
         {
             throw new NotImplementedException();
         }
+
+        public IEnumerable<Tuple<int, string>> ListDocumentComments()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     internal class ConceptualFileImplementation : ConceptFileBase

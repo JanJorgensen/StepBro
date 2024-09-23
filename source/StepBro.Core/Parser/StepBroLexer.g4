@@ -20,10 +20,7 @@ channels { COMMENTS_CHANNEL, DOC_COMMENTS_CHANNEL, DIRECTIVE }
   //protected bool assertIsKeyword = true;
 }
 
-DOC_COMMENT_INDENTED:	    '///    ' InputCharacter*       -> channel(DOC_COMMENTS_CHANNEL);
 DOC_COMMENT:        	    '/// ' InputCharacter*          -> channel(DOC_COMMENTS_CHANNEL);
-//DOC_COMMENT_START:          '/// '                          -> channel(DOC_COMMENTS_CHANNEL), mode(DOC_COMMENT_MODE);
-//DELIMITED_DOC_COMMENT:	'/**' .*? '*/'                  -> channel(DOC_COMMENTS_CHANNEL);
 SINGLE_LINE_COMMENT:		'//'  InputCharacter*           -> channel(COMMENTS_CHANNEL);
 DELIMITED_COMMENT:			'/*'  .*? '*/'                  -> channel(COMMENTS_CHANNEL);
 
@@ -274,13 +271,6 @@ DOUBLE_BACK_SLASH : '\\\\';
 //LINE_COMMENT
 //    : '//' ~[\r\n]* '\r'? '\n' -> channel(COMMENTS_CHANNEL)
 //    ;
-
-mode DOC_COMMENT_MODE;
-
-DOC_COMMENT_NEWLINE_INDENTED    : NewLine '///    ' ' '*    -> channel(DOC_COMMENTS_CHANNEL) ;
-DOC_COMMENT_NEWLINE             : NewLine '/// ' ' '*       -> channel(DOC_COMMENTS_CHANNEL) ;
-DOC_COMMENT_END                 : NewLine                   -> channel(DOC_COMMENTS_CHANNEL), mode(DEFAULT_MODE) ;
-DOC_COMMENT_TEXT                : InputCharacter+           -> channel(DOC_COMMENTS_CHANNEL) ;
 
 mode INTERPOLATION_STRING;
 

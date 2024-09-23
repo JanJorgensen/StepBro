@@ -11,6 +11,7 @@ namespace StepBro.Core.ScriptData
         private IScriptFile m_parentFile;
         private AccessModifier m_accessModifier;
         private int m_line;
+        private int m_lineAssociatedData;
         private string m_baseElementName = null;
         private IFileElement m_baseElement;
         private IFileElement m_parentElement;
@@ -214,10 +215,22 @@ namespace StepBro.Core.ScriptData
             }
         }
 
+        /// <summary>
+        /// Line of the file element definition.
+        /// </summary>
         public int Line
         {
             get { return m_line; }
             internal set { m_line = value; }
+        }
+
+        /// <summary>
+        /// The line number of the first file element associated data (attribute, modifier or the element definition itself).
+        /// </summary>
+        public int LineAssociatedData
+        {
+            get { return m_lineAssociatedData; }
+            internal set { m_lineAssociatedData = value; }
         }
 
         IInheritable IInheritable.Base { get { return this.BaseElement as IInheritable; } }
