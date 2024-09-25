@@ -326,15 +326,21 @@ namespace StepBro.Core
         {
             if (force || CheckIfFileParsingNeeded())
             {
+                Exception exception = null;
                 ILoggerScope logger = null;
                 try
                 {
                     logger = m_logRootScope.LogEntering(LogEntry.Type.PreHighLevel, "StepBro.Main.FileParsing", "Starting file parsing", null);
                     m_lastParsingErrorCount = FileBuilder.ParseFiles(m_serviceManagerAdmin.Manager, logger, (IScriptFile)null);
-                    ParsingCompleted?.Invoke(null, EventArgs.Empty);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError($"Parser threw exception: {ex.GetType().FullName} - {ex.Message.Replace("\r\n", " ")}");
+                    exception = ex;
                 }
                 finally
                 {
+                    ParsingCompleted?.Invoke(null, EventArgs.Empty);
                     if (m_lastParsingErrorCount > 0)
                     {
                         logger.LogError($"Ended file parsing. {m_lastParsingErrorCount} errors.");
@@ -344,7 +350,7 @@ namespace StepBro.Core
                         logger.Log($"Ended file parsing. No errors.");
                     }
                 }
-                return (m_lastParsingErrorCount == 0);
+                return (m_lastParsingErrorCount == 0 && exception == null);
             }
             else
             {
