@@ -1,6 +1,5 @@
 ﻿using Antlr4.Runtime;
 using Markdig;
-using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.DocCreation;
