@@ -1057,7 +1057,6 @@ namespace StepBro.Core.Parser
                 }
                 foreach (var file in filesToParse)
                 {
-                    file.GenerateDocumentationFile();
                     file.DisposeFileStream();
                     if (file.IsDependantOf(parserUser))
                     {
