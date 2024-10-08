@@ -46,25 +46,25 @@ namespace StepBro.SimpleWorkbench
 
             public ScriptExecutionToolStripMenuItem(IFileElement element, string partner, string instanceObject)
             {
-                FileElement = element;
+                this.FileElement = element.FullName;
                 Partner = partner;
                 InstanceObject = instanceObject;
             }
 
             public bool ShowFullName { get; set; } = false;
-            public IFileElement FileElement { get; set; } = null;
+            public string FileElement { get; set; } = null;
             public string Partner { get; set; } = null;
             public bool PartnerIsModel { get; set; } = false;
             public string InstanceObject { get; set; } = null;
 
             public void SetText()
             {
-                this.Text = ScripExecutionButtonTitle(this.ShowFullName, this.FileElement.FullName, this.Partner, this.PartnerIsModel, this.InstanceObject, null);
+                this.Text = ScripExecutionButtonTitle(this.ShowFullName, this.FileElement, this.Partner, this.PartnerIsModel, this.InstanceObject, null);
             }
 
             public bool Equals(string element, string partner, string instanceObject)
             {
-                if (!String.Equals(element, this.FileElement.FullName, StringComparison.InvariantCulture)) return false;
+                if (!String.Equals(element, this.FileElement, StringComparison.InvariantCulture)) return false;
                 if (String.IsNullOrEmpty(partner) != String.IsNullOrEmpty(this.Partner)) return false;
                 if (!String.Equals(partner, this.Partner)) return false;
                 if (!String.Equals(instanceObject, this.InstanceObject)) return false;

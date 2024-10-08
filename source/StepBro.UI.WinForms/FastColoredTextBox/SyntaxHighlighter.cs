@@ -118,6 +118,17 @@ namespace FastColoredTextBoxNS
         protected Regex VBNumberRegex;
         protected Regex VBStringRegex;
 
+        protected Regex StepBroAttributeRegex,
+              StepBroClassNameRegex;
+
+        protected Regex StepBroCommentRegex1,
+                      StepBroCommentRegex2,
+                      StepBroCommentRegex3;
+
+        protected Regex StepBroKeywordRegex;
+        protected Regex StepBroNumberRegex;
+        protected Regex StepBroStringRegex;
+
         protected FastColoredTextBox currentTb;
 
         public static RegexOptions RegexCompiledOption
@@ -178,6 +189,9 @@ namespace FastColoredTextBoxNS
                     break;
                 case Language.JSON:
                     JSONSyntaxHighlight(range);
+                    break;
+                case Language.StepBro:
+                    CSharpSyntaxHighlight(range);
                     break;
                 default:
                     break;
@@ -566,59 +580,6 @@ namespace FastColoredTextBoxNS
             return new[] { tb.LeftBracket, tb.RightBracket, tb.LeftBracket2, tb.RightBracket2 };
         }
 
-        protected void InitCShaprRegex()
-        {
-            //CSharpStringRegex = new Regex( @"""""|@""""|''|@"".*?""|(?<!@)(?<range>"".*?[^\\]"")|'.*?[^\\]'", RegexCompiledOption);
-
-            CSharpStringRegex =
-                new Regex(
-                    @"
-                            # Character definitions:
-                            '
-                            (?> # disable backtracking
-                              (?:
-                                \\[^\r\n]|    # escaped meta char
-                                [^'\r\n]      # any character except '
-                              )*
-                            )
-                            '?
-                            |
-                            # Normal string & verbatim strings definitions:
-                            (?<verbatimIdentifier>@)?         # this group matches if it is an verbatim string
-                            ""
-                            (?> # disable backtracking
-                              (?:
-                                # match and consume an escaped character including escaped double quote ("") char
-                                (?(verbatimIdentifier)        # if it is a verbatim string ...
-                                  """"|                         #   then: only match an escaped double quote ("") char
-                                  \\.                         #   else: match an escaped sequence
-                                )
-                                | # OR
-            
-                                # match any char except double quote char ("")
-                                [^""]
-                              )*
-                            )
-                            ""
-                        ",
-                    RegexOptions.ExplicitCapture | RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace |
-                    RegexCompiledOption
-                    ); //thanks to rittergig for this regex
-
-            CSharpCommentRegex1 = new Regex(@"//.*$", RegexOptions.Multiline | RegexCompiledOption);
-            CSharpCommentRegex2 = new Regex(@"(/\*.*?\*/)|(/\*.*)", RegexOptions.Singleline | RegexCompiledOption);
-            CSharpCommentRegex3 = new Regex(@"(/\*.*?\*/)|(.*\*/)",
-                                            RegexOptions.Singleline | RegexOptions.RightToLeft | RegexCompiledOption);
-            CSharpNumberRegex = new Regex(@"\b\d+[\.]?\d*([eE]\-?\d+)?[lLdDfF]?\b|\b0x[a-fA-F\d]+\b",
-                                          RegexCompiledOption);
-            CSharpAttributeRegex = new Regex(@"^\s*(?<range>\[.+?\])\s*$", RegexOptions.Multiline | RegexCompiledOption);
-            CSharpClassNameRegex = new Regex(@"\b(class|struct|enum|interface)\s+(?<range>\w+?)\b", RegexCompiledOption);
-            CSharpKeywordRegex =
-                new Regex(
-                    @"\b(abstract|add|alias|as|ascending|async|await|base|bool|break|by|byte|case|catch|char|checked|class|const|continue|decimal|default|delegate|descending|do|double|dynamic|else|enum|equals|event|explicit|extern|false|finally|fixed|float|for|foreach|from|get|global|goto|group|if|implicit|in|int|interface|internal|into|is|join|let|lock|long|nameof|namespace|new|null|object|on|operator|orderby|out|override|params|partial|private|protected|public|readonly|ref|remove|return|sbyte|sealed|select|set|short|sizeof|stackalloc|static|static|string|struct|switch|this|throw|true|try|typeof|uint|ulong|unchecked|unsafe|ushort|using|using|value|var|virtual|void|volatile|when|where|while|yield)\b|#region\b|#endregion\b",
-                    RegexCompiledOption);
-        }
-
         public void InitStyleSchema(Language lang)
         {
             switch (lang)
@@ -693,7 +654,71 @@ namespace FastColoredTextBoxNS
                     NumberStyle = MagentaStyle;
                     KeywordStyle = BlueStyle;
                     break;
+                case Language.StepBro:
+                    StringStyle = BrownStyle;
+                    CommentStyle = GreenStyle;
+                    NumberStyle = MagentaStyle;
+                    AttributeStyle = GreenStyle;
+                    ClassNameStyle = BoldStyle;
+                    KeywordStyle = BlueStyle;
+                    CommentTagStyle = GrayStyle;
+                    break;
             }
+        }
+
+        #region C#
+
+        protected void InitCShaprRegex()
+        {
+            //CSharpStringRegex = new Regex( @"""""|@""""|''|@"".*?""|(?<!@)(?<range>"".*?[^\\]"")|'.*?[^\\]'", RegexCompiledOption);
+
+            CSharpStringRegex =
+                new Regex(
+                    @"
+                            # Character definitions:
+                            '
+                            (?> # disable backtracking
+                              (?:
+                                \\[^\r\n]|    # escaped meta char
+                                [^'\r\n]      # any character except '
+                              )*
+                            )
+                            '?
+                            |
+                            # Normal string & verbatim strings definitions:
+                            (?<verbatimIdentifier>@)?         # this group matches if it is an verbatim string
+                            ""
+                            (?> # disable backtracking
+                              (?:
+                                # match and consume an escaped character including escaped double quote ("") char
+                                (?(verbatimIdentifier)        # if it is a verbatim string ...
+                                  """"|                         #   then: only match an escaped double quote ("") char
+                                  \\.                         #   else: match an escaped sequence
+                                )
+                                | # OR
+            
+                                # match any char except double quote char ("")
+                                [^""]
+                              )*
+                            )
+                            ""
+                        ",
+                    RegexOptions.ExplicitCapture | RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace |
+                    RegexCompiledOption
+                    ); //thanks to rittergig for this regex
+
+            CSharpCommentRegex1 = new Regex(@"//.*$", RegexOptions.Multiline | RegexCompiledOption);
+            CSharpCommentRegex2 = new Regex(@"(/\*.*?\*/)|(/\*.*)", RegexOptions.Singleline | RegexCompiledOption);
+            CSharpCommentRegex3 = new Regex(@"(/\*.*?\*/)|(.*\*/)",
+                                            RegexOptions.Singleline | RegexOptions.RightToLeft | RegexCompiledOption);
+            CSharpNumberRegex = new Regex(@"\b\d+[\.]?\d*([eE]\-?\d+)?[lLdDfF]?\b|\b0x[a-fA-F\d]+\b",
+                                          RegexCompiledOption);
+            CSharpAttributeRegex = new Regex(@"^\s*(?<range>\[.+?\])\s*$", RegexOptions.Multiline | RegexCompiledOption);
+            CSharpClassNameRegex = new Regex(@"\b(class|struct|enum|interface)\s+(?<range>\w+?)\b", RegexCompiledOption);
+            CSharpKeywordRegex =
+                new Regex(
+                    @"\b(abstract|add|alias|as|ascending|async|await|base|bool|break|by|byte|case|catch|char|checked|class|const|continue|decimal|default|delegate|descending|do|double|dynamic|else|enum|equals|event|explicit|extern|false|finally|fixed|float|for|foreach|from|get|global|goto|group|if|implicit|in|int|interface|internal|into|is|join|let|lock|long|nameof|namespace|new|null|object|on|operator|orderby|out|override|params|partial|private|protected|public|readonly|ref|remove|return|sbyte|sealed|select|set|short|sizeof|stackalloc|static|static|string|struct|switch|this|throw|true|try|typeof|uint|ulong|unchecked|unsafe|ushort|using|using|value|var|virtual|void|volatile|when|where|while|yield)\b|#region\b|#endregion\b",
+                    RegexCompiledOption);
         }
 
         /// <summary>
@@ -766,6 +791,10 @@ namespace FastColoredTextBoxNS
             range.SetFoldingMarkers(@"/\*", @"\*/"); //allow to collapse comment block
         }
 
+        #endregion
+
+        #region VB
+
         protected void InitVBRegex()
         {
             VBStringRegex = new Regex(@"""""|"".*?[^\\]""", RegexCompiledOption);
@@ -828,6 +857,10 @@ namespace FastColoredTextBoxNS
             range.SetFoldingMarkers(@"^\s*(?<range>Do)\b", @"^\s*(?<range>Loop)\b",
                                     RegexOptions.Multiline | RegexOptions.IgnoreCase);
         }
+
+        #endregion
+
+        #region HTML
 
         protected void InitHTMLRegex()
         {
@@ -895,6 +928,10 @@ namespace FastColoredTextBoxNS
             range.SetFoldingMarkers("<script", "</script>", RegexOptions.IgnoreCase);
             range.SetFoldingMarkers("<tr", "</tr>", RegexOptions.IgnoreCase);
         }
+
+        #endregion
+
+        #region XML
 
         protected void InitXMLRegex()
         {
@@ -1026,6 +1063,10 @@ namespace FastColoredTextBoxNS
             public string Marker { get { return Name + id; } }
         }
 
+        #endregion
+
+        #region SQL
+
         protected void InitSQLRegex()
         {
             SQLStringRegex = new Regex(@"""""|''|"".*?[^\\]""|'.*?[^\\]'", RegexCompiledOption);
@@ -1090,6 +1131,10 @@ namespace FastColoredTextBoxNS
             //allow to collapse BEGIN..END blocks
             range.SetFoldingMarkers(@"/\*", @"\*/"); //allow to collapse comment block
         }
+
+        #endregion
+
+        #region PHP
 
         protected void InitPHPRegex()
         {
@@ -1158,6 +1203,10 @@ namespace FastColoredTextBoxNS
             range.SetFoldingMarkers(@"/\*", @"\*/"); //allow to collapse comment block
         }
 
+        #endregion
+
+        #region JScript
+
         protected void InitJScriptRegex()
         {
             JScriptStringRegex = new Regex(@"""""|''|"".*?[^\\]""|'.*?[^\\]'", RegexCompiledOption);
@@ -1212,6 +1261,10 @@ namespace FastColoredTextBoxNS
             range.SetFoldingMarkers("{", "}"); //allow to collapse brackets block
             range.SetFoldingMarkers(@"/\*", @"\*/"); //allow to collapse comment block
         }
+
+        #endregion
+
+        #region LUA
 
         protected void InitLuaRegex()
         {
@@ -1302,6 +1355,10 @@ namespace FastColoredTextBoxNS
             }
         }
 
+        #endregion
+
+        #region JSON
+
         protected void InitJSONRegex()
         {
             JSONStringRegex = new Regex(@"""([^\\""]|\\"")*""", RegexCompiledOption);
@@ -1343,6 +1400,8 @@ namespace FastColoredTextBoxNS
             range.SetFoldingMarkers("{", "}"); //allow to collapse brackets block
             range.SetFoldingMarkers(@"\[", @"\]"); //allow to collapse comment block
         }
+
+        #endregion
 
         #region Styles
 
@@ -1478,6 +1537,7 @@ namespace FastColoredTextBoxNS
         PHP,
         JS,
         Lua,
-        JSON
+        JSON,
+        StepBro
     }
 }

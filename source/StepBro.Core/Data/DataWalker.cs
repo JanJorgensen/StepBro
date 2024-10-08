@@ -25,7 +25,7 @@ namespace StepBro.Core.Data
         IndexerStateSnapshot GetState();
 
         /// <summary>
-        /// Create an <see cref="IDataWalker<>"/> object that starts at the specified index.
+        /// Create an <see cref="IDataWalker{TEntry}"/> object that starts at the specified index.
         /// </summary>
         /// <param name="start">The start index for the walker object.</param>
         /// <returns>A walker object.</returns>

@@ -28,5 +28,8 @@ namespace StepBro.Core.Api
         public static readonly string STEPBRO_FILE_EXTENSION = ".sbs";
         public static readonly string STEPBRO_PERSISTANCE_LOG_FILE_EXTENSION = ".sbl";
         public static readonly string STEPBRO_SCRIPT_EXECUTION_LOG_LOCATION = "Script Execution";
+        public static readonly string STEPBRO_DOCCOMMENT_SUMMARY = "Summary";
+        public static readonly string STEPBRO_DOCCOMMENT_REMARKS = "Remarks";
+        public static readonly string STEPBRO_DOCCOMMENT_PARAM = "Param";
     }
 }

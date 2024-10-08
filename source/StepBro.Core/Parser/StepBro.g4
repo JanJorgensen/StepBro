@@ -35,7 +35,8 @@ namespaceDeclaration : NAMESPACE namespace SEMICOLON ;
 fileElements : fileElement* ;
 fileElement 
     :	attributes? elementModifier?
-        (	enumDeclaration 
+        (	documentationElement
+        |   enumDeclaration 
         |	constVariable 
         |   fileVariable
         |   procedureOrFunction
@@ -77,6 +78,9 @@ elementModifier
     |   PRIVATE			// Shared within the file
     |	PROTECTED		// Shared within the namespace
     ;
+
+documentationElement : DOCUMENTATION documentationElementName ;
+documentationElementName : IDENTIFIER ;
 
 overrideReference : identifierOrQualified ;
 

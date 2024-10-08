@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Data;
+using StepBro.Core.DocCreation;
 using StepBro.Core.Execution;
 using StepBro.Core.File;
 using StepBro.Core.General;
@@ -107,7 +108,7 @@ namespace StepBroCoreTest
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Tuple<int, string>> ListDocumentComments()
+        public IEnumerable<Tuple<int, ScriptDocumentation.DocCommentLineType, string>> ListDocumentComments()
         {
             throw new NotImplementedException();
         }

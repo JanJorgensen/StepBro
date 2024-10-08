@@ -21,6 +21,10 @@ namespace StepBro.Core.ScriptData
         /// </summary>
         Namespace,
         /// <summary>
+        /// A documentation placeholder.
+        /// </summary>
+        Documentation,
+        /// <summary>
         ///  A definition of a named enum with named values.
         /// </summary>
         EnumDefinition,
