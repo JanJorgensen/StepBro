@@ -1,6 +1,9 @@
 ﻿using Antlr4.Runtime;
+using Markdig;
+using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
+using StepBro.Core.DocCreation;
 using StepBro.Core.Execution;
 using StepBro.Core.File;
 using StepBro.Core.General;
@@ -10,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace StepBro.Core.ScriptData
 {
@@ -38,7 +42,7 @@ namespace StepBro.Core.ScriptData
         //private DateTime m_lastParsing = DateTime.MinValue;
         private FolderShortcutCollection m_folderShortcuts = null;
         private List<FolderConfiguration> m_folderConfigs = new List<FolderConfiguration>();
-        private List<Tuple<int, string>> m_documentComments = null;
+        private List<Tuple<int, ScriptDocumentation.DocCommentLineType, string>> m_documentComments = null;
         private bool m_allFolderConfigsRead = false;
 
         /// <summary>
@@ -123,12 +127,12 @@ namespace StepBro.Core.ScriptData
             }
         }
 
-        public IEnumerable<Tuple<int, string>> ListDocumentComments()
+        public IEnumerable<Tuple<int, ScriptDocumentation.DocCommentLineType, string>> ListDocumentComments()
         {
             return m_documentComments;
         }
 
-        internal void SetDocumentComments(List<Tuple<int, string>> comments)
+        internal void SetDocumentComments(List<Tuple<int, ScriptDocumentation.DocCommentLineType, string>> comments)
         {
             m_documentComments = comments;
         }
@@ -1013,6 +1017,79 @@ namespace StepBro.Core.ScriptData
             }
         }
 
+        public string GetFilePath(string folder = null)
+        {
+            if (String.IsNullOrEmpty(folder)) folder = Path.GetDirectoryName(this.GetFullPath());
+            return Path.Combine(folder, Path.ChangeExtension(this.FileName, ".html"));
+        }
+
+        public void GenerateDocumentationFile(string folder = null)
+        {
+            string filepath = this.GetFilePath(folder);
+
+            if (System.IO.File.Exists(filepath))
+            {
+                System.IO.File.Delete(filepath);
+            }
+            using (StreamWriter outputFile = new StreamWriter(filepath, false))
+            {
+                // TODO: Insert some CSS to make it nice.
+
+                StringBuilder helptext = new StringBuilder();
+                helptext.AppendLine($"**StepBro script file documentation** generated at {DateTime.Now.ToString()} for file:");
+                helptext.AppendLine($"# {this.FileName}");
+                helptext.AppendLine($"**Namespace:** {this.Namespace}<br/>");
+                if (m_fileUsings.Count > 0)
+                {
+                    helptext.AppendLine($"**Usings:**");
+                    foreach (var u in m_fileUsings)
+                    {
+                        if (!u.IsAlias)
+                        {
+                            if (u.Identifier.Type == IdentifierType.FileByName)
+                            {
+                                helptext.AppendLine($" - file {u.Identifier.Name}");
+                            }
+                            else
+                            {
+                                helptext.AppendLine($" - {u.Identifier}");
+                            }
+                        }
+                    }
+                }
+
+                helptext.AppendLine($"## File Elements");
+
+                foreach (var variable in m_fileScopeVariables)
+                {
+                    helptext.AppendLine($"### {variable.Name}");
+                }
+                foreach (var element in m_elements)
+                {
+                    var docComments = new List<Tuple<ScriptDocumentation.DocCommentLineType, string>>();
+                    int docLine = ((FileElement)element).LineAssociatedData - 1; // The line before the element data.
+                    while (true)
+                    {
+                        var doc = m_documentComments.Where(dc => dc.Item1 == docLine).
+                            Select(dc => new Tuple<ScriptDocumentation.DocCommentLineType, string>(dc.Item2, dc.Item3)).FirstOrDefault();
+                        if (doc != null)
+                        {
+                            docComments.Insert(0, doc);
+                            docLine--;
+                        }
+                        else break;
+                    }
+                    helptext.AppendLine(
+                        ScriptDocumentation.CreateFileElementDocumentation(
+                            StepBro.Core.Main.GetService<ILoadedFilesManager>(),
+                            element,
+                            docComments));
+                }
+                System.Diagnostics.Debug.WriteLine(typeof(DateTime).Assembly.Location);
+                var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+                Markdown.ToHtml(helptext.ToString(), outputFile, pipeline);
+            }
+        }
 
 
         private class VariableSetupLoggerWrapper : ILogger
@@ -1081,7 +1158,5 @@ namespace StepBro.Core.ScriptData
                 m_logger.LogCommReceived(text);
             }
         }
-
-
     }
 }

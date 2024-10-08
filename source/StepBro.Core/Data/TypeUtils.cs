@@ -130,7 +130,23 @@ namespace StepBro.Core.Data
                 var args = String.Join(", ", gta.Select(ga => ga.TypeName()));
                 return $"{gtd}<{args}>";
             }
+            else if (type == typeof(void)) return "void";
+            else if (type == typeof(object)) return "object";
             else return type.Name;
+        }
+
+        public static string StepBroTypeName(this Type type)
+        {
+            if (type == typeof(Int64)) return "int";
+            if (type == typeof(String)) return "string";
+            if (type == typeof(Boolean)) return "bool";
+            if (type == typeof(Verdict)) return "verdict";
+            if ((type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(IProcedureReference<>)) ||
+                type == typeof(IProcedureReference))
+            {
+                return "IProcedureReference";
+            }
+            return type.TypeName();
         }
 
         public static string TypeNameSimple(this Type type)
@@ -142,8 +158,8 @@ namespace StepBro.Core.Data
                     return "procedure reference";
                 }
                 var gtd = type.GetGenericTypeDefinition().Name;
-                gtd = gtd.Substring(0, gtd.IndexOf('`'));
-                return "gtd";
+                gtd = gtd[..gtd.IndexOf('`')];
+                return gtd;
             }
             else return type.Name;
         }
@@ -152,6 +168,12 @@ namespace StepBro.Core.Data
         {
             if (type.DynamicType != null) return type.DynamicType.ToString();
             return type.Type.TypeName();
+        }
+
+        public static string StepBroTypeName(this TypeReference type)
+        {
+            if (type.DynamicType != null) return type.DynamicType.ToString();   // TODO: Make simple.
+            return type.Type.StepBroTypeName();
         }
 
         public static IEnumerable<Type> SelfBasesAndInterfaces(this Type type, bool includeBaseClasses = true, bool includeInterfaces = true)

@@ -17,6 +17,7 @@ using System.Reflection;
 using System.Text;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 using Lexer = StepBro.Core.Parser.Grammar.StepBroLexer;
+using StepBro.Core.DocCreation;
 
 namespace StepBro.Core.Parser
 {
@@ -565,13 +566,20 @@ namespace StepBro.Core.Parser
                     file.SetNamespace(System.IO.Path.GetFileNameWithoutExtension(file.FileName));
                 }
 
-                var docComments = new List<Tuple<int,string>>();
+                var docComments = new List<Tuple<int, ScriptDocumentation.DocCommentLineType, string>>();
                 foreach (var token in tokens.GetTokens())
                 {
-                    // token.Type == Lexer.DOC_COMMENT_INDENTED || 
                     if (token.Type == Lexer.DOC_COMMENT)
                     {
-                        docComments.Add(new Tuple<int, string>(token.Line, token.Text));
+                        docComments.Add(new Tuple<int, ScriptDocumentation.DocCommentLineType, string>(token.Line, ScriptDocumentation.DocCommentLineType.Unspecified, token.Text));
+                    }
+                    else if (token.Type == Lexer.DOC_COMMENT_NAMED)
+                    {
+                        docComments.Add(new Tuple<int, ScriptDocumentation.DocCommentLineType, string>(token.Line, ScriptDocumentation.DocCommentLineType.Named, token.Text));
+                    }
+                    else if (token.Type == Lexer.DOC_COMMENT_TYPE_AND_NAMED)
+                    {
+                        docComments.Add(new Tuple<int, ScriptDocumentation.DocCommentLineType, string>(token.Line, ScriptDocumentation.DocCommentLineType.TypeAndNamed, token.Text));
                     }
                 }
                 file.SetDocumentComments(docComments);
@@ -1049,6 +1057,7 @@ namespace StepBro.Core.Parser
                 }
                 foreach (var file in filesToParse)
                 {
+                    file.GenerateDocumentationFile();
                     file.DisposeFileStream();
                     if (file.IsDependantOf(parserUser))
                     {

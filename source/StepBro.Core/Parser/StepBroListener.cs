@@ -186,6 +186,22 @@ namespace StepBro.Core.Parser
             else throw new NotImplementedException();
         }
 
+        public override void EnterDocumentationElement([NotNull] SBP.DocumentationElementContext context)
+        {
+            m_currentFileElement = new FileElementDocumentation(m_file, context.Start.Line, m_currentNamespace, "");
+            m_name = null;
+        }
+
+        public override void ExitDocumentationElementName([NotNull] SBP.DocumentationElementNameContext context)
+        {
+            m_name = context.GetText();
+        }
+
+        public override void ExitDocumentationElement([NotNull] SBP.DocumentationElementContext context)
+        {
+            m_file.AddElement(m_currentFileElement);
+        }
+
         public override void EnterTypedef([NotNull] SBP.TypedefContext context)
         {
             //var fileElement = new FileElementTypeDef(m_file, context.Start.Line, )

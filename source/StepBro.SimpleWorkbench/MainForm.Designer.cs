@@ -57,6 +57,8 @@ namespace StepBro.SimpleWorkbench
             viewObjectCommandPromptToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItemExeNoteInput = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
+            viewDocCommentsPreviewToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator6 = new ToolStripSeparator();
             viewToolbarsToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItemToolbarsDummyEntry = new ToolStripMenuItem();
             shortcutsToolStripMenuItem = new ToolStripMenuItem();
@@ -64,6 +66,9 @@ namespace StepBro.SimpleWorkbench
             toolStripMenuItemDeleteAllShortcuts = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
             viewDocumentationBrowserToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItemCreateDocumentationFiles = new ToolStripMenuItem();
+            toolStripMenuItemCreateProjectOverview = new ToolStripMenuItem();
+            toolStripMenuItemCreateDocForSelectedFile = new ToolStripMenuItem();
             toolStripSeparator1 = new ToolStripSeparator();
             toolStripMenuItemExit = new ToolStripMenuItem();
             toolStripComboBoxTool = new ToolStripComboBox();
@@ -229,7 +234,7 @@ namespace StepBro.SimpleWorkbench
             // 
             // toolStripMenuItemView
             // 
-            toolStripMenuItemView.DropDownItems.AddRange(new ToolStripItem[] { viewExecutionLogToolStripMenuItem, viewErrorsToolStripMenuItem, viewPropertiesToolStripMenuItem, viewReportOverviewToolStripMenuItem, toolStripSeparator3, viewObjectCommandPromptToolStripMenuItem, toolStripMenuItemExeNoteInput, toolStripSeparator2, viewToolbarsToolStripMenuItem });
+            toolStripMenuItemView.DropDownItems.AddRange(new ToolStripItem[] { viewExecutionLogToolStripMenuItem, viewErrorsToolStripMenuItem, viewPropertiesToolStripMenuItem, viewReportOverviewToolStripMenuItem, toolStripSeparator3, viewObjectCommandPromptToolStripMenuItem, toolStripMenuItemExeNoteInput, toolStripSeparator2, viewDocCommentsPreviewToolStripMenuItem, toolStripSeparator6, viewToolbarsToolStripMenuItem });
             toolStripMenuItemView.Name = "toolStripMenuItemView";
             toolStripMenuItemView.Size = new Size(180, 22);
             toolStripMenuItemView.Text = "&View";
@@ -291,6 +296,18 @@ namespace StepBro.SimpleWorkbench
             toolStripSeparator2.Name = "toolStripSeparator2";
             toolStripSeparator2.Size = new Size(209, 6);
             // 
+            // viewDocCommentsPreviewToolStripMenuItem
+            // 
+            viewDocCommentsPreviewToolStripMenuItem.Name = "viewDocCommentsPreviewToolStripMenuItem";
+            viewDocCommentsPreviewToolStripMenuItem.Size = new Size(212, 22);
+            viewDocCommentsPreviewToolStripMenuItem.Text = "Doc Comment Preview";
+            viewDocCommentsPreviewToolStripMenuItem.Click += viewDocCommentsPreviewToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator6
+            // 
+            toolStripSeparator6.Name = "toolStripSeparator6";
+            toolStripSeparator6.Size = new Size(209, 6);
+            // 
             // viewToolbarsToolStripMenuItem
             // 
             viewToolbarsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemToolbarsDummyEntry });
@@ -328,7 +345,7 @@ namespace StepBro.SimpleWorkbench
             // 
             // helpToolStripMenuItem
             // 
-            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { viewDocumentationBrowserToolStripMenuItem });
+            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { viewDocumentationBrowserToolStripMenuItem, toolStripMenuItemCreateDocumentationFiles });
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             helpToolStripMenuItem.Size = new Size(180, 22);
             helpToolStripMenuItem.Text = "&Help";
@@ -341,6 +358,27 @@ namespace StepBro.SimpleWorkbench
             viewDocumentationBrowserToolStripMenuItem.Size = new Size(230, 22);
             viewDocumentationBrowserToolStripMenuItem.Text = "View Documentation Browser";
             viewDocumentationBrowserToolStripMenuItem.Click += viewDocumentationBrowserToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItemCreateDocumentationFiles
+            // 
+            toolStripMenuItemCreateDocumentationFiles.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemCreateProjectOverview, toolStripMenuItemCreateDocForSelectedFile });
+            toolStripMenuItemCreateDocumentationFiles.Name = "toolStripMenuItemCreateDocumentationFiles";
+            toolStripMenuItemCreateDocumentationFiles.Size = new Size(230, 22);
+            toolStripMenuItemCreateDocumentationFiles.Text = "Create Documentation Files";
+            // 
+            // toolStripMenuItemCreateProjectOverview
+            // 
+            toolStripMenuItemCreateProjectOverview.Name = "toolStripMenuItemCreateProjectOverview";
+            toolStripMenuItemCreateProjectOverview.Size = new Size(280, 22);
+            toolStripMenuItemCreateProjectOverview.Text = "Create Project Overview";
+            toolStripMenuItemCreateProjectOverview.Click += toolStripMenuItemCreateProjectOverview_Click;
+            // 
+            // toolStripMenuItemCreateDocForSelectedFile
+            // 
+            toolStripMenuItemCreateDocForSelectedFile.Name = "toolStripMenuItemCreateDocForSelectedFile";
+            toolStripMenuItemCreateDocForSelectedFile.Size = new Size(280, 22);
+            toolStripMenuItemCreateDocForSelectedFile.Text = "Create Documentation for Selected File";
+            toolStripMenuItemCreateDocForSelectedFile.Click += toolStripMenuItemCreateDocForSelectedFile_Click;
             // 
             // toolStripSeparator1
             // 
@@ -640,5 +678,10 @@ namespace StepBro.SimpleWorkbench
         private ToolStripMenuItem toolStripMenuItemSaveLogNow;
         private ToolStripSeparator toolStripSeparator5;
         private ToolStripMenuItem viewReportOverviewToolStripMenuItem;
+        private ToolStripMenuItem toolStripMenuItemCreateDocumentationFiles;
+        private ToolStripMenuItem toolStripMenuItemCreateProjectOverview;
+        private ToolStripMenuItem toolStripMenuItemCreateDocForSelectedFile;
+        private ToolStripMenuItem viewDocCommentsPreviewToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator6;
     }
 }

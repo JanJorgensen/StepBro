@@ -944,6 +944,7 @@ namespace StepBro.Core.Execution
         /// Helper method to save the value for an expect statement, and then just return the value itself.
         /// </summary>
         /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="context">Call contect reference.</param>
         /// <param name="value">Input value</param>
         /// <param name="position">Left, Middle, or Center</param>
         /// <param name="resetString">Whether to reset the string</param>
@@ -997,7 +998,7 @@ namespace StepBro.Core.Execution
         /// Executes the evaluation of an expect statement.
         /// </summary>
         /// <param name="context">Execution call context.</param>
-        /// <param name="evaluation">The expect statement evaluation code.</param>
+        /// <param name="success">Whether the executed expect statement was 'success'.</param>
         /// <param name="negativeVerdict">The verdict for negative evaluation result.</param>
         /// <param name="title">The expect statement title.</param>
         /// <param name="expected">String representation of the expectation.</param>

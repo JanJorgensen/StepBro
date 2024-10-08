@@ -29,7 +29,7 @@ namespace StepBro.Core.Execution
         /// Creates a sub-task in the status reporting.
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="maxTime"></param>
+        /// <param name="expectedTime"></param>
         /// <param name="progressMax"></param>
         /// <param name="progressFormatter"></param>
         /// <returns></returns>
