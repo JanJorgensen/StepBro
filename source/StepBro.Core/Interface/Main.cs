@@ -37,6 +37,7 @@ namespace StepBro.Core
         private static IReportManager m_reportManager = null;
         private static UICalculator m_uiCalculator = null;
         private static FolderManager m_folderShortcuts = null;
+        private static SymbolLookupService m_symbolLookupService = null;
         //private static readonly object m_mainObject = new object();
         //private static readonly bool m_isInDebugMode = true;
         //private static Queue<Task> m_runningTasks = new Queue<Task>();
@@ -130,6 +131,10 @@ namespace StepBro.Core
 
             m_folderShortcuts = new FolderManager(out service);
             m_serviceManagerAdmin.Manager.Register(service);
+
+            m_symbolLookupService = new SymbolLookupService(out service);
+            m_serviceManagerAdmin.Manager.Register(service);
+
 
             if (hostServices != null)
             {

@@ -79,11 +79,16 @@ namespace StepBro.Streams
             set { m_commLogging = value; }
         }
 
+        protected override void DoDispose(bool disposing)
+        {
+            this.Close(null);
+        }
+
         public bool UseTextLineMode
         {
             get
             {
-                // 'Line Mode' is enabled is either a line receiver has been set up, or an line receive queue is created.
+                // 'Line Mode' is enabled if either a line receiver has been set up, or an line receive queue is created.
                 return (m_lineReceiver != null || m_lineReceiveQueue != null);
             }
             set

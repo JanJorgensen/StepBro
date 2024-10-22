@@ -3,9 +3,9 @@ using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
-using StepBro.PanelCreator.DummyUI;
 using System;
 using System.Collections.Generic;
+using static StepBro.Core.Data.PropertyBlockDecoder;
 
 namespace StepBro.ToolBarCreator
 {
@@ -16,6 +16,77 @@ namespace StepBro.ToolBarCreator
         private string m_title = null;
         private PropertyBlock m_definition = null;
         private IToolBarElement m_toolbarElement = null;
+
+        private class DefaultScanner : IPropertyBlockDataScanner
+        {
+            private static Block<object, object> m_decoder;
+
+            static DefaultScanner()
+            {
+                m_decoder = CreateDecoder();
+            }
+
+            public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+            {
+                ToolBar.DefaultPreScanData(data, errors);
+            }
+            public PropertyBlockDecoder.Element TryGetDecoder()
+            {
+                return m_decoder;
+            }
+
+            private static Block<object, object> CreateDecoder()
+            {
+                var color = new ValueString<object>("Color", Doc(""));
+                var text = new ValueString<object>("Text", Doc(""));
+                var maxWidth = new ValueInt<object>("MaxWidth", Doc(""));
+                var widthGroup = new ValueInt<object>("WidthGroup", Doc(""));
+                var instance = new ValueString<object>("Instance", "Object", Doc(""));
+                var fileElement = new ValueString<object>("Procedure", "Element", Doc(""));
+
+                var button = new Block<object, object>("Button", Doc(""),
+                    color, text, instance, fileElement, maxWidth, widthGroup,
+                    new ValueString<object>("Partner", Doc("")),
+                    new Value<object>("Arg", "Argument", Doc("")),
+                    new Array<object>("Args", "Arguments", Doc("")),
+                    new Flag<object>("Stoppable", Doc("")),
+                    new Flag<object>("StopOnButtonRelease", Doc("")),
+                    new ValueString<object>("Command", Doc("")),
+                    new Flag<object>("CheckOnClick", Doc("")),
+                    new Flag<object>("CheckArg", Doc("")),
+                    new ValueString<object>("CheckedText", Doc("")),
+                    new ValueString<object>("UncheckedText", Doc("")),
+                    new ValueString<object>("EnabledSource", Doc("")),
+                    new ValueString<object>("DisabledSource", Doc(""))
+                    );
+
+                var textbox = new Block<object, object>("TextBox", Doc(""),
+                    color, text, instance, maxWidth, widthGroup,
+                    new Flag<object>("ReadOnly", Doc("")),
+                    new Flag<object>("RightAligned", Doc("")),
+                    new ValueString<object>("Property", Doc("")),
+                    new ValueString<object>("ProcedureOutput", Doc("")),
+                    new ValueString<object>("EnabledSource", Doc("")),
+                    new ValueString<object>("DisabledSource", Doc(""))
+                    );
+
+                var menu = new Block<object, object>("Menu", Doc(""));
+                menu.SetChilds(menu, button, instance);
+
+                return new Block<object, object>
+                    (
+                        Doc(""),
+                        new ValueString<object>("Label", Doc("")),
+                        color,
+                        new ValueInt<object>("Index", Doc("")),
+                        new Flag<object>("Separator", Doc("")),
+                        new Flag<object>("ColumnSeparator", Doc("")),
+                        menu, button, textbox, instance
+                    );
+            }
+        }
+
+        private static IPropertyBlockDataScanner g_scanner = new DefaultScanner();
 
         public ToolBar() { }
 
@@ -46,54 +117,21 @@ namespace StepBro.ToolBarCreator
             return new string[] { "Color" };
         }
 
-        public void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors)
+        public static IPropertyBlockDataScanner PreScanner { get { return g_scanner; } set { g_scanner = value; } }
+
+        public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
         {
-            var color = new PropertyBlockDecoder.ValueString<object>("Color");
-            var text = new PropertyBlockDecoder.ValueString<object>("Text");
-            var maxWidth = new PropertyBlockDecoder.ValueInt<object>("MaxWidth");
-            var widthGroup = new PropertyBlockDecoder.ValueInt<object>("WidthGroup");
-            var instance = new PropertyBlockDecoder.ValueString<object>("Instance", "Object");
-            var fileElement = new PropertyBlockDecoder.ValueString<object>("Procedure", "Element");
+            g_scanner.PreScanData(data, errors);
+        }
 
-            var button = new PropertyBlockDecoder.Block<object, object>("Button",
-                color, text, instance, fileElement, maxWidth, widthGroup,
-                new PropertyBlockDecoder.ValueString<object>("Partner"),
-                new PropertyBlockDecoder.Value<object>("Arg", "Argument"),
-                new PropertyBlockDecoder.Array<object>("Args", "Arguments"),
-                new PropertyBlockDecoder.Flag<object>("Stoppable"),
-                new PropertyBlockDecoder.Flag<object>("StopOnButtonRelease"),
-                new PropertyBlockDecoder.ValueString<object>("Command"),
-                new PropertyBlockDecoder.Flag<object>("CheckOnClick"),
-                new PropertyBlockDecoder.Flag<object>("CheckArg"),
-                new PropertyBlockDecoder.ValueString<object>("CheckedText"),
-                new PropertyBlockDecoder.ValueString<object>("UncheckedText"),
-                new PropertyBlockDecoder.ValueString<object>("EnabledSource"),
-                new PropertyBlockDecoder.ValueString<object>("DisabledSource")
-                );
+        public PropertyBlockDecoder.Element TryGetDecoder()
+        {
+            return g_scanner.TryGetDecoder();
+        }
 
-            var textbox = new PropertyBlockDecoder.Block<object, object>("TextBox",
-                color, text, instance, maxWidth, widthGroup,
-                new PropertyBlockDecoder.Flag<object>("ReadOnly"),
-                new PropertyBlockDecoder.Flag<object>("RightAligned"),
-                new PropertyBlockDecoder.ValueString<object>("Property"),
-                new PropertyBlockDecoder.ValueString<object>("ProcedureOutput"),
-                new PropertyBlockDecoder.ValueString<object>("EnabledSource"),
-                new PropertyBlockDecoder.ValueString<object>("DisabledSource")
-                );
-
-            var menu = new PropertyBlockDecoder.Block<object, object>("Menu");
-            menu.SetChilds(menu, button, instance);
-
-            var root = new PropertyBlockDecoder.Block<object, object>
-                (
-                    new PropertyBlockDecoder.ValueString<object>("Label"),
-                    color,
-                    new PropertyBlockDecoder.ValueInt<object>("Index"),
-                    new PropertyBlockDecoder.Flag<object>("Separator"),
-                    new PropertyBlockDecoder.Flag<object>("ColumnSeparator"),
-                    menu, button, textbox, instance
-                );
-            root.DecodeData(data, null, errors);
+        private static void DefaultPreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+        {
+            ((Block<object, object>)g_scanner.TryGetDecoder()).DecodeData(data, null, errors);
         }
 
         public void Setup(IScriptFile file, ILogger logger, PropertyBlock data)

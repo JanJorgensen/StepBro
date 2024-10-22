@@ -6,7 +6,7 @@ using StepBro.Core.ScriptData;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Text;
 using static StepBro.Core.Data.PropertyBlockDecoder;
 
 namespace StepBro.StateMachine
@@ -15,7 +15,7 @@ namespace StepBro.StateMachine
     {
         private string m_name = "StateMachine";
 
-        private PropertyBlockDecoder.Block<object, StateMachineDefinition> m_decoder = null;
+        private Block<object, StateMachineDefinition> m_decoder = null;
         private List<NamedData<Tuple<Type, object>>> m_variables = new List<NamedData<Tuple<Type, object>>>();
         private List<NamedData<IProcedureReference>> m_states = new List<NamedData<IProcedureReference>>();
 
@@ -59,12 +59,121 @@ namespace StepBro.StateMachine
 
         #region Parsing and Setup
 
-        public void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors)
+        public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
         {
-            var root = new PropertyBlockDecoder.Block<object, object>(
-                new PropertyBlockDecoder.Array<object>("states"),
-                new PropertyBlockDecoder.Value<object>());
+            var root = new Block<object, object>(
+                Doc(""),
+                new Array<object>("states", Doc("")),
+                new Value<object>(Doc("")));
             root.DecodeData(data, null, errors);
+        }
+
+        public PropertyBlockDecoder.Element TryGetDecoder()
+        {
+            return new Block<object, StateMachineDefinition>
+                (
+                    Doc(""),
+                    new Array<object>(
+                        "states", Doc(""),
+                        (t, a) =>
+                        {
+                            if (m_states.Count > 0)
+                            {
+                                return "States are already defined.";
+                            }
+                            else
+                            {
+                                foreach (var v in a)
+                                {
+                                    if (!(v is Identifier))
+                                    {
+                                        return "All states must be a simple identifier.";
+                                    }
+                                    m_states.Add(new NamedData<IProcedureReference>(((Identifier)v).Name, null));
+                                }
+                                return null;
+                            }
+                        }),
+                    new Value<StateMachineDefinition>(
+                        Doc(""),
+                        (t, v) =>
+                        {
+                            if (!v.HasTypeSpecified)
+                            {
+                                return "Variable type is not specified.";
+                            }
+                            if (v.SpecifiedTypeName == "var")
+                            {
+                                if (v.Value == null)
+                                {
+                                    return "A variable of type 'var' cannot be set to 'null'.";
+                                }
+                                else
+                                {
+                                    var type = v.Value.GetType();
+                                    if (type == typeof(long) ||
+                                        type == typeof(bool) ||
+                                        type == typeof(string) ||
+                                        type == typeof(TimeSpan) ||
+                                        type == typeof(DateTime))
+                                    {
+                                        m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(type, v.Value)));
+                                    }
+                                    else
+                                    {
+                                        return "Unknown or unsupported variable type '" + type.Name + "'.";
+                                    }
+                                }
+                            }
+                            else if (v.SpecifiedTypeName == "int")
+                            {
+                                m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(long), v.Value)));
+                            }
+                            else if (v.SpecifiedTypeName == "bool")
+                            {
+                                m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(bool), v.Value)));
+                            }
+                            else if (v.SpecifiedTypeName == "string")
+                            {
+                                m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(string), v.Value)));
+                            }
+                            else if (v.SpecifiedTypeName == "datetime")
+                            {
+                                DateTime value = DateTime.MinValue;
+                                if (v.Value.GetType() == typeof(Identifier) && ((Identifier)v.Value).Name.Equals("default"))
+                                {
+                                    value = DateTime.MinValue;
+                                }
+                                else
+                                {
+                                    return "Not implemented: value for datetime.";
+                                }
+                                m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(DateTime), value)));
+                            }
+                            else if (v.SpecifiedTypeName == "timespan")
+                            {
+                                TimeSpan value = TimeSpan.Zero;
+                                if (v.Value.GetType() == typeof(TimeSpan))
+                                {
+                                    value = (TimeSpan)v.Value;
+                                }
+                                else if (v.Value.GetType() == typeof(Identifier) && ((Identifier)v.Value).Name.Equals("default"))
+                                {
+                                    value = TimeSpan.Zero;
+                                }
+                                else
+                                {
+                                    return "Not implemented: value for timespan.";
+                                }
+                                m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(TimeSpan), value)));
+                            }
+                            else
+                            {
+                                return "Unknown or unsupported variable type '" + v.SpecifiedTypeName + "'.";
+                            }
+                            return null;    // No errors
+                        })
+                );
         }
 
         public void Setup(IScriptFile file, ILogger logger, PropertyBlock data)
@@ -72,105 +181,7 @@ namespace StepBro.StateMachine
             m_states = new List<NamedData<IProcedureReference>>();
             m_variables = new List<NamedData<Tuple<Type, object>>>();
 
-            m_decoder = new Block<object, StateMachineDefinition>
-                (
-                    new PropertyBlockDecoder.Array<object>("states", (t, a) =>
-                    {
-                        if (m_states.Count > 0)
-                        {
-                            return "States are already defined.";
-                        }
-                        else
-                        {
-                            foreach (var v in a)
-                            {
-                                if (!(v is Identifier))
-                                {
-                                    return "All states must be a simple identifier.";
-                                }
-                                m_states.Add(new NamedData<IProcedureReference>(((Identifier)v).Name, null));
-                            }
-                            return null;
-                        }
-                    }),
-                    new Value<StateMachineDefinition>((t, v) =>
-                    {
-                        if (!v.HasTypeSpecified)
-                        {
-                            return "Variable type is not specified.";
-                        }
-                        if (v.SpecifiedTypeName == "var")
-                        {
-                            if (v.Value == null)
-                            {
-                                return "A variable of type 'var' cannot be set to 'null'.";
-                            }
-                            else
-                            {
-                                var type = v.Value.GetType();
-                                if (type == typeof(long) ||
-                                    type == typeof(bool) ||
-                                    type == typeof(string) ||
-                                    type == typeof(TimeSpan) ||
-                                    type == typeof(DateTime))
-                                {
-                                    m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(type, v.Value)));
-                                }
-                                else
-                                {
-                                    return "Unknown or unsupported variable type '" + type.Name + "'.";
-                                }
-                            }
-                        }
-                        else if (v.SpecifiedTypeName == "int")
-                        {
-                            m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(long), v.Value)));
-                        }
-                        else if (v.SpecifiedTypeName == "bool")
-                        {
-                            m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(bool), v.Value)));
-                        }
-                        else if (v.SpecifiedTypeName == "string")
-                        {
-                            m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(string), v.Value)));
-                        }
-                        else if (v.SpecifiedTypeName == "datetime")
-                        {
-                            DateTime value = DateTime.MinValue;
-                            if (v.Value.GetType() == typeof(Identifier) && ((Identifier)v.Value).Name.Equals("default"))
-                            {
-                                value = DateTime.MinValue;
-                            }
-                            else
-                            {
-                                return "Not implemented: value for datetime.";
-                            }
-                            m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(DateTime), value)));
-                        }
-                        else if (v.SpecifiedTypeName == "timespan")
-                        {
-                            TimeSpan value = TimeSpan.Zero;
-                            if (v.Value.GetType() == typeof(TimeSpan))
-                            {
-                                value = (TimeSpan)v.Value;
-                            }
-                            else if (v.Value.GetType() == typeof(Identifier) && ((Identifier)v.Value).Name.Equals("default"))
-                            {
-                                value = TimeSpan.Zero;
-                            }
-                            else
-                            {
-                                return "Not implemented: value for timespan.";
-                            }
-                            m_variables.Add(new NamedData<Tuple<Type, object>>(v.Name, new Tuple<Type, object>(typeof(TimeSpan), value)));
-                        }
-                        else
-                        {
-                            return "Unknown or unsupported variable type '" + v.SpecifiedTypeName + "'.";
-                        }
-                        return null;    // No errors
-                    })
-                );
+            m_decoder = (Block<object, StateMachineDefinition>)this.TryGetDecoder();
 
             var errors = new List<Tuple<int, string>>();
             m_decoder.DecodeData(data, this, errors);

@@ -123,16 +123,27 @@ namespace StepBro.Core.DocCreation
             return DocCommentLineType.Unspecified;
         }
 
-        public static string CreateFileElementDocumentation(ILoadedFilesManager fileManager, IFileElement element, List<Tuple<DocCommentLineType, string>> docComments)
+        public static string CreateFileElementDocumentation(int headingLevel, ILoadedFilesManager fileManager, IFileElement element, List<Tuple<DocCommentLineType, string>> docComments = null)
         {
             var docText = new StringBuilder();
 
-            var decoded = DecodeDocCommentLines(docComments);
+            var decoded = (docComments != null && docComments.Count > 0) ? DecodeDocCommentLines(docComments) : null;
+
+            if (decoded == null && element != null)
+            {
+                docComments = ((FileElement)element).GetDocumentation();
+                if (docComments != null && docComments.Count > 0)
+                {
+                    decoded = DecodeDocCommentLines(docComments);
+                }
+            }
 
             if (element != null)
             {
                 var idLink = GetElementLinkID(element);
-                docText.AppendLine($"### {element.Name} ### {{#{idLink}}}");
+                docText.AppendLine($"{new String('#', headingLevel)} {element.Name} ({element.ElementType.ToSimpleName()}) {new String('#', headingLevel)} {{#{idLink}}}");
+                docText.AppendLine($"Namespace: {element.ParentFile.Namespace} </br>");
+                docText.AppendLine($"File: {element.ParentFile.FilePath} </br>");
             }
 
             //if (decoded != null && decoded.ErrorLine >= 0)
@@ -143,7 +154,7 @@ namespace StepBro.Core.DocCreation
             var summary = decoded?.TryGetByName(Constants.STEPBRO_DOCCOMMENT_SUMMARY);
             if (summary != null)
             {
-                docText.AppendLine($"#### Summary");
+                docText.AppendLine($"{new String('#', headingLevel + 1)} Summary");
                 foreach (var line in summary.Content)
                 {
                     docText.AppendLine(line);
@@ -152,35 +163,49 @@ namespace StepBro.Core.DocCreation
 
             if (element != null)
             {
+                docText.AppendLine($"{new String('#', headingLevel + 1)} Definition");
+
                 string returnType = "";
                 string parameters = "";
                 if (element is IFileProcedure proc)
                 {
+                    //docText.AppendLine("</br>");
                     returnType = proc.ReturnType.StepBroTypeName() + " ";
                     int i = 0;
                     StringBuilder paramsText = new StringBuilder();
                     paramsText.Append('(');
-                    if (proc.Parameters.Length > 0)
+                    while (i < proc.Parameters.Length)
                     {
                         if (i > 0) paramsText.Append(", ");
-
                         if (i == 0 && proc.IsFirstParameterThisReference)
                         {
-                            paramsText.Append("_this_ ");
+                            paramsText.Append("this ");
                         }
                         paramsText.Append($"{proc.Parameters[i].Value.StepBroTypeName()} {proc.Parameters[i].Name}");
+                        i++;
                     }
                     paramsText.Append(')');
                     parameters = paramsText.ToString();
+                    docText.AppendLine($"``` {returnType}{element.Name}{parameters} ```");
                 }
-                docText.AppendLine($"Signature: {returnType}{element.Name}{parameters}");
+                else if (element is FileVariable variable)
+                {
+                    docText.AppendLine($"{new String('#', headingLevel + 1)} Type {variable.Value.DataType.Type.TypeNameSimple()}");
+                    docText.AppendLine(TypeDocumentation.CreateDoc(headingLevel + 2, variable.DataType.Type, false));
+                    //docText.AppendLine($"Type external: [{variable.Value.DataType.Type.TypeNameSimple()}](http://www.google.com)</br>");
+                    //docText.AppendLine($"Type internal: [{variable.Value.DataType.Type.TypeNameSimple()}](type://{variable.Value.DataType.Type.TypeNameSimple()})</br>");
+                }
+                else
+                {
+                    docText.AppendLine($"Documentation not implemented for this file element type. ");
+                }
                 if (element.ParentElement != null)
                 {
                     string inheritance = element.ParentElement.FullName;
                     var parent = element.ParentElement.ParentElement;
                     while (parent != null)
                     {
-                        inheritance += "  ->  " + parent.FullName;
+                        inheritance += "  \u2192  " + parent.FullName;
                         parent = parent.ParentElement;
                     }
                     docText.AppendLine($"Inheritance: {inheritance}");
@@ -190,7 +215,7 @@ namespace StepBro.Core.DocCreation
             var remarks = decoded?.TryGetByName(Constants.STEPBRO_DOCCOMMENT_REMARKS);
             if (remarks != null)
             {
-                docText.AppendLine($"#### Remarks");
+                docText.AppendLine($"{new String('#', headingLevel + 1)} Remarks");
                 foreach (var line in remarks.Content)
                 {
                     docText.AppendLine(line);

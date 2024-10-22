@@ -139,37 +139,47 @@ namespace StepBro.Core.General
                 {
                     m_decoder = new Block<object, FolderConfiguration>
                         (
-                            new Flag<FolderConfiguration>(Constants.STEPBRO_FOLDER_CONFIG_FILE_ROOT, (c, f) =>
-                            {
-                                string name = f.Name;
-                                if (f.HasTypeSpecified)
+                            Doc(""),
+                            new Flag<FolderConfiguration>(
+                                Constants.STEPBRO_FOLDER_CONFIG_FILE_ROOT, 
+                                Doc(""),
+                                (c, f) =>
                                 {
-                                    return "The flag cannot have a name; only a type.";
-                                }
-                                c.IsSearchRoot = true;
-                                return null;    // No errors
-                            }),
-                            new ArrayString<FolderConfiguration>(Constants.STEPBRO_FOLDER_CONFIG_FILE_LIBS, (c, a) =>
-                            {
-                                c.LibFolders = a;
-                                return null;    // No errors
-                            }),
-                            new ValueString<FolderConfiguration>(Constants.STEPBRO_FOLDER_CONFIG_FILE_SHORTCUT, (c, v) =>
-                            {
-                                var text = v.ValueAsString();
-                                if (!v.HasTypeSpecified)
+                                    string name = f.Name;
+                                    if (f.HasTypeSpecified)
+                                    {
+                                        return "The flag cannot have a name; only a type.";
+                                    }
+                                    c.IsSearchRoot = true;
+                                    return null;    // No errors
+                                }),
+                            new ArrayString<FolderConfiguration>(
+                                Constants.STEPBRO_FOLDER_CONFIG_FILE_LIBS, 
+                                Doc(""),
+                                (c, a) =>
                                 {
-                                    return "The shortcut is missing a name.";
-                                }
+                                    c.LibFolders = a;
+                                    return null;    // No errors
+                                }),
+                            new ValueString<FolderConfiguration>(
+                                Constants.STEPBRO_FOLDER_CONFIG_FILE_SHORTCUT, 
+                                Doc(""),
+                                (c, v) =>
+                                {
+                                    var text = v.ValueAsString();
+                                    if (!v.HasTypeSpecified)
+                                    {
+                                        return "The shortcut is missing a name.";
+                                    }
 
-                                if (c.Shortcuts == null)
-                                {
-                                    c.Shortcuts = new List<FolderShortcut>();
-                                }
-                                var shortcut = new FolderShortcut(FolderShortcutOrigin.Configuration, v.Name, text);
-                                c.Shortcuts.Add(shortcut);
-                                return null;    // No errors
-                            })
+                                    if (c.Shortcuts == null)
+                                    {
+                                        c.Shortcuts = new List<FolderShortcut>();
+                                    }
+                                    var shortcut = new FolderShortcut(FolderShortcutOrigin.Configuration, v.Name, text);
+                                    c.Shortcuts.Add(shortcut);
+                                    return null;    // No errors
+                                })
                         );
                 }
 

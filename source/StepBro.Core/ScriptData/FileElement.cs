@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Data;
+using StepBro.Core.DocCreation;
 using StepBro.Core.Parser;
 using System;
 using System.Collections.Generic;
@@ -231,6 +232,26 @@ namespace StepBro.Core.ScriptData
         {
             get { return m_lineAssociatedData; }
             internal set { m_lineAssociatedData = value; }
+        }
+
+        public List<Tuple<ScriptDocumentation.DocCommentLineType, string>> GetDocumentation()
+        {
+            var fileComments = m_parentFile.ListDocumentComments().ToList();
+
+            var picker = (int index) => fileComments.FirstOrDefault(c => c.Item1 == index);
+
+            var lineNumber = this.LineAssociatedData - 1;
+            var lines = new List<Tuple<ScriptDocumentation.DocCommentLineType, string>>();
+
+            var lineData = picker(lineNumber);
+
+            while (lineData != null)
+            {
+                lines.Insert(0, new Tuple<ScriptDocumentation.DocCommentLineType, string>(lineData.Item2, lineData.Item3));
+                lineData = picker(--lineNumber);
+            }
+
+            return lines;
         }
 
         IInheritable IInheritable.Base { get { return this.BaseElement as IInheritable; } }

@@ -23,6 +23,8 @@ using FastColoredTextBoxNS;
 using StepBro.UI.WinForms.Dialogs;
 using StepBro.Core.Addons;
 using StepBro.Core.DocCreation;
+using Antlr4.Runtime;
+using Lexer = StepBro.Core.Parser.Grammar.StepBroLexer;
 
 namespace StepBro.SimpleWorkbench
 {
@@ -42,6 +44,7 @@ namespace StepBro.SimpleWorkbench
         private ILoadedFilesManager m_loadedFiles = null;
         private IDynamicObjectManager m_objectManager = null;
         private ILogger m_mainLogger = null;
+        private ISymbolLookupService m_symbolLookupService = null;
 
         private ToolWindow m_toolWindowExecutionLog = null;
         private LogViewer m_logviewer = null;
@@ -50,7 +53,7 @@ namespace StepBro.SimpleWorkbench
         private ToolWindow m_toolWindowReportOverview = null;
         private TestReportOverview m_reportOverview = null;
         private ToolWindow m_toolWindowDocCommentPreview = null;
-        private DocCommentsPreview m_docCommentPreview = null;
+        private DocCommentsPreview m_selectionDocView = null;
 
         private ToolWindow m_toolWindowParsingErrors = null;
         private ParsingErrorListView m_errorsList = null;
@@ -152,6 +155,8 @@ namespace StepBro.SimpleWorkbench
             m_loadedFiles.FileClosed += LoadedFiles_FileClosed;
             m_loadedFiles.FilePropertyChanged += File_PropertyChanged;
             m_objectManager = StepBroMain.ServiceManager.Get<IDynamicObjectManager>();
+            m_symbolLookupService = StepBroMain.ServiceManager.Get<ISymbolLookupService>();
+            StepBro.UI.WinForms.CustomToolBar.ToolBar.ToolBarSetup();
 
             this.ParseCommandLineOptions();
 
@@ -184,8 +189,8 @@ namespace StepBro.SimpleWorkbench
             m_toolWindowReportOverview.DockTo(dockManager, DockOperationType.LeftOuter);
             m_toolWindowReportOverview.Close();
 
-            m_docCommentPreview = new DocCommentsPreview();
-            m_toolWindowDocCommentPreview = new ToolWindow(dockManager, "DocCommentPreview", "Doc Comments Preview", null, m_docCommentPreview);
+            m_selectionDocView = new DocCommentsPreview();
+            m_toolWindowDocCommentPreview = new ToolWindow(dockManager, "SelectionDocView", "Selection Documentation", null, m_selectionDocView);
             m_toolWindowDocCommentPreview.DockTo(dockManager, DockOperationType.RightInner);
             m_toolWindowDocCommentPreview.Close();
 
@@ -560,7 +565,7 @@ namespace StepBro.SimpleWorkbench
             }
         }
 
-        private void viewDocCommentsPreviewToolStripMenuItem_Click(object sender, EventArgs e)
+        private void viewSelectionDocToolStripMenuItem_Click(object sender, EventArgs e)
         {
             m_toolWindowDocCommentPreview.Activate();
         }
@@ -1225,6 +1230,20 @@ namespace StepBro.SimpleWorkbench
             return window;
         }
 
+        private ILoadedFile GetCurrentDocumentFile()
+        {
+            if (dockManager.SelectedDocument is DocumentWindow window &&
+                window.Controls[0] is FastColoredTextBoxNS.FastColoredTextBox &&
+                dockManager.SelectedDocument.Tag is ILoadedFile file)
+            {
+                return file;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         private DocumentWindow OpenOrActivateFileEditor(ILoadedFile file, int line = -1)
         {
             DocumentWindow window = null;
@@ -1369,14 +1388,14 @@ namespace StepBro.SimpleWorkbench
         {
             var tb = sender as FastColoredTextBox;
 
-            if (tb.Selection.TextLength == 0)
+            if (tb.Selection.IsEmpty)
             {
                 int line = tb.Selection.Start.iLine;
-                string lineText = tb.GetLine(line).Text.Trim();
-                if (ScriptDocumentation.IsDocLine(lineText))
+                string lineText = tb.GetLine(line).Text;
+                if (ScriptDocumentation.IsDocLine(lineText.Trim()))
                 {
                     var lines = new List<string>();
-                    lineText = lineText.TrimStart('/').TrimStart();
+                    lineText = lineText.Trim().TrimStart('/').TrimStart();
                     lines.Add(lineText);
 
                     int first = line;
@@ -1401,9 +1420,53 @@ namespace StepBro.SimpleWorkbench
                         }
                         else break;
                     }
-                    m_docCommentPreview.Update(null, lines);
+                    m_selectionDocView.ShowDocCommentsPreview(lines);
                     m_toolWindowDocCommentPreview.Activate(false);
                     System.Diagnostics.Debug.WriteLine($"Do update the preview; {lines.Count} lines, first: {first + 1}, last: {last + 1}");
+                }
+                else
+                {
+                    var lexer = new Lexer(new AntlrInputStream(lineText));
+                    var tokens = lexer.GetAllTokens();
+                    int i = 0, start = -1;
+                    foreach (var token in tokens)
+                    {
+                        if (tb.Selection.Start.iChar > token.Column && tb.Selection.Start.iChar <= (token.Column + token.Text.Length))
+                        {
+                            System.Diagnostics.Debug.WriteLine("Selected token: " + token.Text + " (" + token.Type.ToString() + ")");
+                            start = i;
+                            break;
+                        }
+                        i++;
+                    }
+                    if (start >= 0)
+                    {
+                        if (tokens[start].Type == Lexer.IDENTIFIER || tokens[start].Type == Lexer.AT_IDENTIFIER)
+                        {
+                            var end = start;
+                            while (start >= 2 && tokens[start - 1].Type == Lexer.DOT && (tokens[start - 2].Type == Lexer.IDENTIFIER || tokens[start - 2].Type == Lexer.AT_IDENTIFIER))
+                            {
+                                start -= 2;
+                            }
+                            string qualifiedIdentifier = "";
+                            for (i = start; i <= end; i++)
+                            {
+                                qualifiedIdentifier += tokens[i].Text;
+                            }
+
+                            System.Diagnostics.Debug.WriteLine("------------- Selected token: " + qualifiedIdentifier);
+                            var symbol = m_symbolLookupService.TryResolveSymbol(this.GetCurrentDocumentFile() as IScriptFile, qualifiedIdentifier);
+                            if (symbol != null)
+                            {
+                                if (symbol is TypeReference tr)
+                                {
+                                    symbol = tr.DynamicType ?? tr.Type;
+                                }
+                                System.Diagnostics.Debug.WriteLine("------------- Found Symbol: " + symbol.GetType().FullName);
+                                m_selectionDocView.ShowObjectDocumentation(symbol);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1971,12 +2034,12 @@ namespace StepBro.SimpleWorkbench
 
         }
 
-        private void toolStripMenuItemCreateProjectOverview_Click(object sender, EventArgs e)
+        private void toolStripMenuItemCreateDocForSelectedFile_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void toolStripMenuItemCreateDocForSelectedFile_Click(object sender, EventArgs e)
+        private void toolStripMenuItemCreateProjectOverview_Click(object sender, EventArgs e)
         {
 
         }

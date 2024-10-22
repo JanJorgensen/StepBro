@@ -10,7 +10,7 @@ namespace StepBro.UI.WinForms
         {
             private Func<TParent, Color, string> m_setter;
 
-            public ValueColor(string typeOrName, Func<TParent, Color, string> setter = null) : base(typeOrName)
+            public ValueColor(string typeOrName, DocString doc, Func<TParent, Color, string> setter = null) : base(typeOrName, doc)
             {
                 m_setter = setter;
             }

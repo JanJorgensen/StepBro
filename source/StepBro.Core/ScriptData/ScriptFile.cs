@@ -586,7 +586,7 @@ namespace StepBro.Core.ScriptData
                             var errors = new List<Tuple<int, string>>();
                             try
                             {
-                                ((ISettableFromPropertyBlock)obj).PreScanData(this, props as PropertyBlock, errors);
+                                ((ISettableFromPropertyBlock)obj).PreScanData(props as PropertyBlock, errors);
 
                                 foreach (var e in errors)
                                 {
@@ -1016,7 +1016,7 @@ namespace StepBro.Core.ScriptData
             }
         }
 
-        public string GetFilePath(string folder = null)
+        public string GetDocumentationFilePath(string folder = null)
         {
             if (String.IsNullOrEmpty(folder)) folder = Path.GetDirectoryName(this.GetFullPath());
             return Path.Combine(folder, Path.ChangeExtension(this.FileName, ".html"));
@@ -1024,7 +1024,7 @@ namespace StepBro.Core.ScriptData
 
         public void GenerateDocumentationFile(string folder = null)
         {
-            string filepath = this.GetFilePath(folder);
+            string filepath = this.GetDocumentationFilePath(folder);
 
             if (System.IO.File.Exists(filepath))
             {
@@ -1080,6 +1080,7 @@ namespace StepBro.Core.ScriptData
                     }
                     helptext.AppendLine(
                         ScriptDocumentation.CreateFileElementDocumentation(
+                            3,
                             StepBro.Core.Main.GetService<ILoadedFilesManager>(),
                             element,
                             docComments));
