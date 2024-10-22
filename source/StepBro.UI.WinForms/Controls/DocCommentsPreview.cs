@@ -1,26 +1,13 @@
-﻿using CommandLine.Text;
-using Markdig;
-using Microsoft.Web.WebView2.Core;
-using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+﻿using System.Data;
+using System.Diagnostics;
+using System.Reflection;
+using System.Text;
 using StepBro.Core.Data;
 using StepBro.Core.DocCreation;
 using StepBro.Core.General;
 using StepBro.Core.ScriptData;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using System.Windows.Forms;
-using System.Windows.Media;
-using static StepBro.Core.Data.PropertyBlockDecoder;
+using Markdig;
+using Microsoft.Web.WebView2.Core;
 using static StepBro.Core.DocCreation.ScriptDocumentation;
 
 namespace StepBro.UI.WinForms.Controls
@@ -33,8 +20,6 @@ namespace StepBro.UI.WinForms.Controls
         private Mode m_mode = Mode.Empty;
         private object m_shownObject = null;
         private List<string> m_currentDocComments = null;
-        private bool m_coreIsSetup = false;
-
 
         public DocCommentsPreview()
         {
