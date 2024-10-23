@@ -48,6 +48,9 @@ namespace StepBro.SimpleWorkbench
             toolStripMenuItemSaveLogNow = new ToolStripMenuItem();
             toolStripSeparator5 = new ToolStripSeparator();
             toolStripMenuItemFileTestReport = new ToolStripMenuItem();
+            toolStripMenuItemCreateDocumentationFiles = new ToolStripMenuItem();
+            toolStripMenuItemCreateProjectOverview = new ToolStripMenuItem();
+            toolStripMenuItemCreateDocForSelectedFile = new ToolStripMenuItem();
             toolStripMenuItemView = new ToolStripMenuItem();
             viewExecutionLogToolStripMenuItem = new ToolStripMenuItem();
             viewErrorsToolStripMenuItem = new ToolStripMenuItem();
@@ -57,6 +60,8 @@ namespace StepBro.SimpleWorkbench
             viewObjectCommandPromptToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItemExeNoteInput = new ToolStripMenuItem();
             toolStripSeparator2 = new ToolStripSeparator();
+            viewSelectionDocToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator6 = new ToolStripSeparator();
             viewToolbarsToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItemToolbarsDummyEntry = new ToolStripMenuItem();
             shortcutsToolStripMenuItem = new ToolStripMenuItem();
@@ -164,7 +169,7 @@ namespace StepBro.SimpleWorkbench
             // 
             // toolStripMenuItemFile
             // 
-            toolStripMenuItemFile.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemFileOpen, toolStripMenuItemFileSave, toolStripSeparator4, toolStripMenuItemSaveLogActivate, toolStripMenuItemSaveLogLongOnly, toolStripMenuItemSaveLogNow, toolStripSeparator5, toolStripMenuItemFileTestReport });
+            toolStripMenuItemFile.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemFileOpen, toolStripMenuItemFileSave, toolStripSeparator4, toolStripMenuItemSaveLogActivate, toolStripMenuItemSaveLogLongOnly, toolStripMenuItemSaveLogNow, toolStripSeparator5, toolStripMenuItemFileTestReport, toolStripMenuItemCreateDocumentationFiles });
             toolStripMenuItemFile.Name = "toolStripMenuItemFile";
             toolStripMenuItemFile.Size = new Size(180, 22);
             toolStripMenuItemFile.Text = "&File";
@@ -175,7 +180,7 @@ namespace StepBro.SimpleWorkbench
             toolStripMenuItemFileOpen.Enabled = false;
             toolStripMenuItemFileOpen.Name = "toolStripMenuItemFileOpen";
             toolStripMenuItemFileOpen.ShortcutKeys = Keys.Control | Keys.O;
-            toolStripMenuItemFileOpen.Size = new Size(216, 22);
+            toolStripMenuItemFileOpen.Size = new Size(220, 22);
             toolStripMenuItemFileOpen.Text = "Open...";
             toolStripMenuItemFileOpen.Click += toolStripMenuItemFileOpen_Click;
             // 
@@ -183,21 +188,21 @@ namespace StepBro.SimpleWorkbench
             // 
             toolStripMenuItemFileSave.Name = "toolStripMenuItemFileSave";
             toolStripMenuItemFileSave.ShortcutKeys = Keys.Control | Keys.S;
-            toolStripMenuItemFileSave.Size = new Size(216, 22);
+            toolStripMenuItemFileSave.Size = new Size(220, 22);
             toolStripMenuItemFileSave.Text = "Save";
             toolStripMenuItemFileSave.Click += toolStripMenuItemFileSave_Click;
             // 
             // toolStripSeparator4
             // 
             toolStripSeparator4.Name = "toolStripSeparator4";
-            toolStripSeparator4.Size = new Size(213, 6);
+            toolStripSeparator4.Size = new Size(217, 6);
             // 
             // toolStripMenuItemSaveLogActivate
             // 
             toolStripMenuItemSaveLogActivate.CheckOnClick = true;
             toolStripMenuItemSaveLogActivate.Enabled = false;
             toolStripMenuItemSaveLogActivate.Name = "toolStripMenuItemSaveLogActivate";
-            toolStripMenuItemSaveLogActivate.Size = new Size(216, 22);
+            toolStripMenuItemSaveLogActivate.Size = new Size(220, 22);
             toolStripMenuItemSaveLogActivate.Text = "Save Log";
             // 
             // toolStripMenuItemSaveLogLongOnly
@@ -205,31 +210,52 @@ namespace StepBro.SimpleWorkbench
             toolStripMenuItemSaveLogLongOnly.CheckOnClick = true;
             toolStripMenuItemSaveLogLongOnly.Enabled = false;
             toolStripMenuItemSaveLogLongOnly.Name = "toolStripMenuItemSaveLogLongOnly";
-            toolStripMenuItemSaveLogLongOnly.Size = new Size(216, 22);
+            toolStripMenuItemSaveLogLongOnly.Size = new Size(220, 22);
             toolStripMenuItemSaveLogLongOnly.Text = "Save Only Long Executions";
             // 
             // toolStripMenuItemSaveLogNow
             // 
             toolStripMenuItemSaveLogNow.Name = "toolStripMenuItemSaveLogNow";
-            toolStripMenuItemSaveLogNow.Size = new Size(216, 22);
+            toolStripMenuItemSaveLogNow.Size = new Size(220, 22);
             toolStripMenuItemSaveLogNow.Text = "Save Log Now...";
             toolStripMenuItemSaveLogNow.Click += toolStripMenuItemSaveLogNow_Click;
             // 
             // toolStripSeparator5
             // 
             toolStripSeparator5.Name = "toolStripSeparator5";
-            toolStripSeparator5.Size = new Size(213, 6);
+            toolStripSeparator5.Size = new Size(217, 6);
             // 
             // toolStripMenuItemFileTestReport
             // 
             toolStripMenuItemFileTestReport.Enabled = false;
             toolStripMenuItemFileTestReport.Name = "toolStripMenuItemFileTestReport";
-            toolStripMenuItemFileTestReport.Size = new Size(216, 22);
+            toolStripMenuItemFileTestReport.Size = new Size(220, 22);
             toolStripMenuItemFileTestReport.Text = "Test Report";
+            // 
+            // toolStripMenuItemCreateDocumentationFiles
+            // 
+            toolStripMenuItemCreateDocumentationFiles.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemCreateProjectOverview, toolStripMenuItemCreateDocForSelectedFile });
+            toolStripMenuItemCreateDocumentationFiles.Name = "toolStripMenuItemCreateDocumentationFiles";
+            toolStripMenuItemCreateDocumentationFiles.Size = new Size(220, 22);
+            toolStripMenuItemCreateDocumentationFiles.Text = "Create Documentation Files";
+            // 
+            // toolStripMenuItemCreateProjectOverview
+            // 
+            toolStripMenuItemCreateProjectOverview.Name = "toolStripMenuItemCreateProjectOverview";
+            toolStripMenuItemCreateProjectOverview.Size = new Size(148, 22);
+            toolStripMenuItemCreateProjectOverview.Text = "Project Files...";
+            toolStripMenuItemCreateProjectOverview.Click += toolStripMenuItemCreateProjectOverview_Click;
+            // 
+            // toolStripMenuItemCreateDocForSelectedFile
+            // 
+            toolStripMenuItemCreateDocForSelectedFile.Name = "toolStripMenuItemCreateDocForSelectedFile";
+            toolStripMenuItemCreateDocForSelectedFile.Size = new Size(148, 22);
+            toolStripMenuItemCreateDocForSelectedFile.Text = "Selected File...";
+            toolStripMenuItemCreateDocForSelectedFile.Click += toolStripMenuItemCreateDocForSelectedFile_Click;
             // 
             // toolStripMenuItemView
             // 
-            toolStripMenuItemView.DropDownItems.AddRange(new ToolStripItem[] { viewExecutionLogToolStripMenuItem, viewErrorsToolStripMenuItem, viewPropertiesToolStripMenuItem, viewReportOverviewToolStripMenuItem, toolStripSeparator3, viewObjectCommandPromptToolStripMenuItem, toolStripMenuItemExeNoteInput, toolStripSeparator2, viewToolbarsToolStripMenuItem });
+            toolStripMenuItemView.DropDownItems.AddRange(new ToolStripItem[] { viewExecutionLogToolStripMenuItem, viewErrorsToolStripMenuItem, viewPropertiesToolStripMenuItem, viewReportOverviewToolStripMenuItem, toolStripSeparator3, viewObjectCommandPromptToolStripMenuItem, toolStripMenuItemExeNoteInput, toolStripSeparator2, viewSelectionDocToolStripMenuItem, toolStripSeparator6, viewToolbarsToolStripMenuItem });
             toolStripMenuItemView.Name = "toolStripMenuItemView";
             toolStripMenuItemView.Size = new Size(180, 22);
             toolStripMenuItemView.Text = "&View";
@@ -290,6 +316,18 @@ namespace StepBro.SimpleWorkbench
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
             toolStripSeparator2.Size = new Size(209, 6);
+            // 
+            // viewSelectionDocToolStripMenuItem
+            // 
+            viewSelectionDocToolStripMenuItem.Name = "viewSelectionDocToolStripMenuItem";
+            viewSelectionDocToolStripMenuItem.Size = new Size(212, 22);
+            viewSelectionDocToolStripMenuItem.Text = "Selection Documentation";
+            viewSelectionDocToolStripMenuItem.Click += viewSelectionDocToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator6
+            // 
+            toolStripSeparator6.Name = "toolStripSeparator6";
+            toolStripSeparator6.Size = new Size(209, 6);
             // 
             // viewToolbarsToolStripMenuItem
             // 
@@ -640,5 +678,10 @@ namespace StepBro.SimpleWorkbench
         private ToolStripMenuItem toolStripMenuItemSaveLogNow;
         private ToolStripSeparator toolStripSeparator5;
         private ToolStripMenuItem viewReportOverviewToolStripMenuItem;
+        private ToolStripMenuItem viewSelectionDocToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator6;
+        private ToolStripMenuItem toolStripMenuItemCreateDocumentationFiles;
+        private ToolStripMenuItem toolStripMenuItemCreateProjectOverview;
+        private ToolStripMenuItem toolStripMenuItemCreateDocForSelectedFile;
     }
 }

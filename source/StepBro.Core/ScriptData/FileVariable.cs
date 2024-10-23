@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace StepBro.Core.ScriptData
 {
-    internal class FileVariable : FileElement
+    internal class FileVariable : FileElement, IFileVariable
     {
         private readonly IValueContainerOwnerAccess m_variableAccess;
         private readonly int m_id;
@@ -27,6 +27,8 @@ namespace StepBro.Core.ScriptData
         }
 
         public IValueContainerOwnerAccess VariableOwnerAccess { get { return m_variableAccess; } }
+
+        public IValueContainer Value { get { return m_variableAccess.Container; } }
 
         public int ID { get { return m_id; } }
 

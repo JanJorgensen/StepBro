@@ -38,8 +38,13 @@ namespace StepBro.PanelCreator
             }
         }
 
-        public void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors)
+        public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
         {
+        }
+
+        public PropertyBlockDecoder.Element TryGetDecoder()
+        {
+            return null;
         }
 
         public void Setup(IScriptFile file, ILogger logger, PropertyBlock data)

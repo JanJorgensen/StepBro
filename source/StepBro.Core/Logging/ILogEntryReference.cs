@@ -6,7 +6,7 @@
     public interface ILogEntryReference
     {
         /// <summary>
-        /// Reference to <see cref="ILogEntry"/ object.>
+        /// Reference to <see cref="ILogEntry"/> object.
         /// </summary>
         ILogEntry Entry { get; }
     }

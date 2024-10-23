@@ -20,7 +20,10 @@ channels { COMMENTS_CHANNEL, DOC_COMMENTS_CHANNEL, DIRECTIVE }
   //protected bool assertIsKeyword = true;
 }
 
-DOC_COMMENT:        	    '/// ' InputCharacter*          -> channel(DOC_COMMENTS_CHANNEL);
+DOC_COMMENT_TYPE_AND_NAMED: '///' Whitespace* IdentifierOrKeyword Whitespace+ IdentifierOrKeyword Whitespace* ':' InputCharacter*   -> channel(DOC_COMMENTS_CHANNEL);
+DOC_COMMENT_NAMED:          '///' Whitespace* IdentifierOrKeyword Whitespace* ':' InputCharacter*                                   -> channel(DOC_COMMENTS_CHANNEL);
+DOC_COMMENT:        	    '///' Whitespace* InputCharacter*                                                                       -> channel(DOC_COMMENTS_CHANNEL);
+
 SINGLE_LINE_COMMENT:		'//'  InputCharacter*           -> channel(COMMENTS_CHANNEL);
 DELIMITED_COMMENT:			'/*'  .*? '*/'                  -> channel(COMMENTS_CHANNEL);
 
@@ -51,6 +54,7 @@ DATATABLE : 'datatable' ;
 DATETIME : 'datetime' ;
 DECIMAL : 'decimal' ;
 DO : 'do' ;
+DOCUMENTATION : 'documentation' ;
 DOUBLE : 'double' ;
 ELSE : 'else' ;
 EMPTY : 'empty' ;

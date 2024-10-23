@@ -22,6 +22,9 @@ using StepBro.Core.Logging;
 using FastColoredTextBoxNS;
 using StepBro.UI.WinForms.Dialogs;
 using StepBro.Core.Addons;
+using StepBro.Core.DocCreation;
+using Antlr4.Runtime;
+using Lexer = StepBro.Core.Parser.Grammar.StepBroLexer;
 
 namespace StepBro.SimpleWorkbench
 {
@@ -41,6 +44,7 @@ namespace StepBro.SimpleWorkbench
         private ILoadedFilesManager m_loadedFiles = null;
         private IDynamicObjectManager m_objectManager = null;
         private ILogger m_mainLogger = null;
+        private ISymbolLookupService m_symbolLookupService = null;
 
         private ToolWindow m_toolWindowExecutionLog = null;
         private LogViewer m_logviewer = null;
@@ -48,6 +52,8 @@ namespace StepBro.SimpleWorkbench
         private FileExplorer m_fileExplorer = null;
         private ToolWindow m_toolWindowReportOverview = null;
         private TestReportOverview m_reportOverview = null;
+        private ToolWindow m_toolWindowDocCommentPreview = null;
+        private DocCommentsPreview m_selectionDocView = null;
 
         private ToolWindow m_toolWindowParsingErrors = null;
         private ParsingErrorListView m_errorsList = null;
@@ -149,6 +155,8 @@ namespace StepBro.SimpleWorkbench
             m_loadedFiles.FileClosed += LoadedFiles_FileClosed;
             m_loadedFiles.FilePropertyChanged += File_PropertyChanged;
             m_objectManager = StepBroMain.ServiceManager.Get<IDynamicObjectManager>();
+            m_symbolLookupService = StepBroMain.ServiceManager.Get<ISymbolLookupService>();
+            StepBro.UI.WinForms.CustomToolBar.ToolBar.ToolBarSetup();
 
             this.ParseCommandLineOptions();
 
@@ -180,6 +188,11 @@ namespace StepBro.SimpleWorkbench
             m_toolWindowReportOverview = new ToolWindow(dockManager, "ReportOverviewView", "Report Overview", null, m_reportOverview);
             m_toolWindowReportOverview.DockTo(dockManager, DockOperationType.LeftOuter);
             m_toolWindowReportOverview.Close();
+
+            m_selectionDocView = new DocCommentsPreview();
+            m_toolWindowDocCommentPreview = new ToolWindow(dockManager, "SelectionDocView", "Selection Documentation", null, m_selectionDocView);
+            m_toolWindowDocCommentPreview.DockTo(dockManager, DockOperationType.RightInner);
+            m_toolWindowDocCommentPreview.Close();
 
             // TO BE DELETED
             dockManager.SaveCustomToolWindowLayoutData += DockManager_SaveCustomToolWindowLayoutData;
@@ -280,7 +293,7 @@ namespace StepBro.SimpleWorkbench
                     var typed = shortcut as ScriptExecutionToolStripMenuItem;
                     var shortcutData = new UserDataCurrent.ProcedureShortcut();
                     shortcutData.Text = typed.Text;
-                    shortcutData.Element = typed.FileElement.FullName;
+                    shortcutData.Element = typed.FileElement;
                     shortcutData.Partner = typed.Partner;
                     shortcutData.Instance = typed.InstanceObject;
                     shortcuts.Add(shortcutData);
@@ -349,7 +362,7 @@ namespace StepBro.SimpleWorkbench
                                             continue;   // Just throw away, then.
                                         }
                                     }
-                                    this.AddProcedureShortcut(typed.Text, found, typed.Partner, isPartnerModel, typed.Instance);
+                                    this.AddProcedureShortcut(typed.Text, found.FullName, typed.Partner, isPartnerModel, typed.Instance);
                                 }
                             }
                             else if (shortcut is UserDataCurrent.ObjectCommandShortcut)
@@ -371,6 +384,7 @@ namespace StepBro.SimpleWorkbench
         }
 
         #endregion
+
 
 
         #region ICoreAccess
@@ -549,6 +563,11 @@ namespace StepBro.SimpleWorkbench
             {
                 //toolWindowProperties.Close();
             }
+        }
+
+        private void viewSelectionDocToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            m_toolWindowDocCommentPreview.Activate();
         }
 
         private void viewToolbarsToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
@@ -764,7 +783,7 @@ namespace StepBro.SimpleWorkbench
                 else
                 {
                     var executionItem = outputItem as ScriptExecutionToolStripMenuItem;
-                    executionItem.FileElement = procedure;
+                    executionItem.FileElement = procedure.FullName;
                     executionItem.SetText();
                     if (procedure.Parameters != null && procedure.Parameters.Length > 0)     // TODO: Enable user to input the arguments.
                     {
@@ -836,7 +855,11 @@ namespace StepBro.SimpleWorkbench
         private void FileElementExecutionEntry_Click(object sender, EventArgs e)
         {
             var executionEntry = sender as ScriptExecutionToolStripMenuItem;
-            this.StartExecution(true, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null);
+            var element = StepBroMain.TryFindFileElement(executionEntry.FileElement);
+            if (element != null)
+            {
+                this.StartExecution(true, element, executionEntry.Partner, executionEntry.InstanceObject, null);
+            }
         }
 
         private void toolStripSplitButtonRunScript_ButtonClick(object sender, EventArgs e)
@@ -845,13 +868,37 @@ namespace StepBro.SimpleWorkbench
             {
                 var first = toolStripSplitButtonRunScript.DropDownItems.IndexOf(toolStripSeparatorRunBeforeHistory) + 1;
                 var executionEntry = toolStripSplitButtonRunScript.DropDownItems[first] as ScriptExecutionToolStripMenuItem;
-                this.StartExecution(true, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null);
+                var element = StepBroMain.TryFindFileElement(executionEntry.FileElement);
+                if (element != null)
+                {
+                    this.StartExecution(true, element, executionEntry.Partner, executionEntry.InstanceObject, null);
+                }
+                else
+                {
+                    // TODO: Log the error or dialog?
+                }
             }
         }
 
         private int GetIndexOfTopHistoryElement()
         {
             return toolStripSplitButtonRunScript.DropDownItems.IndexOf(toolStripSeparatorRunBeforeHistory) + 1;
+        }
+
+        private IEnumerable<ScriptExecutionToolStripMenuItem> ListHistoryEntries()
+        {
+            var index = this.GetIndexOfTopHistoryElement();
+            int historyItemsCount = (toolStripSplitButtonRunScript.Tag != null) ? (int)toolStripSplitButtonRunScript.Tag : 0;
+            if (historyItemsCount > 0)
+            {
+                for (int i = 0; i < historyItemsCount; i++)
+                {
+                    var exeItem = toolStripSplitButtonRunScript.DropDownItems[index] as ScriptExecutionToolStripMenuItem;
+                    if (exeItem == null) break;     // Stop here...
+                    yield return exeItem;
+                    index++;
+                }
+            }
         }
 
         private void AddElementExecutionToHistory(IFileElement element, string partner, bool partnerIsModel, string objectVariable, object[] args)
@@ -887,7 +934,7 @@ namespace StepBro.SimpleWorkbench
             if (found == null)
             {
                 found = new ScriptExecutionToolStripMenuItem();
-                found.FileElement = element;
+                found.FileElement = element.FullName;
                 found.Partner = partner;
                 found.PartnerIsModel = partnerIsModel;
                 found.InstanceObject = objectVariable;
@@ -1003,7 +1050,7 @@ namespace StepBro.SimpleWorkbench
                 {
                     var index = GetIndexOfTopHistoryElement();
                     executionEntry = toolStripSplitButtonRunScript.DropDownItems[index] as ScriptExecutionToolStripMenuItem;
-                    procButtonText = ScripExecutionButtonTitle(false, executionEntry.FileElement.FullName, executionEntry.Partner, executionEntry.PartnerIsModel, executionEntry.InstanceObject, null);
+                    procButtonText = ScripExecutionButtonTitle(false, executionEntry.FileElement, executionEntry.Partner, executionEntry.PartnerIsModel, executionEntry.InstanceObject, null);
                     procDescription = procButtonText;
                 }
                 if (commandAvailable)
@@ -1032,10 +1079,9 @@ namespace StepBro.SimpleWorkbench
                     }
                 }
             }
-
         }
 
-        private void AddProcedureShortcut(string text, IFileElement element, string partner, bool partnerIsModel, string instanceObject)
+        private void AddProcedureShortcut(string text, string element, string partner, bool partnerIsModel, string instanceObject)
         {
             var shortcut = new ScriptExecutionToolStripMenuItem();
             shortcut.Text = text;
@@ -1095,7 +1141,11 @@ namespace StepBro.SimpleWorkbench
             }
             else
             {
-                this.StartExecution(false, executionEntry.FileElement, executionEntry.Partner, executionEntry.InstanceObject, null);
+                var element = StepBroMain.TryFindFileElement(executionEntry.FileElement);
+                if (element != null)
+                {
+                    this.StartExecution(false, element, executionEntry.Partner, executionEntry.InstanceObject, null);
+                }
             }
         }
 
@@ -1156,6 +1206,7 @@ namespace StepBro.SimpleWorkbench
             DocumentWindow window = null;
             try
             {
+                editor.Language = Language.StepBro;
                 editor.OpenFile(file.FilePath);
 
                 file.RegisterDependant(m_hostDependancyObject); // Used by editor now.
@@ -1163,10 +1214,13 @@ namespace StepBro.SimpleWorkbench
                 window = new DocumentWindow(dockManager, file.FilePath, Path.GetFileName(file.FilePath), 2, editor);
                 window.Tag = file;
                 window.FileName = file.FilePath;
-                window.FileType = String.Format("Text File (*{0})", Path.GetExtension(file.FilePath).ToLower());
+                window.FileType = String.Format("StepBro Script File (*{0})", Path.GetExtension(file.FilePath).ToLower());
 
                 editor.MouseMove += Editor_MouseMove;
                 editor.TextChanged += TextBox_TextChanged;
+                editor.SelectionChanged += TextBox_SelectionChanged;
+                editor.SelectionChangedDelayed += TextBox_SelectionChangedDelayed;
+                editor.TextChangedDelayed += TextBox_TextChangedDelayed;
             }
             catch (Exception)
             {
@@ -1174,6 +1228,20 @@ namespace StepBro.SimpleWorkbench
             }
 
             return window;
+        }
+
+        private ILoadedFile GetCurrentDocumentFile()
+        {
+            if (dockManager.SelectedDocument is DocumentWindow window &&
+                window.Controls[0] is FastColoredTextBoxNS.FastColoredTextBox &&
+                dockManager.SelectedDocument.Tag is ILoadedFile file)
+            {
+                return file;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private DocumentWindow OpenOrActivateFileEditor(ILoadedFile file, int line = -1)
@@ -1303,14 +1371,121 @@ namespace StepBro.SimpleWorkbench
             return documentWindow;
         }
 
+        private void TextBox_SelectionChanged(object sender, EventArgs e)
+        {
+            var tb = sender as FastColoredTextBox;
+            if (tb.Selection.TextLength == 0)
+            {
+                System.Diagnostics.Debug.WriteLine("TextBox_SelectionChanged - cursor only");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("TextBox_SelectionChanged - selection size: " + tb.Selection.TextLength.ToString());
+            }
+        }
+
+        private void TextBox_SelectionChangedDelayed(object sender, EventArgs e)
+        {
+            var tb = sender as FastColoredTextBox;
+
+            if (tb.Selection.IsEmpty)
+            {
+                int line = tb.Selection.Start.iLine;
+                string lineText = tb.GetLine(line).Text;
+                if (ScriptDocumentation.IsDocLine(lineText.Trim()))
+                {
+                    var lines = new List<string>();
+                    lineText = lineText.Trim().TrimStart('/').TrimStart();
+                    lines.Add(lineText);
+
+                    int first = line;
+                    int last = line;
+                    while (first > 0)
+                    {
+                        string text = tb.GetLine(first - 1).Text.Trim();
+                        if (ScriptDocumentation.IsDocLine(text))
+                        {
+                            lines.Insert(0, text.TrimStart('/').TrimStart());
+                            first--;
+                        }
+                        else break;
+                    }
+                    while (last < (tb.LinesCount - 1))
+                    {
+                        string text = tb.GetLine(last + 1).Text.Trim();
+                        if (ScriptDocumentation.IsDocLine(text))
+                        {
+                            lines.Add(text.TrimStart('/').TrimStart());
+                            last++;
+                        }
+                        else break;
+                    }
+                    m_selectionDocView.ShowDocCommentsPreview(lines);
+                    m_toolWindowDocCommentPreview.Activate(false);
+                    System.Diagnostics.Debug.WriteLine($"Do update the preview; {lines.Count} lines, first: {first + 1}, last: {last + 1}");
+                }
+                else
+                {
+                    var lexer = new Lexer(new AntlrInputStream(lineText));
+                    var tokens = lexer.GetAllTokens();
+                    int i = 0, start = -1;
+                    foreach (var token in tokens)
+                    {
+                        if (tb.Selection.Start.iChar > token.Column && tb.Selection.Start.iChar <= (token.Column + token.Text.Length))
+                        {
+                            System.Diagnostics.Debug.WriteLine("Selected token: " + token.Text + " (" + token.Type.ToString() + ")");
+                            start = i;
+                            break;
+                        }
+                        i++;
+                    }
+                    if (start >= 0)
+                    {
+                        if (tokens[start].Type == Lexer.IDENTIFIER || tokens[start].Type == Lexer.AT_IDENTIFIER)
+                        {
+                            var end = start;
+                            while (start >= 2 && tokens[start - 1].Type == Lexer.DOT && (tokens[start - 2].Type == Lexer.IDENTIFIER || tokens[start - 2].Type == Lexer.AT_IDENTIFIER))
+                            {
+                                start -= 2;
+                            }
+                            string qualifiedIdentifier = "";
+                            for (i = start; i <= end; i++)
+                            {
+                                qualifiedIdentifier += tokens[i].Text;
+                            }
+
+                            System.Diagnostics.Debug.WriteLine("------------- Selected token: " + qualifiedIdentifier);
+                            var symbol = m_symbolLookupService.TryResolveSymbol(this.GetCurrentDocumentFile() as IScriptFile, qualifiedIdentifier);
+                            if (symbol != null)
+                            {
+                                if (symbol is TypeReference tr)
+                                {
+                                    symbol = tr.DynamicType ?? tr.Type;
+                                }
+                                System.Diagnostics.Debug.WriteLine("------------- Found Symbol: " + symbol.GetType().FullName);
+                                m_selectionDocView.ShowObjectDocumentation(symbol);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            var tb = sender as FastColoredTextBox;
             if (ignoreTextChangedEvent)
                 return;
+            System.Diagnostics.Debug.WriteLine("TextBox_TextChanged");
 
-            DocumentWindow documentWindow = ((FastColoredTextBox)sender).Parent as DocumentWindow;
+            DocumentWindow documentWindow = tb.Parent as DocumentWindow;
             if (documentWindow != null)
-                documentWindow.Modified = ((FastColoredTextBox)sender).IsChanged;
+                documentWindow.Modified = tb.IsChanged;
+        }
+
+        private void TextBox_TextChangedDelayed(object sender, TextChangedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("TextBox_TextChangedDelayed");
         }
 
         void Editor_MouseMove(object sender, MouseEventArgs e)
@@ -1855,6 +2030,16 @@ namespace StepBro.SimpleWorkbench
         #endregion
 
         private void toolStripStatusLabelExecutionResult_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripMenuItemCreateDocForSelectedFile_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripMenuItemCreateProjectOverview_Click(object sender, EventArgs e)
         {
 
         }

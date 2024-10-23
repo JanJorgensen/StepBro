@@ -86,7 +86,8 @@ namespace StepBro.Core.Data
 
         public override string ToString()
         {
-            return this.Type.ToString() + " " + this.DataType.ToString();
+            if (this.DataType != null) return this.Type.ToString() + " " + this.DataType.ToString();
+            else return this.Type.ToString();
         }
     }
 

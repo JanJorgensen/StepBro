@@ -190,16 +190,68 @@ namespace StepBro.Core.Parser
             return this.TryGetFileElementInScope(m_file?.Usings, name);
         }
 
-        [Obsolete]
-        public IFileProcedure TryGetProcedureFromDelegateType(Type type)
-        {
-            var procedure = this.ListLocalFileElements().Where(e => e is IFileProcedure).FirstOrDefault(p => p.DataType.Type == type) as IFileProcedure;
+        //[Obsolete]
+        //public IFileProcedure TryGetProcedureFromDelegateType(Type type)
+        //{
+        //    var procedure = this.ListLocalFileElements().Where(e => e is IFileProcedure).FirstOrDefault(p => p.DataType.Type == type) as IFileProcedure;
 
-            while (procedure != null && procedure.BaseElement != null)
+        //    while (procedure != null && procedure.BaseElement != null)
+        //    {
+        //        procedure = procedure.BaseElement as IFileProcedure;
+        //    }
+        //    return procedure;
+        //}
+
+        public object TryResolveSymbol(IFileProcedure procedureScope, string symbol)
+        {
+            var resolved = this.ResolveQualifiedIdentifier(symbol, false);
+            if (resolved == null)
             {
-                procedure = procedure.BaseElement as IFileProcedure;
+                resolved = this.ResolveQualifiedType(symbol);
             }
-            return procedure;
+            if (resolved != null)
+            {
+                switch (resolved.ReferencedType)
+                {
+                    case SBExpressionType.Namespace:
+                        break;
+                    case SBExpressionType.Constant:
+                    case SBExpressionType.Identifier:
+                    case SBExpressionType.GlobalVariableReference:
+                    case SBExpressionType.PropertyReference:
+                    case SBExpressionType.TestListReference:
+                    case SBExpressionType.FileElementOverride:
+                    case SBExpressionType.ProcedurePartner:
+                        return resolved.Value;
+                    case SBExpressionType.TypeReference:
+                        return resolved.DataType;
+                    case SBExpressionType.MethodReference:
+                        return (resolved.Value != null && resolved.Value is List<MethodInfo> methods) ? methods[0] : null;
+                    case SBExpressionType.ThisReference:
+                        return typeof(IProcedureThis);
+                    case SBExpressionType.ProcedureReference:
+                        return ((IProcedureReference)resolved.Value).ProcedureData;
+
+                    case SBExpressionType.Expression:
+                    case SBExpressionType.LocalVariableReference:
+                    case SBExpressionType.Indexing:
+                    case SBExpressionType.GenericTypeDefinition:
+                    case SBExpressionType.ScriptNamespace:
+                    case SBExpressionType.ProcedurePropertyReference:
+                    case SBExpressionType.ProcedureCustomPropertyReference:
+                    case SBExpressionType.DatatableReference:
+                    case SBExpressionType.AwaitExpression:
+                    case SBExpressionType.DynamicObjectMember:
+                    case SBExpressionType.DynamicAsyncObjectMember:
+                    case SBExpressionType.ExpressionError:
+                    case SBExpressionType.UnknownIdentifier:
+                    case SBExpressionType.UnsupportedOperation:
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return null;
         }
 
         private SBExpressionData ResolveQualifiedIdentifier(
@@ -753,11 +805,12 @@ namespace StepBro.Core.Parser
                 var properties = leftType.GetProperties().Where(pi => String.Equals(pi.Name, rightString, StringComparison.InvariantCulture)).ToArray();
                 if (properties.Length == 1)
                 {
+                    var expression = properties[0].IsStatic() ? Expression.Property(null, properties[0]) : null;    // In case an instance property is specified, no expression can be set.
                     return new SBExpressionData(
                         HomeType.Immediate,
                         SBExpressionType.PropertyReference,         // Expression type
                         (TypeReference)properties[0].PropertyType,  // Data type
-                        Expression.Property(null, properties[0]),   // The property access expression
+                        expression,                                 // The property access expression (or null)
                         properties[0],                              // Reference to the property info
                         token: right.Token);
                 }
