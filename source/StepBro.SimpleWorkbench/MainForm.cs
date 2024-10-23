@@ -1756,7 +1756,7 @@ namespace StepBro.SimpleWorkbench
                 if (v.Object is StepBro.ToolBarCreator.ToolBar)
                 {
                     var toolbar = v.Object as StepBro.ToolBarCreator.ToolBar;
-                    panelCustomToolstrips.AddOrSet(v.FullName, toolbar);
+                    panelCustomToolstrips.AddOrSet(v.FullName, toolbar, toolStripMain.Height);  // The height of the main toolbar is adjusted to the display scale factor.
                 }
                 else if (v.Object is StepBro.PanelCreator.Panel)
                 {

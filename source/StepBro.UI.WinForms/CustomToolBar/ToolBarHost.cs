@@ -29,7 +29,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             m_coreAccess = coreAccess;
         }
 
-        public void AddOrSet(string name, StepBro.ToolBarCreator.ToolBar toolbar)
+        public void AddOrSet(string name, StepBro.ToolBarCreator.ToolBar toolbar, int height)
         {
             System.Diagnostics.Debug.WriteLine("Add toolbar: " + toolbar.Name);
             ToolBar toolBar = null;
@@ -48,6 +48,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
             toolBar.Setup(StepBro.Core.Main.RootLogger, name, toolbar.Definition);
             toolbar.SetToolBarReference(toolBar);
+            toolBar.Height = height + 1;
 
             this.Controls.Clear();
 
