@@ -99,12 +99,16 @@ namespace StepBro.Core.DocCreation
 
 
                 sb.AppendLine($"{new String('#', headingLevel)} Properties");
-                foreach (var p in type.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.FlattenHierarchy))
+                var properties = type.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.FlattenHierarchy).ToList();
+                properties.Sort((a, b) => String.Compare(a.Name, b.Name));
+                foreach (var p in properties)
                 {
                     //sb.AppendLine($"{p.Name} instance property </br>");
                     sb.AppendLine($"[{p.Name}](property://{p.DeclaringType.TypeFullName()}.{p.Name})</br>");
                 }
-                foreach (var p in type.GetProperties(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.FlattenHierarchy))
+                properties = type.GetProperties(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.FlattenHierarchy).ToList();
+                properties.Sort((a,b) => String.Compare(a.Name,b.Name));
+                foreach (var p in properties)
                 {
                     //sb.AppendLine($"{p.Name} static property </br>");
                     sb.AppendLine($"[{p.Name}](property://{p.DeclaringType.TypeFullName()}.{p.Name})</br>");
@@ -132,7 +136,7 @@ namespace StepBro.Core.DocCreation
                         var overloaded = methods.Where(m => m.Name.Equals(methodName)).ToList();
                         if (overloaded.Count > 1)
                         {
-                            sb.AppendLine($"[{methodName}](method://{overloaded[0].DeclaringType.TypeFullName()}.{overloaded[0].Name}) and {overloaded.Count - 1} overloaded </br>");
+                            sb.AppendLine($"[{methodName}](method://{overloaded[0].DeclaringType.TypeFullName()}.{overloaded[0].Name}) ({overloaded.Count} overloaded methods) </br>");
                         }
                         else
                         {
@@ -158,7 +162,7 @@ namespace StepBro.Core.DocCreation
                         var overloaded = methods.Where(m => m.Name.Equals(methodName)).ToList();
                         if (overloaded.Count > 1)
                         {
-                            sb.AppendLine($"[{methodName}](method://{overloaded[0].DeclaringType.TypeFullName()}.{overloaded[0].Name}) and {overloaded.Count - 1} overloaded </br>");
+                            sb.AppendLine($"[{methodName}](method://{overloaded[0].DeclaringType.TypeFullName()}.{overloaded[0].Name}) ({overloaded.Count} overloaded methods) </br>");
                         }
                         else
                         {
