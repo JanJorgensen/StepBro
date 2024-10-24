@@ -434,6 +434,20 @@ namespace StepBro.TestInterface
 
         #endregion
 
+        #region Non-textual receiver queue
+
+        public bool TryDequeue(out TimestampedString received)
+        {
+            return m_stream.TryDequeue(out received);
+        }
+
+        public string TryDequeue()
+        {
+            return m_stream.TryDequeue();
+        }
+
+        #endregion
+
         public IParametersAccess Parameters { get { throw new NotImplementedException(); } }
 
         public IRemoteProcedures RemoteProcedures { get { return this; } }
