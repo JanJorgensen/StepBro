@@ -31,7 +31,7 @@
 
   <PropertyGroup>
     <ActiproVersion>24.1.0</ActiproVersion>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
   </PropertyGroup>
 
   <ItemGroup>
