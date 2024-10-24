@@ -355,7 +355,7 @@ namespace StepBro.TestInterface
                     if (m_stream != null)
                     {
                         m_stream.OnLineReceiverTaskLoop -= OnReceiverThreadLoop;
-                        m_stream.SetupLineReceiver(null);
+                        m_stream.SetupLineReceiver(null, false);
                         m_stream.IsOpenChanged -= m_stream_IsOpenChanged;
                         m_stream = null;
                     }
@@ -367,7 +367,7 @@ namespace StepBro.TestInterface
                         m_stream.ReadTimeout = 500;
                         m_stream.IsOpenChanged += m_stream_IsOpenChanged;
                         m_stream.OnLineReceiverTaskLoop += OnReceiverThreadLoop;
-                        m_stream.SetupLineReceiver(this.OnTextLineReceived);
+                        m_stream.SetupLineReceiver(this.OnTextLineReceived, true);
                     }
                 }
             }
@@ -440,10 +440,18 @@ namespace StepBro.TestInterface
         {
             return m_stream.TryDequeue(out received);
         }
+        public bool TryDequeue(TimeSpan timeout, out TimestampedString received)
+        {
+            return m_stream.TryDequeue(timeout, out received);
+        }
 
         public string TryDequeue()
         {
-            return m_stream.TryDequeue();
+            return m_stream?.TryDequeue();
+        }
+        public string TryDequeue(TimeSpan timeout)
+        {
+            return m_stream?.TryDequeue(timeout);
         }
 
         #endregion

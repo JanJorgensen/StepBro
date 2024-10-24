@@ -109,8 +109,8 @@ namespace StepBro.Streams
                     else
                     {
                         this.StopTextLineReceiverTask();
-                        this.SetupLineReceiver(null);       // First this,
-                        this.DeleteLineReceiveQueue();      // .. then this.
+                        this.SetupLineReceiver(null, false);    // First this,
+                        this.DeleteLineReceiveQueue();          // .. then this.
                     }
                 }
             }
@@ -137,12 +137,15 @@ namespace StepBro.Streams
             }
         }
 
-        public void SetupLineReceiver(LineReceivedHandler receiver)
+        public void SetupLineReceiver(LineReceivedHandler receiver, bool keepReceiveQueue)
         {
             if (receiver != null)
             {
                 m_lineReceiver = receiver;
-                this.DeleteLineReceiveQueue();      // The queue is not used, then.
+                if (!keepReceiveQueue)
+                {
+                    this.DeleteLineReceiveQueue();      // The queue is not used, then.
+                }
             }
             else
             {
@@ -283,6 +286,20 @@ namespace StepBro.Streams
             }
         }
 
+        public void InjectReceivedLine(string line)
+        {
+            if (m_lineReceiver == null || !m_lineReceiver(line))
+            {
+                lock (m_sync)
+                {
+                    if (m_lineReceiveQueue != null)
+                    {
+                        m_lineReceiveQueue.Enqueue(new TimestampedString(DateTime.UtcNow, line));
+                    }
+                }
+            }
+        }
+
         public abstract void Write([Implicit] StepBro.Core.Execution.ICallContext context, string text);
 
         public void WriteLine([Implicit] StepBro.Core.Execution.ICallContext context, string text)
@@ -338,6 +355,28 @@ namespace StepBro.Streams
 
         public abstract void DiscardInBuffer();
 
+        public bool TryDequeue(TimeSpan timeout, out TimestampedString received)
+        {
+            if (m_lineReceiveQueue != null)
+            {
+                var entryTime = DateTime.UtcNow;
+                do
+                {
+                    if (m_lineReceiveQueue.TryDequeue(out received))
+                    {
+                        return true;
+                    }
+                    System.Threading.Thread.Sleep(10);
+                } while ((DateTime.UtcNow - entryTime) < timeout);
+                return false;
+            }
+            else
+            {
+                received = null;
+                return false;
+            }
+        }
+
         public bool TryDequeue(out TimestampedString received)
         {
             if (m_lineReceiveQueue != null)
@@ -349,6 +388,25 @@ namespace StepBro.Streams
                 received = null;
                 return false;
             }
+        }
+
+        public string TryDequeue(TimeSpan timeout)
+        {
+            if (m_lineReceiveQueue != null)
+            {
+                var entryTime = DateTime.UtcNow;
+                do
+                {
+                    TimestampedString received;
+                    if (m_lineReceiveQueue.TryDequeue(out received))
+                    {
+                        return received.Data;
+                    }
+                    System.Threading.Thread.Sleep(10);
+                } while ((DateTime.UtcNow - entryTime) < timeout);
+                return null;
+            }
+            return null;
         }
 
         public string TryDequeue()
