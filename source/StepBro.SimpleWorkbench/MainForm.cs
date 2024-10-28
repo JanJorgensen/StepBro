@@ -54,6 +54,8 @@ namespace StepBro.SimpleWorkbench
         private TestReportOverview m_reportOverview = null;
         private ToolWindow m_toolWindowDocCommentPreview = null;
         private DocCommentsPreview m_selectionDocView = null;
+        private ToolWindow m_toolWindowUserInteraction = null;
+        private UserInteractionHostPanel m_userInteractionView = null;
 
         private ToolWindow m_toolWindowParsingErrors = null;
         private ParsingErrorListView m_errorsList = null;
@@ -70,6 +72,8 @@ namespace StepBro.SimpleWorkbench
         private string m_targetFileFullPath = null;
         private IScriptFile m_file = null;
 
+        private IFileElement m_focusElement = null;
+
         private ObservableCollection<IObjectContainer> m_objects = new ObservableCollection<IObjectContainer>();
         private ObservableCollection<IFileElement> m_fileElements = new ObservableCollection<IFileElement>();
         private Dictionary<string, TypeReference> m_variableTypes = new Dictionary<string, TypeReference>();
@@ -79,6 +83,8 @@ namespace StepBro.SimpleWorkbench
         private string m_selectedOutputAddon = OutputSimpleCleartextAddon.Name;
         private static IOutputFormatterTypeAddon m_outputAddon = null;
         private IOutputFormatter m_outputFormatter = null;
+
+        private UserInteraction m_currentUserInteractionData = null;
 
         //private IFileElement m_element = null;
         //private IPartner m_partner = null;
@@ -147,7 +153,7 @@ namespace StepBro.SimpleWorkbench
             base.OnLoad(e);
 
             IService m_hostService = null;
-            m_hostAccess = new HostAccess(out m_hostService);
+            m_hostAccess = new HostAccess(this, out m_hostService);
             StepBroMain.Initialize(m_hostService);
             m_mainLogger = StepBroMain.Logger.RootLogger.CreateSubLocation("StepBro.Workbench");
             m_loadedFiles = StepBroMain.GetLoadedFilesManager();
@@ -193,6 +199,16 @@ namespace StepBro.SimpleWorkbench
             m_toolWindowDocCommentPreview = new ToolWindow(dockManager, "SelectionDocView", "Selection Documentation", null, m_selectionDocView);
             m_toolWindowDocCommentPreview.DockTo(dockManager, DockOperationType.RightInner);
             m_toolWindowDocCommentPreview.Close();
+
+            m_userInteractionView = new UserInteractionHostPanel();
+            m_toolWindowUserInteraction = new ToolWindow(dockManager, "UserInteractionView", "User Interaction", null, m_userInteractionView);
+            m_toolWindowUserInteraction.DockTo(dockManager, DockOperationType.RightInner);
+            m_toolWindowUserInteraction.State = ToolWindowState.TabbedDocument;
+            m_toolWindowUserInteraction.Close();
+
+            //            private ToolWindow m_toolWindowUserInteraction = null;
+            //private UserInteractionHostPanel m_userInteractionView = null;
+
 
             // TO BE DELETED
             dockManager.SaveCustomToolWindowLayoutData += DockManager_SaveCustomToolWindowLayoutData;
@@ -607,6 +623,14 @@ namespace StepBro.SimpleWorkbench
 
         #region Run Button and DropDown
 
+        private void SetFocusedFileElement(IFileElement element)
+        {
+            if (!Object.ReferenceEquals(element, m_focusElement))
+            {
+                m_focusElement = element;
+            }
+        }
+
         private void toolStripTextBoxRunSearch_TextChanged(object sender, EventArgs e)
         {
             this.UpdateFileElementExecutionSearchResult();
@@ -625,6 +649,22 @@ namespace StepBro.SimpleWorkbench
 
         private void toolStripSplitButtonRunScript_DropDownOpening(object sender, EventArgs e)
         {
+            if (!Object.Equals(toolStripSplitButtonRunScript.DropDownItems[0], toolStripMenuItemRunByNamespace))
+            {
+                toolStripSplitButtonRunScript.DropDownItems.RemoveAt(0);
+            }
+
+            if (m_focusElement is IFileProcedure focusProc)
+            {
+                var entry = this.CreateProcedureShortcutMenu(focusProc);
+                toolStripSplitButtonRunScript.DropDownItems.Insert(0, entry);
+            }
+            if (m_focusElement is ITestList focusTestList)
+            {
+                var entry = this.CreateTestListShortcutMenu(focusTestList);
+                toolStripSplitButtonRunScript.DropDownItems.Insert(0, entry);
+            }
+
             this.UpdateFileElementExecutionSearchResult(); // In case files have changed.
         }
 
@@ -1464,6 +1504,10 @@ namespace StepBro.SimpleWorkbench
                                 }
                                 System.Diagnostics.Debug.WriteLine("------------- Found Symbol: " + symbol.GetType().FullName);
                                 m_selectionDocView.ShowObjectDocumentation(symbol);
+                                if (symbol is IFileElement fileElement)
+                                {
+                                    this.SetFocusedFileElement(fileElement);
+                                }
                             }
                         }
                     }
@@ -1560,6 +1604,13 @@ namespace StepBro.SimpleWorkbench
                 System.Diagnostics.Debug.WriteLine("FileSelectionChanged: " + e.NodeData.ToString() + " - " + e.Selection.ToString());
             }
 
+            if (e.Selection == FileExplorer.SelectionEventArgs.SelectionType.Selected)
+            {
+                if (e.NodeData is IFileElement element)
+                {
+                    this.SetFocusedFileElement(element);
+                }
+            }
             if (e.Selection == FileExplorer.SelectionEventArgs.SelectionType.Activated)
             {
                 if (e.NodeData is ILoadedFile file)
@@ -2042,6 +2093,44 @@ namespace StepBro.SimpleWorkbench
         private void toolStripMenuItemCreateProjectOverview_Click(object sender, EventArgs e)
         {
 
+        }
+
+        internal void OpenUserInteraction(UserInteraction interaction)
+        {
+            if (m_currentUserInteractionData != null)
+            {
+                m_currentUserInteractionData.OnOpen -= CurrentUserInteractionData_OnOpen;
+                m_currentUserInteractionData.OnClose -= CurrentUserInteractionData_OnClose;
+                m_currentUserInteractionData = null;
+            }
+
+            m_currentUserInteractionData = interaction;
+            m_currentUserInteractionData.OnOpen += CurrentUserInteractionData_OnOpen;
+            m_currentUserInteractionData.OnClose += CurrentUserInteractionData_OnClose;
+            m_userInteractionView.Setup(m_currentUserInteractionData);
+        }
+
+        private void CurrentUserInteractionData_OnOpen(object sender, EventArgs e)
+        {
+            this.BeginInvoke(this.ShowUserInteractionView);
+        }
+
+        private void CurrentUserInteractionData_OnClose(object sender, EventArgs e)
+        {
+            this.BeginInvoke(this.CloseUserInteractionView);
+        }
+
+        private void ShowUserInteractionView()
+        {
+            m_toolWindowUserInteraction.Activate();
+        }
+
+        private void CloseUserInteractionView()
+        {
+            m_toolWindowUserInteraction.Close();
+            m_currentUserInteractionData.OnOpen -= CurrentUserInteractionData_OnOpen;
+            m_currentUserInteractionData.OnClose -= CurrentUserInteractionData_OnClose;
+            m_currentUserInteractionData = null;
         }
     }
 }

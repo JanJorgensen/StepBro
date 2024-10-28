@@ -194,6 +194,12 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
+        public static bool HostSupportsUserInteraction([Implicit] ICallContext context)
+        {
+            return context.HostApplication.SupportsUserInteraction;
+        }
+
+        [Public]
         public static UserInteraction SetupUserInteraction([Implicit] ICallContext context, string header)
         {
             return context.HostApplication.SetupUserInteraction(context, header);

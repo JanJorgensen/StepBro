@@ -13,8 +13,11 @@ namespace StepBro.SimpleWorkbench
 {
     public class HostAccess : StepBro.Core.Host.HostAccessBase<HostAccess>
     {
-        public HostAccess(out IService serviceAccess) : base("Host", out serviceAccess)
+        MainForm m_mainForm;
+
+        public HostAccess(MainForm mainForm, out IService serviceAccess) : base("Host", out serviceAccess)
         {
+            m_mainForm = mainForm;
         }
 
         public override HostType Type { get { return HostType.WinForms; } }
@@ -30,11 +33,14 @@ namespace StepBro.SimpleWorkbench
             yield break;
         }
 
-        public override bool SupportsUserInteraction {  get { return true; } }
+        public override bool SupportsUserInteraction { get { return true; } }
 
         public override UserInteraction SetupUserInteraction(ICallContext context, string header)
         {
-            return null;
+            var interaction = new UserInteraction();
+            interaction.HeaderText = header;
+            m_mainForm.OpenUserInteraction(interaction);
+            return interaction;
         }
     }
 }
