@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Management;
 using System.Security.AccessControl;
+using static StepBro.Core.Execution.ActionQueue;
+using System.Collections.Generic;
 
 namespace StepBro.Streams
 {
@@ -95,6 +97,43 @@ namespace StepBro.Streams
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
+        private static List<Tuple<string, string, string, string>> ListAvailablePortsInternal()
+        {
+            var list = new List<Tuple<string, string, string, string>>();
+            using (ManagementClass i_Entity = new ManagementClass("Win32_PnPEntity"))
+            {
+                foreach (ManagementObject i_Inst in i_Entity.GetInstances())
+                {
+                    // Solution found at: https://stackoverflow.com/questions/2837985/getting-serial-port-information
+
+                    Object classID = i_Inst.GetPropertyValue("ClassGuid");
+                    if (classID == null || classID.ToString().ToUpper() != "{4D36E978-E325-11CE-BFC1-08002BE10318}")
+                        continue; // Skip all devices except device class "PORTS"
+
+                    string caption = i_Inst.GetPropertyValue("Caption").ToString();
+                    string manufacturer = i_Inst.GetPropertyValue("Manufacturer").ToString();
+                    string deviceID = i_Inst.GetPropertyValue("PnpDeviceID").ToString();
+                    string regPath = "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Enum\\" + deviceID + "\\Device Parameters";
+                    string portName = Registry.GetValue(regPath, "PortName", "").ToString();
+
+                    int i = caption.IndexOf(" (COM");
+                    if (i > 0) // remove COM port from description
+                        caption = caption.Substring(0, i);
+                    var deviceIDParts = deviceID.Split(new char[] { '\\' });
+
+                    list.Add(new Tuple<string, string, string, string>(portName, caption, manufacturer, deviceIDParts[deviceIDParts.Length - 1]));
+                }
+            }
+            return list;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
+        public static System.Collections.Generic.List<string> ListAvailablePorts()
+        {
+            return ListAvailablePortsInternal().Select(p => p.Item1).ToList();
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
         protected override bool DoOpen(StepBro.Core.Execution.ICallContext context)
         {
             try
@@ -113,29 +152,9 @@ namespace StepBro.Streams
                 }
                 if (context != null && context.LoggingEnabled)
                 {
-                    using (ManagementClass i_Entity = new ManagementClass("Win32_PnPEntity"))
+                    foreach (var port in ListAvailablePortsInternal())
                     {
-                        foreach (ManagementObject i_Inst in i_Entity.GetInstances())
-                        {
-                            // Solution found at: https://stackoverflow.com/questions/2837985/getting-serial-port-information
-
-                            Object classID = i_Inst.GetPropertyValue("ClassGuid");
-                            if (classID == null || classID.ToString().ToUpper() != "{4D36E978-E325-11CE-BFC1-08002BE10318}")
-                                continue; // Skip all devices except device class "PORTS"
-
-                            string caption = i_Inst.GetPropertyValue("Caption").ToString();
-                            string manufacturer = i_Inst.GetPropertyValue("Manufacturer").ToString();
-                            string deviceID = i_Inst.GetPropertyValue("PnpDeviceID").ToString();
-                            string regPath = "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Enum\\" + deviceID + "\\Device Parameters";
-                            string portName = Registry.GetValue(regPath, "PortName", "").ToString();
-
-                            int i = caption.IndexOf(" (COM");
-                            if (i > 0) // remove COM port from description
-                                caption = caption.Substring(0, i);
-                            var deviceIDParts = deviceID.Split(new char[] { '\\' });
-
-                            context.Logger.Log($"Available port: {portName}, \"{caption}\" by {manufacturer}. ID: {deviceIDParts[deviceIDParts.Length - 1]}");
-                        }
+                        context.Logger.Log($"Available port: {port.Item1}, \"{port.Item2}\" by {port.Item3}. ID: {port.Item4}");
                     }
 
                     // Cross platform solution.
