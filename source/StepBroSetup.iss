@@ -58,11 +58,17 @@ Name: "{app}\scripts\smoketest"
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 [Files]
 Source: "bin\*"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs
+Source: "StepBro Station Properties.cfg"; DestDir: "{%USERPROFILE}\Documents"; Flags: onlyifdoesntexist
 
 [Registry]
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; \
     ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}\bin"; \
     Check: NeedsAddPath(ExpandConstant('{app}\bin'))
+
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; \
+    ValueType:string; ValueName: "STEPBRO_STATION_PROPERTIES"; \
+    ValueData: "{%USERPROFILE}\Documents\StepBro Station Properties.cfg"; Flags: preservestringtype; \
+    Check: NeedsAddEnvironmentVariable('STEPBRO_STATION_PROPERTIES');
 
 ; Add 'My PDF Editor' menu item to the Shell menu for PDF files:
 Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench"; ValueType: none; ValueName: ""; ValueData: ""; Flags: uninsdeletekey
@@ -86,4 +92,9 @@ begin
   { look for the path with leading and trailing semicolon }
   { Pos() returns 0 if not found }
   Result := Pos(';' + Param + ';', ';' + OrigPath + ';') = 0;
+end;
+
+function NeedsAddEnvironmentVariable(Param: string): boolean;
+begin
+  Result := GetEnv(Param) = '';
 end;
