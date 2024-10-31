@@ -506,7 +506,24 @@ namespace StepBro.Core.Parser
                             Expression.Constant(((FileConstant)element).Value), ((FileConstant)element).Value);
                         break;
                     case FileElementType.Config:
-                        throw new NotImplementedException();
+                        {
+                            var configVariable = element as FileConfigValue;
+                            var container = configVariable.VariableOwnerAccess.Container;
+                            var containerType = typeof(IValueContainer<>).MakeGenericType(container.DataType.Type);
+                            var getGlobalVariableTyped = s_GetGlobalVariable.MakeGenericMethod(container.DataType.Type);
+                            var context = (m_inFunctionScope) ? m_currentProcedure.ContextReferenceInternal : Expression.Constant(null, typeof(Execution.IScriptCallContext));
+                            result = new SBExpressionData(
+                                HomeType.Immediate,
+                                SBExpressionType.GlobalVariableReference,
+                                (TypeReference)containerType,
+                                Expression.Call(
+                                    getGlobalVariableTyped,
+                                    context,
+                                    Expression.Constant((container as IValueContainer).UniqueID)),
+                                configVariable,                                                         // Make access to the file element, and thereby the declared type.
+                                instanceName: identifier.Name);
+                        }
+                        break;
                     case FileElementType.ProcedureDeclaration:
                         {
                             var procedure = element as FileProcedure;

@@ -31,6 +31,7 @@ namespace StepBro.Core.ScriptData
         private List<UsingData> m_fileUsings = new List<UsingData>();
         private PropertyBlock m_fileProperties = null;
         private List<FileConfigValue> m_fileConfigVariables = new List<FileConfigValue>();
+        private List<FileConfigValue> m_fileConfigVariablesBefore = new List<FileConfigValue>();
         private List<FileVariable> m_fileScopeVariables = new List<FileVariable>();
         private List<FileVariable> m_fileScopeVariablesBefore = new List<FileVariable>();
         private List<FileElement> m_elements = new List<FileElement>();
@@ -319,16 +320,42 @@ namespace StepBro.Core.ScriptData
             AccessModifier access,
             string name,
             TypeReference datatype,
-            bool @readonly,
+            int lineFileElementAssociatedData,
             int line,
             int column,
             object defaultValue)
         {
-            return -1;
+            var existing = m_fileConfigVariables.FirstOrDefault(
+                v => (v.VariableOwnerAccess != null &&
+                        String.Equals(v.VariableOwnerAccess.Container.Name, name, StringComparison.InvariantCulture) &&
+                        v.VariableOwnerAccess.Container.DataType.Type == datatype.Type));
+            if (existing != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"Using existing config variable \"{name}\" (in {this.FileName}), with ID {existing.ID}");
+                existing.VariableOwnerAccess.SetValue(defaultValue, null);
+                m_fileConfigVariables.Add(existing);
+                m_fileConfigVariablesBefore.RemoveAt(m_fileConfigVariablesBefore.IndexOf(existing));
+                existing.AccessLevel = (access == AccessModifier.None) ? AccessModifier.Public : access;
+                existing.LineAssociatedData = lineFileElementAssociatedData;
+                return existing.ID;
+            }
+
+            var vc = FileConfigValue.Create(this, access, @namespace, name, line, column, datatype, defaultValue);
+            vc.LineAssociatedData = lineFileElementAssociatedData;
+            m_fileConfigVariables.Add(vc);
+            this.ObjectContainerListChanged?.Invoke(this, EventArgs.Empty);
+            return vc.ID;
         }
 
         private IValueContainerOwnerAccess TryGetVariable(int id)
         {
+            foreach (var v in m_fileConfigVariables)
+            {
+                if (v.VariableOwnerAccess.Container.UniqueID == id)
+                {
+                    return v.VariableOwnerAccess;
+                }
+            }
             foreach (var v in m_fileScopeVariables)
             {
                 if (v.VariableOwnerAccess.Container.UniqueID == id)
@@ -440,7 +467,10 @@ namespace StepBro.Core.ScriptData
         {
             var variable = this.TryGetVariable(id);
             if (variable == null) throw new ArgumentException("Unknown variable ID.");
-            variable.SetAccessModifier(access);
+            if (access != AccessModifier.None)
+            {
+                variable.SetAccessModifier(access);
+            }
         }
 
         internal IProcedureReference GetProcedure(int id)
@@ -540,6 +570,8 @@ namespace StepBro.Core.ScriptData
 
         public void SaveCurrentFileVariables()
         {
+            m_fileConfigVariablesBefore = m_fileConfigVariables;
+            m_fileConfigVariables = new List<FileConfigValue>();
             m_fileScopeVariablesBefore = m_fileScopeVariables;
             m_fileScopeVariables = new List<FileVariable>();
         }

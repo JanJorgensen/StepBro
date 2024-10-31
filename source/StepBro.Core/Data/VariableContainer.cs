@@ -10,6 +10,9 @@ namespace StepBro.Core.Data
         IValueContainer Container { get; }
         void SetUniqueID(int id);
         void SetValue(object value, ILogger logger);
+        void SetValueOverride(bool doOverride, object value);
+        bool UsingValueOverride { get; }
+        object OverrideValue { get; }
         bool DataCreated { get; }
         bool InitNeeded { get; set; }
         void SetAccessModifier(AccessModifier access);
@@ -20,7 +23,7 @@ namespace StepBro.Core.Data
         int FileLine { get; set; }
         int FileColumn { get; set; }
         int CodeHash { get; set; }
-        Dictionary<string,object> Tags { get; set; }
+        Dictionary<string, object> Tags { get; set; }
     }
 
     public delegate bool VariableContainerAction(IScriptFile file, IValueContainerOwnerAccess container, ILogger logger);
@@ -58,8 +61,14 @@ namespace StepBro.Core.Data
             public void SetValue(object value, ILogger logger = null)
             {
                 m_container.SetValue(value, logger, true);
-                m_dataIsSet = (value!= null);
+                m_dataIsSet = (value != null);
             }
+            public void SetValueOverride(bool doOverride, object value)
+            {
+                m_container.SetValueOverride(doOverride, value);
+            }
+            public bool UsingValueOverride { get { return m_container.UsingValueOverride; } }
+            public object OverrideValue { get { return m_container.OverrideValue; } }
 
             public bool DataCreated { get { return m_dataIsSet; } }
             public bool InitNeeded { get; set; } = true;
@@ -77,7 +86,7 @@ namespace StepBro.Core.Data
             public int FileLine { get; set; }
             public int FileColumn { get; set; }
             public int CodeHash { get; set; }
-            public Dictionary<string,object> Tags { get; set; } = null;
+            public Dictionary<string, object> Tags { get; set; } = null;
 
             public bool IsStillValid { get { return disposedValue == false; } }
 
@@ -116,6 +125,8 @@ namespace StepBro.Core.Data
         private readonly string m_name;
         private readonly TypeReference m_declaredType;
         private T m_value;
+        private bool m_useOverrideValue = false;
+        private T m_overrideValue;
         private readonly bool m_readonly;
         private AccessModifier m_access = AccessModifier.None;
         private int m_valueChangeIndex = 0;
@@ -241,7 +252,7 @@ namespace StepBro.Core.Data
 
         public object GetValue(ILogger logger = null)
         {
-            return m_value;
+            return m_useOverrideValue ? m_overrideValue : m_value;
         }
 
         public void SetValue(object value, ILogger logger = null)
@@ -301,7 +312,7 @@ namespace StepBro.Core.Data
 
         public T GetTypedValue(ILogger logger = null)
         {
-            return m_value;
+            return m_useOverrideValue ? m_overrideValue : m_value;
         }
 
         public T Modify(ValueContainerModifier<T> modifier, ILogger logger = null)
@@ -318,6 +329,34 @@ namespace StepBro.Core.Data
                 return vRet;
             }
         }
+
+        private void SetValueOverride(bool doOverride, object value)
+        {
+            m_useOverrideValue = doOverride;
+            if (typeof(T).IsPrimitive)
+            {
+                if (m_value != null && m_value.Equals(value)) return;
+            }
+            else
+            {
+                if (m_value == null)
+                {
+                    if (value == null) return;
+                }
+                else if (value == null || Object.ReferenceEquals(m_value, value))
+                {
+                    return;
+                }
+            }
+
+            m_overrideValue = (T)value;
+            m_valueChangeIndex++;
+            this.ValueChanged?.Invoke(this, EventArgs.Empty);
+            this.ObjectReplaced?.Invoke(this, EventArgs.Empty);
+        }
+
+        bool UsingValueOverride { get { return m_useOverrideValue; } }
+        object OverrideValue { get { return m_overrideValue; } }
     }
 
     public static class VariableContainer
@@ -347,10 +386,9 @@ namespace StepBro.Core.Data
             }
         }
 
-        public static IValueContainerOwnerAccess Create(string @namespace, string name, TypeReference type, bool readOnly)
+        public static IValueContainerOwnerAccess Create(string @namespace, string name, TypeReference type, bool readOnly, object defaultValue = null)
         {
-            object defaultValue = null;
-            if (type.Type.IsValueType)
+            if (defaultValue == null && type.Type.IsValueType)
             {
                 defaultValue = Activator.CreateInstance(type.Type);
             }

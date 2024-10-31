@@ -8,7 +8,7 @@ namespace StepBro.Core.ScriptData
     {
         private readonly IValueContainerOwnerAccess m_variableAccess;
         private readonly int m_id;
-        private readonly object m_defaultValue;
+        //private readonly object m_defaultValue;
 
         public FileConfigValue(
             IScriptFile file,
@@ -16,12 +16,12 @@ namespace StepBro.Core.ScriptData
             int line,
             string @namespace,
             string name,
-            IValueContainerOwnerAccess variableAccess, int id, object defaultValue) :
+            IValueContainerOwnerAccess variableAccess, int id) :
                 base(file, line, null, @namespace, name, access, FileElementType.Config)
         {
             m_variableAccess = variableAccess;
             m_id = id;
-            m_defaultValue = defaultValue;
+            //m_defaultValue = defaultValue;
         }
 
         public IValueContainerOwnerAccess VariableOwnerAccess { get { return m_variableAccess; } }
@@ -36,15 +36,16 @@ namespace StepBro.Core.ScriptData
             IValueContainerOwnerAccess vcOwnerAccess = null;
             if (type.Type != null)
             {
-                vcOwnerAccess = VariableContainer.Create(@namespace, name, type, readOnly: true);
+                vcOwnerAccess = VariableContainer.Create(@namespace, name, type, readOnly: true, defaultValue: value);
                 System.Diagnostics.Debug.WriteLine($"Creating config value \"{name}\" (in {file.FileName}), with ID {vcOwnerAccess.Container.UniqueID}");
+                vcOwnerAccess.SetAccessModifier(access);
                 vcOwnerAccess.File = file;
                 vcOwnerAccess.FileLine = line;
                 vcOwnerAccess.FileColumn = column;
-                //vcOwnerAccess.CodeHash = codeHash;
                 vcOwnerAccess.Tags = new Dictionary<string, Object>();
             }
-            return new FileConfigValue(file, access, line, @namespace, name, vcOwnerAccess, (vcOwnerAccess != null) ? vcOwnerAccess.Container.UniqueID : 0, value);
+
+            return new FileConfigValue(file, access, line, @namespace, name, vcOwnerAccess, (vcOwnerAccess != null) ? vcOwnerAccess.Container.UniqueID : 0);
         }
 
         protected override TypeReference GetDataType()

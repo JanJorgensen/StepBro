@@ -12,27 +12,20 @@ namespace StepBro.Core.Test.Parser
     [TestClass]
     public class TestConstAndConfig
     {
-        [TestMethod, Ignore]
+        [TestMethod]
         public void ParseConfigVariables()
         {
-            var var = FileBuilder.ParseConfigValue<long>("config int MAX_TEMPERATURE = 10 * 3;");
+            var var = FileBuilder.ParseConfigValue<long>("public config int MAX_TEMPERATURE = 10 * 3;");
             Assert.IsNotNull(var);
             Assert.AreEqual("MAX_TEMPERATURE", var.Name);
             Assert.ReferenceEquals(var.DataType, TypeReference.TypeInt64);
-            Assert.IsFalse(var.IsReadonly);
+            Assert.IsTrue(var.IsReadonly);
             Assert.AreEqual(AccessModifier.Public, var.AccessProtection);
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public void UseConfigVariables()
         {
-            var var = FileBuilder.ParseConfigValue<long>("config int MAX_TEMPERATURE = 10 * 3;");
-            Assert.IsNotNull(var);
-            Assert.AreEqual("MAX_TEMPERATURE", var.Name);
-            Assert.ReferenceEquals(var.DataType, TypeReference.TypeInt64);
-            Assert.IsFalse(var.IsReadonly);
-            Assert.AreEqual(AccessModifier.Public, var.AccessProtection);
-
             string f1 =
                 """
                 config int MAX_TEMPERATURE = 12 * 3;
@@ -59,7 +52,7 @@ namespace StepBro.Core.Test.Parser
             var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
 
             var result = taskContext.CallProcedure(procedure);
-            Assert.AreEqual(222L, (Int64)result);
+            Assert.AreEqual(3636L, (Int64)result);
         }
 
         [TestMethod]

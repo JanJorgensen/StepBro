@@ -42,6 +42,7 @@ namespace StepBro.Core.ScriptData
             if (type.Type != null)
             {
                 vcOwnerAccess = VariableContainer.Create(@namespace, name, type, readOnly);
+                vcOwnerAccess.SetAccessModifier(access);
                 System.Diagnostics.Debug.WriteLine($"Creating variable \"{name}\" (in {file.FileName}), with ID {vcOwnerAccess.Container.UniqueID}");
                 vcOwnerAccess.FileLine = line;
                 vcOwnerAccess.FileColumn = column;

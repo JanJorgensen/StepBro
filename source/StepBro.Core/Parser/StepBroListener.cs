@@ -264,24 +264,42 @@ namespace StepBro.Core.Parser
                     return;
                 }
             }
-            if (m_elementType == FileElementType.Const)
+
+            if (m_variableInitializer.IsConstant)
             {
-                if (m_variableInitializer.IsConstant)
+                if (m_elementType == FileElementType.Const)
                 {
-                    m_file.AddElement(new FileConstant(m_file, AccessModifier.Public, context.Start.Line, m_currentNamespace, m_variableName, m_variableInitializer.Value));
+                    m_file.AddElement(
+                        new FileConstant(
+                            m_file,
+                            m_fileElementModifier,
+                            context.Start.Line,
+                            m_currentNamespace,
+                            m_variableName,
+                            m_variableInitializer.Value));
                 }
-                else
+                else if (m_elementType == FileElementType.Config)
                 {
-                    m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Assignment expression is not a constant value.");
-                    return;
+                    var id = m_file.CreateOrGetConfigVariable(
+                        m_currentNamespace,
+                        m_fileElementModifier,
+                        m_variableName,
+                        type,
+                        m_lineFileElementAssociatedData,
+                        context.Start.Line,
+                        context.Start.Column,
+                        m_variableInitializer.Value);
+                    //m_file.SetFileVariableModifier(id, m_fileElementModifier);
                 }
             }
-            else if (m_elementType == FileElementType.Config)
+            else
             {
-                var id = m_file.CreateOrGetConfigVariable(
-                    m_currentNamespace, m_fileElementModifier, m_variableName, type, false,
-                    context.Start.Line, context.Start.Column, null);
-                m_file.SetFileVariableModifier(id, m_fileElementModifier);
+                m_errors.SymanticError(
+                    context.Start.Line,
+                    context.Start.Column,
+                    false,
+                    "Assignment expression is not a constant value.");
+                return;
             }
         }
 
