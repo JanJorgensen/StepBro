@@ -484,9 +484,21 @@ namespace StepBro.SimpleWorkbench
                 editor.IsChanged &&
                 dockManager.SelectedDocument.Tag is ILoadedFile file)
             {
-                File.WriteAllText(file.FilePath, editor.Text);
-                editor.SetChanged(false);
-                window.Modified = false;
+                try
+                {
+                    File.WriteAllText(file.FilePath, editor.Text);
+                    editor.SetChanged(false);
+                    window.Modified = false;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        this, 
+                        $"Failed to save \"{file.FilePath}\"", 
+                        "Save File", 
+                        MessageBoxButtons.OK, 
+                        MessageBoxIcon.Error);
+                }
             }
         }
 

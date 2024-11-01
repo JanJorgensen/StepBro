@@ -10,7 +10,7 @@ namespace StepBro.Core.ScriptData
     internal class FileElementDocumentation : FileElement
     {
         public FileElementDocumentation(IScriptFile file, int line, string @namespace, string name) :
-            base(file, line, null, @namespace, name, AccessModifier.Public, FileElementType.Datatable)
+            base(file, line, null, @namespace, name, AccessModifier.Public, FileElementType.Documentation)
         { }
 
         protected override TypeReference GetDataType()

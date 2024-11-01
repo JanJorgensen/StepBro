@@ -866,6 +866,31 @@ namespace StepBroCoreTest.Parser
             var result = taskContext.CallProcedure(procedureTop);
             Assert.AreEqual(3108L, result);
         }
+
+        [TestMethod]
+        public void FileParsing_DocumentationElement()
+        {
+            string f1 =
+                """
+                /// summary: Some documentation for the file.
+                /// And some more <br/> And yet some _more_.
+                documentation JustSomeDocLineWithoutAnyDocumentation;
+                void main()
+                {
+                    log("");
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var docElement = files[0].ListElements().FirstOrDefault(e => e.ElementType == FileElementType.Documentation) as FileElementDocumentation;
+            Assert.IsNotNull(docElement);
+            Assert.AreEqual(3, docElement.Line);
+            var documentation = docElement.GetDocumentation();
+            Assert.AreEqual(2, documentation.Count);
+        }
     }
 }
 

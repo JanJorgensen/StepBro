@@ -541,456 +541,455 @@ namespace StepBro.Core.Parser
             var fileListeners = new Dictionary<ScriptFile, StepBroListener>();
             var fileContexts = new Dictionary<ScriptFile, SBP.CompilationUnitContext>();
             var namespaceFiles = new Dictionary<string, IdentifierInfo>();
-
-            //==============================================================//
-            #region STEP 1: PRE-SCAN ALL FILES TO OPEN ALL DEPENDENCY FILES //
-            //==============================================================//
-            var fileParsingStack = new Queue<ScriptFile>(filesToParse);
-            while (fileParsingStack.Count > 0)
+            int totalErrors = 0;
+            try
             {
-                var file = fileParsingStack.Dequeue();
-                file.ResetBeforeParsing();
-                file.MarkForTypeScanning();
-                ITokenSource lexer = new Grammar.StepBroLexer(file.GetParserFileStream(services.Get<ITextFileSystem>()));
-                var tokens = new CommonTokenStream(lexer);
-                var parser = new SBP(tokens);
-                parser.RemoveErrorListeners();
-                (file.Errors as ErrorCollector).Clear();
-                parser.AddErrorListener(file.Errors as ErrorCollector);
-                parser.BuildParseTree = true;
-                var context = parser.compilationUnit();
-                fileContexts.Add(file, context);
-
-                if (String.IsNullOrEmpty(file.Namespace))
+                //==============================================================//
+                #region STEP 1: PRE-SCAN ALL FILES TO OPEN ALL DEPENDENCY FILES //
+                //==============================================================//
+                var fileParsingStack = new Queue<ScriptFile>(filesToParse);
+                while (fileParsingStack.Count > 0)
                 {
-                    file.SetNamespace(System.IO.Path.GetFileNameWithoutExtension(file.FileName));
-                }
+                    var file = fileParsingStack.Dequeue();
+                    file.ResetBeforeParsing();
+                    file.MarkForTypeScanning();
+                    ITokenSource lexer = new Grammar.StepBroLexer(file.GetParserFileStream(services.Get<ITextFileSystem>()));
+                    var tokens = new CommonTokenStream(lexer);
+                    var parser = new SBP(tokens);
+                    parser.RemoveErrorListeners();
+                    (file.Errors as ErrorCollector).Clear();
+                    parser.AddErrorListener(file.Errors as ErrorCollector);
+                    parser.BuildParseTree = true;
+                    var context = parser.compilationUnit();
+                    fileContexts.Add(file, context);
 
-                var docComments = new List<Tuple<int, ScriptDocumentation.DocCommentLineType, string>>();
-                foreach (var token in tokens.GetTokens())
-                {
-                    if (token.Type == Lexer.DOC_COMMENT)
+                    if (String.IsNullOrEmpty(file.Namespace))
                     {
-                        docComments.Add(new Tuple<int, ScriptDocumentation.DocCommentLineType, string>(token.Line, ScriptDocumentation.DocCommentLineType.Unspecified, token.Text));
+                        file.SetNamespace(System.IO.Path.GetFileNameWithoutExtension(file.FileName));
                     }
-                    else if (token.Type == Lexer.DOC_COMMENT_NAMED)
+
+                    var docComments = new List<Tuple<int, ScriptDocumentation.DocCommentLineType, string>>();
+                    foreach (var token in tokens.GetTokens())
                     {
-                        docComments.Add(new Tuple<int, ScriptDocumentation.DocCommentLineType, string>(token.Line, ScriptDocumentation.DocCommentLineType.Named, token.Text));
-                    }
-                    else if (token.Type == Lexer.DOC_COMMENT_TYPE_AND_NAMED)
-                    {
-                        docComments.Add(new Tuple<int, ScriptDocumentation.DocCommentLineType, string>(token.Line, ScriptDocumentation.DocCommentLineType.TypeAndNamed, token.Text));
-                    }
-                }
-                file.SetDocumentComments(docComments);
-
-                var visitor = new StepBroTypeVisitor();
-                visitor.Visit(context);
-
-                var scanListener = new StepBroTypeScanListener(file.Namespace);
-                var walker = new ParseTreeWalker();
-                walker.Walk(scanListener, context);
-
-                if (file.Errors.ErrorCount > 0) continue;   // Stop parsing this file
-
-                var parserListener = new StepBroListener(file.Errors as ErrorCollector, addons, file);
-                fileListeners.Add(file, parserListener);
-                var fileScanData = scanListener.GetContent();
-                file.PreScanFileContent = fileScanData;
-
-                System.Diagnostics.Debug.Assert(!String.IsNullOrEmpty(fileScanData.TopElement.Name));
-                file.SetNamespace(fileScanData.TopElement.Name);    // Update the namespace from the scanning.
-
-                foreach (var @using in fileScanData.ListUsings())
-                {
-                    var line = @using.Line;
-                    var type = @using.Type;
-                    var name = @using.Name;
-                    if (type == "i")
-                    {
-                        if (!file.AddNamespaceUsing(line, name))
+                        if (token.Type == Lexer.DOC_COMMENT)
                         {
-                            throw new Exception($"Namespace using already added ({name}).");
+                            docComments.Add(new Tuple<int, ScriptDocumentation.DocCommentLineType, string>(token.Line, ScriptDocumentation.DocCommentLineType.Unspecified, token.Text));
+                        }
+                        else if (token.Type == Lexer.DOC_COMMENT_NAMED)
+                        {
+                            docComments.Add(new Tuple<int, ScriptDocumentation.DocCommentLineType, string>(token.Line, ScriptDocumentation.DocCommentLineType.Named, token.Text));
+                        }
+                        else if (token.Type == Lexer.DOC_COMMENT_TYPE_AND_NAMED)
+                        {
+                            docComments.Add(new Tuple<int, ScriptDocumentation.DocCommentLineType, string>(token.Line, ScriptDocumentation.DocCommentLineType.TypeAndNamed, token.Text));
                         }
                     }
-                    else if (type == "p")
-                    {
-                        if (!file.AddFileUsing(line, @using.IsPublic, name))
-                        {
-                            throw new Exception($"File using already added ({name}).");
-                        }
-                    }
-                    else throw new Exception($"Unhandled using type: {type}");
-                }
+                    file.SetDocumentComments(docComments);
 
-                file.ResolveFileUsings(
-                    (fu, line) =>
-                    {
-                        string basefolder = Path.GetDirectoryName(file.GetFullPath());
-                        var fuName = Path.GetFileName(fu);
+                    var visitor = new StepBroTypeVisitor();
+                    visitor.Visit(context);
 
-                        // Check the already parsed or loaded files first.
-                        foreach (var f in filesToParse)
+                    var scanListener = new StepBroTypeScanListener(file.Namespace);
+                    var walker = new ParseTreeWalker();
+                    walker.Walk(scanListener, context);
+
+                    if (file.Errors.ErrorCount > 0) continue;   // Stop parsing this file
+
+                    var parserListener = new StepBroListener(file.Errors as ErrorCollector, addons, file);
+                    fileListeners.Add(file, parserListener);
+                    var fileScanData = scanListener.GetContent();
+                    file.PreScanFileContent = fileScanData;
+
+                    System.Diagnostics.Debug.Assert(!String.IsNullOrEmpty(fileScanData.TopElement.Name));
+                    file.SetNamespace(fileScanData.TopElement.Name);    // Update the namespace from the scanning.
+
+                    foreach (var @using in fileScanData.ListUsings())
+                    {
+                        var line = @using.Line;
+                        var type = @using.Type;
+                        var name = @using.Name;
+                        if (type == "i")
                         {
-                            if (!Object.ReferenceEquals(file, f) && String.Equals(fuName, f.FileName, StringComparison.InvariantCulture))
+                            if (!file.AddNamespaceUsing(line, name))
                             {
-                                return f;
+                                throw new Exception($"Namespace using already added ({name}).");
                             }
                         }
-                        foreach (var f in filesManager.ListFiles<ScriptFile>())
+                        else if (type == "p")
                         {
-                            if (!Object.ReferenceEquals(file, f) && String.Equals(fuName, f.FileName, StringComparison.InvariantCulture))
+                            if (!file.AddFileUsing(line, @using.IsPublic, name))
                             {
-                                fileParsingStack.Enqueue(f);
-                                filesToParse.Insert(0, f);      // Put in front
-                                return f;
+                                throw new Exception($"File using already added ({name}).");
                             }
                         }
+                        else throw new Exception($"Unhandled using type: {type}");
+                    }
 
-                        // File was not found among the already loaded files. Try loading the file.
-
-                        string foundMatchingFile = null;
-
-                        if (fu.Contains("["))     // It's a path using a folder shortcut.
+                    file.ResolveFileUsings(
+                        (fu, line) =>
                         {
-                            string error = null;
-                            string path = shortcutsManager.ListShortcuts().ResolveShortcutPath(fu, ref error);
-                            if (String.IsNullOrEmpty(path))
+                            string basefolder = Path.GetDirectoryName(file.GetFullPath());
+                            var fuName = Path.GetFileName(fu);
+
+                            // Check the already parsed or loaded files first.
+                            foreach (var f in filesToParse)
                             {
-                                string errorText = ".";
-                                if (!String.IsNullOrEmpty(error))
+                                if (!Object.ReferenceEquals(file, f) && String.Equals(fuName, f.FileName, StringComparison.InvariantCulture))
                                 {
-                                    errorText = "; " + error;
-                                }
-                                file.ErrorsInternal.SymanticError(line, -1, false, $"Parsing '{file.FileName}': Unable to resolve using path \"{fu}\"{errorText}");
-                            }
-                            else
-                            {
-                                if (System.IO.File.Exists(path))
-                                {
-                                    foundMatchingFile = path;
+                                    return f;
                                 }
                             }
-                        }
-                        else if (fu.Contains("\\") || fu.Contains("/"))     // It's a relative or absolute path
-                        {
-                            string path = Path.GetFullPath(Path.Combine(basefolder, fu));
-                            if (System.IO.File.Exists(path))
+                            foreach (var f in filesManager.ListFiles<ScriptFile>())
                             {
-                                foundMatchingFile = path;
+                                if (!Object.ReferenceEquals(file, f) && String.Equals(fuName, f.FileName, StringComparison.InvariantCulture))
+                                {
+                                    fileParsingStack.Enqueue(f);
+                                    filesToParse.Insert(0, f);      // Put in front
+                                    return f;
+                                }
                             }
-                        }
-                        else
-                        {
-                            // Start at the location of this file.
-                            while (basefolder != Path.GetPathRoot(basefolder))
+
+                            // File was not found among the already loaded files. Try loading the file.
+
+                            string foundMatchingFile = null;
+
+                            if (fu.Contains("["))     // It's a path using a folder shortcut.
+                            {
+                                string error = null;
+                                string path = shortcutsManager.ListShortcuts().ResolveShortcutPath(fu, ref error);
+                                if (String.IsNullOrEmpty(path))
+                                {
+                                    string errorText = ".";
+                                    if (!String.IsNullOrEmpty(error))
+                                    {
+                                        errorText = "; " + error;
+                                    }
+                                    file.ErrorsInternal.SymanticError(line, -1, false, $"Parsing '{file.FileName}': Unable to resolve using path \"{fu}\"{errorText}");
+                                }
+                                else
+                                {
+                                    if (System.IO.File.Exists(path))
+                                    {
+                                        foundMatchingFile = path;
+                                    }
+                                }
+                            }
+                            else if (fu.Contains("\\") || fu.Contains("/"))     // It's a relative or absolute path
                             {
                                 string path = Path.GetFullPath(Path.Combine(basefolder, fu));
                                 if (System.IO.File.Exists(path))
                                 {
                                     foundMatchingFile = path;
-                                    break;
                                 }
-
-                                var cfgFile = Path.GetFullPath(Path.Combine(basefolder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
-                                if (System.IO.File.Exists(cfgFile))
+                            }
+                            else
+                            {
+                                // Start at the location of this file.
+                                while (basefolder != Path.GetPathRoot(basefolder))
                                 {
-                                    var folderConfig = file.TryOpenFolderConfiguration(configFileManager, line, cfgFile);
-
-
-                                    //var errors = new List<Tuple<int, string>>();
-                                    //var folderConfig = configFileManager.ReadFolderConfig(cfgFile, errors);
-
-                                    //if (errors.Count > 0)
-                                    //{
-                                    //    var errortext = "";
-                                    //    foreach (var e in errors)
-                                    //    {
-                                    //        if (e.Item1 <= 0) errortext = $"Config file '{cfgFile}': {e.Item2}";
-                                    //        else errortext = $"Config file '{cfgFile}' line {e.Item1}: {e.Item2}";
-                                    //    }
-
-                                    //    file.ErrorsInternal.ConfigError(line, 0, errortext);
-                                    //}
-
-                                    if (folderConfig != null)
+                                    string path = Path.GetFullPath(Path.Combine(basefolder, fu));
+                                    if (System.IO.File.Exists(path))
                                     {
-                                        //file.AddFolderConfig(folderConfig);
+                                        foundMatchingFile = path;
+                                        break;
+                                    }
 
-                                        foreach (var lib in folderConfig.LibFolders)
+                                    var cfgFile = Path.GetFullPath(Path.Combine(basefolder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
+                                    if (System.IO.File.Exists(cfgFile))
+                                    {
+                                        var folderConfig = file.TryOpenFolderConfiguration(configFileManager, line, cfgFile);
+
+
+                                        //var errors = new List<Tuple<int, string>>();
+                                        //var folderConfig = configFileManager.ReadFolderConfig(cfgFile, errors);
+
+                                        //if (errors.Count > 0)
+                                        //{
+                                        //    var errortext = "";
+                                        //    foreach (var e in errors)
+                                        //    {
+                                        //        if (e.Item1 <= 0) errortext = $"Config file '{cfgFile}': {e.Item2}";
+                                        //        else errortext = $"Config file '{cfgFile}' line {e.Item1}: {e.Item2}";
+                                        //    }
+
+                                        //    file.ErrorsInternal.ConfigError(line, 0, errortext);
+                                        //}
+
+                                        if (folderConfig != null)
                                         {
-                                            path = Path.GetFullPath(Path.Combine(basefolder, lib, fu));
-                                            if (System.IO.File.Exists(path))
+                                            //file.AddFolderConfig(folderConfig);
+
+                                            foreach (var lib in folderConfig.LibFolders)
                                             {
-                                                foundMatchingFile = path;
-                                                break;
+                                                path = Path.GetFullPath(Path.Combine(basefolder, lib, fu));
+                                                if (System.IO.File.Exists(path))
+                                                {
+                                                    foundMatchingFile = path;
+                                                    break;
+                                                }
+                                            }
+                                            if (folderConfig.IsSearchRoot)
+                                            {
+                                                break;  // Don't search deeper now.
                                             }
                                         }
-                                        if (folderConfig.IsSearchRoot)
-                                        {
-                                            break;  // Don't search deeper now.
-                                        }
                                     }
+
+                                    // Not found yet; try the parent folder.
+                                    basefolder = Path.GetDirectoryName(basefolder);
                                 }
-
-                                // Not found yet; try the parent folder.
-                                basefolder = Path.GetDirectoryName(basefolder);
                             }
-                        }
 
-                        if (foundMatchingFile != null)
-                        {
-                            // Load and add file to fileParsingStack
-                            if (Main.LoadScriptFile(parserUser, filepath: foundMatchingFile) is ScriptFile loadedFile)
+                            if (foundMatchingFile != null)
                             {
-                                // Note: The parser will set the current scriptfile as a dependant.
-
-                                fileParsingStack.Enqueue(loadedFile);
-                                filesToParse.Add(loadedFile);
-                                return loadedFile;
-                            }
-                        }
-
-                        return null;    // Not found!
-                    }
-                );
-                file.ResolveNamespaceUsings(
-                    id =>
-                    {
-                        var foundIdentifier = addons.Lookup(null, id);
-                        if (foundIdentifier != null)
-                        {
-                            return foundIdentifier;
-                        }
-                        var scriptFilesInNamespace = new List<ScriptFile>();
-                        foreach (var f in filesToParse)
-                        {
-                            if (f.Namespace.Equals(id, StringComparison.InvariantCulture))
-                            {
-                                if (foundIdentifier == null)
+                                // Load and add file to fileParsingStack
+                                if (Main.LoadScriptFile(parserUser, filepath: foundMatchingFile) is ScriptFile loadedFile)
                                 {
-                                    foundIdentifier = new IdentifierInfo(id, id, IdentifierType.FileNamespace, null, scriptFilesInNamespace);
+                                    // Note: The parser will set the current scriptfile as a dependant.
+
+                                    fileParsingStack.Enqueue(loadedFile);
+                                    filesToParse.Add(loadedFile);
+                                    return loadedFile;
                                 }
-                                scriptFilesInNamespace.Add(f);  // More files can have same namespace.
                             }
+
+                            return null;    // Not found!
                         }
-                        if (foundIdentifier != null)
+                    );
+                    file.ResolveNamespaceUsings(
+                        id =>
                         {
-                            return foundIdentifier;
-                        }
-                        foreach (var f in filesManager.ListFiles<ScriptFile>())
-                        {
-                            if (f.Namespace.Equals(id, StringComparison.InvariantCulture))
+                            var foundIdentifier = addons.Lookup(null, id);
+                            if (foundIdentifier != null)
                             {
-                                if (foundIdentifier == null)
-                                {
-                                    foundIdentifier = new IdentifierInfo(id, id, IdentifierType.FileNamespace, null, scriptFilesInNamespace);
-                                }
-                                scriptFilesInNamespace.Add(f);  // Different files can have the same namespace.
-                                fileParsingStack.Enqueue(f);
-                                filesToParse.Insert(0, f);      // Put in front
+                                return foundIdentifier;
                             }
-                        }
-
-                        return foundIdentifier;     // Is null if not found
-                    }
-                );
-
-            }
-
-            foreach (var file in filesToParse)
-            {
-                if (!file.AllFolderConfigsRead)
-                {
-                    string basefolder = Path.GetDirectoryName(file.GetFullPath());
-
-                    while (basefolder != Path.GetPathRoot(basefolder))
-                    {
-                        var cfgFile = Path.GetFullPath(Path.Combine(basefolder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
-                        if (System.IO.File.Exists(cfgFile))
-                        {
-                            var folderConfig = file.TryOpenFolderConfiguration(configFileManager, -1, cfgFile);
-                            if (folderConfig != null && folderConfig.IsSearchRoot)
+                            var scriptFilesInNamespace = new List<ScriptFile>();
+                            foreach (var f in filesToParse)
                             {
-                                break;  // Don't search deeper now.
-                            }
-                        }
-
-                        // Not found yet; try the parent folder.
-                        basefolder = Path.GetDirectoryName(basefolder);
-                    }
-                }
-            }
-
-            #endregion
-
-            //===================================================//
-            #region STEP 2: COLLECT ALL THE PROCEDURE SIGNATURES //
-            //===================================================//
-            // TODO: Sort files after dependencies (usings)
-
-            var beforeSorting = filesToParse;
-            List<ScriptFile> sortedAfterDependencies = new List<ScriptFile>();
-            var filesToCheck = new Queue<ScriptFile>(filesToParse);
-            int parsingFloor = 0;
-            while (filesToCheck.Count > 0)
-            {
-                var file = filesToCheck.Dequeue();
-                bool addNow = true;
-                foreach (var fu in file.ListReferencedScriptFiles())
-                {
-                    if (!sortedAfterDependencies.Contains(fu))
-                    {
-                        filesToCheck.Enqueue(file); // Put back in queue.
-                        addNow = false;
-                        break;
-                    }
-                }
-                if (addNow)
-                {
-                    file.ParsingFloor = parsingFloor++;
-                    sortedAfterDependencies.Add(file);
-                }
-            }
-            filesToParse = sortedAfterDependencies;
-
-            foreach (var file in filesToParse)
-            {
-                var fileScanData = file.PreScanFileContent;
-                if (fileScanData != null)
-                {
-                    foreach (var element in fileScanData.TopElement.Childs)
-                    {
-                        var firstPropFlag = (element.PropertyFlags != null) ? element.PropertyFlags[0] : null;
-                        var accessModifier = (element.Modifiers != null && element.Modifiers.Count > 0) ? (AccessModifier)Enum.Parse(typeof(AccessModifier), element.Modifiers[0], true) : DefaultAccess;
-                        switch (element.Type)
-                        {
-                            case FileElementType.Using:
-                                break;
-                            case FileElementType.Namespace:
-                                file.SetNamespace(element.Name);
-                                throw new Exception();
-                            //break;
-                            case FileElementType.EnumDefinition:
-                                break;
-                            case FileElementType.ProcedureDeclaration:
+                                if (f.Namespace.Equals(id, StringComparison.InvariantCulture))
                                 {
-                                    var procedure = new FileProcedure(file, accessModifier, element.Line, null, file.Namespace, element.Name)
+                                    if (foundIdentifier == null)
                                     {
-                                        Flags = (element.IsFunction ? ProcedureFlags.IsFunction : ProcedureFlags.None),
-                                        HasBody = element.HasBody,
-                                        BaseElementName = firstPropFlag,
-                                    };
-                                    file.AddElement(procedure);
-                                    procedure.CheckForPrototypeChange(element.Parameters, element.ReturnTypeData);
+                                        foundIdentifier = new IdentifierInfo(id, id, IdentifierType.FileNamespace, null, scriptFilesInNamespace);
+                                    }
+                                    scriptFilesInNamespace.Add(f);  // More files can have same namespace.
                                 }
-                                break;
-                            case FileElementType.FileVariable:
-                                // TODO: Add a temporary file element here, to make all file elements available after the pre-scan (to be able to remove "redundant" UpdateRootIdentifiers calls).
-                                // Add file variable with temporary type and data.
-                                //file.CreateOrGetFileVariable(file.Namespace, accessModifier, element.Name, (TypeReference)default(Type), false, element.Line, 0, 0);
-                                break;
-                            case FileElementType.TestList:
+                            }
+                            if (foundIdentifier != null)
+                            {
+                                return foundIdentifier;
+                            }
+                            foreach (var f in filesManager.ListFiles<ScriptFile>())
+                            {
+                                if (f.Namespace.Equals(id, StringComparison.InvariantCulture))
                                 {
-                                    var testlist = new FileTestList(file, accessModifier, element.Line, null, file.Namespace, element.Name)
+                                    if (foundIdentifier == null)
                                     {
-                                        BaseElementName = firstPropFlag,
-                                    };
-                                    file.AddElement(testlist);
+                                        foundIdentifier = new IdentifierInfo(id, id, IdentifierType.FileNamespace, null, scriptFilesInNamespace);
+                                    }
+                                    scriptFilesInNamespace.Add(f);  // Different files can have the same namespace.
+                                    fileParsingStack.Enqueue(f);
+                                    filesToParse.Insert(0, f);      // Put in front
                                 }
-                                break;
-                            case FileElementType.Datatable:
-                                break;
-                            case FileElementType.Override:
+                            }
+
+                            return foundIdentifier;     // Is null if not found
+                        }
+                    );
+
+                }
+
+                foreach (var file in filesToParse)
+                {
+                    if (!file.AllFolderConfigsRead)
+                    {
+                        string basefolder = Path.GetDirectoryName(file.GetFullPath());
+
+                        while (basefolder != Path.GetPathRoot(basefolder))
+                        {
+                            var cfgFile = Path.GetFullPath(Path.Combine(basefolder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
+                            if (System.IO.File.Exists(cfgFile))
+                            {
+                                var folderConfig = file.TryOpenFolderConfiguration(configFileManager, -1, cfgFile);
+                                if (folderConfig != null && folderConfig.IsSearchRoot)
                                 {
-                                    var overrider = file.CreateOrGetOverrideElement(element.Line, element.Name);
-                                    overrider.SetAsType(element.AsType);
-                                    file.AddElement(overrider);
+                                    break;  // Don't search deeper now.
                                 }
-                                break;
-                            case FileElementType.TypeDef:
-                                {
-                                    var typedef = file.CreateOrGetTypeDefElement(element.Line, element.Name);
-                                    typedef.SetDeclaration(element.DataType);
-                                    file.AddElement(typedef);
-                                }
-                                break;
-                            case FileElementType.UsingAlias:
-                                {
-                                    var typedef = new FileElementUsingAlias(file, element.Line, file.Namespace, element.Name);
-                                    typedef.SetDeclaration(element.DataType);
-                                    file.AddElement(typedef);
-                                }
-                                break;
-                            default:
-                                throw new NotImplementedException();
+                            }
+
+                            // Not found yet; try the parent folder.
+                            basefolder = Path.GetDirectoryName(basefolder);
                         }
                     }
-                    file.LastTypeScan = DateTime.UtcNow;
                 }
-            }
-            #endregion
 
-            //====================================================//
-            #region STEP 3: PARSE ALL SIGNATURES AND DECLARATIONS //
-            //====================================================//
-            var signaturesToParseNow = new List<Tuple<FileElement, StepBroListener>>();
-            // Collect file elements to parse from _all_ files
-            foreach (var file in filesToParse)
-            {
-                StepBroListener listener;
-                if (fileListeners.TryGetValue(file, out listener))
+                #endregion
+
+                //===================================================//
+                #region STEP 2: COLLECT ALL THE PROCEDURE SIGNATURES //
+                //===================================================//
+                // TODO: Sort files after dependencies (usings)
+
+                var beforeSorting = filesToParse;
+                List<ScriptFile> sortedAfterDependencies = new List<ScriptFile>();
+                var filesToCheck = new Queue<ScriptFile>(filesToParse);
+                int parsingFloor = 0;
+                while (filesToCheck.Count > 0)
                 {
-                    signaturesToParseNow.AddRange(
-                        file.ListElements().Cast<FileElement>().Select(e => new Tuple<FileElement, StepBroListener>(e, listener)));
-                }
-            }
-
-            // Update the lookup tables before further parsing.
-            foreach (var file in filesToParse)
-            {
-                file.UpdateRootIdentifiers();
-            }
-
-            var numberItemsToParse = (signaturesToParseNow.Count > 0) ? int.MaxValue - 1 : 0;
-            var numberUnparsedItemsBefore = int.MaxValue;
-            var signaturesToParseAgain = new List<Tuple<FileElement, StepBroListener>>();
-            // Continue parsing signatures until no more elements can be resolved
-            while (numberItemsToParse > 0 && numberItemsToParse < numberUnparsedItemsBefore)
-            {
-                numberUnparsedItemsBefore = numberItemsToParse;
-                numberItemsToParse = 0;
-                foreach (var d in signaturesToParseNow)
-                {
-                    d.Item1.ParseBaseElement();
-                    var unparsedItemsInElement = d.Item1.ParseSignature(d.Item2, false);
-                    if (unparsedItemsInElement > 0)
+                    var file = filesToCheck.Dequeue();
+                    bool addNow = true;
+                    foreach (var fu in file.ListReferencedScriptFiles())
                     {
-                        numberItemsToParse += unparsedItemsInElement;
-                        signaturesToParseAgain.Add(d);
+                        if (!sortedAfterDependencies.Contains(fu))
+                        {
+                            filesToCheck.Enqueue(file); // Put back in queue.
+                            addNow = false;
+                            break;
+                        }
+                    }
+                    if (addNow)
+                    {
+                        file.ParsingFloor = parsingFloor++;
+                        sortedAfterDependencies.Add(file);
                     }
                 }
-                signaturesToParseNow = signaturesToParseAgain;
-                signaturesToParseAgain = new List<Tuple<FileElement, StepBroListener>>();
-            }
+                filesToParse = sortedAfterDependencies;
 
-            if (numberItemsToParse > 0)
-            {
-                foreach (var d in signaturesToParseNow)
+                foreach (var file in filesToParse)
                 {
-                    d.Item1.ParseSignature(d.Item2, true);  // Parse again and report the errors
+                    var fileScanData = file.PreScanFileContent;
+                    if (fileScanData != null)
+                    {
+                        foreach (var element in fileScanData.TopElement.Childs)
+                        {
+                            var firstPropFlag = (element.PropertyFlags != null) ? element.PropertyFlags[0] : null;
+                            var accessModifier = (element.Modifiers != null && element.Modifiers.Count > 0) ? (AccessModifier)Enum.Parse(typeof(AccessModifier), element.Modifiers[0], true) : DefaultAccess;
+                            switch (element.Type)
+                            {
+                                case FileElementType.Using:
+                                    break;
+                                case FileElementType.Namespace:
+                                    file.SetNamespace(element.Name);
+                                    throw new Exception();
+                                //break;
+                                case FileElementType.EnumDefinition:
+                                    break;
+                                case FileElementType.ProcedureDeclaration:
+                                    {
+                                        var procedure = new FileProcedure(file, accessModifier, element.Line, null, file.Namespace, element.Name)
+                                        {
+                                            Flags = (element.IsFunction ? ProcedureFlags.IsFunction : ProcedureFlags.None),
+                                            HasBody = element.HasBody,
+                                            BaseElementName = firstPropFlag,
+                                        };
+                                        file.AddElement(procedure);
+                                        procedure.CheckForPrototypeChange(element.Parameters, element.ReturnTypeData);
+                                    }
+                                    break;
+                                case FileElementType.FileVariable:
+                                    // TODO: Add a temporary file element here, to make all file elements available after the pre-scan (to be able to remove "redundant" UpdateRootIdentifiers calls).
+                                    // Add file variable with temporary type and data.
+                                    //file.CreateOrGetFileVariable(file.Namespace, accessModifier, element.Name, (TypeReference)default(Type), false, element.Line, 0, 0);
+                                    break;
+                                case FileElementType.TestList:
+                                    {
+                                        var testlist = new FileTestList(file, accessModifier, element.Line, null, file.Namespace, element.Name)
+                                        {
+                                            BaseElementName = firstPropFlag,
+                                        };
+                                        file.AddElement(testlist);
+                                    }
+                                    break;
+                                case FileElementType.Datatable:
+                                    break;
+                                case FileElementType.Override:
+                                    {
+                                        var overrider = file.CreateOrGetOverrideElement(element.Line, element.Name);
+                                        overrider.SetAsType(element.AsType);
+                                        file.AddElement(overrider);
+                                    }
+                                    break;
+                                case FileElementType.TypeDef:
+                                    {
+                                        var typedef = file.CreateOrGetTypeDefElement(element.Line, element.Name);
+                                        typedef.SetDeclaration(element.DataType);
+                                        file.AddElement(typedef);
+                                    }
+                                    break;
+                                case FileElementType.UsingAlias:
+                                    {
+                                        var typedef = new FileElementUsingAlias(file, element.Line, file.Namespace, element.Name);
+                                        typedef.SetDeclaration(element.DataType);
+                                        file.AddElement(typedef);
+                                    }
+                                    break;
+                                default:
+                                    throw new NotImplementedException();
+                            }
+                        }
+                        file.LastTypeScan = DateTime.UtcNow;
+                    }
                 }
-                //throw new Exception("Not all signatures could be parsed.");     // TBD
-                return signaturesToParseNow.Count;
-            }
-            #endregion
+                #endregion
 
-            //=================================//
-            #region STEP 4: PARSE ALL THE FILES #
-            //=================================//
-            int totalErrors = 0;
-            try
-            {
+                //====================================================//
+                #region STEP 3: PARSE ALL SIGNATURES AND DECLARATIONS //
+                //====================================================//
+                var signaturesToParseNow = new List<Tuple<FileElement, StepBroListener>>();
+                // Collect file elements to parse from _all_ files
+                foreach (var file in filesToParse)
+                {
+                    StepBroListener listener;
+                    if (fileListeners.TryGetValue(file, out listener))
+                    {
+                        signaturesToParseNow.AddRange(
+                            file.ListElements().Cast<FileElement>().Select(e => new Tuple<FileElement, StepBroListener>(e, listener)));
+                    }
+                }
+
+                // Update the lookup tables before further parsing.
+                foreach (var file in filesToParse)
+                {
+                    file.UpdateRootIdentifiers();
+                }
+
+                var numberItemsToParse = (signaturesToParseNow.Count > 0) ? int.MaxValue - 1 : 0;
+                var numberUnparsedItemsBefore = int.MaxValue;
+                var signaturesToParseAgain = new List<Tuple<FileElement, StepBroListener>>();
+                // Continue parsing signatures until no more elements can be resolved
+                while (numberItemsToParse > 0 && numberItemsToParse < numberUnparsedItemsBefore)
+                {
+                    numberUnparsedItemsBefore = numberItemsToParse;
+                    numberItemsToParse = 0;
+                    foreach (var d in signaturesToParseNow)
+                    {
+                        d.Item1.ParseBaseElement();
+                        var unparsedItemsInElement = d.Item1.ParseSignature(d.Item2, false);
+                        if (unparsedItemsInElement > 0)
+                        {
+                            numberItemsToParse += unparsedItemsInElement;
+                            signaturesToParseAgain.Add(d);
+                        }
+                    }
+                    signaturesToParseNow = signaturesToParseAgain;
+                    signaturesToParseAgain = new List<Tuple<FileElement, StepBroListener>>();
+                }
+
+                if (numberItemsToParse > 0)
+                {
+                    foreach (var d in signaturesToParseNow)
+                    {
+                        d.Item1.ParseSignature(d.Item2, true);  // Parse again and report the errors
+                    }
+                    //throw new Exception("Not all signatures could be parsed.");     // TBD
+                    return signaturesToParseNow.Count;
+                }
+                #endregion
+
+                //=================================//
+                #region STEP 4: PARSE ALL THE FILES #
+                //=================================//
                 foreach (var file in filesToParse)
                 {
                     file.SaveCurrentFileVariables();
@@ -1048,6 +1047,7 @@ namespace StepBro.Core.Parser
                     }
                 }
 #endif
+                #endregion
             }
             finally
             {
@@ -1064,7 +1064,6 @@ namespace StepBro.Core.Parser
                     }
                 }
             }
-            #endregion
 
             return totalErrors;
         }

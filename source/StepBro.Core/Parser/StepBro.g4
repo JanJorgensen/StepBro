@@ -79,7 +79,7 @@ elementModifier
     |	PROTECTED		// Shared within the namespace
     ;
 
-documentationElement : DOCUMENTATION documentationElementName ;
+documentationElement : DOCUMENTATION documentationElementName SEMICOLON ;
 documentationElementName : IDENTIFIER ;
 
 overrideReference : identifierOrQualified ;
