@@ -139,6 +139,7 @@ namespace StepBro.Core.General
                 {
                     m_decoder = new Block<object, FolderConfiguration>
                         (
+                            nameof(FolderConfiguration),
                             Doc(""),
                             new Flag<FolderConfiguration>(
                                 Constants.STEPBRO_FOLDER_CONFIG_FILE_ROOT, 
@@ -155,6 +156,7 @@ namespace StepBro.Core.General
                                 }),
                             new ArrayString<FolderConfiguration>(
                                 Constants.STEPBRO_FOLDER_CONFIG_FILE_LIBS, 
+                                Usage.Setting,
                                 Doc(""),
                                 (c, a) =>
                                 {
@@ -163,6 +165,7 @@ namespace StepBro.Core.General
                                 }),
                             new ValueString<FolderConfiguration>(
                                 Constants.STEPBRO_FOLDER_CONFIG_FILE_SHORTCUT, 
+                                Usage.Element,
                                 Doc(""),
                                 (c, v) =>
                                 {

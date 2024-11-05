@@ -229,15 +229,6 @@ namespace StepBro.SimpleWorkbench
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
-            var assembly = System.Reflection.Assembly.GetAssembly(this.GetType()).Location;
-            var folder = System.IO.Path.GetDirectoryName(assembly);
-            var docPersistFile = System.IO.Path.Combine(folder, "doclayout.xml");
-            var toolPersistFile = System.IO.Path.Combine(folder, "toollayout.xml");
-            dockManager.SaveDocumentLayoutToFile(docPersistFile);
-            dockManager.SaveToolWindowLayoutToFile(toolPersistFile);
-            var toolLayout = dockManager.ToolWindowLayoutData;
-            var docLayout = dockManager.DocumentLayoutData;
-
             this.SaveUserSettings();
         }
 
@@ -493,12 +484,36 @@ namespace StepBro.SimpleWorkbench
                 catch (Exception ex)
                 {
                     MessageBox.Show(
-                        this, 
-                        $"Failed to save \"{file.FilePath}\"", 
-                        "Save File", 
-                        MessageBoxButtons.OK, 
+                        this,
+                        $"Failed to save \"{file.FilePath}\"",
+                        "Save File",
+                        MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
                 }
+            }
+        }
+
+
+        private void toolStripMenuItemCreateDocumentationFiles_DropDownOpening(object sender, EventArgs e)
+        {
+            toolStripMenuItemCreateDocForSelectedFile.Enabled =
+                (dockManager.SelectedDocument is DocumentWindow window &&
+                window.Controls[0] is FastColoredTextBoxNS.FastColoredTextBox editor &&
+                dockManager.SelectedDocument.Tag is ILoadedFile file);
+        }
+
+        private void toolStripMenuItemCreateProjectOverview_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripMenuItemCreateDocForSelectedFile_Click(object sender, EventArgs e)
+        {
+            if (dockManager.SelectedDocument is DocumentWindow window &&
+                window.Controls[0] is FastColoredTextBoxNS.FastColoredTextBox editor &&
+                dockManager.SelectedDocument.Tag is IScriptFile file)
+            {
+                file.GenerateDocumentationFile();
             }
         }
 
@@ -2093,16 +2108,6 @@ namespace StepBro.SimpleWorkbench
         #endregion
 
         private void toolStripStatusLabelExecutionResult_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void toolStripMenuItemCreateDocForSelectedFile_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void toolStripMenuItemCreateProjectOverview_Click(object sender, EventArgs e)
         {
 
         }

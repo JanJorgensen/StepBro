@@ -47,8 +47,8 @@ namespace StepBro.ToolBarCreator
                 var button = new Block<object, object>("Button", Doc(""),
                     color, text, instance, fileElement, maxWidth, widthGroup,
                     new ValueString<object>("Partner", Doc("")),
-                    new Value<object>("Arg", "Argument", Doc("")),
-                    new Array<object>("Args", "Arguments", Doc("")),
+                    new Value<object>("Arg", "Argument", Usage.Setting, Doc("")),
+                    new Array<object>("Args", "Arguments", Usage.Setting, Doc("")),
                     new Flag<object>("Stoppable", Doc("")),
                     new Flag<object>("StopOnButtonRelease", Doc("")),
                     new ValueString<object>("Command", Doc("")),
@@ -75,12 +75,13 @@ namespace StepBro.ToolBarCreator
 
                 return new Block<object, object>
                     (
+                        nameof(ToolBar),
                         Doc(""),
                         new ValueString<object>("Label", Doc("")),
                         color,
                         new ValueInt<object>("Index", Doc("")),
-                        new Flag<object>("Separator", Doc("")),
-                        new Flag<object>("ColumnSeparator", Doc("")),
+                        new Flag<object>("Separator", Usage.Element, Doc("")),
+                        new Flag<object>("ColumnSeparator", Usage.Element, Doc("")),
                         menu, button, textbox, instance
                     );
             }

@@ -123,6 +123,11 @@ namespace StepBro.Core.DocCreation
             return DocCommentLineType.Unspecified;
         }
 
+        public static void GenerateDocumentationFile(this IScriptFile file, string folder = null)
+        {
+            ((ScriptFile)file).GenerateDocumentationFile(folder);
+        }
+
         public static string CreateFileElementDocumentation(int headingLevel, ILoadedFilesManager fileManager, IFileElement element, List<Tuple<DocCommentLineType, string>> docComments = null)
         {
             var docText = new StringBuilder();

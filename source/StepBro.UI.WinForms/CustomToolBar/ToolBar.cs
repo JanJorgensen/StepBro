@@ -3,14 +3,10 @@ using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
-using StepBro.Core.ScriptData;
 using StepBro.ToolBarCreator;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Text;
 using static StepBro.Core.Data.PropertyBlockDecoder;
 using static StepBro.UI.WinForms.WinFormsPropertyBlockDecoder;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
@@ -69,23 +65,25 @@ namespace StepBro.UI.WinForms.CustomToolBar
                 ((Block<object, ToolBar>)m_decoder.TryGetDecoder()).DecodeData(data, toolbarToDispose, errors);
             }
 
+            private const string MenuInstanceHelp = "The default script object to be used by child menu elements.";
+
             public Element TryGetDecoder()
             {
                 var buttonElements = new Element[] {
-                    new ValueColor<Button>("Color", Doc("Blah blah blah"), (b, c) => { b.BackColor = c; return null; }),
-                    new ValueString<Button>("Text", Doc("Blah blah blah"), (b, v) => { b.Text = v.ValueAsString(); return null; }),
-                    new ValueInt<Button>("MaxWidth", Doc("Blah blah blah"), (b, v) => { b.MaxWidth = (int)(long)v.Value; b.AutoSize = false; return null; }),
-                    new ValueString<Button>("WidthGroup", Doc("Blah blah blah"), (b, v) => { b.WidthGroup = v.ValueAsString(); return null; }),
-                    new ValueString<Button>("Instance", "Object", Doc("Blah blah blah"), (b, v) => { b.Instance = v.ValueAsString(); return null; }),
-                    new ValueString<Button>("Procedure", "Element", Doc("Blah blah blah"), (b, v) => { b.Procedure = v.ValueAsString(); return null; }),
-                    new ValueString<Button>("Partner", "Model", Doc("Blah blah blah"), (b, v) => { b.Partner = v.ValueAsString(); return null; }),
-                    new Value<Button>("Arg", "Argument", Doc("Argument value for the called procedure."), (b, a) => { b.AddToArguments(a.Value); return null; }),
-                    new PropertyBlockDecoder.Array<Button>("Args", "Arguments", Doc("Argument values for the called procedure."), (b, a) => { b.AddToArguments(a); return null; }),
-                    new Flag<Button>("Stoppable", Doc("Blah blah blah"), (b, f) => { b.SetStoppable(); return null; }),
-                    new Flag<Button>("StopOnButtonRelease", Doc("Blah blah blah"), (b, f) => { b.SetStopOnButtonRelease(); return null; }),
-                    new ValueString<Button>("Command", Doc("Blah blah blah"), (b, v) => { b.ObjectCommand = v.ValueAsString(); return null; }),
-                    new Flag<Button>("CheckOnClick", Doc("Blah blah blah"), (b, f) => { b.SetCheckOnClick(); return null; }),
-                    new Flag<Button>("CheckArg", Doc("Blah blah blah"), (b, f) => { /* TODO */ return null; }),
+                    new ValueColor<Button>("Color", Doc("The button color."), (b, c) => { b.BackColor = c; return null; }),
+                    new ValueString<Button>("Text", Doc("The text shown on the button."), (b, v) => { b.Text = v.ValueAsString(); return null; }),
+                    new ValueInt<Button>("MaxWidth", Doc("The maximum width of the button."), (b, v) => { b.MaxWidth = (int)(long)v.Value; b.AutoSize = false; return null; }),
+                    new ValueString<Button>("WidthGroup", Doc("The name of the group that synchronizes their button width."), (b, v) => { b.WidthGroup = v.ValueAsString(); return null; }),
+                    new ValueString<Button>("Instance", "Object", Doc("The script object associated with the button."), (b, v) => { b.Instance = v.ValueAsString(); return null; }),
+                    new ValueString<Button>("Procedure", "Element", Doc("The procedure or other script element to execute when activating the button."), (b, v) => { b.Procedure = v.ValueAsString(); return null; }),
+                    new ValueString<Button>("Partner", "Model", Doc("The partner/model to use for executing the target procedure or script element."), (b, v) => { b.Partner = v.ValueAsString(); return null; }),
+                    new Value<Button>("Arg", "Argument", Usage.Setting, Doc("An argument for the called procedure."), (b, a) => { b.AddToArguments(a.Value); return null; }),
+                    new Array<Button>("Args", "Arguments", Usage.Setting, Doc("A list of arguments for the called procedure."), (b, a) => { b.AddToArguments(a); return null; }),
+                    new Flag<Button>("Stoppable", Doc("Makes the execution stoppable by activating the button again."), (b, f) => { b.SetStoppable(); return null; }),
+                    new Flag<Button>("StopOnButtonRelease", Doc("Makes the execution stop when the button is released."), (b, f) => { b.SetStopOnButtonRelease(); return null; }),
+                    new ValueString<Button>("Command", Doc("Object command to execute when activating the button."), (b, v) => { b.ObjectCommand = v.ValueAsString(); return null; }),
+                    new Flag<Button>("CheckOnClick", Doc("Makes the button toggle between checked and unchecked when activated."), (b, f) => { b.SetCheckOnClick(); return null; }),
+                    new Flag<Button>("CheckArg", Doc("The 'Instance' object "), (b, f) => { /* TODO */ return null; }),
                     new ValueString<Button>("CheckedText", Doc("Blah blah blah"), (b, v) => { /* TODO */ return null; }),
                     new ValueString<Button>("UncheckedText", Doc("Blah blah blah"), (b, v) => { /* TODO */ return null; }),
                     new ValueString<Button>("EnabledSource", Doc("Blah blah blah"), (b, v) => { /* TODO */ return null; }),
@@ -111,7 +109,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     new ValueString<TextBox>("WidthGroup", Doc("Blah blah blah"), (t, v) => { t.WidthGroup = v.ValueAsString(); return null; }),
                     new Flag<TextBox>("ReadOnly", Doc("Blah blah blah"), (t, f) => { t.ReadOnly = true; return null; }),
                     new Flag<TextBox>("RightAligned", Doc("Blah blah blah"), (t, f) => { t.TextBoxTextAlign = HorizontalAlignment.Right; return null; }),
-                    new ValueString<Button>("Instance", "Object", Doc("Blah blah blah"), (t, v) => { t.Instance = v.ValueAsString(); return null; }),
+                    new ValueString<Button>("Instance", "Object", Doc("The script object associated with the textbox."), (t, v) => { t.Instance = v.ValueAsString(); return null; }),
                     new ValueString<TextBox>("Property", Doc("Blah blah blah"), (t, v) => { /* TODO */ return null; }),
                     new ValueString<TextBox>("ProcedureOutput", Doc("Blah blah blah"), (t, v) => { /* TODO */ return null; }),
                     new ValueString<TextBox>("EnabledSource", Doc("Blah blah blah"), (t, v) => { /* TODO */ return null; }),
@@ -134,7 +132,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                 var menuTitle = new ValueString<IMenu>("Text", "Title", Doc(""), (m, v) => { m.SetTitle(v.ValueAsString()); return null; });
 
                 var subMenu = new Block<ToolStripDropDownMenu, ToolStripMenuSubMenu>(
-                    "Menu", "SubMenu",
+                    "SubMenu", "Menu",
                     Doc("A sub-menu for a drop-down menu or another sub-menu."),
                     (m, n) =>
                     {
@@ -171,8 +169,9 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
                 return new Block<object, ToolBar>
                     (
-                        Doc("Root data decoder for toolbar."),
-                        new ValueString<ToolBar>("Label", Doc("Blah blah blah"), (t, v) =>
+                        nameof(ToolBar),
+                        Doc("Defined properties and GUI element types for the created toolbar."),
+                        new ValueString<ToolBar>("Label", Usage.Element, Doc("A simple text field."), (t, v) =>
                         {
                             var text = v.ValueAsString();
                             Label label;
@@ -188,15 +187,18 @@ namespace StepBro.UI.WinForms.CustomToolBar
                             t.Items.Add(label);
                             return null;    // No errors
                         }),
-                        new ValueColor<ToolBar>("Color", Doc("Blah blah blah"), (t, c) => { t.BackColor = c; return null; }),
-                        new ValueInt<ToolBar>("Index", Doc("Blah blah blah"), (t, v) => { t.Index = Convert.ToInt32(v.Value); return null; }),
-                        new Flag<ToolBar>("Separator", Doc("Blah blah blah"), (t, f) =>
+                        new ValueColor<ToolBar>("Color", Doc("The color of the toolbar and the default color of all the elements."), (t, c) => { t.BackColor = c; return null; }),
+                        new ValueInt<ToolBar>(
+                            "Index", 
+                            Doc("The relative display order index of the toolbar.<br/>The toolbar will be shown below toolbars with a lower index."),
+                            (t, v) => { t.Index = Convert.ToInt32(v.Value); return null; }),
+                        new Flag<ToolBar>("Separator", Usage.Element, Doc("A separator line between the previous and the succeeding elements of the toolbar."), (t, f) =>
                         {
                             var separator = new Separator("Separator");
                             t.Items.Add(separator);
                             return null;
                         }),
-                        new Flag<ToolBar>("ColumnSeparator", Doc("Blah blah blah"), (t, f) =>
+                        new Flag<ToolBar>("ColumnSeparator", Usage.Element, Doc("A separator line between the previous and the succeeding elements of the toolbar.<br/>All separators of this type and the same name will be graphically aligned with the rightmost one."), (t, f) =>
                         {
                             string name = f.Name;
                             if (!f.HasTypeSpecified)
@@ -468,6 +470,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
+        [Public]
         public object GetProperty([Implicit] ICallContext context, string property)
         {
             return GetElementPropertyValue(this, context, property);
@@ -478,6 +481,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             throw new NotImplementedException();
         }
 
+        [Public]
         public void SetProperty([Implicit] ICallContext context, string property, object value)
         {
             SetElementPropertyValue(this, context, property, value);

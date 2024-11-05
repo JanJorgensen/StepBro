@@ -1,4 +1,6 @@
-﻿using StepBro.Core.Api;
+﻿using Markdig.Syntax;
+using Markdig.Syntax.Inlines;
+using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.ScriptData;
 using System;
@@ -107,7 +109,7 @@ namespace StepBro.Core.DocCreation
                     sb.AppendLine($"[{p.Name}](property://{p.DeclaringType.TypeFullName()}.{p.Name})</br>");
                 }
                 properties = type.GetProperties(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.FlattenHierarchy).ToList();
-                properties.Sort((a,b) => String.Compare(a.Name,b.Name));
+                properties.Sort((a, b) => String.Compare(a.Name, b.Name));
                 foreach (var p in properties)
                 {
                     //sb.AppendLine($"{p.Name} static property </br>");
@@ -175,13 +177,171 @@ namespace StepBro.Core.DocCreation
 
                 if (type.IsAssignableTo(typeof(ISettableFromPropertyBlock)))
                 {
-                    sb.AppendLine($"{new String('#', headingLevel)} Special Setup");
+                    sb.AppendLine($"{new String('#', headingLevel)} Configuration");
+
+                    try
+                    {
+                        var instance = Activator.CreateInstance(type) as ISettableFromPropertyBlock;
+                        if (instance != null)
+                        {
+                            var decoder = instance.TryGetDecoder();
+                            if (decoder != null)
+                            {
+                                sb.AppendLine($"THERE IS A DECODER !! <br/>");
+
+                                var blocks = new List<Tuple<Element, Element, List<Element>>>();
+                                blocks.Add(new Tuple<Element, Element, List<Element>>(decoder, null, new List<Element>()));
+
+                                var levelBlocks = new List<Element>();
+                                levelBlocks.Add(decoder);
+                                var nextLevelBlocks = new List<Element>();
+                                while (levelBlocks.Count > 0)
+                                {
+                                    foreach (var block in levelBlocks)
+                                    {
+                                        sb.AppendLine($"Block {block.TypeOrName} <br/>");
+                                        foreach (var child in block.ListChilds().Where(c => c.EntryType == PropertyBlockEntryType.Block && c.Usage == Usage.Element))
+                                        {
+                                            if (blocks.Exists(e => Object.ReferenceEquals(child, e.Item1)))
+                                            {
+                                                blocks.First(e => Object.ReferenceEquals(child, e.Item1)).Item3.Add(block);
+                                            }
+                                            else
+                                            {
+                                                var entry = new Tuple<Element, Element, List<Element>>(child, block, new List<Element>());
+                                                entry.Item3.Add(block);
+                                                blocks.Add(entry);
+
+                                                nextLevelBlocks.Add(child);
+                                            }
+                                        }
+                                    }
+                                    levelBlocks.Clear();
+                                    levelBlocks.AddRange(nextLevelBlocks);
+                                    nextLevelBlocks.Clear();
+                                }
+
+                                foreach (var block in blocks)
+                                {
+                                    CreateDecoderBlockDocumentation(block.Item1, block.Item2, block.Item3, headingLevel + 1, sb);
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+
                 }
             }
 
             // https://learn.microsoft.com/en-us/dotnet/api/system.math
 
             return sb.ToString();
+        }
+
+        private static string GetBlockHeadingLink(PropertyBlockDecoder.Element block)
+        {
+            var link = block.TypeOrName;
+            var parent = block.ParentType();
+            if (parent != null) link += ("-" + parent);
+            return link;
+        }
+
+        private static void CreateDecoderBlockDocumentation(PropertyBlockDecoder.Element block, PropertyBlockDecoder.Element parent, List<Element> hosting, int headingLevel, StringBuilder output)
+        {
+            output.Append($"{new String('#', headingLevel)} {block.TypeOrName} {new String('#', headingLevel)} {{#{GetBlockHeadingLink(block)}}}");
+            if (!String.IsNullOrEmpty(block.AlternativeTypeOrName))
+            {
+                output.Append(" (or ");
+                output.Append(block.AlternativeTypeOrName);
+                output.Append(')');
+            }
+            if (block.ParentType() != null)
+            {
+                output.Append($" - on ");
+            }
+            output.AppendLine();
+
+            if (hosting != null && hosting.Count > 0)
+            {
+                output.Append("Used in: ");
+                output.AppendLine(String.Join(", ", hosting.Select(h => $"[{h.TypeOrName}](#{GetBlockHeadingLink(h)})")));
+                output.AppendLine();
+            }
+
+            if (!String.IsNullOrEmpty(block.Documentation))
+            {
+                output.AppendLine(block.Documentation);
+                output.AppendLine("");
+            }
+            output.AppendLine("");
+
+            var props = block.ListChilds().Where(c => c.Usage == Usage.Setting).ToList();
+            props.Sort((a, b) => String.Compare(a.TypeOrName, b.TypeOrName, false));
+            var elements = block.ListChilds().Where(c => c.Usage == Usage.Element).ToList();
+            elements.Sort((a, b) => String.Compare(a.TypeOrName, b.TypeOrName, false));
+
+            if (props.Count > 0)
+            {
+                output.AppendLine("__Properties__");
+                foreach (var prop in props)
+                {
+                    CreateDecoderBlockChild(block, prop, output);
+                }
+                output.AppendLine();
+                output.AppendLine();
+            }
+            if (elements.Count > 0)
+            {
+                output.AppendLine("__Elements__");
+                foreach (var element in elements)
+                {
+                    CreateDecoderBlockChild(block, element, output);
+                }
+                output.AppendLine();
+                output.AppendLine();
+            }
+        }
+
+        private static void CreateDecoderBlockChild(PropertyBlockDecoder.Element block, PropertyBlockDecoder.Element child, StringBuilder output)
+        {
+            bool isTypeReference = child.EntryType == PropertyBlockEntryType.Block && child.Usage == Usage.Element;
+            output.Append("* ");
+            if (isTypeReference)
+            {
+                output.Append("[");
+            }
+            else
+            {
+                output.Append("__");
+            }
+            output.Append(child.TypeOrName);
+            if (isTypeReference)
+            {
+                output.Append($"](#{GetBlockHeadingLink(child)})");
+            }
+            else
+            {
+                output.Append("__");
+            }
+            if (!String.IsNullOrEmpty(child.AlternativeTypeOrName))
+            {
+                output.Append(" (or ");
+                output.Append(child.AlternativeTypeOrName);
+                output.Append(")");
+            }
+
+            if (!String.IsNullOrEmpty(child.Documentation))
+            {
+                output.Append("  \\-  ");
+                var doc = child.Documentation;
+                var lineEnd = doc.IndexOfAny(['\r', '\n']);
+                //if (lineEnd >= 0)
+                //{
+                //    doc = doc.Substring(0, lineEnd);    // Only take the first line.
+                //}
+                output.AppendLine(doc);
+            }
+            output.AppendLine("<br/>");
         }
 
         public static string CreateDoc(int headingLevel, System.Reflection.MethodInfo method, bool createHeader = true)

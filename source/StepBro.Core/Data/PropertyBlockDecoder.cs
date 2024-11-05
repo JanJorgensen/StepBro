@@ -9,40 +9,46 @@ namespace StepBro.Core.Data
 {
     public class PropertyBlockDecoder
     {
+        public enum Usage { Setting, Element }
+
         public abstract class Element
         {
             public string TypeOrName { get; private set; } = null;
             public string AlternativeTypeOrName { get; private set; } = null;
+            public Usage Usage { get; private set; } = Usage.Setting;
             public string Documentation { get; private set; } = null;
             public PropertyBlockEntryType EntryType { get; private set; }
 
-            public Element(DocString doc, PropertyBlockEntryType type)
+            public Element(Usage usage, DocString doc, PropertyBlockEntryType type)
             {
+                this.Usage = usage;
                 this.Documentation = doc.Text;
                 this.EntryType = type;
             }
 
-            public Element(string typeOrName, DocString doc, PropertyBlockEntryType type)
+            public Element(string typeOrName, Usage usage, DocString doc, PropertyBlockEntryType type)
             {
                 this.TypeOrName = typeOrName;
+                this.Usage = usage;
                 this.Documentation = doc.Text;
                 this.EntryType = type;
             }
 
-            public Element(string typeOrName, string altTypeOrName, DocString doc, PropertyBlockEntryType type)
+            public Element(string typeOrName, string altTypeOrName, Usage usage, DocString doc, PropertyBlockEntryType type)
             {
                 this.TypeOrName = typeOrName;
                 this.AlternativeTypeOrName = altTypeOrName;
+                this.Usage = usage;
                 this.Documentation = doc.Text;
                 this.EntryType = type;
             }
 
             public bool TryDecode(PropertyBlockEntry entry, object parent, List<Tuple<int, string>> errors)
             {
-                if (    entry.BlockEntryType == this.EntryType && 
+                if (entry.BlockEntryType == this.EntryType &&
                         (
                             String.IsNullOrEmpty(this.TypeOrName) ||
-                            entry.TypeOrName == this.TypeOrName || 
+                            entry.TypeOrName == this.TypeOrName ||
                             (this.AlternativeTypeOrName != null && entry.TypeOrName == this.AlternativeTypeOrName)
                         )
                    )
@@ -55,21 +61,27 @@ namespace StepBro.Core.Data
             }
 
             protected abstract void TryCreateOrSet(object parent, PropertyBlockEntry entry, List<Tuple<int, string>> errors);
+
+            public abstract IEnumerable<Element> ListChilds();
+
+            public virtual string ParentType() { return "Null"; }
         }
 
         public abstract class Element<TParent> : Element where TParent : class
         {
-            public Element(DocString doc, PropertyBlockEntryType type) : base(doc, type)
+            public Element(Usage usage, DocString doc, PropertyBlockEntryType type) : base(usage, doc, type)
             {
             }
 
-            public Element(string typeOrName, DocString doc, PropertyBlockEntryType type) : base(typeOrName, doc, type)
+            public Element(string typeOrName, Usage usage, DocString doc, PropertyBlockEntryType type) : base(typeOrName, usage, doc, type)
             {
             }
 
-            public Element(string typeOrName, string altTypeOrName, DocString doc, PropertyBlockEntryType type) : base(typeOrName, altTypeOrName, doc, type)
+            public Element(string typeOrName, string altTypeOrName, Usage usage, DocString doc, PropertyBlockEntryType type) : base(typeOrName, altTypeOrName, usage, doc, type)
             {
             }
+
+            public override string ParentType() { return nameof(TParent); }
 
             protected override void TryCreateOrSet(object parent, PropertyBlockEntry entry, List<Tuple<int, string>> errors)
             {
@@ -93,34 +105,52 @@ namespace StepBro.Core.Data
             private Element[] m_childs;
 
             public Block(string name, DocString doc, Func<TParent, string, TThis> creator, params Element[] childs) :
-                base(name, doc, PropertyBlockEntryType.Block)
+                base(name, Usage.Element, doc, PropertyBlockEntryType.Block)
+            {
+                m_creator = creator;
+                m_childs = childs;
+            }
+            public Block(string name, Usage usage, DocString doc, Func<TParent, string, TThis> creator, params Element[] childs) :
+                base(name, usage, doc, PropertyBlockEntryType.Block)
             {
                 m_creator = creator;
                 m_childs = childs;
             }
             public Block(string name, string altName, DocString doc, Func<TParent, string, TThis> creator, params Element[] childs) :
-                base(name, altName, doc, PropertyBlockEntryType.Block)
+                base(name, altName, Usage.Element, doc, PropertyBlockEntryType.Block)
             {
                 m_creator = creator;
                 m_childs = childs;
             }
-            public Block(DocString doc, Func<TParent, string, TThis> creator, params Element[] childs) :
-                this((string)null, doc, creator, childs)
+            public Block(string name, string altName, Usage usage, DocString doc, Func<TParent, string, TThis> creator, params Element[] childs) :
+                base(name, altName, usage, doc, PropertyBlockEntryType.Block)
+            {
+                m_creator = creator;
+                m_childs = childs;
+            }
+            public Block(string name, DocString doc, params Element[] childs) :
+                this(name, (string)null, Usage.Element, doc, null, childs)
+            { }
+            public Block(string name, Usage usage, DocString doc, params Element[] childs) :
+                this(name, (string)null, usage, doc, null, childs)
+            { }
+            public Block(string name, string altName, Usage usage, DocString doc, params Element[] childs) :
+                this(name, altName, usage, doc, null, childs)
             { }
 
-            public Block(string name, DocString doc, params Element[] childs) :
-                this(name, (string)null, doc, null, childs)
-            { }
-            public Block(string name, string altName, DocString doc, params Element[] childs) :
-                this(name, altName, doc, null, childs)
-            { }
-            public Block(DocString doc, params Element[] childs) :
-                this((string)null, (string)null, doc, null, childs)
-            { }
+            public override string ToString()
+            {
+                return "Block '" + this.TypeOrName + "' for " + typeof(TParent).Name;
+            }
 
             public void SetChilds(params Element[] childs)
             {
                 m_childs = childs;
+            }
+
+            public override IEnumerable<Element> ListChilds()
+            {
+                foreach (var child in m_childs) yield return child;
             }
 
             protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
@@ -162,10 +192,10 @@ namespace StepBro.Core.Data
 
         public abstract class ArrayBase<TParent> : Element<TParent> where TParent : class
         {
-            public ArrayBase(string typeOrName, DocString doc) : base(typeOrName, doc, PropertyBlockEntryType.Array)
+            public ArrayBase(string typeOrName, Usage usage, DocString doc) : base(typeOrName, usage, doc, PropertyBlockEntryType.Array)
             {
             }
-            public ArrayBase(string typeOrName, string altTypeOrName, DocString doc) : base(typeOrName, altTypeOrName, doc, PropertyBlockEntryType.Array)
+            public ArrayBase(string typeOrName, string altTypeOrName, Usage usage, DocString doc) : base(typeOrName, altTypeOrName, usage, doc, PropertyBlockEntryType.Array)
             {
             }
         }
@@ -174,13 +204,18 @@ namespace StepBro.Core.Data
         {
             private Func<TParent, List<string>, string> m_setter;
 
-            public ArrayString(string typeOrName, DocString doc, Func<TParent, List<string>, string> setter = null) : base(typeOrName, doc)
+            public ArrayString(string typeOrName, Usage usage, DocString doc, Func<TParent, List<string>, string> setter = null) : base(typeOrName, usage, doc)
             {
                 m_setter = setter;
             }
-            public ArrayString(string typeOrName, string altTypeOrName, DocString doc, Func<TParent, List<string>, string> setter = null) : base(typeOrName, altTypeOrName, doc)
+            public ArrayString(string typeOrName, string altTypeOrName, Usage usage, DocString doc, Func<TParent, List<string>, string> setter = null) : base(typeOrName, altTypeOrName, usage, doc)
             {
                 m_setter = setter;
+            }
+
+            public override IEnumerable<Element> ListChilds()
+            {
+                yield break;
             }
 
             protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
@@ -215,13 +250,18 @@ namespace StepBro.Core.Data
         {
             private Func<TParent, List<object>, string> m_setter;
 
-            public Array(string typeOrName, DocString doc, Func<TParent, List<object>, string> setter = null) : base(typeOrName, doc)
+            public Array(string typeOrName, Usage usage, DocString doc, Func<TParent, List<object>, string> setter = null) : base(typeOrName, usage, doc)
             {
                 m_setter = setter;
             }
-            public Array(string typeOrName, string altTypeOrName, DocString doc, Func<TParent, List<object>, string> setter = null) : base(typeOrName, altTypeOrName, doc)
+            public Array(string typeOrName, string altTypeOrName, Usage usage, DocString doc, Func<TParent, List<object>, string> setter = null) : base(typeOrName, altTypeOrName, usage, doc)
             {
                 m_setter = setter;
+            }
+
+            public override IEnumerable<Element> ListChilds()
+            {
+                yield break;
             }
 
             protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
@@ -252,14 +292,18 @@ namespace StepBro.Core.Data
 
         public abstract class ValueBase<TParent> : Element<TParent> where TParent : class
         {
-            public ValueBase(DocString doc) : base(doc, PropertyBlockEntryType.Value)
+            public ValueBase(Usage usage, DocString doc) : base(usage, doc, PropertyBlockEntryType.Value)
             {
             }
-            public ValueBase(string typeOrName, DocString doc) : base(typeOrName, doc, PropertyBlockEntryType.Value)
+            public ValueBase(string typeOrName, Usage usage, DocString doc) : base(typeOrName, usage, doc, PropertyBlockEntryType.Value)
             {
             }
-            public ValueBase(string typeOrName, string altTypeOrName, DocString doc) : base(typeOrName, altTypeOrName, doc, PropertyBlockEntryType.Value)
+            public ValueBase(string typeOrName, string altTypeOrName, Usage usage, DocString doc) : base(typeOrName, altTypeOrName, usage, doc, PropertyBlockEntryType.Value)
             {
+            }
+            public override IEnumerable<Element> ListChilds()
+            {
+                yield break;    // No ValueBase classes have child elements.
             }
         }
 
@@ -267,11 +311,19 @@ namespace StepBro.Core.Data
         {
             private ValueSetter<TParent> m_setter;
 
-            public ValueString(string typeOrName, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, doc)
+            public ValueString(string typeOrName, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, Usage.Setting, doc)
             {
                 m_setter = setter;
             }
-            public ValueString(string typeOrName, string altTypeOrName, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, altTypeOrName, doc)
+            public ValueString(string typeOrName, Usage usage, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, usage, doc)
+            {
+                m_setter = setter;
+            }
+            public ValueString(string typeOrName, string altTypeOrName, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, altTypeOrName, Usage.Setting, doc)
+            {
+                m_setter = setter;
+            }
+            public ValueString(string typeOrName, string altTypeOrName, Usage usage, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, altTypeOrName, usage, doc)
             {
                 m_setter = setter;
             }
@@ -306,7 +358,12 @@ namespace StepBro.Core.Data
         {
             private ValueSetter<TParent> m_setter;
 
-            public ValueInt(string typeOrName, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, doc)
+            public ValueInt(string typeOrName, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, Usage.Setting, doc)
+            {
+                m_setter = setter;
+            }
+
+            public ValueInt(string typeOrName, Usage usage, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, usage, doc)
             {
                 m_setter = setter;
             }
@@ -341,7 +398,11 @@ namespace StepBro.Core.Data
         {
             private ValueSetter<TParent> m_setter;
 
-            public ValueBool(string typeOrName, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, doc)
+            public ValueBool(string typeOrName, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, Usage.Setting, doc)
+            {
+                m_setter = setter;
+            }
+            public ValueBool(string typeOrName, Usage usage, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, usage, doc)
             {
                 m_setter = setter;
             }
@@ -376,15 +437,15 @@ namespace StepBro.Core.Data
         {
             private ValueSetter<TParent> m_setter;
 
-            public Value(DocString doc, ValueSetter<TParent> setter = null) : base(doc)
+            public Value(Usage usage, DocString doc, ValueSetter<TParent> setter = null) : base(usage, doc)
             {
                 m_setter = setter;
             }
-            public Value(string typeOrName, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, doc)
+            public Value(string typeOrName, Usage usage, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, usage, doc)
             {
                 m_setter = setter;
             }
-            public Value(string typeOrName, string altTypeOrName, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, altTypeOrName, doc)
+            public Value(string typeOrName, string altTypeOrName, Usage usage, DocString doc, ValueSetter<TParent> setter = null) : base(typeOrName, altTypeOrName, usage, doc)
             {
                 m_setter = setter;
             }
@@ -414,9 +475,19 @@ namespace StepBro.Core.Data
         {
             private Func<TParent, PropertyBlockFlag, string> m_setter;
 
-            public Flag(string typeOrName, DocString doc, Func<TParent, PropertyBlockFlag, string> setter = null) : base(typeOrName, doc, PropertyBlockEntryType.Flag)
+            public Flag(string typeOrName, DocString doc, Func<TParent, PropertyBlockFlag, string> setter = null) : base(typeOrName, Usage.Setting, doc, PropertyBlockEntryType.Flag)
             {
                 m_setter = setter;
+            }
+
+            public Flag(string typeOrName, Usage usage, DocString doc, Func<TParent, PropertyBlockFlag, string> setter = null) : base(typeOrName, usage, doc, PropertyBlockEntryType.Flag)
+            {
+                m_setter = setter;
+            }
+
+            public override IEnumerable<Element> ListChilds()
+            {
+                yield break;
             }
 
             protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)

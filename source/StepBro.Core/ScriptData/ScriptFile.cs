@@ -1067,12 +1067,12 @@ namespace StepBro.Core.ScriptData
                 // TODO: Insert some CSS to make it nice.
 
                 StringBuilder helptext = new StringBuilder();
-                helptext.AppendLine($"**StepBro script file documentation** generated at {DateTime.Now.ToString()} for file:");
+                helptext.AppendLine($"**Generated at {DateTime.Now.ToString()}");
                 helptext.AppendLine($"# {this.FileName}");
                 helptext.AppendLine($"**Namespace:** {this.Namespace}<br/>");
                 if (m_fileUsings.Count > 0)
                 {
-                    helptext.AppendLine($"**Usings:**");
+                    helptext.AppendLine($"**File Usings:**");
                     foreach (var u in m_fileUsings)
                     {
                         if (!u.IsAlias)

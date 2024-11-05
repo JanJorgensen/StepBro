@@ -21,6 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="StepBro.Workbench.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="licenses.licx" />
   </ItemGroup>
 
@@ -32,6 +36,8 @@
   <PropertyGroup>
     <ActiproVersion>24.1.0</ActiproVersion>
     <Version>1.0.6</Version>
+    <ApplicationIcon>StepBro.Workbench.ico</ApplicationIcon>
+    <AssemblyName>StepBro.Workbench</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

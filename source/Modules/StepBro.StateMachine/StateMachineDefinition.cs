@@ -61,20 +61,19 @@ namespace StepBro.StateMachine
 
         public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
         {
-            var root = new Block<object, object>(
-                Doc(""),
-                new Array<object>("states", Doc("")),
-                new Value<object>(Doc("")));
-            root.DecodeData(data, null, errors);
+            var root = this.TryGetDecoder();
+            var definitionToDispose = new StateMachineDefinition();
+            ((Block<object, StateMachineDefinition>)root).DecodeData(data, definitionToDispose, errors);
         }
 
         public PropertyBlockDecoder.Element TryGetDecoder()
         {
             return new Block<object, StateMachineDefinition>
                 (
-                    Doc(""),
+                    nameof(StateMachineDefinition),
+                    Doc("Definition of a state machine."),
                     new Array<object>(
-                        "states", Doc(""),
+                        "states", Usage.Setting, Doc("The states in the defined state machine."),
                         (t, a) =>
                         {
                             if (m_states.Count > 0)
@@ -95,7 +94,8 @@ namespace StepBro.StateMachine
                             }
                         }),
                     new Value<StateMachineDefinition>(
-                        Doc(""),
+                        Usage.Element,
+                        Doc("Typed variable for each state machine instance."),
                         (t, v) =>
                         {
                             if (!v.HasTypeSpecified)

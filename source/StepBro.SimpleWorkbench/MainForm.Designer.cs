@@ -238,6 +238,7 @@ namespace StepBro.SimpleWorkbench
             toolStripMenuItemCreateDocumentationFiles.Name = "toolStripMenuItemCreateDocumentationFiles";
             toolStripMenuItemCreateDocumentationFiles.Size = new Size(220, 22);
             toolStripMenuItemCreateDocumentationFiles.Text = "Create Documentation Files";
+            toolStripMenuItemCreateDocumentationFiles.DropDownOpening += toolStripMenuItemCreateDocumentationFiles_DropDownOpening;
             // 
             // toolStripMenuItemCreateProjectOverview
             // 
@@ -444,18 +445,18 @@ namespace StepBro.SimpleWorkbench
             // toolStripMenuItemRunByNamespace
             // 
             toolStripMenuItemRunByNamespace.Name = "toolStripMenuItemRunByNamespace";
-            toolStripMenuItemRunByNamespace.Size = new Size(180, 22);
+            toolStripMenuItemRunByNamespace.Size = new Size(160, 22);
             toolStripMenuItemRunByNamespace.Text = "By Namespace";
             // 
             // toolStripSeparatorRunBeforeHistory
             // 
             toolStripSeparatorRunBeforeHistory.Name = "toolStripSeparatorRunBeforeHistory";
-            toolStripSeparatorRunBeforeHistory.Size = new Size(177, 6);
+            toolStripSeparatorRunBeforeHistory.Size = new Size(157, 6);
             // 
             // toolStripSeparatorRunAfterHistory
             // 
             toolStripSeparatorRunAfterHistory.Name = "toolStripSeparatorRunAfterHistory";
-            toolStripSeparatorRunAfterHistory.Size = new Size(177, 6);
+            toolStripSeparatorRunAfterHistory.Size = new Size(157, 6);
             toolStripSeparatorRunAfterHistory.Visible = false;
             // 
             // toolStripTextBoxRunSearch
@@ -609,6 +610,7 @@ namespace StepBro.SimpleWorkbench
             Controls.Add(panelCustomToolstrips);
             Controls.Add(toolStripMain);
             Controls.Add(statusStrip);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "MainForm";
             Text = "StepBro Workbench";
             statusStrip.ResumeLayout(false);

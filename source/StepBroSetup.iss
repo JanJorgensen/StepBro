@@ -5,7 +5,7 @@
 #define MyAppVersion "1.0.6"
 #define MyAppPublisher "SchmutStein"
 #define MyAppURL "http://www.schmutstein.com/"
-#define MyAppExeName "StepBro.SimpleWorkbench.exe"
+#define MyAppExeName "StepBro.Workbench.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -41,9 +41,9 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\{#MyAppName}"; Filename: "{app}\bin\{#MyAppExeName}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\bin\{#MyAppExeName}"; Tasks: desktopicon
 
 ;[Run]
 ;Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
@@ -75,7 +75,7 @@ Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workb
 ; Specify icon for the menu item:
 ; Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\images\shortcut.ico"; Flags: uninsdeletekey
 ; Define command for the menu item:
-Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}""  ""%1"""; Flags: uninsdeletekey
+Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench\command"; ValueType: string; ValueName: ""; ValueData: """{app}\bin\{#MyAppExeName}""  ""%1"""; Flags: uninsdeletekey
     
 [Code]
 function NeedsAddPath(Param: string): boolean;
