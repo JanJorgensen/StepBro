@@ -492,7 +492,31 @@ namespace StepBro.Cmd
                                 if (file == null)
                                 {
                                     retval = -1;
-                                    ConsoleWriteErrorLine("Error: Loading script file failed ( " + targetFileFullPath + " )");
+                                    ConsoleWriteErrorLine("Error: Loading script file failed.");
+                                    if (File.Exists(targetFileFullPath))
+                                    {
+                                        ConsoleWriteErrorLine("    File was found (" + targetFileFullPath + " ),");
+                                        if (Path.GetExtension(targetFileFullPath).Equals(".sbs", StringComparison.InvariantCulture))
+                                        {
+                                            ConsoleWriteErrorLine("    but the file extension seems wrong.");
+                                        }
+                                        else
+                                        {
+                                            ConsoleWriteErrorLine("    but it could not be opened.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (Path.Exists(targetFileFullPath))
+                                        {
+                                            ConsoleWriteErrorLine("    File was not found (" + targetFileFullPath + " ),");
+                                            ConsoleWriteErrorLine("    and it seems the specified path is only a folder path.");
+                                        }
+                                        else
+                                        {
+                                            ConsoleWriteErrorLine("    File was not found (" + targetFileFullPath + " )");
+                                        }
+                                    }
                                 }
                                 else
                                 {
