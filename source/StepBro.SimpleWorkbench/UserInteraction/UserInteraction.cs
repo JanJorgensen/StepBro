@@ -35,11 +35,38 @@ namespace StepBro.SimpleWorkbench
             m_closeEvent.Set();
         }
 
+        internal void NotifySelection(string tag, int selection)
+        {
+            var index = FindSelectionEntry(tag);
+            if (index >= 0)
+            {
+                m_selectionsMade[index] = new Tuple<string, int>(tag, selection);
+            }
+            else
+            {
+                m_selectionsMade.Add(new Tuple<string, int>(tag, selection));
+            }
+        }
+
+        private int FindSelectionEntry(string tag)
+        {
+            return m_selectionsMade.FindIndex(s => (tag == null && s.Item1 == null) || String.Equals(tag, s.Item1, StringComparison.InvariantCulture));
+        }
+
         #region Script Interface
 
         public override int GetSelection([Implicit] ICallContext context, string tag)
         {
-            return 30;
+            var tagIndex = this.FindSelectionEntry(tag);
+            if (tagIndex >= 0)
+            {
+                return m_selectionsMade[tagIndex].Item2;
+            }
+            else
+            {
+                // No selection made, or nonexisting section.
+                return -1;
+            }
         }
 
         public override UserResponse Open([Implicit] ICallContext context, TimeSpan timeout = default, UserResponse defaultAnswer = UserResponse.OK)

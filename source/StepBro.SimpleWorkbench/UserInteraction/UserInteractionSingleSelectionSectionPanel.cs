@@ -26,6 +26,8 @@ namespace StepBro.SimpleWorkbench
             InitializeComponent();
         }
 
+        public EventHandler SelectionChanged;
+
         public void SetHeader(string text)
         {
             this.SetupIfJustOpened();
@@ -48,6 +50,8 @@ namespace StepBro.SimpleWorkbench
             radioButton.TabStop = true;
             radioButton.Text = text;
             radioButton.UseVisualStyleBackColor = true;
+            radioButton.CheckedChanged += RadioButton_CheckedChanged;
+            radioButton.Tag = groupBox.Controls.Count;
             groupBox.Controls.Add(radioButton);
             groupBox.Height = m_groupBoxEmptyHeight + (m_optionsVerticalSpacing * groupBox.Controls.Count);
             this.Height = groupBox.Height + (m_panelInitialHeight - m_groupBoxInitialHeight);
@@ -55,6 +59,16 @@ namespace StepBro.SimpleWorkbench
             groupBox.ResumeLayout(false);
             groupBox.PerformLayout();
             ResumeLayout(false);
+        }
+
+        private void RadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            var button = (RadioButton)sender;
+            if (button.Checked)
+            {
+                this.CurrentSelection = (int)button.Tag;
+                this.SelectionChanged?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         private void SetupIfJustOpened()
@@ -73,5 +87,7 @@ namespace StepBro.SimpleWorkbench
                 m_initialValues = false;
             }
         }
+
+        public int CurrentSelection { get; private set; } = -1;
     }
 }

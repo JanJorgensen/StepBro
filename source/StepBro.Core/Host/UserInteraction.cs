@@ -75,5 +75,26 @@ namespace StepBro.Core.Host
         public abstract UserResponse Open([Implicit] ICallContext context, TimeSpan timeout = default(TimeSpan), UserResponse defaultAnswer = UserResponse.OK);
 
         public abstract int GetSelection([Implicit] ICallContext context, string tag);
+        public string GetSelectionText([Implicit] ICallContext context, string tag)
+        {
+            var index = GetSelection(context, tag);
+            if (index >= 0)
+            {
+                var section = m_sections.FirstOrDefault(s => (s is SectionSingleSelection selection) && ((tag == null && selection.Tag == null) || String.Equals(tag, selection.Tag, StringComparison.InvariantCulture))) as SectionSingleSelection;
+
+                if (section != null)
+                {
+                    return section.Options[index];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

@@ -55,6 +55,7 @@ namespace StepBro.SimpleWorkbench
                     {
                         sectionPanel.AddOption(option);
                     }
+                    sectionPanel.SelectionChanged += SingleSelectionSectionPanel_SelectionChanged;
                     flowLayoutPanelSections.Controls.Add(sectionPanel);
                     sectionsHeight += (sectionPanel.Height + sectionPanel.Margin.Top + sectionPanel.Margin.Bottom);
                 }
@@ -66,6 +67,13 @@ namespace StepBro.SimpleWorkbench
             this.Size = new Size(this.Size.Width, this.Size.Height + (sectionPanelOptimalHeight - flowLayoutPanelSections.Height));
             //this.Height += (sectionPanelOptimalHeight - flowLayoutPanelSections.Height);
         }
+
+        private void SingleSelectionSectionPanel_SelectionChanged(object sender, EventArgs e)
+        {
+            var sectionPanel = sender as UserInteractionSingleSelectionSectionPanel;
+            m_interactionData.NotifySelection((string)sectionPanel.Tag, sectionPanel.CurrentSelection);
+        }
+
 
         private void buttonOK_Click(object sender, EventArgs e)
         {
