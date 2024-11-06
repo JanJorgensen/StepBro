@@ -249,28 +249,15 @@ namespace StepBro.SimpleWorkbench
                 //if (!String.IsNullOrWhiteSpace(line)) ConsoleWriteLine(line);
             }
 
-            m_targetFile = m_commandLineOptions.InputFile;
 
-            if (!String.IsNullOrEmpty(m_targetFile))
+            if (!String.IsNullOrEmpty(m_commandLineOptions.InputFile))
             {
-                this.StartScriptFileLoading();
-                this.StartFileParsing();
-
-                if (!String.IsNullOrEmpty(m_commandLineOptions.TargetElement))
-                {
-                    var executionData = new ScriptExecutionData(
-                        this,
-                        null,
-                        m_commandLineOptions.TargetModel,
-                        m_commandLineOptions.TargetInstance,
-                        null);
-                    executionData.ElementName = m_commandLineOptions.TargetElement; // To be resolved.
-                    if (m_commandLineOptions.Arguments != null)
-                    {
-                        executionData.UnparsedArguments = m_commandLineOptions.Arguments.ToList();
-                    }
-                    this.StartScriptExecution(executionData);
-                }
+                this.OpenMainFile(
+                    m_commandLineOptions.InputFile,
+                    m_commandLineOptions.TargetElement,
+                    m_commandLineOptions.TargetModel,
+                    m_commandLineOptions.TargetInstance,
+                    (m_commandLineOptions.Arguments != null) ? m_commandLineOptions.Arguments.ToList() : null);
             }
             else
             {
@@ -450,6 +437,8 @@ namespace StepBro.SimpleWorkbench
 
         private void toolStripMenuItemFile_DropDownOpening(object sender, EventArgs e)
         {
+            toolStripMenuItemFileOpen.Enabled = (m_file == null);
+
             if (dockManager.SelectedDocument is DocumentWindow window && dockManager.SelectedDocument.Tag is ILoadedFile file)
             {
                 if (window.Controls[0] is FastColoredTextBoxNS.FastColoredTextBox editor)
@@ -465,8 +454,52 @@ namespace StepBro.SimpleWorkbench
 
         private void toolStripMenuItemFileOpen_Click(object sender, EventArgs e)
         {
+            var fileContent = string.Empty;
+            var filePath = string.Empty;
 
+            using (var openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = System.Environment.CurrentDirectory;
+                openFileDialog.Filter = "StepBro Script files (*.sbs)|*.sbs|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 1;
+                openFileDialog.CheckFileExists = true;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    m_mainLogger.LogUserAction($"Open file \"{openFileDialog.FileName}\"");
+
+                    this.OpenMainFile(openFileDialog.FileName);
+                }
+            }
         }
+
+        private void OpenMainFile(string file, string targetElement = null, string targetModel = null, string targetInstance = null, List<string> arguments = null)
+        {
+            if (!String.IsNullOrEmpty(file) && File.Exists(file))
+            {
+                m_targetFile = file;
+                this.StartScriptFileLoading();
+                this.StartFileParsing();
+
+                if (!String.IsNullOrEmpty(targetElement))
+                {
+                    var executionData = new ScriptExecutionData(
+                        this,
+                        null,
+                        targetModel,
+                        targetInstance,
+                        null);
+                    executionData.ElementName = m_commandLineOptions.TargetElement; // To be resolved.
+                    if (arguments != null)
+                    {
+                        executionData.UnparsedArguments = arguments;
+                    }
+                    this.StartScriptExecution(executionData);
+                }
+            }
+        }
+
 
         private void toolStripMenuItemFileSave_Click(object sender, EventArgs e)
         {

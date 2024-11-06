@@ -171,7 +171,7 @@ namespace StepBro.SimpleWorkbench
             // 
             toolStripMenuItemFile.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemFileOpen, toolStripMenuItemFileSave, toolStripSeparator4, toolStripMenuItemSaveLogActivate, toolStripMenuItemSaveLogLongOnly, toolStripMenuItemSaveLogNow, toolStripSeparator5, toolStripMenuItemFileTestReport, toolStripMenuItemCreateDocumentationFiles });
             toolStripMenuItemFile.Name = "toolStripMenuItemFile";
-            toolStripMenuItemFile.Size = new Size(179, 22);
+            toolStripMenuItemFile.Size = new Size(180, 22);
             toolStripMenuItemFile.Text = "&File";
             toolStripMenuItemFile.DropDownOpening += toolStripMenuItemFile_DropDownOpening;
             // 
@@ -258,7 +258,7 @@ namespace StepBro.SimpleWorkbench
             // 
             toolStripMenuItemView.DropDownItems.AddRange(new ToolStripItem[] { viewExecutionLogToolStripMenuItem, viewErrorsToolStripMenuItem, viewPropertiesToolStripMenuItem, viewReportOverviewToolStripMenuItem, toolStripSeparator3, viewObjectCommandPromptToolStripMenuItem, toolStripMenuItemExeNoteInput, toolStripSeparator2, viewSelectionDocToolStripMenuItem, toolStripSeparator6, viewToolbarsToolStripMenuItem });
             toolStripMenuItemView.Name = "toolStripMenuItemView";
-            toolStripMenuItemView.Size = new Size(179, 22);
+            toolStripMenuItemView.Size = new Size(180, 22);
             toolStripMenuItemView.Text = "&View";
             toolStripMenuItemView.DropDownOpened += toolStripMenuItemView_DropDownOpened;
             // 
@@ -348,7 +348,7 @@ namespace StepBro.SimpleWorkbench
             // 
             shortcutsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { toolStripMenuItemDeleteShortcut, toolStripMenuItemDeleteAllShortcuts });
             shortcutsToolStripMenuItem.Name = "shortcutsToolStripMenuItem";
-            shortcutsToolStripMenuItem.Size = new Size(179, 22);
+            shortcutsToolStripMenuItem.Size = new Size(180, 22);
             shortcutsToolStripMenuItem.Text = "Execution Shortcuts";
             // 
             // toolStripMenuItemDeleteShortcut
@@ -369,7 +369,7 @@ namespace StepBro.SimpleWorkbench
             // 
             helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { viewDocumentationBrowserToolStripMenuItem });
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            helpToolStripMenuItem.Size = new Size(179, 22);
+            helpToolStripMenuItem.Size = new Size(180, 22);
             helpToolStripMenuItem.Text = "&Help";
             helpToolStripMenuItem.Visible = false;
             // 
@@ -384,12 +384,12 @@ namespace StepBro.SimpleWorkbench
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(176, 6);
+            toolStripSeparator1.Size = new Size(177, 6);
             // 
             // toolStripMenuItemExit
             // 
             toolStripMenuItemExit.Name = "toolStripMenuItemExit";
-            toolStripMenuItemExit.Size = new Size(179, 22);
+            toolStripMenuItemExit.Size = new Size(180, 22);
             toolStripMenuItemExit.Text = "E&xit";
             toolStripMenuItemExit.Click += toolStripMenuItemExit_Click;
             // 
