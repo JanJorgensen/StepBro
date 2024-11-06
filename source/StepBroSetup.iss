@@ -58,6 +58,7 @@ Name: "{app}\scripts\smoketest"
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 [Files]
 Source: "bin\*"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs
+Source: "StepBro.SimpleWorkbench\StepBro.Workbench.ico"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs
 Source: "StepBro Station Properties.cfg"; DestDir: "{%USERPROFILE}\Documents"; Flags: onlyifdoesntexist
 
 [Registry]
@@ -73,7 +74,7 @@ Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environmen
 ; Add 'My PDF Editor' menu item to the Shell menu for PDF files:
 Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench"; ValueType: none; ValueName: ""; ValueData: ""; Flags: uninsdeletekey
 ; Specify icon for the menu item:
-; Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\images\shortcut.ico"; Flags: uninsdeletekey
+Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\bin\StepBro.Workbench.ico"; Flags: uninsdeletekey
 ; Define command for the menu item:
 Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench\command"; ValueType: string; ValueName: ""; ValueData: """{app}\bin\{#MyAppExeName}""  ""%1"""; Flags: uninsdeletekey
     
