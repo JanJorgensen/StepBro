@@ -248,7 +248,8 @@ namespace StepBro.Core.DocCreation
 
         private static void CreateDecoderBlockDocumentation(PropertyBlockDecoder.Element block, PropertyBlockDecoder.Element parent, List<Element> hosting, int headingLevel, StringBuilder output)
         {
-            output.Append($"{new String('#', headingLevel)} {block.TypeOrName} {new String('#', headingLevel)} {{#{GetBlockHeadingLink(block)}}}");
+            string headerTail = (parent != null) ? " element" : ""; 
+            output.Append($"{new String('#', headingLevel)} {block.TypeOrName}{headerTail} {new String('#', headingLevel)} {{#{GetBlockHeadingLink(block)}}}");
             if (!String.IsNullOrEmpty(block.AlternativeTypeOrName))
             {
                 output.Append(" (or ");
@@ -308,7 +309,7 @@ namespace StepBro.Core.DocCreation
             output.Append("* ");
             if (isTypeReference)
             {
-                output.Append("[");
+                output.Append("__[");
             }
             else
             {
@@ -317,7 +318,7 @@ namespace StepBro.Core.DocCreation
             output.Append(child.TypeOrName);
             if (isTypeReference)
             {
-                output.Append($"](#{GetBlockHeadingLink(child)})");
+                output.Append($"](#{GetBlockHeadingLink(child)})__");
             }
             else
             {
@@ -325,9 +326,9 @@ namespace StepBro.Core.DocCreation
             }
             if (!String.IsNullOrEmpty(child.AlternativeTypeOrName))
             {
-                output.Append(" (or ");
+                output.Append(" (or __");
                 output.Append(child.AlternativeTypeOrName);
-                output.Append(")");
+                output.Append("__)");
             }
 
             if (!String.IsNullOrEmpty(child.Documentation))
