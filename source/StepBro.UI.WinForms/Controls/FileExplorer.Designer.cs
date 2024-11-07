@@ -83,11 +83,14 @@
             toolStripButtonShowFiles.Size = new Size(34, 22);
             toolStripButtonShowFiles.Text = "Files";
             toolStripButtonShowFiles.ToolTipText = "Show general files view";
+            toolStripButtonShowFiles.Visible = false;
             toolStripButtonShowFiles.CheckedChanged += toolStripButtonShowFiles_CheckedChanged;
             // 
             // toolStripButtonShowElements
             // 
+            toolStripButtonShowElements.Checked = true;
             toolStripButtonShowElements.CheckOnClick = true;
+            toolStripButtonShowElements.CheckState = CheckState.Checked;
             toolStripButtonShowElements.DisplayStyle = ToolStripItemDisplayStyle.Text;
             toolStripButtonShowElements.Image = (Image)resources.GetObject("toolStripButtonShowElements.Image");
             toolStripButtonShowElements.ImageTransparentColor = Color.Magenta;
