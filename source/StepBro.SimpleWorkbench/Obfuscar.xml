@@ -15,5 +15,5 @@
     <AssemblySearchPath path="c:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.8\" />
     <AssemblySearchPath path="c:\Windows\Microsoft.NET\Framework64\v4.0.30319" />
 
-    <Module file="$(InPath)\StepBro.SimpleWorkbench.dll" />
+    <Module file="$(InPath)\StepBro.Workbench.dll" />
 </Obfuscator>
