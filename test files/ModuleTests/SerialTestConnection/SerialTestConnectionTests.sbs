@@ -2,11 +2,11 @@ using StepBro.Streams;
 using StepBro.TestInterface;
 using "TestFramework.sbs";
 
-//public SerialPort port = SerialPort(){}
+public SerialPort port = SerialPort(){}
 
 public SerialTestConnection connection = SerialTestConnection()
 {
-    //Stream = port
+    Stream = port
 }
 
 public testlist SerialTestConnectionOfflineTests : TestSuite
