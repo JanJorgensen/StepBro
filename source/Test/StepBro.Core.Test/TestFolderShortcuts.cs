@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,22 +36,27 @@ namespace StepBroCoreTest
         public void NoRelative()
         {
             string error = null;
-            Assert.AreEqual(@"C:\temp", m_collection.ListShortcuts().ResolveShortcutPath("[Anna]", ref error));
-            Assert.AreEqual(@"C:\temp\sub", m_collection.ListShortcuts().ResolveShortcutPath("[Christina]", ref error));
+            string pathToTemp = Path.Join("C:", "temp");
+            string pathToSub = Path.Join(pathToTemp, "sub");
+            Assert.AreEqual(pathToTemp, m_collection.ListShortcuts().ResolveShortcutPath("[Anna]", ref error));
+            Assert.AreEqual(pathToSub, m_collection.ListShortcuts().ResolveShortcutPath("[Christina]", ref error));
         }
 
         [TestMethod]
         public void RelativePath()
         {
             string error = null;
-            Assert.AreEqual(@"C:\temp\f1\file.txt", m_collection.ListShortcuts().ResolveShortcutPath(@"[Anna]\f1\file.txt", ref error));
-            Assert.AreEqual(@"C:\temp\sub\f1\file.txt", m_collection.ListShortcuts().ResolveShortcutPath(@"[Christina]\f1\file.txt", ref error));
+            string pathToTemp = Path.Join("C:", "temp");
+            string pathToSub = Path.Join(pathToTemp, "sub");
 
-            Assert.AreEqual(@"C:\temp\..\f2\file.txt", m_collection.ListShortcuts().ResolveShortcutPath(@"[Anna]\..\f2\file.txt", ref error));
-            Assert.AreEqual(@"C:\temp\sub\..\f2\file.txt", m_collection.ListShortcuts().ResolveShortcutPath(@"[Christina]\..\f2\file.txt", ref error));
+            Assert.AreEqual(Path.Join(pathToTemp, "f1", "file.txt"), m_collection.ListShortcuts().ResolveShortcutPath(@"[Anna]\f1\file.txt", ref error));
+            Assert.AreEqual(Path.Join(pathToSub, "f1", "file.txt"), m_collection.ListShortcuts().ResolveShortcutPath(@"[Christina]\f1\file.txt", ref error));
 
-            Assert.AreEqual(@"C:\f2\file.txt", m_collection.ListShortcuts().GetFullPath(@"[Anna]\..\f2\file.txt", ref error));
-            Assert.AreEqual(@"C:\temp\f2\file.txt", m_collection.ListShortcuts().GetFullPath(@"[Christina]\..\f2\file.txt", ref error));
+            Assert.AreEqual(Path.Join(pathToTemp, "..", "f2", "file.txt"), m_collection.ListShortcuts().ResolveShortcutPath(@"[Anna]\..\f2\file.txt", ref error));
+            Assert.AreEqual(Path.Join(pathToSub, "..", "f2", "file.txt"), m_collection.ListShortcuts().ResolveShortcutPath(@"[Christina]\..\f2\file.txt", ref error));
+
+            Assert.AreEqual(Path.Join("C:", "f2", "file.txt"), m_collection.ListShortcuts().GetFullPath(@"[Anna]\..\f2\file.txt", ref error));
+            Assert.AreEqual(Path.Join(pathToTemp, "f2", "file.txt"), m_collection.ListShortcuts().GetFullPath(@"[Christina]\..\f2\file.txt", ref error));
         }
 
         //[TestMethod]
