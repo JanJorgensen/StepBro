@@ -47,8 +47,8 @@ namespace StepBroCoreTest
         {
             string error = null;
             // For compatibility between OSes
-            string pathToC = (Path.GetDirectoryName("C:") == null ? "C:" : new FileInfo("C:").Directory.FullName);
-            string pathToTemp = Path.Join(pathToC, "temp");
+            string pathToC = (Path.GetDirectoryName("C:") == null ? "C:" : Path.Join(new FileInfo("C:").Directory.FullName, "C:"));
+            string pathToTemp = Path.Join("C:", "temp");
             string pathToSub = Path.Join(pathToTemp, "sub");
 
             Assert.AreEqual(Path.Join(pathToTemp, "f1", "file.txt"), m_collection.ListShortcuts().ResolveShortcutPath(Path.Join("[Anna]", "f1", "file.txt"), ref error));
