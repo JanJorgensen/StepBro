@@ -372,7 +372,7 @@ namespace StepBro.Core.Parser
                     // First check if there's a ctor with object name as parameter.
                     var ctor = m_creatorType.Type.GetConstructor(new Type[] { typeof(string) });
                     string infoText = "1: " + ctor + ". " + "2: " + ObjectNameAttribute.IsObjectName(ctor.GetParameters()[0]);
-                    if (ctor != null && ObjectNameAttribute.IsObjectName(ctor.GetParameters()[0]))
+                    if (ctor != null && true) // ObjectNameAttribute.IsObjectName(ctor.GetParameters()[0]))
                     {
                         var code = Expression.New(ctor, Expression.Constant(m_variableName));
                         createAction = CreateVariableContainerValueAssignAction(code);
