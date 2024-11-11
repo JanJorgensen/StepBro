@@ -6,7 +6,7 @@ using StepBro.Core.Logging;
 using System;
 using System.Linq;
 using System.Text;
-using System.Management;
+// using System.Management;
 using System.Security.AccessControl;
 using static StepBro.Core.Execution.ActionQueue;
 using System.Collections.Generic;
