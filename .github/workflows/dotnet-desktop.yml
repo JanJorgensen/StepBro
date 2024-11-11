@@ -91,7 +91,7 @@ jobs:
     #   run: msbuild source/StepBro.sln -r -t:Clean`;Rebuild
 
     - name: Install dependencies
-      run: dotnet restore source/StepBro.sln
+      run: dotnet restore source/StepBro.sln /p:EnableWindowsTargeting=true
       
     - name: Build
       run: dotnet build source/StepBro.sln /p:EnableWindowsTargeting=true
