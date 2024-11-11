@@ -58,7 +58,7 @@ namespace StepBroCoreTest
             Assert.AreEqual(Path.Join(pathToSub, "..", "f2", "file.txt"), m_collection.ListShortcuts().ResolveShortcutPath(Path.Join("[Christina]", "..", "f2", "file.txt"), ref error));
 
             Assert.AreEqual(Path.Join(pathToC, "f2", "file.txt"), m_collection.ListShortcuts().GetFullPath(Path.Join("[Anna]", "..", "f2", "file.txt"), ref error));
-            Assert.AreEqual(Path.Join(pathToTemp, "f2", "file.txt"), m_collection.ListShortcuts().GetFullPath(Path.Join("[Christina]", "..", "f2", "file.txt"), ref error));
+            Assert.AreEqual(Path.Join(pathToC, "temp", "f2", "file.txt"), m_collection.ListShortcuts().GetFullPath(Path.Join("[Christina]", "..", "f2", "file.txt"), ref error));
         }
 
         //[TestMethod]
