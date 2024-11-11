@@ -96,10 +96,14 @@ namespace StepBro.Streams
             m_port = null;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
+        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
         private static List<Tuple<string, string, string, string>> ListAvailablePortsInternal()
         {
             var list = new List<Tuple<string, string, string, string>>();
+#if !TARGET_WINDOWS 
+            list = System.IO.Ports.SerialPort.GetPortNames().Select(p => new Tuple<string, string, string, string>(p, null, null, null)).ToList();
+#else
+            System.IO.Ports.SerialPort.GetPortNames()
             using (ManagementClass i_Entity = new ManagementClass("Win32_PnPEntity"))
             {
                 foreach (ManagementObject i_Inst in i_Entity.GetInstances())
@@ -124,16 +128,15 @@ namespace StepBro.Streams
                     list.Add(new Tuple<string, string, string, string>(portName, caption, manufacturer, deviceIDParts[deviceIDParts.Length - 1]));
                 }
             }
+#endif
             return list;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
         public static System.Collections.Generic.List<string> ListAvailablePorts()
         {
             return ListAvailablePortsInternal().Select(p => p.Item1).ToList();
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
         protected override bool DoOpen(StepBro.Core.Execution.ICallContext context)
         {
             try
@@ -152,17 +155,20 @@ namespace StepBro.Streams
                 }
                 if (context != null && context.LoggingEnabled)
                 {
+
+#if !TARGET_WINDOWS
+                    // Cross platform solution.
+                    var available = ListAvailablePorts();
+                    if (available != null && available.Count > 0)
+                    {
+                        context.Logger.Log("Available port(s): " + String.Join(", ", available.Select(s => "'" + s + "'")));
+                    }
+#else
                     foreach (var port in ListAvailablePortsInternal())
                     {
                         context.Logger.Log($"Available port: {port.Item1}, \"{port.Item2}\" by {port.Item3}. ID: {port.Item4}");
                     }
-
-                    // Cross platform solution.
-                    //var available = System.IO.Ports.SerialPort.GetPortNames();
-                    //if (available != null && available.Length > 0)
-                    //{
-                    //    context.Logger.Log("Available port(s): " + String.Join(", ", available.Select(s => "'" + s + "'")));
-                    //}
+#endif
                 }
                 throw;
             }
