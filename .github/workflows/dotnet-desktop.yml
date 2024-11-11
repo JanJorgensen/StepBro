@@ -101,13 +101,13 @@ jobs:
     #   run: .\source\bin\stepbro.exe --version
         
     - name: Run StepBro Consoletest
-      run: ./source/bin/stepbro.exe "./test files/smoketest/ConsoleTest.sbs" -v -e HelloStepBro --exitcode Verdict
+      run: ./source/bin/stepbro "./test files/smoketest/ConsoleTest.sbs" -v -e HelloStepBro --exitcode Verdict
 
     - name: Run StepBro Smoketest
-      run: ./source/bin/stepbro.exe "./test files/smoketest/smoketest.sbs" -v -e AllTests -m FormalTest --exitcode SubVerdict
+      run: ./source/bin/stepbro "./test files/smoketest/smoketest.sbs" -v -e AllTests -m FormalTest --exitcode SubVerdict
 
     - name: Run SerialTestConnection test
-      run: ./source/bin/stepbro.exe "./test files/ModuleTests/SerialTestConnection/SerialTestConnectionTests.sbs" -v -e SerialTestConnectionOfflineTests -m FormalTest --exitcode SubVerdict
+      run: ./source/bin/stepbro "./test files/ModuleTests/SerialTestConnection/SerialTestConnectionTests.sbs" -v -e SerialTestConnectionOfflineTests -m FormalTest --exitcode SubVerdict
 
     - name: Run ExecutionHelper test
-      run: ./source/bin/stepbro.exe "./test files/ModuleTests/ExecutionHelper/ExecutionHelperTests.sbs" -v -e ExecutionHelperTests -m FormalTest --exitcode SubVerdict
+      run: ./source/bin/stepbro "./test files/ModuleTests/ExecutionHelper/ExecutionHelperTests.sbs" -v -e ExecutionHelperTests -m FormalTest --exitcode SubVerdict
