@@ -13,6 +13,7 @@ public testlist SerialTestConnectionOfflineTests : TestSuite
 {
     * TestSetupCommandHash
     * TestSerialPortName
+    * TestListSerialPorts
 }
 
 void TestSetupCommandHash() : TestCase
@@ -36,6 +37,13 @@ void TestSetupCommandHash() : TestCase
 void TestSerialPortName() : TestCase
 {
     expect(port.Name == "port");
+}
+
+void TestListSerialPorts() : TestCase
+{
+    string[] ports = SerialPort.ListAvailablePorts();
+
+    log(ports);
 }
 
 string CreateSetupHash(int option)
