@@ -11,8 +11,9 @@ jobs:
     strategy:
       matrix:
         configuration: [Debug, Release]
+        os: [ubuntu-latest, windows-latest]
 
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     
     env:
       Solution_Name: source\StepBro.sln
@@ -52,7 +53,7 @@ jobs:
       matrix:
         configuration: [Debug, Release]
 
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
 
     env:
       Solution_Name: source\StepBro.sln
