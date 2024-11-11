@@ -390,7 +390,7 @@ namespace StepBro.Core.Parser
                             var createMethods =
                                 m_creatorType.Type.GetMethods().Where(
                                     m => String.Equals(m.Name, "Create", StringComparison.InvariantCulture) && m.IsStatic).ToArray();
-                            throw new NotImplementedException(String.Join(", ", m_creatorType.Type.GetConstructors().Select(c => String.Join("-", c.GetParameters().Select(p => p.ParameterType.ToString())))));
+                            throw new NotImplementedException(String.Join(", ", m_creatorType.Type.GetConstructors().Select(c => "Bøvs " + String.Join("-", c.GetParameters().Select(p => p.ParameterType.ToString())))));
                         }
                     }
                 }
