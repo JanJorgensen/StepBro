@@ -46,7 +46,9 @@ namespace StepBroCoreTest
         public void RelativePath()
         {
             string error = null;
-            string pathToTemp = Path.Join(Path.GetDirectoryName("C:"), "C:", "temp");
+            // For compatibility between OSes
+            string pathToC = (Path.GetDirectoryName("C:") == null ? "C:" : new FileInfo("C:").Directory.FullName);
+            string pathToTemp = Path.Join(pathToC, "temp");
             string pathToSub = Path.Join(pathToTemp, "sub");
 
             Assert.AreEqual(Path.Join(pathToTemp, "f1", "file.txt"), m_collection.ListShortcuts().ResolveShortcutPath(Path.Join("[Anna]", "f1", "file.txt"), ref error));
@@ -55,7 +57,7 @@ namespace StepBroCoreTest
             Assert.AreEqual(Path.Join(pathToTemp, "..", "f2", "file.txt"), m_collection.ListShortcuts().ResolveShortcutPath(Path.Join("[Anna]", "..", "f2", "file.txt"), ref error));
             Assert.AreEqual(Path.Join(pathToSub, "..", "f2", "file.txt"), m_collection.ListShortcuts().ResolveShortcutPath(Path.Join("[Christina]", "..", "f2", "file.txt"), ref error));
 
-            Assert.AreEqual(Path.Join(Path.GetDirectoryName("C:"), "C:", "f2", "file.txt"), m_collection.ListShortcuts().GetFullPath(Path.Join("[Anna]", "..", "f2", "file.txt"), ref error));
+            Assert.AreEqual(Path.Join(pathToC, "f2", "file.txt"), m_collection.ListShortcuts().GetFullPath(Path.Join("[Anna]", "..", "f2", "file.txt"), ref error));
             Assert.AreEqual(Path.Join(pathToTemp, "f2", "file.txt"), m_collection.ListShortcuts().GetFullPath(Path.Join("[Christina]", "..", "f2", "file.txt"), ref error));
         }
 
