@@ -6,7 +6,7 @@ using StepBro.Core.Logging;
 using System;
 using System.Linq;
 using System.Text;
-// using System.Management;
+using System.Management;
 using System.Security.AccessControl;
 using static StepBro.Core.Execution.ActionQueue;
 using System.Collections.Generic;
@@ -100,35 +100,38 @@ namespace StepBro.Streams
         private static List<Tuple<string, string, string, string>> ListAvailablePortsInternal()
         {
             var list = new List<Tuple<string, string, string, string>>();
-#if !TARGET_WINDOWS 
-            list = System.IO.Ports.SerialPort.GetPortNames().Select(p => new Tuple<string, string, string, string>(p, null, null, null)).ToList();
-#else
-            System.IO.Ports.SerialPort.GetPortNames()
-            using (ManagementClass i_Entity = new ManagementClass("Win32_PnPEntity"))
+            if (!OperatingSystem.IsWindows())
             {
-                foreach (ManagementObject i_Inst in i_Entity.GetInstances())
+                list = System.IO.Ports.SerialPort.GetPortNames().Select(p => new Tuple<string, string, string, string>(p, null, null, null)).ToList();
+            }
+            else
+            {
+                System.IO.Ports.SerialPort.GetPortNames();
+                using (ManagementClass i_Entity = new ManagementClass("Win32_PnPEntity"))
                 {
-                    // Solution found at: https://stackoverflow.com/questions/2837985/getting-serial-port-information
+                    foreach (ManagementObject i_Inst in i_Entity.GetInstances())
+                    {
+                        // Solution found at: https://stackoverflow.com/questions/2837985/getting-serial-port-information
 
-                    Object classID = i_Inst.GetPropertyValue("ClassGuid");
-                    if (classID == null || classID.ToString().ToUpper() != "{4D36E978-E325-11CE-BFC1-08002BE10318}")
-                        continue; // Skip all devices except device class "PORTS"
+                        Object classID = i_Inst.GetPropertyValue("ClassGuid");
+                        if (classID == null || classID.ToString().ToUpper() != "{4D36E978-E325-11CE-BFC1-08002BE10318}")
+                            continue; // Skip all devices except device class "PORTS"
 
-                    string caption = i_Inst.GetPropertyValue("Caption").ToString();
-                    string manufacturer = i_Inst.GetPropertyValue("Manufacturer").ToString();
-                    string deviceID = i_Inst.GetPropertyValue("PnpDeviceID").ToString();
-                    string regPath = "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Enum\\" + deviceID + "\\Device Parameters";
-                    string portName = Registry.GetValue(regPath, "PortName", "").ToString();
+                        string caption = i_Inst.GetPropertyValue("Caption").ToString();
+                        string manufacturer = i_Inst.GetPropertyValue("Manufacturer").ToString();
+                        string deviceID = i_Inst.GetPropertyValue("PnpDeviceID").ToString();
+                        string regPath = "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Enum\\" + deviceID + "\\Device Parameters";
+                        string portName = Registry.GetValue(regPath, "PortName", "").ToString();
 
-                    int i = caption.IndexOf(" (COM");
-                    if (i > 0) // remove COM port from description
-                        caption = caption.Substring(0, i);
-                    var deviceIDParts = deviceID.Split(new char[] { '\\' });
+                        int i = caption.IndexOf(" (COM");
+                        if (i > 0) // remove COM port from description
+                            caption = caption.Substring(0, i);
+                        var deviceIDParts = deviceID.Split(new char[] { '\\' });
 
-                    list.Add(new Tuple<string, string, string, string>(portName, caption, manufacturer, deviceIDParts[deviceIDParts.Length - 1]));
+                        list.Add(new Tuple<string, string, string, string>(portName, caption, manufacturer, deviceIDParts[deviceIDParts.Length - 1]));
+                    }
                 }
             }
-#endif
             return list;
         }
 
