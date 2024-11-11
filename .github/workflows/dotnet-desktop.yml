@@ -18,8 +18,6 @@ jobs:
     env:
       Solution_Name: source/StepBro.sln
       Test_Project_Path: source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
-      Wap_Project_Directory: your-wap-project-directory-name    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
-      Wap_Project_Path: your-wap-project-path                   # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
   
   
   
@@ -34,10 +32,6 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
-
-    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
-    # - name: Setup MSBuild.exe
-    #   uses: microsoft/setup-msbuild@v1.0.2
 
     - name: Install dependencies
       run: dotnet restore source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
@@ -65,8 +59,6 @@ jobs:
     env:
       Solution_Name: source/StepBro.sln
       Test_Project_Path: source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
-      Wap_Project_Directory: your-wap-project-directory-name    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
-      Wap_Project_Path: your-wap-project-path                   # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
 
 
 
@@ -81,14 +73,6 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
-
-    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
-    # - name: Setup MSBuild.exe
-    #   uses: microsoft/setup-msbuild@v1.0.2
-
-    # Build StepBro so we can use it to test StepBro scripts
-    # - name: Build StepBro
-    #   run: msbuild source/StepBro.sln -r -t:Clean`;Rebuild
 
     - name: Install dependencies
       run: dotnet restore source/StepBro.sln /p:EnableWindowsTargeting=true
