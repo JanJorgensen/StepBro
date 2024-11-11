@@ -6,7 +6,7 @@ public SerialPort port = SerialPort(){}
 
 public SerialTestConnection connection = SerialTestConnection()
 {
-    Stream = port
+    //Stream = port
 }
 
 public testlist SerialTestConnectionOfflineTests : TestSuite
@@ -35,7 +35,7 @@ void TestSetupCommandHash() : TestCase
 
 void TestSerialPortName() : TestCase
 {
-    //expect(port.Name == "port");
+    expect(port.Name == "port");
 }
 
 string CreateSetupHash(int option)
