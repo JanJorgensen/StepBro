@@ -33,11 +33,17 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
+    # - name: Setup MSBuild.exe
+    #   uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Install dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build
 
     # Execute all unit tests in the solution
     - name: Execute unit tests
@@ -73,15 +79,21 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
 
     # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
+    # - name: Setup MSBuild.exe
+    #   uses: microsoft/setup-msbuild@v1.0.2
 
     # Build StepBro so we can use it to test StepBro scripts
-    - name: Build StepBro
-      run: msbuild source/StepBro.sln -r -t:Clean`;Rebuild
+    # - name: Build StepBro
+    #   run: msbuild source/StepBro.sln -r -t:Clean`;Rebuild
+
+    - name: Install dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build
         
     # TODO: Out-commented because stepbro --version has exit code -1 for some reason, when it is fixed this can be re-added
     # - name: Run StepBro Version Check
