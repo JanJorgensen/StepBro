@@ -1,5 +1,4 @@
-﻿using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
-using StepBro.Core.Tasks;
+﻿using StepBro.Core.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
