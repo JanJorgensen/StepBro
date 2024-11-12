@@ -1,4 +1,5 @@
-﻿using StepBro.Core.Tasks;
+﻿using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
+using StepBro.Core.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,14 @@ namespace StepBro.Core.Host
 {
     public abstract class HostApplicationTaskHandler
     {
+
+        public enum Priority
+        {
+            Low,
+            Normal,
+            High
+        }
+
         public enum TaskAction
         {
             Continue,
@@ -19,6 +28,23 @@ namespace StepBro.Core.Host
             Delay500ms,
             Finish,
             Cancel,
+        }
+
+        private struct TaskData
+        {
+            public TaskData(TaskCaller caller, TaskStateProxy state, Priority priority, string workingText, string purposeText)
+            {
+                this.caller = caller;
+                this.state = state;
+                this.priority = priority;
+                this.workingText = workingText;
+                this.purposeText = purposeText;
+            }
+            public TaskCaller caller;
+            public TaskStateProxy state;
+            public Priority priority;
+            public string workingText;
+            public string purposeText;
         }
 
         public delegate TaskAction Task<TState>(ref TState state, ref int index, ITaskStateReporting reporting);
@@ -46,7 +72,9 @@ namespace StepBro.Core.Host
             }
         }
 
-        private Queue<Tuple<TaskCaller, TaskStateProxy, string, string>> m_actions = new Queue<Tuple<TaskCaller, TaskStateProxy, string, string>>();
+        private Queue<TaskData> m_actions = new Queue<TaskData>();
+        private TaskAction m_currentAction = TaskAction.Continue;
+        private DateTime m_currentActionTimerExpiryTime = DateTime.MinValue;
         private System.Threading.Tasks.Task m_workerTask = null;
 
         public enum StateChange { Idle, StartingNew, StillWorking }
@@ -66,13 +94,13 @@ namespace StepBro.Core.Host
 
         public event EventHandler<StateChangedEventArgs> StateChangeEvent;
 
-        public void AddTask<TState>(Task<TState> task, string workingText, string purposeText) where TState : struct, System.Enum
+        public void AddTask<TState>(Task<TState> task, Priority priority, string workingText, string purposeText) where TState : struct, System.Enum
         {
             var caller = new TaskCaller<TState>(task);
             // TODO: Register task or make queue public somehow, to be able to show whats going on.
 
             var stateProxy = new TaskStateProxy(TaskExecutionState.AwaitingStartCondition, BreakOption.Stop);
-            m_actions.Enqueue(new Tuple<TaskCaller, TaskStateProxy, string, string>(caller, stateProxy, workingText, purposeText));
+            m_actions.Enqueue(new TaskData(caller, stateProxy, priority, workingText, purposeText));
             if (m_actions.Count == 1)
             {
                 this.StateChangeEvent?.Invoke(this, new StateChangedEventArgs(StateChange.StartingNew, workingText));
@@ -80,6 +108,10 @@ namespace StepBro.Core.Host
             }
         }
 
+        public bool AnyTasks()
+        {
+            return (m_actions.Count != 0);
+        }
 
         private void HostDomainHandling()
         {
@@ -95,17 +127,27 @@ namespace StepBro.Core.Host
         {
             if (m_actions.Count > 0)
             {
+                if (m_currentAction == TaskAction.Delay100ms || m_currentAction == TaskAction.Delay500ms)
+                {
+                    if (DateTime.UtcNow < m_currentActionTimerExpiryTime)
+                    {
+                        m_currentAction = TaskAction.ContinueOnHostDomain;
+                        RequestHostDomainHandling(this.HostDomainHandling);
+                        Thread.Sleep(10);   // TODO: Create an OS timer to do this instead.
+                        return;
+                    }
+                }
                 var task = m_actions.Peek();
-                var caller = task.Item1;
-                var stateReporter = task.Item2;
+                var caller = task.caller;
+                var stateReporter = task.state;
 
-                var state = caller.CallTask(null);
+                m_currentAction = caller.CallTask(null);
                 if (isOnWorkerThread)
                 {
                     m_workerTask = null;
                 }
 
-                switch (state)
+                switch (m_currentAction)
                 {
                     case TaskAction.ContinueOnHostDomain:
                         RequestHostDomainHandling(this.HostDomainHandling);
@@ -116,15 +158,16 @@ namespace StepBro.Core.Host
                         // Now get out of here without touching anything; the worker task will arrive in a moment!
                         break;
                     case TaskAction.Delay100ms:
-                        break;
                     case TaskAction.Delay500ms:
+                        m_currentActionTimerExpiryTime = DateTime.UtcNow + ((m_currentAction == TaskAction.Delay100ms) ? TimeSpan.FromMilliseconds(100) : TimeSpan.FromMilliseconds(500));
+                        RequestHostDomainHandling(this.HostDomainHandling);
                         break;
                     case TaskAction.Finish:
                     case TaskAction.Cancel:
                         m_actions.Dequeue();
                         if (m_actions.Count > 0)
                         {
-                            this.StateChangeEvent?.Invoke(this, new StateChangedEventArgs(StateChange.StartingNew, m_actions.Peek().Item3));
+                            this.StateChangeEvent?.Invoke(this, new StateChangedEventArgs(StateChange.StartingNew, m_actions.Peek().workingText));
                             RequestHostDomainHandling(this.HostDomainHandling);
                         }
                         else

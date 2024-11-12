@@ -74,5 +74,12 @@ namespace StepBro.Core.Data
             return m_containers.FirstOrDefault(
                 oc => string.Equals(oc.FullName, id, System.StringComparison.InvariantCulture));
         }
+
+        public T TryFindObject<T>(string id) where T : class
+        {
+            return m_containers.FirstOrDefault(
+                oc => string.Equals(oc.FullName, id, System.StringComparison.InvariantCulture) &&
+                oc.Object is T)?.Object as T;
+        }
     }
 }

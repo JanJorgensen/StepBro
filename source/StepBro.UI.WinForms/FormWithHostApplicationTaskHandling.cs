@@ -22,7 +22,7 @@ namespace StepBro.UI.WinForms
 
             protected override void RequestHostDomainHandling(Action action)
             {
-                m_parent.BeginInvoke(action);
+                m_parent.BeginInvoke(action);   // Important! - do NOT wait here, therefore 'BeginInvoke'.
             }
         }
 
@@ -147,9 +147,13 @@ namespace StepBro.UI.WinForms
         {
         }
 
-        protected void AddTask<TState>(HostApplicationTaskHandler.Task<TState> task, string workingText, string purposeText) where TState : struct, System.Enum
+        protected void AddTask<TState>(
+            HostApplicationTaskHandler.Task<TState> task, 
+            HostApplicationTaskHandler.Priority priority,
+            string workingText, 
+            string purposeText) where TState : struct, System.Enum
         {
-            m_taskHandler.AddTask(task, workingText, purposeText);
+            m_taskHandler.AddTask(task, priority, workingText, purposeText);
         }
     }
 }

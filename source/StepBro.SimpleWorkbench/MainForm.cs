@@ -14,7 +14,6 @@ using StepBro.UI.WinForms.Controls;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using static StepBro.Core.Host.HostApplicationTaskHandler;
 using static StepBro.SimpleWorkbench.Shortcuts;
 using StepBroMain = StepBro.Core.Main;
@@ -25,11 +24,13 @@ using StepBro.Core.Addons;
 using StepBro.Core.DocCreation;
 using Antlr4.Runtime;
 using Lexer = StepBro.Core.Parser.Grammar.StepBroLexer;
+using StepBro.Core.Host.Presentation;
 
 namespace StepBro.SimpleWorkbench
 {
     public partial class MainForm : FormWithHostApplicationTaskHandling, ICoreAccess
     {
+        private bool m_appLoadFinished = false;
         private int documentWindowIndex = 1;
         //private int toolWindowIndex = 1;
 
@@ -62,11 +63,12 @@ namespace StepBro.SimpleWorkbench
 
         private object m_hostDependancyObject = new object();
         private object m_topScriptFileDependancyObject = new object();
-        private Dictionary<string, ITextCommandInput> m_commandObjectDictionary = new Dictionary<string, ITextCommandInput>();
         private object m_userShortcutItemTag = new object();
 
         private bool m_userFileRead = false;
-        private string m_userFile = null;
+        private string m_userFileCurrentProject = null;
+        private UserDataCurrent m_userDataCurrentProject = new UserDataCurrent();
+
 
         private string m_targetFile = null;
         private string m_targetFileFullPath = null;
@@ -80,55 +82,13 @@ namespace StepBro.SimpleWorkbench
 
         private Queue<ScriptExecutionData> m_executionQueue = new Queue<ScriptExecutionData>();
 
+        private Dictionary<string, List<string>> m_toolCommandHistories = new Dictionary<string, List<string>>();
+
         private string m_selectedOutputAddon = OutputSimpleCleartextAddon.Name;
         private static IOutputFormatterTypeAddon m_outputAddon = null;
         private IOutputFormatter m_outputFormatter = null;
 
         private UserInteraction m_currentUserInteractionData = null;
-
-        //private IFileElement m_element = null;
-        //private IPartner m_partner = null;
-        //private bool executionRequestSilent = false;
-        //private string m_targetElement = null;
-        //private string m_targetPartner = null;
-        //private string m_targetObject = null;
-        //private List<object> m_targetArguments = new List<object>();
-
-        public class UserDataCurrent
-        {
-            [JsonDerivedType(typeof(ProcedureShortcut), typeDiscriminator: "procedure")]
-            [JsonDerivedType(typeof(ObjectCommandShortcut), typeDiscriminator: "command")]
-            public class Shortcut
-            {
-                public string Text { get; set; }
-            }
-            public class ProcedureShortcut : Shortcut
-            {
-                public string Element { get; set; } = null;
-                public string Partner { get; set; } = null;
-                public string Instance { get; set; } = null;
-            }
-            public class ObjectCommandShortcut : Shortcut
-            {
-                public string Instance { get; set; } = null;
-                public string Command { get; set; } = null;
-            }
-
-            public class PanelSetting
-            {
-                public string Panel { get; set; }
-                public string ID { get; set; }
-                public string Value { get; set; }
-            }
-
-            public int version { get; set; } = 2;
-            public Shortcut[] Shortcuts { get; set; } = null;
-            public PanelSetting[] PanelSettings { get; set; } = null;
-            public string[] HiddenToolbars { get; set; } = null;
-            //public System.Xml.XmlDocument ToolLayout { get; set; } = null;
-            //public System.Xml.XmlDocument DocumentLayout { get; set; } = null;
-        }
-
 
         public MainForm()
         {
@@ -137,7 +97,7 @@ namespace StepBro.SimpleWorkbench
             toolStripButtonRunCommand.Text = "\u23F5";
             toolStripButtonStopScriptExecution.Text = "\u23F9";
             toolStripButtonAddShortcut.Text = "\u2795";
-            this.StartUsingTaskHandlingTimer();
+            //this.StartUsingTaskHandlingTimer();
             panelCustomToolstrips.Setup(this);
             this.Size = new System.Drawing.Size(1200, 800);
             //toolWindowProperties.Close();
@@ -152,6 +112,8 @@ namespace StepBro.SimpleWorkbench
         {
             base.OnLoad(e);
 
+            UserDataStationManager.LoadUserSettingsOnStation();
+
             IService m_hostService = null;
             m_hostAccess = new HostAccess(this, out m_hostService);
             StepBroMain.Initialize(m_hostService);
@@ -165,6 +127,14 @@ namespace StepBro.SimpleWorkbench
             StepBro.UI.WinForms.CustomToolBar.ToolBar.ToolBarSetup();
 
             this.ParseCommandLineOptions();
+
+            if (m_targetFile == null)
+            {
+                this.BeginInvoke(this.UserOpenFileDialog);
+            }
+
+            // If no tasks are started in ParseCommandLineOptions(), this task will make sure the activity indicator is stopped.
+            this.AddTask<TaskNoState>(ApplicationStartupIndicationTask, Priority.Low, "Starting application", "Starting application");
 
             m_logviewer = new LogViewer();
             m_toolWindowExecutionLog = new ToolWindow(dockManager, "ExecutionLogView", "Execution Log", null, m_logviewer);
@@ -224,12 +194,24 @@ namespace StepBro.SimpleWorkbench
                 //throw new ExitException();
             }
 
+            m_appLoadFinished = true;
+        }
+
+        private TaskAction ApplicationStartupIndicationTask(ref TaskNoState state, ref int index, ITaskStateReporting reporting)
+        {
+            if (!m_appLoadFinished)
+            {
+                return TaskAction.Delay100ms;
+            }
+            // else...
+            return TaskAction.Finish;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
-            this.SaveUserSettings();
+            this.SaveUserSettingsOnProject();
+            UserDataStationManager.SaveUserSettingsOnStation();
         }
 
         private void DockManager_SaveCustomToolWindowLayoutData(object sender, DockSaveCustomToolWindowLayoutDataEventArgs e)
@@ -267,15 +249,14 @@ namespace StepBro.SimpleWorkbench
 
         #region User Settings Persistance
 
-        private void UpdateUserDataFilePath()
+        private void UpdateUserDataCurrentFilePath()
         {
-            // Change the extension
-            m_userFile = Path.Combine(Path.GetDirectoryName(m_targetFileFullPath), Path.GetFileNameWithoutExtension(m_targetFileFullPath)) + ".user.json";
+            m_userFileCurrentProject = Path.Combine(Path.GetDirectoryName(m_targetFileFullPath), Path.GetFileNameWithoutExtension(m_targetFileFullPath)) + ".user.json";
         }
 
-        private void SaveUserSettings()
+        private void SaveUserSettingsOnProject()
         {
-            var userData = new UserDataCurrent();
+            if (m_userFileCurrentProject == null) return;
             //userData.ToolLayout = dockManager.ToolWindowLayoutData;
             //userData.DocumentLayout = dockManager.DocumentLayoutData;
 
@@ -304,35 +285,35 @@ namespace StepBro.SimpleWorkbench
             }
             if (shortcuts.Count > 0)
             {
-                userData.Shortcuts = shortcuts.ToArray();
+                m_userDataCurrentProject.Shortcuts = shortcuts.ToArray();
             }
 
             var hiddenToolbars = panelCustomToolstrips.ListHiddenToolbars().ToArray();
-            userData.HiddenToolbars = (hiddenToolbars.Length > 0) ? hiddenToolbars : null;
+            m_userDataCurrentProject.HiddenToolbars = (hiddenToolbars.Length > 0) ? hiddenToolbars : null;
 
-            if (userData.Shortcuts != null || userData.PanelSettings != null || userData.HiddenToolbars != null)
+            if (m_userDataCurrentProject.Shortcuts != null || m_userDataCurrentProject.UIElementSettings != null || m_userDataCurrentProject.HiddenToolbars != null)
             {
                 JsonSerializerOptions options = new JsonSerializerOptions();
                 options.WriteIndented = true;
                 options.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
 
-                using (FileStream createStream = File.Create(m_userFile))
+                using (FileStream createStream = File.Create(m_userFileCurrentProject))
                 {
-                    JsonSerializer.Serialize(createStream, userData, options);
+                    JsonSerializer.Serialize(createStream, m_userDataCurrentProject, options);
                 }
             }
 
         }
 
-        private void LoadUserSettings()
+        private void LoadUserSettingsOnProject()
         {
             if (!m_userFileRead)
             {
                 m_userFileRead = true;
 
-                if (File.Exists(m_userFile))
+                if (File.Exists(m_userFileCurrentProject))
                 {
-                    var data = JsonSerializer.Deserialize<UserDataCurrent>(File.ReadAllText(m_userFile));
+                    var data = JsonSerializer.Deserialize<UserDataCurrent>(File.ReadAllText(m_userFileCurrentProject));
                     if (data.Shortcuts != null)
                     {
                         foreach (var shortcut in data.Shortcuts)
@@ -380,7 +361,6 @@ namespace StepBro.SimpleWorkbench
         #endregion
 
 
-
         #region ICoreAccess
 
         public IExecutionAccess StartExecution(string elementName, string partner, string objectVariable, object[] args)
@@ -413,14 +393,22 @@ namespace StepBro.SimpleWorkbench
         public void ExecuteObjectCommand(string objectVariable, string command)
         {
             m_mainLogger.LogUserAction($"Request run '{objectVariable}' command \"{command}\"");
-            var obj = m_commandObjectDictionary[objectVariable];
-            if (obj.AcceptingCommands())
+            var obj = m_objectManager.TryFindObject<ITextCommandInput>(objectVariable);
+            if (obj != null && obj.AcceptingCommands())
             {
                 obj.ExecuteCommand(command);
             }
             else
             {
-                string errorMessage = $"'{objectVariable}' is not accepting commands. Did you forget to open or connect?";
+                string errorMessage;
+                if (obj != null)
+                {
+                    errorMessage = $"'{objectVariable}' is not accepting commands. Did you forget to open or connect?";
+                }
+                else
+                {
+                    errorMessage = $"No command object named'{objectVariable}' found. Is the name wrong or is the object not text command enabled?";
+                }
 
                 m_mainLogger.LogError(errorMessage);
             }
@@ -454,24 +442,40 @@ namespace StepBro.SimpleWorkbench
 
         private void toolStripMenuItemFileOpen_Click(object sender, EventArgs e)
         {
+            this.UserOpenFileDialog();
+        }
+
+        private void UserOpenFileDialog()
+        {
             var fileContent = string.Empty;
             var filePath = string.Empty;
 
-            using (var openFileDialog = new OpenFileDialog())
+            using (var openProjectDialog = new DialogOpenProjectFile())
             {
-                openFileDialog.InitialDirectory = System.Environment.CurrentDirectory;
-                openFileDialog.Filter = "StepBro Script files (*.sbs)|*.sbs|All files (*.*)|*.*";
-                openFileDialog.FilterIndex = 1;
-                openFileDialog.CheckFileExists = true;
-                openFileDialog.RestoreDirectory = true;
-
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                if (openProjectDialog.ShowDialog(this) == DialogResult.OK)
                 {
-                    m_mainLogger.LogUserAction($"Open file \"{openFileDialog.FileName}\"");
+                    m_mainLogger.LogUserAction($"Open file \"{openProjectDialog.SelectedFile}\"");
 
-                    this.OpenMainFile(openFileDialog.FileName);
+                    this.OpenMainFile(openProjectDialog.SelectedFile);
                 }
+                UserDataStationManager.SaveUserSettingsOnStation();     // Just in case anything has changed.
             }
+
+            //using (var openFileDialog = new OpenFileDialog())
+            //{
+            //    openFileDialog.InitialDirectory = System.Environment.CurrentDirectory;
+            //    openFileDialog.Filter = "StepBro Script files (*.sbs)|*.sbs|All files (*.*)|*.*";
+            //    openFileDialog.FilterIndex = 1;
+            //    openFileDialog.CheckFileExists = true;
+            //    openFileDialog.RestoreDirectory = true;
+
+            //    if (openFileDialog.ShowDialog() == DialogResult.OK)
+            //    {
+            //        m_mainLogger.LogUserAction($"Open file \"{openFileDialog.FileName}\"");
+
+            //        this.OpenMainFile(openFileDialog.FileName);
+            //    }
+            //}
         }
 
         private void OpenMainFile(string file, string targetElement = null, string targetModel = null, string targetInstance = null, List<string> arguments = null)
@@ -1068,6 +1072,91 @@ namespace StepBro.SimpleWorkbench
         }
 
         #region USER INTERACTION - COMMANDS
+
+
+        private void toolStripDropDownButtonTool_DropDownOpening(object sender, EventArgs e)
+        {
+            this.UpdateCommandObjectMenu_Objects();
+        }
+
+        private void UpdateCommandObjectMenu_Objects()
+        {
+            var index = toolStripDropDownButtonTool.DropDownItems.IndexOf(toolStripMenuItemNoToolsYet) + 1;
+            while (index < toolStripDropDownButtonTool.DropDownItems.Count)
+            {
+                toolStripDropDownButtonTool.DropDownItems.RemoveAt(index);
+            }
+
+            // Update list of variables containing objects with the ITextCommandInput interface.
+            var objects = m_objectManager.GetObjectCollection();
+            var commandObjectsContainers = objects.Where(o => o.Object is ITextCommandInput).ToList();
+            if (commandObjectsContainers.Count > 0)
+            {
+                toolStripMenuItemNoToolsYet.Visible = false;
+                foreach (var o in commandObjectsContainers)
+                {
+                    var item = new ToolStripMenuItem();
+                    item.Name = "toolStripMenuItem_" + o.FullName.Replace('.', '_');
+                    item.Size = new Size(206, 22);
+                    item.Text = o.FullName.Split('.').Last();
+                    item.Tag = o;
+                    item.Click += toolStripMenuItemToolSelection_Click;
+                    item.Checked = Object.ReferenceEquals(o, toolStripDropDownButtonTool.Tag);
+                    toolStripDropDownButtonTool.DropDownItems.Add(item);
+                }
+            }
+            else
+            {
+                toolStripMenuItemNoToolsYet.Visible = false;
+            }
+        }
+
+        private void UpdateCommandObjectMenu_Commands()
+        {
+            while (true)
+            {
+                if (toolStripDropDownButtonTool.DropDownItems[0] is ToolStripSeparator)
+                {
+                    break;
+                }
+                toolStripDropDownButtonTool.DropDownItems.RemoveAt(0);
+            }
+
+            IObjectContainer tool = toolStripDropDownButtonTool as IObjectContainer;
+
+            toolStripSeparatorToolSelection.Visible = false;
+
+            //foreach (var o in commandObjectsContainers)
+            //{
+            //    m_commandObjectDictionary[o.FullName] = o.Object as ITextCommandInput;    // Add or override.
+
+            //    var item = new ToolStripMenuItem();
+            //    item.BackColor = Color.RosyBrown;
+            //    item.Name = "toolStripMenuItem2";
+            //    item.Size = new Size(206, 22);
+            //    item.Text = "tool command";
+            //    item.ToolTipText = "Script procedure \"Bla\"";
+            //    item.Click += toolStripMenuItemToolCommandExecute_Click;
+
+            //}
+
+        }
+
+        private void toolStripMenuItemToolSelection_Click(object sender, EventArgs e)
+        {
+            var menu = (ToolStripMenuItem)sender;
+            if (!Object.ReferenceEquals(menu.Tag, toolStripDropDownButtonTool.Tag))
+            {
+                toolStripDropDownButtonTool.Tag = menu.Tag;
+                toolStripDropDownButtonTool.Text = (menu.Tag as IObjectContainer).FullName.Split('.').Last();
+                toolStripDropDownButtonTool.ToolTipText = "Selected tool/object: " + (menu.Tag as IObjectContainer).FullName;
+            }
+        }
+
+        private void toolStripMenuItemToolCommandExecute_Click(object sender, EventArgs e)
+        {
+
+        }
 
         private void toolStripComboBoxTool_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -1725,7 +1814,7 @@ namespace StepBro.SimpleWorkbench
             toolStripStatusLabelApplicationTaskState.Text = workingText;
         }
 
-        private enum TaskNoState { Do }
+        private enum TaskNoState { First, Next }
 
         #region Script File Loading
 
@@ -1759,15 +1848,14 @@ namespace StepBro.SimpleWorkbench
                 }
                 else
                 {
+                    UserDataStationManager.AddRecentFile(m_targetFileFullPath);
+
                     var shortcuts = ServiceManager.Global.Get<IFolderManager>();
                     var projectShortcuts = new FolderShortcutCollection(FolderShortcutOrigin.Project);
                     projectShortcuts.AddShortcut(StepBro.Core.Api.Constants.TOP_FILE_FOLDER_SHORTCUT, System.IO.Path.GetDirectoryName(m_file.FilePath), isResolved: true);
                     shortcuts.AddSource(projectShortcuts);
 
-                    this.UpdateUserDataFilePath();
-
-                    //this.CreateTextDocument(m_targetFileFullPath, null, false).Activate();
-                    //m_toolWindowExecutionLog.Activate();    // Stay focused on the execution log view.
+                    this.UpdateUserDataCurrentFilePath();
                 }
             }
             catch (Exception ex)
@@ -1779,7 +1867,7 @@ namespace StepBro.SimpleWorkbench
 
         private void StartScriptFileLoading()
         {
-            this.AddTask<TaskNoState>(ScriptFileLoadingTask, "Loading script file", "Load script file.");
+            this.AddTask<TaskNoState>(ScriptFileLoadingTask, Priority.Normal, "Loading script file", "Load script file.");
         }
 
         #endregion
@@ -1831,7 +1919,7 @@ namespace StepBro.SimpleWorkbench
 
         private void StartFileParsing()
         {
-            this.AddTask<FileParsingState>(FileParsingTask, "Parsing files", "Parse the script files.");
+            this.AddTask<FileParsingState>(FileParsingTask, Priority.Normal, "Parsing files", "Parse the script files.");
         }
 
         private void UpdateAfterSuccessfulFileParsing()
@@ -1842,11 +1930,11 @@ namespace StepBro.SimpleWorkbench
 
             // Update list of variables containing objects with the ITextCommandInput interface.
             var objects = m_objectManager.GetObjectCollection();
-            var commandObjectsContainers = objects.Where(o => o.Object is ITextCommandInput).ToList();
-            foreach (var o in commandObjectsContainers)
-            {
-                m_commandObjectDictionary[o.FullName] = o.Object as ITextCommandInput;    // Add or override.
-            }
+            //var commandObjectsContainers = objects.Where(o => o.Object is ITextCommandInput).ToList();
+            //foreach (var o in commandObjectsContainers)
+            //{
+            //    m_commandObjectDictionary[o.FullName] = o.Object as ITextCommandInput;    // Add or override.
+            //}
 
 
             m_fileElements.Clear();
@@ -1910,7 +1998,7 @@ namespace StepBro.SimpleWorkbench
 
             #endregion
 
-            this.LoadUserSettings(); // Now ready to load the user settings (in case they have not been loaded yet).
+            this.LoadUserSettingsOnProject(); // Now ready to load the user settings (in case they have not been loaded yet).
         }
 
         #endregion
@@ -2114,7 +2202,7 @@ namespace StepBro.SimpleWorkbench
         }
         private void StartScriptExecution()
         {
-            this.AddTask<ScriptExecutionState>(ScriptExecutionTask, "Executing script", "Execute script.");
+            this.AddTask<ScriptExecutionState>(ScriptExecutionTask, Priority.Normal, "Executing script", "Execute script.");
         }
 
 
