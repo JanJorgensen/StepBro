@@ -442,6 +442,7 @@ namespace StepBro.SimpleWorkbench
             toolStripComboBoxToolCommand.Name = "toolStripComboBoxToolCommand";
             toolStripComboBoxToolCommand.Size = new Size(250, 23);
             toolStripComboBoxToolCommand.ToolTipText = "Command prompt for the selected tool/object.";
+            toolStripComboBoxToolCommand.Visible = false;
             toolStripComboBoxToolCommand.SelectedIndexChanged += toolStripComboBoxToolCommand_SelectedIndexChanged;
             toolStripComboBoxToolCommand.KeyPress += toolStripComboBoxToolCommand_KeyPress;
             toolStripComboBoxToolCommand.TextChanged += toolStripComboBoxToolCommand_TextChanged;

@@ -15,6 +15,10 @@ namespace StepBro.UI.WinForms.Dialogs
             base.OnLoad(e);
 
             this.UpdateRecent();
+            if (listBoxRecent.Items.Count > 0)
+            {
+                listBoxRecent.SelectedIndex = 0;    // Set first entry as default choise, to enable user to just push the 'Enter' button.
+            }
             this.UpdateFavorites();
 
             labelFavorites.Text += " \u272D";

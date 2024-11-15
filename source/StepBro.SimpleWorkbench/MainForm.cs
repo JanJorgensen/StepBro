@@ -1107,7 +1107,7 @@ namespace StepBro.SimpleWorkbench
             }
             else
             {
-                toolStripMenuItemNoToolsYet.Visible = false;
+                toolStripMenuItemNoToolsYet.Visible = true;
             }
         }
 
@@ -1150,6 +1150,7 @@ namespace StepBro.SimpleWorkbench
                 toolStripDropDownButtonTool.Tag = menu.Tag;
                 toolStripDropDownButtonTool.Text = (menu.Tag as IObjectContainer).FullName.Split('.').Last();
                 toolStripDropDownButtonTool.ToolTipText = "Selected tool/object: " + (menu.Tag as IObjectContainer).FullName;
+                toolStripComboBoxToolCommand.Visible = true;
             }
         }
 
@@ -1986,14 +1987,13 @@ namespace StepBro.SimpleWorkbench
             if (toolStripComboBoxTool.Items.Count > 0)
             {
                 toolStripComboBoxTool.Enabled = true;
-                toolStripComboBoxToolCommand.Enabled = true;
                 toolStripComboBoxTool.SelectedIndex = selection;
                 toolStripComboBoxTool.SelectionLength = 0;
             }
             else
             {
                 toolStripComboBoxTool.Enabled = false;
-                toolStripComboBoxToolCommand.Enabled = false;
+                toolStripComboBoxToolCommand.Visible = false;
             }
 
             #endregion

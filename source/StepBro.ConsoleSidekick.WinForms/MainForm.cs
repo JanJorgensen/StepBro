@@ -295,13 +295,6 @@ namespace StepBro.ConsoleSidekick.WinForms
 
         #region USER INTERACTION - COMMANDS
 
-        private void toolStripComboBoxTool_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            toolStripComboBoxTool.ToolTipText =
-                "Select tool/object to use for the command prompt. Selected object: '" +
-                (toolStripComboBoxTool.SelectedItem as Variable).FullName + "'";
-        }
-
         private void toolStripComboBoxToolCommand_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
@@ -904,36 +897,6 @@ namespace StepBro.ConsoleSidekick.WinForms
                     toolStripSplitButtonRunScript.DropDownItems.Add(namespaceMenu);
                 }
 
-            }
-
-            #endregion
-
-            #region Tool variables
-
-            var selectedTool = toolStripComboBoxTool.SelectedItem as Variable;
-            toolStripComboBoxTool.Items.Clear();
-            int selection = 0;
-            int i = 0;
-            foreach (var toolVar in commandObjectVariables)
-            {
-                toolStripComboBoxTool.Items.Add(toolVar);
-                if (selectedTool != null && toolVar.FullName == selectedTool.FullName)
-                {
-                    selection = i;
-                }
-                i++;
-            }
-            if (toolStripComboBoxTool.Items.Count > 0)
-            {
-                toolStripComboBoxTool.Enabled = true;
-                toolStripComboBoxToolCommand.Enabled = true;
-                toolStripComboBoxTool.SelectedIndex = selection;
-                toolStripComboBoxTool.SelectionLength = 0;
-            }
-            else
-            {
-                toolStripComboBoxTool.Enabled = false;
-                toolStripComboBoxToolCommand.Enabled = false;
             }
 
             #endregion

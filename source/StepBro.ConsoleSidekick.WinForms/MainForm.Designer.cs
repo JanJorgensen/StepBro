@@ -156,7 +156,6 @@
             toolStripComboBoxTool.Enabled = false;
             toolStripComboBoxTool.Name = "toolStripComboBoxTool";
             toolStripComboBoxTool.Size = new Size(120, 23);
-            toolStripComboBoxTool.SelectedIndexChanged += toolStripComboBoxTool_SelectedIndexChanged;
             // 
             // toolStripComboBoxToolCommand
             // 

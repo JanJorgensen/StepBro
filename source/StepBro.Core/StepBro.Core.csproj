@@ -12,6 +12,7 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <Configurations>Debug;Release;DebugAll;ReleaseAll</Configurations>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
@@ -33,6 +34,7 @@
     <Compile Remove="Data\IObjectPanelManager.cs" />
     <Compile Remove="Data\ObjectPanelCreator.cs" />
     <Compile Remove="Data\ObjectPanelManager.cs" />
+    <Compile Remove="Language\LanguageServer.cs" />
     <Compile Remove="Logging\LogStorage.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +57,7 @@
     <None Include="..\..\additional\StepBro Cheet Sheet.md" Link="StepBro Cheet Sheet.md" />
     <None Include="..\..\README.md" Link="README.md" />
     <None Include="..\..\scripts\TestFramework.sbs" Link="Scripts\TestFramework.sbs" />
+    <None Include="Language\LanguageServer.cs" />
   </ItemGroup>
   
 
@@ -62,28 +65,30 @@
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
     <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" PrivateAssets="all" />
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="Markdig" Version="0.37.0" />
+    <PackageReference Include="Markdig" Version="0.38.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn>3021;1701;1702</NoWarn>
+    <NoWarn>3021;1701;1702;1591</NoWarn>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugAll|AnyCPU'">
-    <NoWarn>3021;1701;1702</NoWarn>
+    <NoWarn>3021;1701;1702;1591</NoWarn>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <NoWarn>3021;1701;1702;1591</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseAll|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <NoWarn>3021;1701;1702;1591</NoWarn>
   </PropertyGroup>
 
 </Project>

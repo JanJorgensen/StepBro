@@ -58,6 +58,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.UI.WinForms", "Step
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.UI.WinForms.Test", "Test\StepBro.UI.WinForms.Test\StepBro.UI.WinForms.Test.csproj", "{75ED57D5-EA7F-4EC3-A71E-58ED4B530127}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.UI.Avalonia", "StepBro.UI.Avalonia\StepBro.UI.Avalonia.csproj", "{F749B5A1-07A0-40EC-820B-0A3D4888439F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.Workbench.Avalonia", "StepBro.Workbench.Avalonia\StepBro.Workbench.Avalonia.csproj", "{9E181145-5EE2-4745-9064-6F0AEBFEDB47}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -183,6 +187,7 @@ Global
 		{CAC9761C-E038-400A-A63C-222A0A98C69A}.ReleaseAll|Any CPU.ActiveCfg = Release|Any CPU
 		{CAC9761C-E038-400A-A63C-222A0A98C69A}.ReleaseAll|Any CPU.Build.0 = Release|Any CPU
 		{44FBF190-BF47-4E04-86BF-5F637B882443}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44FBF190-BF47-4E04-86BF-5F637B882443}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44FBF190-BF47-4E04-86BF-5F637B882443}.DebugAll|Any CPU.ActiveCfg = Debug|Any CPU
 		{44FBF190-BF47-4E04-86BF-5F637B882443}.DebugAll|Any CPU.Build.0 = Debug|Any CPU
 		{44FBF190-BF47-4E04-86BF-5F637B882443}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -211,6 +216,22 @@ Global
 		{75ED57D5-EA7F-4EC3-A71E-58ED4B530127}.Release|Any CPU.Build.0 = Release|Any CPU
 		{75ED57D5-EA7F-4EC3-A71E-58ED4B530127}.ReleaseAll|Any CPU.ActiveCfg = Release|Any CPU
 		{75ED57D5-EA7F-4EC3-A71E-58ED4B530127}.ReleaseAll|Any CPU.Build.0 = Release|Any CPU
+		{F749B5A1-07A0-40EC-820B-0A3D4888439F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F749B5A1-07A0-40EC-820B-0A3D4888439F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F749B5A1-07A0-40EC-820B-0A3D4888439F}.DebugAll|Any CPU.ActiveCfg = Debug|Any CPU
+		{F749B5A1-07A0-40EC-820B-0A3D4888439F}.DebugAll|Any CPU.Build.0 = Debug|Any CPU
+		{F749B5A1-07A0-40EC-820B-0A3D4888439F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F749B5A1-07A0-40EC-820B-0A3D4888439F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F749B5A1-07A0-40EC-820B-0A3D4888439F}.ReleaseAll|Any CPU.ActiveCfg = Release|Any CPU
+		{F749B5A1-07A0-40EC-820B-0A3D4888439F}.ReleaseAll|Any CPU.Build.0 = Release|Any CPU
+		{9E181145-5EE2-4745-9064-6F0AEBFEDB47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E181145-5EE2-4745-9064-6F0AEBFEDB47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E181145-5EE2-4745-9064-6F0AEBFEDB47}.DebugAll|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E181145-5EE2-4745-9064-6F0AEBFEDB47}.DebugAll|Any CPU.Build.0 = Debug|Any CPU
+		{9E181145-5EE2-4745-9064-6F0AEBFEDB47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E181145-5EE2-4745-9064-6F0AEBFEDB47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E181145-5EE2-4745-9064-6F0AEBFEDB47}.ReleaseAll|Any CPU.ActiveCfg = Release|Any CPU
+		{9E181145-5EE2-4745-9064-6F0AEBFEDB47}.ReleaseAll|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
