@@ -89,7 +89,7 @@ fileElementOverride : OVERRIDE overrideReference typeOverride? (elementPropertyb
 typeOverride : AS typedefName ;
 
 typedef 
-    : TYPEDEF typedefName COLON typedefType SEMICOLON       // NOT LIKE A TYPEDEF IN C/C++; NAME FIRST HERE!!
+    : TYPEDEF typedefName (COLON | ASSIGNMENT) typedefType SEMICOLON       // NOT LIKE A TYPEDEF IN C/C++; NAME FIRST HERE!!
     ;
 
 typedefName : IDENTIFIER ;
