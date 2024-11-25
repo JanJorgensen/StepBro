@@ -34,6 +34,7 @@ namespace StepBro.Workbench.Views
                 bool onLeft = checkBoxPrimaryLeft.IsChecked.GetValueOrDefault(true);
 
                 DockPanel.SetDock(primarySideMenu, onLeft ? Dock.Left : Dock.Right);
+                DockPanel.SetDock(primarySideMenuLine, onLeft ? Dock.Right : Dock.Left);
 
                 xLeft.Children.Clear();
                 xRight.Children.Clear();
@@ -71,6 +72,9 @@ namespace StepBro.Workbench.Views
                 //xBottom
                 //xSplitterBottom
 
+                bool leftOn = checkBoxLeft.IsChecked.GetValueOrDefault(true);
+                bool rightOn = checkBoxRight.IsChecked.GetValueOrDefault(true);
+
                 if (checkBoxBottom.IsChecked.GetValueOrDefault(true) != m_xBottomShown)
                 {
                     if (checkBoxBottom.IsChecked.GetValueOrDefault(true))
@@ -86,9 +90,9 @@ namespace StepBro.Workbench.Views
                         mainGrid.Children.Remove(xSplitterBottom);
                     }
                 }
-                if (checkBoxLeft.IsChecked.GetValueOrDefault(true) != m_xLeftShown)
+                if (leftOn != m_xLeftShown)
                 {
-                    if (checkBoxLeft.IsChecked.GetValueOrDefault(true))
+                    if (leftOn)
                     {
                         m_xLeftShown = true;
                         mainGrid.Children.Add(xLeft);
@@ -101,9 +105,9 @@ namespace StepBro.Workbench.Views
                         mainGrid.Children.Remove(xSplitterLeft);
                     }
                 }
-                if (checkBoxRight.IsChecked.GetValueOrDefault(true) != m_xRightShown)
+                if (rightOn != m_xRightShown)
                 {
-                    if (checkBoxRight.IsChecked.GetValueOrDefault(true))
+                    if (rightOn)
                     {
                         m_xRightShown = true;
                         mainGrid.Children.Add(xRight);

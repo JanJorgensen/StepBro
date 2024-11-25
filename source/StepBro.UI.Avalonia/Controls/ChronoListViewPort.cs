@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
-using AvaloniaEdit.Rendering;
 using AvaloniaEdit.Utils;
 using System;
 using System.Collections.Generic;

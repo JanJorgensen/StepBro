@@ -64,7 +64,7 @@
         <DockPanel Name="xLeft" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2">
           <Panel DockPanel.Dock="Right" Width="6" Background="Red"></Panel>
           <StackPanel Name="xLeftContent" Orientation="Vertical">
-            <TreeView Name="SolutionExplorer" IsVisible="False">
+            <TreeView Name="SolutionExplorer" IsVisible="True">
             </TreeView>
             <StackPanel Margin="1" Name="Settings" Orientation="Vertical" IsVisible="True">
               <StackPanel Orientation="Vertical">
@@ -96,15 +96,16 @@
         </DockPanel>
         <GridSplitter Name="xSplitterLeft" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Width="1" Background="Gray" HorizontalAlignment="Right" VerticalAlignment="Stretch"></GridSplitter>
         <DockPanel Name="xMid" Grid.Column="1" Grid.Row="0">
-          <TabControl SelectedIndex="2">
-            <TabItem Header="Edit">
-              <AvaloniaEdit:TextEditor Text="Hello AvaloniaEdit!"
-                ShowLineNumbers="True"
-                LineNumbersForeground="CadetBlue"
-                FontFamily="Cascadia Code,Consolas,Menlo,Monospace"/>
-            </TabItem>
+          <TabControl SelectedIndex="0">
             <TabItem Header="Greeting">
               <TextBlock Text="{Binding Greeting}"/>
+            </TabItem>
+            <TabItem Header="Edit">
+              <StackPanel>
+                <AvaloniaEdit:TextEditor Text="Hello AvaloniaEdit!"
+                           ShowLineNumbers="True"
+                           FontFamily="Cascadia Code,Consolas,Menlo,Monospace"/>
+              </StackPanel>
             </TabItem>
             <TabItem Header="Execution Log">
               <lib:ChronoListViewPort></lib:ChronoListViewPort>
@@ -112,14 +113,14 @@
           </TabControl>
         </DockPanel>
 
-        <DockPanel Name="xRight" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Background="PaleVioletRed">
+        <DockPanel Name="xRight" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2">
           <Panel DockPanel.Dock="Left" Width="6" Background="Red"></Panel>
-          <DockPanel Name="xRightContent" Background="Violet"></DockPanel>
+          <DockPanel Name="xRightContent" Background="Gold"></DockPanel>
         </DockPanel>
         <GridSplitter Name="xSplitterRight" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Width="1" Background="Gray" HorizontalAlignment="Left" VerticalAlignment="Stretch"></GridSplitter>
-        <DockPanel Name="xBottom" Grid.Column="1" Grid.Row="1" Background="Aqua">
+        <DockPanel Name="xBottom" Grid.Column="1" Grid.Row="1">
           <Panel DockPanel.Dock="Top" Height="6" Background="Red"></Panel>
-          <StackPanel></StackPanel>
+          <StackPanel Background="Gold"></StackPanel>
         </DockPanel>
         <GridSplitter Name="xSplitterBottom" Grid.Row="1" Grid.Column="1" Height="1" Background="Gray" HorizontalAlignment="Stretch" VerticalAlignment="Top"></GridSplitter>
       </Grid>

@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>StepBro.UI</RootNamespace>
     <OutputPath>..\bin</OutputPath>
-    <PackageId>stepbro workbench</PackageId>
+    <PackageId>stepbro ui avalonia</PackageId>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Authors>Jan Jorgensen, Milton Lindof</Authors>

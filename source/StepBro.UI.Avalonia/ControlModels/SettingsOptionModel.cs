@@ -16,7 +16,7 @@ namespace StepBro.UI.ControlModels
 
         //ImageHelper.LoadFromResource(new Uri("avares://LoadingImages/Assets/abstract.jpg"));
 
-        public bool HasOptionIcon { get { return this.m_optionIcon != null; } }
+        public bool HasOptionIcon => this.OptionIcon != null;
 
         [ObservableProperty]
         private bool m_optionValue = false;
