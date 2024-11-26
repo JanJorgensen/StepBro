@@ -5,6 +5,7 @@ namespace StepBro.Workbench.Views
 {
     public partial class MainWindow : Window
     {
+        private bool m_primaryOnLeft = true;
         private bool m_xBottomShown = true;
         private bool m_xLeftShown = true;
         private bool m_xRightShown = true;
@@ -29,16 +30,27 @@ namespace StepBro.Workbench.Views
         {
             System.Diagnostics.Debug.WriteLine("PrimaryOnLeft");
 
-            if (checkBoxPrimaryLeft != null)
+            bool onLeft = checkBoxPrimaryLeft.IsChecked.GetValueOrDefault(true);
+
+            if (checkBoxPrimaryLeft != null && onLeft != m_primaryOnLeft)
             {
-                bool onLeft = checkBoxPrimaryLeft.IsChecked.GetValueOrDefault(true);
+                m_primaryOnLeft = onLeft;
+
+                // Switch the enable flags for left and right panels.
+                bool leftOn = checkBoxLeft.IsChecked.GetValueOrDefault(true);
+                checkBoxLeft.IsChecked = checkBoxRight.IsChecked.GetValueOrDefault(true);
+                checkBoxRight.IsChecked = leftOn;
+
+                this.UpdatePanels();
 
                 DockPanel.SetDock(primarySideMenu, onLeft ? Dock.Left : Dock.Right);
                 DockPanel.SetDock(primarySideMenuLine, onLeft ? Dock.Right : Dock.Left);
 
                 xLeft.Children.Clear();
                 xRight.Children.Clear();
+                xLeft.Children.Add(xLeftSplitterSpacing);
                 xLeft.Children.Add(onLeft ? xLeftContent : xRightContent);
+                xRight.Children.Add(xRightSplitterSpacing);
                 xRight.Children.Add(onLeft ? xRightContent : xLeftContent);
 
                 var w = mainGrid.ColumnDefinitions[0].Width;

@@ -62,7 +62,7 @@
         </Grid.ColumnDefinitions>
 
         <DockPanel Name="xLeft" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2">
-          <Panel DockPanel.Dock="Right" Width="6" Background="Red"></Panel>
+          <Panel Name="xLeftSplitterSpacing" DockPanel.Dock="Right" Width="6" Background="Red"></Panel>
           <StackPanel Name="xLeftContent" Orientation="Vertical">
             <TreeView Name="SolutionExplorer" IsVisible="True">
             </TreeView>
@@ -96,7 +96,22 @@
         </DockPanel>
         <GridSplitter Name="xSplitterLeft" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Width="1" Background="Gray" HorizontalAlignment="Right" VerticalAlignment="Stretch"></GridSplitter>
         <DockPanel Name="xMid" Grid.Column="1" Grid.Row="0">
-          <TabControl SelectedIndex="0">
+          <!--<TabStrip>
+            <TabItem Header="Greeting">
+              <TextBlock Text="{Binding Greeting}"/>
+            </TabItem>
+            <TabItem Header="Edit">
+              <StackPanel>
+                <AvaloniaEdit:TextEditor Text="Hello AvaloniaEdit!"
+                           ShowLineNumbers="True"
+                           FontFamily="Cascadia Code,Consolas,Menlo,Monospace"/>
+              </StackPanel>
+            </TabItem>
+            <TabItem Header="Execution Log">
+              <lib:ChronoListViewPort></lib:ChronoListViewPort>
+            </TabItem>
+          </TabStrip>-->
+          <TabControl SelectedIndex="0" >
             <TabItem Header="Greeting">
               <TextBlock Text="{Binding Greeting}"/>
             </TabItem>
@@ -114,7 +129,7 @@
         </DockPanel>
 
         <DockPanel Name="xRight" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2">
-          <Panel DockPanel.Dock="Left" Width="6" Background="Red"></Panel>
+          <Panel Name="xRightSplitterSpacing" DockPanel.Dock="Left" Width="6" Background="Red"></Panel>
           <DockPanel Name="xRightContent" Background="Gold"></DockPanel>
         </DockPanel>
         <GridSplitter Name="xSplitterRight" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Width="1" Background="Gray" HorizontalAlignment="Left" VerticalAlignment="Stretch"></GridSplitter>
