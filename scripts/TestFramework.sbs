@@ -32,6 +32,17 @@ public procedure TestCase() :
     // For each loop the Setup partner, the test case and the Cleanup partner are all called.
     partner model TestFormalUntilFail:  TestCaseFormalTestUntilFail;
 
+/// TestID          : The test case formal identification (if not present, the name of the element is used).
+/// Summary         : The test case objective.
+/// Author          : Name of the person that implemented the test.
+/// Category        : Basic, Smoke Test, Normal or Extensive.
+/// Automation      : No, Full or Semi.
+/// References      : Links to documentation and other relevant resources.
+/// Dependencies    : Test requirements or other test cases.
+/// Preconditions   : Preconditions for the test to be fulfilled before the test can be successfully executed.
+/// Remarks         : Details to add.
+documentation TestDocumentationTemplate;
+
 // Type definition for a test case Setup partner, and an empty implementation when no setup is needed.
 public procedure void TestCaseEmptySetup( this TestCase testcase ){}
 
@@ -201,17 +212,16 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
         while (iterator.GetNext()) : Stoppable
         {
             TestCase testcase = iterator.Procedure as TestCase;
-            summary.AddEntryBeforeResult(testcase.Name);    // Register test case before execution; in case execution is terminated by an unhandled exeception.
             procedureSummary = testcase.ProcedureData.Summary;
             if (System.String.IsNullOrEmpty(procedureSummary))
             {
                 procedureSummary = "";
             }
-            else
-            {
-                procedureSummary = " " + procedureSummary;
-            }
-            testReport.StartGroup("Testcase " + testcase.ProcedureData.FullName, procedureSummary);
+            var testCaseGroup = testReport.StartGroup(
+                testcase.ProcedureData.FullName, 
+                procedureSummary, 
+                testcase);
+            summary.AddEntryBeforeResult(testCaseGroup);    // Register test case before execution; in case execution is terminated by an unhandled exeception.
             // TODO: Save test case data in report
             log ("Starting Test: " + testcase.Name);
 
@@ -233,7 +243,7 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
             testcase.Cleanup();
             result = result.SelectIfWorse(this.LastCallResult);
 
-            summary.AddResult(testcase.Name, result);
+            summary.AddResult(testCaseGroup, result);
         }
         testReport.Close();     // Close the report, but don't remove it; the report might be printed or saved by the host application.
         //testReport.DumpToLog();
