@@ -41,8 +41,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ActiproSoftware.Controls.WinForms" Version="24.1.1" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+    <PackageReference Include="ActiproSoftware.Controls.WinForms" Version="$(ActiproVersion)" />
   </ItemGroup>
 
 </Project>
