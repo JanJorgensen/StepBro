@@ -1151,6 +1151,7 @@ namespace StepBro.SimpleWorkbench
                 toolStripDropDownButtonTool.Text = (menu.Tag as IObjectContainer).FullName.Split('.').Last();
                 toolStripDropDownButtonTool.ToolTipText = "Selected tool/object: " + (menu.Tag as IObjectContainer).FullName;
                 toolStripComboBoxToolCommand.Visible = true;
+                toolStripComboBoxToolCommand.Enabled = true;
             }
         }
 
