@@ -7,7 +7,7 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <RootNamespace>StepBro.Workbench</RootNamespace>
     <OutputPath>..\bin</OutputPath>
-    <PackageId>stepbro workbench</PackageId>
+    <PackageId>stepbro avalonia workbench</PackageId>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Authors>Jan Jorgensen, Milton Lindof</Authors>

@@ -6,7 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputPath>..\bin</OutputPath>
-    <PackageId>stepbro workbench</PackageId>
+    <PackageId>stepbro workbench winforms</PackageId>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Authors>Jan Jorgensen, Milton Lindof</Authors>
@@ -42,7 +42,7 @@
 
   <ItemGroup>
     <PackageReference Include="ActiproSoftware.Controls.WinForms" Version="24.1.1" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2849.39" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
   </ItemGroup>
 
 </Project>
