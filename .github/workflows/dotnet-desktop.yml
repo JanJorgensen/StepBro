@@ -37,7 +37,7 @@ jobs:
       run: dotnet restore source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
       
     - name: Build
-      run: dotnet build source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
+      run: dotnet build source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj -c ${{ matrix.configuration }}
 
     # Execute all unit tests in the solution
     - name: Execute unit tests
