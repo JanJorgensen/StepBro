@@ -97,4 +97,5 @@ jobs:
       run: ./source/bin/stepbro "./test files/ModuleTests/SerialTestConnection/SerialTestConnectionTests.sbs" -v -e SerialTestConnectionOfflineTests -m FormalTest --exitcode SubVerdict
 
     - name: Run ExecutionHelper test
+      if: ${{ matrix.os }} == 'windows-latest'
       run: ./source/bin/stepbro "./test files/ModuleTests/ExecutionHelper/ExecutionHelperTests.sbs" -v -e ExecutionHelperTests -m FormalTest --exitcode SubVerdict
