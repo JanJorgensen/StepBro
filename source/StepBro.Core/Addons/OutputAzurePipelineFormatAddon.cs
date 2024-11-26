@@ -301,13 +301,13 @@ namespace StepBro.Core.Addons
                     System.Console.Write(text);
                 }
 
-                //if (m_reportFileName != null)
-                //{
+                if (m_reportFileName != null)
+                {
                     using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
                     {
                         sw.Write(text);
                     }
-                //}
+                }
             }
 
             void ITextWriter.WriteLine(string text)
@@ -319,13 +319,13 @@ namespace StepBro.Core.Addons
                     System.Console.WriteLine(text);
                 }
 
-                //if (m_reportFileName != null)
-                //{
+                if (m_reportFileName != null)
+                {
                     using (StreamWriter sw = System.IO.File.AppendText("report.sbr"))
                     {
                         sw.WriteLine(text);
                     }
-                //}
+                }
             }
 
             public void Dispose()
