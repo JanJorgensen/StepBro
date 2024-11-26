@@ -228,6 +228,7 @@ namespace StepBro.Core
                 reversed.Reverse();
                 long i = 0;
                 bool fails = false;
+                string exceptionMessage = "";
                 foreach (var s in reversed)
                 {
                     if (s.State == ServiceState.Started)
@@ -237,8 +238,9 @@ namespace StepBro.Core
                             context.UpdateStatus("Stopping service " + s.Name, i);
                             s.Stop(this, context);
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
+                            exceptionMessage += e.Message + " ";
                             fails = true;
                         }
                     }
@@ -251,7 +253,7 @@ namespace StepBro.Core
                     {
                         this.State = ServiceManagerState.StopFailed;
                     }
-                    throw new Exception("Failed starting services. Some dependencies are missing.");
+                    throw new Exception("Failed starting services. Some dependencies are missing. " + exceptionMessage);
                 }
                 else
                 {

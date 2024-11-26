@@ -1009,7 +1009,7 @@ namespace StepBro.Core.Parser
                             }
                             catch (Exception e)
                             {
-                                file.ErrorsInternal.InternalError(-1, -1, e.GetType().Name + "; " + e.Message);
+                                file.ErrorsInternal.InternalError(-1, -1, e.GetType().Name + "; " + e.Message + "\n" + e.StackTrace);
                             }
                         }
                         else

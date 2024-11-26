@@ -1,4 +1,4 @@
-﻿using @"..\..\scripts\TestFramework.sbs";
+﻿using "TestFramework.sbs";
 
 
 //########################################################################
