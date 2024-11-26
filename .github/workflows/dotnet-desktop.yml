@@ -79,9 +79,6 @@ jobs:
       
     - name: Build
       run: dotnet build source/StepBro.sln /p:EnableWindowsTargeting=true -c ${{ matrix.configuration }}
-
-    - name: tree
-      run: tree .
         
     # TODO: Out-commented because stepbro --version has exit code -1 for some reason, when it is fixed this can be re-added
     # - name: Run StepBro Version Check
