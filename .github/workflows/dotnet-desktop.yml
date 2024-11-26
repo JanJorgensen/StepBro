@@ -78,7 +78,7 @@ jobs:
       run: dotnet restore source/StepBro.sln /p:EnableWindowsTargeting=true
       
     - name: Build
-      run: dotnet build source/StepBro.sln /p:EnableWindowsTargeting=true
+      run: dotnet build source/StepBro.sln /p:EnableWindowsTargeting=true -c ${{ matrix.configuration }}
 
     - name: tree
       run: tree .
