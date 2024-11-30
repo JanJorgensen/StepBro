@@ -10,18 +10,18 @@ namespace StepBro.Core.Host.Presentation
 {
     public static class UserDataStationManager
     {
-        private static string m_userFileStation = null;
+        private static string m_userFileStationPath = null;
         private static UserDataStation m_userDataStation = new UserDataStation() { Changed = true };   // Note: New object is created if loading existing settings.
 
-        public static string UserFileStation
+        public static string UserFileStationPath
         {
             get
             {
-                if (m_userFileStation == null)
+                if (m_userFileStationPath == null)
                 {
-                    m_userFileStation = Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "StepBro", "StepBro.Workbench.user.json");
+                    m_userFileStationPath = Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "StepBro", "StepBro.Workbench.user.json");
                 }
-                return m_userFileStation;
+                return m_userFileStationPath;
             }
         }
 
@@ -33,7 +33,7 @@ namespace StepBro.Core.Host.Presentation
                 options.WriteIndented = true;
                 options.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
 
-                var folder = Path.GetDirectoryName(UserFileStation);
+                var folder = Path.GetDirectoryName(UserFileStationPath);
                 if (!Directory.Exists(folder))
                 {
                     var root = Path.GetDirectoryName(folder);
@@ -44,7 +44,7 @@ namespace StepBro.Core.Host.Presentation
                     Directory.CreateDirectory(folder);
                 }
 
-                using (FileStream createStream = System.IO.File.Create(UserFileStation))
+                using (FileStream createStream = System.IO.File.Create(UserFileStationPath))
                 {
                     JsonSerializer.Serialize(createStream, m_userDataStation, options);
                     m_userDataStation.Changed = false;
@@ -54,9 +54,9 @@ namespace StepBro.Core.Host.Presentation
 
         public static void LoadUserSettingsOnStation()
         {
-            if (System.IO.File.Exists(UserFileStation))
+            if (System.IO.File.Exists(UserFileStationPath))
             {
-                m_userDataStation = JsonSerializer.Deserialize<UserDataStation>(System.IO.File.ReadAllText(UserFileStation));
+                m_userDataStation = JsonSerializer.Deserialize<UserDataStation>(System.IO.File.ReadAllText(UserFileStationPath));
             }
         }
 

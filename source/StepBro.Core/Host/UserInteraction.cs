@@ -20,26 +20,21 @@ namespace StepBro.Core.Host
 
     public abstract class UserInteraction
     {
-        //public enum SectionType { TextBlock, SingleSelection, Image }
         public class SectionData
         {
-            //public SectionType Type { get; protected set; }
             public string Header { get; set; }
         }
         public class SectionTextBlock : SectionData
         {
-            //public SectionTextBlock() { this.Type = SectionType.TextBlock; }
             public string Text { get; set; }
         }
         public class SectionSingleSelection : SectionData
         {
-            //public SectionSingleSelection() { this.Type = SectionType.SingleSelection; }
             public string Tag { get; set; }
             public List<string> Options { get; } = new List<string>();
         }
         public class SectionImage : SectionData
         {
-            //public SectionImage() { this.Type = SectionType.Image; }
             public string ImageFile { get; set; } = null;
             public System.Drawing.Image Image { get; set; } = null;
         }

@@ -26,7 +26,7 @@ namespace StepBro.Core.Logging
         /// <param name="name">The name of the new scope.</param>
         /// <returns>A logger to use for the scope.</returns>
         ILoggerScope CreateSubLocation(string name);
-        ILogEntry Log(string text);
+        ITimestampedData Log(string text);
         void LogDetail(string text);
         void LogAsync(string text);
         void LogError(string text);
@@ -51,8 +51,8 @@ namespace StepBro.Core.Logging
         ILoggerScope LogEntering(LogEntry.Type type, string location, string text, LoggerDynamicLocationSource dynamicLocation);
         //void EnteredParallelTask(string text);
         void LogExit(string text);
-        ILogEntry FirstLogEntryInScope { get; }
-        ILogEntry LastLogEntryInScope { get; }
+        ITimestampedData FirstLogEntryInScope { get; }
+        ITimestampedData LastLogEntryInScope { get; }
         /// <summary>
         /// Indicates whether any errors were logged directly in this scope.
         /// </summary>

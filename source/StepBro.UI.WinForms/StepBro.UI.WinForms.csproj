@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>StepBro.UI.WinForms</RootNamespace>
+    <AssemblyName>StepBro.UI.WinForms</AssemblyName>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputPath>..\bin</OutputPath>
@@ -34,6 +36,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
+    <ProjectReference Include="..\StepBro.HostSupport\StepBro.HostSupport.csproj" />
   </ItemGroup>
 
   <ItemGroup>

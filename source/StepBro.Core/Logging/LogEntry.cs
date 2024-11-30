@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Logging
 {
-    public class LogEntry : ILogEntry
+    public class LogEntry : ITimestampedData
     {
         public enum Type : UInt32
         {

@@ -5,13 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StepBro.Core.Data;
+using StepBro.HostSupport;
 
 namespace StepBro.UI.WinForms.Controls
 {
     public abstract class ChronoTimestampedListViewEntry : ChronoListViewEntry
     {
-        public abstract DateTime TimeStamp { get; }
-
         public override void DoPaint(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntryMarkState selected)
         {
             var width = view.ViewSettings.TimeStampWidth;

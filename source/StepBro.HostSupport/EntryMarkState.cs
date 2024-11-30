@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StepBro.UI.WinForms.Controls
+namespace StepBro.HostSupport
 {
     public enum EntryMarkState
     {

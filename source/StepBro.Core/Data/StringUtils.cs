@@ -96,12 +96,12 @@ namespace StepBro.Core.Data
             else if (Char.IsLetter(value[0]))
             {
                 bool b;
-                if (value.TryParse(out b))
+                if (value.TryParseBool(out b))
                 {
                     literal = b;
                     return true;
                 }
-                literal = value;
+                literal = (Identifier)value;
                 return true;
             }
             else if (value[0] == '\"')
@@ -223,9 +223,20 @@ namespace StepBro.Core.Data
 
         public static string DecodeLiteral(this string s)
         {
+            var value = DecodeLiteral(s, out int len);
+            if (len != s.Length)
+            {
+                throw new FormatException("Unexpected end of string.");
+            }
+            return value;
+        }
+
+        public static string DecodeLiteral(this string s, out int len)
+        {
             int l = s.Length;
             StringBuilder decoded = new(l);
-            for (int i = 0; i < l; i++)
+            int i = 0;
+            for (; i < l; i++)
             {
                 if (s[i] == '\\')
                 {
@@ -243,7 +254,7 @@ namespace StepBro.Core.Data
                         case 'f': decoded.Append('\f'); break;
                         case 'u':
                         case 'x':
-                            i++;
+                            i++;    // Skip past the initial char (u or x).
                             if ((l - i) < 4)
                             {
                                 throw new FormatException(String.Format("Error in unicode escape sequence at index {0}", i));
@@ -264,11 +275,16 @@ namespace StepBro.Core.Data
                             break;
                     }
                 }
+                else if (s[i] == '"')
+                {
+                    break;
+                }
                 else
                 {
                     decoded.Append(s[i]);
                 }
             }
+            len = i;
             return decoded.ToString();
         }
 
@@ -383,13 +399,13 @@ namespace StepBro.Core.Data
             text.Append(new string(' ', 1 + entry.IndentLevel * 3));
             string type = (entry.EntryType & LogEntry.Type.FlagFilter) switch
             {
-                LogEntry.Type.Async =>                          "<A> ",
-                LogEntry.Type.CommunicationOut =>               "                                <Out> ",
-                LogEntry.Type.CommunicationIn =>                "                                <In>  ",
-                LogEntry.Type.TaskEntry =>                      "TaskEntry - ",
-                LogEntry.Type.Error => showErrorAndFailType ?   "Error - " : "",
+                LogEntry.Type.Async => "<A> ",
+                LogEntry.Type.CommunicationOut => "                                <Out> ",
+                LogEntry.Type.CommunicationIn => "                                <In>  ",
+                LogEntry.Type.TaskEntry => "TaskEntry - ",
+                LogEntry.Type.Error => showErrorAndFailType ? "Error - " : "",
                 LogEntry.Type.Failure => showErrorAndFailType ? "Fail - " : "",
-                LogEntry.Type.UserAction =>                     "UserAction - ",
+                LogEntry.Type.UserAction => "UserAction - ",
                 _ => ""
             };
             text.Append(type);
@@ -441,6 +457,11 @@ namespace StepBro.Core.Data
                 }
             }
             return text.ToString();
+        }
+
+        public static string ToHTMLText(string text)
+        {
+            return text.Replace("\r\n", "<br />").Replace("\n", "<br />").Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
         }
 
         #region String Comparison

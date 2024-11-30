@@ -5,12 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace StepBro.Core.Api
 {
     public static class StationPropertiesHelper
     {
-        public static PropertyBlock TryGetStationPropertiesDeviceData(ServiceManager services = null)
+        public static PropertyBlock TryGetStationProperties(ServiceManager services = null)
         {
             if (services == null)
             {
@@ -69,6 +70,15 @@ namespace StepBro.Core.Api
                 return null;
             }
             return CloneWithoutGeneralDeviceConfigEntries(found);
+        }
+
+        public static IEnumerable<PropertyBlockEntry> GetConfigValuesFromStationProperties(this PropertyBlock stationProperties)
+        {
+            return stationProperties.Where(
+                e =>
+                    e.HasTypeSpecified &&
+                        (e.SpecifiedTypeName.Equals(Constants.STATION_PROPERTIES_CONFIG_VARIABLE, StringComparison.InvariantCultureIgnoreCase) ||
+                        e.SpecifiedTypeName.StartsWith(Constants.STATION_PROPERTIES_CONFIG_VARIABLE + " ", StringComparison.InvariantCultureIgnoreCase)));
         }
 
         /// <summary>

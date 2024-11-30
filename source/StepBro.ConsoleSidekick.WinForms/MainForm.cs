@@ -1317,7 +1317,7 @@ namespace StepBro.ConsoleSidekick.WinForms
             throw new NotImplementedException();
         }
 
-        ILogEntry ILogger.Log(string text)
+        ITimestampedData ILogger.Log(string text)
         {
             var log = new Log() { LogType = Log.Type.Normal, Text = text };
             m_pipe.Send(log);

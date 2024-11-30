@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
+    <ProjectReference Include="..\StepBro.Models\StepBro.HostSupport.csproj" />
     <ProjectReference Include="..\StepBro.UI.WinForms\StepBro.UI.WinForms.csproj" />
   </ItemGroup>
 

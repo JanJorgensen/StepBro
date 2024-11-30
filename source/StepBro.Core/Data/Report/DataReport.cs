@@ -106,7 +106,7 @@ namespace StepBro.Core
                 }
                 m_currentGroup = null;
             }
-            ILogEntry logStart = null;
+            ITimestampedData logStart = null;
             if (context != null && context.Logger is LoggerScope)
             {
                 if (String.IsNullOrEmpty(description)) description = "";

@@ -15,6 +15,7 @@ namespace StepBro.Core.Api
         public static readonly string STATION_PROPERTIES_DEVICE_GROUP = "devices";
         public static readonly string STATION_PROPERTIES_DEVICE_ALIAS_ENTRY = "aliases";
         public static readonly string STATION_PROPERTIES_DEVICE_TYPE_ENTRY = "devicetype";
+        public static readonly string STATION_PROPERTIES_CONFIG_VARIABLE = "config";
         public static readonly string VARIABLE_DEVICE_REFERENCE = "device";
         public static readonly string STEPBRO_FOLDER_CONFIG_FILE = "StepBro.cfg";
         public static readonly string STEPBRO_FOLDER_CONFIG_FILE_ROOT = "RootFolderHere";

@@ -398,7 +398,7 @@ namespace StepBro.SimpleWorkbench
             // 
             // toolStripDropDownButtonTool
             // 
-            toolStripDropDownButtonTool.BackColor = Color.YellowGreen;
+            toolStripDropDownButtonTool.BackColor = SystemColors.Control;
             toolStripDropDownButtonTool.DisplayStyle = ToolStripItemDisplayStyle.Text;
             toolStripDropDownButtonTool.DropDownItems.AddRange(new ToolStripItem[] { toolStripSeparatorToolSelection, toolStripMenuItemNoToolsYet });
             toolStripDropDownButtonTool.Image = (Image)resources.GetObject("toolStripDropDownButtonTool.Image");
@@ -479,18 +479,18 @@ namespace StepBro.SimpleWorkbench
             // toolStripMenuItemRunByNamespace
             // 
             toolStripMenuItemRunByNamespace.Name = "toolStripMenuItemRunByNamespace";
-            toolStripMenuItemRunByNamespace.Size = new Size(160, 22);
+            toolStripMenuItemRunByNamespace.Size = new Size(180, 22);
             toolStripMenuItemRunByNamespace.Text = "By Namespace";
             // 
             // toolStripSeparatorRunBeforeHistory
             // 
             toolStripSeparatorRunBeforeHistory.Name = "toolStripSeparatorRunBeforeHistory";
-            toolStripSeparatorRunBeforeHistory.Size = new Size(157, 6);
+            toolStripSeparatorRunBeforeHistory.Size = new Size(177, 6);
             // 
             // toolStripSeparatorRunAfterHistory
             // 
             toolStripSeparatorRunAfterHistory.Name = "toolStripSeparatorRunAfterHistory";
-            toolStripSeparatorRunAfterHistory.Size = new Size(157, 6);
+            toolStripSeparatorRunAfterHistory.Size = new Size(177, 6);
             toolStripSeparatorRunAfterHistory.Visible = false;
             // 
             // toolStripTextBoxRunSearch

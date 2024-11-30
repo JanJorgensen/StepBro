@@ -58,6 +58,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.UI.WinForms", "Step
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StepBro.UI.WinForms.Test", "Test\StepBro.UI.WinForms.Test\StepBro.UI.WinForms.Test.csproj", "{75ED57D5-EA7F-4EC3-A71E-58ED4B530127}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.HostSupport", "StepBro.HostSupport\StepBro.HostSupport.csproj", "{FF2E6B6D-6DAE-4213-9E50-C2CE0F601B4D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -210,6 +212,14 @@ Global
 		{75ED57D5-EA7F-4EC3-A71E-58ED4B530127}.Release|Any CPU.Build.0 = Release|Any CPU
 		{75ED57D5-EA7F-4EC3-A71E-58ED4B530127}.ReleaseAll|Any CPU.ActiveCfg = Release|Any CPU
 		{75ED57D5-EA7F-4EC3-A71E-58ED4B530127}.ReleaseAll|Any CPU.Build.0 = Release|Any CPU
+		{FF2E6B6D-6DAE-4213-9E50-C2CE0F601B4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF2E6B6D-6DAE-4213-9E50-C2CE0F601B4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF2E6B6D-6DAE-4213-9E50-C2CE0F601B4D}.DebugAll|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF2E6B6D-6DAE-4213-9E50-C2CE0F601B4D}.DebugAll|Any CPU.Build.0 = Debug|Any CPU
+		{FF2E6B6D-6DAE-4213-9E50-C2CE0F601B4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF2E6B6D-6DAE-4213-9E50-C2CE0F601B4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF2E6B6D-6DAE-4213-9E50-C2CE0F601B4D}.ReleaseAll|Any CPU.ActiveCfg = Release|Any CPU
+		{FF2E6B6D-6DAE-4213-9E50-C2CE0F601B4D}.ReleaseAll|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

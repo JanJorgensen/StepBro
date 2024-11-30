@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Logging
 {
-    public interface ILogEntry
+    public interface ITimestampedData
     {
         bool HasId { get; }
         ulong Id { get; }

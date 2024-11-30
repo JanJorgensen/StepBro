@@ -591,6 +591,14 @@ namespace StepBro.Core.ScriptData
             }
         }
 
+        public void UpdateConfigVariables()
+        {
+            foreach (var v in m_fileConfigVariables)
+            {
+                v.VariableOwnerAccess.SetValueOverride(true, null);
+            }
+        }
+
         public void InitializeFileVariables(ILogger logger)
         {
             foreach (var v in m_fileScopeVariables)
@@ -1144,7 +1152,7 @@ namespace StepBro.Core.ScriptData
                 return m_logger.CreateSubLocation(name);
             }
 
-            public ILogEntry Log(string text)
+            public ITimestampedData Log(string text)
             {
                 return m_logger.Log(text);
             }

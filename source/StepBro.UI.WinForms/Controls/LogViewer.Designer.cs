@@ -79,7 +79,7 @@
             toolStripButtonClear.Name = "toolStripButtonClear";
             toolStripButtonClear.Size = new Size(38, 22);
             toolStripButtonClear.Text = "Clear";
-            toolStripButtonClear.ToolTipText = "Hide the execution log befroe now.";
+            toolStripButtonClear.ToolTipText = "Hide what's in the execution log up till now.";
             toolStripButtonClear.Click += toolStripButtonClear_Click;
             // 
             // toolStripSeparator1

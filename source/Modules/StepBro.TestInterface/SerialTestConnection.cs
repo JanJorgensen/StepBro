@@ -200,7 +200,7 @@ namespace StepBro.TestInterface
                                     {
                                         m_result = v_int;
                                     }
-                                    else if (TypeUtils.TryParse(s, out bool v_bool))
+                                    else if (TypeUtils.TryParseBool(s, out bool v_bool))
                                     {
                                         m_result = v_bool;
                                     }
@@ -229,7 +229,7 @@ namespace StepBro.TestInterface
                                     }
                                     else if (m_expectedReturnType == typeof(bool))
                                     {
-                                        if (TypeUtils.TryParse(s, out bool v))
+                                        if (TypeUtils.TryParseBool(s, out bool v))
                                         {
                                             m_result = v;
                                         }

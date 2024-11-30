@@ -2,6 +2,7 @@
 using StepBro.Core.Data;
 using StepBro.Core.Api;
 using System;
+using StepBro.HostSupport;
 
 namespace StepBro.UI.WinForms.Controls
 {
@@ -138,7 +139,8 @@ namespace StepBro.UI.WinForms.Controls
 
         private IDataListSource<LogEntry> m_source = null;
         private PresentationListForListData<LogEntry, ChronoListViewEntry> m_presentationList = null;
-        private long m_lastEntryBeforeClear = -1L;
+        private long m_lastEntryIndexBeforeClear = -1L;
+        private static LogEntry s_lastEntryBeforeClear = null;
         private NewLogStart m_zeroStartSource = null;
         private int m_visibleLevels = 1000;
         private Predicate<LogEntry>[] m_filter = null;
@@ -171,6 +173,8 @@ namespace StepBro.UI.WinForms.Controls
             logView.SetupSearchMatchChecker(this.SearchMarkMatchChecker);
             this.SetupFromHeadMode();
         }
+
+        #region Filters
 
         private bool LevelFilter(LogEntry entry)
         {
@@ -230,6 +234,8 @@ namespace StepBro.UI.WinForms.Controls
             }
         }
 
+        #endregion
+
         private void toolStripButtonFollowHead_CheckedChanged(object sender, EventArgs e)
         {
             logView.HeadMode = toolStripButtonFollowHead.Checked;
@@ -276,16 +282,17 @@ namespace StepBro.UI.WinForms.Controls
 
         private void toolStripButtonClear_Click(object sender, EventArgs e)
         {
-            m_lastEntryBeforeClear = m_source.GetState().LastIndex;
-            m_presentationList = new PresentationListSearchingForFirstSource(this, m_source, m_lastEntryBeforeClear);
+            m_lastEntryIndexBeforeClear = m_source.GetState().LastIndex;
+            s_lastEntryBeforeClear = m_source.Get(m_lastEntryIndexBeforeClear);
+            m_presentationList = new PresentationListSearchingForFirstSource(this, m_source, m_lastEntryIndexBeforeClear);
             logView.Setup(m_presentationList);
         }
 
         private void SetupZeroStart()
         {
             bool headMode = m_presentationList.InHeadMode;
-            var zeroTime = m_source.Get(m_lastEntryBeforeClear + 1L).Timestamp;
-            m_zeroStartSource = new NewLogStart(m_source, m_source.Get(m_lastEntryBeforeClear + 1L), m_lastEntryBeforeClear + 1L);
+            var zeroTime = m_source.Get(m_lastEntryIndexBeforeClear + 1L).Timestamp;
+            m_zeroStartSource = new NewLogStart(m_source, m_source.Get(m_lastEntryIndexBeforeClear + 1L), m_lastEntryIndexBeforeClear + 1L);
             m_presentationList = new PresentationList(m_zeroStartSource);
             m_presentationList.SetHeadMode(headMode);
             this.CreateFilter();

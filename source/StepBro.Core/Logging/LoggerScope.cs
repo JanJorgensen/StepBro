@@ -124,7 +124,7 @@ namespace StepBro.Core.Logging
             }
         }
 
-        public ILogEntry Log(string text)
+        public ITimestampedData Log(string text)
         {
             return this.Log(LogEntry.Type.Normal, text);
         }
@@ -184,12 +184,12 @@ namespace StepBro.Core.Logging
             return (IProtectedLogger)this;
         }
 
-        public ILogEntry FirstLogEntryInScope
+        public ITimestampedData FirstLogEntryInScope
         {
             get { return m_scopeStartEntry; }
         }
 
-        public ILogEntry LastLogEntryInScope
+        public ITimestampedData LastLogEntryInScope
         {
             get { return m_scopeEndEntry; }
         }

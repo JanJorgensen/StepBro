@@ -33,6 +33,7 @@ namespace StepBro.Core
         private static HostApplicationActionQueue m_hostActions = null;
         private static ScriptExecutionManager m_scriptExecutionManager = null;
         private static DynamicObjectManager m_dynamicObjectManager = null;
+        private static UserDataProject m_userDataCurrentProject = null;
         private static LogFileCreationManager m_logFileCreationManager = null;
         private static IReportManager m_reportManager = null;
         private static UICalculator m_uiCalculator = null;
@@ -118,6 +119,9 @@ namespace StepBro.Core
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_dynamicObjectManager = new DynamicObjectManager(out service);
+            m_serviceManagerAdmin.Manager.Register(service);
+
+            m_userDataCurrentProject = new UserDataProject(out service);
             m_serviceManagerAdmin.Manager.Register(service);
 
             m_logFileCreationManager = new LogFileCreationManager(out service);

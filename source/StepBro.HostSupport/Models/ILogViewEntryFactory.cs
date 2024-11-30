@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StepBro.Core.Logging
+namespace StepBro.HostSupport.Models
 {
-    public interface IDerivedLogEntry : ITimestampedData, ILogEntryReference
+    public interface ILogViewEntryFactory
     {
     }
 }

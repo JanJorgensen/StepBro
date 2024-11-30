@@ -67,7 +67,7 @@ namespace StepBro.SimpleWorkbench
 
         private bool m_userFileRead = false;
         private string m_userFileCurrentProject = null;
-        private UserDataCurrent m_userDataCurrentProject = new UserDataCurrent();
+        private UserDataProject m_userDataProject = null;
 
 
         private string m_targetFile = null;
@@ -124,6 +124,7 @@ namespace StepBro.SimpleWorkbench
             m_loadedFiles.FilePropertyChanged += File_PropertyChanged;
             m_objectManager = StepBroMain.ServiceManager.Get<IDynamicObjectManager>();
             m_symbolLookupService = StepBroMain.ServiceManager.Get<ISymbolLookupService>();
+            m_userDataProject = StepBroMain.ServiceManager.Get<UserDataProject>();
             StepBro.UI.WinForms.CustomToolBar.ToolBar.ToolBarSetup();
 
             this.ParseCommandLineOptions();
@@ -212,6 +213,7 @@ namespace StepBro.SimpleWorkbench
             base.OnFormClosing(e);
             this.SaveUserSettingsOnProject();
             UserDataStationManager.SaveUserSettingsOnStation();
+            StepBroMain.Deinitialize();
         }
 
         private void DockManager_SaveCustomToolWindowLayoutData(object sender, DockSaveCustomToolWindowLayoutDataEventArgs e)
@@ -249,24 +251,17 @@ namespace StepBro.SimpleWorkbench
 
         #region User Settings Persistance
 
-        private void UpdateUserDataCurrentFilePath()
-        {
-            m_userFileCurrentProject = Path.Combine(Path.GetDirectoryName(m_targetFileFullPath), Path.GetFileNameWithoutExtension(m_targetFileFullPath)) + ".user.json";
-        }
-
         private void SaveUserSettingsOnProject()
         {
-            if (m_userFileCurrentProject == null) return;
-            //userData.ToolLayout = dockManager.ToolWindowLayoutData;
-            //userData.DocumentLayout = dockManager.DocumentLayoutData;
+            if (m_file == null) return;
 
-            var shortcuts = new List<UserDataCurrent.Shortcut>();
+            var shortcuts = new List<UserDataProject.Shortcut>();
             foreach (var shortcut in toolStripMain.Items.Cast<ToolStripItem>().Where(o => object.Equals(m_userShortcutItemTag, o.Tag)))
             {
                 if (shortcut is ScriptExecutionToolStripMenuItem)
                 {
                     var typed = shortcut as ScriptExecutionToolStripMenuItem;
-                    var shortcutData = new UserDataCurrent.ProcedureShortcut();
+                    var shortcutData = new UserDataProject.ProcedureShortcut();
                     shortcutData.Text = typed.Text;
                     shortcutData.Element = typed.FileElement;
                     shortcutData.Partner = typed.Partner;
@@ -276,33 +271,19 @@ namespace StepBro.SimpleWorkbench
                 else if (shortcut is ObjectCommandToolStripMenuItem)
                 {
                     var typed = shortcut as ObjectCommandToolStripMenuItem;
-                    var shortcutData = new UserDataCurrent.ObjectCommandShortcut();
+                    var shortcutData = new UserDataProject.ObjectCommandShortcut();
                     shortcutData.Text = typed.Text;
                     shortcutData.Instance = typed.Instance;
                     shortcutData.Command = typed.Command;
                     shortcuts.Add(shortcutData);
                 }
             }
-            if (shortcuts.Count > 0)
-            {
-                m_userDataCurrentProject.Shortcuts = shortcuts.ToArray();
-            }
+            m_userDataProject.SaveShortcuts(shortcuts);
 
             var hiddenToolbars = panelCustomToolstrips.ListHiddenToolbars().ToArray();
-            m_userDataCurrentProject.HiddenToolbars = (hiddenToolbars.Length > 0) ? hiddenToolbars : null;
+            m_userDataProject.SaveElementSettingString(UserDataProject.ELEMENT_TOOLBARS, UserDataProject.ELEMENT_TOOLBARS_HIDDEN, (hiddenToolbars.Length > 0) ? hiddenToolbars : null);
 
-            if (m_userDataCurrentProject.Shortcuts != null || m_userDataCurrentProject.UIElementSettings != null || m_userDataCurrentProject.HiddenToolbars != null)
-            {
-                JsonSerializerOptions options = new JsonSerializerOptions();
-                options.WriteIndented = true;
-                options.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-
-                using (FileStream createStream = File.Create(m_userFileCurrentProject))
-                {
-                    JsonSerializer.Serialize(createStream, m_userDataCurrentProject, options);
-                }
-            }
-
+            m_userDataProject.Save();   // TODO: Remove from here, and let the 
         }
 
         private void LoadUserSettingsOnProject()
@@ -313,14 +294,14 @@ namespace StepBro.SimpleWorkbench
 
                 if (File.Exists(m_userFileCurrentProject))
                 {
-                    var data = JsonSerializer.Deserialize<UserDataCurrent>(File.ReadAllText(m_userFileCurrentProject));
-                    if (data.Shortcuts != null)
+                    var data = JsonSerializer.Deserialize<UserDataProject>(File.ReadAllText(m_userFileCurrentProject));
+                    if (data.AnyShortcuts())
                     {
-                        foreach (var shortcut in data.Shortcuts)
+                        foreach (var shortcut in data.ListShortcuts())
                         {
-                            if (shortcut is UserDataCurrent.ProcedureShortcut)
+                            if (shortcut is UserDataProject.ProcedureShortcut)
                             {
-                                var typed = shortcut as UserDataCurrent.ProcedureShortcut;
+                                var typed = shortcut as UserDataProject.ProcedureShortcut;
                                 var found = m_fileElements.FirstOrDefault(e => String.Equals(typed.Element, e.FullName));
                                 if (found != null)
                                 {
@@ -340,16 +321,18 @@ namespace StepBro.SimpleWorkbench
                                     this.AddProcedureShortcut(typed.Text, found.FullName, typed.Partner, isPartnerModel, typed.Instance);
                                 }
                             }
-                            else if (shortcut is UserDataCurrent.ObjectCommandShortcut)
+                            else if (shortcut is UserDataProject.ObjectCommandShortcut)
                             {
-                                var typed = shortcut as UserDataCurrent.ObjectCommandShortcut;
+                                var typed = shortcut as UserDataProject.ObjectCommandShortcut;
                                 this.AddObjectCommandShortcut(typed.Text, typed.Instance, typed.Command);
                             }
                         }
                     }
-                    if (data.HiddenToolbars != null && data.HiddenToolbars.Length > 0)
+                    
+                    var hiddenToolbars = data.TryGetElementSettingList(UserDataProject.ELEMENT_TOOLBARS, UserDataProject.ELEMENT_TOOLBARS_HIDDEN);
+                    if (hiddenToolbars != null)
                     {
-                        foreach (var hidden in data.HiddenToolbars)
+                        foreach (var hidden in hiddenToolbars)
                         {
                             panelCustomToolstrips.SetToolbarVisibility(hidden, false);
                         }
@@ -1856,8 +1839,6 @@ namespace StepBro.SimpleWorkbench
                     var projectShortcuts = new FolderShortcutCollection(FolderShortcutOrigin.Project);
                     projectShortcuts.AddShortcut(StepBro.Core.Api.Constants.TOP_FILE_FOLDER_SHORTCUT, System.IO.Path.GetDirectoryName(m_file.FilePath), isResolved: true);
                     shortcuts.AddSource(projectShortcuts);
-
-                    this.UpdateUserDataCurrentFilePath();
                 }
             }
             catch (Exception ex)

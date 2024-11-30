@@ -64,8 +64,8 @@ namespace StepBroCoreTest.Mocks
         }
 
         #region ILoggerScope
-        ILogEntry ILoggerScope.FirstLogEntryInScope => throw new NotImplementedException();
-        ILogEntry ILoggerScope.LastLogEntryInScope => throw new NotImplementedException();
+        ITimestampedData ILoggerScope.FirstLogEntryInScope => throw new NotImplementedException();
+        ITimestampedData ILoggerScope.LastLogEntryInScope => throw new NotImplementedException();
 
         bool ILoggerScope.ErrorsLogged => throw new NotImplementedException();
 
@@ -73,7 +73,7 @@ namespace StepBroCoreTest.Mocks
 
         string ILogger.Location => throw new NotImplementedException();
 
-        ILogEntry ILogger.Log(string text)
+        ITimestampedData ILogger.Log(string text)
         {
             throw new NotImplementedException();
         }

@@ -1,4 +1,7 @@
-﻿using System;
+﻿using StepBro.Core.Logging;
+using StepBro.HostSupport;
+using StepBro.HostSupport.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,9 +10,13 @@ using System.Windows.Forms;
 
 namespace StepBro.UI.WinForms.Controls
 {
-    public abstract class ChronoListViewEntry
+    public abstract class ChronoListViewEntry : ITimestampedViewEntry
     {
-        public abstract object DataObject { get; }
+        public abstract ITimestampedData DataObject { get; }
+
+        public virtual DateTime TimeStamp { get { return this.DataObject.Timestamp; } }
+
+
         public abstract void DoPaint(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntryMarkState selected);
 
 

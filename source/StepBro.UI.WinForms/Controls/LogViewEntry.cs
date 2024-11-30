@@ -1,5 +1,6 @@
 ﻿using StepBro.Core.Data;
 using StepBro.Core.Logging;
+using StepBro.HostSupport;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,9 +23,7 @@ namespace StepBro.UI.WinForms.Controls
             m_sourceIndex = index;
         }
 
-        public override DateTime TimeStamp { get { return m_entry.Timestamp; } }
-
-        public override object DataObject { get { return m_entry; } }
+        public override ITimestampedData DataObject { get { return m_entry; } }
 
         protected virtual string GetHeaderText()
         {

@@ -505,10 +505,10 @@ namespace StepBro.Core.Parser
             {
                 var deviceName = (deviceEntry as PropertyBlockValue).ValueAsString();
                 deviceEntry.IsUsedOrApproved = true;
-                var devices = StationPropertiesHelper.TryGetStationPropertiesDeviceData();
-                if (devices != null)
+                var stationProperties = StationPropertiesHelper.TryGetStationProperties();
+                if (stationProperties != null)
                 {
-                    var deviceProps = devices.TryGetDeviceFromStationProperties(deviceName);
+                    var deviceProps = stationProperties.TryGetDeviceFromStationProperties(deviceName);
                     if (deviceProps != null)
                     {
                         effectiveProperties = deviceProps.MergeStationPropertiesWithLocalProperties(properties);
@@ -517,6 +517,10 @@ namespace StepBro.Core.Parser
                     {
                         errors.SymanticError(startToken.Line, startToken.Column, false, $"No data for a device named \"{deviceName}\" can be found in the station properties.");
                     }
+                }
+                else
+                {
+                    errors.ConfigError(startToken.Line, startToken.Column, $"No station properties file was found or loaded. When using the \"{Constants.VARIABLE_DEVICE_REFERENCE}\" keyword, that file is needed.");
                 }
             }
 
