@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.Workbench.WPF5", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.UI", "..\StepBro.UI\StepBro.UI.csproj", "{A39E1FF4-3304-4377-BB2F-A9D2026D8422}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.UI.UnitTest", "..\Test\StepBro.UI.UnitTest\StepBro.UI.UnitTest.csproj", "{E3C0418C-BC68-40B8-B10C-CAFB692C622E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.Workbench.Test5", "..\Test\StepBro.Workbench.Test\StepBro.Workbench.Test5.csproj", "{208114C1-8010-4230-B13D-F88A9D40E1C4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{A39E1FF4-3304-4377-BB2F-A9D2026D8422}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A39E1FF4-3304-4377-BB2F-A9D2026D8422}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A39E1FF4-3304-4377-BB2F-A9D2026D8422}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3C0418C-BC68-40B8-B10C-CAFB692C622E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3C0418C-BC68-40B8-B10C-CAFB692C622E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3C0418C-BC68-40B8-B10C-CAFB692C622E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3C0418C-BC68-40B8-B10C-CAFB692C622E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{208114C1-8010-4230-B13D-F88A9D40E1C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{208114C1-8010-4230-B13D-F88A9D40E1C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{208114C1-8010-4230-B13D-F88A9D40E1C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{208114C1-8010-4230-B13D-F88A9D40E1C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -111,7 +111,6 @@ namespace StepBro.UI.WinForms.Controls
             }
         }
 
-        private object m_sync = new object();
         private IChronoListViewer m_viewer = null;
         private IElementIndexer<ChronoListViewEntry> m_source = null;
         private int m_lineHeight = 20;

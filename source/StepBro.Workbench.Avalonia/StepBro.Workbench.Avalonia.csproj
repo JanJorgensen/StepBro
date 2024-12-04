@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
+    <ProjectReference Include="..\StepBro.HostSupport\StepBro.HostSupport.csproj" />
     <ProjectReference Include="..\StepBro.UI.Avalonia\StepBro.UI.Avalonia.csproj" />
   </ItemGroup>
 </Project>

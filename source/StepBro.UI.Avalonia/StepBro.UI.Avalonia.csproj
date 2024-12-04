@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>StepBro.UI</RootNamespace>
     <OutputPath>..\bin</OutputPath>
@@ -24,6 +23,11 @@
     <PackageReference Include="Avalonia" Version="11.2.0" />
     <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.1.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
+    <ProjectReference Include="..\StepBro.HostSupport\StepBro.HostSupport.csproj" />
   </ItemGroup>
 
 </Project>
