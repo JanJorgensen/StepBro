@@ -606,7 +606,12 @@ namespace StepBro.Core.ScriptData
                 bool doInit = !v.VariableOwnerAccess.DataCreated || v.VariableOwnerAccess.InitNeeded;
                 if (!v.VariableOwnerAccess.DataCreated)
                 {
-                    logger?.Log("Variable " + v.VariableOwnerAccess.Container.Name + " - Create data");
+#if DEBUG
+                    if (v.DataType.Type.IsClass || v.DataType.Type.IsInterface)
+                    {
+                        logger?.LogDetail("Variable " + v.VariableOwnerAccess.Container.Name + " - Create data");
+                    }
+#endif
                     v.VariableOwnerAccess.DataCreator?.Invoke(this, v.VariableOwnerAccess, logger);
                     var obj = v.VariableOwnerAccess.Container.GetValue();
                     if (obj != null && obj is INameable && (obj as INameable).Name == null)
@@ -649,7 +654,8 @@ namespace StepBro.Core.ScriptData
 
                 if (doInit)
                 {
-                    if (logger != null)
+#if DEBUG
+                    if (logger != null && (v.DataType.Type.IsClass || v.DataType.Type.IsInterface))
                     {
                         var text = "Reset and initialize";
                         var props = GetFileVariableAllData(v);
@@ -665,8 +671,9 @@ namespace StepBro.Core.ScriptData
                                 text = String.Concat(text, ", data: ", datastring.Substring(0, 100), "...");
                             }
                         }
-                        logger.Log("Variable " + v.VariableOwnerAccess.Container.Name + " init: " + text);
+                        logger.LogDetail("Variable " + v.VariableOwnerAccess.Container.Name + " init: " + text);
                     }
+#endif
                     var logWrapper = new VariableSetupLoggerWrapper(v, logger);
                     v.VariableOwnerAccess.DataResetter?.Invoke(this, v.VariableOwnerAccess, logWrapper);
                     v.VariableOwnerAccess.DataInitializer?.Invoke(this, v.VariableOwnerAccess, logWrapper);
