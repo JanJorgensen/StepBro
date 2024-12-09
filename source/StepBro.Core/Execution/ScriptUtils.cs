@@ -189,7 +189,7 @@ namespace StepBro.Core.Execution
         {
             if (String.IsNullOrEmpty(prefix)) throw new ArgumentException(nameof(prefix));
             string folder = GetOutputFileFolder();
-            string filename = prefix + time.ToLocalTime().ToFileName() + ((String.IsNullOrEmpty(postfix)) ? "" : postfix) + "." + extension;
+            string filename = prefix + time.ToLocalTime().ToFileName() + ((String.IsNullOrEmpty(postfix)) ? "" : postfix) + "." + extension.TrimStart('.');
             return System.IO.Path.Combine(folder, filename);
         }
 
@@ -375,6 +375,13 @@ namespace StepBro.Core.Execution
         public static bool AppendLineToFile([Implicit] ICallContext context, string path, string text, bool reportErrors = false)
         {
             return AppendTextToFile(context, path, text + Environment.NewLine, reportErrors);
+        }
+
+        [Public]
+        public static bool AppendDataLineToCSVFile([Implicit] ICallContext context, string path, params object[] values)
+        {
+            var strings = values.Select(v => ObjectToString(v, true));
+            return AppendLineToFile(context, path, String.Join(", ", strings));
         }
 
         #endregion

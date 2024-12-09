@@ -298,11 +298,11 @@ namespace StepBro.Core.Data
                 .Replace("\'", "\\\'");
         }
 
-        public static string ObjectToString(object value, bool identifierBare = false)
+        public static string ObjectToString(object value, bool identifierBare = false, bool stringBare = false)
         {
             if (value == null) return "<null>";
             var t = value.GetType();
-            if (t == typeof(string)) return "\"" + ((string)value).EscapeString() + "\"";
+            if (t == typeof(string)) return stringBare ? (string)value : ("\"" + ((string)value).EscapeString() + "\"");
             if (t == typeof(Identifier)) return identifierBare ? ((Identifier)value).Name : ("'" + ((Identifier)value).Name + "'");
             if (t == typeof(DateTime)) return ((DateTime)value).ToGeneralFormat();
             if (t == typeof(ArgumentList))
