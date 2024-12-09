@@ -47,7 +47,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Modules\StepBro.TestInterface\StepBro.TestInterface.csproj" />
     <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
-    <ProjectReference Include="..\StepBro.Models\StepBro.HostSupport.csproj" />
+    <ProjectReference Include="..\StepBro.HostSupport\StepBro.HostSupport.csproj" />
   </ItemGroup>
 
   <ItemGroup>
