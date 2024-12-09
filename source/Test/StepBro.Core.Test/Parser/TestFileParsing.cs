@@ -231,12 +231,12 @@ namespace StepBroCoreTest.Parser
             var log = new LogInspector(taskContext.Logger);
             log.DebugDump();
             log.ExpectNext("0 - Pre - TestRun - Starting");
-            log.ExpectNext("1 - Normal - TestRun - Variable myTool1 - Create data");
-            log.ExpectNext("1 - Normal - TestRun - Variable myTool1 init: Reset and initialize, data: { BoolA=True, IntA=36, ExtraData = { a=8227, b=Bee } }");
+            log.ExpectNext("1 - Detail - TestRun - Variable myTool1 - Create data");
+            log.ExpectNext("1 - Detail - TestRun - Variable myTool1 init: Reset and initialize, data: { BoolA=True, IntA=36, ExtraData = { a=8227, b=Bee } }");
             log.ExpectNext("1 - Normal - TestRun - Entry: Value: a=8227");
             log.ExpectNext("1 - Normal - TestRun - Entry: Value: b=Bee");
-            log.ExpectNext("1 - Normal - TestRun - Variable myTool2 - Create data");
-            log.ExpectNext("1 - Normal - TestRun - Variable myTool2 init: Reset and initialize, data: { BoolA=True, IntA=36, Mogens = { m1=True, m2=Identifier: Jepper } }");
+            log.ExpectNext("1 - Detail - TestRun - Variable myTool2 - Create data");
+            log.ExpectNext("1 - Detail - TestRun - Variable myTool2 init: Reset and initialize, data: { BoolA=True, IntA=36, Mogens = { m1=True, m2=Identifier: Jepper } }");
             log.ExpectNext("1 - Error - TestRun - Unknown data field: \"Mogens\", line 13");
             log.ExpectEnd();
         }
