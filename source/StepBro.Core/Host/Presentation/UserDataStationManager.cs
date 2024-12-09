@@ -11,7 +11,7 @@ namespace StepBro.Core.Host.Presentation
     public static class UserDataStationManager
     {
         private static string m_userFileStationPath = null;
-        private static UserDataStation m_userDataStation = new UserDataStation() { Changed = true };   // Note: New object is created if loading existing settings.
+        private static UserDataStation m_userDataStation = new UserDataStation() { Changed = false };   // Note: New object is created if loading existing settings.
 
         public static string UserFileStationPath
         {

@@ -2,9 +2,11 @@
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -12,13 +14,21 @@ namespace StepBro.Core.General
 {
     public class UserDataProject : ServiceBase<UserDataProject, UserDataProject>
     {
+        [JsonDerivedType(typeof(ScriptElementShortcut), typeDiscriminator: "scriptelement")]
         [JsonDerivedType(typeof(ProcedureShortcut), typeDiscriminator: "procedure")]
         [JsonDerivedType(typeof(ObjectCommandShortcut), typeDiscriminator: "command")]
         public class Shortcut
         {
             public string Text { get; set; }
         }
-        public class ProcedureShortcut : Shortcut
+        public class ScriptElementShortcut : Shortcut
+        {
+            public string Element { get; set; } = null;
+            public string Partner { get; set; } = null;
+            public string Instance { get; set; } = null;
+            public string[] Arguments { get; set; } = null;
+        }
+        public class ProcedureShortcut : Shortcut       // TBD - obsolete
         {
             public string Element { get; set; } = null;
             public string Partner { get; set; } = null;
@@ -35,20 +45,33 @@ namespace StepBro.Core.General
         {
             public string Element { get; set; }
             public string ID { get; set; }
-            public string Type { get; set; }
             public string Value { get; set; }
+            public string[] Values { get; set; }
+
+            bool HasValue() {  return this.Value != null || (this.Values != null && this.Values.Length > 0); }
 
             public void SetValue(object value)
             {
                 if (value == null)
                 {
-                    this.Type = null;
                     this.Value = null;
                 }
                 else
                 {
-                    this.Value = StringUtils.ObjectToString(value, true);
-                    this.Type = value.GetType().StepBroTypeName();
+                    if (value is not string && value is IEnumerable)
+                    {
+                        this.Value = null;
+                        var values = ((IEnumerable)value).Cast<object>().Select(v => StringUtils.ObjectToString(v, true, true)).ToArray();
+                        if (values.Length > 0)
+                        {
+                            this.Values = values;
+                        }
+                    }
+                    else
+                    {
+                        this.Value = StringUtils.ObjectToString(value, true, true);
+                        this.Values = null;
+                    }
                 }
             }
         }
@@ -69,6 +92,7 @@ namespace StepBro.Core.General
         private ILoadedFilesManager m_loadedFilesManager = null;
         private IScriptFile m_topFile = null;
         private string m_userFilePath = null;
+        private bool m_dataRead = false;
 
         internal UserDataProject(out IService serviceAccess) :
             base("UserDataProject", out serviceAccess, typeof(ILoadedFilesManager), typeof(IConfigurationFileManager))
@@ -86,6 +110,8 @@ namespace StepBro.Core.General
             this.Save();
         }
 
+        public bool FileRead { get => m_dataRead; }
+
         private void LoadedFilesManager_FileLoaded(object sender, LoadedFileEventArgs args)
         {
             if (m_topFile == null)
@@ -100,10 +126,21 @@ namespace StepBro.Core.General
                         var data = JsonSerializer.Deserialize<Data>(System.IO.File.ReadAllText(m_userFilePath));
                         if (data != null)
                         {
+                            if (data.Shortcuts != null && data.Shortcuts.Count > 0)
+                            {
+                                for (int i = 0; i < data.Shortcuts.Count; i++)
+                                {
+                                    if (data.Shortcuts[i] is ProcedureShortcut ps)
+                                    {
+                                        data.Shortcuts[i] = new ScriptElementShortcut { Element = ps.Element, Instance = ps.Instance, Partner = ps.Partner, Text = ps.Text };   // Convert to element of the future.
+                                    }
+                                }
+                            }
+                            m_dataRead = true;
                             m_data = data;
                             if (m_data.HiddenToolbars != null)
                             {
-                                this.SaveElementSettingString(ELEMENT_TOOLBARS, ELEMENT_TOOLBARS_HIDDEN, m_data.HiddenToolbars);
+                                this.SaveElementSettingValue(ELEMENT_TOOLBARS, ELEMENT_TOOLBARS_HIDDEN, m_data.HiddenToolbars);
                                 m_data.HiddenToolbars = null;
                             }
                         }
@@ -134,7 +171,7 @@ namespace StepBro.Core.General
 
         #region Element Settings
 
-        public void SaveElementSettingString(string element, string id, string value)
+        public void SaveElementSettingValue(string element, string id, object value)
         {
             if (m_data.ElementSettings == null)
             {
@@ -143,80 +180,31 @@ namespace StepBro.Core.General
             var setting = m_data.ElementSettings.FirstOrDefault(s => s.Element == element && s.ID == id);
             if (setting != null)
             {
-                setting.Value = value;
+                setting.SetValue(value);
             }
             else
             {
-                m_data.ElementSettings.Add(new ElementSetting { Element = element, ID = id, Value = value });
+                setting = new ElementSetting
+                {
+                    Element = element,
+                    ID = id
+                };
+                setting.SetValue(value);
+                m_data.ElementSettings.Add(setting);
             }
         }
 
-        public void SaveElementSettingString(string element, string id, string[] value)
-        {
-            if (value == null || value.Length == 0)
-            {
-                // TODI: Remove existing.
-            }
-            else
-            {
-                // TODO: Overwrite if already existing, remove tail if fewer than existing and insert just fter if more than existing.
-                var index = 0;
-                foreach (var v in value)
-                {
-                    this.SaveElementSettingString(element, $"{id}[{index++}]", v);
-                }
-            }
-        }
-
-        public void SaveElementSettingValue(string element, string id, object value)
-        {
-            string stringValue = null;
-            if (value != null)
-            {
-                var t = value.GetType();
-                if (t.IsArray)
-                {
-                    return;
-                }
-                if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>))
-                {
-
-                }
-            }
-            SaveElementSettingString (element, id, stringValue);
-        }
-
-        public string TryGetElementSetting(string element, string id)
+        public object TryGetElementSetting(string element, string id)
         {
             if (m_data.ElementSettings != null)
             {
                 var setting = m_data.ElementSettings.FirstOrDefault(s => s.Element == element && s.ID == id);
                 if (setting != null)
                 {
-                    return setting.Value;
+                    return (setting.Value != null) ? setting.Value : setting.Values;
                 }
             }
             return null;
-        }
-
-        public List<string> TryGetElementSettingList(string element, string id)
-        {
-            var index = 0;
-            List<string> list = null;
-            while (true)
-            {
-                var value = this.TryGetElementSetting(element, $"{id}[{index++}]");
-                if (value != null)
-                {
-                    if (list == null)
-                    {
-                        list = new List<string>();
-                    }
-                    list.Add(value);
-                }
-                else break;
-            }
-            return list;
         }
 
         #endregion
@@ -234,7 +222,7 @@ namespace StepBro.Core.General
 
                     using (FileStream createStream = System.IO.File.Create(m_userFilePath))
                     {
-                        JsonSerializer.Serialize(createStream, m_userFilePath, options);
+                        JsonSerializer.Serialize(createStream, m_data, options);
                     }
                 }
             }

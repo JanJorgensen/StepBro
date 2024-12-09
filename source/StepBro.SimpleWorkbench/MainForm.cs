@@ -66,9 +66,7 @@ namespace StepBro.SimpleWorkbench
         private object m_userShortcutItemTag = new object();
 
         private bool m_userFileRead = false;
-        private string m_userFileCurrentProject = null;
         private UserDataProject m_userDataProject = null;
-
 
         private string m_targetFile = null;
         private string m_targetFileFullPath = null;
@@ -212,7 +210,7 @@ namespace StepBro.SimpleWorkbench
         {
             base.OnFormClosing(e);
             this.SaveUserSettingsOnProject();
-            UserDataStationManager.SaveUserSettingsOnStation();
+            UserDataStationManager.SaveUserSettingsOnStation(); // TODO: Remove when UserDataStationManager changed to a service.
             StepBroMain.Deinitialize();
         }
 
@@ -261,7 +259,7 @@ namespace StepBro.SimpleWorkbench
                 if (shortcut is ScriptExecutionToolStripMenuItem)
                 {
                     var typed = shortcut as ScriptExecutionToolStripMenuItem;
-                    var shortcutData = new UserDataProject.ProcedureShortcut();
+                    var shortcutData = new UserDataProject.ScriptElementShortcut();
                     shortcutData.Text = typed.Text;
                     shortcutData.Element = typed.FileElement;
                     shortcutData.Partner = typed.Partner;
@@ -281,61 +279,54 @@ namespace StepBro.SimpleWorkbench
             m_userDataProject.SaveShortcuts(shortcuts);
 
             var hiddenToolbars = panelCustomToolstrips.ListHiddenToolbars().ToArray();
-            m_userDataProject.SaveElementSettingString(UserDataProject.ELEMENT_TOOLBARS, UserDataProject.ELEMENT_TOOLBARS_HIDDEN, (hiddenToolbars.Length > 0) ? hiddenToolbars : null);
-
-            m_userDataProject.Save();   // TODO: Remove from here, and let the 
+            m_userDataProject.SaveElementSettingValue(UserDataProject.ELEMENT_TOOLBARS, UserDataProject.ELEMENT_TOOLBARS_HIDDEN, (hiddenToolbars.Length > 0) ? hiddenToolbars : null);
         }
 
         private void LoadUserSettingsOnProject()
         {
-            if (!m_userFileRead)
+            if (!m_userFileRead && m_userDataProject.FileRead)
             {
                 m_userFileRead = true;
-
-                if (File.Exists(m_userFileCurrentProject))
+                if (m_userDataProject.AnyShortcuts())
                 {
-                    var data = JsonSerializer.Deserialize<UserDataProject>(File.ReadAllText(m_userFileCurrentProject));
-                    if (data.AnyShortcuts())
+                    foreach (var shortcut in m_userDataProject.ListShortcuts())
                     {
-                        foreach (var shortcut in data.ListShortcuts())
+                        if (shortcut is UserDataProject.ScriptElementShortcut)
                         {
-                            if (shortcut is UserDataProject.ProcedureShortcut)
+                            var typed = shortcut as UserDataProject.ScriptElementShortcut;
+                            var found = m_fileElements.FirstOrDefault(e => String.Equals(typed.Element, e.FullName));
+                            if (found != null)
                             {
-                                var typed = shortcut as UserDataProject.ProcedureShortcut;
-                                var found = m_fileElements.FirstOrDefault(e => String.Equals(typed.Element, e.FullName));
-                                if (found != null)
+                                var isPartnerModel = false;
+                                if (!String.IsNullOrEmpty(typed.Partner))
                                 {
-                                    var isPartnerModel = false;
-                                    if (!String.IsNullOrEmpty(typed.Partner))
+                                    var partner = found.ListPartners().FirstOrDefault(p => p.Name == typed.Partner);
+                                    if (partner != null)
                                     {
-                                        var partner = found.ListPartners().FirstOrDefault(p => p.Name == typed.Partner);
-                                        if (partner != null)
-                                        {
-                                            isPartnerModel = partner.IsModel;
-                                        }
-                                        else
-                                        {
-                                            continue;   // Just throw away, then.
-                                        }
+                                        isPartnerModel = partner.IsModel;
                                     }
-                                    this.AddProcedureShortcut(typed.Text, found.FullName, typed.Partner, isPartnerModel, typed.Instance);
+                                    else
+                                    {
+                                        continue;   // Just throw away, then.
+                                    }
                                 }
+                                this.AddProcedureShortcut(typed.Text, found.FullName, typed.Partner, isPartnerModel, typed.Instance);
                             }
-                            else if (shortcut is UserDataProject.ObjectCommandShortcut)
-                            {
-                                var typed = shortcut as UserDataProject.ObjectCommandShortcut;
-                                this.AddObjectCommandShortcut(typed.Text, typed.Instance, typed.Command);
-                            }
+                        }
+                        else if (shortcut is UserDataProject.ObjectCommandShortcut)
+                        {
+                            var typed = shortcut as UserDataProject.ObjectCommandShortcut;
+                            this.AddObjectCommandShortcut(typed.Text, typed.Instance, typed.Command);
                         }
                     }
-                    
-                    var hiddenToolbars = data.TryGetElementSettingList(UserDataProject.ELEMENT_TOOLBARS, UserDataProject.ELEMENT_TOOLBARS_HIDDEN);
-                    if (hiddenToolbars != null)
+                }
+
+                var hiddenToolbars = (string[])m_userDataProject.TryGetElementSetting(UserDataProject.ELEMENT_TOOLBARS, UserDataProject.ELEMENT_TOOLBARS_HIDDEN);
+                if (hiddenToolbars != null)
+                {
+                    foreach (var hidden in hiddenToolbars)
                     {
-                        foreach (var hidden in hiddenToolbars)
-                        {
-                            panelCustomToolstrips.SetToolbarVisibility(hidden, false);
-                        }
+                        panelCustomToolstrips.SetToolbarVisibility(hidden, false);
                     }
                 }
             }
