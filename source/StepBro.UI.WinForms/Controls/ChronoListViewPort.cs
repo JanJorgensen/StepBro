@@ -157,6 +157,7 @@ namespace StepBro.UI.WinForms.Controls
             public int Line { get { return m_line; } }
             public long Index { get { return m_index; } }
         }
+        
         public delegate void MouseOnLineEventHandler(object sender, MouseOnLineEventArgs e);
 
         public event MouseOnLineEventHandler MouseDownOnLine;

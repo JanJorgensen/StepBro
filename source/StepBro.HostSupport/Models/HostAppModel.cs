@@ -12,6 +12,7 @@ using StepBro.Core.Execution;
 using StepBro.Core.General;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
+using static StepBro.Core.Data.PropertyBlockDecoder;
 using StepBroMain = StepBro.Core.Main;
 
 namespace StepBro.HostSupport.Models
@@ -24,6 +25,7 @@ namespace StepBro.HostSupport.Models
         private int m_documentIndex = 1;
         //private readonly ObservableCollection<DocumentItemViewModel> m_userDocumentItems = new ObservableCollection<DocumentItemViewModel>();
         //private readonly DeferrableObservableCollection<ToolItemViewModel> m_toolItems = new DeferrableObservableCollection<ToolItemViewModel>();
+        private readonly ItemViewModelCollection m_itemViews = new ItemViewModelCollection();
         private readonly ObservableCollection<ProblemInfo> m_errors = new ObservableCollection<ProblemInfo>();
         //private readonly DeferrableObservableCollection<CreateCustomPanelMenuItemViewModel> m_creatableCustomPanels = new DeferrableObservableCollection<CreateCustomPanelMenuItemViewModel>();
         //private readonly DeferrableObservableCollection<IFileElement> m_allFileElements = new DeferrableObservableCollection<IFileElement>();
@@ -59,6 +61,7 @@ namespace StepBro.HostSupport.Models
         private string m_documentToActivateWhenLoaded = null;
         private string m_executionTarget = "tadaa!";
         private Tuple<IFileElement, string> m_executionTargetResolved = null;
+        private InteractiveHostAppModel m_interactive = null;
         private static SynchronizationContext g_syncContext = null;
         //private readonly CustomPanelManager m_panelManager = null;
 
@@ -67,18 +70,21 @@ namespace StepBro.HostSupport.Models
         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HostAppModel"/> class.
+        /// Constructor.
         /// </summary>
         public HostAppModel()
         {
-            g_syncContext = SynchronizationContext.Current;
+            g_syncContext = SynchronizationContext.Current;         // The CTOR MUST then be called from the UI thread !!!!
+        }
+
+        public void Initialize(params IService[] hostServices)
+        {
             //var cmd = ApplicationCommands.Save;
 
             //IService panelManagerService;
             //m_panelManager = new CustomPanelManager(out panelManagerService);
 
-            // Initialize before the views start asking for the different services.
-            StepBroMain.Initialize();   // TODO: Add virtual function that can contribute to the list of host services.
+            StepBroMain.Initialize(hostServices);
 
             //m_propertiesViewModel = new PropertiesViewModel();
             //m_propertiesViewModel.IsOpen = true;
@@ -108,6 +114,31 @@ namespace StepBro.HostSupport.Models
             StepBroMain.RootLogger.LogSystem("StepBro Workbench: " + text);
         }
 
+        public static void Invoke(SendOrPostCallback func, object state = null)
+        {
+            if (g_syncContext != null)
+            {
+                g_syncContext.Post(func, state);
+            }
+            else
+            {
+                func(state);
+            }
+        }
+
+        public InteractiveHostAppModel Interactive
+        {
+            get
+            {
+                if (m_interactive == null)
+                {
+                    // Create on demand.
+                    m_interactive = new InteractiveHostAppModel(this);
+                }
+                return m_interactive;
+            }
+        }
+
         #region Properties
 
         public string ApplicationStateMessage
@@ -116,17 +147,17 @@ namespace StepBro.HostSupport.Models
             set => SetProperty(ref m_applicationStateMessage, value, nameof(ApplicationStateMessage));
         }
 
-        /// <summary>
-        /// Gets the document items associated with this view-model.
+        ///<summary>
+        /// Gets the active view models.
         /// </summary>
-        /// <value>The document items associated with this view-model.</value>
-        //public IList<DocumentItemViewModel> DocumentItems
-        //{
-        //    get
-        //    {
-        //        return m_userDocumentItems;
-        //    }
-        //}
+        /// <value>The view models associated with this model.</value>
+        public IList<ItemViewModel> Views
+        {
+            get
+            {
+                return m_itemViews;
+            }
+        }
 
         /// <summary>
         /// Gets the tool items associated with this view-model.
@@ -148,11 +179,13 @@ namespace StepBro.HostSupport.Models
         //    }
         //}
 
+        private bool m_fileParsingRunning = false;
         public bool FileParsingRunning
         {
             get
             {
-                return m_fileParsingTask != null;
+                SetProperty(ref m_fileParsingRunning, m_fileParsingTask != null);
+                return m_fileParsingRunning;
             }
         }
 
@@ -256,7 +289,10 @@ namespace StepBro.HostSupport.Models
             //m_commandParseAllFiles?.RaiseCanExecuteChanged();
             //m_commandStartExecution?.RaiseCanExecuteChanged();
             //m_commandStartExecutionOfSelectedFileElement?.RaiseCanExecuteChanged();
+            this.UpdatingCommandStates?.Invoke(this, EventArgs.Empty);
         }
+
+        public event EventHandler<EventArgs> UpdatingCommandStates;
 
         #region VIEWMODEL EVENTS
 
@@ -360,17 +396,7 @@ namespace StepBro.HostSupport.Models
         #region MODEL EVENTS
         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        internal static void Invoke(SendOrPostCallback func, object state = null)
-        {
-            if (g_syncContext != null)
-            {
-                g_syncContext.Post(func, state);
-            }
-            else
-            {
-                func(state);
-            }
-        }
+        #region LoadedFiles Events
 
         private void LoadedFiles_FileLoaded(object sender, LoadedFileEventArgs args)
         {
@@ -421,28 +447,6 @@ namespace StepBro.HostSupport.Models
             });
         }
 
-        private void ScriptFileErrors_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            Invoke(o =>
-            {
-                //switch (e.Action)
-                //{
-                //    case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                //        m_errors.Add(new ErrorInfo((IScriptFile)sender, (IErrorData)e.NewItems[0]));
-                //        break;
-                //    case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-                //        for (int i = m_errors.Count - 1; i >= 0; i--)
-                //        {
-                //            if (m_errors[i].Type == ProblemType.ParsingError) m_errors.RemoveAt(i);
-                //        }
-                //        break;
-                //    default:
-                //        break;
-                //}
-                UpdateCommandStates();
-            });
-        }
-
         private void LoadedFiles_FileClosed(object sender, LoadedFileEventArgs args)
         {
             //var foundDocument = m_userDocumentItems.FirstOrDefault(f => Object.ReferenceEquals(args.File, f.LoadedFile));
@@ -464,20 +468,6 @@ namespace StepBro.HostSupport.Models
             //}
             UpdateCommandStates();
         }
-
-        //private void DocViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        //{
-        //    System.Diagnostics.Debug.WriteLine($"MainViewModel.DocViewModel_PropertyChanged: {e.PropertyName}");
-        //    if (e.PropertyName == nameof(DocumentItemViewModel.IsOpen))
-        //    {
-        //        var document = sender as DocumentItemViewModel;
-        //        if (document.IsOpen == false)
-        //        {
-        //            document.LoadedFile.UnregisterDependant(this);
-        //        }
-        //        this.UpdateCommandStates();
-        //    }
-        //}
 
         private void File_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -515,6 +505,44 @@ namespace StepBro.HostSupport.Models
                 }, sender);
             }
         }
+
+        #endregion
+
+        private void ScriptFileErrors_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            Invoke(o =>
+            {
+                //switch (e.Action)
+                //{
+                //    case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                //        m_errors.Add(new ErrorInfo((IScriptFile)sender, (IErrorData)e.NewItems[0]));
+                //        break;
+                //    case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                //        for (int i = m_errors.Count - 1; i >= 0; i--)
+                //        {
+                //            if (m_errors[i].Type == ProblemType.ParsingError) m_errors.RemoveAt(i);
+                //        }
+                //        break;
+                //    default:
+                //        break;
+                //}
+                UpdateCommandStates();
+            });
+        }
+
+        //private void DocViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        //{
+        //    System.Diagnostics.Debug.WriteLine($"MainViewModel.DocViewModel_PropertyChanged: {e.PropertyName}");
+        //    if (e.PropertyName == nameof(DocumentItemViewModel.IsOpen))
+        //    {
+        //        var document = sender as DocumentItemViewModel;
+        //        if (document.IsOpen == false)
+        //        {
+        //            document.LoadedFile.UnregisterDependant(this);
+        //        }
+        //        this.UpdateCommandStates();
+        //    }
+        //}
 
         #endregion
 

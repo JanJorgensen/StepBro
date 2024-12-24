@@ -19,6 +19,7 @@ namespace StepBro.UI.Controls
 
         public virtual DateTime TimeStamp { get { return this.DataObject.Timestamp; } }
 
+        public abstract string GetTextForSearchMatching(bool includeExtraFields);
 
         public abstract void DoPaint(DrawingContext context, ChronoListViewPort.IView view, ref Avalonia.Rect rect, EntryMarkState selected);
 

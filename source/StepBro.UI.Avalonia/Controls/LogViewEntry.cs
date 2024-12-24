@@ -53,6 +53,11 @@ namespace StepBro.UI.Controls
             return m_entry.Text;
         }
 
+        public override string GetTextForSearchMatching(bool includeExtraFields)
+        {
+            return m_entry.Text;
+        }
+
         protected override void PaintRest(DrawingContext context, ChronoListViewPort.IView view, ref Rect rect, EntryMarkState selected)
         {
         }

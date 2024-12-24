@@ -9,6 +9,8 @@ namespace StepBro.HostSupport.Models
 {
     public interface ITimestampedViewEntry
     {
-        public abstract ITimestampedData DataObject { get; }
+        public DateTime TimeStamp { get; }
+        public ITimestampedData DataObject { get; }
+        public string GetTextForSearchMatching(bool includeExtraFields);
     }
 }

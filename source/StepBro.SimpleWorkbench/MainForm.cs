@@ -25,6 +25,7 @@ using StepBro.Core.DocCreation;
 using Antlr4.Runtime;
 using Lexer = StepBro.Core.Parser.Grammar.StepBroLexer;
 using StepBro.Core.Host.Presentation;
+using StepBro.HostSupport.Models;
 
 namespace StepBro.SimpleWorkbench
 {
@@ -42,6 +43,7 @@ namespace StepBro.SimpleWorkbench
 
         private CommandLineOptions m_commandLineOptions = null;
         private HostAccess m_hostAccess = null;
+        private HostAppModel m_appModel = null;
         private ILoadedFilesManager m_loadedFiles = null;
         private IDynamicObjectManager m_objectManager = null;
         private ILogger m_mainLogger = null;
@@ -66,7 +68,7 @@ namespace StepBro.SimpleWorkbench
         private object m_userShortcutItemTag = new object();
 
         private bool m_userFileRead = false;
-        private UserDataProject m_userDataProject = null;
+        private ProjectUserData m_userDataProject = null;
 
         private string m_targetFile = null;
         private string m_targetFileFullPath = null;
@@ -114,15 +116,13 @@ namespace StepBro.SimpleWorkbench
 
             IService m_hostService = null;
             m_hostAccess = new HostAccess(this, out m_hostService);
-            StepBroMain.Initialize(m_hostService);
+            m_appModel = new HostAppModel();
+            m_appModel.Initialize(m_hostService);
             m_mainLogger = StepBroMain.Logger.RootLogger.CreateSubLocation("StepBro.Workbench");
             m_loadedFiles = StepBroMain.GetLoadedFilesManager();
-            m_loadedFiles.FileLoaded += LoadedFiles_FileLoaded;
-            m_loadedFiles.FileClosed += LoadedFiles_FileClosed;
-            m_loadedFiles.FilePropertyChanged += File_PropertyChanged;
             m_objectManager = StepBroMain.ServiceManager.Get<IDynamicObjectManager>();
             m_symbolLookupService = StepBroMain.ServiceManager.Get<ISymbolLookupService>();
-            m_userDataProject = StepBroMain.ServiceManager.Get<UserDataProject>();
+            m_userDataProject = StepBroMain.ServiceManager.Get<ProjectUserData>();
             StepBro.UI.WinForms.CustomToolBar.ToolBar.ToolBarSetup();
 
             this.ParseCommandLineOptions();
@@ -253,13 +253,13 @@ namespace StepBro.SimpleWorkbench
         {
             if (m_file == null) return;
 
-            var shortcuts = new List<UserDataProject.Shortcut>();
+            var shortcuts = new List<ProjectUserData.Shortcut>();
             foreach (var shortcut in toolStripMain.Items.Cast<ToolStripItem>().Where(o => object.Equals(m_userShortcutItemTag, o.Tag)))
             {
                 if (shortcut is ScriptExecutionToolStripMenuItem)
                 {
                     var typed = shortcut as ScriptExecutionToolStripMenuItem;
-                    var shortcutData = new UserDataProject.ScriptElementShortcut();
+                    var shortcutData = new ProjectUserData.ScriptElementShortcut();
                     shortcutData.Text = typed.Text;
                     shortcutData.Element = typed.FileElement;
                     shortcutData.Partner = typed.Partner;
@@ -269,7 +269,7 @@ namespace StepBro.SimpleWorkbench
                 else if (shortcut is ObjectCommandToolStripMenuItem)
                 {
                     var typed = shortcut as ObjectCommandToolStripMenuItem;
-                    var shortcutData = new UserDataProject.ObjectCommandShortcut();
+                    var shortcutData = new ProjectUserData.ObjectCommandShortcut();
                     shortcutData.Text = typed.Text;
                     shortcutData.Instance = typed.Instance;
                     shortcutData.Command = typed.Command;
@@ -279,7 +279,7 @@ namespace StepBro.SimpleWorkbench
             m_userDataProject.SaveShortcuts(shortcuts);
 
             var hiddenToolbars = panelCustomToolstrips.ListHiddenToolbars().ToArray();
-            m_userDataProject.SaveElementSettingValue(UserDataProject.ELEMENT_TOOLBARS, UserDataProject.ELEMENT_TOOLBARS_HIDDEN, (hiddenToolbars.Length > 0) ? hiddenToolbars : null);
+            m_userDataProject.SaveElementSettingValue(ProjectUserData.ELEMENT_TOOLBARS, ProjectUserData.ELEMENT_TOOLBARS_HIDDEN, (hiddenToolbars.Length > 0) ? hiddenToolbars : null);
         }
 
         private void LoadUserSettingsOnProject()
@@ -291,9 +291,9 @@ namespace StepBro.SimpleWorkbench
                 {
                     foreach (var shortcut in m_userDataProject.ListShortcuts())
                     {
-                        if (shortcut is UserDataProject.ScriptElementShortcut)
+                        if (shortcut is ProjectUserData.ScriptElementShortcut)
                         {
-                            var typed = shortcut as UserDataProject.ScriptElementShortcut;
+                            var typed = shortcut as ProjectUserData.ScriptElementShortcut;
                             var found = m_fileElements.FirstOrDefault(e => String.Equals(typed.Element, e.FullName));
                             if (found != null)
                             {
@@ -313,15 +313,15 @@ namespace StepBro.SimpleWorkbench
                                 this.AddProcedureShortcut(typed.Text, found.FullName, typed.Partner, isPartnerModel, typed.Instance);
                             }
                         }
-                        else if (shortcut is UserDataProject.ObjectCommandShortcut)
+                        else if (shortcut is ProjectUserData.ObjectCommandShortcut)
                         {
-                            var typed = shortcut as UserDataProject.ObjectCommandShortcut;
+                            var typed = shortcut as ProjectUserData.ObjectCommandShortcut;
                             this.AddObjectCommandShortcut(typed.Text, typed.Instance, typed.Command);
                         }
                     }
                 }
 
-                var hiddenToolbars = (string[])m_userDataProject.TryGetElementSetting(UserDataProject.ELEMENT_TOOLBARS, UserDataProject.ELEMENT_TOOLBARS_HIDDEN);
+                var hiddenToolbars = (string[])m_userDataProject.TryGetElementSetting(ProjectUserData.ELEMENT_TOOLBARS, ProjectUserData.ELEMENT_TOOLBARS_HIDDEN);
                 if (hiddenToolbars != null)
                 {
                     foreach (var hidden in hiddenToolbars)
@@ -1794,22 +1794,22 @@ namespace StepBro.SimpleWorkbench
 
         #region Script File Loading
 
-        private void LoadedFiles_FileLoaded(object sender, LoadedFileEventArgs args)
-        {
-        }
+        //private void LoadedFiles_FileLoaded(object sender, LoadedFileEventArgs args)
+        //{
+        //}
 
-        private void LoadedFiles_FileClosed(object sender, LoadedFileEventArgs args)
-        {
+        //private void LoadedFiles_FileClosed(object sender, LoadedFileEventArgs args)
+        //{
 
-        }
+        //}
 
-        private void File_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(ILoadedFile.RegisteredDependantsCount))
-            {
+        //private void File_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        //{
+        //    if (e.PropertyName == nameof(ILoadedFile.RegisteredDependantsCount))
+        //    {
 
-            }
-        }
+        //    }
+        //}
 
         private TaskAction ScriptFileLoadingTask(ref TaskNoState state, ref int index, ITaskStateReporting reporting)
         {

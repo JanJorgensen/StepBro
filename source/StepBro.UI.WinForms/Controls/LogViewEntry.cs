@@ -25,6 +25,11 @@ namespace StepBro.UI.WinForms.Controls
 
         public override ITimestampedData DataObject { get { return m_entry; } }
 
+        public override string GetTextForSearchMatching(bool includeExtraFields)
+        {
+            return m_entry.Text;
+        }
+
         protected virtual string GetHeaderText()
         {
             string headerText = m_entry.EntryType switch

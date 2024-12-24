@@ -12,7 +12,7 @@ using System.Text.Json.Serialization;
 
 namespace StepBro.Core.General
 {
-    public class UserDataProject : ServiceBase<UserDataProject, UserDataProject>
+    public class ProjectUserData : ServiceBase<ProjectUserData, ProjectUserData>
     {
         [JsonDerivedType(typeof(ScriptElementShortcut), typeDiscriminator: "scriptelement")]
         [JsonDerivedType(typeof(ProcedureShortcut), typeDiscriminator: "procedure")]
@@ -94,8 +94,8 @@ namespace StepBro.Core.General
         private string m_userFilePath = null;
         private bool m_dataRead = false;
 
-        internal UserDataProject(out IService serviceAccess) :
-            base("UserDataProject", out serviceAccess, typeof(ILoadedFilesManager), typeof(IConfigurationFileManager))
+        internal ProjectUserData(out IService serviceAccess) :
+            base("ProjectUserData", out serviceAccess, typeof(ILoadedFilesManager), typeof(IConfigurationFileManager))
         {
         }
 

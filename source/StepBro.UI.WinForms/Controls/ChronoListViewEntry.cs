@@ -14,6 +14,8 @@ namespace StepBro.UI.WinForms.Controls
     {
         public abstract ITimestampedData DataObject { get; }
 
+        public abstract string GetTextForSearchMatching(bool includeExtraFields);
+
         public virtual DateTime TimeStamp { get { return this.DataObject.Timestamp; } }
 
 

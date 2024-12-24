@@ -11,35 +11,39 @@ using System.Threading.Tasks;
 
 namespace StepBro.HostSupport.Models
 {
-    public class LogViewerModel : ObservableObject
+    public class LogViewerModel<TViewEntryType> : ItemViewModel where TViewEntryType : class, ITimestampedViewEntry
     {
-        private class PresentationList : PresentationListForListData<LogEntry, ITimestampedViewEntry>
+        private class PresentationList : PresentationListForListData<LogEntry, TViewEntryType>
         {
-            public PresentationList(IDataListSource<LogEntry> source) :
+            private ILogViewEntryFactory<TViewEntryType> m_viewEntryCreator;
+
+            public PresentationList(IDataListSource<LogEntry> source, ILogViewEntryFactory<TViewEntryType> viewEntryCreator) :
                 base(source, 1000000, 50)
             {
+                m_viewEntryCreator = viewEntryCreator;
             }
 
-            public override void CreatePresentationEntry(LogEntry entry, long sourceIndex, Action<ITimestampedViewEntry> adder)
+            public override void CreatePresentationEntry(LogEntry entry, long sourceIndex, Action<TViewEntryType> adder)
             {
-                if ((entry.EntryType & LogEntry.Type.Special) != LogEntry.Type.Special)
-                {
-                    //adder(new LogViewEntry(entry, sourceIndex));
-                }
-                else
-                {
-                    //adder(new LogViewEntrySpecial(entry, sourceIndex));     // TODO: Get reference to the special handler for this data type.
-                    // TODO: Maybe the special handler could throw in a decoded/translated entry.
-                }
+                m_viewEntryCreator.CreatePresentationEntry(entry, sourceIndex, adder);
+                //if ((entry.EntryType & LogEntry.Type.Special) != LogEntry.Type.Special)
+                //{
+                //    adder(new LogViewEntry(entry, sourceIndex));
+                //}
+                //else
+                //{
+                //    adder(new LogViewEntrySpecial(entry, sourceIndex));     // TODO: Get reference to the special handler for this data type.
+                //    // TODO: Maybe the special handler could throw in a decoded/translated entry.
+                //}
             }
 
-            public override LogEntry PresentationToSource(ITimestampedViewEntry entry)
+            public override LogEntry PresentationToSource(TViewEntryType entry)
             {
                 return entry.DataObject as LogEntry;
             }
         }
 
-        private class PresentationListSearchingForFirstSource : PresentationListForListData<LogEntry, ITimestampedViewEntry>
+        private class PresentationListSearchingForFirstSource : PresentationListForListData<LogEntry, TViewEntryType>
         {
             private class EmptySource : IDataListSource<LogEntry>
             {
@@ -69,11 +73,11 @@ namespace StepBro.HostSupport.Models
                 }
             }
 
-            private LogViewerModel m_parent;
+            private LogViewerModel<TViewEntryType> m_parent;
             private IDataListSource<LogEntry> m_source;
             private long m_lastBefore;
 
-            public PresentationListSearchingForFirstSource(LogViewerModel parent, IDataListSource<LogEntry> source, long lastBefore) :
+            public PresentationListSearchingForFirstSource(LogViewerModel<TViewEntryType> parent, IDataListSource<LogEntry> source, long lastBefore) :
                 base(new EmptySource(), 100, 10)
             {
                 m_parent = parent;
@@ -81,11 +85,11 @@ namespace StepBro.HostSupport.Models
                 m_lastBefore = lastBefore;
             }
 
-            public override void CreatePresentationEntry(LogEntry entry, long sourceIndex, Action<ITimestampedViewEntry> adder)
+            public override void CreatePresentationEntry(LogEntry entry, long sourceIndex, Action<TViewEntryType> adder)
             {
             }
 
-            public override LogEntry PresentationToSource(ITimestampedViewEntry entry)
+            public override LogEntry PresentationToSource(TViewEntryType entry)
             {
                 return null;
             }
@@ -143,27 +147,27 @@ namespace StepBro.HostSupport.Models
         private delegate bool SkipChecker(LogEntry entry);
 
         private IDataListSource<LogEntry> m_source = null;
-        private PresentationListForListData<LogEntry, ITimestampedViewEntry> m_presentationList = null;
+        private PresentationListForListData<LogEntry, TViewEntryType> m_presentationList = null;
+        private ILogViewEntryFactory<TViewEntryType> m_viewEntryCreator = null;
         private long m_lastEntryIndexBeforeClear = -1L;
         private static LogEntry s_lastEntryBeforeClear = null;
         private NewLogStart m_zeroStartSource = null;
         private int m_visibleLevels = 1000;
         private Predicate<LogEntry>[] m_filter = null;
-        //private ToolStripMenuItem m_selectedSkipOption = null;
         private bool m_enoughCharsInSearchText = false;
         private bool m_markSearchMatches = true;
         private string m_searchText = "";
         private bool m_quickSearchActivated = false;
 
-        public LogViewerModel()
+        public LogViewerModel(ILogViewEntryFactory<TViewEntryType> viewEntryCreator) : base("LogViewer")
         {
-            this.UpdatePresentationLevels();
+            m_viewEntryCreator = viewEntryCreator;
         }
 
         public void Setup()
         {
             m_source = StepBro.Core.Main.Logger;
-            m_presentationList = new PresentationList(m_source);
+            m_presentationList = new PresentationList(m_source, m_viewEntryCreator);
             this.CreateFilter();
             //logView.ZeroTime = StepBro.Core.Main.Logger.GetFirst().Item2.Timestamp;
             //logView.Setup(m_presentationList);
@@ -217,31 +221,19 @@ namespace StepBro.HostSupport.Models
             m_presentationList.Get(Int64.MaxValue);
         }
 
-        private void UpdatePresentationLevels()
+        public int VisibleLevels
         {
-            //toolStripDropDownButtonDisplayLevels.Text = "∞";
+            get => m_visibleLevels;
+            set
+            {
+                if (this.SetProperty(ref m_visibleLevels, value))
+                {
+                    this.CreateFilter();
+                    //logView.Setup(m_presentationList);
+                    //logView.RequestViewUpdate(true);
+                }
+            }
         }
-
-        //private void toolStripMenuItemDisplayLevel_CheckedChanged(object sender, EventArgs e)
-        //{
-        //    if (((ToolStripMenuItem)sender).Checked)
-        //    {
-        //        int choise = -1;
-        //        if (sender == toolStripMenuItemLevels2) { choise = 2; toolStripDropDownButtonDisplayLevels.Text = "2"; } else toolStripMenuItemLevels2.Checked = false;
-        //        if (sender == toolStripMenuItemLevels3) { choise = 3; toolStripDropDownButtonDisplayLevels.Text = "3"; } else toolStripMenuItemLevels3.Checked = false;
-        //        if (sender == toolStripMenuItemLevels4) { choise = 4; toolStripDropDownButtonDisplayLevels.Text = "4"; } else toolStripMenuItemLevels4.Checked = false;
-        //        if (sender == toolStripMenuItemLevels5) { choise = 5; toolStripDropDownButtonDisplayLevels.Text = "5"; } else toolStripMenuItemLevels5.Checked = false;
-        //        if (sender == toolStripMenuItemLevels6) { choise = 6; toolStripDropDownButtonDisplayLevels.Text = "6"; } else toolStripMenuItemLevels6.Checked = false;
-        //        if (sender == toolStripMenuItemLevelsAll) { choise = 1000; toolStripDropDownButtonDisplayLevels.Text = "∞"; } else toolStripMenuItemLevelsAll.Checked = false;
-        //        if (choise != m_visibleLevels)
-        //        {
-        //            m_visibleLevels = choise;
-        //            this.CreateFilter();
-        //            logView.Setup(m_presentationList);
-        //            logView.RequestViewUpdate(true);
-        //        }
-        //    }
-        //}
 
         #endregion
 
@@ -302,7 +294,7 @@ namespace StepBro.HostSupport.Models
             bool headMode = m_presentationList.InHeadMode;
             var zeroTime = m_source.Get(m_lastEntryIndexBeforeClear + 1L).Timestamp;
             m_zeroStartSource = new NewLogStart(m_source, m_source.Get(m_lastEntryIndexBeforeClear + 1L), m_lastEntryIndexBeforeClear + 1L);
-            m_presentationList = new PresentationList(m_zeroStartSource);
+            m_presentationList = new PresentationList(m_zeroStartSource, m_viewEntryCreator);
             m_presentationList.SetHeadMode(headMode);
             this.CreateFilter();
             //logView.ZeroTime = zeroTime;
