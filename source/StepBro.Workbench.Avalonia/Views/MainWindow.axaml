@@ -103,7 +103,7 @@
         <DockPanel Name="xMid" Grid.Column="1" Grid.Row="0">
           <TabControl SelectedIndex="0" >
             <TabItem Header="Execution Log">
-              <lib:LogViewer></lib:LogViewer>
+              <lib:LogViewer Name="logViewer"></lib:LogViewer>
             </TabItem>
             <TabItem Header="PCM02.Workbench.sbs">
               <StackPanel>

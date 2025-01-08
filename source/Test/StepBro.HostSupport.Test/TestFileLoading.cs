@@ -18,8 +18,8 @@ namespace StepBro.HostSupport.Test
         public void TestInitialization()
         {
             var hostAppModel = new HostAppModel();
-            hostAppModel.Initialize();
-            Assert.AreEqual(0, hostAppModel.Views.Count);
+            hostAppModel.Initialize(logViewerModel: null);
+            Assert.AreEqual(0, hostAppModel.Views.Where(v => v.IsShownInDocuments()).Count());
         }
 
         //[TestMethod]

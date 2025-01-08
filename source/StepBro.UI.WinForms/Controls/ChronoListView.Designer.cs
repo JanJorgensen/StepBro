@@ -90,11 +90,7 @@
             viewPort.Text = "ViewPort";
             viewPort.MouseDownOnLine += viewPort_MouseDownOnLine;
             viewPort.MouseUpOnLine += viewPort_MouseUpOnLine;
-            viewPort.Click += chronoListViewPort_Click;
             viewPort.KeyDown += viewPort_KeyDown;
-            viewPort.MouseDown += viewPort_MouseDown;
-            viewPort.MouseMove += viewPort_MouseMove;
-            viewPort.MouseUp += viewPort_MouseUp;
             // 
             // timerUpdate
             // 

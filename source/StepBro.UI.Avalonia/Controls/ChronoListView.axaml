@@ -7,10 +7,10 @@
              x:Class="StepBro.UI.Controls.ChronoListView">
   <DockPanel>
     <DockPanel DockPanel.Dock="Bottom">
-      <Panel DockPanel.Dock="Right"></Panel>
-      <ScrollBar Orientation="Horizontal"></ScrollBar>
+      <Panel Name="panelScrollbarAlignment" DockPanel.Dock="Right" MinWidth="16" MinHeight="16"></Panel>
+      <ScrollBar Name="scrollbarHorizontal" Orientation="Horizontal"></ScrollBar>
     </DockPanel>
-    <ScrollBar Orientation="Vertical" DockPanel.Dock="Right"></ScrollBar>
-    <controls:ChronoListViewPort></controls:ChronoListViewPort>
+    <ScrollBar Name="scrollbarVertical" Orientation="Vertical" DockPanel.Dock="Right"></ScrollBar>
+    <controls:ChronoListViewPort Name="viewPort"></controls:ChronoListViewPort>
   </DockPanel>
 </UserControl>

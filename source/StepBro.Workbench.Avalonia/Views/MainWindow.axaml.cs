@@ -1,5 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using StepBro.HostSupport.Models;
+using StepBro.UI.Controls;
 
 namespace StepBro.Workbench.Views
 {
@@ -13,7 +15,13 @@ namespace StepBro.Workbench.Views
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = new HostAppModel();
+            var logViewerModel = new LogViewerModel<LogViewEntry>(new LogViewEntryFactory());
+            this.AppModel.Initialize(logViewerModel);
+            logViewerModel.Setup();
         }
+
+        private HostAppModel AppModel { get { return this.DataContext as HostAppModel; } }
 
         protected override void OnLoaded(RoutedEventArgs e)
         {
@@ -67,7 +75,7 @@ namespace StepBro.Workbench.Views
         private void panelAlignmentSelector_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             this.UpdatePanels();
-            var port = new StepBro.UI.Controls.ChronoListViewPort();
+            //var port = new StepBro.UI.Controls.ChronoListViewPort();
         }
 
         private void UpdatePanels()

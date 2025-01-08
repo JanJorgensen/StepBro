@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Host
 {
-    public abstract class HostApplicationTaskHandler
+    public class HostApplicationTaskHandler
     {
 
         public enum Priority
@@ -71,6 +71,7 @@ namespace StepBro.Core.Host
             }
         }
 
+        private SynchronizationContext m_synchronizationContext = null;
         private Queue<TaskData> m_actions = new Queue<TaskData>();
         private TaskAction m_currentAction = TaskAction.Continue;
         private DateTime m_currentActionTimerExpiryTime = DateTime.MinValue;
@@ -112,12 +113,12 @@ namespace StepBro.Core.Host
             return (m_actions.Count != 0);
         }
 
-        private void HostDomainHandling()
+        private void HostDomainHandling(object state)
         {
             TaskHandling(false);
         }
 
-        private void WorkerTaskHandling()
+        private void WorkerTaskHandling(object state)
         {
             TaskHandling(true);
         }
@@ -152,7 +153,7 @@ namespace StepBro.Core.Host
                         RequestHostDomainHandling(this.HostDomainHandling);
                         break;
                     case TaskAction.ContinueOnWorkerThreadDomain:
-                        m_workerTask = new System.Threading.Tasks.Task(this.WorkerTaskHandling);
+                        m_workerTask = new System.Threading.Tasks.Task(this.WorkerTaskHandling, null);
                         m_workerTask.Start();
                         // Now get out of here without touching anything; the worker task will arrive in a moment!
                         break;
@@ -192,6 +193,13 @@ namespace StepBro.Core.Host
             }
         }
 
-        protected abstract void RequestHostDomainHandling(System.Action action);
+        protected void RequestHostDomainHandling(SendOrPostCallback action, object state = null)
+        {
+            if (m_synchronizationContext == null)
+            {
+                m_synchronizationContext = SynchronizationContext.Current;
+            }
+            m_synchronizationContext.Post(action, state);
+        }
     }
 }

@@ -9,6 +9,6 @@
     <StackPanel DockPanel.Dock="Top" Background="LightSteelBlue">
       <Button>Push!</Button>
     </StackPanel>
-    <controls:ChronoListView></controls:ChronoListView>
+    <controls:ChronoListView Name="listView"></controls:ChronoListView>
   </DockPanel>
 </UserControl>

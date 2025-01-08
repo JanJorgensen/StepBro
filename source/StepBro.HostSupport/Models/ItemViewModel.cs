@@ -7,34 +7,64 @@ using System.Threading.Tasks;
 
 namespace StepBro.HostSupport.Models
 {
-    public class ItemViewModel : ObservableObject
+    public partial class ItemViewModel : ObservableObject
     {
-        private string m_description;
-        //private ImageSource imageSource;
-        private bool m_isActive;
-        private bool m_isFloating;
-        private bool m_isOpen;
-        private bool m_isSelected;
-        private string m_serializationID;
-        private string m_title;
+        private string m_title = null;
         private bool m_isModified = false;
-        private string m_windowGroupName = null;
-        private string[] m_supportedWindowGroups = null;
-
+        //private ImageSource imageSource;
         public ItemViewModel(string serializationID)
         {
             m_serializationID = serializationID;
         }
 
         /// <summary>
+        /// Gets or sets the name that uniquely identifies the view-model for layout serialization.
+        /// </summary>
+        /// <value>The name that uniquely identifies the view-model for layout serialization.</value>
+        [ObservableProperty]
+        private string m_serializationID;
+
+        /// <summary>
         /// Gets or sets the description associated with the view-model.
         /// </summary>
         /// <value>The description associated with the view-model.</value>
-        public string Description
-        {
-            get { return m_description; }
-            set => SetProperty(ref m_description, value);
-        }
+        [ObservableProperty]
+        private string m_description = null;
+
+        [ObservableProperty]
+        private object m_dataContext = null;
+
+        [ObservableProperty]
+        private bool m_isDocument = false;
+
+        /// <summary>
+        /// Gets or sets whether the view is currently active.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if the view is currently active; otherwise, <c>false</c>.
+        /// </value>
+        [ObservableProperty]
+        private bool m_isActive = false;
+
+        /// <summary>
+        /// Gets or sets whether the view is currently open.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if the view is currently open; otherwise, <c>false</c>.
+        /// </value>
+        [ObservableProperty]
+        private bool m_isOpen = false;
+
+        /// <summary>
+        /// Gets or sets whether the view is currently selected in its parent container.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if the view is currently selected in its parent container; otherwise, <c>false</c>.
+        /// </value>
+        [ObservableProperty]
+        private bool m_isSelected = false;
+
+
 
         ///// <summary>
         ///// Gets or sets the image associated with the view-model.
@@ -56,71 +86,6 @@ namespace StepBro.HostSupport.Models
         //    }
         //}
 
-        /// <summary>
-        /// Gets or sets whether the view is currently active.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if the view is currently active; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsActive
-        {
-            get { return m_isActive; }
-            set => SetProperty(ref m_isActive, value);
-        }
-
-        ///// <summary>
-        ///// Gets or sets whether the view is floating.
-        ///// </summary>
-        ///// <value>
-        ///// <c>true</c> if the view is floating; otherwise, <c>false</c>.
-        ///// </value>
-        //public bool IsFloating
-        //{
-        //    get { return m_isFloating; }
-        //    set => SetProperty(ref m_isFloating, value);
-        //}
-
-        /// <summary>
-        /// Gets or sets whether the view is currently open.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if the view is currently open; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsOpen
-        {
-            get { return m_isOpen; }
-            set => SetProperty(ref m_isOpen, value);
-        }
-
-        /// <summary>
-        /// Gets or sets whether the view is currently selected in its parent container.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if the view is currently selected in its parent container; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsSelected
-        {
-            get { return m_isSelected; }
-            set => SetProperty(ref m_isSelected, value);
-        }
-
-        ///// <summary>
-        ///// Gets whether the container generated for this view model should be a tool window.
-        ///// </summary>
-        ///// <value>
-        ///// <c>true</c> if the container generated for this view model should be a tool window; otherwise, <c>false</c>.
-        ///// </value>
-        //public abstract bool IsTool { get; }
-
-        /// <summary>
-        /// Gets or sets the name that uniquely identifies the view-model for layout serialization.
-        /// </summary>
-        /// <value>The name that uniquely identifies the view-model for layout serialization.</value>
-        public string SerializationId
-        {
-            get { return m_serializationID; }
-            set => SetProperty(ref m_serializationID, value);
-        }
 
         /// <summary>
         /// Gets or sets the title associated with the view-model.
@@ -130,7 +95,7 @@ namespace StepBro.HostSupport.Models
         {
             get
             {
-                return m_isModified ? (m_title + "*") : m_title;
+                return this.m_isModified ? (m_title + "*") : m_title;
             }
             set => SetProperty(ref m_title, value);
         }
@@ -157,25 +122,33 @@ namespace StepBro.HostSupport.Models
         /// Gets or sets the window group name associated with the view-model.
         /// </summary>
         /// <value>The window group name associated with the view-model.</value>
-        public string WindowGroupName
-        {
-            get
-            {
-                return m_windowGroupName;
-            }
-            set => SetProperty(ref m_windowGroupName, value);
-        }
-
+        [ObservableProperty]
+        private string m_windowGroupName = null;
         /// <summary>
         /// The list of window group options for the view.
         /// </summary>
-        public string[] SupportedWindowGroups
+        [ObservableProperty]
+        private string[] m_supportedWindowGroups = null;
+    }
+
+
+    public static class ItemViewModelSupport
+    {
+        public static bool IsShownInDocuments(this ItemViewModel view)
         {
-            get
-            {
-                return m_supportedWindowGroups;
-            }
-            set => SetProperty(ref m_supportedWindowGroups, value);
+            return view.WindowGroupName == HostAppModel.WG_DOCUMENT;
+        }
+        public static bool IsShownInPrimary(this ItemViewModel view)
+        {
+            return view.WindowGroupName == HostAppModel.WG_PRIMARY;
+        }
+        public static bool IsShownInSecondary(this ItemViewModel view)
+        {
+            return view.WindowGroupName == HostAppModel.WG_SECONDARY;
+        }
+        public static bool IsShownInBottom(this ItemViewModel view)
+        {
+            return view.WindowGroupName == HostAppModel.WG_BOTTOM;
         }
     }
 }

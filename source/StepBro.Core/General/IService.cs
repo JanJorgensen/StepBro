@@ -145,4 +145,21 @@ namespace StepBro.Core
             }
         }
     }
+
+    public class ObjectReferenceService<TData> : ServiceBase<ObjectReferenceService<TData>, ObjectReferenceService<TData>>
+    {
+        private ObjectReferenceService(string name, TData data, out IService serviceAccess, Type[] dependencies) : base(name, out serviceAccess, dependencies) 
+        {
+            this.Data = data;
+        }
+
+        public TData Data { get; private set; }
+
+        public static IService Create(string name, TData data, params Type[] dependencies)
+        {
+            IService service;
+            var obj = new ObjectReferenceService<TData>(name, data, out service, dependencies);
+            return service;
+        }
+    }
 }
