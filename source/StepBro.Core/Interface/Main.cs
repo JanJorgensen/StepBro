@@ -308,7 +308,7 @@ namespace StepBro.Core
                         {
                             context.UpdateStatus($"Finished parsing. {m_lastParsingErrorCount} parsing error(s).");
                             m_parsingInQueue = null;
-                            ParsingCompleted?.Invoke(null, EventArgs.Empty);
+                            ParsingCompleted?.Invoke(null, new ParsingCompletedEventArgs(m_lastParsingErrorCount == 0));
                         }
                     });
                 return m_parsingInQueue;
@@ -349,7 +349,7 @@ namespace StepBro.Core
                 }
                 finally
                 {
-                    ParsingCompleted?.Invoke(null, EventArgs.Empty);
+                    ParsingCompleted?.Invoke(null, new ParsingCompletedEventArgs(m_lastParsingErrorCount == 0));
                     if (m_lastParsingErrorCount > 0)
                     {
                         logger.LogError($"Ended file parsing. {m_lastParsingErrorCount} errors.");
@@ -367,7 +367,19 @@ namespace StepBro.Core
             }
         }
 
-        public static event EventHandler ParsingCompleted;
+        public class ParsingCompletedEventArgs : EventArgs
+        {
+            private bool m_succeededWithoutErrors;
+
+            public ParsingCompletedEventArgs(bool succeededWithoutErrors)
+            {
+                m_succeededWithoutErrors = succeededWithoutErrors;
+            }
+
+            public bool SucceededWithoutErrors { get { return m_succeededWithoutErrors; } }
+            public bool Errors { get { return m_succeededWithoutErrors == false; } }
+        }
+        public static event EventHandler<ParsingCompletedEventArgs> ParsingCompleted;
 
         public static int LastParsingErrorCount { get { return m_lastParsingErrorCount; } }
 

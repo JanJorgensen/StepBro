@@ -74,7 +74,6 @@ namespace StepBro.SimpleWorkbench
             toolStripDropDownButtonTool = new ToolStripDropDownButton();
             toolStripSeparatorToolSelection = new ToolStripSeparator();
             toolStripMenuItemNoToolsYet = new ToolStripMenuItem();
-            toolStripComboBoxTool = new ToolStripComboBox();
             toolStripComboBoxToolCommand = new ToolStripComboBox();
             toolStripButtonRunCommand = new ToolStripButton();
             toolStripSeparatorTool = new ToolStripSeparator();
@@ -153,7 +152,7 @@ namespace StepBro.SimpleWorkbench
             // 
             // toolStripMain
             // 
-            toolStripMain.Items.AddRange(new ToolStripItem[] { toolStripMainMenu, toolStripDropDownButtonTool, toolStripComboBoxTool, toolStripComboBoxToolCommand, toolStripButtonRunCommand, toolStripSeparatorTool, toolStripSplitButtonRunScript, toolStripButtonStopScriptExecution, toolStripSeparatorExtraFields, toolStripTextBoxExeNote, toolStripSeparatorBeforeShortcuts, toolStripButtonAddShortcut });
+            toolStripMain.Items.AddRange(new ToolStripItem[] { toolStripMainMenu, toolStripDropDownButtonTool, toolStripComboBoxToolCommand, toolStripButtonRunCommand, toolStripSeparatorTool, toolStripSplitButtonRunScript, toolStripButtonStopScriptExecution, toolStripSeparatorExtraFields, toolStripTextBoxExeNote, toolStripSeparatorBeforeShortcuts, toolStripButtonAddShortcut });
             toolStripMain.Location = new Point(0, 0);
             toolStripMain.Name = "toolStripMain";
             toolStripMain.Size = new Size(1028, 25);
@@ -408,6 +407,8 @@ namespace StepBro.SimpleWorkbench
             toolStripDropDownButtonTool.Size = new Size(43, 22);
             toolStripDropDownButtonTool.Text = "tool";
             toolStripDropDownButtonTool.DropDownOpening += toolStripDropDownButtonTool_DropDownOpening;
+            toolStripDropDownButtonTool.DropDownOpened += toolStripDropDownButtonTool_DropDownOpened;
+            toolStripDropDownButtonTool.Click += toolStripDropDownButtonTool_Click;
             // 
             // toolStripSeparatorToolSelection
             // 
@@ -423,16 +424,6 @@ namespace StepBro.SimpleWorkbench
             toolStripMenuItemNoToolsYet.Name = "toolStripMenuItemNoToolsYet";
             toolStripMenuItemNoToolsYet.Size = new Size(206, 22);
             toolStripMenuItemNoToolsYet.Text = "No tools to choose from.";
-            // 
-            // toolStripComboBoxTool
-            // 
-            toolStripComboBoxTool.BackColor = SystemColors.Control;
-            toolStripComboBoxTool.DropDownStyle = ComboBoxStyle.DropDownList;
-            toolStripComboBoxTool.Enabled = false;
-            toolStripComboBoxTool.Name = "toolStripComboBoxTool";
-            toolStripComboBoxTool.Size = new Size(120, 25);
-            toolStripComboBoxTool.Visible = false;
-            toolStripComboBoxTool.SelectedIndexChanged += toolStripComboBoxTool_SelectedIndexChanged;
             // 
             // toolStripComboBoxToolCommand
             // 
@@ -479,18 +470,18 @@ namespace StepBro.SimpleWorkbench
             // toolStripMenuItemRunByNamespace
             // 
             toolStripMenuItemRunByNamespace.Name = "toolStripMenuItemRunByNamespace";
-            toolStripMenuItemRunByNamespace.Size = new Size(180, 22);
+            toolStripMenuItemRunByNamespace.Size = new Size(160, 22);
             toolStripMenuItemRunByNamespace.Text = "By Namespace";
             // 
             // toolStripSeparatorRunBeforeHistory
             // 
             toolStripSeparatorRunBeforeHistory.Name = "toolStripSeparatorRunBeforeHistory";
-            toolStripSeparatorRunBeforeHistory.Size = new Size(177, 6);
+            toolStripSeparatorRunBeforeHistory.Size = new Size(157, 6);
             // 
             // toolStripSeparatorRunAfterHistory
             // 
             toolStripSeparatorRunAfterHistory.Name = "toolStripSeparatorRunAfterHistory";
-            toolStripSeparatorRunAfterHistory.Size = new Size(177, 6);
+            toolStripSeparatorRunAfterHistory.Size = new Size(157, 6);
             toolStripSeparatorRunAfterHistory.Visible = false;
             // 
             // toolStripTextBoxRunSearch
@@ -680,7 +671,6 @@ namespace StepBro.SimpleWorkbench
         private ActiproSoftware.UI.WinForms.Controls.Docking.AutoHideTabStripPanel autoHideTabStripPanel4;
         private ToolStripMenuItem viewObjectCommandPromptToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator3;
-        private ToolStripComboBox toolStripComboBoxTool;
         private ToolStripComboBox toolStripComboBoxToolCommand;
         private ToolStripButton toolStripButtonRunCommand;
         private ToolStripSeparator toolStripSeparatorTool;

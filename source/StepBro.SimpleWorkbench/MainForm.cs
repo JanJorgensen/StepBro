@@ -48,6 +48,7 @@ namespace StepBro.SimpleWorkbench
         private IDynamicObjectManager m_objectManager = null;
         private ILogger m_mainLogger = null;
         private ISymbolLookupService m_symbolLookupService = null;
+        private ToolsInteractionModel m_toolsInteractionModel = null;
 
         private ToolWindow m_toolWindowExecutionLog = null;
         private LogViewer m_logviewer = null;
@@ -124,6 +125,10 @@ namespace StepBro.SimpleWorkbench
             m_symbolLookupService = StepBroMain.ServiceManager.Get<ISymbolLookupService>();
             m_userDataProject = StepBroMain.ServiceManager.Get<ProjectUserData>();
             StepBro.UI.WinForms.CustomToolBar.ToolBar.ToolBarSetup();
+            m_toolsInteractionModel = new ToolsInteractionModel();
+            m_toolsInteractionModel.PropertyChanged += ToolsMenuModel_PropertyChanged;
+            m_toolsInteractionModel.Synchronize();
+
 
             this.ParseCommandLineOptions();
 
@@ -194,6 +199,9 @@ namespace StepBro.SimpleWorkbench
             }
 
             m_appLoadFinished = true;
+
+
+            toolStripDropDownButtonTool.DropDownItems.Clear();
         }
 
         private TaskAction ApplicationStartupIndicationTask(ref TaskNoState state, ref int index, ITaskStateReporting reporting)
@@ -1050,96 +1058,175 @@ namespace StepBro.SimpleWorkbench
 
         private void toolStripDropDownButtonTool_DropDownOpening(object sender, EventArgs e)
         {
-            this.UpdateCommandObjectMenu_Objects();
+            //this.UpdateCommandObjectMenu_Objects();
         }
 
-        private void UpdateCommandObjectMenu_Objects()
+        private void toolStripDropDownButtonTool_DropDownOpened(object sender, EventArgs e)
         {
-            var index = toolStripDropDownButtonTool.DropDownItems.IndexOf(toolStripMenuItemNoToolsYet) + 1;
-            while (index < toolStripDropDownButtonTool.DropDownItems.Count)
-            {
-                toolStripDropDownButtonTool.DropDownItems.RemoveAt(index);
-            }
-
-            // Update list of variables containing objects with the ITextCommandInput interface.
-            var objects = m_objectManager.GetObjectCollection();
-            var commandObjectsContainers = objects.Where(o => o.Object is ITextCommandInput).ToList();
-            if (commandObjectsContainers.Count > 0)
-            {
-                toolStripMenuItemNoToolsYet.Visible = false;
-                foreach (var o in commandObjectsContainers)
-                {
-                    var item = new ToolStripMenuItem();
-                    item.Name = "toolStripMenuItem_" + o.FullName.Replace('.', '_');
-                    item.Size = new Size(206, 22);
-                    item.Text = o.FullName.Split('.').Last();
-                    item.Tag = o;
-                    item.Click += toolStripMenuItemToolSelection_Click;
-                    item.Checked = Object.ReferenceEquals(o, toolStripDropDownButtonTool.Tag);
-                    toolStripDropDownButtonTool.DropDownItems.Add(item);
-                }
-            }
-            else
-            {
-                toolStripMenuItemNoToolsYet.Visible = true;
-            }
+            toolStripDropDownButtonTool.HideDropDown();
         }
 
-        private void UpdateCommandObjectMenu_Commands()
+        private void toolStripDropDownButtonTool_Click(object sender, EventArgs e)
         {
-            while (true)
-            {
-                if (toolStripDropDownButtonTool.DropDownItems[0] is ToolStripSeparator)
-                {
-                    break;
-                }
-                toolStripDropDownButtonTool.DropDownItems.RemoveAt(0);
-            }
+            var dialog = new ToolInteractionPopup();
+            dialog.DataContext = m_toolsInteractionModel;
+            dialog.Location = toolStripDropDownButtonTool.GetCurrentParent().PointToScreen(new Point(toolStripDropDownButtonTool.Bounds.X + 30, toolStripDropDownButtonTool.Bounds.Bottom));
+            dialog.Show();
+        }
 
-            IObjectContainer tool = toolStripDropDownButtonTool as IObjectContainer;
-
-            toolStripSeparatorToolSelection.Visible = false;
-
-            //foreach (var o in commandObjectsContainers)
+        private void UpdateToolButton()
+        {
+            m_toolsInteractionModel.Synchronize();
+            //if (m_toolsMenuModel.CurrentTextCommandTool != null)
             //{
-            //    m_commandObjectDictionary[o.FullName] = o.Object as ITextCommandInput;    // Add or override.
+            //    toolStripDropDownButtonTool.Text = m_toolsMenuModel.CurrentTextCommandTool.PresentationName;
+            //    toolStripComboBoxTool.Visible = true;
+            //}
+            //else
+            //{
+            //    toolStripDropDownButtonTool.Text = "Tool";
+            //    toolStripComboBoxTool.Visible = false;
+            //}
 
-            //    var item = new ToolStripMenuItem();
-            //    item.BackColor = Color.RosyBrown;
-            //    item.Name = "toolStripMenuItem2";
-            //    item.Size = new Size(206, 22);
-            //    item.Text = "tool command";
-            //    item.ToolTipText = "Script procedure \"Bla\"";
-            //    item.Click += toolStripMenuItemToolCommandExecute_Click;
+            //var selectedTool = toolStripComboBoxTool.SelectedItem as ComboboxItem;
+            //toolStripComboBoxTool.Items.Clear();
+            //int selection = 0;
+            //int index = 0;
 
+            //foreach (var v in objects)
+            //{
+            //    if (v.Object is ITextCommandInput)
+            //    {
+            //        var name = v.FullName.Split('.').Last();
+            //        toolStripComboBoxTool.Items.Add(new ComboboxItem(name, v));
+            //        if (selectedTool != null && name == selectedTool.Text)
+            //        {
+            //            selection = index;
+            //        }
+            //        index++;
+            //    }
+            //}
+            //if (toolStripComboBoxTool.Items.Count > 0)
+            //{
+            //    toolStripComboBoxTool.Enabled = true;
+            //    toolStripComboBoxTool.SelectedIndex = selection;
+            //    toolStripComboBoxTool.SelectionLength = 0;
+            //}
+            //else
+            //{
+            //    toolStripComboBoxTool.Enabled = false;
+            //    toolStripComboBoxToolCommand.Visible = false;
             //}
 
         }
 
-        private void toolStripMenuItemToolSelection_Click(object sender, EventArgs e)
+        private void ToolsMenuModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var menu = (ToolStripMenuItem)sender;
-            if (!Object.ReferenceEquals(menu.Tag, toolStripDropDownButtonTool.Tag))
+            if (e.PropertyName == nameof(m_toolsInteractionModel.CurrentTextCommandTool))
             {
-                toolStripDropDownButtonTool.Tag = menu.Tag;
-                toolStripDropDownButtonTool.Text = (menu.Tag as IObjectContainer).FullName.Split('.').Last();
-                toolStripDropDownButtonTool.ToolTipText = "Selected tool/object: " + (menu.Tag as IObjectContainer).FullName;
-                toolStripComboBoxToolCommand.Visible = true;
-                toolStripComboBoxToolCommand.Enabled = true;
+                if (m_toolsInteractionModel.CurrentTextCommandTool != null)
+                {
+                    toolStripDropDownButtonTool.Text = m_toolsInteractionModel.CurrentTextCommandTool.PresentationName;
+                    toolStripDropDownButtonTool.ToolTipText = "Selected tool/object: " + m_toolsInteractionModel.CurrentTextCommandTool.PresentationFullName;
+                    toolStripComboBoxToolCommand.Visible = true;
+                    toolStripComboBoxToolCommand.Enabled = true;
+                }
+                else
+                {
+                    toolStripDropDownButtonTool.Text = "Tool";
+                    toolStripComboBoxToolCommand.Visible = false;
+                    toolStripComboBoxToolCommand.Enabled = false;
+                }
             }
         }
 
-        private void toolStripMenuItemToolCommandExecute_Click(object sender, EventArgs e)
-        {
+        //private void UpdateCommandObjectMenu_Objects()
+        //{
+        //    var index = toolStripDropDownButtonTool.DropDownItems.IndexOf(toolStripMenuItemNoToolsYet) + 1;
+        //    while (index < toolStripDropDownButtonTool.DropDownItems.Count)
+        //    {
+        //        toolStripDropDownButtonTool.DropDownItems.RemoveAt(index);
+        //    }
 
-        }
+        //    // Update list of variables containing objects with the ITextCommandInput interface.
+        //    var objects = m_objectManager.GetObjectCollection();
+        //    var commandObjectsContainers = objects.Where(o => o.Object is ITextCommandInput).ToList();
+        //    if (commandObjectsContainers.Count > 0)
+        //    {
+        //        toolStripMenuItemNoToolsYet.Visible = false;
+        //        foreach (var o in commandObjectsContainers)
+        //        {
+        //            var item = new ToolStripMenuItem();
+        //            item.Name = "toolStripMenuItem_" + o.FullName.Replace('.', '_');
+        //            item.Size = new Size(206, 22);
+        //            item.Text = o.FullName.Split('.').Last();
+        //            item.Tag = o;
+        //            item.Click += toolStripMenuItemToolSelection_Click;
+        //            item.Checked = Object.ReferenceEquals(o, toolStripDropDownButtonTool.Tag);
+        //            toolStripDropDownButtonTool.DropDownItems.Add(item);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        toolStripMenuItemNoToolsYet.Visible = true;
+        //    }
+        //}
 
-        private void toolStripComboBoxTool_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            toolStripComboBoxTool.ToolTipText =
-                "Select tool/object to use for the command prompt. Selected object: '" +
-                ((IObjectContainer)(toolStripComboBoxTool.SelectedItem as ComboboxItem).Value).FullName + "'";
-        }
+        //private void UpdateCommandObjectMenu_Commands()
+        //{
+        //    while (true)
+        //    {
+        //        if (toolStripDropDownButtonTool.DropDownItems[0] is ToolStripSeparator)
+        //        {
+        //            break;
+        //        }
+        //        toolStripDropDownButtonTool.DropDownItems.RemoveAt(0);
+        //    }
+
+        //    IObjectContainer tool = toolStripDropDownButtonTool as IObjectContainer;
+
+        //    toolStripSeparatorToolSelection.Visible = false;
+
+        //    //foreach (var o in commandObjectsContainers)
+        //    //{
+        //    //    m_commandObjectDictionary[o.FullName] = o.Object as ITextCommandInput;    // Add or override.
+
+        //    //    var item = new ToolStripMenuItem();
+        //    //    item.BackColor = Color.RosyBrown;
+        //    //    item.Name = "toolStripMenuItem2";
+        //    //    item.Size = new Size(206, 22);
+        //    //    item.Text = "tool command";
+        //    //    item.ToolTipText = "Script procedure \"Bla\"";
+        //    //    item.Click += toolStripMenuItemToolCommandExecute_Click;
+
+        //    //}
+
+        //}
+
+        //private void toolStripMenuItemToolSelection_Click(object sender, EventArgs e)
+        //{
+        //    var menu = (ToolStripMenuItem)sender;
+        //    if (!Object.ReferenceEquals(menu.Tag, toolStripDropDownButtonTool.Tag))
+        //    {
+        //        toolStripDropDownButtonTool.Tag = menu.Tag;
+        //        toolStripDropDownButtonTool.Text = (menu.Tag as IObjectContainer).FullName.Split('.').Last();
+        //        toolStripDropDownButtonTool.ToolTipText = "Selected tool/object: " + (menu.Tag as IObjectContainer).FullName;
+        //        toolStripComboBoxToolCommand.Visible = true;
+        //        toolStripComboBoxToolCommand.Enabled = true;
+        //    }
+        //}
+
+        //private void toolStripMenuItemToolCommandExecute_Click(object sender, EventArgs e)
+        //{
+
+        //}
+
+        //private void toolStripComboBoxTool_SelectedIndexChanged(object sender, EventArgs e)
+        //{
+        //    toolStripComboBoxTool.ToolTipText =
+        //        "Select tool/object to use for the command prompt. Selected object: '" +
+        //        ((IObjectContainer)(toolStripComboBoxTool.SelectedItem as ComboboxItem).Value).FullName + "'";
+        //}
 
         private void toolStripComboBoxToolCommand_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -1191,7 +1278,7 @@ namespace StepBro.SimpleWorkbench
 
         private void ExecuteCommand(string command)
         {
-            var container = (toolStripComboBoxTool.Items[toolStripComboBoxTool.SelectedIndex] as ComboboxItem).Value as IObjectContainer;
+            var container = m_toolsInteractionModel.CurrentTextCommandTool.ToolContainer;
             this.ExecuteObjectCommand(container.FullName, command);
         }
 
@@ -1221,7 +1308,7 @@ namespace StepBro.SimpleWorkbench
                 if (commandAvailable)
                 {
                     commandButtonText = toolStripComboBoxToolCommand.Text;
-                    commandDescription = "On " + toolStripComboBoxTool.Text + ": " + commandButtonText;
+                    commandDescription = "On " + m_toolsInteractionModel.CurrentTextCommandTool.PresentationName + ": " + commandButtonText;
                 }
 
                 var dialog = new DialogAddShortcut("Adding Shortcut", procDescription, commandDescription, procButtonText, commandButtonText);
@@ -1238,8 +1325,7 @@ namespace StepBro.SimpleWorkbench
                     }
                     else
                     {
-                        var item = toolStripComboBoxTool.Items[toolStripComboBoxTool.SelectedIndex] as ComboboxItem;
-                        var tool = (item.Value as IObjectContainer).FullName;
+                        var tool = m_toolsInteractionModel.CurrentTextCommandTool.ToolContainer.FullName;
                         this.AddObjectCommandShortcut(dialog.ButtonText, tool, toolStripComboBoxToolCommand.Text);
                     }
                 }
@@ -1902,6 +1988,8 @@ namespace StepBro.SimpleWorkbench
             var fileManager = StepBroMain.ServiceManager.Get<ILoadedFilesManager>();
             var files = fileManager.ListFiles<IScriptFile>().ToList();
 
+            m_toolsInteractionModel.Synchronize();
+
             // Update list of variables containing objects with the ITextCommandInput interface.
             var objects = m_objectManager.GetObjectCollection();
             //var commandObjectsContainers = objects.Where(o => o.Object is ITextCommandInput).ToList();
@@ -1937,39 +2025,7 @@ namespace StepBro.SimpleWorkbench
                 }
             }
 
-            #region Update Command Objects
-
-            var selectedTool = toolStripComboBoxTool.SelectedItem as ComboboxItem;
-            toolStripComboBoxTool.Items.Clear();
-            int selection = 0;
-            int index = 0;
-
-            foreach (var v in objects)
-            {
-                if (v.Object is ITextCommandInput)
-                {
-                    var name = v.FullName.Split('.').Last();
-                    toolStripComboBoxTool.Items.Add(new ComboboxItem(name, v));
-                    if (selectedTool != null && name == selectedTool.Text)
-                    {
-                        selection = index;
-                    }
-                    index++;
-                }
-            }
-            if (toolStripComboBoxTool.Items.Count > 0)
-            {
-                toolStripComboBoxTool.Enabled = true;
-                toolStripComboBoxTool.SelectedIndex = selection;
-                toolStripComboBoxTool.SelectionLength = 0;
-            }
-            else
-            {
-                toolStripComboBoxTool.Enabled = false;
-                toolStripComboBoxToolCommand.Visible = false;
-            }
-
-            #endregion
+            this.UpdateToolButton();
 
             this.LoadUserSettingsOnProject(); // Now ready to load the user settings (in case they have not been loaded yet).
         }
