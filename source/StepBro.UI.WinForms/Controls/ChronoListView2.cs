@@ -17,19 +17,6 @@ namespace StepBro.UI.WinForms.Controls;
 public partial class ChronoListView2 : UserControl
 {
     private ChronoListViewModel<ChronoListViewEntry> m_model = null;
-    //private IPresentationList<ChronoListViewEntry> m_presentationSource = null;
-    //private DateTime m_zeroTime;
-    //private bool m_headMode = true;
-    //private long m_topEntry = 0L;
-    //private long m_lastIndex = 0;
-    //private bool m_viewDirty = false;
-    //private bool m_updateVerticalScroll = false;
-    //private long m_currentEntryIndex = -1L;
-    //private ChronoListViewEntry m_currentEntry = null;
-    //private List<long> m_selectedEntries = new List<long>();
-    //private long m_lastSingleSelectionEntry = -1L;
-    //private long m_rangeSelectionEnd = -1L;
-    //private Func<long, ChronoListViewEntry, long, ChronoListViewEntry, EntryMarkState> m_searchMatchChecker = null;
 
     public ChronoListView2()
     {
@@ -40,13 +27,6 @@ public partial class ChronoListView2 : UserControl
     }
 
     public ChronoListViewModel<ChronoListViewEntry> Model {  get { return m_model; } }
-
-    //public DateTime ZeroTime { get { return m_model.ZeroTime; } set { m_model.ZeroTime = value; } }
-
-    //public IElementIndexer<ChronoListViewEntry> Source { get { return m_presentationSource; } }
-
-    //public long TopEntry { get { return m_topEntry; } }
-
 
     public void Setup(ChronoListViewModel<ChronoListViewEntry> model)
     {

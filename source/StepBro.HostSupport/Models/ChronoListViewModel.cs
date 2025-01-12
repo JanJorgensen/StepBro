@@ -72,8 +72,8 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         }
     }
 
-    [ObservableProperty]
-    private int m_viewPortMaxLinesVisible = 10;
+    //[ObservableProperty]
+    //private int m_viewPortMaxLinesVisible = 10;
 
     [ObservableProperty]
     private int m_horizontalScrollValue = 0;
@@ -174,7 +174,7 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         m_viewDirty = false;
         if (m_headMode)
         {
-            m_topEntry = Math.Max(0L, m_lastIndex - (this.ViewPortMaxLinesVisible - 1L));
+            m_topEntry = Math.Max(0L, m_lastIndex - (m_viewPort.MaxLinesVisible - 1L));
         }
         this.ViewChanged?.Invoke(this, new ViewChangedEventArgs(m_topEntry, 0 - this.HorizontalScrollValue));
     }
@@ -254,7 +254,7 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
 
         if (updateView)
         {
-            if (index >= 0 && (index < m_topEntry || index > (m_topEntry + (this.ViewPortMaxLinesVisible - 2))))
+            if (index >= 0 && (index < m_topEntry || index > (m_topEntry + (m_viewPort.MaxLinesVisible - 2))))
             {
                 if (index < m_topEntry)
                 {
@@ -262,7 +262,7 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
                 }
                 else
                 {
-                    m_topEntry = Math.Max(0L, index - (this.ViewPortMaxLinesVisible - 5));  // Set selection in bottom.
+                    m_topEntry = Math.Max(0L, index - (m_viewPort.MaxLinesVisible - 5));  // Set selection in bottom.
                 }
                 m_updateVerticalScroll = true;
                 this.VerticalScrollValue = (int)m_topEntry;
