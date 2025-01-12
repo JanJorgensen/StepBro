@@ -55,17 +55,17 @@ namespace StepBro.UI.WinForms.Controls
             return m_entry.Text;
         }
 
-        protected override void PaintRest(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntryMarkState markings)
+        protected override void PaintRest(PaintEventArgs pe, IChronoListView view, ref Rectangle rect, EntryMarkState markings)
         {
             var color = ((markings & EntryMarkState.Selected) != EntryMarkState.None) ? Brushes.White : GetDefaultEntryTypeColor(m_entry.EntryType);
 
             string headerText = this.GetHeaderText();
-            var width = view.ViewSettings.LineHeaderWidth;
+            var width = view.DynamicSettings.LineHeaderWidth;
             var w = DrawTextField(pe.Graphics, view.NormalFont, color, headerText, ChronoListViewEntry.NormalStringFormat, ref rect, width);
             if (w > width)
             {
                 width = w;
-                view.ViewSettings.LineHeaderWidth = width;
+                view.DynamicSettings.LineHeaderWidth = width;
             }
             rect.X += width + 4 + (m_entry.IndentLevel * 40);
 

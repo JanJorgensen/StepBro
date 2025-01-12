@@ -19,7 +19,7 @@ namespace StepBro.UI.WinForms.Controls
         public virtual DateTime TimeStamp { get { return this.DataObject.Timestamp; } }
 
 
-        public abstract void DoPaint(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntryMarkState selected);
+        public abstract void DoPaint(PaintEventArgs pe, IChronoListView view, ref Rectangle rect, EntryMarkState selected);
 
 
         public static int GetWidth(System.Drawing.Graphics graphics, Font font, string s)

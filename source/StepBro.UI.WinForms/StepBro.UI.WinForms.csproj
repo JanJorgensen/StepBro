@@ -40,6 +40,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Controls\ChronoListViewPort2.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="CustomToolBar\ColumnSeparator.cs" />
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>

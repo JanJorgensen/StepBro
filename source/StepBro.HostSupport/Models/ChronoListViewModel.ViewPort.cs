@@ -15,7 +15,7 @@ public partial class ChronoListViewModel<TViewEntryType>
         private IElementIndexer<TViewEntryType> m_source = null;
         private List<TViewEntryType> m_viewEntries = new List<TViewEntryType>(200);
         private int m_viewEntryCount = 0;
-        private DynamicViewSettings m_viewSettings = new DynamicViewSettings();
+        private ChronoListViewDynamicSettings m_dynamicSettings = new ChronoListViewDynamicSettings();
         private Point m_mouseDownLocation = new Point();
         private DateTime m_lastViewScroll = DateTime.MinValue;
 
@@ -34,6 +34,8 @@ public partial class ChronoListViewModel<TViewEntryType>
             m_source = view.Source;
             view.ViewChanged += View_ViewChanged;
         }
+
+        public ChronoListViewDynamicSettings DynamicSettings {  get { return m_dynamicSettings; } } 
 
         public int HorizontalScrollPosition
         {
@@ -89,7 +91,7 @@ public partial class ChronoListViewModel<TViewEntryType>
 
             if (m_source != null)
             {
-                m_viewSettings.ZeroTime = m_view.ZeroTime;
+                m_dynamicSettings.ZeroTime = m_view.ZeroTime;
                 var sourceState = m_source.GetState();
                 long lastIndex = sourceState.LastIndex;
                 if (lastIndex >= 0L)

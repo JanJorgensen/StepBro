@@ -39,7 +39,7 @@ public partial class ChronoListView : UserControl, IChronoListViewer
 
     public DateTime ZeroTime { get { return m_zeroTime; } set { m_zeroTime = value; } }
 
-    public IElementIndexer<ChronoListViewEntry> Source { get { return m_presentationSource; } }
+    //public IElementIndexer<ChronoListViewEntry> Source { get { return m_presentationSource; } }
 
     public long TopEntry { get { return m_topEntry; } }
 
@@ -47,7 +47,7 @@ public partial class ChronoListView : UserControl, IChronoListViewer
     {
         m_presentationSource = source;
         m_topEntry = 0;
-        viewPort.SetDataSource(this);
+        viewPort.SetDataSource(this, m_presentationSource);
         timerUpdate.Start();
     }
 
