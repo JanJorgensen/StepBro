@@ -72,18 +72,20 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         }
     }
 
-    //[ObservableProperty]
-    //private int m_viewPortMaxLinesVisible = 10;
-
     [ObservableProperty]
     private int m_horizontalScrollValue = 0;
 
     public void Setup(LogViewerModel<TViewEntryType> model)
     {
         m_logViewModel = model;
+        m_viewPort = new ViewPortModel(this);
+        this.NotifyPresentationListChange();
+    }
+
+    public void NotifyPresentationListChange()
+    {
         m_presentationSource = m_logViewModel.PresentationList;
         m_topEntry = 0;
-        m_viewPort = new ViewPortModel(this);
     }
 
     public bool HeadMode

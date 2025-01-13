@@ -140,7 +140,6 @@ namespace StepBro.UI.WinForms.Controls
         private IDataListSource<LogEntry> m_source = null;
         private PresentationListForListData<LogEntry, ChronoListViewEntry> m_presentationList = null;
         private long m_lastEntryIndexBeforeClear = -1L;
-        private static LogEntry s_lastEntryBeforeClear = null;
         private NewLogStart m_zeroStartSource = null;
         private int m_visibleLevels = 1000;
         private Predicate<LogEntry>[] m_filter = null;
@@ -283,7 +282,7 @@ namespace StepBro.UI.WinForms.Controls
         private void toolStripButtonClear_Click(object sender, EventArgs e)
         {
             m_lastEntryIndexBeforeClear = m_source.GetState().LastIndex;
-            s_lastEntryBeforeClear = m_source.Get(m_lastEntryIndexBeforeClear);
+            //s_lastEntryBeforeClear = m_source.Get(m_lastEntryIndexBeforeClear);
             m_presentationList = new PresentationListSearchingForFirstSource(this, m_source, m_lastEntryIndexBeforeClear);
             logView.Setup(m_presentationList);
         }

@@ -34,14 +34,8 @@ public partial class ChronoListView2 : UserControl
         this.DataContext = model;
         m_model.PropertyChanged += Model_PropertyChanged;
         m_model.HeadModeChanged += Model_HeadModeChanged;
-        m_model.ViewChanged += Model_ViewChanged;
         viewPort.Setup(model.ViewPort);
         timerUpdate.Start();
-    }
-
-    private void Model_ViewChanged(object sender, ChronoListViewModel<ChronoListViewEntry>.ViewChangedEventArgs e)
-    {
-        throw new NotImplementedException();
     }
 
     private void Model_HeadModeChanged(object sender, EventArgs e)

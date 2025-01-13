@@ -151,7 +151,6 @@ public class LogViewerModel<TViewEntryType> : ItemViewModel where TViewEntryType
     private ILogViewEntryFactory<TViewEntryType> m_viewEntryCreator = null;
     private long m_lastEntryIndexBeforeClear = -1L;
     private ChronoListViewModel<TViewEntryType> m_listView = null;
-    private static LogEntry s_lastEntryBeforeClear = null;
     private NewLogStart m_zeroStartSource = null;
     private int m_visibleLevels = 1000;
     private Predicate<LogEntry>[] m_filter = null;
@@ -190,8 +189,6 @@ public class LogViewerModel<TViewEntryType> : ItemViewModel where TViewEntryType
         get => m_quickSearchActivated;
         set => SetProperty(ref m_quickSearchActivated, value);
     }
-
-    public event EventHandler PresentationListChanged;
 
     public IPresentationList<TViewEntryType> PresentationList
     {
@@ -295,9 +292,9 @@ public class LogViewerModel<TViewEntryType> : ItemViewModel where TViewEntryType
     private void toolStripButtonClear_Click(object sender, EventArgs e)
     {
         m_lastEntryIndexBeforeClear = m_source.GetState().LastIndex;
-        s_lastEntryBeforeClear = m_source.Get(m_lastEntryIndexBeforeClear);
+        //s_lastEntryBeforeClear = m_source.Get(m_lastEntryIndexBeforeClear);
         m_presentationList = new PresentationListSearchingForFirstSource(this, m_source, m_lastEntryIndexBeforeClear);
-        //logView.Setup(m_presentationList);
+        m_listView.NotifyPresentationListChange();
     }
 
     private void SetupZeroStart()
@@ -308,8 +305,8 @@ public class LogViewerModel<TViewEntryType> : ItemViewModel where TViewEntryType
         m_presentationList = new ViewPresentationList(m_zeroStartSource, m_viewEntryCreator);
         m_presentationList.SetHeadMode(headMode);
         this.CreateFilter();
-        //logView.ZeroTime = zeroTime;
-        //logView.Setup(m_presentationList);
+        m_listView.ZeroTime = zeroTime;
+        m_listView.NotifyPresentationListChange();
     }
 
     private void toolStripDropDownButtonLoggers_DropDownOpening(object sender, EventArgs e)

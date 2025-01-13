@@ -39,8 +39,6 @@ public partial class ChronoListView : UserControl, IChronoListViewer
 
     public DateTime ZeroTime { get { return m_zeroTime; } set { m_zeroTime = value; } }
 
-    //public IElementIndexer<ChronoListViewEntry> Source { get { return m_presentationSource; } }
-
     public long TopEntry { get { return m_topEntry; } }
 
     public void Setup(IPresentationList<ChronoListViewEntry> source)
