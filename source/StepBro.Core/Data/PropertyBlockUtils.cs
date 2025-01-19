@@ -1,7 +1,9 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using StepBro.Core.General;
 using StepBro.Core.Parser;
 using System;
+using System.IO;
 using System.Linq;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
@@ -29,6 +31,12 @@ namespace StepBro.Core.Data
         }
 
         public static PropertyBlock GetPropertyBlockFromFile(this string file)
+        {
+            string text = StepBro.Core.Main.GetService<ITextFileSystem>().ReadTextFile(file);
+            return text.ToPropertyBlock();
+        }
+
+        public static PropertyBlock GetPropertyBlockFromRealFile(this string file)
         {
             string text = System.IO.File.ReadAllText(file);
             return text.ToPropertyBlock();

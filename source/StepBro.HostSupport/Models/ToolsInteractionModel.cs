@@ -74,8 +74,10 @@ public partial class ToolsInteractionModel : ObservableObject
         }
     }
 
-    public ToolsInteractionModel()
+    public ToolsInteractionModel(IDynamicObjectManager objectManager, ILoadedFilesManager loadedFilesManager)
     {
+        m_objectManager = objectManager;
+        m_loadedFilesManager = loadedFilesManager;
         m_currentTextCommandHistoryPublic = new ReadOnlyObservableCollection<string>(m_currentTextCommandHistory);
         m_toolProceduresPublic = new ReadOnlyObservableCollection<IFileProcedure>(m_toolProcedures);
 
@@ -87,6 +89,8 @@ public partial class ToolsInteractionModel : ObservableObject
 
     }
 
+    private IDynamicObjectManager m_objectManager;
+    private ILoadedFilesManager m_loadedFilesManager;
     private ObservableCollection<SelectableTool> m_selectableTools = new ObservableCollection<SelectableTool>();
     private ObservableCollection<SelectableTool> m_textCommandTools = new ObservableCollection<SelectableTool>();
     private Dictionary<string, List<string>> m_textCommandHistory = new Dictionary<string, List<string>>();
@@ -157,7 +161,7 @@ public partial class ToolsInteractionModel : ObservableObject
 
     public bool Synchronize()
     {
-        m_selectableTools.Synchronize(Fetch());
+        m_selectableTools.Synchronize(Fetch(m_objectManager));
         m_textCommandTools.Synchronize(m_selectableTools.Where(t => t.HasTextCommandInput));
 
         if (m_selectableTools.Count > 0)
@@ -187,19 +191,17 @@ public partial class ToolsInteractionModel : ObservableObject
         return false;
     }
 
-    private static List<SelectableTool> Fetch()
+    private static List<SelectableTool> Fetch(IDynamicObjectManager objectManager)
     {
-        var objectManager = StepBroMain.ServiceManager.Get<IDynamicObjectManager>();
         return objectManager.GetObjectCollection().Select(o => new SelectableTool(null, o)).ToList();
     }
 
     public List<IFileProcedure> ListActivatableToolProcedures(SelectableTool tool)
     {
-        System.Diagnostics.Debug.WriteLine($"Selected: {tool.ToolContainer.FullName}");
-        var obj = this.SelectedTool.ToolContainer.Object;
+        System.Diagnostics.Debug.WriteLine($"Tool: {tool.ToolContainer.FullName}");
+        var obj = tool.ToolContainer.Object;
         var objType = obj.GetType();
-        var fileManager = StepBroMain.ServiceManager.Get<ILoadedFilesManager>();
-        var procedures = fileManager.ListFiles<IScriptFile>().SelectMany(f => f.ListElements()).Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Cast<IFileProcedure>().ToList();
+        var procedures = m_loadedFilesManager.ListFiles<IScriptFile>().SelectMany(f => f.ListElements()).Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Cast<IFileProcedure>().ToList();
 
         foreach (var proc in procedures)
         {
@@ -210,8 +212,5 @@ public partial class ToolsInteractionModel : ObservableObject
         }
 
         return procedures.Where(p => p.IsFirstParameterThisReference && p.Parameters.Length == 1 && p.Parameters[0].Value.Type.IsAssignableFrom(objType)).ToList();
-        // p.Parameters[0].Value.HasProcedureReference && 
     }
 }
-
-

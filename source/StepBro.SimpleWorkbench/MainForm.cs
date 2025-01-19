@@ -117,15 +117,17 @@ namespace StepBro.SimpleWorkbench
 
             IService m_hostService = null;
             m_hostAccess = new HostAccess(this, out m_hostService);
+            IService m_textFileSystemService = null;
+            new TextFileSystem(out m_textFileSystemService);
             m_appModel = new HostAppModel();
-            m_appModel.Initialize(m_hostService);
+            m_appModel.Initialize(null, m_hostService, m_textFileSystemService);
             m_mainLogger = StepBroMain.Logger.RootLogger.CreateSubLocation("StepBro.Workbench");
             m_loadedFiles = StepBroMain.GetLoadedFilesManager();
             m_objectManager = StepBroMain.ServiceManager.Get<IDynamicObjectManager>();
             m_symbolLookupService = StepBroMain.ServiceManager.Get<ISymbolLookupService>();
             m_userDataProject = StepBroMain.ServiceManager.Get<ProjectUserData>();
             StepBro.UI.WinForms.CustomToolBar.ToolBar.ToolBarSetup();
-            m_toolsInteractionModel = new ToolsInteractionModel();
+            m_toolsInteractionModel = m_appModel.ToolsInteraction;
             m_toolsInteractionModel.PropertyChanged += ToolsMenuModel_PropertyChanged;
             m_toolsInteractionModel.Synchronize();
 

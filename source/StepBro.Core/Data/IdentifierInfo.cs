@@ -40,6 +40,10 @@ namespace StepBro.Core.Data
         /// </summary>
         VariableContainer,
         /// <summary>
+        /// An <seealso cref="IObjectContainer"/> variable supplied by the host application.
+        /// </summary>
+        HostVariable,
+        /// <summary>
         /// An partner reference to a script file procedure.
         /// </summary>
         ElementPartner

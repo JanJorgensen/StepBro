@@ -37,6 +37,11 @@ namespace StepBro.Core
             return admin;
         }
 
+        internal static void Dispose()
+        {
+            g_manager = null;
+        }
+
         private class ServiceManagerAdministration : IServiceManagerAdministration
         {
             public ServiceManager Manager { get; private set; }
@@ -50,6 +55,7 @@ namespace StepBro.Core
             public void StopServices(ITaskContext context, bool reset)
             {
                 this.Manager.StopServices(context, reset);
+                g_manager = null;
             }
         }
 
@@ -118,10 +124,12 @@ namespace StepBro.Core
                     else
                     {
                         var allDepsFound = true;
-                        foreach (var d in s.Dependencies)
+                        var deps = (s.OptionalDependencies != null) ? s.Dependencies.Concat(s.OptionalDependencies) : s.Dependencies;
+                        foreach (var d in deps)
                         {
-                            if (!newList.Exists(x => x.ServiceType == d))
+                            if (allServices.Exists(x => x.ServiceType == d) && !newList.Exists(x => x.ServiceType == d))
                             {
+                                // If the dependency exists in the list but not already added to the new list, don't add this service yet.
                                 allDepsFound = false;
                                 break;
                             }

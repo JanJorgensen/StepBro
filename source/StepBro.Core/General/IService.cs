@@ -15,6 +15,7 @@ namespace StepBro.Core
         object ServiceObject { get; }
         string Name { get; }
         IEnumerable<Type> Dependencies { get; }
+        IEnumerable<Type> OptionalDependencies { get; }
         void Initialize(ServiceManager manager, ITaskContext context);
         void Start(ServiceManager manager, ITaskContext context);
         void Stop(ServiceManager manager, ITaskContext context);
@@ -31,6 +32,7 @@ namespace StepBro.Core
         {
             private TThis m_service;
             private readonly List<Type> m_dependencies;
+            private List<Type> m_optionalDependencies = null;
 
             public MyServiceInterface(TThis service, string name, List<Type> dependencies)
             {
@@ -45,6 +47,23 @@ namespace StepBro.Core
                 {
                     return m_dependencies;
                 }
+            }
+
+            public IEnumerable<Type> OptionalDependencies
+            {
+                get
+                {
+                    return m_optionalDependencies;
+                }
+            }
+
+            public void AddOptionalDependency(Type type)
+            {
+                if (m_optionalDependencies == null)
+                {
+                    m_optionalDependencies = new List<Type>();
+                }
+                m_optionalDependencies.Add(type);
             }
 
             public string Name { get; }
@@ -117,11 +136,11 @@ namespace StepBro.Core
             m_myInterface = new MyServiceInterface(this as TThis, name, dependencies.ToList());
             serviceAccess = m_myInterface as IService;
         }
-        public ServiceBase(string name, out IService serviceAccess, List<Type> firstSetOfDependencies, params Type[] dependencies)
-        {
-            m_myInterface = new MyServiceInterface(this as TThis, name, firstSetOfDependencies.Concat(dependencies).ToList());
-            serviceAccess = m_myInterface as IService;
-        }
+        //public ServiceBase(string name, out IService serviceAccess, List<Type> firstSetOfDependencies, params Type[] dependencies)
+        //{
+        //    m_myInterface = new MyServiceInterface(this as TThis, name, firstSetOfDependencies.Concat(dependencies).ToList());
+        //    serviceAccess = m_myInterface as IService;
+        //}
 
         /// <summary>
         /// Constructor for using when the derived object is not actually used as a service.
@@ -129,6 +148,11 @@ namespace StepBro.Core
         protected ServiceBase()
         {
             m_myInterface = null;
+        }
+
+        protected void AddOptionalDependency(Type type)
+        {
+            m_myInterface.AddOptionalDependency(type);
         }
 
         protected virtual void Initialize(ServiceManager manager, ITaskContext context) { }
