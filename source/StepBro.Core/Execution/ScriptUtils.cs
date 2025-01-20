@@ -165,13 +165,19 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static string GetFullPath(this string filepath, [Implicit] ICallContext context)
+        public static string GetFullPath(this string filepath, [Implicit] ICallContext context, params string[] paths)
         {
             string error = null;
             var result = context.ListShortcuts().GetFullPath(filepath, ref error);
             if (result == null)
             {
                 context.ReportError(error);
+            }
+            if (paths != null && paths.Length > 0)
+            {
+                List<string> parts = new List<string>(paths);
+                parts.Insert(0, result);
+                result = System.IO.Path.Combine(parts.ToArray());
             }
             return result;
         }
