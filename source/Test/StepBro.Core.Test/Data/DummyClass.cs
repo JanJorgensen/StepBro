@@ -337,6 +337,11 @@ namespace StepBroCoreTest.Data
             throw new KeyNotFoundException();
         }
 
+        bool ITextCommandInput.Enabled
+        {
+            get { return true; }
+        }
+
         bool ITextCommandInput.AcceptingCommands()
         {
             return m_propBool;

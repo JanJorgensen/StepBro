@@ -24,6 +24,7 @@ namespace StepBro.Streams
         private bool m_stopReceiver = false;
         private ConcurrentQueue<TimestampedString> m_lineReceiveQueue = null;
         private LineReceivedHandler m_lineReceiver = null;
+        private bool m_textCommandInterfaceEnabled = true;
 
         public Stream([ObjectName] string objectName = "<a Stream>")
         {
@@ -420,6 +421,17 @@ namespace StepBro.Streams
                 }
             }
             return null;
+        }
+
+        public bool TextCommandInputEnabled
+        {
+            get { return m_textCommandInterfaceEnabled; }
+            set { m_textCommandInterfaceEnabled = value; }
+        }
+
+        bool ITextCommandInput.Enabled
+        {
+            get { return m_textCommandInterfaceEnabled; }
         }
 
         bool ITextCommandInput.AcceptingCommands()

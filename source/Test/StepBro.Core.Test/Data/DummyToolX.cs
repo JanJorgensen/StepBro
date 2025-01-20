@@ -12,6 +12,11 @@ namespace StepBroCoreTest.Data
         public string LastCommand { get; set; } = "";
         public long IntProp { get; set; } = 0L;
 
+        bool ITextCommandInput.Enabled
+        {
+            get { return true; }
+        }
+
         bool ITextCommandInput.AcceptingCommands()
         {
             return true;

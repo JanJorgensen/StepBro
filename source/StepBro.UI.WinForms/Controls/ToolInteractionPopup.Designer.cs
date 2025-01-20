@@ -40,7 +40,7 @@
             panel.Dock = DockStyle.Fill;
             panel.Location = new Point(0, 0);
             panel.Name = "panel";
-            panel.Size = new Size(239, 460);
+            panel.Size = new Size(239, 164);
             panel.TabIndex = 0;
             // 
             // toolInteractionView
@@ -48,7 +48,7 @@
             toolInteractionView.Dock = DockStyle.Fill;
             toolInteractionView.Location = new Point(0, 0);
             toolInteractionView.Name = "toolInteractionView";
-            toolInteractionView.Size = new Size(237, 458);
+            toolInteractionView.Size = new Size(237, 162);
             toolInteractionView.TabIndex = 0;
             toolInteractionView.TextCommandToolSelected += toolInteractionView_TextCommandToolSelected;
             // 
@@ -56,7 +56,7 @@
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
-            ClientSize = new Size(239, 460);
+            ClientSize = new Size(239, 164);
             Controls.Add(panel);
             FormBorderStyle = FormBorderStyle.None;
             Name = "ToolInteractionPopup";

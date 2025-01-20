@@ -33,7 +33,7 @@ public partial class ToolsInteractionModel : ObservableObject
 
         public IObjectContainer ToolContainer { get { return m_objectVariable; } }
 
-        public bool HasTextCommandInput { get { return (m_objectVariable != null && m_objectVariable.Object != null && m_objectVariable.Object is ITextCommandInput); } }
+        public bool HasTextCommandInput { get { return (m_objectVariable != null && m_objectVariable.Object != null && m_objectVariable.Object is ITextCommandInput) && (m_objectVariable.Object as ITextCommandInput).Enabled; } }
 
         public string PresentationName
         {
@@ -193,7 +193,7 @@ public partial class ToolsInteractionModel : ObservableObject
 
     private static List<SelectableTool> Fetch(IDynamicObjectManager objectManager)
     {
-        return objectManager.GetObjectCollection().Select(o => new SelectableTool(null, o)).ToList();
+        return objectManager.GetObjectCollection().Where(oc => oc.Object != null && oc.Object.GetType().IsClass && oc.Object.GetType() != typeof(String)).Select(o => new SelectableTool(null, o)).ToList();
     }
 
     public List<IFileProcedure> ListActivatableToolProcedures(SelectableTool tool)

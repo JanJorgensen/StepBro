@@ -42,7 +42,7 @@ namespace StepBro.UI.WinForms.Controls
 
         private void toolInteractionView_TextCommandToolSelected(object sender, EventArgs e)
         {
-            this.Close();
+            //this.Close();     // Enable again when finding a solution to wait for mouse button release (avoid release on whatever behind dialog).
         }
     }
 }

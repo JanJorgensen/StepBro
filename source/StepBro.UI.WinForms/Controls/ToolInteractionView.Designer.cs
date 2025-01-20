@@ -48,7 +48,7 @@
             listViewToolSelection.MultiSelect = false;
             listViewToolSelection.Name = "listViewToolSelection";
             listViewToolSelection.ShowGroups = false;
-            listViewToolSelection.Size = new Size(173, 131);
+            listViewToolSelection.Size = new Size(173, 160);
             listViewToolSelection.TabIndex = 0;
             listViewToolSelection.UseCompatibleStateImageBehavior = false;
             listViewToolSelection.View = View.Details;
@@ -83,10 +83,10 @@
             flowLayoutPanel.Controls.Add(button2);
             flowLayoutPanel.Controls.Add(propertyGrid);
             flowLayoutPanel.FlowDirection = FlowDirection.TopDown;
-            flowLayoutPanel.Location = new Point(0, 133);
+            flowLayoutPanel.Location = new Point(0, 165);
             flowLayoutPanel.Margin = new Padding(2);
             flowLayoutPanel.Name = "flowLayoutPanel";
-            flowLayoutPanel.Size = new Size(173, 285);
+            flowLayoutPanel.Size = new Size(173, 253);
             flowLayoutPanel.TabIndex = 2;
             flowLayoutPanel.WrapContents = false;
             // 
@@ -117,7 +117,7 @@
             Controls.Add(flowLayoutPanel);
             Controls.Add(listViewToolSelection);
             Name = "ToolInteractionView";
-            Size = new Size(173, 422);
+            Size = new Size(173, 418);
             flowLayoutPanel.ResumeLayout(false);
             ResumeLayout(false);
         }

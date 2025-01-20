@@ -34,9 +34,12 @@ namespace StepBro.UI.WinForms.Controls
             int i = 0;
             m_handlingCheck = true;
             int selectedIndex = 0;
-            foreach (var tool in this.Model.SelectableTools)
+            var sortedList = new List<ToolsInteractionModel.SelectableTool>(this.Model.SelectableTools);
+            sortedList.Sort((t1, t2) => (t1.HasTextCommandInput != t2.HasTextCommandInput) ? (t1.HasTextCommandInput ? -1 : 1) : String.Compare(t1.PresentationName, t2.PresentationName));
+            foreach (var tool in sortedList)
             {
                 ListViewItem item = new ListViewItem("");   // First column is checkbox; so no text.
+                item.ForeColor = tool.HasTextCommandInput ? Color.OrangeRed : Color.Black;
                 item.SubItems.Add(tool.PresentationName);   // Second column is the variable name.
                 if (tool.Equals(this.Model.CurrentTextCommandTool))
                 {
