@@ -26,6 +26,7 @@ using Antlr4.Runtime;
 using Lexer = StepBro.Core.Parser.Grammar.StepBroLexer;
 using StepBro.Core.Host.Presentation;
 using StepBro.HostSupport.Models;
+using System.IO;
 
 namespace StepBro.SimpleWorkbench
 {
@@ -506,7 +507,7 @@ namespace StepBro.SimpleWorkbench
                 {
                     MessageBox.Show(
                         this,
-                        $"Failed to save \"{file.FilePath}\"",
+                        $"Failed to save \"{file.FilePath}\"\r\n\r\nDetails:\r\n{ex.GetType().Name}\r\n{ex.Message}",
                         "Save File",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error);

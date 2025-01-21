@@ -891,6 +891,27 @@ namespace StepBroCoreTest.Parser
             var documentation = docElement.GetDocumentation();
             Assert.AreEqual(2, documentation.Count);
         }
+
+        [TestMethod]
+        public void FileParsing_ArgumentErrorInProcedureCall()
+        {
+            string f1 =
+                """
+                void main()
+                {
+                    sub(mogens);
+                }
+                void sub(int x)
+                {
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);
+            Assert.AreEqual("Unknown identifier: mogens", files[0].Errors[0].Message);
+        }
     }
 }
 

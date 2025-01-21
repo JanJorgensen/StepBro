@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StepBroCoreTest.Data;
+namespace TestModule;
 
-public class DummyToolX : ITextCommandInput
+public class TestClassWithTextCommands : ITextCommandInput
 {
     public string LastCommand { get; set; } = "";
     public long IntProp { get; set; } = 0L;
