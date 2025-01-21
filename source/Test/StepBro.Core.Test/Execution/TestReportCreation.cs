@@ -8,6 +8,12 @@ namespace StepBroCoreTest.Execution
     [TestClass]
     public class TestReportCreation
     {
+        [TestInitialize]
+        public void Setup()
+        {
+            ServiceManager.Dispose();
+        }
+
         [TestMethod]
         public void CreateReportInProcedure()
         {

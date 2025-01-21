@@ -10,12 +10,19 @@ using StepBro.Core.ScriptData;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using StepBroCoreTest.Utils;
+using StepBro.Core;
 
 namespace StepBroCoreTest
 {
     [TestClass]
     public class TestProcedureCallDynamic
     {
+        [TestInitialize]
+        public void Setup()
+        {
+            ServiceManager.Dispose();
+        }
+
         [TestMethod]
         public void TestSimpleCallsNoParamsNoReturn()
         {

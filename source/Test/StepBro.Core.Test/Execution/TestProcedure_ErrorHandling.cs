@@ -18,6 +18,12 @@ namespace StepBroCoreTest
     [TestClass]
     public class TestProcedure_ErrorHandling
     {
+        [TestInitialize]
+        public void Setup()
+        {
+            ServiceManager.Dispose();
+        }
+
         [TestMethod]
         public void ErrorHandling_Normal()
         {

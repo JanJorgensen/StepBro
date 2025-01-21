@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using StepBro.Core;
 using StepBro.Core.Data;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
@@ -13,6 +14,12 @@ namespace StepBroCoreTest
     [TestClass]
     public class TestExecutionSupportMethods
     {
+        [TestInitialize]
+        public void Setup()
+        {
+            ServiceManager.Dispose();
+        }
+
         [TestMethod]
         public void TestThisReference()
         {

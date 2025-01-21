@@ -362,7 +362,7 @@ internal partial class StepBroListener
 
         if (foundIdentifier == null)
         {
-            var host = ServiceManager.Global?.Get<IHost>();
+            var host = ServiceManager.GlobalIfReady?.Get<IHost>();
             if (host != null)
             {
                 var hostObjectContainer = host.ListObjectContainers().FirstOrDefault(c => c.FullName == identifier);

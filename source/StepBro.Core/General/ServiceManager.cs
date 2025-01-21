@@ -27,6 +27,7 @@ namespace StepBro.Core
         }
 
         public static ServiceManager Global { get { return g_manager; } }
+        public static ServiceManager GlobalIfReady { get { return (g_manager != null && g_manager.State == ServiceManagerState.Started) ? g_manager : null; } }
 
         public ServiceManagerState State { get; private set; } = ServiceManagerState.Initial;
 
