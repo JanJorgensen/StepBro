@@ -15,6 +15,7 @@ using StepBro.Core.File;
 using StepBro.Core.Logging;
 using static StepBro.Core.Data.StringUtils;
 using StepBro.Core.Host;
+using StepBro.Core.Tasks;
 
 namespace StepBro.Core.Execution
 {
@@ -216,6 +217,69 @@ namespace StepBro.Core.Execution
         {
             var internalContext = ToScriptContext(context);
             internalContext.SetNextProcedureAsHighLevel(type);
+        }
+
+        /// <summary>
+        /// Await an asynchronous task to finish, and return its result value.
+        /// </summary>
+        /// <typeparam name="T">The type of the result value.</typeparam>
+        /// <param name="task">An asynchronous task reference.</param>
+        /// <param name="context">A call context.</param>
+        /// <returns>The task result value.</returns>
+        [Public]
+        public static T Await<T>(this Tasks.IAsyncResult<T> task, [Implicit] ICallContext context)
+        {
+            var scriptContext = context as IScriptCallContext;
+            if (task != null && !task.IsCompleted)
+            {
+                // TODO: Register this "task".
+                if (context != null)
+                {
+                    while (!task.AsyncWaitHandle.WaitOne(250))
+                    {
+                        if (context.StopRequested())
+                        {
+                            context.ReportFailure("User aborted waiting for asynchronous result.");
+                            return default(T);
+                        }
+                    }
+                }
+                else
+                {
+                    if (!task.AsyncWaitHandle.WaitOne(60000))
+                    {
+                        context.ReportFailure("Timeout waiting for asynchronous result.");
+                        return default(T);
+                    }
+                }
+            }
+            if (task.IsFaulted)
+            {
+                return default(T);
+            }
+            else
+            {
+                return task.Result;
+            }
+        }
+
+        /// <summary>
+        /// Get the fault description for an IAsyncResult<typeparamref name="T"/> fault.
+        /// </summary>
+        /// <typeparam name="T">Result value type.</typeparam>
+        /// <param name="result">The asynchronout result (task) reference.</param>
+        /// <returns>The fault description.</returns>
+        /// <remarks>This function checks if the <paramref name="result"/> argument has the <seealso cref="IObjectFaultDescriptor"/> interface, anduses that to get the description text.</remarks>
+        public static string GetFault<T>(this IAsyncResult<T> result)
+        {
+            if (!result.IsFaulted) return String.Empty;
+
+            if (result is IObjectFaultDescriptor fd)
+            {
+                return fd.FaultDescription;
+            }
+
+            return "Faulted";
         }
 
         #region Reporting

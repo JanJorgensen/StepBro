@@ -634,10 +634,24 @@ internal static class ExecutionHelperMethods
         }
         if (!result.IsCompleted)
         {
-            if (!result.AsyncWaitHandle.WaitOne(20000))
+            if (context != null)
             {
-                context.ReportError("Timeout");
-                return default(T);
+                while (!result.AsyncWaitHandle.WaitOne(250))
+                {
+                    if (context.StopRequested())
+                    {
+                        context.ReportFailure($"User aborted waiting for asynchronous result in line {context.CurrentScriptFileLine}.");
+                        return default(T);
+                    }
+                }
+            }
+            else
+            {
+                if (!result.AsyncWaitHandle.WaitOne(60000))
+                {
+                    context.ReportFailure($"Timeout waiting for asynchronous result in line {context.CurrentScriptFileLine}.");
+                    return default(T);
+                }
             }
         }
         if (result.IsFaulted)
@@ -678,22 +692,36 @@ internal static class ExecutionHelperMethods
     {
         if (result != null && !result.IsCompleted)
         {
-            // TODO: Register this "task" and replace with loop that waits a short while.
-            // TODO: Ask the object itself what the timeout time should be.
-            if (!result.AsyncWaitHandle.WaitOne(20000))
+            // TODO: Register this "task".
+            if (context != null)
             {
-                throw new TimeoutException($"Timeout waiting for asynchronous result in line {context.CurrentScriptFileLine}.");
+                while (!result.AsyncWaitHandle.WaitOne(250))
+                {
+                    if (context.StopRequested())
+                    {
+                        context.ReportFailure($"User aborted waiting for asynchronous result in line {context.CurrentScriptFileLine}.");
+                        return default(T);
+                    }
+                }
+            }
+            else
+            {
+                if (!result.AsyncWaitHandle.WaitOne(60000))
+                {
+                    context.ReportFailure($"Timeout waiting for asynchronous result in line {context.CurrentScriptFileLine}.");
+                    return default(T);
+                }
             }
         }
         if (result.IsFaulted)
         {
             if (result is IObjectFaultDescriptor)
             {
-                context.ReportError("Async operation failed. Fault: " + ((IObjectFaultDescriptor)result).FaultDescription);
+                context.ReportFailure("Async operation failed. Fault: " + ((IObjectFaultDescriptor)result).FaultDescription);
             }
             else
             {
-                context.ReportError("Async operation failed.");
+                context.ReportFailure("Async operation failed.");
             }
             return default(T);
         }
