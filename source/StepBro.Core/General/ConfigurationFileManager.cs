@@ -25,19 +25,22 @@ namespace StepBro.Core.General
     {
         private PropertyBlock m_stationProperties = null;
         private List<NamedData<FolderConfiguration>> m_folderConfigs = new List<NamedData<FolderConfiguration>>();
+        private ITextFileSystem m_fileSystem = null;
 
         public ConfigurationFileManager(out IService serviceAccess) :
             base("ConfigurationFileManager", out serviceAccess, typeof(ILogger))
         {
+            this.AddOptionalDependency(typeof(ITextFileSystem));
         }
 
         protected override void Start(ServiceManager manager, ITaskContext context)
         {
+            m_fileSystem = manager.Get<ITextFileSystem>();
             string stationPropFile = System.Environment.GetEnvironmentVariable(Constants.STEPBRO_STATION_PROPERTIES);
             if (!String.IsNullOrEmpty(stationPropFile))
             {
                 System.Diagnostics.Debug.WriteLine($"Station properties file: ({stationPropFile}).");
-                if (System.IO.File.Exists(stationPropFile))
+                if (m_fileSystem.FileExists(stationPropFile))
                 {
                     try
                     {

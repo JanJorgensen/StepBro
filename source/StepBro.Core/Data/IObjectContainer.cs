@@ -24,4 +24,41 @@ namespace StepBro.Core.Data
         /// </summary>
         object Object { get; }
     }
+
+    public class SimpleObjectContainer : IObjectContainer
+    {
+        private string m_name;
+        private object m_object;
+        private bool m_disposed = false;
+
+        public SimpleObjectContainer(string name, object o)
+        {
+            m_name = name;
+            m_object = o;
+        }
+
+        public string FullName { get { return m_name; } }
+
+        public object Object { get { return m_object; } }
+
+        public bool IsStillValid { get { return m_disposed == false; } }
+
+        public event EventHandler ObjectReplaced;
+        public event EventHandler Disposed;
+        public event EventHandler Disposing;
+
+        public void Dispose()
+        {
+            if (!m_disposed)
+            {
+                this.Disposing?.Invoke(this, EventArgs.Empty);
+                if (m_object is IDisposable)
+                {
+                    ((IDisposable)m_object).Dispose();
+                }
+                m_disposed = true;
+                this.Disposed?.Invoke(this, EventArgs.Empty);
+            }
+        }
+    }
 }

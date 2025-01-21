@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Test.Mocks
 {
-    internal class TextFileSystemMock : ServiceBase<ITextFileSystem, TextFileSystemMock>, ITextFileSystem
+    public class TextFileSystemMock : ServiceBase<ITextFileSystem, TextFileSystemMock>, ITextFileSystem
     {
         private string m_basePath = "";
         private List<NamedData<Tuple<string,DateTime>>> m_files = new List<NamedData<Tuple<string, DateTime>>>();
@@ -21,16 +21,17 @@ namespace StepBro.Core.Test.Mocks
         {
         }
 
-        public void AddFile(string path, string content)
+        public string AddFile(string path, string content)
         {
             m_files.Add(new NamedData<Tuple<string, DateTime>>(path, new Tuple<string, DateTime>(content, DateTime.Now)));
+            return path;
         }
 
         private NamedData<Tuple<string, DateTime>> TryGetFile(string path)
         {
             foreach (var fileData in m_files)
             {
-                string fileFullPath = System.IO.Path.Combine(m_basePath, fileData.Name);
+                string fileFullPath = (String.IsNullOrEmpty(m_basePath)) ? System.IO.Path.GetFullPath(fileData.Name) : System.IO.Path.Combine(m_basePath, fileData.Name);
                 if (String.Equals(path, fileFullPath, StringComparison.InvariantCultureIgnoreCase))
                 {
                     return fileData;
@@ -42,6 +43,20 @@ namespace StepBro.Core.Test.Mocks
         public bool FileExists(string path)
         {
             return this.TryGetFile(path).IsEmpty() == false;
+        }
+
+        public bool DirectoryExists(string path)
+        {
+            foreach (var fileData in m_files)
+            {
+                string fileFullPath = (String.IsNullOrEmpty(m_basePath)) ? fileData.Name : System.IO.Path.Combine(m_basePath, fileData.Name);
+                var fileFolder = System.IO.Path.GetDirectoryName(fileFullPath);
+                if (fileFolder.StartsWith(path, StringComparison.InvariantCulture))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public DateTime GetFileChangeTime(string path)
@@ -67,6 +82,13 @@ namespace StepBro.Core.Test.Mocks
             if (data.IsEmpty()) throw new ArgumentException("File not found.");
             var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(data.Value.Item1));
             return new StreamReader(stream);
+        }
+
+        public string ReadTextFile(string path)
+        {
+            var data = this.TryGetFile(path);
+            if (data.IsEmpty()) throw new ArgumentException("File not found.");
+            return data.Value.Item1;
         }
 
         public string SearchFile(string startpath, string name, IFolderShortcutsSource shortcuts)

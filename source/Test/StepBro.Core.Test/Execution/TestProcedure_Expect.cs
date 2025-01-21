@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using StepBro.Core;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using System.Text;
@@ -8,6 +9,12 @@ namespace StepBroCoreTest
     [TestClass]
     public class TestProcedure_Expect
     {
+        [TestInitialize]
+        public void Setup()
+        {
+            ServiceManager.Dispose();
+        }
+
         [TestMethod]
         public void TestExpectWithVariableInput()
         {

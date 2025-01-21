@@ -357,6 +357,7 @@ namespace StepBro.TestInterface
                         m_stream.OnLineReceiverTaskLoop -= OnReceiverThreadLoop;
                         m_stream.SetupLineReceiver(null, false);
                         m_stream.IsOpenChanged -= m_stream_IsOpenChanged;
+                        m_stream.TextCommandInputEnabled = true;
                         m_stream = null;
                     }
                     if (value != null)
@@ -368,6 +369,7 @@ namespace StepBro.TestInterface
                         m_stream.IsOpenChanged += m_stream_IsOpenChanged;
                         m_stream.OnLineReceiverTaskLoop += OnReceiverThreadLoop;
                         m_stream.SetupLineReceiver(this.OnTextLineReceived, true);
+                        m_stream.TextCommandInputEnabled = false;
                     }
                 }
             }
@@ -519,6 +521,11 @@ namespace StepBro.TestInterface
                 context.Logger.Log("SendDirect: \"" + text + "\"");
             }
             DoSendDirect(text);
+        }
+
+        bool ITextCommandInput.Enabled
+        {
+            get { return true; }
         }
 
         bool ITextCommandInput.AcceptingCommands()

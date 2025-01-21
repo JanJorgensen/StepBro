@@ -19,6 +19,7 @@ namespace StepBro.Core.Parser
         ThisReference,
         GlobalVariableReference,
         LocalVariableReference,
+        HostApplicationVariableReference,
         Indexing,
         TypeReference,
         GenericTypeDefinition,

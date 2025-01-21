@@ -8,6 +8,7 @@ namespace StepBro.Core.Api
 {
     public interface ITextCommandInput
     {
+        bool Enabled { get; }
         bool AcceptingCommands();
         void ExecuteCommand(string command);
     }

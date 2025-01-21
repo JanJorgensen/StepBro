@@ -1,4 +1,5 @@
-﻿using StepBro.Core.General;
+﻿using StepBro.Core;
+using StepBro.Core.General;
 using StepBro.HostSupport.Models;
 using System.Linq;
 using StepBroMain = StepBro.Core.Main;
@@ -17,8 +18,12 @@ namespace StepBro.HostSupport.Test
         [TestMethod]
         public void TestInitialization()
         {
+            IService testFileSystemService = null;
+            var mockFileSystem = new StepBro.Core.Test.Mocks.TextFileSystemMock(out testFileSystemService);
             var hostAppModel = new HostAppModel();
-            hostAppModel.Initialize(logViewerModel: null);
+            IService hostAccessService = null;
+            var host = new HostAccess(hostAppModel, out hostAccessService);
+            hostAppModel.Initialize(logViewerModel: null, testFileSystemService, hostAccessService);
             Assert.AreEqual(0, hostAppModel.Views.Where(v => v.IsShownInDocuments()).Count());
         }
 

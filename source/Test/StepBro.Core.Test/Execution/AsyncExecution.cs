@@ -14,6 +14,12 @@ namespace StepBroCoreTest.Execution
     [TestClass]
     public class AsyncExecution
     {
+        [TestInitialize]
+        public void Setup()
+        {
+            ServiceManager.Dispose();
+        }
+
         [TestMethod, Ignore]
         public void AsyncExecutionSimple()
         {

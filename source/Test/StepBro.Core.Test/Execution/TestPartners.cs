@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using StepBro.Core;
 using StepBro.Core.Logging;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
@@ -12,6 +13,12 @@ namespace StepBroCoreTest.Execution
     [TestClass]
     public class TestPartners
     {
+        [TestInitialize]
+        public void Setup()
+        {
+            ServiceManager.Dispose();
+        }
+
         [TestMethod]
         public void TestProcedurePartnerDirectCall()
         {

@@ -158,7 +158,10 @@ namespace StepBro.Cmd
 
             try
             {
-                StepBroMain.Initialize(m_hostService);
+                IService textFileSystemService;
+                var textFileSystem = new TextFileSystem(out textFileSystemService);
+
+                StepBroMain.Initialize(m_hostService, textFileSystemService);
                 StepBroMain.Logger.IsDebugging = m_commandLineOptions.Debugging;
                 var objectManager = StepBroMain.ServiceManager.Get<IDynamicObjectManager>();
 
