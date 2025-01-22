@@ -20,8 +20,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Modules\StepBro.CAN\StepBro.CAN.csproj" />
-    <ProjectReference Include="..\..\StepBro.Core\StepBro.Core.csproj" />
+    <ProjectReference Include="..\..\StepBro.Core\StepBro.Core.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Modules\StepBro.CAN\StepBro.CAN.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>
