@@ -84,7 +84,7 @@ jobs:
     - name: Execute unit tests
       run: dotnet test source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
   
-     - name: Install dependencies
+    - name: Install dependencies
       run: dotnet restore source/Test/StepBro.HostSupport.Test/StepBro.HostSupport.Test.csproj
       
     - name: Build
