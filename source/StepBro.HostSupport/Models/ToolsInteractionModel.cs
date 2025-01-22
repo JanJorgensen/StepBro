@@ -33,7 +33,7 @@ public partial class ToolsInteractionModel : ObservableObject
 
         public IObjectContainer ToolContainer { get { return m_objectVariable; } }
 
-        public bool HasTextCommandInput { get { return (m_objectVariable != null && m_objectVariable.Object != null && m_objectVariable.Object is ITextCommandInput) && (m_objectVariable.Object as ITextCommandInput).Enabled; } }
+        public bool HasEnabledTextCommandInput { get { return (m_objectVariable != null && m_objectVariable.Object != null && m_objectVariable.Object is ITextCommandInput) && (m_objectVariable.Object as ITextCommandInput).Enabled; } }
 
         public string PresentationName
         {
@@ -53,7 +53,7 @@ public partial class ToolsInteractionModel : ObservableObject
 
         public bool IsReadyForTextCommand
         {
-            get { return this.HasTextCommandInput && (m_objectVariable.Object as ITextCommandInput).AcceptingCommands(); }
+            get { return this.HasEnabledTextCommandInput && (m_objectVariable.Object as ITextCommandInput).AcceptingCommands(); }
         }
 
         public override bool Equals(object obj)
@@ -71,6 +71,11 @@ public partial class ToolsInteractionModel : ObservableObject
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return "SelectableTool " + this.PresentationName;
         }
     }
 
@@ -162,7 +167,7 @@ public partial class ToolsInteractionModel : ObservableObject
     public bool Synchronize()
     {
         m_selectableTools.Synchronize(Fetch(m_objectManager));
-        m_textCommandTools.Synchronize(m_selectableTools.Where(t => t.HasTextCommandInput));
+        m_textCommandTools.Synchronize(m_selectableTools.Where(t => t.HasEnabledTextCommandInput));
 
         if (m_selectableTools.Count > 0)
         {

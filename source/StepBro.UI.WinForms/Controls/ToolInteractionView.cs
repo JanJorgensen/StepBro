@@ -1,4 +1,5 @@
-﻿using StepBro.HostSupport.Models;
+﻿using StepBro.Core.Api;
+using StepBro.HostSupport.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -35,11 +36,11 @@ namespace StepBro.UI.WinForms.Controls
             m_handlingCheck = true;
             int selectedIndex = 0;
             var sortedList = new List<ToolsInteractionModel.SelectableTool>(this.Model.SelectableTools);
-            sortedList.Sort((t1, t2) => (t1.HasTextCommandInput != t2.HasTextCommandInput) ? (t1.HasTextCommandInput ? -1 : 1) : String.Compare(t1.PresentationName, t2.PresentationName));
+            sortedList.Sort((t1, t2) => (t1.HasEnabledTextCommandInput != t2.HasEnabledTextCommandInput) ? (t1.HasEnabledTextCommandInput ? -1 : 1) : String.Compare(t1.PresentationName, t2.PresentationName));
             foreach (var tool in sortedList)
             {
                 ListViewItem item = new ListViewItem("");   // First column is checkbox; so no text.
-                item.ForeColor = tool.HasTextCommandInput ? Color.OrangeRed : Color.Black;
+                item.ForeColor = tool.HasEnabledTextCommandInput ? Color.OrangeRed : Color.Black;
                 item.SubItems.Add(tool.PresentationName);   // Second column is the variable name.
                 if (tool.Equals(this.Model.CurrentTextCommandTool))
                 {
@@ -81,7 +82,7 @@ namespace StepBro.UI.WinForms.Controls
                 if (e.Item.Checked)
                 {
                     var tool = e.Item.Tag as ToolsInteractionModel.SelectableTool;
-                    if (tool.HasTextCommandInput)
+                    if (tool.HasEnabledTextCommandInput)
                     {
                         this.Model.CurrentTextCommandTool = tool;
 
