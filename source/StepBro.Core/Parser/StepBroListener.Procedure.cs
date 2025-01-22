@@ -376,6 +376,12 @@ namespace StepBro.Core.Parser
             var left = m_expressionData.Pop();
             var argumentStack = m_arguments.Pop();
             var propertyBlock = m_lastElementPropertyBlock;
+
+            if (!CheckArgumentExpressionsForErrors(context, argumentStack.ToArray()))
+            {
+                return;
+            }
+
             left = this.ResolveIfIdentifier(left, true);        // Now done in EnterMethodArguments() above.
 
             this.HandleParensExpression(context, true, left, argumentStack, null, propertyBlock);

@@ -75,6 +75,7 @@ namespace StepBro.Core.Api
             base("AddonManager", out serviceAccess, typeof(Logging.ILogger))
         {
             m_basicModulesLoader = basicModulesLoader;
+            this.AddOptionalDependency(typeof(IHost));
         }
 
         public void AddTypeHandler(IAddonTypeHandler handler)
@@ -92,6 +93,14 @@ namespace StepBro.Core.Api
         {
             var host = manager.Get<IHost>();
             m_hostIsWPF = (host != null) ? (host.Type == HostType.WPF) : false;
+
+            if (host != null)
+            {
+                foreach (var t in host.ListHostCodeModuleTypes())
+                {
+                    this.AddTypeLookup(t);
+                }
+            }
 
             if (m_basicModulesLoader != null)
             {

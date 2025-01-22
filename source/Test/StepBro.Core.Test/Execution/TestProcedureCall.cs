@@ -11,12 +11,19 @@ using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using StepBroCoreTest.Utils;
 using StepBro.Core.Api;
+using StepBro.Core;
 
 namespace StepBroCoreTest
 {
     [TestClass]
     public class TestProcedureCall
     {
+        [TestInitialize]
+        public void Setup()
+        {
+            ServiceManager.Dispose();
+        }
+
         [TestMethod]
         public void TestFunctionCallInReturnStatement()
         {

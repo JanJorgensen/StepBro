@@ -265,8 +265,8 @@ namespace StepBro.Core.Parser
 
                 m_expressionData.Push(
                     new SBExpressionData(Expression.Condition(
-                        exp.ExpressionCode, 
-                        val1.ExpressionCode, 
+                        exp.ExpressionCode,
+                        val1.ExpressionCode,
                         val2.ExpressionCode)));
             }
         }
@@ -415,7 +415,7 @@ namespace StepBro.Core.Parser
                                 var valueSaverFirst = s_SaveExpectValueText.MakeGenericMethod(first.DataType.Type);
                                 first = new SBExpressionData(Expression.Call(valueSaverFirst, m_currentProcedure.ContextReferenceInternal, first.ExpressionCode, Expression.Constant("Left"), Expression.Constant(true)));
                             }
-                            
+
                             if (last.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
                             {
                                 var valueSaverLast = s_SaveExpectValueText.MakeGenericMethod(last.DataType.Type);
@@ -804,7 +804,7 @@ namespace StepBro.Core.Parser
                         }
                         else
                         {
-                            throw new NotImplementedException();
+                            throw new NotImplementedException("Type: " + e.ReferencedType.ToString());
                             //m_errors.SymanticError(e.Token.Line, e.Token.Column, false, "");
                         }
                     }
@@ -818,6 +818,37 @@ namespace StepBro.Core.Parser
                 return false;
             }
         }
+
+        private bool CheckArgumentExpressionsForErrors(ParserRuleContext context, params SBExpressionData[] expressions)
+        {
+            if (expressions.All(e => e.IsResolved && !e.IsError()))
+            {
+                return true;
+            }
+            else
+            {
+                foreach (var e in expressions.Where(exp => exp.IsResolved == false && exp.ReferencedType > SBExpressionType.ExpressionError))
+                {
+                    if (e.ReferencedType == SBExpressionType.UnknownIdentifier)
+                    {
+                        m_errors.SymanticError(e.Token.Line, e.Token.Column, false, "Unknown identifier: " + (e.Value as string));
+                    }
+                    else
+                    {
+                        throw new NotImplementedException("Type: " + e.ReferencedType.ToString());
+                        //m_errors.SymanticError(e.Token.Line, e.Token.Column, false, "");
+                    }
+                }
+
+                m_expressionData.Push(new SBExpressionData(
+                    SBExpressionType.ExpressionError,
+                    "Expression error.",
+                    context.GetText(),
+                    new TokenOrSection(context.Start, context.Stop, context.GetText())));
+                return false;
+            }
+        }
+
 
         #endregion
     }

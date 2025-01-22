@@ -15,6 +15,12 @@ namespace StepBroCoreTest.Execution
     [TestClass]
     public class FormalTestSetupExecution
     {
+        [TestInitialize]
+        public void Setup()
+        {
+            ServiceManager.Dispose();
+        }
+
         [TestMethod]
         public void TestPartnerOnProcedureUsingThisModifier()
         {

@@ -1012,10 +1012,13 @@ namespace StepBro.Core.ScriptData
                 if (recursively || ((!publicOnly || u.IsPublic) && u.Identifier.Reference != null && u.Identifier.Type == IdentifierType.FileByName))
                 {
                     var file = u.Identifier.Reference as ScriptFile;
-                    yield return file;
-                    foreach (var childUsing in file.ListResolvedFileUsings(true, recursively))
+                    if (file != null)
                     {
-                        yield return childUsing;
+                        yield return file;
+                        foreach (var childUsing in file.ListResolvedFileUsings(true, recursively))
+                        {
+                            yield return childUsing;
+                        }
                     }
                 }
             }

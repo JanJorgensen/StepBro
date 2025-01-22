@@ -19,6 +19,7 @@ namespace StepBro.Core.General
 
         DateTime GetFileChangeTime(string path);
         StreamReader OpenFileStream(string path);
+        string ReadTextFile(string path);
 
         /// <summary>
         /// Search for the specified file based on the specified search path. 
@@ -35,9 +36,15 @@ namespace StepBro.Core.General
         /// <param name="path">The file to check.</param>
         /// <returns>true if the caller has the required permissions and path contains the name of an existing file; otherwise, false.</returns>
         bool FileExists(string path);
+        /// <summary>
+        /// Determins whether the specified folder/directory exists.
+        /// </summary>
+        /// <param name="path">The directory to check.</param>
+        /// <returns>true if the caller has the required permissions and path contains the name of an existing directory; otherwise, false.</returns>
+        bool DirectoryExists(string path);
     }
 
-    internal class TextFileSystem : ServiceBase<ITextFileSystem, TextFileSystem>, ITextFileSystem
+    public class TextFileSystem : ServiceBase<ITextFileSystem, TextFileSystem>, ITextFileSystem
     {
 
         public TextFileSystem(out IService serviceAccess) :
@@ -65,6 +72,12 @@ namespace StepBro.Core.General
             return System.IO.File.OpenText(path);
         }
 
+        public string ReadTextFile(string path)
+        {
+            return System.IO.File.ReadAllText(path);
+        }
+
+
         public string SearchFile(string startpath, string name, IFolderShortcutsSource shortcuts)
         {
             return SearchFile(this, startpath, name, shortcuts);
@@ -73,6 +86,11 @@ namespace StepBro.Core.General
         public bool FileExists(string path)
         {
             return System.IO.File.Exists(path);
+        }
+
+        public bool DirectoryExists(string path)
+        {
+            return System.IO.Directory.Exists(path);
         }
 
         public static string SearchFile(ITextFileSystem fileSystem, string startpath, string name, IFolderShortcutsSource shortcuts)

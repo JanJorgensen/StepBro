@@ -517,6 +517,7 @@ namespace StepBro.Core.Parser
 
         public static int ParseFiles(ServiceManager services, ILogger logger, IScriptFile topfile)
         {
+            var fileSystem = services.Get<ITextFileSystem>();
             var addons = services.Get<IAddonManager>();
             var filesManager = services.Get<ILoadedFilesManager>();
             var shortcutsManager = ServiceManager.Global.Get<IFolderManager>();
@@ -553,7 +554,7 @@ namespace StepBro.Core.Parser
                     var file = fileParsingStack.Dequeue();
                     file.ResetBeforeParsing();
                     file.MarkForTypeScanning();
-                    ITokenSource lexer = new Grammar.StepBroLexer(file.GetParserFileStream(services.Get<ITextFileSystem>()));
+                    ITokenSource lexer = new Grammar.StepBroLexer(file.GetParserFileStream(fileSystem));
                     var tokens = new CommonTokenStream(lexer);
                     var parser = new SBP(tokens);
                     parser.RemoveErrorListeners();

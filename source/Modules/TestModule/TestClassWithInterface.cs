@@ -6,30 +6,29 @@ using System.Threading.Tasks;
 using StepBro.Core.Api;
 using StepBro.Core.Execution;
 
-namespace TestModule
+namespace TestModule;
+
+public interface IInterfaceForClassWithInterface : IDisposable
 {
-    public interface IInterfaceForClassWithInterface : IDisposable
+    void SetupA([Implicit] ICallContext context);
+    bool SetupDone { get; }
+}
+
+public class TestClassWithInterface : IInterfaceForClassWithInterface
+{
+    public static IInterfaceForClassWithInterface CreateInstanceInterface()
     {
-        void SetupA([Implicit] ICallContext context);
-        bool SetupDone { get; }
+        return new TestClassWithInterface() as IInterfaceForClassWithInterface;
     }
 
-    public class TestClassWithInterface : IInterfaceForClassWithInterface
+    public bool SetupDone { get; set; }
+
+    public void Dispose()
     {
-        public static IInterfaceForClassWithInterface CreateInstanceInterface()
-        {
-            return new TestClassWithInterface() as IInterfaceForClassWithInterface;
-        }
+    }
 
-        public bool SetupDone { get; set; }
-
-        public void Dispose()
-        {
-        }
-
-        public void SetupA([Implicit] ICallContext context)
-        {
-            this.SetupDone = true;
-        }
+    public void SetupA([Implicit] ICallContext context)
+    {
+        this.SetupDone = true;
     }
 }

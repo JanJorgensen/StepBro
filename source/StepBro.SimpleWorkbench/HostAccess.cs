@@ -22,12 +22,6 @@ namespace StepBro.SimpleWorkbench
 
         public override HostType Type { get { return HostType.WinForms; } }
 
-        public override IEnumerable<NamedData<object>> ListHostCodeModuleInstances()
-        {
-            // TODO: yield return new NamedData<object>("Host.Console", m_app);
-            yield break;
-        }
-
         public override IEnumerable<Type> ListHostCodeModuleTypes()
         {
             yield break;

@@ -26,7 +26,7 @@ namespace StepBroCoreTest.Data
 
     }
 
-    public class DummyClass : IDummyClass, IScriptDisposable
+    public class DummyClass : IDummyClass, IScriptDisposable, ITextCommandInput
     {
         private long m_propInt;
         private bool m_propBool = false;
@@ -336,5 +336,20 @@ namespace StepBroCoreTest.Data
         {
             throw new KeyNotFoundException();
         }
+
+        bool ITextCommandInput.Enabled
+        {
+            get { return true; }
+        }
+
+        bool ITextCommandInput.AcceptingCommands()
+        {
+            return m_propBool;
+        }
+        void ITextCommandInput.ExecuteCommand(string command)
+        {
+            m_propInt = long.Parse(command);         
+        }
+
     }
 }

@@ -21,7 +21,7 @@ namespace StepBro.HostSupport.Models;
 /// <summary>
 /// Represents the main view-model.
 /// </summary>
-public class HostAppModel : ObservableObject
+public partial class HostAppModel : ObservableObject
 {
     public static readonly string WG_PRIMARY = "PRIMARY";
     public static readonly string WG_SECONDARY = "SECONDARY";
@@ -36,14 +36,14 @@ public class HostAppModel : ObservableObject
     //private readonly DeferrableObservableCollection<CreateCustomPanelMenuItemViewModel> m_creatableCustomPanels = new DeferrableObservableCollection<CreateCustomPanelMenuItemViewModel>();
     //private readonly DeferrableObservableCollection<IFileElement> m_allFileElements = new DeferrableObservableCollection<IFileElement>();
 
-    private RelayCommand<object> m_commandActivateNextDocument;
-    private RelayCommand<object> m_commandCloseActiveDocument;
-    private RelayCommand<object> m_commandCreateNewStepBroDocument;
-    private RelayCommand<object> m_commandCreateNewTextDocument;
+    private RelayCommand m_commandActivateNextDocument;
+    private RelayCommand m_commandCloseActiveDocument;
+    private RelayCommand m_commandCreateNewStepBroDocument;
+    private RelayCommand m_commandCreateNewTextDocument;
     private RelayCommand<string> m_commandOpenFile;
     private RelayCommand<string> m_commandOpenDocument;
-    private RelayCommand<object> m_commandSelectFirstDocument;
-    private RelayCommand<object> m_commandParseAllFiles;
+    private RelayCommand m_commandSelectFirstDocument;
+    private RelayCommand m_commandParseAllFiles;
     private RelayCommand<object> m_commandStartExecution;
     private RelayCommand<object> m_commandStartExecutionOfSelectedFileElement;
     private ICommand m_commandShowErrorsView;
@@ -66,13 +66,13 @@ public class HostAppModel : ObservableObject
     //private readonly CommandLineOptions m_commandLineOptions = null;
     private ILoadedFilesManager m_loadedFiles = null;
     private string m_applicationStateMessage = "Ready or not";
-    private ITask m_fileParsingTask = null;
     private IScriptExecution m_mainScriptExecution = null;
     private string m_documentToActivateWhenLoaded = null;
     private string m_executionTarget = "tadaa!";
     private Tuple<IFileElement, string> m_executionTargetResolved = null;
     private static SynchronizationContext g_syncContext = null;
     //private readonly CustomPanelManager m_panelManager = null;
+    private ToolsInteractionModel m_toolsInteractionModel = null;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // OBJECT
@@ -166,6 +166,21 @@ public class HostAppModel : ObservableObject
         }
     }
 
+    public ILoadedFilesManager LoadedFiles { get { return m_loadedFiles; } }
+
+    public ToolsInteractionModel ToolsInteraction
+    {
+        get
+        {
+            // Create on demand.
+            if (m_toolsInteractionModel == null)
+            {
+                m_toolsInteractionModel = new ToolsInteractionModel(StepBroMain.GetService<IDynamicObjectManager>(), m_loadedFiles);
+            }
+            return m_toolsInteractionModel;
+        }
+    }
+
     /// <summary>
     /// Gets the tool items associated with this view-model.
     /// </summary>
@@ -186,12 +201,15 @@ public class HostAppModel : ObservableObject
     //    }
     //}
 
+    [ObservableProperty]
+    private ITask m_fileParsingTask = null;
+
     private bool m_fileParsingRunning = false;
     public bool FileParsingRunning
     {
         get
         {
-            SetProperty(ref m_fileParsingRunning, m_fileParsingTask != null);
+            SetProperty(ref m_fileParsingRunning, this.FileParsingTask != null);
             return m_fileParsingRunning;
         }
     }
@@ -632,8 +650,7 @@ public class HostAppModel : ObservableObject
         System.Diagnostics.Debug.WriteLine($"MainViewModel.OpenFile({filepath}, {(activate ? "activate" : "don't activate")})");
         if (string.IsNullOrWhiteSpace(filepath)) return null;
         ILoadedFile loadedFile = null;
-        var filesManager = StepBroMain.GetLoadedFilesManager();
-        var alreadyLoadedFile = filesManager.ListFiles<ILoadedFile>().FirstOrDefault(f => string.Equals(f.FilePath, filepath));
+        var alreadyLoadedFile = m_loadedFiles.ListFiles<ILoadedFile>().FirstOrDefault(f => string.Equals(f.FilePath, filepath));
         if (alreadyLoadedFile != null)
         {
             if (activate)
@@ -816,8 +833,8 @@ public class HostAppModel : ObservableObject
         get
         {
             if (m_commandCreateNewTextDocument == null)
-                m_commandCreateNewTextDocument = new RelayCommand<object>(
-                    (param) =>
+                m_commandCreateNewTextDocument = new RelayCommand(
+                    () =>
                     {
                         CreateNewTextDocument(true);
                     }
@@ -836,8 +853,8 @@ public class HostAppModel : ObservableObject
         get
         {
             if (m_commandCreateNewStepBroDocument == null)
-                m_commandCreateNewStepBroDocument = new RelayCommand<object>(
-                    (param) =>
+                m_commandCreateNewStepBroDocument = new RelayCommand(
+                    () =>
                     {
                         CreateNewStepBroDocument(true);
                     }
@@ -929,8 +946,8 @@ public class HostAppModel : ObservableObject
         get
         {
             if (m_commandSelectFirstDocument == null)
-                m_commandSelectFirstDocument = new RelayCommand<object>(
-                    (param) =>
+                m_commandSelectFirstDocument = new RelayCommand(
+                    () =>
                     {
                         //var documentItem = m_userDocumentItems.FirstOrDefault();
                         //if (documentItem != null)
@@ -956,8 +973,8 @@ public class HostAppModel : ObservableObject
         get
         {
             if (m_commandActivateNextDocument == null)
-                m_commandActivateNextDocument = new RelayCommand<object>(
-                    (param) =>
+                m_commandActivateNextDocument = new RelayCommand(
+                    () =>
                     {
                         //if (m_userDocumentItems.Count > 0)
                         //{
@@ -987,8 +1004,8 @@ public class HostAppModel : ObservableObject
         get
         {
             if (m_commandCloseActiveDocument == null)
-                m_commandCloseActiveDocument = new RelayCommand<object>(
-                    (param) =>
+                m_commandCloseActiveDocument = new RelayCommand(
+                    () =>
                     {
                         //var activeDocumentItem = m_userDocumentItems.FirstOrDefault(d => d.IsActive);
                         //if (activeDocumentItem != null)
@@ -1013,15 +1030,15 @@ public class HostAppModel : ObservableObject
         get
         {
             if (m_commandParseAllFiles == null)
-                m_commandParseAllFiles = new RelayCommand<object>(
-                    (param) =>
+                m_commandParseAllFiles = new RelayCommand(
+                    () =>
                     {
                         System.Diagnostics.Debug.WriteLine("MainViewModel.ParseAllFilesCommand.Execute");
-                        m_fileParsingTask = StepBroMain.StartFileParsing(false);
-                        if (m_fileParsingTask != null)
+                        this.FileParsingTask = StepBroMain.StartFileParsing(false);
+                        if (this.FileParsingTask != null)
                         {
                             ApplicationStateMessage = "Parsing all script files...";
-                            m_fileParsingTask.Control.CurrentStateChanged += FileParsing_CurrentStateChanged;
+                            this.FileParsingTask.Control.CurrentStateChanged += FileParsing_CurrentStateChanged;
                             m_commandParseAllFiles.NotifyCanExecuteChanged();
                             //NotifyPropertyChanged(nameof(FileParsingRunning));    
                             UpdateCommandStates();
@@ -1031,9 +1048,9 @@ public class HostAppModel : ObservableObject
                             ApplicationStateMessage = "Failed to start file parsing.";
                         }
                     },
-                    (param) =>
+                    () =>
                     {
-                        return m_fileParsingTask == null;
+                        return this.FileParsingTask == null;
                     }
                 );
 
@@ -1043,17 +1060,17 @@ public class HostAppModel : ObservableObject
 
     private void FileParsing_CurrentStateChanged(object sender, EventArgs e)
     {
-        System.Diagnostics.Debug.WriteLine($"MainViewModel.FileParsing_CurrentStateChanged: {m_fileParsingTask.Control.CurrentState}");
-        if (m_fileParsingTask.Control.CurrentState >= TaskExecutionState.Ended)
+        System.Diagnostics.Debug.WriteLine($"MainViewModel.FileParsing_CurrentStateChanged: {this.FileParsingTask.Control.CurrentState}");
+        if (this.FileParsingTask.Control.CurrentState >= TaskExecutionState.Ended)
         {
             Invoke(o =>
             {
-                m_fileParsingTask.Control.CurrentStateChanged -= FileParsing_CurrentStateChanged;
-                var parsingTime = m_fileParsingTask.Control.EndTime - m_fileParsingTask.Control.StartTime;
+                this.FileParsingTask.Control.CurrentStateChanged -= FileParsing_CurrentStateChanged;
+                var parsingTime = this.FileParsingTask.Control.EndTime - this.FileParsingTask.Control.StartTime;
                 var parsingErrorCount = m_errors.Where(err => err.Type == ProblemType.Parsing && err.Severity >= ProblemSeverity.Error).Count();
                 var errors = parsingErrorCount > 0 ? $"{parsingErrorCount} error(s)!" : "No errors.";
                 ApplicationStateMessage = $"Finished file parsing. Time: {parsingTime.ToMinutesTimestamp()} {errors}";
-                m_fileParsingTask = null;
+                this.FileParsingTask = null;
                 m_commandParseAllFiles.NotifyCanExecuteChanged();
                 //NotifyPropertyChanged(nameof(FileParsingRunning));
                 UpdateCommandStates();

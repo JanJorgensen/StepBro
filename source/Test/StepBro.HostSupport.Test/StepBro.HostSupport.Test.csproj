@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
+    <!--<LangVersion>latest</LangVersion>-->
     <IsPackable>false</IsPackable>
     <OutputPath>..\..\bin\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -14,8 +14,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\StepBro.Core.Test\Data\DummyClass.cs" Link="DummyClass.cs" />
+    <Compile Include="..\StepBro.Core.Test\Data\DummyToolX.cs" Link="DummyToolX.cs" />
+    <Compile Include="..\StepBro.Core.Test\Mocks\TextFileSystemMock.cs" Link="TextFileSystemMock.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    <PackageReference Include="MSTest" Version="3.6.1" />
+    <PackageReference Include="MSTest" Version="3.6.4" />
   </ItemGroup>
 
   <ItemGroup>

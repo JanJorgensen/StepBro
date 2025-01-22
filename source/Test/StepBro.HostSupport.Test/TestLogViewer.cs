@@ -1,4 +1,5 @@
-﻿using StepBro.Core.General;
+﻿using StepBro.Core;
+using StepBro.Core.General;
 using StepBro.HostSupport.Models;
 using System.Linq;
 using StepBroMain = StepBro.Core.Main;
@@ -15,8 +16,12 @@ public class TestLogViewer
     public void Setup()
     {
         m_app = new HostAppModel();
+        IService testFileSystemService = null;
+        var mockFileSystem = new StepBro.Core.Test.Mocks.TextFileSystemMock(out testFileSystemService);
         m_logViewer = new LogViewerModel<LogViewTestEntry>(new LogViewTestEntryFactory());
-        m_app.Initialize(m_logViewer);
+        IService hostAccessService = null;
+        var host = new HostAccess(m_app, out hostAccessService);
+        m_app.Initialize(m_logViewer, testFileSystemService, hostAccessService);
         Assert.AreEqual(0, m_app.Views.Where(v => v.IsOpen).Count());
         m_logViewer.Setup();
     }

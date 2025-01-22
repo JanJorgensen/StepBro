@@ -15,6 +15,12 @@ namespace StepBroCoreTest.Execution
     [TestClass]
     public class TestLayeredModuleUsage
     {
+        [TestInitialize]
+        public void Setup()
+        {
+            ServiceManager.Dispose();
+        }
+
         [TestMethod]
         public void ThreeCodeModulesSetup()
         {
