@@ -8,11 +8,9 @@ using StepBro.Core.Host;
 using StepBro.Core.ScriptData;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using static StepBro.Core.Data.PropertyBlockDecoder;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser;
@@ -441,10 +439,13 @@ internal partial class StepBroListener
             {
                 if (identifiers.Count > 1)
                 {
-                    string fileName = (m_file.FileName != null ? m_file.FileName : "");
-                    int lineNumber = (token != null ? token.Line : -1);
-                    throw new ParsingErrorException(fileName, lineNumber, identifier, $"More than one alternative.");
+                    return new SBExpressionData(
+                        HomeType.Immediate,
+                        SBExpressionType.TypeReference,
+                        (TypeReference)identifiers[0].DataType,
+                        value: identifiers.Select(i => i.DataType.Type).ToList());
                 }
+
                 return this.IdentifierToExpressionData(identifiers[0], token);
             }
 
@@ -493,7 +494,7 @@ internal partial class StepBroListener
         SBExpressionData result = null;
         if (identifier.Type == IdentifierType.DotNetType)
         {
-            result = new SBExpressionData(HomeType.Immediate, SBExpressionType.TypeReference, (TypeReference)identifier.DataType, null, null);
+            result = new SBExpressionData(HomeType.Immediate, SBExpressionType.TypeReference, (TypeReference)identifier.DataType);
         }
         else if (identifier.Type == IdentifierType.DotNetMethod)
         {
@@ -509,7 +510,7 @@ internal partial class StepBroListener
         }
         else if (identifier.Type == IdentifierType.DotNetNamespace)
         {
-            result = new SBExpressionData(HomeType.Immediate, SBExpressionType.Namespace, null, null, identifier.Reference);
+            result = new SBExpressionData(HomeType.Immediate, SBExpressionType.Namespace, value: identifier.Reference);
         }
         else if (identifier.Type == IdentifierType.Variable || identifier.Type == IdentifierType.Parameter || identifier.Type == IdentifierType.LambdaParameter)
         {
@@ -774,18 +775,29 @@ internal partial class StepBroListener
         else
         {
             // If the class is static we will not be adding it (At least for now) - Static classes have been giving issues in other cases and does not seem to be used
-            var type = left.NamespaceList.ListTypes(false).FirstOrDefault(ti => ti.Name == rightString && !(ti.IsAbstract && ti.IsSealed));
-            if (type != null)
+            //var type = left.NamespaceList.ListTypes(false).FirstOrDefault(ti => ti.Name == rightString && !(ti.IsAbstract && ti.IsSealed));
+
+            var types = left.NamespaceList.ListTypes(false).Where(ti => ti.Name == rightString).ToArray();
+            var gtName = rightString + "`";
+            var genericTypedefs = left.NamespaceList.ListTypes(false).Where(ti => ti.Name.StartsWith(gtName)).ToList();
+            if (genericTypedefs.Count > 0)
             {
-                return new SBExpressionData(HomeType.Immediate, SBExpressionType.TypeReference, (TypeReference)type, token: right.Token);
+                return new SBExpressionData(
+                    HomeType.Immediate,
+                    SBExpressionType.GenericTypeDefinition,
+                    (types != null && types.Length > 0) ? (TypeReference)types[0] : (TypeReference)null,
+                    value: genericTypedefs,
+                    token: right.Token);
             }
             else
             {
-                var gtName = rightString + "`";
-                var genericTypedefs = left.NamespaceList.ListTypes(false).Where(ti => ti.Name.StartsWith(gtName)).ToList();
-                if (genericTypedefs.Count > 0)
+                if (types != null && types.Length > 0)
                 {
-                    return new SBExpressionData(HomeType.Immediate, SBExpressionType.GenericTypeDefinition, (TypeReference)null, value: genericTypedefs, token: right.Token);
+                    return new SBExpressionData(
+                        HomeType.Immediate,
+                        SBExpressionType.TypeReference,
+                        (TypeReference)types[0],
+                        token: right.Token);
                 }
                 else
                 {

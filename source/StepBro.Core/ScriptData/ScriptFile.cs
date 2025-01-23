@@ -906,11 +906,16 @@ namespace StepBro.Core.ScriptData
                             }
                             foreach (var type in ns.ListTypes(false))
                             {
-                                // If the class is static we will not be adding it (At least for now) - Static classes have been giving issues in other cases and does not seem to be used
-                                if (!(type.IsAbstract && type.IsSealed))
+                                var name = type.Name;
+                                if (type.IsGenericTypeDefinition)
                                 {
-                                    this.AddRootIdentifier(type.Name, new IdentifierInfo(type.Name, type.FullName, IdentifierType.DotNetType, new TypeReference(type), null));
+                                    if (type.IsNested)
+                                    {
+                                        continue;    // TODO: Any smart way of handling these?
+                                    }
+                                    name = name.Substring(0, name.IndexOf('`'));
                                 }
+                                this.AddRootIdentifier(name, new IdentifierInfo(type.Name, type.FullName, IdentifierType.DotNetType, new TypeReference(type), null));
                             }
                         }
                         break;
