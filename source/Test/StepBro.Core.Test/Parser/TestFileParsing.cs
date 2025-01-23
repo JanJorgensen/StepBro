@@ -86,7 +86,7 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(5L, result);
         }
 
-        [TestMethod]    // public using is not working yet.
+        [TestMethod]
         public void FileParsing_AccessProcedureInUsedFilesPublicUsingFile()
         {
             var files = FileBuilder.ParseFiles((ILogger)null,
@@ -108,6 +108,19 @@ namespace StepBroCoreTest.Parser
             var result = taskContext.CallProcedure(procedureA);
             Assert.AreEqual(82L, result);
         }
+
+        [TestMethod]
+        public void TestFileParsingHandlingDublicateFileUsing()
+        {
+            var files = FileBuilder.ParseFiles((ILogger)null,
+                new Tuple<string, string>("andrea.sbs", "using \"betty.sbs\"; using \"betty.sbs\"; namespace Anders; procedure int Absalon(){ int i = 0; i = Bethlehem(); return i; }"),
+                new Tuple<string, string>("betty.sbs", "namespace Anders; public procedure int Bethlehem(){ return 7161; }"));
+            Assert.AreEqual(2, files.Length);
+            Assert.AreEqual(1, files.ElementAt(0).Errors.ErrorCount);
+            Assert.AreEqual("File using already added (betty.sbs).", files.ElementAt(0).Errors[0].Message);
+            Assert.AreEqual(0, files.ElementAt(1).Errors.ErrorCount);
+        }
+
 
         [TestMethod, Description("Testing the behaviour of generated code when parsing, and then re-parsing the code.")]
         public void TestFileParsingWithReParsing()
@@ -930,7 +943,6 @@ namespace StepBroCoreTest.Parser
                 new Tuple<string, string>("myfile.sbs", f1.ToString()));
 
             Assert.AreEqual(0, files[0].Errors.ErrorCount);
-            //Assert.AreEqual("Unknown identifier: mogens", files[0].Errors[0].Message);
 
             var procedure = files[0].ListElements().First(p => p.Name == "main") as IFileProcedure;
             Assert.IsNotNull(procedure);

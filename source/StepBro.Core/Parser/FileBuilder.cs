@@ -620,7 +620,7 @@ namespace StepBro.Core.Parser
                         {
                             if (!file.AddFileUsing(line, @using.IsPublic, name))
                             {
-                                throw new Exception($"File using already added ({name}).");
+                                file.ErrorsInternal.SymanticError(line, -1, false, $"File using already added ({name}).");
                             }
                         }
                         else throw new Exception($"Unhandled using type: {type}");
