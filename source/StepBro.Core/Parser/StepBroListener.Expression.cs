@@ -115,7 +115,6 @@ namespace StepBro.Core.Parser
                     m_currentProcedure.ContextReferenceInternal,
                     typeof(IScriptCallContext).GetProperty(nameof(IScriptCallContext.This)));
                 m_expressionData.Push(new SBExpressionData(
-                    HomeType.Immediate,
                     SBExpressionType.PropertyReference,
                     new TypeReference(typeof(IProcedureThis)),
                     thisProperty,
@@ -189,7 +188,6 @@ namespace StepBro.Core.Parser
                     Expression.Constant((type.DynamicType as IFileProcedure).UniqueID));
                 m_expressionData.Push(
                     new SBExpressionData(
-                        HomeType.Immediate,
                         SBExpressionType.Expression,
                         type,
                         call));
@@ -207,7 +205,6 @@ namespace StepBro.Core.Parser
                     Expression.Constant(context.ChildCount == 4));
                 m_expressionData.Push(
                     new SBExpressionData(
-                        HomeType.Immediate,
                         SBExpressionType.Expression,
                         TypeReference.TypeBool,
                         call));
@@ -229,7 +226,6 @@ namespace StepBro.Core.Parser
                     Expression.Constant(context.ChildCount == 4));
                 m_expressionData.Push(
                     new SBExpressionData(
-                        HomeType.Immediate,
                         SBExpressionType.Expression,
                         TypeReference.TypeBool,
                         call));
@@ -247,7 +243,6 @@ namespace StepBro.Core.Parser
                     Expression.Constant(context.ChildCount == 4));
                 m_expressionData.Push(
                     new SBExpressionData(
-                        HomeType.Immediate,
                         SBExpressionType.Expression,
                         TypeReference.TypeBool,
                         call));
@@ -367,7 +362,6 @@ namespace StepBro.Core.Parser
                         expression.Type.GetMethod("GetTypedValue"),
                         Expression.Constant(null, typeof(StepBro.Core.Logging.ILogger)));
                     output = new SBExpressionData(
-                        HomeType.Immediate,
                         SBExpressionType.Expression,
                         datatype,
                         getValue);//,
@@ -506,14 +500,14 @@ namespace StepBro.Core.Parser
                             m_errors.SymanticError(context.Start.Line, context.Start.Column, false, $"Assignment failed: {ae.Message}");
                             // Adding an error expression to the expression data stack makes it possible
                             // to parse the rest of the script to catch further issues
-                            m_expressionData.Push(new SBExpressionData(HomeType.Immediate, SBExpressionType.ExpressionError));
+                            m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError));
                         }
                         catch (Exception e)
                         {
                             m_errors.InternalError(context.Start.Line, context.Start.Column, $"Assignment failed: {e.Message}");
                             // Adding an error expression to the expression data stack makes it possible
                             // to parse the rest of the script to catch further issues
-                            m_expressionData.Push(new SBExpressionData(HomeType.Immediate, SBExpressionType.ExpressionError));
+                            m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError));
                         }
                     }
                 }

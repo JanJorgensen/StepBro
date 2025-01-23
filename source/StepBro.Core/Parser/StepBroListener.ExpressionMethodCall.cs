@@ -353,7 +353,6 @@ namespace StepBro.Core.Parser
                                 {
                                     m_expressionData.Push(
                                         new SBExpressionData(
-                                            HomeType.Immediate,
                                             SBExpressionType.Expression,
                                             returnType,
                                             dynamicCall,
@@ -706,7 +705,6 @@ namespace StepBro.Core.Parser
 
                         m_expressionData.Push(
                             new SBExpressionData(
-                                HomeType.Immediate,
                                 SBExpressionType.Expression,
                                 returnType,
                                 Expression.Call(
@@ -727,7 +725,6 @@ namespace StepBro.Core.Parser
                             {
                                 m_expressionData.Push(
                                     new SBExpressionData(
-                                        HomeType.Immediate,
                                         SBExpressionType.Expression,
                                     (TypeReference)(leftType.GetMethod("Invoke").ReturnType),
                                     Expression.Invoke(left.ExpressionCode, methodArguments.Select(a => a.ExpressionCode).ToArray()),
@@ -769,7 +766,6 @@ namespace StepBro.Core.Parser
                                 {
                                     m_expressionData.Push(
                                         new SBExpressionData(
-                                            HomeType.Immediate,
                                             SBExpressionType.Expression,
                                             returnType,
                                             callMethod,
@@ -785,7 +781,6 @@ namespace StepBro.Core.Parser
                 {
                     m_expressionData.Push(
                         new SBExpressionData(
-                            HomeType.Immediate,
                             SBExpressionType.ExpressionError));
                 }
                 #endregion
