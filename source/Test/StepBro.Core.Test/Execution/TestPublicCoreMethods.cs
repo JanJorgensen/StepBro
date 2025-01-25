@@ -23,6 +23,7 @@ namespace StepBroCoreTest
         [TestMethod]
         public void TestGetFullPath()
         {
+
             var f = new StringBuilder();
             f.AppendLine("string MyProcedure(string path) {");
             f.AppendLine("   string r = System.String.Concat(\"\", path.GetFullPath(\"Erik\"));");
@@ -33,8 +34,17 @@ namespace StepBroCoreTest
             Assert.AreEqual(0, files[0].Errors.ErrorCount);
 
             var taskContext = ExecutionHelper.ExeContext();
-            var result = taskContext.CallProcedure(procedure, "c:\\knud");
-            Assert.AreEqual("c:\\knud\\Erik", (string)result);
+
+            if (System.OperatingSystem.IsWindows())
+            {
+                var result = taskContext.CallProcedure(procedure, "c:\\knud");
+                Assert.AreEqual("c:\\knud\\Erik", (string)result);
+            }
+            else
+            {
+                var result = taskContext.CallProcedure(procedure, "/home/runner/work/knud");
+                Assert.AreEqual("/home/runner/work/knud/Erik", (string)result);
+            }
         }
 
         [TestMethod]
