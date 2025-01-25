@@ -46,8 +46,8 @@ namespace StepBro.Core.Parser
 
         public SBExpressionData GetExpressionResultUnresolved()
         {
-            var topStack = m_expressionData.PopStackLevel();
-            return topStack.Pop();
+            var topLevel = m_expressionData.PopStackLevel();
+            return topLevel.Stack.Pop();
         }
 
         //public Expression PopStackLevelAsExpression()
@@ -98,8 +98,8 @@ namespace StepBro.Core.Parser
         public override void ExitParExpression([NotNull] SBP.ParExpressionContext context)
         {
             var expressionScope = m_expressionData.PopStackLevel();
-            System.Diagnostics.Debug.Assert(expressionScope.Count == 1, "Parameter error in: " + context.GetText());    // Until anything else has been seen...
-            var data = expressionScope.Pop();
+            System.Diagnostics.Debug.Assert(expressionScope.Stack.Count == 1, "Parameter error in: " + context.GetText());    // Until anything else has been seen...
+            var data = expressionScope.Stack.Pop();
             m_expressionData.Push(data);
         }
 
@@ -251,9 +251,9 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpSelect([NotNull] SBP.ExpSelectContext context)
         {
-            var val2 = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
-            var val1 = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
-            var exp = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), targetType: TypeReference.TypeBool, reportIfUnresolved: true).NarrowGetValueType();
+            var val2 = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var val1 = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var exp = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), targetType: TypeReference.TypeBool, reportIfUnresolved: true).NarrowGetValueType();
             if (CheckExpressionsForErrors(context, exp, val1, val2))
             {
                 // TODO: Add some try-catch around this to catch exceptions and report errors.
@@ -392,8 +392,8 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpBinary([NotNull] SBP.ExpBinaryContext context)
         {
-            var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
-            var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var last = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var first = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), reportIfUnresolved: true).NarrowGetValueType();
             if (CheckExpressionsForErrors(context, first, last))
             {
                 try
@@ -464,7 +464,7 @@ namespace StepBro.Core.Parser
 
         private void ExitExpUnary(ParserRuleContext context, int type, bool opOnLeft)
         {
-            var input = this.ResolveIfIdentifier(m_expressionData.Peek().Pop(), true);
+            var input = this.ResolveIfIdentifier(m_expressionData.Peek().Stack.Pop(), true);
             if (CheckExpressionsForErrors(context, input))
             {
                 var op = UnaryOperators.UnaryOperatorBase.GetOperator(type);
@@ -475,8 +475,8 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpAssignment([NotNull] SBP.ExpAssignmentContext context)
         {
-            var last = m_expressionData.Peek().Pop();
-            var first = this.ResolveIfIdentifier(m_expressionData.Peek().Pop(), true);
+            var last = m_expressionData.Peek().Stack.Pop();
+            var first = this.ResolveIfIdentifier(m_expressionData.Peek().Stack.Pop(), true);
             last = this.ResolveForGetOperation(last, reportIfUnresolved: true, targetType: first.DataType);
             if (CheckExpressionsForErrors(context, first, last))
             {
@@ -520,9 +520,9 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpBetween([NotNull] SBP.ExpBetweenContext context)
         {
-            var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            var middle = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
+            var last = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
+            var middle = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
+            var first = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
             if (CheckExpressionsForErrors(context, first, middle, last))
             {
                 if (m_isSimpleExpectWithValue)
@@ -556,9 +556,9 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpEqualsWithTolerance([NotNull] SBP.ExpEqualsWithToleranceContext context)
         {
-            var tolerance = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            var expected = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            var value = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
+            var tolerance = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
+            var expected = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
+            var value = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
             if (CheckExpressionsForErrors(context, value, expected, tolerance))
             {
                 var op = context.op.Type;
@@ -586,8 +586,8 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpCoalescing([NotNull] SBP.ExpCoalescingContext context)
         {
-            var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
+            var last = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
+            var first = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
             if (CheckExpressionsForErrors(context, first, last))
             {
                 var result = SpecialOperators.CoalescingOperator.Resolve(this, first, last);

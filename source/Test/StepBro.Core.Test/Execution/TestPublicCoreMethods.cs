@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StepBro.Core;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
+using StepBro.Core.Logging;
 
 namespace StepBroCoreTest
 {
@@ -17,6 +18,23 @@ namespace StepBroCoreTest
         public void Setup()
         {
             ServiceManager.Dispose();
+        }
+
+        [TestMethod]
+        public void TestGetFullPath()
+        {
+            var f = new StringBuilder();
+            f.AppendLine("string MyProcedure(string path) {");
+            f.AppendLine("   string r = System.String.Concat(\"\", path.GetFullPath(\"Erik\"));");
+            f.AppendLine("   return r;");
+            f.AppendLine("}");
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly, new Tuple<string, string>("myfile.sbs", f.ToString()));
+            var procedure = files[0].GetFileElement<IFileProcedure>("MyProcedure");
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+
+            var taskContext = ExecutionHelper.ExeContext();
+            var result = taskContext.CallProcedure(procedure, "c:\\knud");
+            Assert.AreEqual("c:\\knud\\Erik", (string)result);
         }
 
         [TestMethod]

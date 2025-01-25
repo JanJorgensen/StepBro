@@ -74,10 +74,10 @@ namespace StepBro.Core.Parser
 
         public override void ExitUsingDeclarationWithIdentifier([NotNull] SBP.UsingDeclarationWithIdentifierContext context)
         {
-            var stack = m_expressionData.PopStackLevel();
+            var levelData = m_expressionData.PopStackLevel();
             if (!m_file.TypeScanIncluded)
             {
-                var identifierExpression = stack.Pop();
+                var identifierExpression = levelData.Stack.Pop();
                 if (identifierExpression.IsUnresolvedIdentifier)
                 {
                     var identifier = (string)identifierExpression.Value;
@@ -94,10 +94,10 @@ namespace StepBro.Core.Parser
 
         public override void ExitTypeAlias([NotNull] SBP.TypeAliasContext context)
         {
-            var stack = m_expressionData.PopStackLevel();
+            var levelData = m_expressionData.PopStackLevel();
             if (!m_file.TypeScanIncluded)
             {
-                var identifierExpression = stack.Pop();
+                var identifierExpression = levelData.Stack.Pop();
                 if (identifierExpression.IsUnresolvedIdentifier)
                 {
                     var identifier = (string)identifierExpression.Value;
@@ -755,8 +755,8 @@ namespace StepBro.Core.Parser
 
         public override void ExitTestListEntry([NotNull] SBP.TestListEntryContext context)
         {
-            var stack = m_expressionData.PopStackLevel();
-            var entryTarget = stack.Pop();
+            var levelData = m_expressionData.PopStackLevel();
+            var entryTarget = levelData.Stack.Pop();
             var referenceName = "";
             if (entryTarget.IsUnresolvedIdentifier)
             {
@@ -806,7 +806,7 @@ namespace StepBro.Core.Parser
 
         public override void ExitOverrideReference([NotNull] SBP.OverrideReferenceContext context)
         {
-            m_fileElementReference = m_expressionData.Peek().Pop();
+            m_fileElementReference = m_expressionData.Peek().Stack.Pop();
             m_expressionData.PopStackLevel();
 
             m_currentFileElement.SetName(m_currentNamespace, m_fileElementReference.Value as string);

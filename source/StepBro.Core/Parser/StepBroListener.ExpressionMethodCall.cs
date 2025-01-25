@@ -21,20 +21,18 @@ namespace StepBro.Core.Parser
 
         #region Arguments
 
-        private int m_argumentIndex = 0;   // TODO: add this to the stack somehow.
-        private string m_argumentName = null;  // TODO: add this to the stack somehow.
         private SBExpressionData m_leftOfMethodCallExpression = null;   // TODO: add this to the stack somehow.
 
         public override void EnterArgument([NotNull] SBP.ArgumentContext context)
         {
-            m_argumentIndex = m_expressionData.Peek().Count;
-            m_argumentName = null;
+            m_expressionData.Peek().ArgumentIndex = m_expressionData.Peek().Stack.Count;
+            m_expressionData.Peek().ArgumentName = null;
         }
 
         public override void ExitArgument([NotNull] SBP.ArgumentContext context)
         {
-            m_expressionData.Peek().Peek().ArgumentIndex = m_argumentIndex;
-            m_expressionData.Peek().Peek().ParameterName = m_argumentName;
+            m_expressionData.Peek().Stack.Peek().ArgumentIndex = m_expressionData.Peek().ArgumentIndex;
+            m_expressionData.Peek().Stack.Peek().ParameterName = m_expressionData.Peek().ArgumentName;
         }
 
         //public override void EnterArgumentWithoutName([NotNull] SBP.ArgumentWithoutNameContext context)
@@ -56,7 +54,7 @@ namespace StepBro.Core.Parser
 
         public override void ExitArgumentName([NotNull] SBP.ArgumentNameContext context)
         {
-            m_argumentName = context.children[0].GetText();
+            m_expressionData.Peek().ArgumentName = context.children[0].GetText();
         }
 
         //public override void ExitArgumentWithName([NotNull] SBP.ArgumentWithNameContext context)
@@ -76,7 +74,7 @@ namespace StepBro.Core.Parser
             // the variables are resolved. This is specifically for global variables as when they are not resolved
             // they are VariableContainers which is not the same as the underlying type, and gives compile errors.
 
-            List<SBExpressionData> stackData = m_expressionData.PopStackLevel().ToList();
+            List<SBExpressionData> stackData = m_expressionData.PopStackLevel().Stack.ToList();
             Stack<SBExpressionData> handledStackData = new Stack<SBExpressionData>();
             for (int i = stackData.Count() - 1; i >= 0; i--) // Need to go through backwards because Stack -> List -> Stack
             {
@@ -444,12 +442,14 @@ namespace StepBro.Core.Parser
 
                 // Fall through: Not a dynamic call
 
-                if (methods == null)
+                if (methods == null || methods.Any() == false)
                 {
                     throw new Exception("No methods identified; should be handled and reported earlier.");
                 }
 
                 #region Find matching method and setup arguments
+
+                var methodName = methods.First().Name;
 
                 foreach (MethodInfo m in methods)
                 {
@@ -507,17 +507,17 @@ namespace StepBro.Core.Parser
                     if (matchingMethods.Count() > 0)
                     {
                         // Multiple methods can be used, all fit the call.
-                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"Ambiguity in method resolve for method: {left.Token.Text}.");
+                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"Ambiguity in method resolve for method: {methodName}.");
                     }
                     else if (methods.Count() > 0 && matchingMethods.Count() == 0)
                     {
                         // The method exists, but no method fits with the given call
-                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"No method named \"{left.Token.Text}\" could be found with matching parameters.");
+                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"No method named \"{methodName}\" could be found with matching parameters.");
                     }
                     else
                     {
                         // The method does not exist
-                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"No method named \"{left.Token.Text}\" could be found.");
+                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"No method named \"{methodName}\" could be found.");
                     }
 
                     // Set the call type to error so we do not get an exception
@@ -910,10 +910,21 @@ namespace StepBro.Core.Parser
                     suggestedAssignmentsOut.Add(extensionInstanceData);
                     thisParameterHandled = true;
                     state = ArgumentInsertState.Initial;
-                    if (IsParameterAssignableFromArgument(p, extensionInstanceData))
-                        matchScore += 5; // If we have the correct extension instance then it is more correct than a method that does not use the extension instance (This is a choice we have made).
-                    else
-                        matchScore -= 5; // If it is incorrect, we should not use it.
+                    var matching = CheckParameterArgumentTypeMatch(p, extensionInstanceData);
+                    switch (matching)
+                    {
+                        case TypeMatch.NoTypeMatch:
+                        case TypeMatch.UnsupportedSource:
+                            matchScore = 0; // If it is incorrect, we should not use it.
+                            break;
+                        case TypeMatch.MatchLowest:
+                        case TypeMatch.MatchLevel3:
+                        case TypeMatch.MatchLevel2:
+                        case TypeMatch.MatchLevel1:
+                        case TypeMatch.ExactMatch:
+                            matchScore += 10 - (((int)(TypeMatch.ExactMatch - matching)) * 5); // If we have the correct extension instance then it is more correct than a method that does not use the extension instance (This is a choice we have made).
+                            break;
+                    }
                     continue;
                 }
                 else if (state == ArgumentInsertState.ProcedureContext)
@@ -1028,6 +1039,7 @@ namespace StepBro.Core.Parser
                     }
                     else
                     {
+                        TypeMatch matching = TypeMatch.NoTypeMatch;
                         if (argPicker.Current.IsNamed)
                         {
                             if (argPicker.AllBeforeCurrentArePickedAndOthersUnpicked())
@@ -1059,22 +1071,24 @@ namespace StepBro.Core.Parser
                                 suggestedAssignmentsOut.Add(new SBExpressionData(Expression.New(ctor, Expression.Constant((string)(argPicker.Pick().Value)))));
                             }
                         }
-                        else if (argPicker.Current.DataType.Type == p.ParameterType)
+                        else if ((matching = CheckParameterArgumentTypeMatch(p, argPicker.Current)) >= TypeMatch.MatchLowest)
                         {
-                            var a = ResolveForGetOperation(argPicker.Pick(), (TypeReference)p.ParameterType);
-                            suggestedAssignmentsOut.Add(a);
-                            continue;   // next parameter
-                        }
-                        else if (IsParameterAssignableFromArgument(p, argPicker.Current))
-                        {
-                            var a = ResolveForGetOperation(argPicker.Pick(), (TypeReference)p.ParameterType);
-                            matchScore -= 5;
-                            if (p.ParameterType == typeof(object))
+                            var argExpression = ResolveForGetOperation(argPicker.Pick(), (TypeReference)p.ParameterType);
+                            matchScore -= (((int)(TypeMatch.ExactMatch - matching)) * 5);
+                            switch (matching)
                             {
-                                a = a.NewExpressionCode(Expression.Convert(a.ExpressionCode, typeof(object)));
-                                matchScore -= 5;    // Matching an object parameter is not as good as matching the exact same type.
+                                case TypeMatch.MatchLowest:
+                                    argExpression = argExpression.NewExpressionCode(Expression.Convert(argExpression.ExpressionCode, typeof(object)));
+                                    break;
+                                case TypeMatch.MatchLevel3:
+                                case TypeMatch.MatchLevel2:
+                                case TypeMatch.MatchLevel1:
+                                case TypeMatch.ExactMatch:
+                                    break;
+                                default:
+                                    throw new InvalidOperationException("Should not be here");
                             }
-                            suggestedAssignmentsOut.Add(a);
+                            suggestedAssignmentsOut.Add(argExpression);
                             continue;   // next parameter
                         }
                         else if (argPicker.Current.DataType.Type == typeof(Int64) && p.ParameterType.IsPrimitiveNarrowableIntType())
@@ -1180,6 +1194,7 @@ namespace StepBro.Core.Parser
                 {
                     if (!p.ParameterType.IsArray) throw new Exception("Unexpected type of 'params' parameter; not an array.");
                     var t = p.ParameterType.GetElementType();
+                    matchScore -= 5;    // Lower score, just to make methods having direct parameters instead of params array score higher.
 
                     if (!argPicker.AllBeforeCurrentArePickedAndOthersUnpicked())
                     {
@@ -1203,6 +1218,7 @@ namespace StepBro.Core.Parser
                             else if (t.IsAssignableFrom(argPicker.Current.DataType.Type))
                             {
                                 paramsArgs.Add(Expression.Convert(argPicker.Pick().ExpressionCode, t));
+                                matchScore -= 5;    // Lower score when not an exact match;
                             }
                             else
                             {
@@ -1405,16 +1421,20 @@ namespace StepBro.Core.Parser
 
         #endregion
 
-        private static bool IsParameterAssignableFromArgument(ParameterInfo parameter, SBExpressionData argument)
+        private static TypeMatch CheckParameterArgumentTypeMatch(ParameterInfo parameter, SBExpressionData argument)
         {
             if (parameter.ParameterType.IsByRef)
             {
-                if (argument.ReferencedType != SBExpressionType.LocalVariableReference) return false;   // TODO: report reason for rejection.
-                return (parameter.ParameterType == argument.DataType.Type);  // When it's a ByRef, the type must be exactly the same (I think).
+                if (argument.ReferencedType != SBExpressionType.LocalVariableReference) return TypeMatch.UnsupportedSource;
+                return (parameter.ParameterType == argument.DataType.Type) ? TypeMatch.ExactMatch : TypeMatch.NoTypeMatch;  // When it's a ByRef, the type must be exactly the same (I think).
             }
-            if (argument.IsUnknownIdentifier)
+            if (argument.DataType.Type == parameter.ParameterType)
             {
-                return false;
+                return TypeMatch.ExactMatch;
+            }
+            else if (argument.IsUnknownIdentifier)
+            {
+                return TypeMatch.NoTypeMatch;
             }
             else if (typeof(IValueContainer).IsAssignableFrom(argument.DataType.Type) && !typeof(IValueContainer).IsAssignableFrom(parameter.ParameterType))
             {
@@ -1422,14 +1442,18 @@ namespace StepBro.Core.Parser
                     argument.DataType.Type.GetGenericTypeDefinition() == typeof(IValueContainer<>) &&
                     parameter.ParameterType.IsAssignableFrom(argument.DataType.Type.GenericTypeArguments[0]))
                 {
-                    return true;
+                    return TypeMatch.MatchLevel1;
                 }
                 else
                 {
-                    return false;
+                    return TypeMatch.NoTypeMatch;
                 }
             }
-            return parameter.ParameterType.IsAssignableFrom(argument.DataType.Type);
+            else if (parameter.ParameterType == typeof(object)) // Not exac match, and parameter is the lowest possible matching level (object).
+            {
+                return TypeMatch.MatchLowest;
+            }
+            return parameter.ParameterType.IsAssignableFrom(argument.DataType.Type) ? TypeMatch.MatchLevel1 : TypeMatch.NoTypeMatch;
         }
 
         private static int GetIndexOfNamedArgument(List<SBExpressionData> arguments, string name)

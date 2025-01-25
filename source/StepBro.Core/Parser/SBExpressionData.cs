@@ -211,7 +211,7 @@ namespace StepBro.Core.Parser
                     case SBExpressionType.Identifier:
                     case SBExpressionType.UnknownIdentifier:
                     case SBExpressionType.UnsupportedOperation:
-                    //case SBExpressionType.OperationError:
+                        //case SBExpressionType.OperationError:
                         return false;
                     default:
                         return true;
@@ -237,11 +237,11 @@ namespace StepBro.Core.Parser
 
         public override string ToString()
         {
-            if (Value != null)
-            {
-                return ReferencedType.ToString() + ":" + Value.ToString();
-            }
-            return base.ToString();
+            var parts = new List<string>();
+            parts.Add(this.ReferencedType.ToString());
+            if (this.DataType != null) parts.Add(this.DataType.ToString());
+            if (this.Value != null) parts.Add(this.Value.ToString());
+            return "SBExpressionData " + String.Join(", ", parts);
         }
 
         public bool IsNamed { get { return String.IsNullOrEmpty(ParameterName) == false; } }
@@ -260,7 +260,7 @@ namespace StepBro.Core.Parser
                     case SBExpressionType.TestListReference:
                     case SBExpressionType.FileElementOverride:
                     case SBExpressionType.DatatableReference:
-                    //case SBExpressionType.OperationError:
+                        //case SBExpressionType.OperationError:
                         return false;
 
                     case SBExpressionType.Constant:

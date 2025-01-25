@@ -205,8 +205,8 @@ namespace StepBro.Core.Parser
 
         public override void ExitFormalParameterAssignment([NotNull] SBP.FormalParameterAssignmentContext context)
         {
-            var stack = m_expressionData.PopStackLevel();
-            var parInitializer = this.ResolveForGetOperation(stack.Pop());
+            var levelData = m_expressionData.PopStackLevel();
+            var parInitializer = this.ResolveForGetOperation(levelData.Stack.Pop());
             m_parameters[m_parameters.Count - 1].SetDefaultValue(parInitializer.Value, ((ParserRuleContext)context.children[0]).Start);
             //if (m_variableInitializer.IsError())
             //{
@@ -431,8 +431,8 @@ namespace StepBro.Core.Parser
 
         public override void ExitIfStatement([NotNull] SBP.IfStatementContext context)
         {
-            var stack = m_expressionData.PopStackLevel();
-            var condition = stack.Pop();
+            var levelData = m_expressionData.PopStackLevel();
+            var condition = levelData.Stack.Pop();
             var subStatements = m_scopeStack.Peek().GetSubStatements();
             var attributes = m_scopeStack.Peek().GetAttributes();
 
@@ -547,7 +547,7 @@ namespace StepBro.Core.Parser
             // by popping when we exit the "ForCondition" part of the for-loop, meaning the second part of the
             // three-part initialization of the for-loop.
             // We use a stack as multiple for loops can be within each other.
-            m_forCondition.Push(m_expressionData.Peek().Pop());
+            m_forCondition.Push(m_expressionData.Peek().Stack.Pop());
 
             m_scopeStack.Push(new ProcedureParsingScope(m_scopeStack.Peek(), "for-loop", ProcedureParsingScope.ScopeType.Block));
             m_scopeStack.Peek().ForConditionExists = true;
@@ -583,8 +583,8 @@ namespace StepBro.Core.Parser
             var forInitVariables = m_forInitVariables.Pop();
 
             // Contains the expressions in the for-update part of the for-loop
-            var forUpdateExpressions = (forLoopScope.ForUpdateExists ? m_expressionData.PopStackLevel() : new());
-            var forInitExpressions = m_expressionData.PopStackLevel();
+            var forUpdateExpressions = (forLoopScope.ForUpdateExists ? m_expressionData.PopStackLevel().Stack : new());
+            var forInitExpressions = m_expressionData.PopStackLevel().Stack;
 
             // Contains the part of the for-loop that contains the condition
             var condition = (forLoopScope.ForConditionExists ? m_forCondition.Pop() : new SBExpressionData(Expression.Constant(true)));
@@ -829,8 +829,8 @@ namespace StepBro.Core.Parser
         public override void ExitWhileStatement([NotNull] SBP.WhileStatementContext context)
         {
             var whileScope = m_scopeStack.Pop();
-            var stack = m_expressionData.PopStackLevel();
-            var condition = stack.Pop();
+            var levalData = m_expressionData.PopStackLevel();
+            var condition = levalData.Stack.Pop();
             var subStatements = whileScope.GetSubStatements();
             var attributes = whileScope.GetAttributes();
             ProcedureVariable varLoopIndex = null;
@@ -1197,8 +1197,8 @@ namespace StepBro.Core.Parser
             }
             else if (child.RuleIndex == SBP.RULE_expression)
             {
-                var stack = m_expressionData.PopStackLevel();
-                var exp = stack.Pop();
+                var levelData = m_expressionData.PopStackLevel();
+                var exp = levelData.Stack.Pop();
 
                 exp = this.ResolveForGetOperation(exp);
 
@@ -1243,14 +1243,14 @@ namespace StepBro.Core.Parser
                 m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Return value missing.");
                 return;
             }
-            var stack = m_expressionData.PopStackLevel();
-            if (stack.Count == 0)
+            var levelData = m_expressionData.PopStackLevel();
+            if (levelData.Stack.Count == 0)
             {
                 m_errors.InternalError(context.Start.Line, context.Start.Column, "");
                 return;
             }
 
-            var exp = stack.Pop();
+            var exp = levelData.Stack.Pop();
             exp = this.ResolveForGetOperation(exp).NarrowGetValueType();
             var code = exp.ExpressionCode;
             if (exp.IsError())
@@ -1346,13 +1346,13 @@ namespace StepBro.Core.Parser
 
         public override void ExitLogStatement([NotNull] SBP.LogStatementContext context)
         {
-            var stack = m_expressionData.PopStackLevel();
-            if (stack.Count == 0)
+            var levelData = m_expressionData.PopStackLevel();
+            if (levelData.Stack.Count == 0)
             {
                 m_errors.InternalError(context.Start.Line, context.Start.Column, "");
                 return;
             }
-            var exp = stack.Pop();
+            var exp = levelData.Stack.Pop();
             exp = this.ResolveIfIdentifier(exp, m_inFunctionScope);
             if (exp.IsError())
             {
@@ -1480,8 +1480,8 @@ namespace StepBro.Core.Parser
         {
             var isAssert = (context.children[0].GetText() == "assert");
 
-            var stack = m_expressionData.PopStackLevel();
-            var expression = stack.Pop();
+            var levelData = m_expressionData.PopStackLevel();
+            var expression = levelData.Stack.Pop();
             expression = this.ResolveForGetOperation(expression);
             if (expression.IsError())
             {
@@ -1615,7 +1615,7 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpressionStatement([NotNull] SBP.ExpressionStatementContext context)
         {
-            var expression = m_expressionData.PopStackLevel().Pop();
+            var expression = m_expressionData.PopStackLevel().Stack.Pop();
             if (expression.IsError())
             {
                 m_scopeStack.Peek().AddStatementCode(Expression.Empty());   // Add ampty statement, to make the rest of the error handling easier.

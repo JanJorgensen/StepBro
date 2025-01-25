@@ -296,6 +296,8 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(4109L, ParseAndRunExp<long>(nameof(MethodStaticLongOut6) + "(a: 103, b: true, c: 1ms)"));
             Assert.AreEqual(4110L, ParseAndRunExp<long>(nameof(MethodStaticLongOut6) + "(b: true, c: 3003ms, a: 104)"));
             Assert.AreEqual(4111L, ParseAndRunExp<long>(nameof(MethodStaticLongOut6) + "(c: 12s, a: 105, b: true)"));
+
+            Assert.AreEqual(4635L, ParseAndRunExp<long>(nameof(MethodStaticLongOut9) + "(105, c: System.String.Concat(\"Anders\", \"Bent\"))"));    // Check if argument name is lost when argument is another method call.
         }
 
         [TestMethod]

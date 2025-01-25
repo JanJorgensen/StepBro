@@ -78,7 +78,6 @@ namespace StepBro.SimpleWorkbench
 
         private IFileElement m_focusElement = null;
 
-        private ObservableCollection<IObjectContainer> m_objects = new ObservableCollection<IObjectContainer>();
         private ObservableCollection<IFileElement> m_fileElements = new ObservableCollection<IFileElement>();
         private Dictionary<string, TypeReference> m_variableTypes = new Dictionary<string, TypeReference>();
 
@@ -792,7 +791,7 @@ namespace StepBro.SimpleWorkbench
             if (procedure.Parameters.Length > 0 && procedure.IsFirstParameterThisReference)
             {
                 var par = procedure.Parameters[0];
-                foreach (var v in m_objects)
+                foreach (var v in m_objectManager.GetObjectCollection())
                 {
                     if (par.Value.IsAssignableFrom(m_variableTypes[v.FullName]))
                     {

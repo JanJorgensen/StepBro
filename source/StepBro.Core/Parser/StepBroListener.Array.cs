@@ -18,8 +18,8 @@ namespace StepBro.Core.Parser
         {
             var expressions = m_expressionData.PopStackLevel();
             var indexingExpressions = new List<SBExpressionData>();
-            indexingExpressions.Add(expressions.Pop());
-            var source = this.ResolveIfIdentifier(expressions.Pop(), true);
+            indexingExpressions.Add(expressions.Stack.Pop());
+            var source = this.ResolveIfIdentifier(expressions.Stack.Pop(), true);
             var sourceType = source.DataType;
 
             if (sourceType.Type.IsGenericType && sourceType.Type.GetGenericTypeDefinition() == typeof(List<>))
@@ -109,7 +109,7 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpArray([NotNull] SBP.ExpArrayContext context)
         {
-            var valueParserExpressions = m_expressionData.PopStackLevel().ToList();
+            var valueParserExpressions = m_expressionData.PopStackLevel().Stack.ToList();
             for (int i = 0; i < valueParserExpressions.Count; i++)
             {
                 valueParserExpressions[i] = this.ResolveForGetOperation(valueParserExpressions[i]);

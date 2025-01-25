@@ -489,6 +489,8 @@ namespace StepBro.Core.Parser
             services.Manager.Register(mainLogger.RootScopeService);
             var taskManager = new TaskManager(out service);
             services.Manager.Register(service);
+            var folderShortcuts = new FolderManager(out service);
+            services.Manager.Register(service);
 
             TaskContextDummy taskContext = new TaskContextDummy();
             services.StartServices(taskContext);
