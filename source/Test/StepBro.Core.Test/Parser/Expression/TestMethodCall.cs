@@ -215,12 +215,11 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
-        [Ignore]    // Selecting between two alternatives not implemented yet
         public void ExtensionMethodFromTwoAlternatives()
         {
             // There are two ToArray methods to choose from.
 
-            Assert.AreEqual(26L, ParseAndRun<long>(
+            Assert.AreEqual(57L, ParseAndRun<long>(
                 "value",
                 "var arr = [ 25, 26, 27 ]; " +
                 "var value = arr.ToArray().MyExtMethodArrayLong();",
@@ -314,14 +313,15 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(70L + 726L, ParseAndRun<long>("varDummyB.MethodWithCallContextB(\"Upsan\")", varDummyClass: true));
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public void TestSystemRandom()
         {
-            Assert.AreEqual(25L, ParseAndRun<long>(
+            var value = ParseAndRun<long>(
                 "value",
-                "var rnd = new Random(); " +
-                "var value = rnd.Next(0, 100);",
-                false));
+                "var rnd = Random(); " +
+                "int value = rnd.Next(1, 100);",
+                false);
+            Assert.IsTrue(value >= 1L && value <= 100L);
         }
 
         [TestMethod]
