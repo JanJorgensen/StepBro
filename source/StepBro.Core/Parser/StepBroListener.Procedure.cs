@@ -1268,6 +1268,12 @@ namespace StepBro.Core.Parser
                     Expression.Convert(Expression.Constant(null), typeof(Logging.ILogger)));
             }
 
+            if (!m_currentProcedure.ReturnType.Type.IsAssignableFrom(code.Type))
+            {
+                m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Expression data type is not compatible with the procedure return type.");
+                return;
+            }
+
             var procedureReference = Expression.Convert(Expression.Property(m_currentProcedure.ContextReferenceInternal, nameof(IScriptCallContext.Self)), typeof(FileProcedure));
             code = Expression.Call(procedureReference, nameof(FileProcedure.OnReturn), new Type[] { code.Type }, code);
 

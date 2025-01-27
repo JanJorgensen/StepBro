@@ -85,7 +85,7 @@ namespace StepBro.Core.Data
             this.FullName = fullName;
             this.Type = type;
             this.DataType = dataType;
-            this.Reference = dataType.DynamicType;
+            this.Reference = dataType?.DynamicType;
         }
 
         public override string ToString()

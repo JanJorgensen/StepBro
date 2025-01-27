@@ -41,7 +41,7 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(40, (long)result);
         }
 
-        [TestMethod, ExpectedException(typeof(ParsingErrorException))]
+        [TestMethod]
         public void TestProcedureReferenceBadCasting()
         {
             var f = new StringBuilder();
@@ -53,7 +53,16 @@ namespace StepBroCoreTest.Parser
             f.AppendLine("    ProcA ref2 = ref1;");     // No implicit casting - should result in parsing error.
             f.AppendLine("    return ref2(4);");
             f.AppendLine("}");
-            FileBuilder.ParseFile(null, f.ToString());
+            try
+            {
+                FileBuilder.ParseFile(null, f.ToString());
+
+                Assert.Fail("No exception thrown.");
+            }
+            catch (ParsingErrorException ex)
+            {
+                Assert.AreEqual("Variable assignment of incompatible type.", ex.Message);
+            }
         }
     }
 }

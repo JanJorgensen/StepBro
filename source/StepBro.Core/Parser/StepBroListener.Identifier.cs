@@ -321,6 +321,21 @@ internal partial class StepBroListener
         }
         if (m_file != null)
         {
+            if (String.Equals(identifier, m_file.Namespace, StringComparison.InvariantCulture))
+            {
+                return new SBExpressionData(SBExpressionType.ScriptNamespace, "", identifier, token);
+            }
+            else
+            {
+                foreach (var fu in m_file.ListResolvedFileUsings())
+                {
+                    if (String.Equals(identifier, fu.Namespace, StringComparison.InvariantCulture))
+                    {
+                        return new SBExpressionData(SBExpressionType.ScriptNamespace, "", identifier, token);
+                    }
+                }
+            }
+
             var identifiers = m_file.LookupIdentifier(identifier, predicate);
             if (identifiers != null)
             {
@@ -341,6 +356,7 @@ internal partial class StepBroListener
                     foundIdentifier = identifiers[0];       // NOTE: This might not always be the best solution.
                 }
             }
+
             if (foundIdentifier == null)
             {
                 foundIdentifier = this.TryGetFileElementInScope(m_file?.Usings, identifier);
@@ -890,9 +906,45 @@ internal partial class StepBroListener
 
     private SBExpressionData ResolveDotIdentifierInstanceReference(SBExpressionData left, SBExpressionData right, bool includeBaseAndInterfaces)
     {
-        var leftType = left.DataType.Type;
+        var leftType = left.DataType?.Type;
         var rightString = right.Value as string;
         bool nativeOnly = false;    // Whether to skip file elements.
+
+        if (left.ReferencedType == SBExpressionType.ScriptNamespace)
+        {
+            var theNamespace = (string)(left.Value);
+
+            var filesInNamespace = m_file.ListResolvedFileUsings().Where(f => f.Namespace == theNamespace).ToList();
+            if (String.Equals(theNamespace, m_file.Namespace, StringComparison.InvariantCulture))
+            {
+                filesInNamespace.Insert(0, m_file);
+            }
+
+            foreach (var file in filesInNamespace)
+            {
+                var found = file.ListPublicElements(theNamespace, false).Where(e => e.Name == rightString).ToList();
+                if (found.Count == 1)
+                {
+                    return this.IdentifierToExpressionData(found[0], right.Token);
+                }
+                else
+                {
+                    var line = (left.Token != null) ? left.Token.Line : 0;
+                    var column = (left.Token != null) ? left.Token.Column : 0;
+                    if (found.Count == 0)
+                    {
+                        m_errors.SymanticError(line, column, false, $"No elements named \"{rightString}\" could be found in the namespace \"{theNamespace}\" ");
+                        return new SBExpressionData(SBExpressionType.ExpressionError);
+                    }
+                    else
+                    {
+                        m_errors.SymanticError(line, column, false, $"More than one element named \"{rightString}\" could be found in the namespace \"{theNamespace}\".");
+                        return new SBExpressionData(SBExpressionType.ExpressionError);
+                    }
+                }
+            }
+        }
+
         if (rightString.StartsWith('@'))
         {
             nativeOnly = true;

@@ -449,8 +449,6 @@ namespace StepBro.Core.Parser
 
                 #region Find matching method and setup arguments
 
-                var methodName = methods.First().Name;
-
                 foreach (MethodInfo m in methods)
                 {
                     var constructedMethod = m;
@@ -503,21 +501,61 @@ namespace StepBro.Core.Parser
                 }
                 else
                 {
+                    var callTargetDescriptor = methods.First().Name;
+                    if (left.Value != null)
+                    {
+                        if (left.Value is IProcedureReference reference)
+                        {
+                            callTargetDescriptor = reference.Name;
+                        }
+                        else if (left.Value is List<MethodInfo> methodList)
+                        {
+                            callTargetDescriptor = methodList[0].Name;
+                        }
+                        else if (left.ReferencedType == SBExpressionType.LocalVariableReference)
+                        {
+                            if (left.Value is IdentifierInfo info)
+                            {
+                                callTargetDescriptor = info.Name;
+                            }
+                            else if (left.Value is IProcedureReference proc)
+                            {
+                                callTargetDescriptor = proc.Name;
+                            }
+                            else if (left.Value is FileVariable variable)
+                            {
+                                callTargetDescriptor = $"target referenced by '{variable.Name}'";     // TODO: Improve on this .
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine("Value type: " + left.Value.GetType().FullName);
+                                //throw new NotImplementedException();
+                            }
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine("Value type: " + left.Value.GetType().FullName);
+                            //throw new NotImplementedException();
+                        }
+                    }
+
+
+
                     // Handle none or more than one alternative
                     if (matchingMethods.Count() > 0)
                     {
                         // Multiple methods can be used, all fit the call.
-                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"Ambiguity in method resolve for method: {methodName}.");
+                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"Ambiguity in method or procedure resolved for {callTargetDescriptor}.");
                     }
                     else if (methods.Count() > 0 && matchingMethods.Count() == 0)
                     {
                         // The method exists, but no method fits with the given call
-                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"No method named \"{methodName}\" could be found with matching parameters.");
+                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"All arguments are not matching for {callTargetDescriptor}\".");
                     }
                     else
                     {
                         // The method does not exist
-                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"No method named \"{methodName}\" could be found.");
+                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"Unknown method or identifier {callTargetDescriptor}.");
                     }
 
                     // Set the call type to error so we do not get an exception

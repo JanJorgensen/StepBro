@@ -35,6 +35,54 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
+        public void TestFileParsingProceduresOfSameNameInDifferentNamespaces()
+        {
+            string f1 =
+                """
+                using "betty.sbs";
+                namespace Anders;
+                public void Absalon()
+                {
+                    Fly();
+                    Anders.Fly();
+                    Bent.Fly();
+                    Christian.Fly();
+                }
+                public void Fly(){}
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null,
+                new Tuple<string, string>("andrea.sbs", f1),
+                new Tuple<string, string>("betty.sbs",      "public using \"chrissy.sbs\";  namespace Bent;         public void Fly(){}"),
+                new Tuple<string, string>("chrissy.sbs",    "                               namespace Christian;    public void Fly(){}"));
+            Assert.AreEqual(3, files.Length);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            Assert.AreEqual(0, files[1].Errors.ErrorCount);
+            Assert.AreEqual(0, files[2].Errors.ErrorCount);
+            var procedureA = files[0].ListElements().First(p => p.Name == "Absalon") as IFileProcedure;
+            Assert.AreEqual("Absalon", procedureA.Name);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            taskContext.CallProcedure(procedureA);
+
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - Anders.Absalon - <no arguments>");
+            log.ExpectNext("2 - Pre - 5 Anders.Fly - <no arguments>");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Pre - 6 Anders.Fly - <no arguments>");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Pre - 7 Bent.Fly - <no arguments>");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Pre - 8 Christian.Fly - <no arguments>");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
+
+        [TestMethod]
         public void FileParsing_AccessVariablesSameNamespace()
         {
             var files = FileBuilder.ParseFiles((ILogger)null,
