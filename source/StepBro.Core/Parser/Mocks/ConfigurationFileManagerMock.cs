@@ -13,6 +13,8 @@ namespace StepBro.Core.Parser.Mocks
         {
         }
 
+        public string StationPropertiesFile { get { return null; } }
+
         public PropertyBlock GetStationProperties()
         {
             throw new NotImplementedException();
