@@ -24,10 +24,10 @@ namespace StepBro.Core.General
 
     internal class ConfigurationFileManager : ServiceBase<IConfigurationFileManager, ConfigurationFileManager>, IConfigurationFileManager
     {
+        private string m_stationPropertiesFileName = null;
         private PropertyBlock m_stationProperties = null;
         private List<NamedData<FolderConfiguration>> m_folderConfigs = new List<NamedData<FolderConfiguration>>();
         private ITextFileSystem m_fileSystem = null;
-        private string m_fileName = null;
 
         public ConfigurationFileManager(out IService serviceAccess) :
             base("ConfigurationFileManager", out serviceAccess, typeof(ILogger))
@@ -38,29 +38,29 @@ namespace StepBro.Core.General
         protected override void Start(ServiceManager manager, ITaskContext context)
         {
             m_fileSystem = manager.Get<ITextFileSystem>();
-            m_fileName = System.Environment.GetEnvironmentVariable(Constants.STEPBRO_STATION_PROPERTIES);
-            if (!String.IsNullOrEmpty(m_fileName))
+            m_stationPropertiesFileName = System.Environment.GetEnvironmentVariable(Constants.STEPBRO_STATION_PROPERTIES);
+            if (!String.IsNullOrEmpty(m_stationPropertiesFileName))
             {
-                System.Diagnostics.Debug.WriteLine($"Station properties file: ({m_fileName}).");
-                if (m_fileSystem.FileExists(m_fileName))
+                System.Diagnostics.Debug.WriteLine($"Station properties file: ({m_stationPropertiesFileName}).");
+                if (m_fileSystem.FileExists(m_stationPropertiesFileName))
                 {
                     try
                     {
-                        m_stationProperties = m_fileName.GetPropertyBlockFromFile();
+                        m_stationProperties = m_stationPropertiesFileName.GetPropertyBlockFromFile();
 #if DEBUG
                         context.Logger.LogSystem($"Successfully read the station properties file.");
 #else
-                        context.Logger.LogSystem($"Station properties file: {stationPropFile}.");
+                        context.Logger.LogSystem($"Station properties file: {m_stationPropertiesFileName}.");
 #endif
                     }
                     catch
                     {
-                        context.Logger.LogError($"Error reading station properties file ({m_fileName}).");
+                        context.Logger.LogError($"Error reading station properties file ({m_stationPropertiesFileName}).");
                     }
                 }
                 else
                 {
-                    context.Logger.LogError($"Station properties file ({m_fileName}) was not found.");
+                    context.Logger.LogError($"Station properties file ({m_stationPropertiesFileName}) was not found.");
                 }
             }
             else
@@ -69,7 +69,7 @@ namespace StepBro.Core.General
             }
         }
 
-        public string StationPropertiesFile { get => m_fileName; }
+        public string StationPropertiesFile { get => m_stationPropertiesFileName; }
 
         public PropertyBlock GetStationProperties()
         {
