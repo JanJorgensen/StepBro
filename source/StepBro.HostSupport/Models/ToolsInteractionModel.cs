@@ -18,7 +18,7 @@ namespace StepBro.HostSupport.Models;
 
 public partial class ToolsInteractionModel : ObservableObject
 {
-    public partial class SelectableTool : ObservableObject
+    public partial class SelectableTool : ObservableObject, IEquatable<SelectableTool>
     {
         private TypeReference m_typeReference;
         private IObjectContainer m_objectVariable;
@@ -58,14 +58,7 @@ public partial class ToolsInteractionModel : ObservableObject
 
         public override bool Equals(object obj)
         {
-            if (obj == null) return false;
-            if (obj is not SelectableTool other) return false;
-            if (other.m_typeReference != m_typeReference) return false;
-            if ((other.m_typeReference == null) != (m_typeReference == null)) return false;
-            if (other.m_typeReference != null && !other.m_typeReference.Equals(m_typeReference)) return false;
-            if ((other.m_objectVariable == null) != (m_objectVariable == null)) return false;
-            if (other.m_objectVariable != null && !other.m_objectVariable.Equals(m_objectVariable)) return false;
-            return true;
+            return this.Equals(obj as SelectableTool);
         }
 
         public override int GetHashCode()
@@ -76,6 +69,17 @@ public partial class ToolsInteractionModel : ObservableObject
         public override string ToString()
         {
             return "SelectableTool " + this.PresentationName;
+        }
+
+        public bool Equals(SelectableTool other)
+        {
+            if (other  == null) return false;
+            if (other.m_typeReference != m_typeReference) return false;
+            if ((other.m_typeReference == null) != (m_typeReference == null)) return false;
+            if (other.m_typeReference != null && !other.m_typeReference.Equals(m_typeReference)) return false;
+            if ((other.m_objectVariable == null) != (m_objectVariable == null)) return false;
+            if (other.m_objectVariable != null && !other.m_objectVariable.Equals(m_objectVariable)) return false;
+            return true;
         }
     }
 
