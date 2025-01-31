@@ -850,7 +850,7 @@ namespace StepBro.SimpleWorkbench
                         procedureExecutionOptionMenu.Name = "toolStripMenuProcedure" + procedure.Name + "On" + variable.Replace(".", "Dot");
                         procedureExecutionOptionMenu.SetText();
                         procedureExecutionOptionMenu.ToolTipText = null; // $"Procedure '{procedure.FullName}' partner '{partner.Name}'";
-                                                                         //procedureExecutionOptionMenu.Click += FileElementExecutionEntry_Click; // TODO
+                        procedureExecutionOptionMenu.Click += FileElementExecutionEntry_Click;
                         if (procedure.Parameters == null || procedure.Parameters.Length > 1)     // TODO: Enable user to input the arguments.
                         {
                             procedureExecutionOptionMenu.Enabled = false;
@@ -867,7 +867,7 @@ namespace StepBro.SimpleWorkbench
                     {
                         executionItem.Enabled = false;
                     }
-                    executionItem.Click += FileElementExecutionEntry_Click;
+                    executionItem.Click += FileElementExecutionEntry_Click;     // The procedure itself; not a partner or any instance variable.
                 }
             }
             else
