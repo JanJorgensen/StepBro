@@ -1033,6 +1033,27 @@ namespace StepBro.Core.Parser
                     }
                 }
 
+                if (state == ArgumentInsertState.ThisReference)
+                {
+                    if (instance != null)
+                    {
+                        thisParameterHandled = true;
+                        if (p.ParameterType.IsAssignableFrom(instance.Type))
+                        {
+                            suggestedAssignmentsOut.Add(new SBExpressionData(instance));
+                            state = ArgumentInsertState.Mandatory;  // Not sure about this...
+                        }
+                        else
+                        {
+                            return 0;   // Wrong type of 'this' reference
+                        }
+                    }
+                    else
+                    {
+                        state = ArgumentInsertState.Mandatory;  // The parameter must be set from a normal argument, then.
+                    }
+                }
+
                 if (state == ArgumentInsertState.Mandatory)
                 {
                     if (p.ParameterType == typeof(ArgumentList))
@@ -1158,20 +1179,6 @@ namespace StepBro.Core.Parser
                         {
                             state = ArgumentInsertState.Named;  // Try finding the argument by name, then.
                         }
-                    }
-                }
-
-                if (state == ArgumentInsertState.ThisReference)
-                {
-                    thisParameterHandled = true;
-                    if (p.ParameterType.IsAssignableFrom(instance.Type))
-                    {
-                        suggestedAssignmentsOut.Add(new SBExpressionData(instance));
-                        state = ArgumentInsertState.Mandatory;  // Not sure about this...
-                    }
-                    else
-                    {
-                        return 0;   // Wrong type of 'this' reference
                     }
                 }
 

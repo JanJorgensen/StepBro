@@ -231,5 +231,59 @@ namespace StepBro.Core.Test.Parser
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
         }
+
+        [TestMethod]
+        public void ConstVariableForProcedureReference()
+        {
+            string f1 =
+                """
+                using "mysub.sbs";
+                procedure void MyHarnessSetup() : HarnessSetupMethod
+                {
+                    log("MyHarnessSetup");
+                }
+                
+                override const HarnessSetupMethod HARNESS_SETUP = MyHarnessSetup;
+                """;
+
+            string f2 =
+                """
+                procedure void HarnessSetupMethod();
+                procedure void NoSpecificHarnessSetup() : HarnessSetupMethod
+                {
+                    log("NoSpecificHarnessSetup");
+                }
+                
+                public const HarnessSetupMethod HARNESS_SETUP = NoSpecificHarnessSetup;
+                
+                public void Setup()
+                {
+                    log("The General Setup");
+                    HARNESS_SETUP();
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()),
+                new Tuple<string, string>("mysub.sbs", f2.ToString()));
+            Assert.AreEqual(2, files.Length);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var procedure = files[1].ListElements().FirstOrDefault(p => p.Name == "Setup") as IFileProcedure;
+            Assert.IsNotNull(procedure);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+            taskContext.CallProcedure(procedure);
+
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - mysub.Setup - <no arguments>");
+            log.ExpectNext("2 - Normal - 11 Log - The General Setup");
+            log.ExpectNext("2 - Pre - 12 myfile.MyHarnessSetup - <no arguments>");
+            log.ExpectNext("3 - Normal - 4 Log - MyHarnessSetup");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
+        }
     }
 }

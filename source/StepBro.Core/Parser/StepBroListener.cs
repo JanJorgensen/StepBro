@@ -272,7 +272,7 @@ namespace StepBro.Core.Parser
                 }
             }
 
-            if (m_variableInitializer.IsConstant)
+            if (m_variableInitializer.IsConstant || m_variableInitializer.IsProcedureReference)
             {
                 if (m_override)
                 {

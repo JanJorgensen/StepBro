@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Data;
+using StepBro.Core.Execution;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +38,10 @@ namespace StepBro.Core.ScriptData
 
         protected override TypeReference GetDataType()
         {
+            if (m_defaultValue != null && m_defaultValue is IProcedureReference proc)
+            {
+                return proc.ProcedureData.DataType;
+            }
             return TypeReference.GetSimpleTypeReference(m_defaultValue.GetType());
         }
     }
