@@ -289,7 +289,52 @@ internal static class ExecutionHelperMethods
         return (value >= lower && value <= upper);
     }
 
-    public static IValueContainer<T> GetGlobalVariable<T>(IScriptCallContext context, int id)
+    public static T GetFileConstant<T>(IScriptCallContext context, int fileID, int id)
+    {
+        ScriptFile file = null;
+        if (fileID < 0)
+        {
+            file = (ScriptFile)context.Self.ParentFile;
+        }
+        else
+        {
+            file = ServiceManager.Global.Get<ILoadedFilesManager>().ListFiles<ScriptFile>().FirstOrDefault(f => f.UniqueID == fileID);
+        }
+        if (file != null)
+        {
+            var constantElement = file.ListElements().Where(e => e.UniqueID == id).FirstOrDefault().Cast<FileConstant>();
+            if (constantElement == null)
+            {
+                if (context != null)
+                {
+                    context.ReportError(String.Format("INTERNAL ERROR: Could not find constant with id = {0}.", id));
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            else
+            {
+                return (T)constantElement.Value;
+            }
+        }
+        else
+        {
+            if (context != null)
+            {
+                context.ReportError(String.Format("INTERNAL ERROR: Could not find script file with id = {0}.", fileID));
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        return default(T);
+    }
+
+    public static IValueContainer<T> GetFileVariable<T>(IScriptCallContext context, int id)
     {
         if (context == null)
         {
@@ -314,16 +359,16 @@ internal static class ExecutionHelperMethods
         return null;
     }
 
-    public static void SetGlobalVariable<T>(IScriptCallContext context, int id, T value)
+    public static void SetFileVariable<T>(IScriptCallContext context, int id, T value)
     {
         // GetGlobalVariable reports error if the variable can not be found
-        GetGlobalVariable<T>(context, id)?.SetValue(value);
+        GetFileVariable<T>(context, id)?.SetValue(value);
     }
 
     public static T UnaryOperatorGlobalVariable<T>(IScriptCallContext context, int id, int op, bool opOnLeft)
     {
         // GetGlobalVariable reports error if the variable can not be found
-        var variable = GetGlobalVariable<T>(context, id);
+        var variable = GetFileVariable<T>(context, id);
         if (variable != null)
         {
             // We save value before for opOnRight unary operations

@@ -102,7 +102,8 @@ fileVariable
     ;
 
 constType : CONST | CONFIG ;
-constVariable : elementModifier? constType variableType variableDeclaratorId ASSIGNMENT variableInitializer SEMICOLON ;
+constOverride : OVERRIDE ;
+constVariable : elementModifier? constOverride? constType variableType variableDeclaratorId ASSIGNMENT variableInitializer SEMICOLON ;
 
 ctorClassType : type ;
 

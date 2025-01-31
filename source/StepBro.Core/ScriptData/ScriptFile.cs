@@ -591,13 +591,13 @@ namespace StepBro.Core.ScriptData
             }
         }
 
-        public void UpdateConfigVariables()
-        {
-            foreach (var v in m_fileConfigVariables)
-            {
-                v.VariableOwnerAccess.SetValueOverride(true, null);
-            }
-        }
+        //public void UpdateConfigVariables()
+        //{
+        //    foreach (var v in m_fileConfigVariables)
+        //    {
+        //        v.VariableOwnerAccess.SetValueOverride(true, null);
+        //    }
+        //}
 
         public void InitializeFileVariables(ILogger logger)
         {

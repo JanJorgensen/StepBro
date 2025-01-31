@@ -39,6 +39,7 @@ namespace StepBro.Core.Parser
         protected Stack<SBExpressionData> m_testListEntryArguments = null;
         //private SBExpressionData m_overrideVariable = null;
         private SBExpressionData m_fileElementReference = null;
+        private bool m_override = false;
 
         public StepBroListener(ErrorCollector errorCollector)
         {
@@ -239,6 +240,12 @@ namespace StepBro.Core.Parser
 
         public override void EnterConstVariable([NotNull] SBP.ConstVariableContext context)
         {
+            m_override = false;
+        }
+
+        public override void ExitConstOverride([NotNull] SBP.ConstOverrideContext context)
+        {
+            m_override = true;
         }
 
         public override void ExitConstType([NotNull] SBP.ConstTypeContext context)
@@ -267,29 +274,75 @@ namespace StepBro.Core.Parser
 
             if (m_variableInitializer.IsConstant)
             {
-                if (m_elementType == FileElementType.Const)
+                if (m_override)
                 {
-                    m_file.AddElement(
-                        new FileConstant(
+                    var element = new FileConstant(
                             m_file,
                             m_fileElementModifier,
                             context.Start.Line,
                             m_currentNamespace,
                             m_variableName,
-                            m_variableInitializer.Value));
+                            @override: true,
+                            m_variableInitializer.Value);
+                    m_file.AddElement(element);
+
+                    if (element.ParseBaseElement())
+                    {
+                        if (element.BaseElement is FileConfigValue cfg)
+                        {
+                            cfg.VariableOwnerAccess.SetValueOverride((int)ValueOverridePriorityLevel.FileOverride, true, m_variableInitializer.Value);
+                        }
+                        else if (element.BaseElement is FileConstant constant)
+                        {
+                            constant.OverrideValue = m_variableInitializer.Value;
+                        }
+                        else
+                        {
+                            m_errors.SymanticError(
+                                context.Start.Line,
+                                context.Start.Column,
+                                false,
+                                $"Could not find base {((m_elementType == FileElementType.Const) ? "constant" : "config value")} to override.");
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        m_errors.SymanticError(
+                            context.Start.Line,
+                            context.Start.Column,
+                            false,
+                            $"Could not find base {((m_elementType == FileElementType.Const) ? "constant" : "config value")} to override.");
+                        return;
+                    }
+
                 }
-                else if (m_elementType == FileElementType.Config)
+                else
                 {
-                    var id = m_file.CreateOrGetConfigVariable(
-                        m_currentNamespace,
-                        m_fileElementModifier,
-                        m_variableName,
-                        type,
-                        m_lineFileElementAssociatedData,
-                        context.Start.Line,
-                        context.Start.Column,
-                        m_variableInitializer.Value);
-                    //m_file.SetFileVariableModifier(id, m_fileElementModifier);
+                    if (m_elementType == FileElementType.Const)
+                    {
+                        m_file.AddElement(
+                            new FileConstant(
+                                m_file,
+                                m_fileElementModifier,
+                                context.Start.Line,
+                                m_currentNamespace,
+                                m_variableName,
+                                @override: false,
+                                m_variableInitializer.Value));
+                    }
+                    else if (m_elementType == FileElementType.Config)
+                    {
+                        var id = m_file.CreateOrGetConfigVariable(
+                            m_currentNamespace,
+                            m_fileElementModifier,
+                            m_variableName,
+                            type,
+                            m_lineFileElementAssociatedData,
+                            context.Start.Line,
+                            context.Start.Column,
+                            m_variableInitializer.Value);
+                    }
                 }
             }
             else

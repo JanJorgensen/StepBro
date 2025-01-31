@@ -17,7 +17,8 @@ namespace StepBro.Core.Parser;
 
 internal partial class StepBroListener
 {
-    private static MethodInfo s_GetGlobalVariable = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetGlobalVariable));
+    private static MethodInfo s_GetFileConstant = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetFileConstant));
+    private static MethodInfo s_GetGlobalVariable = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetFileVariable));
     private static MethodInfo s_GetHostVariable = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetHostVariable));
     private static MethodInfo s_GetProcedure = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetProcedure));
     private static MethodInfo s_GetProcedureTyped = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetProcedureTyped));
@@ -551,10 +552,23 @@ internal partial class StepBroListener
             switch (element.ElementType)
             {
                 case FileElementType.Const:
-                    result = new SBExpressionData(
-                        SBExpressionType.Constant,
-                        element.DataType,
-                        Expression.Constant(((FileConstant)element).Value), ((FileConstant)element).Value);
+                    {
+                        var constantElement = element as FileConstant;
+                        var getConstantTyped = s_GetFileConstant.MakeGenericMethod(constantElement.DataType.Type);
+                        int fileID = (m_inFunctionScope && Object.ReferenceEquals(constantElement.ParentFile, m_file)) ? -1 : ((ScriptFile)constantElement.ParentFile).UniqueID;
+                        var context = (m_inFunctionScope) ? m_currentProcedure.ContextReferenceInternal : Expression.Constant(null, typeof(Execution.IScriptCallContext));
+
+                        result = new SBExpressionData(
+                            SBExpressionType.Expression,
+                            constantElement.DataType,
+                            Expression.Call(
+                                getConstantTyped,
+                                context,
+                                Expression.Constant(fileID),
+                                Expression.Constant(constantElement.UniqueID)),
+                            constantElement,                                                         // Make access to the file element, and thereby the declared type.
+                            instanceName: identifier.Name);
+                    }
                     break;
                 case FileElementType.Config:
                     {
