@@ -9,6 +9,7 @@ using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Api;
 using StepBro.Core.Execution;
+using StepBro.ToolBarCreator;
 
 namespace StepBroCoreTest.Parser
 {
@@ -212,6 +213,46 @@ namespace StepBroCoreTest.Parser
             var taskContext = ExecutionHelper.ExeContext();
             var result = taskContext.CallProcedure(procedure);
             //Assert.AreEqual(44L, result);
+        }
+
+        [TestMethod]
+        public void TestFileVariableOverride()
+        {
+            string f1 =
+                """
+                using StepBro.ToolBarCreator;
+                using "file2.sbs";
+                override toolbar
+                {
+                    Button ExtraFun: { Color: Red },
+                    Button NoFun : { Color: Green }
+                }
+                """;
+            string f2 =
+                """
+                using StepBro.ToolBarCreator;
+                ToolBar toolbar = ToolBar()
+                {
+                    Label title: "Aero Battery",
+                    Button Serious: { Color: Yellow }
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("file1.sbs", f1),
+                new Tuple<string, string>("file2.sbs", f2));
+
+            var variable = files[1].ListElements().First(p => p.Name == "toolbar") as FileVariable;
+            Assert.IsNotNull(variable);
+            var toolbar = variable.VariableOwnerAccess.Container.GetValue() as ToolBar;
+            Assert.IsNotNull(toolbar);
+            Assert.AreEqual("toolbar", toolbar.Name);
+            var elements = toolbar.Definition;
+            Assert.AreEqual(4, elements.Count);
+            Assert.AreEqual("title", elements[0].Name);
+            Assert.AreEqual("Serious", elements[1].Name);
+            Assert.AreEqual("ExtraFun", elements[2].Name);
+            Assert.AreEqual("NoFun", elements[3].Name);
         }
 
 
