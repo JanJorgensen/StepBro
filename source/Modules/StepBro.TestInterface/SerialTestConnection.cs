@@ -293,6 +293,7 @@ namespace StepBro.TestInterface
         private string m_nextResponse = null;
         private Dictionary<string, string> m_loopbackAnswers = null;
         private List<Tuple<string, string>> m_uiCommands = null;
+        private bool m_collectingSetupCommands = false;
         private List<string> m_setupCommands = null;
 
         private List<RemoteProcedureInfo> m_remoteProcedures = new List<RemoteProcedureInfo>();
@@ -474,33 +475,41 @@ namespace StepBro.TestInterface
 
         public IAsyncResult<object> SendCommand([Implicit] ICallContext context, string command, params object[] arguments)
         {
-            if (!m_stream.IsOpen)
+            if (m_collectingSetupCommands)
             {
-                context.Logger.LogError("Stream is not opened.");
-                return null;
+                this.AddSetupCommand(context, command, arguments);
+                return new AsyncResultCompletedDummy();
             }
-            if (AsyncLogFlushOnSendCommand && !NoFlushOnNextCommand)
+            else
             {
-                AsyncLog.Flush();
-            }
-            NoFlushOnNextCommand = false;
-
-            var commandParts = new List<string>();
-            commandParts.Add(command);
-            if (arguments != null && arguments.Length > 0)
-            {
-                foreach (var a in arguments)
+                if (!m_stream.IsOpen)
                 {
-                    commandParts.Add(ArgumentToCommandString(a));
+                    context.Logger.LogError("Stream is not opened.");
+                    return null;
                 }
+                if (AsyncLogFlushOnSendCommand && !NoFlushOnNextCommand)
+                {
+                    AsyncLog.Flush();
+                }
+                NoFlushOnNextCommand = false;
+
+                var commandParts = new List<string>();
+                commandParts.Add(command);
+                if (arguments != null && arguments.Length > 0)
+                {
+                    foreach (var a in arguments)
+                    {
+                        commandParts.Add(ArgumentToCommandString(a));
+                    }
+                }
+                var fullCommand = String.Join(" ", commandParts);
+                if (context != null && context.LoggingEnabled)
+                {
+                    context.Logger.Log("\"" + fullCommand + "\"");
+                }
+                var commandData = new CommandData(context?.Logger, fullCommand, this.CommandResponseTimeout, null);
+                return EnqueueCommand(commandData);
             }
-            var fullCommand = String.Join(" ", commandParts);
-            if (context != null && context.LoggingEnabled)
-            {
-                context.Logger.Log("\"" + fullCommand + "\"");
-            }
-            var commandData = new CommandData(context?.Logger, fullCommand, this.CommandResponseTimeout, null);
-            return EnqueueCommand(commandData);
         }
 
         public void SendDirect([Implicit] ICallContext context, string text)
@@ -523,6 +532,8 @@ namespace StepBro.TestInterface
             DoSendDirect(text);
         }
 
+        #region ITextCommandInput
+
         bool ITextCommandInput.Enabled
         {
             get { return true; }
@@ -543,10 +554,35 @@ namespace StepBro.TestInterface
             EnqueueCommand(commandData);
         }
 
-        #region Setup Commands
+        #endregion
+
+        #region Collecting Setup Commands
+
+        /// <summary>
+        /// Makes the normal <seealso cref="SendCommand"/> add the command to the setup commands, and not send the command directly.
+        /// </summary>
+        /// <param name="context"></param>
+        public void StartCollectingSetupCommands([Implicit] ICallContext context)
+        {
+            if (m_setupCommands != null)
+            {
+                if (m_setupCommands.Count > 0)
+                {
+                    context.Logger.Log($"Deleting the {m_setupCommands.Count} commands already collected.");
+                    m_setupCommands.Clear();
+                }
+                m_setupCommands = null;
+            }
+            m_collectingSetupCommands = true;
+            if (m_setupCommands == null)
+            {
+                m_setupCommands = new List<string>();
+            }
+        }
 
         public void ClearSetupCommands([Implicit] ICallContext context)
         {
+            m_collectingSetupCommands = false;
             if (context != null && context.LoggingEnabled)
             {
                 if (m_setupCommands == null || m_setupCommands.Count == 0)
@@ -562,6 +598,7 @@ namespace StepBro.TestInterface
             {
                 m_setupCommands.Clear();
             }
+            m_setupCommands = null;
         }
 
         public void AddSetupCommand([Implicit] ICallContext context, string command, params object[] arguments)
@@ -627,12 +664,23 @@ namespace StepBro.TestInterface
 
         public IAsyncResult SendSetupCommands([Implicit] ICallContext context)
         {
+            if (m_setupCommands == null ||  m_setupCommands.Count == 0)
+            {
+                context.Logger.LogError("No commands have been collected.");
+                return new AsyncResultCompletedDummy();
+            }
+
+            m_collectingSetupCommands = false;  // Stop now, then.
             IAsyncResult last = null;
             foreach (var command in m_setupCommands)
             {
                 var commandData = new CommandData((context != null && context.LoggingEnabled) ? context.Logger : null, command, this.CommandResponseTimeout, null);
                 last = EnqueueCommand(commandData);
             }
+
+            m_setupCommands.Clear();
+            m_setupCommands = null;
+
             return last;    // Return the last command to allow caller to wait until all commands have been executed.
         }
 
