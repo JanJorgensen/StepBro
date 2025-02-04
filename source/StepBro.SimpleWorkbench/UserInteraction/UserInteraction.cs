@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Api;
+using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Host;
 using System;
@@ -71,6 +72,14 @@ namespace StepBro.SimpleWorkbench
 
         public override UserResponse Open([Implicit] ICallContext context, TimeSpan timeout = default, UserResponse defaultAnswer = UserResponse.OK)
         {
+            string interactionText = String.IsNullOrEmpty(this.HeaderText) ? "User interaction" : $"User interaction \"{this.HeaderText}\"";
+            string timeoutText = "";
+            if (timeout != default(TimeSpan))
+            {
+                timeoutText = "Timeout: " + StringUtils.ObjectToString(timeout) + ".";
+            }
+            context.Logger.Log($"{interactionText}. {timeoutText}");
+
             m_defaultUserResponse = defaultAnswer;
             var userResponse = defaultAnswer;
 
@@ -96,8 +105,6 @@ namespace StepBro.SimpleWorkbench
                 }
             }
 
-            string interactionText = String.IsNullOrEmpty(this.HeaderText) ? "User interaction" : $"User interaction \"{this.HeaderText}\"";
-
             if (m_userClose)
             {
                 userResponse = m_userResponse;
@@ -109,7 +116,7 @@ namespace StepBro.SimpleWorkbench
             }
             else  // Timeout
             {
-                context.Logger.LogUserAction($"{interactionText}. Timeout; '{m_userResponse}' selected.");
+                context.Logger.LogUserAction($"{interactionText}. Timeout; '{userResponse}' selected.");
             }
 
             this.OnClose?.Invoke(this, new EventArgs());
