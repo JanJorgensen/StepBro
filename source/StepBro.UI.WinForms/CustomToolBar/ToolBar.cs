@@ -131,6 +131,13 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
                 var menuTitle = new ValueString<IMenu>("Text", "Title", Doc(""), (m, v) => { m.SetTitle(v.ValueAsString()); return null; });
 
+                var menuSeparator = new Flag<IMenuItemHost>("Separator", Usage.Element, Doc("A separator line between the previous and the succeeding menu item."), (m, f) =>
+                {
+                    var separator = new Separator("Separator");
+                    m.Add(separator);
+                    return null;
+                });
+
                 var subMenu = new Block<ToolStripDropDownMenu, ToolStripMenuSubMenu>(
                     "SubMenu", "Menu",
                     Doc("A sub-menu for a drop-down menu or another sub-menu."),
@@ -143,7 +150,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                         return menu;
                     });
                 subMenu.SetChilds(
-                    menuTitle, subMenu, button,
+                    menuTitle, subMenu, button, menuSeparator,
                     new ValueString<ToolStripMenuSubMenu>("Instance", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Instance", v.ValueAsString()); return null; }),
                     new ValueString<ToolStripMenuSubMenu>("Procedure", "Element", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Element", v.ValueAsString()); return null; }),
                     new ValueString<ToolStripMenuSubMenu>("Partner", "Model", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Partner", v.ValueAsString()); return null; }),
@@ -161,7 +168,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                         return menu;
                     });
                 toolbarMenu.SetChilds(
-                    menuTitle, subMenu, button, textbox,
+                    menuTitle, subMenu, button, textbox, menuSeparator,
                     new ValueString<ToolStripDropDownMenu>("Instance", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Instance", v.ValueAsString()); return null; }),
                     new ValueString<ToolStripDropDownMenu>("Procedure", "Element", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Element", v.ValueAsString()); return null; }),
                     new ValueString<ToolStripDropDownMenu>("Partner", "Model", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Partner", v.ValueAsString()); return null; }),
@@ -392,7 +399,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
-        public void Add(ToolStripMenuItem item)
+        public void Add(ToolStripItem item)
         {
             this.Items.Add(item);
         }
