@@ -15,7 +15,7 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <Platforms>AnyCPU</Platforms>
-    <Version>1.0.9</Version>
+    <Version>1.1.0</Version>
     <Company>SchmutStein</Company>
     <Configurations>Debug;Release;DebugAll;ReleaseAll</Configurations>
   </PropertyGroup>
