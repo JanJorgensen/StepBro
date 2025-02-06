@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace StepBro.Core.Data
 {
     [Public]
-    public class CRC
+    public static class CRC
     {
         public static ushort CalculateCrc16CcittFalse(ByteArray data, int length = -1, ushort initialCrc = 0xFFFF)
         {
@@ -60,5 +60,22 @@ namespace StepBro.Core.Data
 
             return crc;
         }
+
+        public static uint CombineHashCodes(uint h1, uint h2)
+        {
+            return (((h1 << 5) + h1) ^ h2);
+        }
+
+        public static uint GetStringHash(string input)
+        {
+            uint hash = 8376231;
+            foreach (char ch in input)
+            {
+                hash = ((((uint)ch << 5) + (uint)ch) ^ hash);
+            }
+            return hash;
+        }
+
+
     }
 }

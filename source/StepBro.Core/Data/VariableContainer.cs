@@ -24,6 +24,7 @@ namespace StepBro.Core.Data
         int FileLine { get; set; }
         int FileColumn { get; set; }
         int CodeHash { get; set; }
+        int DataHash { get; set; }
         Dictionary<string, object> Tags { get; set; }
     }
 
@@ -87,6 +88,7 @@ namespace StepBro.Core.Data
             public int FileLine { get; set; }
             public int FileColumn { get; set; }
             public int CodeHash { get; set; }
+            public int DataHash { get; set; } = 0;
             public Dictionary<string, object> Tags { get; set; } = null;
 
             public bool IsStillValid { get { return disposedValue == false; } }

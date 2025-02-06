@@ -603,7 +603,12 @@ namespace StepBro.Core.ScriptData
         {
             foreach (var v in m_fileScopeVariables)
             {
-                bool doInit = !v.VariableOwnerAccess.DataCreated || v.VariableOwnerAccess.InitNeeded;
+                var data = GetFileVariableAllData(v);
+                var dataHash = (data != null) ? data.GetHashCode() : 0;
+                var existingHash = v.VariableOwnerAccess.DataHash;
+                v.VariableOwnerAccess.DataHash = dataHash;  // Save it.
+
+                bool doInit = !v.VariableOwnerAccess.DataCreated || v.VariableOwnerAccess.InitNeeded || (dataHash != existingHash);
                 if (!v.VariableOwnerAccess.DataCreated)
                 {
 #if DEBUG
@@ -723,7 +728,7 @@ namespace StepBro.Core.ScriptData
             m_elements.Add(function);
         }
 
-        public IEnumerable<IFileElement> ListElements()
+        public IEnumerable<IFileElement> ListElements(bool includeExternal = false)
         {
             foreach (var e in m_fileConfigVariables)
             {
@@ -736,6 +741,17 @@ namespace StepBro.Core.ScriptData
             foreach (var e in m_elements)
             {
                 yield return e;
+            }
+
+            if (includeExternal)
+            {
+                foreach (var fu in this.ListResolvedFileUsings())
+                {
+                    foreach (var element in fu.ListPublicElements(m_namespace))
+                    {
+                        yield return element;
+                    }
+                }
             }
         }
 

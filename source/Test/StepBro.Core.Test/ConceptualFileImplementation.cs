@@ -88,7 +88,7 @@ namespace StepBroCoreTest
             throw new NotImplementedException();
         }
 
-        public IEnumerable<IFileElement> ListElements()
+        public IEnumerable<IFileElement> ListElements(bool includeExternal = false)
         {
             throw new NotImplementedException();
         }

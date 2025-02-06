@@ -28,6 +28,16 @@ namespace StepBro.Core.Data
             m_children.AddRange(children);
         }
 
+        protected override uint GetValueHashCode()
+        {
+            uint hash = 8376299;
+            foreach (PropertyBlockEntry child in m_children)
+            {
+                hash = CRC.CombineHashCodes(hash, (uint)child.GetHashCode());
+            }
+            return hash;
+        }
+
         public void AddRange(IEnumerable<PropertyBlockEntry> children)
         {
             m_children.AddRange(children);
