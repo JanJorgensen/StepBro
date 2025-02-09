@@ -2047,10 +2047,11 @@ namespace StepBro.SimpleWorkbench
 
             foreach (var v in objects)
             {
+                var homeFile = files.FirstOrDefault(f => f.ListObjectContainers().Any(oc => Object.ReferenceEquals(oc, v)));    // Try to find home scriptfile.
                 if (v.Object is StepBro.ToolBarCreator.ToolBar)
                 {
                     var toolbar = v.Object as StepBro.ToolBarCreator.ToolBar;
-                    panelCustomToolstrips.AddOrSet(v.FullName, toolbar, toolStripMain.Height);  // The height of the main toolbar is adjusted to the display scale factor.
+                    panelCustomToolstrips.AddOrSet(homeFile, v.FullName, toolbar, toolStripMain.Height);  // The height of the main toolbar is adjusted to the display scale factor.
                 }
                 else if (v.Object is StepBro.PanelCreator.Panel)
                 {
@@ -2209,7 +2210,7 @@ namespace StepBro.SimpleWorkbench
                         }
                         else
                         {
-                            //ConsoleWriteErrorLine($"Error: File element named '{targetElement} was not found.");
+                            //ConsoleWriteErrorLine($"Error: File element named '{targetElement}' was not found.");
                         }
 
                         state = ScriptExecutionState.Running;

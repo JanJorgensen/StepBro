@@ -120,7 +120,8 @@ namespace StepBro.Core.ScriptData
                     // Assume not the same element.
                     System.Diagnostics.Debug.Assert(!object.ReferenceEquals(value, this));
                     // Assume not both override elements or elements are from different files.
-                    System.Diagnostics.Debug.Assert(this.ElementType != FileElementType.Override || value.ElementType != FileElementType.Override || !Object.ReferenceEquals(m_parentFile, value.ParentFile));
+                    var oneIsNotOverride = this.ElementType != FileElementType.Override || value.ElementType != FileElementType.Override;
+                    System.Diagnostics.Debug.Assert(oneIsNotOverride || !Object.ReferenceEquals(m_parentFile, value.ParentFile));
                     m_baseElement = value;
                 }
             }
@@ -289,12 +290,12 @@ namespace StepBro.Core.ScriptData
             {
                 var file = m_parentFile as ScriptFile;
 
-                bool allowOverrideElements = false;
+                bool allowOverrideElements = false;     // TODO: Should this be removed or actually used again?
                 switch (this.ElementType)
                 {
                     case FileElementType.Override:
                     case FileElementType.ConstOverride:
-                        allowOverrideElements = true;
+                        //allowOverrideElements = true;
                         break;
                     case FileElementType.Using:
                     case FileElementType.Namespace:

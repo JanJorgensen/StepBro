@@ -194,7 +194,7 @@ namespace StepBro.Core.General
                 }
 
                 var config = new FolderConfiguration(currentPath);
-                m_decoder.DecodeData(data, config, errors);
+                m_decoder.DecodeData(null, data, config, errors);
                 return config;
             }
         }

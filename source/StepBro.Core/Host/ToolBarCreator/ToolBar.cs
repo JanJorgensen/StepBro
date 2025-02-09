@@ -5,7 +5,10 @@ using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using static StepBro.Core.Data.PropertyBlockDecoder;
+using static StepBro.Core.Parser.StepBroTypeScanListener;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace StepBro.ToolBarCreator
 {
@@ -17,7 +20,7 @@ namespace StepBro.ToolBarCreator
         private PropertyBlock m_definition = null;
         private IToolBarElement m_toolbarElement = null;
 
-        private class DefaultScanner : IPropertyBlockDataScanner
+        internal class DefaultScanner : IPropertyBlockDataScanner
         {
             private static Block<object, object> m_decoder;
 
@@ -26,63 +29,92 @@ namespace StepBro.ToolBarCreator
                 m_decoder = CreateDecoder();
             }
 
-            public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+            public void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors)
             {
-                ToolBar.DefaultPreScanData(data, errors);
+                ToolBar.DefaultPreScanData(file, data, errors);
             }
             public PropertyBlockDecoder.Element TryGetDecoder()
             {
                 return m_decoder;
             }
 
+            public static readonly ValueString<object> FieldColor = new ValueString<object>("Color", Doc(""));
+            public static readonly ValueInt<object> FieldIndex = new ValueInt<object>("Index", Doc(""));
+            public static readonly ValueString<object> FieldText = new ValueString<object>("Text", Doc(""));
+            public static readonly ValueString<object> FieldInstance = new ValueString<object>("Instance", "Object", Doc(""));
+            public static readonly ValueString<object> FieldFileElement = new ValueString<object>("Procedure", "Element", Doc(""));
+            public static readonly ValueInt<object> FieldMaxWidth = new ValueInt<object>("MaxWidth", Doc(""));
+            public static readonly ValueString<object> FieldWidthGroup = new ValueString<object>("WidthGroup", Doc(""));
+            public static readonly Flag<object> FieldSeparatorFlag = new Flag<object>("Separator", Usage.Element, Doc(""));
+            public static readonly Block<object, object> FieldSeparatorBlock = new Block<object, object>("Separator", Doc(""), FieldIndex);
+
+            private static Block<object, object> s_button = null;
+            public static Block<object, object> GetButton()
+            {
+                if (s_button == null)
+                {
+                    s_button = new Block<object, object>("Button", Doc(""),
+                        FieldColor, FieldIndex, FieldText, FieldInstance, FieldFileElement, FieldMaxWidth, FieldWidthGroup,
+                        new ValueString<object>("Partner", Doc("")),
+                        new Value<object>("Arg", "Argument", Usage.Setting, Doc("")),
+                        new Array<object>("Args", "Arguments", Usage.Setting, Doc("")),
+                        new Flag<object>("Stoppable", Doc("")),
+                        new Flag<object>("StopOnButtonRelease", Doc("")),
+                        new ValueString<object>("Command", Doc("")),
+                        new Flag<object>("CheckOnClick", Doc("")),
+                        new Flag<object>("CheckArg", Doc("")),
+                        new ValueString<object>("CheckedText", Doc("")),
+                        new ValueString<object>("UncheckedText", Doc("")),
+                        new ValueString<object>("EnabledSource", Doc("")),
+                        new ValueString<object>("DisabledSource", Doc(""))
+                        );
+                }
+                return s_button;
+            }
+            private static Block<object, object> s_textbox = null;
+            public static Block<object, object> GetTextBox()
+            {
+                if (s_textbox == null)
+                {
+                    s_textbox = new Block<object, object>("TextBox", Doc(""),
+                        FieldColor, FieldIndex, FieldText, FieldInstance, FieldMaxWidth, FieldWidthGroup,
+                        new Flag<object>("ReadOnly", Doc("")),
+                        new Flag<object>("RightAligned", Doc("")),
+                        new ValueString<object>("Property", Doc("")),
+                        new ValueString<object>("ProcedureOutput", Doc("")),
+                        new ValueString<object>("EnabledSource", Doc("")),
+                        new ValueString<object>("DisabledSource", Doc(""))
+                        );
+                }
+                return s_textbox;
+            }
+
+            private static Block<object, object> s_menu = null;
+            public static Block<object, object> GetMenu()
+            {
+                if (s_menu == null)
+                {
+                    s_menu = new Block<object, object>("Menu", Doc(""));
+                    s_menu.SetChilds(FieldIndex, FieldInstance, s_menu, GetButton());
+                }
+                return s_menu;
+            }
+
+
             private static Block<object, object> CreateDecoder()
             {
-                var color = new ValueString<object>("Color", Doc(""));
-                var text = new ValueString<object>("Text", Doc(""));
-                var maxWidth = new ValueInt<object>("MaxWidth", Doc(""));
-                var widthGroup = new ValueInt<object>("WidthGroup", Doc(""));
-                var instance = new ValueString<object>("Instance", "Object", Doc(""));
-                var fileElement = new ValueString<object>("Procedure", "Element", Doc(""));
-
-                var button = new Block<object, object>("Button", Doc(""),
-                    color, text, instance, fileElement, maxWidth, widthGroup,
-                    new ValueString<object>("Partner", Doc("")),
-                    new Value<object>("Arg", "Argument", Usage.Setting, Doc("")),
-                    new Array<object>("Args", "Arguments", Usage.Setting, Doc("")),
-                    new Flag<object>("Stoppable", Doc("")),
-                    new Flag<object>("StopOnButtonRelease", Doc("")),
-                    new ValueString<object>("Command", Doc("")),
-                    new Flag<object>("CheckOnClick", Doc("")),
-                    new Flag<object>("CheckArg", Doc("")),
-                    new ValueString<object>("CheckedText", Doc("")),
-                    new ValueString<object>("UncheckedText", Doc("")),
-                    new ValueString<object>("EnabledSource", Doc("")),
-                    new ValueString<object>("DisabledSource", Doc(""))
-                    );
-
-                var textbox = new Block<object, object>("TextBox", Doc(""),
-                    color, text, instance, maxWidth, widthGroup,
-                    new Flag<object>("ReadOnly", Doc("")),
-                    new Flag<object>("RightAligned", Doc("")),
-                    new ValueString<object>("Property", Doc("")),
-                    new ValueString<object>("ProcedureOutput", Doc("")),
-                    new ValueString<object>("EnabledSource", Doc("")),
-                    new ValueString<object>("DisabledSource", Doc(""))
-                    );
-
-                var menu = new Block<object, object>("Menu", Doc(""));
-                menu.SetChilds(menu, button, instance);
-
                 return new Block<object, object>
                     (
                         nameof(ToolBar),
                         Doc(""),
                         new ValueString<object>("Label", Doc("")),
-                        color,
-                        new ValueInt<object>("Index", Doc("")),
-                        new Flag<object>("Separator", Usage.Element, Doc("")),
+                        FieldColor,
+                        FieldIndex,
+                        FieldSeparatorFlag,
+                        FieldSeparatorBlock,
                         new Flag<object>("ColumnSeparator", Usage.Element, Doc("")),
-                        menu, button, textbox, instance
+                        FieldInstance,
+                        GetMenu(), GetButton(), GetTextBox()
                     );
             }
         }
@@ -108,21 +140,11 @@ namespace StepBro.ToolBarCreator
             }
         }
 
-        public static string[] ToolbarElementTypes()
-        {
-            return new string[] { "ProcedureActivationButton", "ObjectCommandButton", "Menu", "ColumnSeparator", "Label" };
-        }
-
-        public static string[] ToolbarPropertiesAndFlags()
-        {
-            return new string[] { "Color" };
-        }
-
         public static IPropertyBlockDataScanner PreScanner { get { return g_scanner; } set { g_scanner = value; } }
 
-        public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+        public void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors)
         {
-            g_scanner.PreScanData(data, errors);
+            g_scanner.PreScanData(file, data, errors);
         }
 
         public PropertyBlockDecoder.Element TryGetDecoder()
@@ -130,9 +152,9 @@ namespace StepBro.ToolBarCreator
             return g_scanner.TryGetDecoder();
         }
 
-        private static void DefaultPreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+        private static void DefaultPreScanData(object context, PropertyBlock data, List<Tuple<int, string>> errors)
         {
-            ((Block<object, object>)g_scanner.TryGetDecoder()).DecodeData(data, null, errors);
+            ((Block<object, object>)g_scanner.TryGetDecoder()).DecodeData(context, data, null, errors);
         }
 
         public void Setup(IScriptFile file, ILogger logger, PropertyBlock data)

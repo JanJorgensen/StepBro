@@ -20,7 +20,7 @@ namespace StepBro.UI.WinForms
                 m_setter = setter;
             }
 
-            protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
+            protected override void TryCreateOrSet(object context, PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
             {
                 if (m_setter == null) return;
                 var valueEntry = entry as PropertyBlockValue;

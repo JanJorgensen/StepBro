@@ -3,6 +3,7 @@ using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
+using StepBro.Core.ScriptData;
 using StepBro.ToolBarCreator;
 using System.ComponentModel;
 using static StepBro.Core.Data.PropertyBlockDecoder;
@@ -16,7 +17,8 @@ namespace StepBro.UI.WinForms.CustomToolBar
         bool m_colorSet = false;
         bool m_settingDefaultColor = false;
         int m_index = 1000;
-        private static Scanner m_decoder = null;
+        private static ToolbarScanner m_toolbarDecoder = null;
+        private static ToolbarMenuScanner m_menuDecoder = null;
         private Dictionary<string, object> m_commonChildFields = null;
         private static bool m_adjustingSizes = false;
         private static bool g_scannerIsSetup = false;
@@ -33,8 +35,10 @@ namespace StepBro.UI.WinForms.CustomToolBar
         {
             if (!g_scannerIsSetup)
             {
-                m_decoder = new Scanner();
-                StepBro.ToolBarCreator.ToolBar.PreScanner = m_decoder;
+                m_toolbarDecoder = new ToolbarScanner();
+                m_menuDecoder = new ToolbarMenuScanner();
+                StepBro.ToolBarCreator.ToolBar.PreScanner = m_toolbarDecoder;
+                StepBro.ToolBarCreator.ToolBarMenu.PreScanner = m_menuDecoder;
                 g_scannerIsSetup = true;
             }
         }
@@ -49,27 +53,35 @@ namespace StepBro.UI.WinForms.CustomToolBar
             m_coreAccess = coreAccess;
         }
 
-        public void Setup(ILogger logger, string name, PropertyBlock definition)
+        public void Setup(ILogger logger, IScriptFile homeDefinition, string name, PropertyBlock definition)
         {
             this.Text = name.Split(".").Last();
             this.Name = name;
             this.Tag = name;
-            this.Setup(logger, definition);
+            this.Setup(logger, homeDefinition, definition);
         }
 
-        private class Scanner : IPropertyBlockDataScanner
+        private class ToolbarScanner : IPropertyBlockDataScanner
         {
-            public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+            public void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors)
             {
                 var toolbarToDispose = new ToolBar();
-                ((Block<object, ToolBar>)m_decoder.TryGetDecoder()).DecodeData(data, toolbarToDispose, errors);
+                ((Block<object, ToolBar>)m_toolbarDecoder.TryGetDecoder()).DecodeData(file, data, toolbarToDispose, errors);
             }
 
-            private const string MenuInstanceHelp = "The default script object to be used by child menu elements.";
+            //private const string MenuInstanceHelp = "The default script object to be used by child menu elements.";
+
+            public static Block<ToolStripDropDownMenu, ToolStripMenuSubMenu> s_menu = null;
 
             public Element TryGetDecoder()
             {
+                var index = new ValueInt<ToolStripMenuItem>(
+                    "Index",
+                    Doc("The relative display order index of the item.<br/>The items with the lowest index will be shown first."),
+                    (t, v) => { t.MergeIndex = Convert.ToInt32(v.Value); return null; });
+
                 var buttonElements = new Element[] {
+                    index,
                     new ValueColor<Button>("Color", Doc("The button color."), (b, c) => { b.BackColor = c; return null; }),
                     new ValueString<Button>("Text", Doc("The text shown on the button."), (b, v) => { b.Text = v.ValueAsString(); return null; }),
                     new ValueInt<Button>("MaxWidth", Doc("The maximum width of the button."), (b, v) => { b.MaxWidth = (int)(long)v.Value; b.AutoSize = false; return null; }),
@@ -103,6 +115,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     buttonElements);
 
                 var textboxElements = new Element[] {
+                    index,
                     new ValueColor<TextBox>("Color", Doc("Blah blah blah"), (t, c) => { t.BackColor = c; return null; }),
                     new ValueString<TextBox>("Text", Doc("Blah blah blah"), (t, v) => { t.Text = v.ValueAsString(); return null; }),
                     new ValueInt<TextBox>("MaxWidth", Doc("Blah blah blah"), (t, v) => { t.MaxWidth = (int)(long)v.Value; t.AutoSize = false; return null; }),
@@ -138,7 +151,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                     return null;
                 });
 
-                var subMenu = new Block<ToolStripDropDownMenu, ToolStripMenuSubMenu>(
+                s_menu = new Block<ToolStripDropDownMenu, ToolStripMenuSubMenu>(
                     "SubMenu", "Menu",
                     Doc("A sub-menu for a drop-down menu or another sub-menu."),
                     (m, n) =>
@@ -149,14 +162,14 @@ namespace StepBro.UI.WinForms.CustomToolBar
                         menu.AutoSize = true;
                         return menu;
                     });
-                subMenu.SetChilds(
-                    menuTitle, subMenu, button, menuSeparator,
+                s_menu.SetChilds(
+                    index, menuTitle, s_menu, button, menuSeparator,
                     new ValueString<ToolStripMenuSubMenu>("Instance", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Instance", v.ValueAsString()); return null; }),
                     new ValueString<ToolStripMenuSubMenu>("Procedure", "Element", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Element", v.ValueAsString()); return null; }),
                     new ValueString<ToolStripMenuSubMenu>("Partner", "Model", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Partner", v.ValueAsString()); return null; }),
                     new ValueString<ToolStripMenuSubMenu>("Command", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Command", v.ValueAsString()); return null; }));
 
-                var toolbarMenu = new Block<ToolBar, ToolStripDropDownMenu>(
+                var toolbarMenu = new Block<ToolBar, ToolStripDropDownMenu, StepBro.ToolBarCreator.ToolBarMenu>(
                     "Menu", "DropDownMenu",
                     Doc("A drop-down menu that can contain different kinds of entries."),
                     (t, n) =>
@@ -168,7 +181,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                         return menu;
                     });
                 toolbarMenu.SetChilds(
-                    menuTitle, subMenu, button, textbox, menuSeparator,
+                    index, menuTitle, s_menu, button, textbox, menuSeparator,
                     new ValueString<ToolStripDropDownMenu>("Instance", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Instance", v.ValueAsString()); return null; }),
                     new ValueString<ToolStripDropDownMenu>("Procedure", "Element", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Element", v.ValueAsString()); return null; }),
                     new ValueString<ToolStripDropDownMenu>("Partner", "Model", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Partner", v.ValueAsString()); return null; }),
@@ -196,7 +209,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                         }),
                         new ValueColor<ToolBar>("Color", Doc("The color of the toolbar and the default color of all the elements."), (t, c) => { t.BackColor = c; return null; }),
                         new ValueInt<ToolBar>(
-                            "Index", 
+                            "Index",
                             Doc("The relative display order index of the toolbar.<br/>The toolbar will be shown below toolbars with a lower index."),
                             (t, v) => { t.Index = Convert.ToInt32(v.Value); return null; }),
                         new Flag<ToolBar>("Separator", Usage.Element, Doc("A separator line between the previous and the succeeding elements of the toolbar."), (t, f) =>
@@ -220,6 +233,20 @@ namespace StepBro.UI.WinForms.CustomToolBar
                         new ValueString<ToolBar>("Instance", Doc("Blah blah blah"), (t, v) => { t.SetChildProperty("Instance", v.ValueAsString()); return null; }),
                         toolbarMenu, button, textbox
                     );
+            }
+        }
+
+        private class ToolbarMenuScanner : IPropertyBlockDataScanner
+        {
+            public void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors)
+            {
+                var toolbarToDispose = new ToolBar();
+                ((Block<object, ToolBar>)m_toolbarDecoder.TryGetDecoder()).DecodeData(file, data, toolbarToDispose, errors);
+            }
+            public Element TryGetDecoder()
+            {
+                m_toolbarDecoder.TryGetDecoder();   // Call this, to make sure the scanner is created.
+                return ToolbarScanner.s_menu;
             }
         }
 
@@ -379,11 +406,11 @@ namespace StepBro.UI.WinForms.CustomToolBar
         }
         public ICoreAccess Core { get { return m_coreAccess; } }
 
-        public void Setup(ILogger logger, PropertyBlock definition)
+        public void Setup(ILogger logger, IScriptFile homeDefinition, PropertyBlock definition)
         {
             this.Items.Clear();
             var errors = new List<Tuple<int, string>>();
-            ((Block<object, ToolBar>)m_decoder.TryGetDecoder()).DecodeData(definition, this, errors);
+            ((Block<object, ToolBar>)m_toolbarDecoder.TryGetDecoder()).DecodeData(homeDefinition, definition, this, errors);
 
             foreach (var error in errors)
             {

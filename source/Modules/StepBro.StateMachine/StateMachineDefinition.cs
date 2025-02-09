@@ -59,11 +59,11 @@ namespace StepBro.StateMachine
 
         #region Parsing and Setup
 
-        public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+        public void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors)
         {
             var root = this.TryGetDecoder();
             var definitionToDispose = new StateMachineDefinition();
-            ((Block<object, StateMachineDefinition>)root).DecodeData(data, definitionToDispose, errors);
+            ((Block<object, StateMachineDefinition>)root).DecodeData(file, data, definitionToDispose, errors);
         }
 
         public PropertyBlockDecoder.Element TryGetDecoder()
@@ -184,7 +184,7 @@ namespace StepBro.StateMachine
             m_decoder = (Block<object, StateMachineDefinition>)this.TryGetDecoder();
 
             var errors = new List<Tuple<int, string>>();
-            m_decoder.DecodeData(data, this, errors);
+            m_decoder.DecodeData(file, data, this, errors);
 
             if (errors.Count > 0)
             {

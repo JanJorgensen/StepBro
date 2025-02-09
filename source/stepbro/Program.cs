@@ -846,7 +846,7 @@ namespace StepBro.Cmd
                                     }
                                     else
                                     {
-                                        ConsoleWriteErrorLine($"Error: File element named '{targetElement} was not found.");
+                                        ConsoleWriteErrorLine($"Error: File element named '{targetElement}' was not found.");
                                     }
                                 }
 

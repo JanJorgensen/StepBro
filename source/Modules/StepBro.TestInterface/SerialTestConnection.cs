@@ -1047,7 +1047,7 @@ namespace StepBro.TestInterface
             //m_remoteProcedures.Add(new RemoteProcedureInfo("Apples", 25, "List of names.", typeof(List<string>)));
         }
 
-        public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+        public void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors)
         {
         }
 
