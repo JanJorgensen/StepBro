@@ -1137,10 +1137,10 @@ internal static class ExecutionHelperMethods
             location = location + "." + locationFixed;
         }
         var newContext = new CallContext(
-            (ScriptCallContext)context,
+            context,
             CallEntry.Subsequent,
             false,
-            ((ScriptCallContext)context).GetDynamicLogLocation() + " " + location);  // TODO: set the last two arguments.
+            context.GetLogLocation() + " " + location);  // TODO: set the last two arguments.
         return newContext;
     }
 }

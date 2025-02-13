@@ -173,6 +173,8 @@ namespace StepBro.Core.Execution
             return m_currentLogLocation;
         }
 
+        public string GetLogLocation() => GetDynamicLogLocation();
+
         public void SetErrorListener(RuntimeErrorListener listener)
         {
             m_errorListener = listener;

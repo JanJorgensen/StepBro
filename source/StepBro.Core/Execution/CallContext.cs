@@ -13,23 +13,33 @@ namespace StepBro.Core.Execution
 {
     internal class CallContext : ICallContext
     {
-        private ScriptCallContext m_parentScriptContext;
+        private IScriptCallContext m_parentScriptContext;
         private ICallContext m_parentContext;
         private ILoggerScope m_logger;
         private CallContext m_childContext = null;
         private CallEntry m_callEntry;
         private bool m_break;
 
-        public CallContext(CallContext parent, string location)
+        private static IScriptCallContext GetParentScriptContext(ICallContext context)
         {
-            m_parentScriptContext = parent.m_parentScriptContext;
+            if (context != null)
+            {
+                if (context is ScriptCallContext scriptCallContext) return scriptCallContext;
+                if (context is CallContext callContext) return callContext.m_parentScriptContext;
+            }
+            return null;
+        }
+
+        public CallContext(ICallContext parent, string location)
+        {
+            m_parentScriptContext = GetParentScriptContext(parent);
             m_parentContext = parent;
-            m_logger = parent.m_logger.CreateSubLocation(location);
+            m_logger = parent.Logger.CreateSubLocation(location);
             m_callEntry = parent.CurrentCallEntry;
             m_break = false;
         }
 
-        public CallContext(ScriptCallContext parent, CallEntry callEntry, bool breakSet, string location)
+        public CallContext(IScriptCallContext parent, CallEntry callEntry, bool breakSet, string location)
         {
             m_parentScriptContext = parent;
             m_parentContext = parent;

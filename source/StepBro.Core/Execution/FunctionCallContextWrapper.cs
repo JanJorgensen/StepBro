@@ -119,6 +119,11 @@ namespace StepBro.Core.Execution
             }
         }
 
+        public string GetLogLocation()
+        {
+            return m_context.GetLogLocation();
+        }
+
         public IFileProcedure Self
         {
             get

@@ -34,6 +34,7 @@ namespace StepBro.Core.Execution
         void Log(string text);
         void LogDetail(string text);
         void LogError(string text);
+        string GetLogLocation();
 
         ILoadedFilesManager LoadedFiles { get; }
 
