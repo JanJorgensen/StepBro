@@ -278,7 +278,7 @@ namespace StepBro.ToolBarCreator
             // else, just ignore.
         }
 
-        public void DumpPanelElements([Implicit] ICallContext context)
+        public void DumpElements([Implicit] ICallContext context)
         {
             if (m_toolbarElement != null)
             {
