@@ -7,19 +7,60 @@ on:
     branches: [ "master" ]
 
 jobs:
-  unit_test:
+  unit_test_windows:
     strategy:
       matrix:
         configuration: [Debug, Release]
-        os: [ubuntu-latest, windows-latest]
 
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     
     env:
       Solution_Name: source/StepBro.sln
       Test_Project_Path: source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
   
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        
+    # Install the .NET Core workload
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Install dependencies
+      run: dotnet restore source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
+      
+    - name: Build
+      run: dotnet build source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj -c ${{ matrix.configuration }}
+
+    # Execute all unit tests in the solution
+    - name: Execute unit tests
+      run: dotnet test source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
+
+    - name: Install dependencies
+      run: dotnet restore source/Test/StepBro.HostSupport.Test/StepBro.HostSupport.Test.csproj
+      
+    - name: Build
+      run: dotnet build source/Test/StepBro.HostSupport.Test/StepBro.HostSupport.Test.csproj -c ${{ matrix.configuration }}
+
+    # Execute all unit tests in the solution
+    - name: Execute unit tests
+      run: dotnet test source/Test/StepBro.HostSupport.Test/StepBro.HostSupport.Test.csproj
   
+  
+  unit_test_ubuntu:
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+
+    runs-on: ubuntu-latest
+    
+    env:
+      Solution_Name: source/StepBro.sln
+      Test_Project_Path: source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
   
     steps:
     - name: Checkout
@@ -43,7 +84,15 @@ jobs:
     - name: Execute unit tests
       run: dotnet test source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
   
-  
+    - name: Install dependencies
+      run: dotnet restore source/Test/StepBro.HostSupport.Test/StepBro.HostSupport.Test.csproj
+      
+    - name: Build
+      run: dotnet build source/Test/StepBro.HostSupport.Test/StepBro.HostSupport.Test.csproj -c ${{ matrix.configuration }}
+
+    # Execute all unit tests in the solution
+    - name: Execute unit tests
+      run: dotnet test source/Test/StepBro.HostSupport.Test/StepBro.HostSupport.Test.csproj
   
   
   
