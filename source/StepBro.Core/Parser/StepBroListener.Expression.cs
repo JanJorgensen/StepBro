@@ -374,8 +374,6 @@ namespace StepBro.Core.Parser
                 }
                 else if (output.IsOverrideElement)
                 {
-                    System.Diagnostics.Debug.WriteLine("OVERRIDE!");
-
                     var overrider = (FileElementOverride)(output.Value);
                     var rootElement = IdentifierToExpressionData(overrider.GetRootBaseElement(), output.Token);
                     if (overrider.HasTypeOverride)
