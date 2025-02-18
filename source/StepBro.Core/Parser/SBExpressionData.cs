@@ -312,6 +312,8 @@ namespace StepBro.Core.Parser
         public bool IsAwaitExpression { get { return ReferencedType == SBExpressionType.AwaitExpression; } }
         public bool IsDynamicObjectMember { get { return ReferencedType == SBExpressionType.DynamicObjectMember; } }
 
+        public bool IsOverrideElement { get {  return this.ReferencedType == SBExpressionType.FileElementOverride; } }
+
         public SBExpressionData NarrowGetValueType(TypeReference type = null)
         {
             TypeReference t = type ?? DataType;

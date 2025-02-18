@@ -551,12 +551,37 @@ namespace StepBro.Core.Parser
                     {
                         // The method exists, but no method fits with the given call
                         m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"All arguments are not matching for {callTargetDescriptor}\".");
+
+
                     }
                     else
                     {
                         // The method does not exist
                         m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"Unknown method or identifier {callTargetDescriptor}.");
                     }
+
+
+
+#if DEBUG
+
+                    foreach (MethodInfo m in methods)
+                    {
+                        var constructedMethod = m;
+                        var extensionInstance = (m.IsExtension() || (callType == ParansExpressionType.ProcedureCall || callType == ParansExpressionType.FunctionCall)) ? instance : null;
+                        List<SBExpressionData> suggestedAssignments = new List<SBExpressionData>();
+                        int score = this.CheckMethodArguments(
+                            ref constructedMethod,
+                            callType == ParansExpressionType.ProcedureCall || callType == ParansExpressionType.FunctionCall,
+                            firstParIsThis,
+                            procedure?.GetFormalParameters(),
+                            instance,
+                            instanceName,
+                            m_currentProcedure?.ContextReferenceInternal,
+                            extensionInstance,
+                            arguments,
+                            suggestedAssignments);
+                    }
+#endif
 
                     // Set the call type to error so we do not get an exception
                     callType = ParansExpressionType.Error;
