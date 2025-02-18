@@ -372,6 +372,27 @@ namespace StepBro.Core.Parser
                     // Do automatic conversion from int to double.
                     output = new SBExpressionData(Expression.Convert(output.ExpressionCode, typeof(double)));
                 }
+                else if (output.IsOverrideElement)
+                {
+                    System.Diagnostics.Debug.WriteLine("OVERRIDE!");
+
+                    var overrider = (FileElementOverride)(output.Value);
+                    var rootElement = IdentifierToExpressionData(overrider.GetRootBaseElement(), output.Token);
+                    if (overrider.HasTypeOverride)
+                    {
+                        rootElement.Value = output.Value;
+                    }
+
+                    var getValue = Expression.Call(
+                        rootElement.ExpressionCode,        // Code for getting the variable reference
+                        rootElement.DataType.Type.GetMethod("GetTypedValue"),
+                        Expression.Constant(null, typeof(StepBro.Core.Logging.ILogger)));
+                    output = new SBExpressionData(
+                        SBExpressionType.Expression,
+                        overrider.DataType,
+                        getValue,
+                        output.Value);
+                }
             }
             return output;
         }

@@ -629,7 +629,7 @@ namespace StepBroCoreTest.Parser
 
 
         [TestMethod]
-        public void FileParsing_OverrideVariableAsTypedef_NoDataChange()
+        public void FileParsing_OverrideVariableAsTypedef_NoDataChange_DataAsInstance()
         {
             var f1 = new StringBuilder();
             f1.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
@@ -696,6 +696,120 @@ namespace StepBroCoreTest.Parser
 
             result = taskContext.CallProcedure(procedureMid);
             Assert.AreEqual(125L, result);
+        }
+
+        [TestMethod]
+        public void FileParsing_OverrideVariableAsTypedef_NoDataChange_SimpleDataAsInstance()
+        {
+            var f1 = new StringBuilder();
+            f1.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
+            f1.AppendLine("using \"midfile.sbs\";");
+            f1.AppendLine("namespace ObjectOverride;");
+            f1.AppendLine("procedure void Main()");
+            f1.AppendLine("{");
+            f1.AppendLine("   myTool.DoProcB();");
+            f1.AppendLine("}");
+
+            var f2 = new StringBuilder();
+            f2.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
+            f2.AppendLine("public using \"libfile.sbs\";");
+            f2.AppendLine("namespace ObjectOverride;");
+            f2.AppendLine("type DumberInstrument : " + typeof(DummyInstrumentClass).Name + ";");
+            f2.AppendLine("override myTool as DumberInstrument;");
+            f2.AppendLine("procedure void DoProcB(this " + typeof(DummyInstrumentClass).Name + " instrument)");
+            f2.AppendLine("{");
+            f2.AppendLine("   instrument.IntA = 992;");
+            f2.AppendLine("}");
+
+            var f3 = new StringBuilder();
+            f3.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
+            f3.AppendLine("namespace ObjectOverride;");
+            f3.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool = " + typeof(DummyInstrumentClass).Name);
+            f3.AppendLine("{");
+            f3.AppendLine("   BoolA: true,");
+            f3.AppendLine("   IntA:  36");
+            f3.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("topfile.sbs", f1.ToString()),
+                new Tuple<string, string>("midfile.sbs", f2.ToString()),
+                new Tuple<string, string>("libfile.sbs", f3.ToString()));
+            Assert.AreEqual(3, files.Length);
+            Assert.AreEqual("topfile.sbs", files[0].FileName);
+            Assert.AreEqual("midfile.sbs", files[1].FileName);
+            Assert.AreEqual("libfile.sbs", files[2].FileName);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            Assert.AreEqual(0, files[1].Errors.ErrorCount);
+            Assert.AreEqual(0, files[2].Errors.ErrorCount);
+            var procedureMain = files[0].ListElements().First(p => p.Name == "Main") as IFileProcedure;
+            Assert.IsNotNull(procedureMain);
+            var toolMid = files[1].ListElements().First(p => p.Name == "myTool") as IFileElement;
+            Assert.IsNotNull(toolMid);
+            Assert.IsNotNull(toolMid.ElementType == FileElementType.Override);
+            var toolLib = files[2].ListElements().First(p => p.Name == "myTool") as IFileElement;
+            Assert.IsNotNull(toolLib);
+            Assert.IsNotNull(toolLib.ElementType == FileElementType.FileVariable);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+            taskContext.CallProcedure(procedureMain);
+        }
+
+        [TestMethod]
+        public void FileParsing_OverrideVariableAsTypedef_NoDataChange_DataAsArgument()
+        {
+            var f1 = new StringBuilder();
+            f1.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
+            f1.AppendLine("using \"midfile.sbs\";");
+            f1.AppendLine("namespace ObjectOverride;");
+            f1.AppendLine("procedure void Main()");
+            f1.AppendLine("{");
+            f1.AppendLine("   DoProcB(myTool);");
+            f1.AppendLine("}");
+
+            var f2 = new StringBuilder();
+            f2.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
+            f2.AppendLine("public using \"libfile.sbs\";");
+            f2.AppendLine("namespace ObjectOverride;");
+            f2.AppendLine("type DumberInstrument : " + typeof(DummyInstrumentClass).Name + ";");
+            f2.AppendLine("override myTool as DumberInstrument;");
+            f2.AppendLine("procedure void DoProcB(" + typeof(DummyInstrumentClass).Name + " instrument)");
+            f2.AppendLine("{");
+            f2.AppendLine("   instrument.IntA = 992;");
+            f2.AppendLine("}");
+
+            var f3 = new StringBuilder();
+            f3.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
+            f3.AppendLine("namespace ObjectOverride;");
+            f3.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool = " + typeof(DummyInstrumentClass).Name);
+            f3.AppendLine("{");
+            f3.AppendLine("   BoolA: true,");
+            f3.AppendLine("   IntA:  36");
+            f3.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("topfile.sbs", f1.ToString()),
+                new Tuple<string, string>("midfile.sbs", f2.ToString()),
+                new Tuple<string, string>("libfile.sbs", f3.ToString()));
+            Assert.AreEqual(3, files.Length);
+            Assert.AreEqual("topfile.sbs", files[0].FileName);
+            Assert.AreEqual("midfile.sbs", files[1].FileName);
+            Assert.AreEqual("libfile.sbs", files[2].FileName);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            Assert.AreEqual(0, files[1].Errors.ErrorCount);
+            Assert.AreEqual(0, files[2].Errors.ErrorCount);
+            var procedureMain = files[0].ListElements().First(p => p.Name == "Main") as IFileProcedure;
+            Assert.IsNotNull(procedureMain);
+            var toolMid = files[1].ListElements().First(p => p.Name == "myTool") as IFileElement;
+            Assert.IsNotNull(toolMid);
+            Assert.IsNotNull(toolMid.ElementType == FileElementType.Override);
+            var toolLib = files[2].ListElements().First(p => p.Name == "myTool") as IFileElement;
+            Assert.IsNotNull(toolLib);
+            Assert.IsNotNull(toolLib.ElementType == FileElementType.FileVariable);
+            var obj = (toolLib as FileVariable).Value.Object as DummyInstrumentClass;
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+            taskContext.CallProcedure(procedureMain);
+            Assert.AreEqual(992L, obj.IntA);
         }
 
         [TestMethod]
