@@ -357,10 +357,11 @@ namespace StepBro.Process
             }
         }
 
+        private string m_name = "Process";
         public string Name
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => m_name;
+            set => m_name = value;
         }
 
         public bool AwaitStart([Implicit] StepBro.Core.Execution.ICallContext context, TimeSpan timeout = default)
