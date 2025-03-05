@@ -145,6 +145,9 @@ namespace StepBro.Process
             }
             osProcess.StartInfo.UseShellExecute = useShell;
 
+            osProcess.StartInfo.CreateNoWindow = true;
+            osProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
             if (context != null && context.LoggingEnabled)
             {
                 if (String.IsNullOrEmpty(arguments))
