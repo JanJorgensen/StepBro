@@ -415,6 +415,10 @@ namespace StepBro.Core.Execution
             }
         }
 
+        #endregion
+
+        #region File Creation
+
         [Public]
         public static bool AppendTextToFile([Implicit] ICallContext context, string path, string text, bool reportErrors = false)
         {
