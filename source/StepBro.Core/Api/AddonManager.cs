@@ -334,7 +334,14 @@ namespace StepBro.Core.Api
                                         //pars[0].ParameterType.GetGenericArguments().Length == 1 &&
                                         genericArgs[0] == pars[0].ParameterType.GetGenericArguments()[0])
                                     {
-                                        m = m.MakeGenericMethod(thistype.GetGenericArguments()[0]);
+                                        try
+                                        {
+                                            m = m.MakeGenericMethod(thistype.GetGenericArguments()[0]);
+                                        }
+                                        catch (ArgumentException)
+                                        {
+                                            continue;   // Didn't work; skip it.
+                                        }
                                     }
                                     else
                                     {

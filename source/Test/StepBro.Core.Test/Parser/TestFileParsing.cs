@@ -6,6 +6,7 @@ using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using StepBroCoreTest.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -849,6 +850,128 @@ namespace StepBroCoreTest.Parser
             var result = taskContext.CallProcedure(procedure);
             Assert.AreEqual(5, ((Tuple<long, long>)result).Item1);
             Assert.AreEqual(7, ((Tuple<long, long>)result).Item2);
+        }
+
+        [TestMethod]
+        public void FileParsing_TypeDefUseOtherTypeDef()
+        {
+            string f1 =
+                """
+                using System;
+                
+                type TupleInts : Tuple<int, int>;
+                type TupleList : System.Collections.Generic.List<TupleInts>;
+
+                procedure TupleList test()
+                {
+                    var list  = TupleList();
+                    var entry = TupleInts(12, 16);
+                    list.Add(entry);
+                    list.Add(TupleInts(22, 28));
+                    return list;
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var typedef = files[0].ListElements().FirstOrDefault(p => p.Name == "TupleInts");
+            Assert.IsNotNull(typedef);
+            Assert.IsNotNull(typedef.DataType);
+            var procedure = files[0].ListElements().FirstOrDefault(p => p.Name == "test") as IFileProcedure;
+            Assert.IsNotNull(procedure);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            var result = taskContext.CallProcedure(procedure);
+            Assert.IsInstanceOfType(result, typeof(List<Tuple<long, long>>));
+            var list = result as List<Tuple<long, long>>;
+            Assert.AreEqual(2, list.Count);
+            Assert.AreEqual(12L, (list[0]).Item1);
+            Assert.AreEqual(16L, (list[0]).Item2);
+            Assert.AreEqual(22L, (list[1]).Item1);
+            Assert.AreEqual(28L, (list[1]).Item2);
+        }
+
+        [TestMethod]
+        public void FileParsing_TypeDefUsePropertyWhereExtensionMethodExistsWithSameName()
+        {
+            string f1 =
+                """
+                using System;
+                
+                type EntryType : Tuple<int,int>;
+                type MyList : System.Collections.Generic.List<EntryType>;
+
+                procedure int test()
+                {
+                    var list = MyList();
+                    list.Add(EntryType(0, 30));
+                    list.Add(EntryType(1, 31));
+                    list.Add(EntryType(2, 32));
+                    return list.Count;
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var typedef = files[0].ListElements().FirstOrDefault(p => p.Name == "MyList");
+            Assert.IsNotNull(typedef);
+            Assert.IsNotNull(typedef.DataType);
+            var procedure = files[0].ListElements().FirstOrDefault(p => p.Name == "test") as IFileProcedure;
+            Assert.IsNotNull(procedure);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            var result = taskContext.CallProcedure(procedure);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(3L, (long)result);
+        }
+
+        [TestMethod, Ignore("Finding generic type List<> via a using statement is not implemented.")]
+        public void FileParsing_TypeDefByNamespaceUsing()
+        {
+            string f1 =
+                """
+                using System;
+                using System.Collections.Generic;   // Make this work.
+                                
+                type TupleInts : Tuple<int, int>;
+                type TupleList : List<TupleInts>;   // Make this work.
+
+                procedure TupleList test()
+                {
+                    var list  = TupleList();
+                    var entry = TupleInts(12, 16);
+                    list.Add(entry);
+                    list.Add(TupleInts(22, 28));
+                    return list;
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var typedef = files[0].ListElements().FirstOrDefault(p => p.Name == "TupleInts");
+            Assert.IsNotNull(typedef);
+            Assert.IsNotNull(typedef.DataType);
+            var procedure = files[0].ListElements().FirstOrDefault(p => p.Name == "test") as IFileProcedure;
+            Assert.IsNotNull(procedure);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            var result = taskContext.CallProcedure(procedure);
+            Assert.IsInstanceOfType(result, typeof(List<Tuple<long, long>>));
+            var list = result as List<Tuple<long, long>>;
+            Assert.AreEqual(2, list.Count);
+            Assert.AreEqual(12L, (list[0]).Item1);
+            Assert.AreEqual(16L, (list[0]).Item2);
+            Assert.AreEqual(22L, (list[1]).Item1);
+            Assert.AreEqual(28L, (list[1]).Item2);
         }
 
         [TestMethod]
