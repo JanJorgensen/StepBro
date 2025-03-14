@@ -66,6 +66,8 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual("Snappy", ParseAndRun<string>("myVar", "var myVar = \"\"; myVar = \"Snappy\";", false));
             Assert.AreEqual(13.45, ParseAndRun<double>("myVar", "var myVar = 0.0; myVar = 13.45;", false));
             Assert.AreEqual(Verdict.Error, ParseAndRun<Verdict>("myVar", "var myVar = unset; myVar = error;", false));
+            Assert.AreEqual(93L, ParseAndRun<long>("myVar", "System.UInt32 myVar = 93;", false));
+            Assert.AreEqual(16L, ParseAndRun<long>("myVar", "System.UInt32 other = 16; var myVar = 0; myVar = other;", false));
         }
 
 

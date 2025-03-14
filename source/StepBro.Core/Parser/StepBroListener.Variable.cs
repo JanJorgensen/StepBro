@@ -165,6 +165,11 @@ namespace StepBro.Core.Parser
                                 m_variableInitializer = new SBExpressionData(
                                     Expression.Convert(m_variableInitializer.ExpressionCode, m_variableType.Type));
                             }
+                            else if (m_variableType.Type.IsPrimitive && m_variableType.Type.IsPrimitiveNarrowableIntType())
+                            {
+                                m_variableInitializer = new SBExpressionData(
+                                    Expression.Convert(m_variableInitializer.ExpressionCode, m_variableType.Type));
+                            }
                             else
                             {
                                 m_variableInitializer.NarrowGetValueType();
