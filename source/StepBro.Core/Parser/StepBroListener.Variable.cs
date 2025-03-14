@@ -5,7 +5,6 @@ using StepBro.Core.ScriptData;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Runtime;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
@@ -246,19 +245,8 @@ namespace StepBro.Core.Parser
             // If stack.Count is 0, then there is no body and we do not initialize to anything
             if (levelData.Stack.Count != 0)
             {
-                m_variableInitializer = this.ResolveForGetOperation(levelData.Stack.Pop(), targetType: m_variableType);
-            }
-
-            if (m_variableInitializer.IsError())
-            {
-                if (m_variableInitializer.Token != null)
-                {
-                    m_errors.UnresolvedIdentifier(m_variableInitializer.Token.Line, m_variableInitializer.Token.Column, m_variableInitializer.Value as string);
-                }
-                else
-                {
-                    m_errors.UnresolvedIdentifier(context.Start.Line, context.Start.Column, m_variableInitializer.Value as string);
-                }
+                m_variableInitializer = levelData.Stack.Pop();
+                m_variableInitializer = this.ResolveForGetOperation(m_variableInitializer, targetType: m_variableType, reportIfUnresolved: true);
             }
         }
     }

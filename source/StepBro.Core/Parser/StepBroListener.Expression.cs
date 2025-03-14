@@ -575,9 +575,9 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpEqualsWithTolerance([NotNull] SBP.ExpEqualsWithToleranceContext context)
         {
-            var tolerance = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
-            var expected = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
-            var value = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
+            var tolerance = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var expected = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var value = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), reportIfUnresolved: true).NarrowGetValueType();
             if (CheckExpressionsForErrors(context, value, expected, tolerance))
             {
                 var op = context.op.Type;

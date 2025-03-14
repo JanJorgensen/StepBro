@@ -41,5 +41,13 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(3, result.Errors[0].Line);
             Assert.AreEqual("Unresolved identifier: \"spidskommen\".", result.Errors[0].Message);
         }
+
+        [TestMethod]
+        public void ErrorComparisonWithUnknownIdentifier()
+        {
+            var result = Parse<bool>("(varIntA == spidskommen ± 2)", varGeneration: true);
+            Assert.AreEqual(1, result.Errors.ErrorCount);
+            Assert.AreEqual("Unresolved identifier: \"spidskommen\".", result.Errors[0].Message);
+        }
     }
 }

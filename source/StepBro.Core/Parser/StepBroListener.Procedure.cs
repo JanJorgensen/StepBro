@@ -32,7 +32,6 @@ namespace StepBro.Core.Parser
         private Stack<ProcedureParsingScope> m_scopeStack = new Stack<ProcedureParsingScope>();
         private bool m_enteredLoopStatement = false;
         private string m_modifiers = null;
-        //private bool m_awaitsExpectExpression = false;
         private bool m_isSimpleExpectWithValue = false;
 
         public IFileProcedure LastParsedProcedure { get { return m_lastProcedure; } }
@@ -1478,8 +1477,6 @@ namespace StepBro.Core.Parser
             {
                 m_isSimpleExpectWithValue = true;
             }
-
-            //m_awaitsExpectExpression = true;
         }
 
         public override void ExitExpectStatement([NotNull] SBP.ExpectStatementContext context)
@@ -1489,8 +1486,9 @@ namespace StepBro.Core.Parser
             var levelData = m_expressionData.PopStackLevel();
             var expression = levelData.Stack.Pop();
             expression = this.ResolveForGetOperation(expression);
-            if (expression.IsError())
+            if (!CheckExpressionsForErrors(context, expression))
             {
+                m_scopeStack.Peek().AddStatementCode(Expression.Empty());
                 return;
             }
 
