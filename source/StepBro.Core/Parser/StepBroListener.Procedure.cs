@@ -1232,6 +1232,7 @@ namespace StepBro.Core.Parser
 
         public override void ExitReturnStatement([NotNull] SBP.ReturnStatementContext context)
         {
+            var levelData = m_expressionData.PopStackLevel();
             if (context.ChildCount == 2)
             {
                 m_scopeStack.Peek().AddStatementCode(Expression.Return(m_currentProcedure.ReturnLabel));
@@ -1242,7 +1243,6 @@ namespace StepBro.Core.Parser
                 m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Return value missing.");
                 return;
             }
-            var levelData = m_expressionData.PopStackLevel();
             if (levelData.Stack.Count == 0)
             {
                 m_errors.InternalError(context.Start.Line, context.Start.Column, "");
