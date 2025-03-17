@@ -53,7 +53,10 @@ namespace StepBro.UI.WinForms.Controls
             }
             m_handlingCheck = false;
             listViewToolSelection.SelectedIndices.Clear();
-            listViewToolSelection.SelectedIndices.Add(selectedIndex);
+            if (listViewToolSelection.Items.Count > selectedIndex && selectedIndex >= 0)
+            {
+                listViewToolSelection.SelectedIndices.Add(selectedIndex);
+            }
         }
 
         protected override void OnSizeChanged(EventArgs e)
