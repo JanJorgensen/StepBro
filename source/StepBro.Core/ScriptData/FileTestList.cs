@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 
@@ -12,19 +14,22 @@ namespace StepBro.Core.ScriptData
             private readonly FileTestList m_home;
             private readonly TestListEntryType m_type;
             private readonly string m_reference;
+            private readonly string m_title;
             private readonly ArgumentList m_arguments;
-            public EntryBase(FileTestList home, TestListEntryType type, string reference)
+            public EntryBase(FileTestList home, TestListEntryType type, string reference, string title, ArgumentList arguments = null)
             {
                 m_home = home;
                 m_type = type;
                 m_reference = reference;
-                m_arguments = new ArgumentList(home.m_arguments);
+                m_title = title;
+                m_arguments = (arguments != null) ? new ArgumentList(home.m_arguments, arguments) : new ArgumentList(home.m_arguments);
             }
 
             public ITestList Home { get { return m_home; } }
             public virtual IFileElement Reference { get { throw new NotSupportedException("No reference set;"); } }
 
             public string ReferenceName { get { return m_reference; } }
+            public string Title { get { return m_title; } }
 
             public TestListEntryType Type { get { return m_type; } }
 
@@ -41,7 +46,8 @@ namespace StepBro.Core.ScriptData
         {
             private IProcedureReference m_procedure;
 
-            public EntryTestCase(FileTestList home, string referenceName, IProcedureReference procedure) : base(home, TestListEntryType.TestCase, referenceName)
+            public EntryTestCase(FileTestList home, string referenceName, string title, IProcedureReference procedure, ArgumentList arguments = null) : 
+                base(home, TestListEntryType.TestCase, referenceName, title, arguments)
             {
                 m_procedure = procedure;
             }
@@ -53,7 +59,7 @@ namespace StepBro.Core.ScriptData
         private class EntryTestList : EntryBase, ITestListEntryTestList
         {
             private readonly ITestList m_list;
-            public EntryTestList(FileTestList home, string referenceName, ITestList list) : base(home, TestListEntryType.TestList, referenceName)
+            public EntryTestList(FileTestList home, string referenceName, ITestList list) : base(home, TestListEntryType.TestList, referenceName, referenceName)
             {
                 m_list = list;
             }
@@ -95,14 +101,14 @@ namespace StepBro.Core.ScriptData
 
         public ITestListEntry AddTestCase(string name, IProcedureReference procedure, ArgumentList arguments)
         {
-            var entry = new EntryTestCase(this, name, procedure);
+            var entry = new EntryTestCase(this, name, name, procedure, arguments);
             m_entries.Add(entry);
             return entry;
         }
 
         public void AddTestEntry(string target)
         {
-            m_entries.Add(new EntryBase(this, TestListEntryType.Unresolved, target));
+            m_entries.Add(new EntryBase(this, TestListEntryType.Unresolved, target, target));
         }
 
         public ITestListEntry AddTestList(string name, ITestList list)
@@ -122,6 +128,7 @@ namespace StepBro.Core.ScriptData
             private readonly ITestList m_list;
             private int m_index = -1;
             private List<ITestListEntryTestCase> m_testCases = null;
+            private string m_title = null;
             private IProcedureReference m_currentProcedure = null;
             private ArgumentList m_currentProcedureArguments = null;
 
@@ -129,6 +136,14 @@ namespace StepBro.Core.ScriptData
             {
                 if (list == null) throw new ArgumentNullException("list");
                 m_list = list;
+            }
+
+            public string Title
+            {
+                get
+                {
+                    return m_title;
+                }
             }
 
             public IProcedureReference Procedure
@@ -152,32 +167,57 @@ namespace StepBro.Core.ScriptData
                 m_index = -1;
             }
 
-            private static void GetTestCases(ITestList list, List<ITestListEntryTestCase> collected)
+            private static void GetTestCases(string path, ITestList list, List<ITestListEntryTestCase> collected)
             {
                 foreach (var entry in list.ListEntries())
                 {
                     if (entry.Type == TestListEntryType.TestCase)
                     {
-                        collected.Add(entry as ITestListEntryTestCase);
+                        var newEntry = new EntryTestCase(
+                            entry.Home as FileTestList, 
+                            entry.ReferenceName, 
+                            path + CreateTitle((entry as EntryTestCase).ProcedureReference, entry.Arguments), 
+                            (entry as EntryTestCase).ProcedureReference, 
+                            entry.Arguments);
+                        collected.Add(newEntry);
                     }
                     else if (entry.Type == TestListEntryType.TestList)
                     {
-                        GetTestCases((entry as ITestListEntryTestList).TestListReference, collected);
+                        GetTestCases(entry.ReferenceName + " - ", (entry as ITestListEntryTestList).TestListReference, collected);
                     }
                 }
             }
+
+            private static string CreateTitle(IProcedureReference procedure, ArgumentList arguments)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append(procedure.FullName);
+                if (arguments != null)
+                {
+                    var list = arguments.Select(a => (a.Name + ": " + StringUtils.ObjectToString(a.Value))).ToList();
+                    if (list.Count > 0)
+                    {
+                        sb.Append("( ");
+                        sb.Append(String.Join(", ", list));
+                        sb.Append(" )");
+                    }
+                }
+                return sb.ToString();
+            }
+
 
             public bool GetNext()
             {
                 if (m_testCases == null)
                 {
                     m_testCases = new List<ITestListEntryTestCase>();
-                    GetTestCases(m_list, m_testCases);
+                    GetTestCases(m_list.Name + " - ", m_list, m_testCases);
                 }
 
                 if (m_index < (m_testCases.Count - 1))
                 {
                     m_index++;
+                    m_title = m_testCases[m_index].Title;
                     m_currentProcedure = m_testCases[m_index].ProcedureReference;
                     m_currentProcedureArguments = m_testCases[m_index].Arguments;
                     return true;

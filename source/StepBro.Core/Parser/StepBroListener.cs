@@ -840,7 +840,7 @@ namespace StepBro.Core.Parser
             }
             if (entry != null && m_testListEntryArguments != null)
             {
-                foreach (var a in m_testListEntryArguments)
+                foreach (var a in m_testListEntryArguments.Reverse())
                 {
                     entry.Arguments.Add(a.ParameterName, a.Value);
                 }

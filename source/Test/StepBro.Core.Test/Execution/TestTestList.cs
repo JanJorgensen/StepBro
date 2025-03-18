@@ -99,6 +99,7 @@ namespace StepBroCoreTest.Execution
             f.AppendLine("   var iterator = AllTests.GetProcedureIterator();");
             f.AppendLine("   while (iterator.GetNext())");
             f.AppendLine("   {");
+            f.AppendLine("      log(\"Entry: \" + iterator.Title);");
             f.AppendLine("      iterator.Procedure( iterator.Arguments );");
             f.AppendLine("   }");
             f.AppendLine("}");
@@ -124,11 +125,14 @@ namespace StepBroCoreTest.Execution
 
             log.ExpectNext("0 - Pre - TestRun - Starting");
             log.ExpectNext("1 - Pre - MyFile.ExecuteAllTests - <no arguments>");
-            log.ExpectNext("2 - Pre - 16 <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (b: \"Brian\") )");
+            log.ExpectNext("2 - Normal - 16 Log - Entry: MyFile.TestCaseWithParameters( b: \"Brian\" )");
+            log.ExpectNext("2 - Pre - 17 <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (b: \"Brian\") )");
             log.ExpectNext("3 - Post");
-            log.ExpectNext("2 - Pre - 16 <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (<empty>) )");
+            log.ExpectNext("2 - Normal - 16 Log - Entry: MyFile.TestCaseWithParameters");
+            log.ExpectNext("2 - Pre - 17 <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (<empty>) )");
             log.ExpectNext("3 - Post");
-            log.ExpectNext("2 - Pre - 16 <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (<empty>) )");
+            log.ExpectNext("2 - Normal - 16 Log - Entry: MyFile.TestCaseWithParameters");
+            log.ExpectNext("2 - Pre - 17 <DYNAMIC CALL> MyFile.TestCaseWithParameters - ( (<empty>) )");
             log.ExpectNext("3 - Post");
             log.ExpectNext("2 - Post");
             log.ExpectEnd();
