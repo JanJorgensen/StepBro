@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace StepBro.SimpleWorkbench
 {
@@ -17,7 +18,7 @@ namespace StepBro.SimpleWorkbench
             InitializeComponent();
 
             labelHeader.Visible = false;
-            labelText.Text = "First,\r\nSecond,\r\nThird and actually all the rest.";
+            //labelText.Text = "First,\r\nSecond,\r\nThird and actually all the rest.";
         }
 
         protected override void OnLoad(EventArgs e)
@@ -33,8 +34,10 @@ namespace StepBro.SimpleWorkbench
 
         public void SetText(string text)
         {
+            labelHeader.Visible = !String.IsNullOrEmpty(labelHeader.Text);
             labelText.Text = text;
-            this.Height = labelText.Bottom + 5;
+            labelText.Visible = !String.IsNullOrEmpty(text);
+            this.Height = (labelText.Visible ? labelText.Bottom : labelHeader.Bottom) + 5;
         }
     }
 }

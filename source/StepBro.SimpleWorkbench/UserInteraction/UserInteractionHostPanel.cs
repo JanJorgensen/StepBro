@@ -46,7 +46,7 @@ namespace StepBro.SimpleWorkbench
             userInteractionPanel = new UserInteractionPanel();
             userInteractionPanel.Location = new Point(32, 64);      // TODO
             userInteractionPanel.Name = "userInteractionPanel";
-            userInteractionPanel.Size = new Size(339, 288);         // TODO
+            userInteractionPanel.Size = new Size(450, 288);         // TODO
             userInteractionPanel.TabIndex = 0;
             Controls.Add(userInteractionPanel);
             Controls.Add(panelBackground);
@@ -59,6 +59,10 @@ namespace StepBro.SimpleWorkbench
         private void HidePanel()
         {
             SuspendLayout();
+            foreach (Control control in Controls)
+            {
+                control.Dispose();
+            }
             Controls.Clear();
             Controls.Add(panelBackground);
             ResumeLayout(false);

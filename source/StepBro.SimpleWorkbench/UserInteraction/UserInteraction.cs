@@ -72,6 +72,7 @@ namespace StepBro.SimpleWorkbench
 
         public override UserResponse Open([Implicit] ICallContext context, TimeSpan timeout = default, UserResponse defaultAnswer = UserResponse.OK)
         {
+            this.TimeoutTime = timeout;
             string interactionText = String.IsNullOrEmpty(this.HeaderText) ? "User interaction" : $"User interaction \"{this.HeaderText}\"";
             string timeoutText = "";
             if (timeout != default(TimeSpan))
@@ -87,10 +88,10 @@ namespace StepBro.SimpleWorkbench
             {
                 timeout = TimeSpan.FromSeconds(60);
             }
-            var entryTime = DateTime.UtcNow;
             bool stopRequested = false;
 
             this.OnOpen?.Invoke(this, new EventArgs());
+            var entryTime = DateTime.UtcNow;
 
             while (!m_userClose && !m_closeEvent.WaitOne(0) && (DateTime.UtcNow - entryTime) < timeout)
             {
@@ -112,6 +113,7 @@ namespace StepBro.SimpleWorkbench
             }
             else if (stopRequested)
             {
+                userResponse = UserResponse.StopRequested;
                 context.Logger.LogUserAction($"{interactionText}. User requested script execution stop.");
             }
             else  // Timeout

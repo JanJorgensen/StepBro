@@ -15,11 +15,17 @@ namespace StepBro.Core.Host
         OK,
         Yes,
         No,
-        Cancel
+        Cancel,
+        Timeout,
+        StopRequested
     }
 
     public abstract class UserInteraction
     {
+        private bool m_showOK = true;
+        private bool m_showCancel = false;
+        private bool m_showYesNo = false;
+
         public class SectionData
         {
             public string Header { get; set; }
@@ -41,9 +47,20 @@ namespace StepBro.Core.Host
 
         protected List<SectionData> m_sections = new List<SectionData>();
 
-        public bool ShowOK { get; set; } = true;
-        public bool ShowYesNo { get; set; } = false;
+        public bool ShowOK { get => m_showOK; set { m_showOK = value; } }
+        public bool ShowYesNo 
+        { 
+            get => m_showYesNo; 
+            set 
+            {
+                if (value == true) m_showOK = false;    // Normalerweise, the OK button is not used when using Yes/No.
+                m_showYesNo = value;
+            }
+        }
         public bool ShowCancel { get; set; } = false;
+        
+        public TimeSpan TimeoutTime {  get; set; } = default(TimeSpan);
+        
         public void AddTextBlock(string header, string text)
         {
             m_sections.Add(new SectionTextBlock { Header = header, Text = text });

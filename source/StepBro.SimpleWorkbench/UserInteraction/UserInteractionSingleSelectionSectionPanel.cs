@@ -31,7 +31,7 @@ namespace StepBro.SimpleWorkbench
         public void SetHeader(string text)
         {
             this.SetupIfJustOpened();
-            groupBox.Text = "Options";
+            groupBox.Text = String.IsNullOrEmpty(text) ? "Options" : text;
         }
 
         public void AddOption(string text)
