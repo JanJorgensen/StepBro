@@ -17,6 +17,7 @@ namespace StepBro.Core.Data.Report
         //private readonly DateTime m_starttime;
         private readonly LogEntry m_logStart;
         private LogEntry m_logEnd = null;
+        private Verdict m_verdict = Verdict.Unset;
         private readonly List<ReportData> m_data = new List<ReportData>();
 
         public ReportGroup(string name, string description, LogEntry logStart, IFileElement fileElement)
@@ -33,6 +34,7 @@ namespace StepBro.Core.Data.Report
         public DateTime StartTime { get { return m_logStart.Timestamp; } }
         public LogEntry LogStart { get { return m_logStart; } }
         public LogEntry LogEnd { get { return m_logEnd; } }
+        public Verdict Verdict { get { return m_verdict; } set { m_verdict = value; } }
 
         public void AddData(ReportData data)
         {
