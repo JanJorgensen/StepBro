@@ -200,7 +200,8 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
     testReport.StartGroup("Test Suite Test Setup", "The test configuration and preconditions. Setup procedure: " + suite.PreTest.FullName + "." + procedureSummary);
     NextProcedureIsHighLevel("PRETEST");
     passedPreTest = suite.PreTest();        // Keep this in separate line, to make sure this is a high-level procedure call.
-    if (passedPreTest)
+    var result = this.LastCallResult;
+    if (passedPreTest && result.Verdict <= pass)
     {
         var iterator = suite.GetProcedureIterator();
 
@@ -218,17 +219,17 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
                 procedureSummary = "";
             }
             var testCaseGroup = testReport.StartGroup(
-                testcase.ProcedureData.FullName, 
+                "Testcase " + iterator.Title, 
                 procedureSummary, 
                 testcase);
             summary.AddEntryBeforeResult(testCaseGroup);    // Register test case before execution; in case execution is terminated by an unhandled exeception.
             // TODO: Save test case data in report
-            log ("Starting Test: " + testcase.Name);
+            log ("Starting Test: " + iterator.Title);
 
             testReport.AddSection("Setup", "");
             NextProcedureIsHighLevel("SETUP");
             testcase.Setup();
-            var result = this.LastCallResult;
+            result = this.LastCallResult;
 
             if (result.Verdict < fail)  // Only run the test if the setup succeeded.
             {
@@ -244,12 +245,17 @@ public procedure void TestSuiteFormalTestExecution(this TestSuite suite) :
             result = result.SelectIfWorse(this.LastCallResult);
 
             summary.AddResult(testCaseGroup, result);
+            testCaseGroup.Verdict = result.Verdict;
         }
         testReport.Close();     // Close the report, but don't remove it; the report might be printed or saved by the host application.
         //testReport.DumpToLog();
         // TODO: Save report in selected format in the selected location (file or URL). Selection taken from configuration file.
 
         this.SetResult(summary.GetResultVerdict(), summary.GetResultDescription());     // Keep this as the last statement; if there were any failed tests, the procedure will exit after this statement.
+    }
+    else
+    {
+        this.SetResult(result.Verdict <= pass ? fail : result.Verdict, "Pre-test failed. " + result.Description);
     }
 }
 
