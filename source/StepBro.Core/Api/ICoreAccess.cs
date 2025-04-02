@@ -14,6 +14,7 @@ namespace StepBro.Core.Api
         /// </summary>
         /// <param name="element">The file element to execute (procedure or testlist).</param>
         /// <param name="model">The model/partner to use for the execution.</param>
+        /// <param name="objectVariable">The instance object for the execution. This object is used for the 'this' marked parameter.</param>
         /// <param name="args">The input arguments for the target procedure (or partner).</param>
         /// <returns>Interface to the started execution.</returns>
         IExecutionAccess StartExecution(string element, string model, string objectVariable, object[] args);

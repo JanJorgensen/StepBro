@@ -1,5 +1,6 @@
 ﻿using FastColoredTextBoxNS;
 using StepBro.Core.Data;
+using StepBro.HostSupport;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,7 +111,6 @@ namespace StepBro.UI.WinForms.Controls
             }
         }
 
-        private object m_sync = new object();
         private IChronoListViewer m_viewer = null;
         private IElementIndexer<ChronoListViewEntry> m_source = null;
         private int m_lineHeight = 20;
@@ -157,6 +157,7 @@ namespace StepBro.UI.WinForms.Controls
             public int Line { get { return m_line; } }
             public long Index { get { return m_index; } }
         }
+        
         public delegate void MouseOnLineEventHandler(object sender, MouseOnLineEventArgs e);
 
         public event MouseOnLineEventHandler MouseDownOnLine;
@@ -183,7 +184,7 @@ namespace StepBro.UI.WinForms.Controls
         public long TopEntryIndex { get { return m_topIndex; } }
         public long LastShownEntryIndex { get { return m_lastShown; } }
 
-        public DateTime LastViewScrollTime {  get { return m_lastViewScroll; } }
+        public DateTime LastViewScrollTime { get { return m_lastViewScroll; } }
 
         public bool ViewJustScrolled { get { return (DateTime.UtcNow - m_lastViewScroll) < TimeSpan.FromMilliseconds(500); } }
 
@@ -241,13 +242,23 @@ namespace StepBro.UI.WinForms.Controls
                         lastShown = entryIndex;
                         m_viewEntries[viewIndex] = entry;
 
-                        var selectionState = m_viewer.GetEntrySelectionState(entryIndex);
+                        var selectionState = m_viewer.GetEntryMarkState(entryIndex, entry);
                         rect = new Rectangle(m_horizontalScrollPosition, y, 10000, m_lineHeight);
-                        if (selectionState >= EntrySelectionState.Selected)
+                        if ((selectionState & EntryMarkState.Selected) != EntryMarkState.None)
                         {
                             e.Graphics.FillRectangle(Brushes.Blue, rect);
+                            if ((selectionState & EntryMarkState.SearchMatch) != EntryMarkState.None)
+                            {
+                                var r = new Rectangle(m_horizontalScrollPosition, y + 1, this.ViewSettings.TimeStampWidth + 2, m_lineHeight - 1);
+                                e.Graphics.FillRectangle(Brushes.Purple, r);
+                            }
                         }
-                        if (selectionState == EntrySelectionState.Current || selectionState == EntrySelectionState.SelectedCurrent)
+                        else if ((selectionState & EntryMarkState.SearchMatch) != EntryMarkState.None)
+                        {
+                            var r = new Rectangle(m_horizontalScrollPosition, y + 1, 10000, m_lineHeight - 1);
+                            e.Graphics.FillRectangle(Brushes.Purple, r);
+                        }
+                        if ((selectionState & EntryMarkState.Current) != EntryMarkState.None)
                         {
                             e.Graphics.DrawLine(Pens.White, 0, y - 1, this.ClientRectangle.Right, y - 1);
                             e.Graphics.DrawLine(Pens.White, 0, y + m_lineHeight, this.ClientRectangle.Right, y + m_lineHeight);

@@ -10,13 +10,13 @@ using StepBro.Core.Data.Report;
 using StepBro.Core.Execution;
 using StepBro.Core.General;
 using StepBro.Core.Logging;
+using StepBro.Core.ScriptData;
 
 namespace StepBro.Core
 {
     [Public]
     public class DataReport : IScriptDisposable
     {
-        private static List<DataReport> m_savedReports = new List<DataReport>();
         private bool m_isDisposed = false;
         private bool m_isOpen = true;
         private readonly string m_type;
@@ -24,6 +24,7 @@ namespace StepBro.Core
         private ReportTestSummary m_summary = null;
         private readonly List<ReportGroup> m_groups = new List<ReportGroup>();
         private ReportGroup m_currentGroup = null;
+        private object m_sync = new object();
 
         public event EventHandler Disposing;
 
@@ -36,19 +37,28 @@ namespace StepBro.Core
         public string Type { get { return m_type; } }
         public string Title { get { return m_title; } }
 
+        public event EventHandler GroupAdded;
+        public event EventHandler SummaryUpdated;
+
         public IEnumerable<ReportGroup> ListGroups()
         {
-            foreach (var g in m_groups)
+            lock (m_sync)
             {
-                yield return g;
+                foreach (var g in m_groups)
+                {
+                    yield return g;
+                }
             }
         }
 
         public IEnumerable<ReportData> ListData()
         {
-            foreach (var g in m_groups)
+            lock (m_sync)
             {
-                foreach (var d in g.ListData()) yield return d;
+                foreach (var g in m_groups)
+                {
+                    foreach (var d in g.ListData()) yield return d;
+                }
             }
         }
 
@@ -70,10 +80,18 @@ namespace StepBro.Core
             {
                 context.ReportError("Trying to write data to a locked group.");
             }
-            m_currentGroup.AddData(data);
+            lock (m_sync)
+            {
+                m_currentGroup.AddData(data);
+            }
         }
 
-        public void StartGroup([Implicit] ICallContext context, string name, string description = null)
+        public ReportGroup StartGroup([Implicit] ICallContext context, string name, string description, IProcedureReference procedure)
+        {
+            return this.StartGroup(context, name, description, procedure.ProcedureData);
+        }
+
+        public ReportGroup StartGroup([Implicit] ICallContext context, string name, string description = null, IFileElement fileElement = null)
         {
             if (m_currentGroup != null)
             {
@@ -88,15 +106,22 @@ namespace StepBro.Core
                 }
                 m_currentGroup = null;
             }
-            ILogEntry logStart = null;
+            ITimestampedData logStart = null;
             if (context != null && context.Logger is LoggerScope)
             {
                 if (String.IsNullOrEmpty(description)) description = "";
                 else description = " " + description;
                 logStart = context.Logger.Log($"Starting report group \"{name}\".{description}");
             }
-            m_currentGroup = new ReportGroup(name, description, (LogEntry)logStart);
-            m_groups.Add(m_currentGroup);
+            m_currentGroup = new ReportGroup(name, description, (LogEntry)logStart, fileElement);
+            lock (m_sync)
+            {
+                m_groups.Add(m_currentGroup);
+            }
+
+            this.GroupAdded?.Invoke(this, EventArgs.Empty);
+
+            return m_currentGroup;
         }
 
         public void AddSection([Implicit] ICallContext context, string header, string subheader = "")
@@ -120,7 +145,14 @@ namespace StepBro.Core
         public ReportTestSummary CreateTestSummary()
         {
             m_summary = new ReportTestSummary(DateTime.Now);
+            m_summary.SummaryUpdated += SummaryDataUpdated;
+            this.SummaryUpdated?.Invoke(this, EventArgs.Empty);
             return m_summary;
+        }
+
+        private void SummaryDataUpdated(object sender, EventArgs e)
+        {
+            this.SummaryUpdated?.Invoke(this, EventArgs.Empty);     // Forward the event.
         }
 
         public ReportDataTable CreateDataTable([Implicit] ICallContext context, string title, string subttitle, ReportDataTable.DataSetDirection dataSetDirection)
@@ -189,7 +221,7 @@ namespace StepBro.Core
                     logger.Log("Summary");
                     foreach (var r in m_summary.ListResults())
                     {
-                        logger.Log("        " +  r.Item1 + " - " + r.Item2.ToString(r.Item2.Verdict > Verdict.Pass));
+                        logger.Log("        " +  r.GetName() + " - " + r.Result.ToString(r.Result.Verdict > Verdict.Pass));
                     }
                 }
             }

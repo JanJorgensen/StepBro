@@ -17,7 +17,7 @@ namespace StepBro.Core.Parser.AssignmentOperators
     internal class AssignmentOperator : AssignmentOperatorBase
     {
         private static MethodInfo s_DynamicObjectSetProperty = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.DynamicObjectSetProperty));
-        private static MethodInfo s_SetGlobalVariable = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.SetGlobalVariable));
+        private static MethodInfo s_SetGlobalVariable = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.SetFileVariable));
 
         public override SBExpressionData Resolve(StepBroListener listener, SBExpressionData first, SBExpressionData last)
         {

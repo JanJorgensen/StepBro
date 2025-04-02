@@ -13,6 +13,8 @@ namespace StepBro.Core.Test.Mocks
         {
         }
 
+        public string StationPropertiesFile { get; } = string.Empty;
+
         public PropertyBlock StationProperties { get; set; } = null;
 
         public PropertyBlock GetStationProperties()

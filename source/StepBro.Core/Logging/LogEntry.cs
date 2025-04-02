@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StepBro.Core.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,20 +7,20 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Logging
 {
-    public class LogEntry : ILogEntry
+    public class LogEntry : ITimestampedData
     {
-        public enum Type
+        public enum Type : UInt32
         {
             /// <summary>
             /// Normal information about a unning task in the current scope.
             /// </summary>
-            Normal,
+            Normal = 0x00,
             /// <summary>
             /// Entering a new scope.
             /// </summary>
             Pre,
             /// <summary>
-            /// Entrring a new high level scope.
+            /// Entering a new high level scope.
             /// </summary>
             PreHighLevel,
             /// <summary>
@@ -39,16 +40,26 @@ namespace StepBro.Core.Logging
             /// </summary>
             Async,
             /// <summary>
+            /// Information related to a specific software component or device.
+            /// </summary>
+            Component,
+            /// <summary>
             /// Communication out of (sent from) the automation system.
             /// </summary>
             CommunicationOut,
             /// <summary>
             /// Communication in to (received by) the automation system.
             /// </summary>
-            CommunicationIn, Error,
+            CommunicationIn, 
+            Error,
             Failure,
             UserAction,
-            System
+            System,
+            FlagFilter = 0xFF,
+            /// <summary>
+            /// A special kind of information, where only the source knows how to show/decode/understand the data.
+            /// </summary>
+            Special = 0x100
         }
 
         private LogEntry m_next = null;
@@ -107,5 +118,52 @@ namespace StepBro.Core.Logging
         public string Location { get { return m_location; } }
 
         public string Text { get { return m_text; } }
+
+        public bool IsParentOf(LogEntry other, bool recursive)
+        {
+            if (other.m_parent == null) return false;
+            if (Object.ReferenceEquals(other.m_parent, this)) return true;
+            return (recursive) ? this.IsParentOf(other.m_parent, true) : false;
+        }
+
+        #region Persisting 
+
+        public string ToPersistanceString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(m_id.ToString());
+            sb.Append('\t');
+            sb.Append((m_parent != null) ? m_parent.m_id.ToString() : "-");
+            sb.Append('\t');
+            sb.Append(m_threadId.ToString());
+            sb.Append('\t');
+            sb.Append(m_timestamp.Ticks.ToString());
+            sb.Append('\t');
+            sb.Append(m_type.ToString());
+            if (!String.IsNullOrEmpty(m_location))
+            {
+                sb.Append("\t\"");
+                sb.Append(m_location.EscapeString());
+                sb.Append('\"');
+            }
+            else
+            {
+                sb.Append("\t-");
+            }
+            if (!String.IsNullOrEmpty(m_text))
+            {
+                sb.Append("\t\"");
+                sb.Append(m_text.EscapeString());
+                sb.Append("\"");
+            }
+            else
+            {
+                sb.Append("\t-");
+            }
+
+            return sb.ToString();
+        }
+
+        #endregion
     }
 }

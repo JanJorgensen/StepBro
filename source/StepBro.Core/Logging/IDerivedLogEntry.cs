@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Logging
 {
-    public interface IDerivedLogEntry : ILogEntry, ILogEntryReference
+    public interface IDerivedLogEntry : ITimestampedData, ILogEntryReference
     {
     }
 }

@@ -18,6 +18,9 @@ namespace StepBro.Core.Addons
 
         public OutputType FormatterType { get { return OutputType.Text; } }
 
+        public string LogFileExtension { get { return "txt"; } }
+        public string ReportFileExtension { get { return "txt"; } }
+
         public IOutputFormatter Create()
         {
             throw new NotImplementedException();

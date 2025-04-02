@@ -28,12 +28,9 @@ namespace StepBro.Core.Language
 
             this.AddTokenStyle(Lexer.SINGLE_LINE_COMMENT, EditorTextStyles.Comment);
             this.AddTokenStyle(Lexer.DELIMITED_COMMENT, EditorTextStyles.Comment);
-            this.AddTokenStyle(Lexer.DOC_COMMENT_INDENTED, EditorTextStyles.DocComment);
             this.AddTokenStyle(Lexer.DOC_COMMENT, EditorTextStyles.DocComment);
-            //this.AddTokenStyle(Lexer.DOC_COMMENT_START, EditorTextStyles.DocComment);
-            //this.AddTokenStyle(Lexer.DOC_COMMENT_NEWLINE_INDENTED, EditorTextStyles.DocComment);
-            //this.AddTokenStyle(Lexer.DOC_COMMENT_NEWLINE, EditorTextStyles.DocComment);
-            //this.AddTokenStyle(Lexer.DOC_COMMENT_TEXT, EditorTextStyles.DocComment);
+            this.AddTokenStyle(Lexer.DOC_COMMENT_NAMED, EditorTextStyles.DocComment);
+            this.AddTokenStyle(Lexer.DOC_COMMENT_TYPE_AND_NAMED, EditorTextStyles.DocComment);
 
             this.AddTokenStyle(Lexer.DATATABLE_ROW_START, EditorTextStyles.DataTableRow);
             this.AddTokenStyle(Lexer.DATATABLE_CELL_CONTENT, EditorTextStyles.DataTableCell);

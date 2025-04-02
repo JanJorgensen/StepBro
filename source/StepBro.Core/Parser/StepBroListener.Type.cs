@@ -179,7 +179,7 @@ namespace StepBro.Core.Parser
                 else
                 {
                     var types = this.ResolveQualifiedType(declaration.TypeName, reportErrors, token);
-                    if (types != null && types.ReferencedType == SBExpressionType.GenericTypeDefinition)
+                    if (types != null && (types.ReferencedType == SBExpressionType.GenericTypeDefinition || types.ReferencedType == SBExpressionType.TypeReference))
                     {
                         var foundTypes = (List<Type>)types.Value;
                         System.Diagnostics.Debug.Assert(foundTypes != null);

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using StepBro.Core.Data;
+using StepBro.Core.Execution;
 
 namespace StepBro.Core.Host
 {
@@ -12,15 +13,17 @@ namespace StepBro.Core.Host
     {
         Console,
         WinForms,
-        WPF
+        WPF,
+        Mock
     }
 
-    public interface IHost
+    public interface IHost : IObjectHost
     {
         HostType Type { get; }
         void LogUserAction(string text);
         void LogSystem(string text);
         IEnumerable<Type> ListHostCodeModuleTypes();
-        IEnumerable<NamedData<object>> ListHostCodeModuleInstances();
+        bool SupportsUserInteraction { get; }
+        UserInteraction SetupUserInteraction(ICallContext context, string header);
     }
 }

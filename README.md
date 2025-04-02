@@ -13,7 +13,7 @@ StepBro is both a language definition and a runtime system.
 
 Scripts can be opened and executed with the __stepbro.exe__ console application.
 Plans are to create __Visual Studio Code__ extensions for editing, execution, debugging and more.
-The (not finished yet) WPF application, __StepBro Workbench__, is an integreted development/test environment that gives a highly interactive experience.
+The WinForms application, __StepBro Workbench__, is an integreted development/test environment that gives a highly interactive experience.
 
 When executing scripts, an execution log is automatically created without having to add any statements in the script procedures. This eases the script writing and makes the scripts shorter and easier to read and maintain. Additional data can easily be added to the log by inserting simple _log_ statements.
 
@@ -55,3 +55,12 @@ If interested, please have a look at the files in the examples/scripts folder.
 StepBro compiles the script files into binary code using LINQ expressions, and not into .net assemblies. Technically, that means StepBro does not have to deal with application domains, and can re-build changed scripts without drawbacks.
 
 The compilation happens automatically when starting a script execution with the console application.
+
+
+## Use of commercial license
+
+The __StepBro Workbench__ application in this repository makes use of commercial UI controls from _Actipro Software_. 
+Compiling that application will require that an appropriate number of developer licenses have been purchased from this link:
+[Pricing - Actipro Software](https://www.actiprosoftware.com/purchase/pricing/controls/windowsforms)
+
+Neither the console application (__stepbro.exe__), or any of the class library assemblies use any commercial licenses.

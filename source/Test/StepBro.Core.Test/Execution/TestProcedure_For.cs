@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using StepBro.Core;
 using StepBro.Core.Parser;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,12 @@ namespace StepBroCoreTest.Parser
     [TestClass]
     public class TestProcedure_For
     {
+        [TestInitialize]
+        public void Setup()
+        {
+            ServiceManager.Dispose();
+        }
+
         [TestMethod]
         public void TestProcedureForStatementWithExpression01()
         {

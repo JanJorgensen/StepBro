@@ -10,6 +10,7 @@ using StepBro.Core.ScriptData;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
 using StepBroCoreTest.Utils;
+using StepBro.Core.Api;
 using StepBro.Core;
 
 namespace StepBroCoreTest
@@ -17,6 +18,12 @@ namespace StepBroCoreTest
     [TestClass]
     public class TestProcedureCall
     {
+        [TestInitialize]
+        public void Setup()
+        {
+            ServiceManager.Dispose();
+        }
+
         [TestMethod]
         public void TestFunctionCallInReturnStatement()
         {
@@ -321,7 +328,7 @@ namespace StepBroCoreTest
                 }
                 """;
 
-            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile." + Main.StepBroFileExtension, content))[0];
+            var file = FileBuilder.ParseFiles((ILogger)null, new Tuple<string, string>("myfile" + Constants.STEPBRO_FILE_EXTENSION, content))[0];
 
 
             Assert.AreEqual(3, file.ListElements().Count());

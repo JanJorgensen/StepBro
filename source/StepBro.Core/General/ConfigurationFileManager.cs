@@ -15,6 +15,7 @@ namespace StepBro.Core.General
 {
     public interface IConfigurationFileManager
     {
+        string StationPropertiesFile { get; }
         PropertyBlock GetStationProperties();
         FolderConfiguration ReadFolderConfig(ILogger logger, string configFile);
         FolderConfiguration ReadFolderConfig(string configFile, List<Tuple<int, string>> errors);
@@ -23,39 +24,43 @@ namespace StepBro.Core.General
 
     internal class ConfigurationFileManager : ServiceBase<IConfigurationFileManager, ConfigurationFileManager>, IConfigurationFileManager
     {
+        private string m_stationPropertiesFileName = null;
         private PropertyBlock m_stationProperties = null;
         private List<NamedData<FolderConfiguration>> m_folderConfigs = new List<NamedData<FolderConfiguration>>();
+        private ITextFileSystem m_fileSystem = null;
 
         public ConfigurationFileManager(out IService serviceAccess) :
             base("ConfigurationFileManager", out serviceAccess, typeof(ILogger))
         {
+            this.AddOptionalDependency(typeof(ITextFileSystem));
         }
 
         protected override void Start(ServiceManager manager, ITaskContext context)
         {
-            string stationPropFile = System.Environment.GetEnvironmentVariable(Constants.STEPBRO_STATION_PROPERTIES);
-            if (!String.IsNullOrEmpty(stationPropFile))
+            m_fileSystem = manager.Get<ITextFileSystem>();
+            m_stationPropertiesFileName = System.Environment.GetEnvironmentVariable(Constants.STEPBRO_STATION_PROPERTIES);
+            if (!String.IsNullOrEmpty(m_stationPropertiesFileName))
             {
-                System.Diagnostics.Debug.WriteLine($"Station properties file: ({stationPropFile}).");
-                if (System.IO.File.Exists(stationPropFile))
+                System.Diagnostics.Debug.WriteLine($"Station properties file: ({m_stationPropertiesFileName}).");
+                if (m_fileSystem.FileExists(m_stationPropertiesFileName))
                 {
                     try
                     {
-                        m_stationProperties = stationPropFile.GetPropertyBlockFromFile();
+                        m_stationProperties = m_stationPropertiesFileName.GetPropertyBlockFromFile();
 #if DEBUG
                         context.Logger.LogSystem($"Successfully read the station properties file.");
 #else
-                        context.Logger.LogSystem($"Station properties file: {stationPropFile}.");
+                        context.Logger.LogSystem($"Station properties file: {m_stationPropertiesFileName}.");
 #endif
                     }
                     catch
                     {
-                        context.Logger.LogError($"Error reading station properties file ({stationPropFile}).");
+                        context.Logger.LogError($"Error reading station properties file ({m_stationPropertiesFileName}).");
                     }
                 }
                 else
                 {
-                    context.Logger.LogError($"Station properties file ({stationPropFile}) was not found.");
+                    context.Logger.LogError($"Station properties file ({m_stationPropertiesFileName}) was not found.");
                 }
             }
             else
@@ -63,6 +68,8 @@ namespace StepBro.Core.General
                 context.Logger.LogSystem($"Environment variable \"{Constants.STEPBRO_STATION_PROPERTIES}\" for station properties file reference is not created.");
             }
         }
+
+        public string StationPropertiesFile { get => m_stationPropertiesFileName; }
 
         public PropertyBlock GetStationProperties()
         {
@@ -139,42 +146,55 @@ namespace StepBro.Core.General
                 {
                     m_decoder = new Block<object, FolderConfiguration>
                         (
-                            new Flag<FolderConfiguration>(Constants.STEPBRO_FOLDER_CONFIG_FILE_ROOT, (c, f) =>
-                            {
-                                string name = f.Name;
-                                if (f.HasTypeSpecified)
+                            nameof(FolderConfiguration),
+                            Doc(""),
+                            new Flag<FolderConfiguration>(
+                                Constants.STEPBRO_FOLDER_CONFIG_FILE_ROOT, 
+                                Doc(""),
+                                (c, f) =>
                                 {
-                                    return "The flag cannot have a name; only a type.";
-                                }
-                                c.IsSearchRoot = true;
-                                return null;    // No errors
-                            }),
-                            new ArrayString<FolderConfiguration>(Constants.STEPBRO_FOLDER_CONFIG_FILE_LIBS, (c, a) =>
-                            {
-                                c.LibFolders = a;
-                                return null;    // No errors
-                            }),
-                            new ValueString<FolderConfiguration>(Constants.STEPBRO_FOLDER_CONFIG_FILE_SHORTCUT, (c, v) =>
-                            {
-                                var text = v.ValueAsString();
-                                if (!v.HasTypeSpecified)
+                                    string name = f.Name;
+                                    if (f.HasTypeSpecified)
+                                    {
+                                        return "The flag cannot have a name; only a type.";
+                                    }
+                                    c.IsSearchRoot = true;
+                                    return null;    // No errors
+                                }),
+                            new ArrayString<FolderConfiguration>(
+                                Constants.STEPBRO_FOLDER_CONFIG_FILE_LIBS, 
+                                Usage.Setting,
+                                Doc(""),
+                                (c, a) =>
                                 {
-                                    return "The shortcut is missing a name.";
-                                }
+                                    c.LibFolders = a;
+                                    return null;    // No errors
+                                }),
+                            new ValueString<FolderConfiguration>(
+                                Constants.STEPBRO_FOLDER_CONFIG_FILE_SHORTCUT, 
+                                Usage.Element,
+                                Doc(""),
+                                (c, v) =>
+                                {
+                                    var text = v.ValueAsString();
+                                    if (!v.HasTypeSpecified)
+                                    {
+                                        return "The shortcut is missing a name.";
+                                    }
 
-                                if (c.Shortcuts == null)
-                                {
-                                    c.Shortcuts = new List<FolderShortcut>();
-                                }
-                                var shortcut = new FolderShortcut(FolderShortcutOrigin.Configuration, v.Name, text);
-                                c.Shortcuts.Add(shortcut);
-                                return null;    // No errors
-                            })
+                                    if (c.Shortcuts == null)
+                                    {
+                                        c.Shortcuts = new List<FolderShortcut>();
+                                    }
+                                    var shortcut = new FolderShortcut(FolderShortcutOrigin.Configuration, v.Name, text);
+                                    c.Shortcuts.Add(shortcut);
+                                    return null;    // No errors
+                                })
                         );
                 }
 
                 var config = new FolderConfiguration(currentPath);
-                m_decoder.DecodeData(data, config, errors);
+                m_decoder.DecodeData(null, data, config, errors);
                 return config;
             }
         }

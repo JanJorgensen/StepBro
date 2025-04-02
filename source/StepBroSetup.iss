@@ -2,10 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "StepBro"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.2.0"
 #define MyAppPublisher "SchmutStein"
 #define MyAppURL "http://www.schmutstein.com/"
-#define MyAppExeName "StepBro.SimpleWorkbench.exe"
+#define MyAppExeName "StepBro.Workbench.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -41,9 +41,9 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+Name: "{group}\{#MyAppName}"; Filename: "{app}\bin\{#MyAppExeName}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\bin\{#MyAppExeName}"; Tasks: desktopicon
 
 ;[Run]
 ;Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
@@ -58,18 +58,25 @@ Name: "{app}\scripts\smoketest"
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 [Files]
 Source: "bin\*"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs
+Source: "StepBro.SimpleWorkbench\StepBro.Workbench.ico"; DestDir: "{app}\bin"; Flags: ignoreversion recursesubdirs
+Source: "StepBro Station Properties.cfg"; DestDir: "{%USERPROFILE}\Documents"; Flags: onlyifdoesntexist
 
 [Registry]
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; \
     ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}\bin"; \
     Check: NeedsAddPath(ExpandConstant('{app}\bin'))
 
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; \
+    ValueType:string; ValueName: "STEPBRO_STATION_PROPERTIES"; \
+    ValueData: "{%USERPROFILE}\Documents\StepBro Station Properties.cfg"; Flags: preservestringtype; \
+    Check: NeedsAddEnvironmentVariable('STEPBRO_STATION_PROPERTIES');
+
 ; Add 'My PDF Editor' menu item to the Shell menu for PDF files:
 Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench"; ValueType: none; ValueName: ""; ValueData: ""; Flags: uninsdeletekey
 ; Specify icon for the menu item:
-; Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\images\shortcut.ico"; Flags: uninsdeletekey
+Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\bin\StepBro.Workbench.ico"; Flags: uninsdeletekey
 ; Define command for the menu item:
-Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}""  ""%1"""; Flags: uninsdeletekey
+Root: "HKCR"; Subkey: "SystemFileAssociations\.sbs\shell\Open with StepBro Workbench\command"; ValueType: string; ValueName: ""; ValueData: """{app}\bin\{#MyAppExeName}""  ""%1"""; Flags: uninsdeletekey
     
 [Code]
 function NeedsAddPath(Param: string): boolean;
@@ -86,4 +93,9 @@ begin
   { look for the path with leading and trailing semicolon }
   { Pos() returns 0 if not found }
   Result := Pos(';' + Param + ';', ';' + OrigPath + ';') = 0;
+end;
+
+function NeedsAddEnvironmentVariable(Param: string): boolean;
+begin
+  Result := GetEnv(Param) = '';
 end;

@@ -1,6 +1,8 @@
 ﻿using Antlr4.Runtime;
+using Markdig;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
+using StepBro.Core.DocCreation;
 using StepBro.Core.Execution;
 using StepBro.Core.File;
 using StepBro.Core.General;
@@ -10,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace StepBro.Core.ScriptData
 {
@@ -28,6 +31,7 @@ namespace StepBro.Core.ScriptData
         private List<UsingData> m_fileUsings = new List<UsingData>();
         private PropertyBlock m_fileProperties = null;
         private List<FileConfigValue> m_fileConfigVariables = new List<FileConfigValue>();
+        private List<FileConfigValue> m_fileConfigVariablesBefore = new List<FileConfigValue>();
         private List<FileVariable> m_fileScopeVariables = new List<FileVariable>();
         private List<FileVariable> m_fileScopeVariablesBefore = new List<FileVariable>();
         private List<FileElement> m_elements = new List<FileElement>();
@@ -38,6 +42,7 @@ namespace StepBro.Core.ScriptData
         //private DateTime m_lastParsing = DateTime.MinValue;
         private FolderShortcutCollection m_folderShortcuts = null;
         private List<FolderConfiguration> m_folderConfigs = new List<FolderConfiguration>();
+        private List<Tuple<int, ScriptDocumentation.DocCommentLineType, string>> m_documentComments = null;
         private bool m_allFolderConfigsRead = false;
 
         /// <summary>
@@ -120,6 +125,16 @@ namespace StepBro.Core.ScriptData
                     }
                 }
             }
+        }
+
+        public IEnumerable<Tuple<int, ScriptDocumentation.DocCommentLineType, string>> ListDocumentComments()
+        {
+            return m_documentComments;
+        }
+
+        internal void SetDocumentComments(List<Tuple<int, ScriptDocumentation.DocCommentLineType, string>> comments)
+        {
+            m_documentComments = comments;
         }
 
         public IErrorCollector Errors { get { return m_errors; } }
@@ -305,16 +320,42 @@ namespace StepBro.Core.ScriptData
             AccessModifier access,
             string name,
             TypeReference datatype,
-            bool @readonly,
+            int lineFileElementAssociatedData,
             int line,
             int column,
             object defaultValue)
         {
-            return -1;
+            var existing = m_fileConfigVariables.FirstOrDefault(
+                v => (v.VariableOwnerAccess != null &&
+                        String.Equals(v.VariableOwnerAccess.Container.Name, name, StringComparison.InvariantCulture) &&
+                        v.VariableOwnerAccess.Container.DataType.Type == datatype.Type));
+            if (existing != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"Using existing config variable \"{name}\" (in {this.FileName}), with ID {existing.ID}");
+                existing.VariableOwnerAccess.SetValue(defaultValue, null);
+                m_fileConfigVariables.Add(existing);
+                m_fileConfigVariablesBefore.RemoveAt(m_fileConfigVariablesBefore.IndexOf(existing));
+                existing.AccessLevel = (access == AccessModifier.None) ? AccessModifier.Public : access;
+                existing.LineAssociatedData = lineFileElementAssociatedData;
+                return existing.ID;
+            }
+
+            var vc = FileConfigValue.Create(this, access, @namespace, name, line, column, datatype, defaultValue);
+            vc.LineAssociatedData = lineFileElementAssociatedData;
+            m_fileConfigVariables.Add(vc);
+            this.ObjectContainerListChanged?.Invoke(this, EventArgs.Empty);
+            return vc.ID;
         }
 
         private IValueContainerOwnerAccess TryGetVariable(int id)
         {
+            foreach (var v in m_fileConfigVariables)
+            {
+                if (v.VariableOwnerAccess.Container.UniqueID == id)
+                {
+                    return v.VariableOwnerAccess;
+                }
+            }
             foreach (var v in m_fileScopeVariables)
             {
                 if (v.VariableOwnerAccess.Container.UniqueID == id)
@@ -331,6 +372,7 @@ namespace StepBro.Core.ScriptData
             string name,
             TypeReference datatype,
             bool @readonly,
+            int lineFileElementAssociatedData,
             int line,
             int column,
             int codeHash,
@@ -371,6 +413,7 @@ namespace StepBro.Core.ScriptData
                 {
                     SetFileVariableCustomData(existing, customSetupData);
                 }
+                existing.LineAssociatedData = lineFileElementAssociatedData;
                 return existing.ID;
             }
 
@@ -383,6 +426,7 @@ namespace StepBro.Core.ScriptData
             {
                 SetFileVariableCustomData(vc, customSetupData);
             }
+            vc.LineAssociatedData = lineFileElementAssociatedData;
             m_fileScopeVariables.Add(vc);
             this.ObjectContainerListChanged?.Invoke(this, EventArgs.Empty);
             return vc.ID;
@@ -423,7 +467,10 @@ namespace StepBro.Core.ScriptData
         {
             var variable = this.TryGetVariable(id);
             if (variable == null) throw new ArgumentException("Unknown variable ID.");
-            variable.SetAccessModifier(access);
+            if (access != AccessModifier.None)
+            {
+                variable.SetAccessModifier(access);
+            }
         }
 
         internal IProcedureReference GetProcedure(int id)
@@ -523,6 +570,8 @@ namespace StepBro.Core.ScriptData
 
         public void SaveCurrentFileVariables()
         {
+            m_fileConfigVariablesBefore = m_fileConfigVariables;
+            m_fileConfigVariables = new List<FileConfigValue>();
             m_fileScopeVariablesBefore = m_fileScopeVariables;
             m_fileScopeVariables = new List<FileVariable>();
         }
@@ -542,14 +591,205 @@ namespace StepBro.Core.ScriptData
             }
         }
 
+        //public void UpdateConfigVariables()
+        //{
+        //    foreach (var v in m_fileConfigVariables)
+        //    {
+        //        v.VariableOwnerAccess.SetValueOverride(true, null);
+        //    }
+        //}
+
+        public void InitializeFileVariables_Stage1(ILogger logger)
+        {
+            foreach (var v in m_fileScopeVariables)
+            {
+                //var data = GetFileVariableAllData(v);
+                //var dataHash = (data != null) ? data.GetHashCode() : 0;
+                //var existingHash = v.VariableOwnerAccess.DataHash;
+                //v.VariableOwnerAccess.DataHash = dataHash;  // Save it.
+
+                //bool doInit = !v.VariableOwnerAccess.DataCreated || v.VariableOwnerAccess.InitNeeded || (dataHash != existingHash);
+                if (!v.VariableOwnerAccess.DataCreated)
+                {
+#if DEBUG
+                    if (v.DataType.Type.IsClass || v.DataType.Type.IsInterface)
+                    {
+                        logger?.LogDetail("Variable " + v.VariableOwnerAccess.Container.Name + " - Create data");
+                    }
+#endif
+                    v.VariableOwnerAccess.DataCreator?.Invoke(this, v.VariableOwnerAccess, logger);
+                    var obj = v.VariableOwnerAccess.Container.GetValue();
+                    if (obj != null && obj is INameable && (obj as INameable).Name == null)
+                    {
+                        // Set the name of the object to the same as the container/variable;
+                        (obj as INameable).Name = v.VariableOwnerAccess.Container.Name;
+                    }
+                }
+                if (v.VariableOwnerAccess.DataCreated)
+                {
+                    var obj = v.VariableOwnerAccess.Container.GetValue();
+                    if (obj != null && obj is ISettableFromPropertyBlock)
+                    {
+                        object props;
+                        if (v.VariableOwnerAccess.Tags.TryGetValue(ScriptFile.VARIABLE_CUSTOM_PROPS_TAG, out props) && props is PropertyBlock)
+                        {
+                            var errors = new List<Tuple<int, string>>();
+                            try
+                            {
+                                ((ISettableFromPropertyBlock)obj).PreScanData(this, props as PropertyBlock, errors);
+
+                                foreach (var e in errors)
+                                {
+                                    this.ErrorsInternal.SymanticError(e.Item1, -1, false, e.Item2);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                this.ErrorsInternal.InternalError(v.Line, -1, "Exception scanning data: " + ex.Message);
+                            }
+                        }
+                        else
+                        {
+                            //this.ErrorsInternal.InternalError(v.Line, -1, "No data (PropertyBlock) for '" + v.Name + "'.");
+
+                            // It should not be an error...
+                        }
+                    }
+                }
+
+//                if (doInit)
+//                {
+//#if DEBUG
+//                    if (logger != null && (v.DataType.Type.IsClass || v.DataType.Type.IsInterface))
+//                    {
+//                        var text = "Reset and initialize";
+//                        var props = GetFileVariableAllData(v);
+//                        if (props != null)
+//                        {
+//                            var datastring = props.GetTestString();
+//                            if (datastring.Length < 100)
+//                            {
+//                                text = String.Concat(text, ", data: ", datastring);
+//                            }
+//                            else
+//                            {
+//                                text = String.Concat(text, ", data: ", datastring.Substring(0, 100), "...");
+//                            }
+//                        }
+//                        logger.LogDetail("Variable " + v.VariableOwnerAccess.Container.Name + " init: " + text);
+//                    }
+//#endif
+//                    var logWrapper = new VariableSetupLoggerWrapper(v, logger);
+//                    v.VariableOwnerAccess.DataResetter?.Invoke(this, v.VariableOwnerAccess, logWrapper);
+//                    v.VariableOwnerAccess.DataInitializer?.Invoke(this, v.VariableOwnerAccess, logWrapper);
+//                }
+            }
+        }
+        public void InitializeFileVariables_Stage2(ILogger logger)
+        {
+            foreach (var v in m_fileScopeVariables)
+            {
+                var data = GetFileVariableAllData(v);
+                var dataHash = (data != null) ? data.GetHashCode() : 0;
+                var existingHash = v.VariableOwnerAccess.DataHash;
+                v.VariableOwnerAccess.DataHash = dataHash;  // Save it.
+
+                bool doInit = !v.VariableOwnerAccess.DataCreated || v.VariableOwnerAccess.InitNeeded || (dataHash != existingHash);
+//                if (!v.VariableOwnerAccess.DataCreated)
+//                {
+//#if DEBUG
+//                    if (v.DataType.Type.IsClass || v.DataType.Type.IsInterface)
+//                    {
+//                        logger?.LogDetail("Variable " + v.VariableOwnerAccess.Container.Name + " - Create data");
+//                    }
+//#endif
+//                    v.VariableOwnerAccess.DataCreator?.Invoke(this, v.VariableOwnerAccess, logger);
+//                    var obj = v.VariableOwnerAccess.Container.GetValue();
+//                    if (obj != null && obj is INameable && (obj as INameable).Name == null)
+//                    {
+//                        // Set the name of the object to the same as the container/variable;
+//                        (obj as INameable).Name = v.VariableOwnerAccess.Container.Name;
+//                    }
+//                }
+//                if (v.VariableOwnerAccess.DataCreated)
+//                {
+//                    var obj = v.VariableOwnerAccess.Container.GetValue();
+//                    if (obj != null && obj is ISettableFromPropertyBlock)
+//                    {
+//                        object props;
+//                        if (v.VariableOwnerAccess.Tags.TryGetValue(ScriptFile.VARIABLE_CUSTOM_PROPS_TAG, out props) && props is PropertyBlock)
+//                        {
+//                            var errors = new List<Tuple<int, string>>();
+//                            try
+//                            {
+//                                ((ISettableFromPropertyBlock)obj).PreScanData(props as PropertyBlock, errors);
+
+//                                foreach (var e in errors)
+//                                {
+//                                    this.ErrorsInternal.SymanticError(e.Item1, -1, false, e.Item2);
+//                                }
+//                            }
+//                            catch (Exception ex)
+//                            {
+//                                this.ErrorsInternal.InternalError(v.Line, -1, "Exception scanning data: " + ex.Message);
+//                            }
+//                        }
+//                        else
+//                        {
+//                            //this.ErrorsInternal.InternalError(v.Line, -1, "No data (PropertyBlock) for '" + v.Name + "'.");
+
+//                            // It should not be an error...
+//                        }
+//                    }
+//                }
+
+                if (doInit)
+                {
+#if DEBUG
+                    if (logger != null && (v.DataType.Type.IsClass || v.DataType.Type.IsInterface))
+                    {
+                        var text = "Reset and initialize";
+                        var props = GetFileVariableAllData(v);
+                        if (props != null)
+                        {
+                            var datastring = props.GetTestString();
+                            if (datastring.Length < 100)
+                            {
+                                text = String.Concat(text, ", data: ", datastring);
+                            }
+                            else
+                            {
+                                text = String.Concat(text, ", data: ", datastring.Substring(0, 100), "...");
+                            }
+                        }
+                        logger.LogDetail("Variable " + v.VariableOwnerAccess.Container.Name + " init: " + text);
+                    }
+#endif
+                    var logWrapper = new VariableSetupLoggerWrapper(v, logger);
+                    v.VariableOwnerAccess.DataResetter?.Invoke(this, v.VariableOwnerAccess, logWrapper);
+                    v.VariableOwnerAccess.DataInitializer?.Invoke(this, v.VariableOwnerAccess, logWrapper);
+                }
+            }
+        }
+
         public void InitializeFileVariables(ILogger logger)
         {
             foreach (var v in m_fileScopeVariables)
             {
-                bool doInit = !v.VariableOwnerAccess.DataCreated || v.VariableOwnerAccess.InitNeeded;
+                var data = GetFileVariableAllData(v);
+                var dataHash = (data != null) ? data.GetHashCode() : 0;
+                var existingHash = v.VariableOwnerAccess.DataHash;
+                v.VariableOwnerAccess.DataHash = dataHash;  // Save it.
+
+                bool doInit = !v.VariableOwnerAccess.DataCreated || v.VariableOwnerAccess.InitNeeded || (dataHash != existingHash);
                 if (!v.VariableOwnerAccess.DataCreated)
                 {
-                    logger?.Log("Variable " + v.VariableOwnerAccess.Container.Name + " - Create data");
+#if DEBUG
+                    if (v.DataType.Type.IsClass || v.DataType.Type.IsInterface)
+                    {
+                        logger?.LogDetail("Variable " + v.VariableOwnerAccess.Container.Name + " - Create data");
+                    }
+#endif
                     v.VariableOwnerAccess.DataCreator?.Invoke(this, v.VariableOwnerAccess, logger);
                     var obj = v.VariableOwnerAccess.Container.GetValue();
                     if (obj != null && obj is INameable && (obj as INameable).Name == null)
@@ -592,7 +832,8 @@ namespace StepBro.Core.ScriptData
 
                 if (doInit)
                 {
-                    if (logger != null)
+#if DEBUG
+                    if (logger != null && (v.DataType.Type.IsClass || v.DataType.Type.IsInterface))
                     {
                         var text = "Reset and initialize";
                         var props = GetFileVariableAllData(v);
@@ -608,8 +849,9 @@ namespace StepBro.Core.ScriptData
                                 text = String.Concat(text, ", data: ", datastring.Substring(0, 100), "...");
                             }
                         }
-                        logger.Log("Variable " + v.VariableOwnerAccess.Container.Name + " init: " + text);
+                        logger.LogDetail("Variable " + v.VariableOwnerAccess.Container.Name + " init: " + text);
                     }
+#endif
                     var logWrapper = new VariableSetupLoggerWrapper(v, logger);
                     v.VariableOwnerAccess.DataResetter?.Invoke(this, v.VariableOwnerAccess, logWrapper);
                     v.VariableOwnerAccess.DataInitializer?.Invoke(this, v.VariableOwnerAccess, logWrapper);
@@ -659,7 +901,7 @@ namespace StepBro.Core.ScriptData
             m_elements.Add(function);
         }
 
-        public IEnumerable<IFileElement> ListElements()
+        public IEnumerable<IFileElement> ListElements(bool includeExternal = false)
         {
             foreach (var e in m_fileConfigVariables)
             {
@@ -672,6 +914,17 @@ namespace StepBro.Core.ScriptData
             foreach (var e in m_elements)
             {
                 yield return e;
+            }
+
+            if (includeExternal)
+            {
+                foreach (var fu in this.ListResolvedFileUsings())
+                {
+                    foreach (var element in fu.ListPublicElements(m_namespace))
+                    {
+                        yield return element;
+                    }
+                }
             }
         }
 
@@ -842,11 +1095,16 @@ namespace StepBro.Core.ScriptData
                             }
                             foreach (var type in ns.ListTypes(false))
                             {
-                                // If the class is static we will not be adding it (At least for now) - Static classes have been giving issues in other cases and does not seem to be used
-                                if (!(type.IsAbstract && type.IsSealed))
+                                var name = type.Name;
+                                if (type.IsGenericTypeDefinition)
                                 {
-                                    this.AddRootIdentifier(type.Name, new IdentifierInfo(type.Name, type.FullName, IdentifierType.DotNetType, new TypeReference(type), null));
+                                    if (type.IsNested)
+                                    {
+                                        continue;    // TODO: Any smart way of handling these?
+                                    }
+                                    name = name.Substring(0, name.IndexOf('`'));
                                 }
+                                this.AddRootIdentifier(name, new IdentifierInfo(type.Name, type.FullName, IdentifierType.DotNetType, new TypeReference(type), null));
                             }
                         }
                         break;
@@ -948,10 +1206,13 @@ namespace StepBro.Core.ScriptData
                 if (recursively || ((!publicOnly || u.IsPublic) && u.Identifier.Reference != null && u.Identifier.Type == IdentifierType.FileByName))
                 {
                     var file = u.Identifier.Reference as ScriptFile;
-                    yield return file;
-                    foreach (var childUsing in file.ListResolvedFileUsings(true, recursively))
+                    if (file != null)
                     {
-                        yield return childUsing;
+                        yield return file;
+                        foreach (var childUsing in file.ListResolvedFileUsings(true, recursively))
+                        {
+                            yield return childUsing;
+                        }
                     }
                 }
             }
@@ -999,6 +1260,80 @@ namespace StepBro.Core.ScriptData
             }
         }
 
+        public string GetDocumentationFilePath(string folder = null)
+        {
+            if (String.IsNullOrEmpty(folder)) folder = Path.GetDirectoryName(this.GetFullPath());
+            return Path.Combine(folder, Path.ChangeExtension(this.FileName, ".html"));
+        }
+
+        public void GenerateDocumentationFile(string folder = null)
+        {
+            string filepath = this.GetDocumentationFilePath(folder);
+
+            if (System.IO.File.Exists(filepath))
+            {
+                System.IO.File.Delete(filepath);
+            }
+            using (StreamWriter outputFile = new StreamWriter(filepath, false))
+            {
+                // TODO: Insert some CSS to make it nice.
+
+                StringBuilder helptext = new StringBuilder();
+                helptext.AppendLine($"**Generated at {DateTime.Now.ToString()}");
+                helptext.AppendLine($"# {this.FileName}");
+                helptext.AppendLine($"**Namespace:** {this.Namespace}<br/>");
+                if (m_fileUsings.Count > 0)
+                {
+                    helptext.AppendLine($"**File Usings:**");
+                    foreach (var u in m_fileUsings)
+                    {
+                        if (!u.IsAlias)
+                        {
+                            if (u.Identifier.Type == IdentifierType.FileByName)
+                            {
+                                helptext.AppendLine($" - file {u.Identifier.Name}");
+                            }
+                            else
+                            {
+                                helptext.AppendLine($" - {u.Identifier}");
+                            }
+                        }
+                    }
+                }
+
+                helptext.AppendLine($"## File Elements");
+
+                foreach (var variable in m_fileScopeVariables)
+                {
+                    helptext.AppendLine($"### {variable.Name}");
+                }
+                foreach (var element in m_elements)
+                {
+                    var docComments = new List<Tuple<ScriptDocumentation.DocCommentLineType, string>>();
+                    int docLine = ((FileElement)element).LineAssociatedData - 1; // The line before the element data.
+                    while (true)
+                    {
+                        var doc = m_documentComments.Where(dc => dc.Item1 == docLine).
+                            Select(dc => new Tuple<ScriptDocumentation.DocCommentLineType, string>(dc.Item2, dc.Item3)).FirstOrDefault();
+                        if (doc != null)
+                        {
+                            docComments.Insert(0, doc);
+                            docLine--;
+                        }
+                        else break;
+                    }
+                    helptext.AppendLine(
+                        ScriptDocumentation.CreateFileElementDocumentation(
+                            3,
+                            StepBro.Core.Main.GetService<ILoadedFilesManager>(),
+                            element,
+                            docComments));
+                }
+                System.Diagnostics.Debug.WriteLine(typeof(DateTime).Assembly.Location);
+                var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+                Markdown.ToHtml(helptext.ToString(), outputFile, pipeline);
+            }
+        }
 
 
         private class VariableSetupLoggerWrapper : ILogger
@@ -1021,7 +1356,7 @@ namespace StepBro.Core.ScriptData
                 return m_logger.CreateSubLocation(name);
             }
 
-            public ILogEntry Log(string text)
+            public ITimestampedData Log(string text)
             {
                 return m_logger.Log(text);
             }
@@ -1067,7 +1402,5 @@ namespace StepBro.Core.ScriptData
                 m_logger.LogCommReceived(text);
             }
         }
-
-
     }
 }

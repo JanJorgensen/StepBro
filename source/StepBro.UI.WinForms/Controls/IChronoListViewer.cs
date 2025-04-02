@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Data;
+using StepBro.HostSupport;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,6 @@ namespace StepBro.UI.WinForms.Controls
         DateTime ZeroTime { get; }
         IElementIndexer<ChronoListViewEntry> Source { get; }
 
-        EntrySelectionState GetEntrySelectionState(long index);
+        EntryMarkState GetEntryMarkState(long index, ChronoListViewEntry entry);
     }
 }

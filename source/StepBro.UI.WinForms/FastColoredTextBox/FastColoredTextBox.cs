@@ -5084,7 +5084,7 @@ namespace FastColoredTextBoxNS
                 //
                 //draw bookmark
                 var bookmark = bookmarks.Where(b => b.LineIndex == iLine && b.IsVisible).FirstOrDefault();
-                if (bookmark != null)
+                if (bookmark != null && bookmark.IsVisible)
                 {
                     bookmark.Paint(e.Graphics, new Rectangle(LeftIndent, y, Width, CharHeight * lineInfo.WordWrapStringsCount));
                 }

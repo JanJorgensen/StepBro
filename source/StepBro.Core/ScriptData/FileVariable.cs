@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace StepBro.Core.ScriptData
 {
-    internal class FileVariable : FileElement
+    internal class FileVariable : FileElement, IFileVariable
     {
         private readonly IValueContainerOwnerAccess m_variableAccess;
         private readonly int m_id;
@@ -28,6 +28,8 @@ namespace StepBro.Core.ScriptData
 
         public IValueContainerOwnerAccess VariableOwnerAccess { get { return m_variableAccess; } }
 
+        public IValueContainer Value { get { return m_variableAccess.Container; } }
+
         public int ID { get { return m_id; } }
 
         public static FileVariable Create(IScriptFile file, AccessModifier access, string @namespace, string name, TypeReference type, bool readOnly,
@@ -40,6 +42,7 @@ namespace StepBro.Core.ScriptData
             if (type.Type != null)
             {
                 vcOwnerAccess = VariableContainer.Create(@namespace, name, type, readOnly);
+                vcOwnerAccess.SetAccessModifier(access);
                 System.Diagnostics.Debug.WriteLine($"Creating variable \"{name}\" (in {file.FileName}), with ID {vcOwnerAccess.Container.UniqueID}");
                 vcOwnerAccess.FileLine = line;
                 vcOwnerAccess.FileColumn = column;

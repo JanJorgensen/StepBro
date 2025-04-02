@@ -21,6 +21,10 @@ namespace StepBro.Core.ScriptData
         /// </summary>
         Namespace,
         /// <summary>
+        /// A documentation placeholder.
+        /// </summary>
+        Documentation,
+        /// <summary>
         ///  A definition of a named enum with named values.
         /// </summary>
         EnumDefinition,
@@ -40,6 +44,10 @@ namespace StepBro.Core.ScriptData
         /// A config value in a value container, but read-only.
         /// </summary>
         Config,
+        /// <summary>
+        /// A const/config override value.
+        /// </summary>
+        ConstOverride,
         /// <summary>
         /// A list of test procedure and test list references.
         /// </summary>

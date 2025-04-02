@@ -6,6 +6,7 @@ using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using StepBroCoreTest.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -32,6 +33,54 @@ namespace StepBroCoreTest.Parser
 
             var result = taskContext.CallProcedure(procedureA);
             Assert.AreEqual(7161L, result);
+        }
+
+        [TestMethod]
+        public void TestFileParsingProceduresOfSameNameInDifferentNamespaces()
+        {
+            string f1 =
+                """
+                using "betty.sbs";
+                namespace Anders;
+                public void Absalon()
+                {
+                    Fly();
+                    Anders.Fly();
+                    Bent.Fly();
+                    Christian.Fly();
+                }
+                public void Fly(){}
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null,
+                new Tuple<string, string>("andrea.sbs", f1),
+                new Tuple<string, string>("betty.sbs",      "public using \"chrissy.sbs\";  namespace Bent;         public void Fly(){}"),
+                new Tuple<string, string>("chrissy.sbs",    "                               namespace Christian;    public void Fly(){}"));
+            Assert.AreEqual(3, files.Length);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            Assert.AreEqual(0, files[1].Errors.ErrorCount);
+            Assert.AreEqual(0, files[2].Errors.ErrorCount);
+            var procedureA = files[0].ListElements().First(p => p.Name == "Absalon") as IFileProcedure;
+            Assert.AreEqual("Absalon", procedureA.Name);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            taskContext.CallProcedure(procedureA);
+
+            var log = new LogInspector(taskContext.Logger);
+            log.DebugDump();
+            log.ExpectNext("0 - Pre - TestRun - Starting");
+            log.ExpectNext("1 - Pre - Anders.Absalon - <no arguments>");
+            log.ExpectNext("2 - Pre - 5 Anders.Fly - <no arguments>");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Pre - 6 Anders.Fly - <no arguments>");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Pre - 7 Bent.Fly - <no arguments>");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Pre - 8 Christian.Fly - <no arguments>");
+            log.ExpectNext("3 - Post");
+            log.ExpectNext("2 - Post");
+            log.ExpectEnd();
         }
 
         [TestMethod]
@@ -86,7 +135,7 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(5L, result);
         }
 
-        [TestMethod]    // public using is not working yet.
+        [TestMethod]
         public void FileParsing_AccessProcedureInUsedFilesPublicUsingFile()
         {
             var files = FileBuilder.ParseFiles((ILogger)null,
@@ -108,6 +157,19 @@ namespace StepBroCoreTest.Parser
             var result = taskContext.CallProcedure(procedureA);
             Assert.AreEqual(82L, result);
         }
+
+        [TestMethod]
+        public void TestFileParsingHandlingDublicateFileUsing()
+        {
+            var files = FileBuilder.ParseFiles((ILogger)null,
+                new Tuple<string, string>("andrea.sbs", "using \"betty.sbs\"; using \"betty.sbs\"; namespace Anders; procedure int Absalon(){ int i = 0; i = Bethlehem(); return i; }"),
+                new Tuple<string, string>("betty.sbs", "namespace Anders; public procedure int Bethlehem(){ return 7161; }"));
+            Assert.AreEqual(2, files.Length);
+            Assert.AreEqual(1, files.ElementAt(0).Errors.ErrorCount);
+            Assert.AreEqual("File using already added (betty.sbs).", files.ElementAt(0).Errors[0].Message);
+            Assert.AreEqual(0, files.ElementAt(1).Errors.ErrorCount);
+        }
+
 
         [TestMethod, Description("Testing the behaviour of generated code when parsing, and then re-parsing the code.")]
         public void TestFileParsingWithReParsing()
@@ -231,12 +293,12 @@ namespace StepBroCoreTest.Parser
             var log = new LogInspector(taskContext.Logger);
             log.DebugDump();
             log.ExpectNext("0 - Pre - TestRun - Starting");
-            log.ExpectNext("1 - Normal - TestRun - Variable myTool1 - Create data");
-            log.ExpectNext("1 - Normal - TestRun - Variable myTool1 init: Reset and initialize, data: { BoolA=True, IntA=36, ExtraData = { a=8227, b=Bee } }");
+            log.ExpectNext("1 - Detail - TestRun - Variable myTool1 - Create data");
+            log.ExpectNext("1 - Detail - TestRun - Variable myTool1 init: Reset and initialize, data: { BoolA=True, IntA=36, ExtraData = { a=8227, b=Bee } }");
             log.ExpectNext("1 - Normal - TestRun - Entry: Value: a=8227");
             log.ExpectNext("1 - Normal - TestRun - Entry: Value: b=Bee");
-            log.ExpectNext("1 - Normal - TestRun - Variable myTool2 - Create data");
-            log.ExpectNext("1 - Normal - TestRun - Variable myTool2 init: Reset and initialize, data: { BoolA=True, IntA=36, Mogens = { m1=True, m2=Identifier: Jepper } }");
+            log.ExpectNext("1 - Detail - TestRun - Variable myTool2 - Create data");
+            log.ExpectNext("1 - Detail - TestRun - Variable myTool2 init: Reset and initialize, data: { BoolA=True, IntA=36, Mogens = { m1=True, m2=Identifier: Jepper } }");
             log.ExpectNext("1 - Error - TestRun - Unknown data field: \"Mogens\", line 13");
             log.ExpectEnd();
         }
@@ -568,7 +630,7 @@ namespace StepBroCoreTest.Parser
 
 
         [TestMethod]
-        public void FileParsing_OverrideVariableAsTypedef_NoDataChange()
+        public void FileParsing_OverrideVariableAsTypedef_NoDataChange_DataAsInstance()
         {
             var f1 = new StringBuilder();
             f1.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
@@ -638,6 +700,120 @@ namespace StepBroCoreTest.Parser
         }
 
         [TestMethod]
+        public void FileParsing_OverrideVariableAsTypedef_NoDataChange_SimpleDataAsInstance()
+        {
+            var f1 = new StringBuilder();
+            f1.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
+            f1.AppendLine("using \"midfile.sbs\";");
+            f1.AppendLine("namespace ObjectOverride;");
+            f1.AppendLine("procedure void Main()");
+            f1.AppendLine("{");
+            f1.AppendLine("   myTool.DoProcB();");
+            f1.AppendLine("}");
+
+            var f2 = new StringBuilder();
+            f2.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
+            f2.AppendLine("public using \"libfile.sbs\";");
+            f2.AppendLine("namespace ObjectOverride;");
+            f2.AppendLine("type DumberInstrument : " + typeof(DummyInstrumentClass).Name + ";");
+            f2.AppendLine("override myTool as DumberInstrument;");
+            f2.AppendLine("procedure void DoProcB(this " + typeof(DummyInstrumentClass).Name + " instrument)");
+            f2.AppendLine("{");
+            f2.AppendLine("   instrument.IntA = 992;");
+            f2.AppendLine("}");
+
+            var f3 = new StringBuilder();
+            f3.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
+            f3.AppendLine("namespace ObjectOverride;");
+            f3.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool = " + typeof(DummyInstrumentClass).Name);
+            f3.AppendLine("{");
+            f3.AppendLine("   BoolA: true,");
+            f3.AppendLine("   IntA:  36");
+            f3.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("topfile.sbs", f1.ToString()),
+                new Tuple<string, string>("midfile.sbs", f2.ToString()),
+                new Tuple<string, string>("libfile.sbs", f3.ToString()));
+            Assert.AreEqual(3, files.Length);
+            Assert.AreEqual("topfile.sbs", files[0].FileName);
+            Assert.AreEqual("midfile.sbs", files[1].FileName);
+            Assert.AreEqual("libfile.sbs", files[2].FileName);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            Assert.AreEqual(0, files[1].Errors.ErrorCount);
+            Assert.AreEqual(0, files[2].Errors.ErrorCount);
+            var procedureMain = files[0].ListElements().First(p => p.Name == "Main") as IFileProcedure;
+            Assert.IsNotNull(procedureMain);
+            var toolMid = files[1].ListElements().First(p => p.Name == "myTool") as IFileElement;
+            Assert.IsNotNull(toolMid);
+            Assert.IsNotNull(toolMid.ElementType == FileElementType.Override);
+            var toolLib = files[2].ListElements().First(p => p.Name == "myTool") as IFileElement;
+            Assert.IsNotNull(toolLib);
+            Assert.IsNotNull(toolLib.ElementType == FileElementType.FileVariable);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+            taskContext.CallProcedure(procedureMain);
+        }
+
+        [TestMethod]
+        public void FileParsing_OverrideVariableAsTypedef_NoDataChange_DataAsArgument()
+        {
+            var f1 = new StringBuilder();
+            f1.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
+            f1.AppendLine("using \"midfile.sbs\";");
+            f1.AppendLine("namespace ObjectOverride;");
+            f1.AppendLine("procedure void Main()");
+            f1.AppendLine("{");
+            f1.AppendLine("   DoProcB(myTool);");
+            f1.AppendLine("}");
+
+            var f2 = new StringBuilder();
+            f2.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
+            f2.AppendLine("public using \"libfile.sbs\";");
+            f2.AppendLine("namespace ObjectOverride;");
+            f2.AppendLine("type DumberInstrument : " + typeof(DummyInstrumentClass).Name + ";");
+            f2.AppendLine("override myTool as DumberInstrument;");
+            f2.AppendLine("procedure void DoProcB(" + typeof(DummyInstrumentClass).Name + " instrument)");
+            f2.AppendLine("{");
+            f2.AppendLine("   instrument.IntA = 992;");
+            f2.AppendLine("}");
+
+            var f3 = new StringBuilder();
+            f3.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");  // An object with the IResettable interface.
+            f3.AppendLine("namespace ObjectOverride;");
+            f3.AppendLine("public " + typeof(DummyInstrumentClass).Name + " myTool = " + typeof(DummyInstrumentClass).Name);
+            f3.AppendLine("{");
+            f3.AppendLine("   BoolA: true,");
+            f3.AppendLine("   IntA:  36");
+            f3.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("topfile.sbs", f1.ToString()),
+                new Tuple<string, string>("midfile.sbs", f2.ToString()),
+                new Tuple<string, string>("libfile.sbs", f3.ToString()));
+            Assert.AreEqual(3, files.Length);
+            Assert.AreEqual("topfile.sbs", files[0].FileName);
+            Assert.AreEqual("midfile.sbs", files[1].FileName);
+            Assert.AreEqual("libfile.sbs", files[2].FileName);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            Assert.AreEqual(0, files[1].Errors.ErrorCount);
+            Assert.AreEqual(0, files[2].Errors.ErrorCount);
+            var procedureMain = files[0].ListElements().First(p => p.Name == "Main") as IFileProcedure;
+            Assert.IsNotNull(procedureMain);
+            var toolMid = files[1].ListElements().First(p => p.Name == "myTool") as IFileElement;
+            Assert.IsNotNull(toolMid);
+            Assert.IsNotNull(toolMid.ElementType == FileElementType.Override);
+            var toolLib = files[2].ListElements().First(p => p.Name == "myTool") as IFileElement;
+            Assert.IsNotNull(toolLib);
+            Assert.IsNotNull(toolLib.ElementType == FileElementType.FileVariable);
+            var obj = (toolLib as FileVariable).Value.Object as DummyInstrumentClass;
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+            taskContext.CallProcedure(procedureMain);
+            Assert.AreEqual(992L, obj.IntA);
+        }
+
+        [TestMethod]
         public void FileParsing_TypeDefUseConstructorOneAbstraction()
         {
             string f1 =
@@ -674,6 +850,128 @@ namespace StepBroCoreTest.Parser
             var result = taskContext.CallProcedure(procedure);
             Assert.AreEqual(5, ((Tuple<long, long>)result).Item1);
             Assert.AreEqual(7, ((Tuple<long, long>)result).Item2);
+        }
+
+        [TestMethod]
+        public void FileParsing_TypeDefUseOtherTypeDef()
+        {
+            string f1 =
+                """
+                using System;
+                
+                type TupleInts : Tuple<int, int>;
+                type TupleList : System.Collections.Generic.List<TupleInts>;
+
+                procedure TupleList test()
+                {
+                    var list  = TupleList();
+                    var entry = TupleInts(12, 16);
+                    list.Add(entry);
+                    list.Add(TupleInts(22, 28));
+                    return list;
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var typedef = files[0].ListElements().FirstOrDefault(p => p.Name == "TupleInts");
+            Assert.IsNotNull(typedef);
+            Assert.IsNotNull(typedef.DataType);
+            var procedure = files[0].ListElements().FirstOrDefault(p => p.Name == "test") as IFileProcedure;
+            Assert.IsNotNull(procedure);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            var result = taskContext.CallProcedure(procedure);
+            Assert.IsInstanceOfType(result, typeof(List<Tuple<long, long>>));
+            var list = result as List<Tuple<long, long>>;
+            Assert.AreEqual(2, list.Count);
+            Assert.AreEqual(12L, (list[0]).Item1);
+            Assert.AreEqual(16L, (list[0]).Item2);
+            Assert.AreEqual(22L, (list[1]).Item1);
+            Assert.AreEqual(28L, (list[1]).Item2);
+        }
+
+        [TestMethod]
+        public void FileParsing_TypeDefUsePropertyWhereExtensionMethodExistsWithSameName()
+        {
+            string f1 =
+                """
+                using System;
+                
+                type EntryType : Tuple<int,int>;
+                type MyList : System.Collections.Generic.List<EntryType>;
+
+                procedure int test()
+                {
+                    var list = MyList();
+                    list.Add(EntryType(0, 30));
+                    list.Add(EntryType(1, 31));
+                    list.Add(EntryType(2, 32));
+                    return list.Count;
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var typedef = files[0].ListElements().FirstOrDefault(p => p.Name == "MyList");
+            Assert.IsNotNull(typedef);
+            Assert.IsNotNull(typedef.DataType);
+            var procedure = files[0].ListElements().FirstOrDefault(p => p.Name == "test") as IFileProcedure;
+            Assert.IsNotNull(procedure);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            var result = taskContext.CallProcedure(procedure);
+            Assert.IsInstanceOfType(result, typeof(long));
+            Assert.AreEqual(3L, (long)result);
+        }
+
+        [TestMethod, Ignore("Finding generic type List<> via a using statement is not implemented.")]
+        public void FileParsing_TypeDefByNamespaceUsing()
+        {
+            string f1 =
+                """
+                using System;
+                using System.Collections.Generic;   // Make this work.
+                                
+                type TupleInts : Tuple<int, int>;
+                type TupleList : List<TupleInts>;   // Make this work.
+
+                procedure TupleList test()
+                {
+                    var list  = TupleList();
+                    var entry = TupleInts(12, 16);
+                    list.Add(entry);
+                    list.Add(TupleInts(22, 28));
+                    return list;
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var typedef = files[0].ListElements().FirstOrDefault(p => p.Name == "TupleInts");
+            Assert.IsNotNull(typedef);
+            Assert.IsNotNull(typedef.DataType);
+            var procedure = files[0].ListElements().FirstOrDefault(p => p.Name == "test") as IFileProcedure;
+            Assert.IsNotNull(procedure);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+
+            var result = taskContext.CallProcedure(procedure);
+            Assert.IsInstanceOfType(result, typeof(List<Tuple<long, long>>));
+            var list = result as List<Tuple<long, long>>;
+            Assert.AreEqual(2, list.Count);
+            Assert.AreEqual(12L, (list[0]).Item1);
+            Assert.AreEqual(16L, (list[0]).Item2);
+            Assert.AreEqual(22L, (list[1]).Item1);
+            Assert.AreEqual(28L, (list[1]).Item2);
         }
 
         [TestMethod]
@@ -865,6 +1163,78 @@ namespace StepBroCoreTest.Parser
 
             var result = taskContext.CallProcedure(procedureTop);
             Assert.AreEqual(3108L, result);
+        }
+
+        [TestMethod]
+        public void FileParsing_DocumentationElement()
+        {
+            string f1 =
+                """
+                /// summary: Some documentation for the file.
+                /// And some more <br/> And yet some _more_.
+                documentation JustSomeDocLineWithoutAnyDocumentation;
+                void main()
+                {
+                    log("");
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var docElement = files[0].ListElements().FirstOrDefault(e => e.ElementType == FileElementType.Documentation) as FileElementDocumentation;
+            Assert.IsNotNull(docElement);
+            Assert.AreEqual(3, docElement.Line);
+            var documentation = docElement.GetDocumentation();
+            Assert.AreEqual(2, documentation.Count);
+        }
+
+        [TestMethod]
+        public void FileParsing_ArgumentErrorInProcedureCall()
+        {
+            string f1 =
+                """
+                void main()
+                {
+                    sub(mogens);
+                }
+                void sub(int x)
+                {
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);
+            Assert.AreEqual("Unknown identifier: mogens", files[0].Errors[0].Message);
+        }
+
+        [TestMethod]
+        public void FileParsing_UsingMethodInStaticClass()
+        {
+            string f1 =
+                """
+                int main()
+                {
+                    var v = 10.8;
+                    var i = System.Convert.ToInt64(v);
+                    return i;
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+
+            var procedure = files[0].ListElements().First(p => p.Name == "main") as IFileProcedure;
+            Assert.IsNotNull(procedure);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+            var result = taskContext.CallProcedure(procedure);
+            Assert.AreEqual(11L, result);
         }
     }
 }

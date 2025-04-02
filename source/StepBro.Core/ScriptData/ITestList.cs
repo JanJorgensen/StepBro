@@ -29,6 +29,7 @@ namespace StepBro.Core.ScriptData
         ITestList Home { get; }
         IFileElement Reference { get; }
         string ReferenceName { get; }
+        string Title { get; }
         TestListEntryType Type { get; }
         ArgumentList Arguments { get; }
     }
@@ -47,6 +48,7 @@ namespace StepBro.Core.ScriptData
     {
         void Reset();
         bool GetNext();
+        string Title { get; }
         IProcedureReference Procedure { get; }
         ArgumentList Arguments { get; }
     }

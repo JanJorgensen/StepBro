@@ -133,6 +133,9 @@
   <data name="ScriptFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ScriptFile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="StepBro_Workbench" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\StepBro.Workbench.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="TestList" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\TestList.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

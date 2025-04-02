@@ -46,8 +46,8 @@ namespace StepBro.Core.Parser
 
         public SBExpressionData GetExpressionResultUnresolved()
         {
-            var topStack = m_expressionData.PopStackLevel();
-            return topStack.Pop();
+            var topLevel = m_expressionData.PopStackLevel();
+            return topLevel.Stack.Pop();
         }
 
         //public Expression PopStackLevelAsExpression()
@@ -98,8 +98,8 @@ namespace StepBro.Core.Parser
         public override void ExitParExpression([NotNull] SBP.ParExpressionContext context)
         {
             var expressionScope = m_expressionData.PopStackLevel();
-            System.Diagnostics.Debug.Assert(expressionScope.Count == 1, "Parameter error in: " + context.GetText());    // Until anything else has been seen...
-            var data = expressionScope.Pop();
+            System.Diagnostics.Debug.Assert(expressionScope.Stack.Count == 1, "Parameter error in: " + context.GetText());    // Until anything else has been seen...
+            var data = expressionScope.Stack.Pop();
             m_expressionData.Push(data);
         }
 
@@ -115,7 +115,6 @@ namespace StepBro.Core.Parser
                     m_currentProcedure.ContextReferenceInternal,
                     typeof(IScriptCallContext).GetProperty(nameof(IScriptCallContext.This)));
                 m_expressionData.Push(new SBExpressionData(
-                    HomeType.Immediate,
                     SBExpressionType.PropertyReference,
                     new TypeReference(typeof(IProcedureThis)),
                     thisProperty,
@@ -189,7 +188,6 @@ namespace StepBro.Core.Parser
                     Expression.Constant((type.DynamicType as IFileProcedure).UniqueID));
                 m_expressionData.Push(
                     new SBExpressionData(
-                        HomeType.Immediate,
                         SBExpressionType.Expression,
                         type,
                         call));
@@ -207,7 +205,6 @@ namespace StepBro.Core.Parser
                     Expression.Constant(context.ChildCount == 4));
                 m_expressionData.Push(
                     new SBExpressionData(
-                        HomeType.Immediate,
                         SBExpressionType.Expression,
                         TypeReference.TypeBool,
                         call));
@@ -229,7 +226,6 @@ namespace StepBro.Core.Parser
                     Expression.Constant(context.ChildCount == 4));
                 m_expressionData.Push(
                     new SBExpressionData(
-                        HomeType.Immediate,
                         SBExpressionType.Expression,
                         TypeReference.TypeBool,
                         call));
@@ -247,7 +243,6 @@ namespace StepBro.Core.Parser
                     Expression.Constant(context.ChildCount == 4));
                 m_expressionData.Push(
                     new SBExpressionData(
-                        HomeType.Immediate,
                         SBExpressionType.Expression,
                         TypeReference.TypeBool,
                         call));
@@ -256,17 +251,17 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpSelect([NotNull] SBP.ExpSelectContext context)
         {
-            var val2 = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
-            var val1 = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
-            var exp = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), targetType: TypeReference.TypeBool, reportIfUnresolved: true).NarrowGetValueType();
+            var val2 = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var val1 = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var exp = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), targetType: TypeReference.TypeBool, reportIfUnresolved: true).NarrowGetValueType();
             if (CheckExpressionsForErrors(context, exp, val1, val2))
             {
                 // TODO: Add some try-catch around this to catch exceptions and report errors.
 
                 m_expressionData.Push(
                     new SBExpressionData(Expression.Condition(
-                        exp.ExpressionCode, 
-                        val1.ExpressionCode, 
+                        exp.ExpressionCode,
+                        val1.ExpressionCode,
                         val2.ExpressionCode)));
             }
         }
@@ -367,7 +362,6 @@ namespace StepBro.Core.Parser
                         expression.Type.GetMethod("GetTypedValue"),
                         Expression.Constant(null, typeof(StepBro.Core.Logging.ILogger)));
                     output = new SBExpressionData(
-                        HomeType.Immediate,
                         SBExpressionType.Expression,
                         datatype,
                         getValue);//,
@@ -377,6 +371,25 @@ namespace StepBro.Core.Parser
                 {
                     // Do automatic conversion from int to double.
                     output = new SBExpressionData(Expression.Convert(output.ExpressionCode, typeof(double)));
+                }
+                else if (output.IsOverrideElement)
+                {
+                    var overrider = (FileElementOverride)(output.Value);
+                    var rootElement = IdentifierToExpressionData(overrider.GetRootBaseElement(), output.Token);
+                    if (overrider.HasTypeOverride)
+                    {
+                        rootElement.Value = output.Value;
+                    }
+
+                    var getValue = Expression.Call(
+                        rootElement.ExpressionCode,        // Code for getting the variable reference
+                        rootElement.DataType.Type.GetMethod("GetTypedValue"),
+                        Expression.Constant(null, typeof(StepBro.Core.Logging.ILogger)));
+                    output = new SBExpressionData(
+                        SBExpressionType.Expression,
+                        overrider.DataType,
+                        getValue,
+                        output.Value);
                 }
             }
             return output;
@@ -398,8 +411,8 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpBinary([NotNull] SBP.ExpBinaryContext context)
         {
-            var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
-            var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var last = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var first = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), reportIfUnresolved: true).NarrowGetValueType();
             if (CheckExpressionsForErrors(context, first, last))
             {
                 try
@@ -415,7 +428,7 @@ namespace StepBro.Core.Parser
                                 var valueSaverFirst = s_SaveExpectValueText.MakeGenericMethod(first.DataType.Type);
                                 first = new SBExpressionData(Expression.Call(valueSaverFirst, m_currentProcedure.ContextReferenceInternal, first.ExpressionCode, Expression.Constant("Left"), Expression.Constant(true)));
                             }
-                            
+
                             if (last.ExpressionCode.ToString() != "null") // This is only true when the expression is null. The string "null" turns into "\"null\""
                             {
                                 var valueSaverLast = s_SaveExpectValueText.MakeGenericMethod(last.DataType.Type);
@@ -470,7 +483,7 @@ namespace StepBro.Core.Parser
 
         private void ExitExpUnary(ParserRuleContext context, int type, bool opOnLeft)
         {
-            var input = this.ResolveIfIdentifier(m_expressionData.Peek().Pop(), true);
+            var input = this.ResolveIfIdentifier(m_expressionData.Peek().Stack.Pop(), true);
             if (CheckExpressionsForErrors(context, input))
             {
                 var op = UnaryOperators.UnaryOperatorBase.GetOperator(type);
@@ -481,8 +494,8 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpAssignment([NotNull] SBP.ExpAssignmentContext context)
         {
-            var last = m_expressionData.Peek().Pop();
-            var first = this.ResolveIfIdentifier(m_expressionData.Peek().Pop(), true);
+            var last = m_expressionData.Peek().Stack.Pop();
+            var first = this.ResolveIfIdentifier(m_expressionData.Peek().Stack.Pop(), true);
             last = this.ResolveForGetOperation(last, reportIfUnresolved: true, targetType: first.DataType);
             if (CheckExpressionsForErrors(context, first, last))
             {
@@ -506,14 +519,14 @@ namespace StepBro.Core.Parser
                             m_errors.SymanticError(context.Start.Line, context.Start.Column, false, $"Assignment failed: {ae.Message}");
                             // Adding an error expression to the expression data stack makes it possible
                             // to parse the rest of the script to catch further issues
-                            m_expressionData.Push(new SBExpressionData(HomeType.Immediate, SBExpressionType.ExpressionError));
+                            m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError));
                         }
                         catch (Exception e)
                         {
                             m_errors.InternalError(context.Start.Line, context.Start.Column, $"Assignment failed: {e.Message}");
                             // Adding an error expression to the expression data stack makes it possible
                             // to parse the rest of the script to catch further issues
-                            m_expressionData.Push(new SBExpressionData(HomeType.Immediate, SBExpressionType.ExpressionError));
+                            m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError));
                         }
                     }
                 }
@@ -526,9 +539,9 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpBetween([NotNull] SBP.ExpBetweenContext context)
         {
-            var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            var middle = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
+            var last = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
+            var middle = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
+            var first = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
             if (CheckExpressionsForErrors(context, first, middle, last))
             {
                 if (m_isSimpleExpectWithValue)
@@ -562,9 +575,9 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpEqualsWithTolerance([NotNull] SBP.ExpEqualsWithToleranceContext context)
         {
-            var tolerance = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            var expected = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            var value = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
+            var tolerance = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var expected = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), reportIfUnresolved: true).NarrowGetValueType();
+            var value = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop(), reportIfUnresolved: true).NarrowGetValueType();
             if (CheckExpressionsForErrors(context, value, expected, tolerance))
             {
                 var op = context.op.Type;
@@ -592,8 +605,8 @@ namespace StepBro.Core.Parser
 
         public override void ExitExpCoalescing([NotNull] SBP.ExpCoalescingContext context)
         {
-            var last = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
-            var first = this.ResolveForGetOperation(m_expressionData.Peek().Pop()).NarrowGetValueType();
+            var last = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
+            var first = this.ResolveForGetOperation(m_expressionData.Peek().Stack.Pop()).NarrowGetValueType();
             if (CheckExpressionsForErrors(context, first, last))
             {
                 var result = SpecialOperators.CoalescingOperator.Resolve(this, first, last);
@@ -804,7 +817,7 @@ namespace StepBro.Core.Parser
                         }
                         else
                         {
-                            throw new NotImplementedException();
+                            throw new NotImplementedException("Type: " + e.ReferencedType.ToString());
                             //m_errors.SymanticError(e.Token.Line, e.Token.Column, false, "");
                         }
                     }
@@ -818,6 +831,37 @@ namespace StepBro.Core.Parser
                 return false;
             }
         }
+
+        private bool CheckArgumentExpressionsForErrors(ParserRuleContext context, params SBExpressionData[] expressions)
+        {
+            if (expressions.All(e => e.IsResolved && !e.IsError()))
+            {
+                return true;
+            }
+            else
+            {
+                foreach (var e in expressions.Where(exp => exp.IsResolved == false && exp.ReferencedType > SBExpressionType.ExpressionError))
+                {
+                    if (e.ReferencedType == SBExpressionType.UnknownIdentifier)
+                    {
+                        m_errors.SymanticError(e.Token.Line, e.Token.Column, false, "Unknown identifier: " + (e.Value as string));
+                    }
+                    else
+                    {
+                        throw new NotImplementedException("Type: " + e.ReferencedType.ToString());
+                        //m_errors.SymanticError(e.Token.Line, e.Token.Column, false, "");
+                    }
+                }
+
+                m_expressionData.Push(new SBExpressionData(
+                    SBExpressionType.ExpressionError,
+                    "Expression error.",
+                    context.GetText(),
+                    new TokenOrSection(context.Start, context.Stop, context.GetText())));
+                return false;
+            }
+        }
+
 
         #endregion
     }

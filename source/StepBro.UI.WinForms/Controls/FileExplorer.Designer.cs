@@ -41,12 +41,13 @@
             // 
             // treeView
             // 
+            treeView.BackColor = SystemColors.Window;
             treeView.Dock = DockStyle.Fill;
             treeView.FullRowSelect = true;
             treeView.Indent = 19;
             treeView.Location = new Point(0, 25);
             treeView.Name = "treeView";
-            treeView.Size = new Size(428, 217);
+            treeView.Size = new Size(300, 217);
             treeView.TabIndex = 0;
             treeView.BeforeCollapse += treeView_BeforeCollapse;
             treeView.BeforeExpand += treeView_BeforeExpand;
@@ -66,7 +67,7 @@
             toolStrip.Items.AddRange(new ToolStripItem[] { toolStripButtonShowFiles, toolStripButtonShowElements, toolStripTextBoxSearch });
             toolStrip.Location = new Point(0, 0);
             toolStrip.Name = "toolStrip";
-            toolStrip.Size = new Size(428, 25);
+            toolStrip.Size = new Size(300, 25);
             toolStrip.TabIndex = 1;
             toolStrip.Text = "toolStrip";
             // 
@@ -83,11 +84,14 @@
             toolStripButtonShowFiles.Size = new Size(34, 22);
             toolStripButtonShowFiles.Text = "Files";
             toolStripButtonShowFiles.ToolTipText = "Show general files view";
+            toolStripButtonShowFiles.Visible = false;
             toolStripButtonShowFiles.CheckedChanged += toolStripButtonShowFiles_CheckedChanged;
             // 
             // toolStripButtonShowElements
             // 
+            toolStripButtonShowElements.Checked = true;
             toolStripButtonShowElements.CheckOnClick = true;
+            toolStripButtonShowElements.CheckState = CheckState.Checked;
             toolStripButtonShowElements.DisplayStyle = ToolStripItemDisplayStyle.Text;
             toolStripButtonShowElements.Image = (Image)resources.GetObject("toolStripButtonShowElements.Image");
             toolStripButtonShowElements.ImageTransparentColor = Color.Magenta;
@@ -109,8 +113,9 @@
             AutoScaleMode = AutoScaleMode.Font;
             Controls.Add(treeView);
             Controls.Add(toolStrip);
+            MinimumSize = new Size(300, 100);
             Name = "FileExplorer";
-            Size = new Size(428, 242);
+            Size = new Size(300, 242);
             toolStrip.ResumeLayout(false);
             toolStrip.PerformLayout();
             ResumeLayout(false);

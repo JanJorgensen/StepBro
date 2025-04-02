@@ -100,9 +100,14 @@ namespace StepBro.Core.Logging
             return scope;
         }
 
-        public ILoggerScope LogEntering(bool isHighLevel, string location, string text, LoggerDynamicLocationSource dynamicLocation)
+        public ILoggerScope LogEntering(LogEntry.Type type, string location, string text, LoggerDynamicLocationSource dynamicLocation = null)
         {
-            var entry = m_logger.Log(m_scopeStartEntry, isHighLevel ? LogEntry.Type.PreHighLevel : LogEntry.Type.Pre, DateTime.UtcNow, m_threadID, location, text);
+            var thread = m_threadID;
+            if (type == LogEntry.Type.TaskEntry)
+            {
+                thread = System.Threading.Thread.CurrentThread.ManagedThreadId;
+            }
+            var entry = m_logger.Log(m_scopeStartEntry, type, DateTime.UtcNow, thread, location, text);
             return new LoggerScope(m_logger, entry, dynamicLocation: dynamicLocation);
         }
 
@@ -119,7 +124,7 @@ namespace StepBro.Core.Logging
             }
         }
 
-        public ILogEntry Log(string text)
+        public ITimestampedData Log(string text)
         {
             return this.Log(LogEntry.Type.Normal, text);
         }
@@ -179,12 +184,12 @@ namespace StepBro.Core.Logging
             return (IProtectedLogger)this;
         }
 
-        public ILogEntry FirstLogEntryInScope
+        public ITimestampedData FirstLogEntryInScope
         {
             get { return m_scopeStartEntry; }
         }
 
-        public ILogEntry LastLogEntryInScope
+        public ITimestampedData LastLogEntryInScope
         {
             get { return m_scopeEndEntry; }
         }

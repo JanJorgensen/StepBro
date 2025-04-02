@@ -23,6 +23,9 @@ namespace StepBro.Core.Addons
 
         public OutputType FormatterType { get { return OutputType.Console; } }
 
+        public string LogFileExtension { get { throw new InvalidOperationException("This formatter cannot write to files."); } }
+        public string ReportFileExtension { get { throw new InvalidOperationException("This formatter cannot write to files."); } }
+
         public IOutputFormatter Create(OutputFormatOptions options, ITextWriter writer = null)
         {
             if (writer != null)
@@ -30,11 +33,6 @@ namespace StepBro.Core.Addons
                 throw new NotSupportedException();
             }
             return new TextToConsoleFormatter(options);
-        }
-
-        public IOutputFormatter Create(ITextWriter writer)
-        {
-            throw new NotImplementedException();
         }
 
         public class TextToConsoleFormatter : IOutputFormatter, ITextWriter
@@ -127,7 +125,12 @@ namespace StepBro.Core.Addons
                             for (int i = 0; i < 3; i++) m_writer.WriteLine(""); // Empty lines
                         }
 
-                        m_writer.WriteLine($"--- GROUP: {group.Name} ---");
+                        var verdict = "";
+                        if (group.Verdict != Verdict.Unset)
+                        {
+                            verdict = " - " + group.Verdict.ToString();
+                        }
+                        m_writer.WriteLine($"--- GROUP: {group.Name}{verdict} ---");
                         if (!String.IsNullOrEmpty(group.Description))
                         {
                             m_writer.WriteLine($"Description:{group.Description}");
@@ -233,7 +236,7 @@ namespace StepBro.Core.Addons
                         m_writer.WriteLine("--- SUMMARY ---");
                         foreach (var result in summary.ListResults())
                         {
-                            m_writer.WriteLine($"{result.Item1}: {(result.Item2 != null ? result.Item2.ToString(false) : "MISSING")}");
+                            m_writer.WriteLine($"{result.GetName()}: {(result.Result != null ? result.Result.ToString(false) : "MISSING")}");
                         }
                     }
 

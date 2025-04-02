@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>StepBro.UI.WinForms</RootNamespace>
+    <AssemblyName>StepBro.UI.WinForms</AssemblyName>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputPath>..\bin</OutputPath>
@@ -28,11 +30,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2592.51" />
+    <PackageReference Include="Markdig" Version="0.38.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
+    <ProjectReference Include="..\StepBro.HostSupport\StepBro.HostSupport.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -22,6 +22,9 @@ namespace StepBro.Core.Addons
 
         public OutputType FormatterType { get { return OutputType.Text; } }
 
+        public string LogFileExtension { get { return "txt"; } }
+        public string ReportFileExtension { get { return "txt"; } }
+
         public IOutputFormatter Create(OutputFormatOptions options, ITextWriter writer = null)
         {
             return new Outputter(options, writer);
@@ -83,16 +86,16 @@ namespace StepBro.Core.Addons
                     {
                         var summary = report.Summary;
                         m_writer.WriteLine("##[group] SUMMARY - " + summary.ToString());
-                        var width1 = summary.ListResults().Select(r => r.Item1.Length).Max() + 2;
+                        var width1 = summary.ListResults().Select(r => r.GetName().Length).Max() + 2;
                         foreach (var result in summary.ListResults())
                         {
-                            if (result.Item2 != null)
+                            if (result.Result != null)
                             {
-                                m_writer.WriteLine($"    {result.Item1}:{new String(' ', width1 - result.Item1.Length)}{result.Item2.ToString(false)}");
+                                m_writer.WriteLine($"    {result.GetName()}:{new String(' ', width1 - result.GetName().Length)}{result.Result.ToString(false)}");
                             }
                             else
                             {
-                                m_writer.WriteLine($"    {result.Item1}:{new String(' ', width1 - result.Item1.Length)}MISSING");
+                                m_writer.WriteLine($"    {result.GetName()}:{new String(' ', width1 - result.GetName().Length)}MISSING");
                             }
                         }
                         m_writer.WriteLine("##[endgroup]");
@@ -104,7 +107,12 @@ namespace StepBro.Core.Addons
 
                     foreach (var group in report.ListGroups())
                     {
-                        m_writer.WriteLine("##[group] " + group.Name);
+                        string verdict = "";
+                        if (group.Verdict != Verdict.Unset)
+                        {
+                            verdict = " - " + group.Verdict.ToString();
+                        }
+                        m_writer.WriteLine("##[group] " + group.Name + verdict);
                         if (!String.IsNullOrEmpty(group.Description))
                         {
                             m_writer.WriteLine(indent.Peek() + "  Description: " + group.Description);
@@ -245,7 +253,7 @@ namespace StepBro.Core.Addons
                 }
                 if (measurements.Count > 0)
                 {
-                    m_writer.WriteLine("##[section]"+ indent.Peek() + "Measurements");
+                    m_writer.WriteLine("##[section]" + indent.Peek() + "Measurements");
 
                     indent.Push(indent.Peek() + "    ");
                     var indentString = indent.Peek();

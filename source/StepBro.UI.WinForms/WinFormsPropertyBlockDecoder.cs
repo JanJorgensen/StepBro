@@ -10,12 +10,17 @@ namespace StepBro.UI.WinForms
         {
             private Func<TParent, Color, string> m_setter;
 
-            public ValueColor(string typeOrName, Func<TParent, Color, string> setter = null) : base(typeOrName)
+            public ValueColor(string typeOrName, DocString doc, Func<TParent, Color, string> setter = null) : base(typeOrName, Usage.Setting, doc)
             {
                 m_setter = setter;
             }
 
-            protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
+            public ValueColor(string typeOrName, Usage usage, DocString doc, Func<TParent, Color, string> setter = null) : base(typeOrName, usage, doc)
+            {
+                m_setter = setter;
+            }
+
+            protected override void TryCreateOrSet(object context, PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
             {
                 if (m_setter == null) return;
                 var valueEntry = entry as PropertyBlockValue;

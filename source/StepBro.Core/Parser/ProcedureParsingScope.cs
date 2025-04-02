@@ -60,9 +60,9 @@ namespace StepBro.Core.Parser
             else return m_scopeStatements[0];
         }
 
-        public ProcedureVariable AddVariable(string name, TypeReference type, SBExpressionData assignment, EntryModifiers modifiers)
+        public ProcedureVariable AddVariable(string name, TypeReference type, SBExpressionData assignment, EntryModifiers modifiers, string file, int line)
         {
-            var v = new ProcedureVariable(false, name, type, modifiers);
+            var v = new ProcedureVariable(false, name, type, modifiers, file, line);
             v.Assignment = assignment;
             m_localVariables.Add(v);
             return v;

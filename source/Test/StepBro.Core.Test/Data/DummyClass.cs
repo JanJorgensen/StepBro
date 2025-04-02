@@ -26,7 +26,7 @@ namespace StepBroCoreTest.Data
 
     }
 
-    public class DummyClass : IDummyClass, IScriptDisposable
+    public class DummyClass : IDummyClass, IScriptDisposable, ITextCommandInput
     {
         private long m_propInt;
         private bool m_propBool = false;
@@ -122,6 +122,7 @@ namespace StepBroCoreTest.Data
         public static long MethodStaticLongOut6(long a, bool b = true, TimeSpan c = default(TimeSpan)) { return a + 4006L; }
         public static long MethodStaticLongOut7(DummyEnum value) { return (long)((int)value) * 7L; }
         public static long MethodStaticLongOut8(object value) { return (value == null) ? -1L : value.ToString().Length; }
+        public static long MethodStaticLongOut9(long a, bool b = true, string c = default(string)) { return a + (b ? 20 : 10) + c.Length + 4500L; }
 
         public static int MethodStaticLongToInt(long value) { return (int)value; }
 
@@ -336,5 +337,20 @@ namespace StepBroCoreTest.Data
         {
             throw new KeyNotFoundException();
         }
+
+        bool ITextCommandInput.Enabled
+        {
+            get { return true; }
+        }
+
+        bool ITextCommandInput.AcceptingCommands()
+        {
+            return m_propBool;
+        }
+        void ITextCommandInput.ExecuteCommand(string command)
+        {
+            m_propInt = long.Parse(command);         
+        }
+
     }
 }

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!--
-    Microsoft ResX Schema 
+    Microsoft ResX Schema
 
     Version 2.0
 
@@ -48,7 +48,7 @@
     value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-    
+
     mimetype: application/x-microsoft.net.object.soap.base64
     value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
@@ -142,6 +142,15 @@
         AAAAAElFTkSuQmCC
 </value>
   </data>
+  <data name="toolStripDropDownButtonTool.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACRSURBVDhPY/j27dt/SjDYACcnJ7IwigEf3n8kCZNswPNb
+        J/+f6DYF0yA+yQac6Db5f6hWCmwIiE+mC0wIu2DS2Vf/F1x6DefjwlgNyNr34r/0wkdgTMgQDAOQNRNj
+        CIoBOg0rMTTDMLIhIHbriZeYBmDTiIxBGkEYxge5liQDsGGQqykyAISpZwAlmIEywMAAAAc1/Jwvt6sN
+        AAAAAElFTkSuQmCC
+</value>
+  </data>
   <data name="toolStripButtonRunCommand.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -181,4 +190,63 @@
   <metadata name="dockManager.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>808, 17</value>
   </metadata>
+  <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        AAABAAEAICAAAAAAGACoDAAAFgAAACgAAAAgAAAAQAAAAAEAGAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAA
+        AAAinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPo8rPpoyfp/1/qO4fqa6fqa6fqa6fqJ3vp51PpRuvoinPoinPoinPoinPpZwPqa6fqa6fqa
+        6fqa6fqa6fqa6fqa6fqa6fqa6fqa6fqU5fp51PpHtPoinPoinPpZwPqJ3vqa6fqa6fqa6fqa6fqa6fqa
+        6fqa6fqa6fqa6fqa6fqD2vovpfoinPoinPoinPqD2vqa6fqa6fqa6fqa6fqa6fqa6fqa6fqa6fqa6fqa
+        6fqa6fqa6fpRuvoinPovpfqU5fqa6fqU5fp00fpRuvovpfoinPovpfphxPqU5fqa6fqa6fp51PoinPoi
+        nPoinPqD2vqa6fqa6fpRuvoinPoinPoinPoinPoinPo8rPp51Pqa6fqa6fqO4foinPoinPp51Pp51Pov
+        pfoinPoinPoinPoinPoinPoinPpHtPqa6fqa6fqa6fovpfoinPoinPqD2vqa6fqa6fpRuvoinPoinPoi
+        nPoinPoinPoinPovpfqa6fqa6fqa6fpHtPoinPo8rPo8rPoinPoinPoinPoinPoinPoinPoinPoinPqJ
+        3vqa6fqa6fpRuvoinPoinPqD2vqa6fqa6fpRuvoinPoinPoinPoinPoinPoinPoinPqa6fqa6fqa6fpR
+        uvoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPovpfqU5fqa6fqa6fovpfoinPoinPqD2vqa6fqa
+        6fpRuvoinPoinPoinPoinPoinPoinPovpfqa6fqa6fqa6fo8rPoinPoinPoinPoinPoinPovpfpRuvpZ
+        wPpuzfp/1/qU5fqa6fqa6fp00foinPoinPoinPqD2vqa6fqa6fpRuvoinPoinPoinPoinPoinPo8rPp5
+        1Pqa6fqa6fp00foinPoinPoinPo8rPp51PqU5fqa6fqa6fqa6fqa6fqa6fqa6fqa6fp00foinPoinPoi
+        nPoinPqD2vqa6fqa6fqa6fqa6fqa6fqa6fqa6fqa6fqa6fqa6fqU5fpuzfoinPoinPoinPo8rPqU5fqa
+        6fqa6fqa6fqJ3vqD2vp/1/puzfpZwPovpfoinPoinPoinPoinPoinPqD2vqa6fqa6fqa6fqa6fqa6fqa
+        6fqa6fqa6fqa6fqa6fqO4fpHtPoinPoinPoinPpuzfqa6fqa6fpuzfoinPoinPoinPoinPoinPoinPoi
+        nPo8rPoinPoinPoinPoinPqD2vqa6fqa6fpRuvoinPoinPoinPoinPoinPpRuvqa6fqa6fqU5fovpfoi
+        nPoinPpuzfqa6fqa6fpRuvoinPoinPoinPoinPoinPoinPpZwPqD2voinPoinPoinPoinPqD2vqa6fqa
+        6fpRuvoinPoinPoinPoinPoinPoinPqD2vqa6fqa6fpRuvoinPoinPphxPqa6fqa6fqJ3vpZwPoinPoi
+        nPovpfpZwPqD2vqa6fqa6fphxPoinPoinPoinPqD2vqa6fqa6fpRuvoinPoinPoinPoinPoinPpRuvqa
+        6fqa6fqa6fpHtPoinPoinPoinPp51Pqa6fqa6fqa6fqa6fqa6fqa6fqa6fqa6fqa6fqU5fp51PoinPoi
+        nPoinPqD2vqa6fqa6fqa6fqa6fqa6fqa6fqa6fqa6fqa6fqa6fqa6fqD2voinPoinPoinPoinPoinPpZ
+        wPp/1/qU5fqa6fqa6fqa6fqD2vp00fpZwPoinPoinPoinPoinPpZwPqa6fqa6fqa6fqa6fqa6fqa6fqa
+        6fqa6fqa6fqa6fqO4fpuzfovpfoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoinPoi
+        nPoinPoinPoinPoinPoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
+</value>
+  </data>
 </root>

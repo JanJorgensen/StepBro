@@ -56,6 +56,10 @@ namespace StepBro.Core.Data
         {
             return time.ToString("yyyyMMdd_HHmmss") + ((extension != null) ? ("." + extension) : "");
         }
+        public static string ToGeneralFormat(this DateTime time)
+        {
+            return time.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+        }
 
         public static bool TryParseLiteral(this string value, out object literal)
         {
@@ -92,12 +96,12 @@ namespace StepBro.Core.Data
             else if (Char.IsLetter(value[0]))
             {
                 bool b;
-                if (value.TryParse(out b))
+                if (value.TryParseBool(out b))
                 {
                     literal = b;
                     return true;
                 }
-                literal = value;
+                literal = (Identifier)value;
                 return true;
             }
             else if (value[0] == '\"')
@@ -219,9 +223,20 @@ namespace StepBro.Core.Data
 
         public static string DecodeLiteral(this string s)
         {
+            var value = DecodeLiteral(s, out int len);
+            if (len != s.Length)
+            {
+                throw new FormatException("Unexpected end of string.");
+            }
+            return value;
+        }
+
+        public static string DecodeLiteral(this string s, out int len)
+        {
             int l = s.Length;
             StringBuilder decoded = new(l);
-            for (int i = 0; i < l; i++)
+            int i = 0;
+            for (; i < l; i++)
             {
                 if (s[i] == '\\')
                 {
@@ -239,7 +254,7 @@ namespace StepBro.Core.Data
                         case 'f': decoded.Append('\f'); break;
                         case 'u':
                         case 'x':
-                            i++;
+                            i++;    // Skip past the initial char (u or x).
                             if ((l - i) < 4)
                             {
                                 throw new FormatException(String.Format("Error in unicode escape sequence at index {0}", i));
@@ -260,11 +275,16 @@ namespace StepBro.Core.Data
                             break;
                     }
                 }
+                else if (s[i] == '"')
+                {
+                    break;
+                }
                 else
                 {
                     decoded.Append(s[i]);
                 }
             }
+            len = i;
             return decoded.ToString();
         }
 
@@ -278,12 +298,13 @@ namespace StepBro.Core.Data
                 .Replace("\'", "\\\'");
         }
 
-        public static string ObjectToString(object value, bool identifierBare = false)
+        public static string ObjectToString(object value, bool identifierBare = false, bool stringBare = false)
         {
             if (value == null) return "<null>";
             var t = value.GetType();
-            if (t == typeof(string)) return "\"" + ((string)value).EscapeString() + "\"";
+            if (t == typeof(string)) return stringBare ? (string)value : ("\"" + ((string)value).EscapeString() + "\"");
             if (t == typeof(Identifier)) return identifierBare ? ((Identifier)value).Name : ("'" + ((Identifier)value).Name + "'");
+            if (t == typeof(DateTime)) return ((DateTime)value).ToGeneralFormat();
             if (t == typeof(ArgumentList))
             {
                 var list = value as ArgumentList;
@@ -372,10 +393,11 @@ namespace StepBro.Core.Data
 
         public static string ToClearText(this LogEntry entry, string timestamp, bool forceShow = false, bool showErrorAndFailType = true)
         {
+            if (entry.EntryType == LogEntry.Type.Special) return null;
             StringBuilder text = new(1000);
             text.Append(timestamp);
             text.Append(new string(' ', 1 + entry.IndentLevel * 3));
-            string type = entry.EntryType switch
+            string type = (entry.EntryType & LogEntry.Type.FlagFilter) switch
             {
                 LogEntry.Type.Async => "<A> ",
                 LogEntry.Type.CommunicationOut => "                                <Out> ",
@@ -435,6 +457,11 @@ namespace StepBro.Core.Data
                 }
             }
             return text.ToString();
+        }
+
+        public static string ToHTMLText(string text)
+        {
+            return text.Replace("\r\n", "<br />").Replace("\n", "<br />").Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
         }
 
         #region String Comparison

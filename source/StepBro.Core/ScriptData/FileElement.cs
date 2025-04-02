@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Data;
+using StepBro.Core.DocCreation;
 using StepBro.Core.Parser;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace StepBro.Core.ScriptData
         private IScriptFile m_parentFile;
         private AccessModifier m_accessModifier;
         private int m_line;
+        private int m_lineAssociatedData;
         private string m_baseElementName = null;
         private IFileElement m_baseElement;
         private IFileElement m_parentElement;
@@ -118,7 +120,8 @@ namespace StepBro.Core.ScriptData
                     // Assume not the same element.
                     System.Diagnostics.Debug.Assert(!object.ReferenceEquals(value, this));
                     // Assume not both override elements or elements are from different files.
-                    System.Diagnostics.Debug.Assert(this.ElementType != FileElementType.Override || value.ElementType != FileElementType.Override || !Object.ReferenceEquals(m_parentFile, value.ParentFile));
+                    var oneIsNotOverride = this.ElementType != FileElementType.Override || value.ElementType != FileElementType.Override;
+                    System.Diagnostics.Debug.Assert(oneIsNotOverride || !Object.ReferenceEquals(m_parentFile, value.ParentFile));
                     m_baseElement = value;
                 }
             }
@@ -202,6 +205,10 @@ namespace StepBro.Core.ScriptData
             }
         }
 
+        string IIdentifierInfo.SourceFile { get { return m_parentFile.FilePath; } }
+
+        int IIdentifierInfo.SourceLine { get { return m_line; } }
+
         public int UniqueID
         {
             get
@@ -210,10 +217,42 @@ namespace StepBro.Core.ScriptData
             }
         }
 
+        /// <summary>
+        /// Line of the file element definition.
+        /// </summary>
         public int Line
         {
             get { return m_line; }
             internal set { m_line = value; }
+        }
+
+        /// <summary>
+        /// The line number of the first file element associated data (attribute, modifier or the element definition itself).
+        /// </summary>
+        public int LineAssociatedData
+        {
+            get { return m_lineAssociatedData; }
+            internal set { m_lineAssociatedData = value; }
+        }
+
+        public List<Tuple<ScriptDocumentation.DocCommentLineType, string>> GetDocumentation()
+        {
+            var fileComments = m_parentFile.ListDocumentComments().ToList();
+
+            var picker = (int index) => fileComments.FirstOrDefault(c => c.Item1 == index);
+
+            var lineNumber = this.LineAssociatedData - 1;
+            var lines = new List<Tuple<ScriptDocumentation.DocCommentLineType, string>>();
+
+            var lineData = picker(lineNumber);
+
+            while (lineData != null)
+            {
+                lines.Insert(0, new Tuple<ScriptDocumentation.DocCommentLineType, string>(lineData.Item2, lineData.Item3));
+                lineData = picker(--lineNumber);
+            }
+
+            return lines;
         }
 
         IInheritable IInheritable.Base { get { return this.BaseElement as IInheritable; } }
@@ -246,16 +285,17 @@ namespace StepBro.Core.ScriptData
 
         internal bool ParseBaseElement()
         {
-            var baseName = (this.ElementType == FileElementType.Override) ? m_elementName : m_baseElementName;
+            var baseName = (this.ElementType == FileElementType.Override || this.ElementType == FileElementType.ConstOverride) ? m_elementName : m_baseElementName;
             if (!String.IsNullOrEmpty(baseName) && m_parentFile != null)
             {
                 var file = m_parentFile as ScriptFile;
 
-                bool allowOverrideElements = false;
+                bool allowOverrideElements = false;     // TODO: Should this be removed or actually used again?
                 switch (this.ElementType)
                 {
                     case FileElementType.Override:
-                        allowOverrideElements = true;
+                    case FileElementType.ConstOverride:
+                        //allowOverrideElements = true;
                         break;
                     case FileElementType.Using:
                     case FileElementType.Namespace:
@@ -275,7 +315,7 @@ namespace StepBro.Core.ScriptData
                     predicate: (IIdentifierInfo id) => (
                         id.Type == IdentifierType.FileElement &&
                         !Object.ReferenceEquals(id, this) &&
-                        (allowOverrideElements || ((FileElement)id).ElementType != FileElementType.Override)));
+                        (allowOverrideElements || (((FileElement)id).ElementType != FileElementType.Override && ((FileElement)id).ElementType != FileElementType.ConstOverride))));
                 var element = (found != null) ? (found[0] as IFileElement) : null;
                 if (element != null)
                 {
@@ -361,7 +401,7 @@ namespace StepBro.Core.ScriptData
                 type.Equals("model", StringComparison.InvariantCulture) ||
                 type.Equals("partner override", StringComparison.InvariantCulture) ||
                 type.Equals("model override", StringComparison.InvariantCulture)))
-                //type.Equals("partner new", StringComparison.InvariantCulture)))
+            //type.Equals("partner new", StringComparison.InvariantCulture)))
             {
                 string referenceName = null;
                 if (value is string)
@@ -395,13 +435,13 @@ namespace StepBro.Core.ScriptData
                                 }
                                 else
                                 {
-                                    baseElement.m_partners.Add(new FileElementPartner(this, name, referenceName, referenceElement as IFileProcedure));
+                                    baseElement.m_partners.Add(new FileElementPartner(this, name, referenceName, referenceElement as IFileProcedure, line));
                                 }
                             }
                         }
                         else
                         {
-                            var partner = new FileElementPartner(this, name, referenceName, referenceElement as IFileProcedure);
+                            var partner = new FileElementPartner(this, name, referenceName, referenceElement as IFileProcedure, line);
                             if (type.Contains("model", StringComparison.InvariantCulture))
                             {
                                 partner.IsModelDirect = true;

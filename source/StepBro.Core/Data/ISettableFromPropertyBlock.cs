@@ -6,9 +6,14 @@ using System.Reflection.Metadata;
 
 namespace StepBro.Core.Data
 {
-    public interface ISettableFromPropertyBlock
+
+    public interface IPropertyBlockDataScanner
     {
         void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors);
+        PropertyBlockDecoder.Element TryGetDecoder();
+    }
+    public interface ISettableFromPropertyBlock : IPropertyBlockDataScanner
+    {
         void Setup(IScriptFile file, ILogger logger, PropertyBlock data);
     }
 }

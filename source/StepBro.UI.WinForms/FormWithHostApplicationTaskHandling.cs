@@ -11,23 +11,8 @@ namespace StepBro.UI.WinForms
 {
     public class FormWithHostApplicationTaskHandling : Form
     {
-        private class MyTaskHandler : HostApplicationTaskHandler
-        {
-            FormWithHostApplicationTaskHandling m_parent;
-
-            public MyTaskHandler(FormWithHostApplicationTaskHandling parent)
-            {
-                m_parent = parent;
-            }
-
-            protected override void RequestHostDomainHandling(Action action)
-            {
-                m_parent.BeginInvoke(action);
-            }
-        }
-
         private System.ComponentModel.IContainer components = null;
-        private MyTaskHandler m_taskHandler;
+        private HostApplicationTaskHandler m_taskHandler;
         private System.Windows.Forms.Timer m_timer = null;
         private StateChange m_taskWorkingState = StateChange.Idle;
         private string m_taskWorkingText = "Ready";
@@ -37,7 +22,7 @@ namespace StepBro.UI.WinForms
         public FormWithHostApplicationTaskHandling() : base()
         {
             components = new System.ComponentModel.Container();
-            m_taskHandler = new MyTaskHandler(this);
+            m_taskHandler = new HostApplicationTaskHandler();
             m_taskHandler.StateChangeEvent += TaskHandler_StateChangeEvent;
         }
 
@@ -147,9 +132,13 @@ namespace StepBro.UI.WinForms
         {
         }
 
-        protected void AddTask<TState>(HostApplicationTaskHandler.Task<TState> task, string workingText, string purposeText) where TState : struct, System.Enum
+        protected void AddTask<TState>(
+            HostApplicationTaskHandler.Task<TState> task, 
+            HostApplicationTaskHandler.Priority priority,
+            string workingText, 
+            string purposeText) where TState : struct, System.Enum
         {
-            m_taskHandler.AddTask(task, workingText, purposeText);
+            m_taskHandler.AddTask(task, priority, workingText, purposeText);
         }
     }
 }

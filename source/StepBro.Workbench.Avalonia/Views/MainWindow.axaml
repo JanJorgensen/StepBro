@@ -1,0 +1,138 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:StepBro.Workbench.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lib="clr-namespace:StepBro.UI.Controls;assembly=StepBro.UI.Avalonia"
+        xmlns:AvaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="StepBro.Workbench.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/StepBro.Workbench.ico"
+        Title="StepBro Workbench">
+
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
+
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="LightGray">
+      <Button Name="mainMenu" Background="Transparent">
+        <Image Height="20" Width="20" Source="/Assets/menu.png"/>
+      </Button>
+      <CheckBox Name="checkBoxPrimaryLeft" IsChecked="true" Margin="5 0 0 0" Checked="CheckBoxPrimaryOnLeft_Click" Unchecked="CheckBoxPrimaryOnLeft_Click">Primary on Left</CheckBox>
+      <CheckBox Name="checkBoxLeft" IsChecked="true" Margin="5 0 0 0" Checked="checkBox_Layout" Unchecked="checkBox_Layout">Left</CheckBox>
+      <CheckBox Name="checkBoxRight" IsChecked="false" Margin="5 0 0 0" Checked="checkBox_Layout" Unchecked="checkBox_Layout">Right</CheckBox>
+      <CheckBox Name="checkBoxBottom" IsChecked="true" Margin="5 0 0 0" Checked="checkBox_Layout" Unchecked="checkBox_Layout">Bottom</CheckBox>
+      <ComboBox Name="panelAlignmentSelector" Margin="5 0 0 0" SelectedIndex="2" SelectionChanged="panelAlignmentSelector_SelectionChanged">
+        <ComboBoxItem>Left</ComboBoxItem>
+        <ComboBoxItem>Right</ComboBoxItem>
+        <ComboBoxItem>Center</ComboBoxItem>
+        <ComboBoxItem>Justify</ComboBoxItem>
+      </ComboBox>
+      <Button Click="Button_Click" Margin="5 0 0 0">Do it!</Button>
+    </StackPanel>
+    <StackPanel DockPanel.Dock="Bottom" Height="20" Background="LightGray"></StackPanel>
+
+    <DockPanel Name="outer">
+      <DockPanel Name="primarySideMenu" DockPanel.Dock="Left" Width="42">
+        <Panel Name="primarySideMenuLine" DockPanel.Dock="Right" Width="2" Background="Gray"></Panel>
+        <DockPanel>
+          <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+            <Button Height="32" Width="32" Margin="4" Background="LightSkyBlue">
+              <Image Height="24" Width="24" Source="/Assets/files.png"/>
+            </Button>
+          </StackPanel>
+          <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical">
+            <Button Height="32" Width="32" Margin="4" Background="Transparent">
+              <Image Height="24" Width="24" Source="/Assets/settings.png"/>
+            </Button>
+          </StackPanel>
+          <Panel></Panel>
+        </DockPanel>
+      </DockPanel>
+      <Grid Name="mainGrid">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*" MinHeight="30"/>
+          <RowDefinition Height="Auto" MinHeight="40"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" MinWidth="40"/>
+          <ColumnDefinition Width="*" MinWidth="30"/>
+          <ColumnDefinition Width="Auto" MinWidth="40"/>
+        </Grid.ColumnDefinitions>
+
+        <DockPanel Name="xLeft" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2">
+          <Panel Name="xLeftSplitterSpacing" DockPanel.Dock="Right" Width="6" Background="Red"></Panel>
+          <StackPanel Name="xLeftContent" Orientation="Vertical">
+            <DockPanel Name="primaryPanel">
+              <TreeView Name="SolutionExplorer" IsVisible="True">
+              </TreeView>
+              <StackPanel Margin="1" Name="Settings" Orientation="Vertical" IsVisible="True">
+                <StackPanel Orientation="Vertical">
+                  <Button Background="Transparent" Padding="1" Margin="1" HorizontalAlignment="Stretch">
+                    <DockPanel>
+                      <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                        <Image Height="16" Width="16" Source="/Assets/dock left on.png"/>
+                        <Label>Left</Label>
+                        <Panel Width="6"/>
+                      </StackPanel>
+                      <StackPanel DockPanel.Dock="Right">
+                        <Label>Primary Panel Location</Label>
+                      </StackPanel>
+                      <Panel/>
+                    </DockPanel>
+                  </Button>
+                  <Button Background="Transparent" Padding="1" Margin="1" HorizontalAlignment="Stretch">
+                    <DockPanel>
+                      <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                        <Image Height="16" Width="16" Source="/Assets/dock right on.png"/>
+                        <Label>Right</Label>
+                      </StackPanel>
+                    </DockPanel>
+                  </Button>
+                  <lib:SettingsOption></lib:SettingsOption>
+                </StackPanel>
+              </StackPanel>
+            </DockPanel>
+          </StackPanel>
+        </DockPanel>
+        <GridSplitter Name="xSplitterLeft" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Width="1" Background="Gray" HorizontalAlignment="Right" VerticalAlignment="Stretch"></GridSplitter>
+        <DockPanel Name="xMid" Grid.Column="1" Grid.Row="0">
+          <TabControl SelectedIndex="0" >
+            <TabItem Header="Execution Log">
+              <lib:LogViewer Name="logViewer"></lib:LogViewer>
+            </TabItem>
+            <TabItem Header="PCM02.Workbench.sbs">
+              <StackPanel>
+                <AvaloniaEdit:TextEditor Text="Hello AvaloniaEdit!"
+                           ShowLineNumbers="True"
+                           FontFamily="Cascadia Code,Consolas,Menlo,Monospace"/>
+              </StackPanel>
+            </TabItem>
+          </TabControl>
+        </DockPanel>
+
+        <DockPanel Name="xRight" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2">
+          <Panel Name="xRightSplitterSpacing" DockPanel.Dock="Left" Width="6" Background="Red"></Panel>
+          <DockPanel Name="xRightContent" Background="LightSkyBlue"></DockPanel>
+        </DockPanel>
+        <GridSplitter Name="xSplitterRight" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Width="1" Background="Gray" HorizontalAlignment="Left" VerticalAlignment="Stretch"></GridSplitter>
+        <DockPanel Name="xBottom" Grid.Column="1" Grid.Row="1">
+          <Panel DockPanel.Dock="Top" Height="6" Background="Red"></Panel>
+          <StackPanel Background="LightSkyBlue"></StackPanel>
+        </DockPanel>
+        <GridSplitter Name="xSplitterBottom" Grid.Row="1" Grid.Column="1" Height="1" Background="Gray" HorizontalAlignment="Stretch" VerticalAlignment="Top"></GridSplitter>
+      </Grid>
+
+
+    </DockPanel>
+
+  </DockPanel>
+
+
+  <!--<TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>-->
+
+</Window>

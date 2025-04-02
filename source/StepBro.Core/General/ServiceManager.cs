@@ -27,6 +27,7 @@ namespace StepBro.Core
         }
 
         public static ServiceManager Global { get { return g_manager; } }
+        public static ServiceManager GlobalIfReady { get { return (g_manager != null && g_manager.State == ServiceManagerState.Started) ? g_manager : null; } }
 
         public ServiceManagerState State { get; private set; } = ServiceManagerState.Initial;
 
@@ -35,6 +36,11 @@ namespace StepBro.Core
             IServiceManagerAdministration admin;
             g_manager = new ServiceManager(out admin);
             return admin;
+        }
+
+        internal static void Dispose()
+        {
+            g_manager = null;
         }
 
         private class ServiceManagerAdministration : IServiceManagerAdministration
@@ -50,6 +56,7 @@ namespace StepBro.Core
             public void StopServices(ITaskContext context, bool reset)
             {
                 this.Manager.StopServices(context, reset);
+                g_manager = null;
             }
         }
 
@@ -118,10 +125,12 @@ namespace StepBro.Core
                     else
                     {
                         var allDepsFound = true;
-                        foreach (var d in s.Dependencies)
+                        var deps = (s.OptionalDependencies != null) ? s.Dependencies.Concat(s.OptionalDependencies) : s.Dependencies;
+                        foreach (var d in deps)
                         {
-                            if (!newList.Exists(x => x.ServiceType == d))
+                            if (allServices.Exists(x => x.ServiceType == d) && !newList.Exists(x => x.ServiceType == d))
                             {
+                                // If the dependency exists in the list but not already added to the new list, don't add this service yet.
                                 allDepsFound = false;
                                 break;
                             }
@@ -228,6 +237,7 @@ namespace StepBro.Core
                 reversed.Reverse();
                 long i = 0;
                 bool fails = false;
+                string exceptionMessage = "";
                 foreach (var s in reversed)
                 {
                     if (s.State == ServiceState.Started)
@@ -237,8 +247,9 @@ namespace StepBro.Core
                             context.UpdateStatus("Stopping service " + s.Name, i);
                             s.Stop(this, context);
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
+                            exceptionMessage += e.Message + " ";
                             fails = true;
                         }
                     }
@@ -251,7 +262,7 @@ namespace StepBro.Core
                     {
                         this.State = ServiceManagerState.StopFailed;
                     }
-                    throw new Exception("Failed starting services. Some dependencies are missing.");
+                    throw new Exception("Failed starting services. Some dependencies are missing. " + exceptionMessage);
                 }
                 else
                 {

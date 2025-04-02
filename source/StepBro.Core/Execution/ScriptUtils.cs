@@ -14,6 +14,8 @@ using StepBro.Core.Data.Report;
 using StepBro.Core.File;
 using StepBro.Core.Logging;
 using static StepBro.Core.Data.StringUtils;
+using StepBro.Core.Host;
+using StepBro.Core.Tasks;
 
 namespace StepBro.Core.Execution
 {
@@ -128,9 +130,24 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static byte[] ToByteArray(this List<long> input)
+        public static ByteArray ToByteArray(this List<long> input)
         {
-            return input.ConvertAll(v => (byte)(ulong)v).ToArray();
+            return new ByteArray(input.ConvertAll(v => (byte)(ulong)v).ToArray());
+        }
+        [Public]
+        public static ByteArray ToByteArray(this List<int> input)
+        {
+            return new ByteArray(input.ConvertAll(v => (byte)(uint)v).ToArray());
+        }
+        [Public]
+        public static ByteArray ToByteArray(this List<uint> input)
+        {
+            return new ByteArray(input.ConvertAll(v => (byte)v).ToArray());
+        }
+        [Public]
+        public static ByteArray ToByteArray(this byte[] array, int start = 0, int length = -1)
+        {
+            return new ByteArray(array, start, length);
         }
 
         [Public]
@@ -149,13 +166,19 @@ namespace StepBro.Core.Execution
         }
 
         [Public]
-        public static string GetFullPath(this string filepath, [Implicit] ICallContext context)
+        public static string GetFullPath(this string filepath, [Implicit] ICallContext context, params string[] paths)
         {
             string error = null;
             var result = context.ListShortcuts().GetFullPath(filepath, ref error);
             if (result == null)
             {
                 context.ReportError(error);
+            }
+            if (paths != null && paths.Length > 0)
+            {
+                List<string> parts = new List<string>(paths);
+                parts.Insert(0, result);
+                result = System.IO.Path.Combine(parts.ToArray());
             }
             return result;
         }
@@ -173,8 +196,20 @@ namespace StepBro.Core.Execution
         {
             if (String.IsNullOrEmpty(prefix)) throw new ArgumentException(nameof(prefix));
             string folder = GetOutputFileFolder();
-            string filename = prefix + time.ToFileName() + ((String.IsNullOrEmpty(postfix)) ? "" : postfix) + "." + extension;
+            string filename = prefix + time.ToLocalTime().ToFileName() + ((String.IsNullOrEmpty(postfix)) ? "" : postfix) + "." + extension.TrimStart('.');
             return System.IO.Path.Combine(folder, filename);
+        }
+
+        [Public]
+        public static bool HostSupportsUserInteraction([Implicit] ICallContext context)
+        {
+            return context.HostApplication.SupportsUserInteraction;
+        }
+
+        [Public]
+        public static UserInteraction SetupUserInteraction([Implicit] ICallContext context, string header)
+        {
+            return context.HostApplication.SetupUserInteraction(context, header);
         }
 
         [Public]
@@ -184,6 +219,71 @@ namespace StepBro.Core.Execution
             internalContext.SetNextProcedureAsHighLevel(type);
         }
 
+        /// <summary>
+        /// Await an asynchronous task to finish, and return its result value.
+        /// </summary>
+        /// <typeparam name="T">The type of the result value.</typeparam>
+        /// <param name="task">An asynchronous task reference.</param>
+        /// <param name="context">A call context.</param>
+        /// <returns>The task result value.</returns>
+        [Public]
+        public static T Await<T>(this Tasks.IAsyncResult<T> task, [Implicit] ICallContext context)
+        {
+            var scriptContext = context as IScriptCallContext;
+            if (task != null && !task.IsCompleted)
+            {
+                // TODO: Register this "task".
+                if (context != null)
+                {
+                    while (!task.AsyncWaitHandle.WaitOne(250))
+                    {
+                        if (context.StopRequested())
+                        {
+                            context.ReportFailure("User aborted waiting for asynchronous result.");
+                            return default(T);
+                        }
+                    }
+                }
+                else
+                {
+                    if (!task.AsyncWaitHandle.WaitOne(60000))
+                    {
+                        context.ReportFailure("Timeout waiting for asynchronous result.");
+                        return default(T);
+                    }
+                }
+            }
+            if (task.IsFaulted)
+            {
+                return default(T);
+            }
+            else
+            {
+                return task.Result;
+            }
+        }
+
+        /// <summary>
+        /// Get the fault description for an IAsyncResult<typeparamref name="T"/> fault.
+        /// </summary>
+        /// <typeparam name="T">Result value type.</typeparam>
+        /// <param name="result">The asynchronout result (task) reference.</param>
+        /// <returns>The fault description.</returns>
+        /// <remarks>This function checks if the <paramref name="result"/> argument has the <seealso cref="IObjectFaultDescriptor"/> interface, anduses that to get the description text.</remarks>
+        public static string GetFault<T>(this IAsyncResult<T> result)
+        {
+            if (!result.IsFaulted) return String.Empty;
+
+            if (result is IObjectFaultDescriptor fd)
+            {
+                return fd.FaultDescription;
+            }
+
+            return "Faulted";
+        }
+
+        #region Reporting
+
         [Public]
         public static DataReport StartReport([Implicit] ICallContext context, string type, string title)
         {
@@ -192,6 +292,10 @@ namespace StepBro.Core.Execution
             try
             {
                 internalContext.AddReport(report);
+                if (StepBro.Core.Main.ServiceManager.State == ServiceManager.ServiceManagerState.Started)
+                {
+                    (StepBro.Core.Main.GetService<IReportManager>() as ReportManager)?.AddReport(report);
+                }
                 return report;
             }
             catch
@@ -262,16 +366,28 @@ namespace StepBro.Core.Execution
             }
         }
 
+        #endregion
+
+        #region Logging
+
         public static ILogFileCreator StartCreatingLogFile(
             [Implicit] ICallContext context,
             string filename,
-            string format = "SimpleCleartext",
+            string format = null,
             bool includePast = false)
         {
             var manager = StepBro.Core.Main.GetService<ILogFileCreationManager>();
             if (String.IsNullOrEmpty(format))
             {
-                format = "SimpleCleartext";
+                var extension = System.IO.Path.GetExtension(filename);
+                if (extension.Equals(Constants.STEPBRO_PERSISTANCE_LOG_FILE_EXTENSION, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    format = OutputStepBroPersistanceAddon.Name;
+                }
+                else
+                {
+                    format = OutputSimpleCleartextAddon.Name;
+                }
             }
 
             try
@@ -298,6 +414,10 @@ namespace StepBro.Core.Execution
                 return null;
             }
         }
+
+        #endregion
+
+        #region File Creation
 
         [Public]
         public static bool AppendTextToFile([Implicit] ICallContext context, string path, string text, bool reportErrors = false)
@@ -330,6 +450,15 @@ namespace StepBro.Core.Execution
         {
             return AppendTextToFile(context, path, text + Environment.NewLine, reportErrors);
         }
+
+        [Public]
+        public static bool AppendDataLineToCSVFile([Implicit] ICallContext context, string path, params object[] values)
+        {
+            var strings = values.Select(v => ObjectToString(v, true));
+            return AppendLineToFile(context, path, String.Join(", ", strings));
+        }
+
+        #endregion
 
         #region LineReader
 

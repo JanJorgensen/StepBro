@@ -40,6 +40,7 @@ namespace StepBro.StateMachine
 
             private bool m_isActive = true;
             private bool m_requestedStop = false;
+            private bool m_requestedStopSeen = false;
             private uint m_stateTransitionNumber = 0;
             private int m_currentState = 0;
             private int m_requestedState = 0;
@@ -64,7 +65,23 @@ namespace StepBro.StateMachine
             public string Name { get { return m_name; } }
             public string TypeName { get { return m_definition.Name; } }
             public bool IsActive { get { return m_isActive; } set { m_isActive = value; } }
-            public bool StopRequested { get { return m_requestedStop; } }
+            public bool StopRequested
+            {
+                get
+                {
+                    if (m_requestedStop)
+                    {
+                        m_requestedStopSeen = true;
+                        return true;
+                    }
+                    else return false;
+                }
+            }
+            public bool StopRequestedSeen
+            {
+                get { return m_requestedStopSeen; }
+                set { m_requestedStopSeen = value; }
+            }
 
             public uint StateTransitionNumber { get { return m_stateTransitionNumber; } }
 
@@ -139,6 +156,7 @@ namespace StepBro.StateMachine
             public void Dispose()
             {
                 this.Instance = null;
+                this.Next = null;
             }
         }
 
@@ -236,7 +254,7 @@ namespace StepBro.StateMachine
                     timer.StateTransitionIndex = m_instance.StateTransitionNumber;
                 }
                 context.Logger.Log(
-                    "Start timer '" + name + "' at " + t.ToLocalTime().ToString() + " (" + ((long)((t - now).TotalMilliseconds)).ToString() + "ms from now)");
+                    "Start timer '" + name + "' at " + t.ToGeneralFormat() + " (" + ((long)((t - now).TotalMilliseconds)).ToString() + "ms from now)");
                 m_executor.AddTimer(timer);
             }
 
@@ -321,6 +339,7 @@ namespace StepBro.StateMachine
         private Context m_context;
         private EventData m_currentEvent = null;
         private Timer m_nextTimer = null;
+        private bool m_stopRequested = false;
 
         public Executor()
         {
@@ -331,9 +350,17 @@ namespace StepBro.StateMachine
 
         public void Reset([Implicit] ICallContext context)
         {
+            m_currentEvent = null;
             m_instances.Clear();
             m_highPriorityEvents.Clear();
             m_lowPriorityEvents.Clear();
+            m_stopRequested = false;
+            while (m_nextTimer != null)
+            {
+                var next = m_nextTimer.Next;
+                m_nextTimer.Dispose();
+                m_nextTimer = next;
+            }
         }
 
         public void CreateStateMachine([Implicit] ICallContext context, StateMachineDefinition type, Identifier name, ArgumentList arguments)
@@ -386,6 +413,10 @@ namespace StepBro.StateMachine
                     var enterEvent = new EventData(m_currentEvent.Instance, Event.Enter);
                     m_highPriorityEvents.Enqueue(enterEvent);
                 }
+                if (m_currentEvent.StateEvent == Event.StopRequested)
+                {
+                    m_currentEvent.Instance.StopRequestedSeen = true;
+                }
             }
 
             m_currentEvent = null;
@@ -427,6 +458,8 @@ namespace StepBro.StateMachine
                     }
                 }
 
+
+
                 if (m_highPriorityEvents.Count > 0)
                 {
                     m_currentEvent = m_highPriorityEvents.Dequeue();
@@ -438,7 +471,8 @@ namespace StepBro.StateMachine
 
                 if (m_currentEvent != null)
                 {
-                    if (!m_currentEvent.Instance.IsActive)
+                    if (!m_currentEvent.Instance.IsActive ||
+                        (m_currentEvent.StateEvent == Event.StopRequested && m_currentEvent.Instance.StopRequestedSeen))    // Don't send if statemachine already knows about the stop request.
                     {
                         m_currentEvent = null;
                         continue;
@@ -467,7 +501,7 @@ namespace StepBro.StateMachine
                     }
                     bool justStartedWaiting = true;
                     var timeLeft = sleepUntil - DateTime.UtcNow;
-                    while (timeLeft > TimeSpan.Zero)
+                    while (!m_stopRequested && timeLeft > TimeSpan.Zero)
                     {
                         //System.Diagnostics.Debug.WriteLine("AwaitNextEvent sleep");
                         if (justStartedWaiting)
@@ -475,10 +509,15 @@ namespace StepBro.StateMachine
                             context.Logger.LogDetail("Waiting " + ((long)timeLeft.TotalMilliseconds).ToString() + "ms");
                             justStartedWaiting = false;
                         }
-                        if (context.StopRequested())
+                        if (!m_stopRequested && context.StopRequested())
                         {
-                            context.Logger.Log("Waiting terminated by the user.");
-                            return null;
+                            context.Logger.Log("User requested execution stop.");
+                            m_stopRequested = true;
+                            foreach (var inst in m_instances)
+                            {
+                                m_lowPriorityEvents.Enqueue(new EventData(inst, Event.StopRequested));
+                                inst.SetStopRequest();
+                            }
                         }
                         var sleepTime = TimeSpan.FromMilliseconds(1000);
                         if (timeLeft < sleepTime) sleepTime = timeLeft;

@@ -35,7 +35,8 @@ namespaceDeclaration : NAMESPACE namespace SEMICOLON ;
 fileElements : fileElement* ;
 fileElement 
     :	attributes? elementModifier?
-        (	enumDeclaration 
+        (	documentationElement
+        |   enumDeclaration 
         |	constVariable 
         |   fileVariable
         |   procedureOrFunction
@@ -78,6 +79,9 @@ elementModifier
     |	PROTECTED		// Shared within the namespace
     ;
 
+documentationElement : DOCUMENTATION documentationElementName SEMICOLON ;
+documentationElementName : IDENTIFIER ;
+
 overrideReference : identifierOrQualified ;
 
 fileElementOverride : OVERRIDE overrideReference typeOverride? (elementPropertyblock | SEMICOLON) ;
@@ -85,7 +89,7 @@ fileElementOverride : OVERRIDE overrideReference typeOverride? (elementPropertyb
 typeOverride : AS typedefName ;
 
 typedef 
-    : TYPEDEF typedefName COLON typedefType SEMICOLON       // NOT LIKE A TYPEDEF IN C/C++; NAME FIRST HERE!!
+    : TYPEDEF typedefName (COLON | ASSIGNMENT) typedefType SEMICOLON       // NOT LIKE A TYPEDEF IN C/C++; NAME FIRST HERE!!
     ;
 
 typedefName : IDENTIFIER ;
@@ -98,7 +102,8 @@ fileVariable
     ;
 
 constType : CONST | CONFIG ;
-constVariable : elementModifier? constType variableType variableDeclaratorId ASSIGNMENT variableInitializer SEMICOLON ;
+constOverride : OVERRIDE ;
+constVariable : elementModifier? constOverride? constType variableType variableDeclaratorId ASSIGNMENT variableInitializer SEMICOLON ;
 
 ctorClassType : type ;
 

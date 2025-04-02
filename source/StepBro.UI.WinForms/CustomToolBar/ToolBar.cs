@@ -3,12 +3,11 @@ using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Logging;
+using StepBro.Core.ScriptData;
 using StepBro.ToolBarCreator;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using static StepBro.Core.Data.PropertyBlockDecoder;
 using static StepBro.UI.WinForms.WinFormsPropertyBlockDecoder;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace StepBro.UI.WinForms.CustomToolBar
 {
@@ -18,15 +17,30 @@ namespace StepBro.UI.WinForms.CustomToolBar
         bool m_colorSet = false;
         bool m_settingDefaultColor = false;
         int m_index = 1000;
-        private static PropertyBlockDecoder.Block<object, ToolBar> m_decoder = null;
+        private static ToolbarScanner m_toolbarDecoder = null;
+        private static ToolbarMenuScanner m_menuDecoder = null;
         private Dictionary<string, object> m_commonChildFields = null;
         private static bool m_adjustingSizes = false;
+        private static bool g_scannerIsSetup = false;
+
 
         public ToolBar() : base()
         {
             this.GripStyle = ToolStripGripStyle.Hidden;
             this.AutoSize = false;
             this.Height = 26;
+        }
+
+        public static void ToolBarSetup()
+        {
+            if (!g_scannerIsSetup)
+            {
+                m_toolbarDecoder = new ToolbarScanner();
+                m_menuDecoder = new ToolbarMenuScanner();
+                StepBro.ToolBarCreator.ToolBar.PreScanner = m_toolbarDecoder;
+                StepBro.ToolBarCreator.ToolBarMenu.PreScanner = m_menuDecoder;
+                g_scannerIsSetup = true;
+            }
         }
 
         public ToolBar(ICoreAccess coreAccess) : this()
@@ -39,111 +53,145 @@ namespace StepBro.UI.WinForms.CustomToolBar
             m_coreAccess = coreAccess;
         }
 
-        public void Setup(ILogger logger, string name, PropertyBlock definition)
+        public void Setup(ILogger logger, IScriptFile homeDefinition, string name, PropertyBlock definition)
         {
             this.Text = name.Split(".").Last();
             this.Name = name;
             this.Tag = name;
-            this.Setup(logger, definition);
+            this.Setup(logger, homeDefinition, definition);
         }
 
-        private static void SetupDataDecoder()
+        private class ToolbarScanner : IPropertyBlockDataScanner
         {
-            var buttonElements = new Element[] {
-                new ValueColor<Button>("Color", (b, c) => { b.BackColor = c; return null; }),
-                new ValueString<Button>("Text", (b, v) => { b.Text = v.ValueAsString(); return null; }),
-                new ValueInt<Button>("MaxWidth", (b, v) => { b.MaxWidth = (int)(long)v.Value; b.AutoSize = false; return null; }),
-                new ValueString<Button>("WidthGroup", (b, v) => { b.WidthGroup = v.ValueAsString(); return null; }),
-                new ValueString<Button>("Instance", "Object", (b, v) => { b.Instance = v.ValueAsString(); return null; }),
-                new ValueString<Button>("Procedure", "Element", (b, v) => { b.Procedure = v.ValueAsString(); return null; }),
-                new ValueString<Button>("Partner", "Model", (b, v) => { b.Partner = v.ValueAsString(); return null; }),
-                new Value<Button>("Arg", "Argument", (b, a) => { b.AddToArguments(a.Value); return null; }),
-                new PropertyBlockDecoder.Array<Button>("Args", "Arguments", (b, a) => { b.AddToArguments(a); return null; }),
-                new Flag<Button>("Stoppable", (b, f) => { b.SetStoppable(); return null; }),
-                new Flag<Button>("StopOnButtonRelease", (b, f) => { b.SetStopOnButtonRelease(); return null; }),
-                new ValueString<Button>("Command", (b, v) => { b.ObjectCommand = v.ValueAsString(); return null; }),
-                new Flag<Button>("CheckOnClick", (b, f) => { b.SetCheckOnClick(); return null; }),
-                new Flag<Button>("CheckArg", (b, f) => { /* TODO */ return null; }),
-                new ValueString<Button>("CheckedText", (b, v) => { /* TODO */ return null; }),
-                new ValueString<Button>("UncheckedText", (b, v) => { /* TODO */ return null; }),
-                new ValueString<Button>("EnabledSource", (b, v) => { /* TODO */ return null; }),
-                new ValueString<Button>("DisabledSource", (b, v) => { /* TODO */ return null; })
-            };
-            var button = new Block<IMenuItemHost, Button>(
-                "Button",
-                (m, n) =>
+            public void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors)
+            {
+                var toolbarToDispose = new ToolBar();
+                ((Block<object, ToolBar>)m_toolbarDecoder.TryGetDecoder()).DecodeData(file, data, toolbarToDispose, errors);
+            }
+
+            //private const string MenuInstanceHelp = "The default script object to be used by child menu elements.";
+
+            public static Block<ToolStripDropDownMenu, ToolStripMenuSubMenu> s_menu = null;
+
+            public Element TryGetDecoder()
+            {
+                var index = new ValueInt<ToolStripMenuItem>(
+                    "Index",
+                    Doc("The relative display order index of the item.<br/>The items with the lowest index will be shown first."),
+                    (t, v) => { t.MergeIndex = Convert.ToInt32(v.Value); return null; });
+
+                var buttonElements = new Element[] {
+                    index,
+                    new ValueColor<Button>("Color", Doc("The button color."), (b, c) => { b.BackColor = c; return null; }),
+                    new ValueString<Button>("Text", Doc("The text shown on the button."), (b, v) => { b.Text = v.ValueAsString(); return null; }),
+                    new ValueInt<Button>("MaxWidth", Doc("The maximum width of the button."), (b, v) => { b.MaxWidth = (int)(long)v.Value; b.AutoSize = false; return null; }),
+                    new ValueString<Button>("WidthGroup", Doc("The name of the group that synchronizes their button width."), (b, v) => { b.WidthGroup = v.ValueAsString(); return null; }),
+                    new ValueString<Button>("Instance", "Object", Doc("The script object associated with the button."), (b, v) => { b.Instance = v.ValueAsString(); return null; }),
+                    new ValueString<Button>("Procedure", "Element", Doc("The procedure or other script element to execute when activating the button."), (b, v) => { b.Procedure = v.ValueAsString(); return null; }),
+                    new ValueString<Button>("Partner", "Model", Doc("The partner/model to use for executing the target procedure or script element."), (b, v) => { b.Partner = v.ValueAsString(); return null; }),
+                    new Value<Button>("Arg", "Argument", Usage.Setting, Doc("An argument for the called procedure."), (b, a) => { b.AddToArguments(a.Value); return null; }),
+                    new Array<Button>("Args", "Arguments", Usage.Setting, Doc("A list of arguments for the called procedure."), (b, a) => { b.AddToArguments(a); return null; }),
+                    new Flag<Button>("Stoppable", Doc("Makes the execution stoppable by activating the button again."), (b, f) => { b.SetStoppable(); return null; }),
+                    new Flag<Button>("StopOnButtonRelease", Doc("Makes the execution stop when the button is released."), (b, f) => { b.SetStopOnButtonRelease(); return null; }),
+                    new ValueString<Button>("Command", Doc("Object command to execute when activating the button."), (b, v) => { b.ObjectCommand = v.ValueAsString(); return null; }),
+                    new Flag<Button>("CheckOnClick", Doc("Makes the button toggle between checked and unchecked when activated."), (b, f) => { b.SetCheckOnClick(); return null; }),
+                    new Flag<Button>("CheckArg", Doc("The 'Instance' object "), (b, f) => { /* TODO */ return null; }),
+                    new ValueString<Button>("CheckedText", Doc("Blah blah blah"), (b, v) => { /* TODO */ return null; }),
+                    new ValueString<Button>("UncheckedText", Doc("Blah blah blah"), (b, v) => { /* TODO */ return null; }),
+                    new ValueString<Button>("EnabledSource", Doc("Blah blah blah"), (b, v) => { /* TODO */ return null; }),
+                    new ValueString<Button>("DisabledSource", Doc("Blah blah blah"), (b, v) => { /* TODO */ return null; })
+                };
+                var button = new Block<IMenuItemHost, Button>(
+                    "Button",
+                    Doc("A push button."),
+                    (m, n) =>
+                    {
+                        var button = new Button(m as IToolBarElement, m_coreAccess, n);
+                        m.Add(button);
+                        button.Size = new Size(23, 20);
+                        button.AutoSize = true;
+                        return button;
+                    },
+                    buttonElements);
+
+                var textboxElements = new Element[] {
+                    index,
+                    new ValueColor<TextBox>("Color", Doc("Blah blah blah"), (t, c) => { t.BackColor = c; return null; }),
+                    new ValueString<TextBox>("Text", Doc("Blah blah blah"), (t, v) => { t.Text = v.ValueAsString(); return null; }),
+                    new ValueInt<TextBox>("MaxWidth", Doc("Blah blah blah"), (t, v) => { t.MaxWidth = (int)(long)v.Value; t.AutoSize = false; return null; }),
+                    new ValueString<TextBox>("WidthGroup", Doc("Blah blah blah"), (t, v) => { t.WidthGroup = v.ValueAsString(); return null; }),
+                    new Flag<TextBox>("ReadOnly", Doc("Blah blah blah"), (t, f) => { t.ReadOnly = true; return null; }),
+                    new Flag<TextBox>("RightAligned", Doc("Blah blah blah"), (t, f) => { t.TextBoxTextAlign = HorizontalAlignment.Right; return null; }),
+                    new ValueString<Button>("Instance", "Object", Doc("The script object associated with the textbox."), (t, v) => { t.Instance = v.ValueAsString(); return null; }),
+                    new ValueString<TextBox>("Property", Doc("Blah blah blah"), (t, v) => { /* TODO */ return null; }),
+                    new ValueString<TextBox>("ProcedureOutput", Doc("Blah blah blah"), (t, v) => { /* TODO */ return null; }),
+                    new ValueString<TextBox>("EnabledSource", Doc("Blah blah blah"), (t, v) => { /* TODO */ return null; }),
+                    new ValueString<TextBox>("DisabledSource", Doc("Blah blah blah"), (t, v) => { /* TODO */ return null; })
+                };
+
+                var textbox = new Block<IMenuItemHost, CustomToolBar.TextBox>(
+                    "TextBox",
+                    Doc("A text box that is either read-only (just an indicator), or where the user can input some text."),
+                    (m, n) =>
+                    {
+                        var tb = new CustomToolBar.TextBox(m as IToolBarElement, m_coreAccess, n);
+                        m.Add(tb);
+                        tb.Size = new Size(60, 22);
+                        tb.AutoSize = true;
+                        return tb;
+                    },
+                    textboxElements);
+
+                var menuTitle = new ValueString<IMenu>("Text", "Title", Doc(""), (m, v) => { m.SetTitle(v.ValueAsString()); return null; });
+
+                var menuSeparator = new Flag<IMenuItemHost>("Separator", Usage.Element, Doc("A separator line between the previous and the succeeding menu item."), (m, f) =>
                 {
-                    var button = new Button(m as IToolBarElement, m_coreAccess, n);
-                    m.Add(button);
-                    button.Size = new Size(23, 20);
-                    button.AutoSize = true;
-                    return button;
-                },
-                buttonElements);
-
-            var textboxElements = new Element[] {
-                new ValueColor<TextBox>("Color", (t, c) => { t.BackColor = c; return null; }),
-                new ValueString<TextBox>("Text", (t, v) => { t.Text = v.ValueAsString(); return null; }),
-                new ValueInt<TextBox>("MaxWidth", (t, v) => { t.MaxWidth = (int)(long)v.Value; t.AutoSize = false; return null; }),
-                new ValueString<TextBox>("WidthGroup", (t, v) => { t.WidthGroup = v.ValueAsString(); return null; }),
-                new Flag<TextBox>("ReadOnly", (t, f) => { t.ReadOnly = true; return null; }),
-                new Flag<TextBox>("RightAligned", (t, f) => { t.TextBoxTextAlign = HorizontalAlignment.Right; return null; }),
-                new ValueString<Button>("Instance", "Object", (t, v) => { t.Instance = v.ValueAsString(); return null; }),
-                new ValueString<TextBox>("Property", (t, v) => { /* TODO */ return null; }),
-                new ValueString<TextBox>("ProcedureOutput", (t, v) => { /* TODO */ return null; }),
-                new ValueString<TextBox>("EnabledSource", (t, v) => { /* TODO */ return null; }),
-                new ValueString<TextBox>("DisabledSource", (t, v) => { /* TODO */ return null; })
-            };
-
-            var textbox = new Block<IMenuItemHost, CustomToolBar.TextBox>(
-                "TextBox",
-                (m, n) =>
-                {
-                    var tb = new CustomToolBar.TextBox(m as IToolBarElement, m_coreAccess, n);
-                    m.Add(tb);
-                    tb.Size = new Size(60, 22);
-                    tb.AutoSize = true;
-                    return tb;
-                },
-                textboxElements);
-
-            var menuTitle = new ValueString<IMenu>("Text", "Title", (m, v) => { m.SetTitle(v.ValueAsString()); return null; });
-
-            var subMenu = new Block<ToolStripDropDownMenu, ToolStripMenuSubMenu>("Menu", "SubMenu",
-                (m, n) =>
-                {
-                    var menu = new ToolStripMenuSubMenu(m, m_coreAccess, n);
-                    m.DropDownItems.Add(menu);
-                    menu.Size = new Size(30, 20);
-                    menu.AutoSize = true;
-                    return menu;
+                    var separator = new Separator("Separator");
+                    m.Add(separator);
+                    return null;
                 });
-            subMenu.SetChilds(
-                menuTitle, subMenu, button,
-                new ValueString<ToolStripMenuSubMenu>("Instance", (m, v) => { m.SetChildProperty("Instance", v.ValueAsString()); return null; }),
-                new ValueString<ToolStripMenuSubMenu>("Procedure", "Element", (m, v) => { m.SetChildProperty("Element", v.ValueAsString()); return null; }),
-                new ValueString<ToolStripMenuSubMenu>("Partner", "Model", (m, v) => { m.SetChildProperty("Partner", v.ValueAsString()); return null; }),
-                new ValueString<ToolStripMenuSubMenu>("Command", (m, v) => { m.SetChildProperty("Command", v.ValueAsString()); return null; }));
 
-            var toolbarMenu = new Block<ToolBar, ToolStripDropDownMenu>("Menu", "DropDownMenu",
-                (t, n) =>
-                {
-                    var menu = new ToolStripDropDownMenu(t, m_coreAccess, n);
-                    t.Items.Add(menu);
-                    menu.Size = new Size(30, 20);
-                    menu.AutoSize = true;
-                    return menu;
-                });
-            toolbarMenu.SetChilds(
-                menuTitle, subMenu, button, textbox,
-                new ValueString<ToolStripDropDownMenu>("Instance", (m, v) => { m.SetChildProperty("Instance", v.ValueAsString()); return null; }),
-                new ValueString<ToolStripDropDownMenu>("Procedure", "Element", (m, v) => { m.SetChildProperty("Element", v.ValueAsString()); return null; }),
-                new ValueString<ToolStripDropDownMenu>("Partner", "Model", (m, v) => { m.SetChildProperty("Partner", v.ValueAsString()); return null; }),
-                new ValueString<ToolStripDropDownMenu>("Command", (m, v) => { m.SetChildProperty("Command", v.ValueAsString()); return null; }));
+                s_menu = new Block<ToolStripDropDownMenu, ToolStripMenuSubMenu>(
+                    "SubMenu", "Menu",
+                    Doc("A sub-menu for a drop-down menu or another sub-menu."),
+                    (m, n) =>
+                    {
+                        var menu = new ToolStripMenuSubMenu(m, m_coreAccess, n);
+                        m.DropDownItems.Add(menu);
+                        menu.Size = new Size(30, 20);
+                        menu.AutoSize = true;
+                        return menu;
+                    });
+                s_menu.SetChilds(
+                    index, menuTitle, s_menu, button, menuSeparator,
+                    new ValueString<ToolStripMenuSubMenu>("Instance", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Instance", v.ValueAsString()); return null; }),
+                    new ValueString<ToolStripMenuSubMenu>("Procedure", "Element", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Element", v.ValueAsString()); return null; }),
+                    new ValueString<ToolStripMenuSubMenu>("Partner", "Model", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Partner", v.ValueAsString()); return null; }),
+                    new ValueString<ToolStripMenuSubMenu>("Command", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Command", v.ValueAsString()); return null; }));
 
-            m_decoder = new Block<object, ToolBar>
-                (
-                    new ValueString<ToolBar>("Label", (t, v) =>
+                var toolbarMenu = new Block<ToolBar, ToolStripDropDownMenu, StepBro.ToolBarCreator.ToolBarMenu>(
+                    "Menu", "DropDownMenu",
+                    Doc("A drop-down menu that can contain different kinds of entries."),
+                    (t, n) =>
+                    {
+                        var menu = new ToolStripDropDownMenu(t, m_coreAccess, n);
+                        t.Items.Add(menu);
+                        menu.Size = new Size(30, 20);
+                        menu.AutoSize = true;
+                        return menu;
+                    });
+                toolbarMenu.SetChilds(
+                    index, menuTitle, s_menu, button, textbox, menuSeparator,
+                    new ValueString<ToolStripDropDownMenu>("Instance", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Instance", v.ValueAsString()); return null; }),
+                    new ValueString<ToolStripDropDownMenu>("Procedure", "Element", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Element", v.ValueAsString()); return null; }),
+                    new ValueString<ToolStripDropDownMenu>("Partner", "Model", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Partner", v.ValueAsString()); return null; }),
+                    new ValueString<ToolStripDropDownMenu>("Command", Doc("Blah blah blah"), (m, v) => { m.SetChildProperty("Command", v.ValueAsString()); return null; }));
+
+                return new Block<object, ToolBar>
+                    (
+                        nameof(ToolBar),
+                        Doc("Defined properties and GUI element types for the created toolbar."),
+                        new ValueString<ToolBar>("Label", Usage.Element, Doc("A simple text field."), (t, v) =>
                         {
                             var text = v.ValueAsString();
                             Label label;
@@ -159,29 +207,47 @@ namespace StepBro.UI.WinForms.CustomToolBar
                             t.Items.Add(label);
                             return null;    // No errors
                         }),
-                    new ValueColor<ToolBar>("Color", (t, c) => { t.BackColor = c; return null; }),
-                    new ValueInt<ToolBar>("Index", (t, v) => { t.Index = Convert.ToInt32(v.Value); return null; }),
-                    new Flag<ToolBar>("Separator", (t, f) =>
-                    {
-                        var separator = new Separator("Separator");
-                        t.Items.Add(separator);
-                        return null;
-                    }),
-                    new Flag<ToolBar>("ColumnSeparator", (t, f) =>
-                    {
-                        string name = f.Name;
-                        if (!f.HasTypeSpecified)
+                        new ValueColor<ToolBar>("Color", Doc("The color of the toolbar and the default color of all the elements."), (t, c) => { t.BackColor = c; return null; }),
+                        new ValueInt<ToolBar>(
+                            "Index",
+                            Doc("The relative display order index of the toolbar.<br/>The toolbar will be shown below toolbars with a lower index."),
+                            (t, v) => { t.Index = Convert.ToInt32(v.Value); return null; }),
+                        new Flag<ToolBar>("Separator", Usage.Element, Doc("A separator line between the previous and the succeeding elements of the toolbar."), (t, f) =>
                         {
-                            int index = t.Items.Cast<ToolStripItem>().Count(i => i is ColumnSeparator);
-                            name = "column" + index;
-                        }
-                        var separator = new ColumnSeparator(name);
-                        t.Items.Add(separator); t.Items.Add(separator);
-                        return null;
-                    }),
-                    new ValueString<ToolBar>("Instance", (t, v) => { t.SetChildProperty("Instance", v.ValueAsString()); return null; }),
-                    toolbarMenu, button, textbox
-                );
+                            var separator = new Separator("Separator");
+                            t.Items.Add(separator);
+                            return null;
+                        }),
+                        new Flag<ToolBar>("ColumnSeparator", Usage.Element, Doc("A separator line between the previous and the succeeding elements of the toolbar.<br/>All separators of this type and the same name will be graphically aligned with the rightmost one."), (t, f) =>
+                        {
+                            string name = f.Name;
+                            if (!f.HasTypeSpecified)
+                            {
+                                int index = t.Items.Cast<ToolStripItem>().Count(i => i is ColumnSeparator);
+                                name = "column" + index;
+                            }
+                            var separator = new ColumnSeparator(name);
+                            t.Items.Add(separator); t.Items.Add(separator);
+                            return null;
+                        }),
+                        new ValueString<ToolBar>("Instance", Doc("Blah blah blah"), (t, v) => { t.SetChildProperty("Instance", v.ValueAsString()); return null; }),
+                        toolbarMenu, button, textbox
+                    );
+            }
+        }
+
+        private class ToolbarMenuScanner : IPropertyBlockDataScanner
+        {
+            public void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors)
+            {
+                var toolbarToDispose = new ToolBar();
+                ((Block<object, ToolBar>)m_toolbarDecoder.TryGetDecoder()).DecodeData(file, data, toolbarToDispose, errors);
+            }
+            public Element TryGetDecoder()
+            {
+                m_toolbarDecoder.TryGetDecoder();   // Call this, to make sure the scanner is created.
+                return ToolbarScanner.s_menu;
+            }
         }
 
         protected override void OnBackColorChanged(EventArgs e)
@@ -281,7 +347,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
                 {
                     widthGroupedItems.AddRange(toolbar.Items.Cast<ToolStripItem>().Where(i => i is IResizeable && !String.IsNullOrEmpty((i as IResizeable).WidthGroup)).Cast<IResizeable>());
                 });
-            widthGroupedItems.ForEach(item => 
+            widthGroupedItems.ForEach(item =>
                 {
                     var v = widthGroupSizes.ContainsKey(item.WidthGroup) ? widthGroupSizes[item.WidthGroup] : 0;
                     widthGroupSizes[item.WidthGroup] = Math.Max(v, (item as ToolStripItem).Width);
@@ -340,15 +406,11 @@ namespace StepBro.UI.WinForms.CustomToolBar
         }
         public ICoreAccess Core { get { return m_coreAccess; } }
 
-        public void Setup(ILogger logger, PropertyBlock definition)
+        public void Setup(ILogger logger, IScriptFile homeDefinition, PropertyBlock definition)
         {
             this.Items.Clear();
             var errors = new List<Tuple<int, string>>();
-            if (m_decoder == null)
-            {
-                SetupDataDecoder();
-            }
-            m_decoder.DecodeData(definition, this, errors);
+            ((Block<object, ToolBar>)m_toolbarDecoder.TryGetDecoder()).DecodeData(homeDefinition, definition, this, errors);
 
             foreach (var error in errors)
             {
@@ -364,7 +426,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
-        public void Add(ToolStripMenuItem item)
+        public void Add(ToolStripItem item)
         {
             this.Items.Add(item);
         }
@@ -442,6 +504,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
+        [Public]
         public object GetProperty([Implicit] ICallContext context, string property)
         {
             return GetElementPropertyValue(this, context, property);
@@ -452,6 +515,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             throw new NotImplementedException();
         }
 
+        [Public]
         public void SetProperty([Implicit] ICallContext context, string property, object value)
         {
             SetElementPropertyValue(this, context, property, value);

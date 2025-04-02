@@ -40,6 +40,10 @@ namespace StepBro.Core.Data
         /// </summary>
         VariableContainer,
         /// <summary>
+        /// An <seealso cref="IObjectContainer"/> variable supplied by the host application.
+        /// </summary>
+        HostVariable,
+        /// <summary>
         /// An partner reference to a script file procedure.
         /// </summary>
         ElementPartner
@@ -52,6 +56,8 @@ namespace StepBro.Core.Data
         IdentifierType Type { get; }
         TypeReference DataType { get; }
         object Reference { get; }
+        string SourceFile { get; }
+        int SourceLine { get; }
     }
 
     public class IdentifierInfo : IIdentifierInfo
@@ -61,6 +67,8 @@ namespace StepBro.Core.Data
         public IdentifierType Type { get; private set; }
         public TypeReference DataType { get; private set; }
         public object Reference { get; private set; }
+        public string SourceFile { get; internal set; } = null;
+        public int SourceLine { get; internal set; } = -1;
 
         public IdentifierInfo(string name, string fullName, IdentifierType type, TypeReference dataType, object reference)
         {
@@ -77,12 +85,13 @@ namespace StepBro.Core.Data
             this.FullName = fullName;
             this.Type = type;
             this.DataType = dataType;
-            this.Reference = dataType.DynamicType;
+            this.Reference = dataType?.DynamicType;
         }
 
         public override string ToString()
         {
-            return this.Type.ToString() + " " + this.DataType.ToString();
+            if (this.DataType != null) return this.Type.ToString() + " " + this.DataType.ToString();
+            else return this.Type.ToString();
         }
     }
 

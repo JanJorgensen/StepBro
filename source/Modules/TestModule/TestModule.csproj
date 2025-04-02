@@ -41,6 +41,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\StepBro.Core\StepBro.Core.csproj">
       <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
   </ItemGroup>
 

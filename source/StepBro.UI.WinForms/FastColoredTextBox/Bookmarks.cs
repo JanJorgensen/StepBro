@@ -48,13 +48,13 @@ namespace FastColoredTextBoxNS
     /// </summary>
     public class Bookmarks : BaseBookmarks
     {
-        protected FastColoredTextBox tb;
-        protected List<Bookmark> items = new List<Bookmark>();
-        protected int counter;
+        protected FastColoredTextBox m_tb;
+        protected List<Bookmark> m_items = new List<Bookmark>();
+        protected int m_counter;
 
         public Bookmarks(FastColoredTextBox tb)
         {
-            this.tb = tb;
+            this.m_tb = tb;
             tb.LineInserted += tb_LineInserted;
             tb.LineRemoved += tb_LineRemoved;
         }
@@ -62,25 +62,25 @@ namespace FastColoredTextBoxNS
         protected virtual void tb_LineRemoved(object sender, LineRemovedEventArgs e)
         {
             for(int i=0; i<Count; i++)
-            if (items[i].LineIndex >= e.Index)
+            if (m_items[i].LineIndex >= e.Index)
             {
-                if (items[i].LineIndex >= e.Index + e.Count)
+                if (m_items[i].LineIndex >= e.Index + e.Count)
                 {
-                    items[i].LineIndex = items[i].LineIndex - e.Count;
+                    m_items[i].LineIndex = m_items[i].LineIndex - e.Count;
                     continue;
                 }
 
                 var was = e.Index <= 0;
-                foreach (var b in items)
+                foreach (var b in m_items)
                     if (b.LineIndex == e.Index - 1)
                         was = true;
 
                 if(was)
                 {
-                    items.RemoveAt(i);
+                    m_items.RemoveAt(i);
                     i--;
                 }else
-                    items[i].LineIndex = e.Index - 1;
+                    m_items[i].LineIndex = e.Index - 1;
 
                 //if (items[i].LineIndex == e.Index + e.Count - 1)
                 //{
@@ -96,64 +96,64 @@ namespace FastColoredTextBoxNS
         protected virtual void tb_LineInserted(object sender, LineInsertedEventArgs e)
         {
             for (int i = 0; i < Count; i++)
-                if (items[i].LineIndex >= e.Index)
+                if (m_items[i].LineIndex >= e.Index)
                 {
-                    items[i].LineIndex = items[i].LineIndex + e.Count;
+                    m_items[i].LineIndex = m_items[i].LineIndex + e.Count;
                 }else
-                if (items[i].LineIndex == e.Index - 1 && e.Count == 1)
+                if (m_items[i].LineIndex == e.Index - 1 && e.Count == 1)
                 {
-                    if(tb[e.Index - 1].StartSpacesCount == tb[e.Index - 1].Count)
-                        items[i].LineIndex = items[i].LineIndex + e.Count;
+                    if(m_tb[e.Index - 1].StartSpacesCount == m_tb[e.Index - 1].Count)
+                        m_items[i].LineIndex = m_items[i].LineIndex + e.Count;
                 }
         }
     
         public override void Dispose()
         {
-            tb.LineInserted -= tb_LineInserted;
-            tb.LineRemoved -= tb_LineRemoved;
+            m_tb.LineInserted -= tb_LineInserted;
+            m_tb.LineRemoved -= tb_LineRemoved;
         }
 
         public override IEnumerator<Bookmark> GetEnumerator()
         {
-            foreach (var item in items)
+            foreach (var item in m_items)
                 yield return item;
         }
 
         public override void Add(int lineIndex)
         {
-            Add(new Bookmark(tb, lineIndex, null));
+            Add(new Bookmark(m_tb, lineIndex, null));
         }
 
         public override void Add(int lineIndex, object group)
         {
-            Add(new Bookmark(tb, lineIndex, group));
+            Add(new Bookmark(m_tb, lineIndex, group));
         }
 
         public override void Clear()
         {
-            items.Clear();
-            counter = 0;
+            m_items.Clear();
+            m_counter = 0;
         }
 
         public override void Add(Bookmark bookmark)
         {
-            foreach (var bm in items)
+            foreach (var bm in m_items)
                 if (bm.LineIndex == bookmark.LineIndex)
                     return;
 
-            items.Add(bookmark);
-            counter++;
-            tb.Invalidate();
+            m_items.Add(bookmark);
+            m_counter++;
+            m_tb.Invalidate();
         }
 
         public override bool Contains(Bookmark item)
         {
-            return items.Contains(item);
+            return m_items.Contains(item);
         }
 
         public override bool Contains(int lineIndex)
         {
-            foreach (var item in items)
+            foreach (var item in m_items)
                 if (item.LineIndex == lineIndex)
                     return true;
             return false;
@@ -161,12 +161,12 @@ namespace FastColoredTextBoxNS
 
         public override void CopyTo(Bookmark[] array, int arrayIndex)
         {
-            items.CopyTo(array, arrayIndex);
+            m_items.CopyTo(array, arrayIndex);
         }
 
         public override int Count
         {
-            get { return items.Count; }
+            get { return m_items.Count; }
         }
 
         public override bool IsReadOnly
@@ -176,8 +176,8 @@ namespace FastColoredTextBoxNS
 
         public override bool Remove(Bookmark item)
         {
-            tb.Invalidate();
-            return items.Remove(item);
+            m_tb.Invalidate();
+            return m_items.Remove(item);
         }
 
         /// <summary>
@@ -187,13 +187,13 @@ namespace FastColoredTextBoxNS
         {
             bool was = false;
             for (int i = 0; i < Count; i++)
-            if (items[i].LineIndex == lineIndex)
+            if (m_items[i].LineIndex == lineIndex)
             {
-                items.RemoveAt(i);
+                m_items.RemoveAt(i);
                 i--;
                 was = true;
             }
-            tb.Invalidate();
+            m_tb.Invalidate();
 
             return was;
         }
@@ -203,7 +203,7 @@ namespace FastColoredTextBoxNS
         /// </summary>
         public override Bookmark GetBookmark(int i)
         {
-            return items[i];
+            return m_items[i];
         }
     }
 

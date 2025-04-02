@@ -6,7 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputPath>..\bin</OutputPath>
-    <PackageId>stepbro workbench</PackageId>
+    <PackageId>stepbro workbench winforms</PackageId>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <Authors>Jan Jorgensen, Milton Lindof</Authors>
@@ -21,20 +21,29 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="StepBro.Workbench.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="licenses.licx" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\StepBro.Core\StepBro.Core.csproj" />
+    <ProjectReference Include="..\StepBro.HostSupport\StepBro.HostSupport.csproj" />
     <ProjectReference Include="..\StepBro.UI.WinForms\StepBro.UI.WinForms.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
     <ActiproVersion>24.1.0</ActiproVersion>
+    <Version>1.2.0</Version>
+    <ApplicationIcon>StepBro.Workbench.ico</ApplicationIcon>
+    <AssemblyName>StepBro.Workbench</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ActiproSoftware.Controls.WinForms" Version="$(ActiproVersion)" />
+    <PackageReference Include="ActiproSoftware.Controls.WinForms" Version="24.1.1" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2957.106" />
   </ItemGroup>
 
 </Project>

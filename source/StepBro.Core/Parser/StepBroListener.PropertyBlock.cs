@@ -233,8 +233,8 @@ namespace StepBro.Core.Parser
         {
             if (context.Start.Type == SBP.IDENTIFIER)
             {
-                var stack = m_expressionData.Peek();
-                var identifier = stack.Pop();
+                var levelData = m_expressionData.Peek();
+                var identifier = levelData.Stack.Pop();
                 return (string)identifier.Value;
             }
             else if (context.Start.Type == SBP.STRING)
@@ -263,8 +263,8 @@ namespace StepBro.Core.Parser
 
         private void PopValuePushEntry(int line)
         {
-            var stack = m_expressionData.PopStackLevel();
-            var expression = stack.Pop();
+            var levelData = m_expressionData.PopStackLevel();
+            var expression = levelData.Stack.Pop();
             object value = null;
             if (expression.IsConstant)
             {
@@ -364,9 +364,9 @@ namespace StepBro.Core.Parser
 
         public override void ExitPropertyblockEventVerdict([NotNull] SBP.PropertyblockEventVerdictContext context)
         {
-            var stack = m_expressionData.PopStackLevel();
-            var verdict = (Verdict)(stack.Pop().Value);
-            var name = (string)(stack.Pop().Value);
+            var levelData = m_expressionData.PopStackLevel();
+            var verdict = (Verdict)(levelData.Stack.Pop().Value);
+            var name = (string)(levelData.Stack.Pop().Value);
             m_propertyBlockOperands.Peek().Add(new PropertyBlockEvent(context.Start.Line, name, verdict));
         }
 

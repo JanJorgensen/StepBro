@@ -3,6 +3,7 @@ using Peak.Can.Basic.BackwardCompatibility;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace StepBro.CAN
     using TPCANHandle = System.UInt16;
 
     [Public]
-    public class PCAN : IDriver
+    public class PCAN : StepBro.CAN.IDriver
     {
         private static List<PCANAdapter> g_adapters;
 
@@ -33,12 +34,21 @@ namespace StepBro.CAN
                 "LANBUS1", "LANBUS2", "LANBUS3", "LANBUS4", "LANBUS5", "LANBUS6", "LANBUS7", "LANBUS8", "LANBUS9", "LANBUS10", "LANBUS11", "LANBUS12", "LANBUS13", "LANBUS14", "LANBUS15", "LANBUS16" };
             foreach (var s in ids)
             {
-                g_adapters.Add(new PCANAdapter(Driver, s, AdapterIdentificationToHandle(s)));
+                var h = AdapterIdentificationToHandle(s);
+                //var status = PCANBasic.GetStatus(h);
+                //System.Diagnostics.Debug.WriteLine("Adapter " + s + " status: " + status.ToString());
+                g_adapters.Add(new PCANAdapter(Driver, s, h));
             }
         }
 
         [Public]
         public static PCAN Driver { get; private set; }
+
+        public string Name => throw new NotImplementedException();
+
+        public string Description => throw new NotImplementedException();
+
+        public string Version => throw new NotImplementedException();
 
         [Public]
         public IAdapter GetAdapter([Implicit] ICallContext context, string identification = "")
@@ -133,14 +143,48 @@ namespace StepBro.CAN
             }
             return PCANBasic.PCAN_NONEBUS;
         }
+
+        public string ScanForDevices()
+        {
+            string result = null;
+            foreach (var device in g_adapters.Where(a => a.IsDiscovered || a.IsCreated))
+            {
+                var channel = device.GetChannel(null, 0);
+                if (channel != null)
+                {
+                    //Note: Opening and closing the first channel will update the 'IsDiscovered" flag of the adapter/driver.
+                    if (channel.Open(null))
+                    {
+                        channel.Close(null);
+                    }
+                }
+            }
+            return result;
+        }
+
+        public IEnumerable<Core.Devices.IDevice> ListDevices(bool discoveredOnly = true)
+        {
+            foreach (var device in g_adapters.Where(a => a.IsDiscovered || a.IsCreated))
+            {
+                yield return device;
+            }
+        }
+
+        public Core.Devices.IDevice GetDevice(string name)
+        {
+            throw new NotImplementedException();
+        }
     }
 
-    internal class PCANAdapter : IAdapter
+    internal class PCANAdapter : IAdapter, IComponentLoggerSource
     {
         private readonly PCAN m_parent;
         private readonly string m_identification;
         private readonly TPCANHandle m_handle;
         private readonly PCANChannel m_onlyChannel;
+        private bool m_discovered = false;
+        private bool m_componentLoggingEnabled = false;
+        private IComponentLogging m_componentLogging = null;
 
         internal PCANAdapter(PCAN parent, string identification, TPCANHandle handle)
         {
@@ -189,6 +233,37 @@ namespace StepBro.CAN
             if (index != 0) throw new ArgumentOutOfRangeException("index");
 
             return m_onlyChannel;
+        }
+
+        internal void SetDiscovered(bool wasDiscovered)
+        {
+            m_discovered = wasDiscovered;
+        }
+
+        string IComponentLoggerSource.Name { get { return "PeakCAN " + m_identification; } }
+
+        bool IComponentLoggerSource.Enabled { get { return m_componentLoggingEnabled; } }
+
+        Core.Devices.IDriver Core.Devices.IDevice.Driver => throw new NotImplementedException();
+
+        public bool IsDiscovered => throw new NotImplementedException();
+
+        public bool IsConnected => throw new NotImplementedException();
+
+        public bool IsCreated => throw new NotImplementedException();
+
+        bool IComponentLoggerSource.SetEnabled(bool value)
+        {
+            if (value != m_componentLoggingEnabled)
+            {
+                if (value && m_componentLogging == null)
+                {
+                    m_componentLogging = Core.Main.GetService<IComponentLoggerService>().CreateComponentLogger(this);
+                }
+                m_componentLoggingEnabled = value;
+                return true;
+            }
+            else return true;
         }
     }
 
@@ -323,7 +398,9 @@ namespace StepBro.CAN
             if (!m_open)
             {
                 TPCANStatus result = PCANBasic.Initialize(m_handle, ToPCANBaudrate(m_baudrate), TPCANType.PCAN_TYPE_ISA, 0, 0);
-                if (this.UpdateStatusFromOperation(result) == TPCANStatus.PCAN_ERROR_OK)
+                result = this.UpdateStatusFromOperation(result);
+                m_parent.SetDiscovered(result == TPCANStatus.PCAN_ERROR_OK);
+                if (result == TPCANStatus.PCAN_ERROR_OK)
                 {
                     if (context != null && context.LoggingEnabled)
                     {

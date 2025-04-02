@@ -2,11 +2,18 @@ using StepBro.Streams;
 using StepBro.TestInterface;
 using "TestFramework.sbs";
 
-public SerialTestConnection connection = SerialTestConnection(){}
+public SerialPort port = SerialPort(){}
+
+public SerialTestConnection connection = SerialTestConnection()
+{
+    Stream = port
+}
 
 public testlist SerialTestConnectionOfflineTests : TestSuite
 {
     * TestSetupCommandHash
+    * TestSerialPortName
+    * TestListSerialPorts
 }
 
 void TestSetupCommandHash() : TestCase
@@ -25,6 +32,18 @@ void TestSetupCommandHash() : TestCase
     expect(hash2 != hash3);
     expect(hash1 != hash3);
     expect(hash1 == hash4);
+}
+
+void TestSerialPortName() : TestCase
+{
+    expect(port.Name == "port");
+}
+
+void TestListSerialPorts() : TestCase
+{
+    string[] ports = SerialPort.ListAvailablePorts();
+
+    log(ports);
 }
 
 string CreateSetupHash(int option)

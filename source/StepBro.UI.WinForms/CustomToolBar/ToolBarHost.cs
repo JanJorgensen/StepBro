@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Parser.Grammar;
+using StepBro.Core.ScriptData;
 using StepBro.UI.WinForms.CustomToolBar;
 
 namespace StepBro.UI.WinForms.CustomToolBar
@@ -29,7 +30,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             m_coreAccess = coreAccess;
         }
 
-        public void AddOrSet(string name, StepBro.ToolBarCreator.ToolBar toolbar)
+        public void AddOrSet(IScriptFile home, string name, StepBro.ToolBarCreator.ToolBar toolbar, int height)
         {
             System.Diagnostics.Debug.WriteLine("Add toolbar: " + toolbar.Name);
             ToolBar toolBar = null;
@@ -46,8 +47,9 @@ namespace StepBro.UI.WinForms.CustomToolBar
                 toolBar.VisibleChanged += ToolBar_VisibleChanged;
             }
 
-            toolBar.Setup(StepBro.Core.Main.RootLogger, name, toolbar.Definition);
+            toolBar.Setup(StepBro.Core.Main.RootLogger, home, name, toolbar.Definition);
             toolbar.SetToolBarReference(toolBar);
+            toolBar.Height = height + 1;
 
             this.Controls.Clear();
 

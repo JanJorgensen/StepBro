@@ -7,26 +7,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StepBro.Core.Execution;
 
 namespace StepBro.SimpleWorkbench
 {
     public class HostAccess : StepBro.Core.Host.HostAccessBase<HostAccess>
     {
-        public HostAccess(out IService serviceAccess) : base("Host", out serviceAccess)
+        MainForm m_mainForm;
+
+        public HostAccess(MainForm mainForm, out IService serviceAccess) : base("Host", out serviceAccess)
         {
+            m_mainForm = mainForm;
         }
 
         public override HostType Type { get { return HostType.WinForms; } }
 
-        public override IEnumerable<NamedData<object>> ListHostCodeModuleInstances()
-        {
-            // TODO: yield return new NamedData<object>("Host.Console", m_app);
-            yield break;
-        }
-
         public override IEnumerable<Type> ListHostCodeModuleTypes()
         {
             yield break;
+        }
+
+        public override bool SupportsUserInteraction { get { return true; } }
+
+        public override UserInteraction SetupUserInteraction(ICallContext context, string header)
+        {
+            var interaction = new UserInteraction();
+            interaction.HeaderText = header;
+            m_mainForm.OpenUserInteraction(interaction);
+            return interaction;
         }
     }
 }

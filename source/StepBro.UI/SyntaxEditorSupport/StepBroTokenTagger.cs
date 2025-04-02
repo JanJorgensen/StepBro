@@ -73,7 +73,6 @@ namespace StepBro.UI.SyntaxEditorSupport
                     return this.ClassificationTypeProvider.StringLiteral;
                 case Core.Parser.Grammar.StepBroLexer.SINGLE_LINE_COMMENT:
                 case Core.Parser.Grammar.StepBroLexer.DELIMITED_COMMENT:
-                case Core.Parser.Grammar.StepBroLexer.DOC_COMMENT_INDENTED:
                 case Core.Parser.Grammar.StepBroLexer.DOC_COMMENT:
                     return this.ClassificationTypeProvider.Comment;
                 default:

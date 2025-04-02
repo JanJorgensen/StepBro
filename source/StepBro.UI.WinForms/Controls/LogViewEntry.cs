@@ -1,5 +1,6 @@
 ﻿using StepBro.Core.Data;
 using StepBro.Core.Logging;
+using StepBro.HostSupport;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,11 @@ namespace StepBro.UI.WinForms.Controls
 {
     public class LogViewEntry : ChronoTimestampedListViewEntry
     {
-        private LogEntry m_entry;
-        private long m_sourceIndex;
+        protected LogEntry m_entry;
+        protected long m_sourceIndex;
+
+        private static Pen s_parentPen = new Pen(Color.Orange, 3.0f);
+        private static Pen s_siblingPen = new Pen(Color.Yellow, 1.0f);
 
         public LogViewEntry(LogEntry entry, long index) : base()
         {
@@ -19,17 +23,18 @@ namespace StepBro.UI.WinForms.Controls
             m_sourceIndex = index;
         }
 
-        public override DateTime TimeStamp { get { return m_entry.Timestamp; } }
+        public override ITimestampedData DataObject { get { return m_entry; } }
 
-        public override object DataObject { get { return m_entry; } }
-
-        protected override void PaintRest(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntrySelectionState selected)
+        public override string GetTextForSearchMatching(bool includeExtraFields)
         {
-            var color = (selected != EntrySelectionState.Not) ? Brushes.White : GetDefaultEntryTypeColor(m_entry.EntryType);
+            return m_entry.Text;
+        }
 
+        protected virtual string GetHeaderText()
+        {
             string headerText = m_entry.EntryType switch
             {
-                LogEntry.Type.Async => "<A>",
+                //LogEntry.Type.Async => "<A>",
                 LogEntry.Type.CommunicationOut => "<Out>",
                 LogEntry.Type.CommunicationIn => "<In>",
                 LogEntry.Type.TaskEntry => "TaskEntry",
@@ -38,6 +43,23 @@ namespace StepBro.UI.WinForms.Controls
                 LogEntry.Type.UserAction => "UserAction",
                 _ => ""
             };
+            return headerText;
+        }
+
+        protected virtual string GetLocationText()
+        {
+            return m_entry.Location;
+        }
+        protected virtual string GetDetailsText()
+        {
+            return m_entry.Text;
+        }
+
+        protected override void PaintRest(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntryMarkState markings)
+        {
+            var color = ((markings & EntryMarkState.Selected) != EntryMarkState.None) ? Brushes.White : GetDefaultEntryTypeColor(m_entry.EntryType);
+
+            string headerText = this.GetHeaderText();
             var width = view.ViewSettings.LineHeaderWidth;
             var w = DrawTextField(pe.Graphics, view.NormalFont, color, headerText, ChronoListViewEntry.NormalStringFormat, ref rect, width);
             if (w > width)
@@ -47,23 +69,34 @@ namespace StepBro.UI.WinForms.Controls
             }
             rect.X += width + 4 + (m_entry.IndentLevel * 40);
 
-            if (m_entry.Location != null)
+            if ((markings & EntryMarkState.Parent) != EntryMarkState.None)
             {
-                w = DrawTextField(pe.Graphics, view.NormalFont, color, m_entry.Location, ChronoListViewEntry.NormalStringFormat, ref rect);
-                if (m_entry.Text != null)
+                pe.Graphics.DrawLine(s_parentPen, new Point(rect.X - 3, rect.Top), new Point(rect.X - 3, rect.Bottom));
+            }
+            if ((markings & EntryMarkState.Sibling) != EntryMarkState.None)
+            {
+                pe.Graphics.DrawLine(s_siblingPen, new Point(rect.X - 3, rect.Top), new Point(rect.X - 3, rect.Bottom));
+            }
+
+            var location = this.GetLocationText();
+            var text = this.GetDetailsText();
+            if (location != null)
+            {
+                w = DrawTextField(pe.Graphics, view.NormalFont, color, location, ChronoListViewEntry.NormalStringFormat, ref rect);
+                if (text != null)
                 {
                     rect.X += w + 15;
                     w = DrawTextField(pe.Graphics, view.NormalFont, color, "-", ChronoListViewEntry.NormalStringFormat, ref rect);
                     rect.X += w + 15;
                 }
             }
-            if (m_entry.Text != null)
+            if (text != null)
             {
-                w = DrawTextField(pe.Graphics, view.NormalFont, color, m_entry.Text, ChronoListViewEntry.NormalStringFormat, ref rect);
+                w = DrawTextField(pe.Graphics, view.NormalFont, color, text, ChronoListViewEntry.NormalStringFormat, ref rect);
             }
         }
 
-        public Brush GetDefaultEntryTypeColor(LogEntry.Type type)
+        public static Brush GetDefaultEntryTypeColor(LogEntry.Type type)
         {
             switch (type)
             {
@@ -87,6 +120,8 @@ namespace StepBro.UI.WinForms.Controls
                     return Brushes.LightGray;
                 case LogEntry.Type.System:
                     return Brushes.Plum;
+                case LogEntry.Type.Special:
+                    return Brushes.Pink;
                 default:
                     return Brushes.White;
             }

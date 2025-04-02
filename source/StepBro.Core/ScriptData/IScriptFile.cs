@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StepBro.Core.DocCreation;
 using StepBro.Core.File;
 using StepBro.Core.General;
 using StepBro.Core.Parser;
@@ -24,8 +25,9 @@ namespace StepBro.Core.ScriptData
         /// </summary>
         string Author { get; }
         string Namespace { get; }
-        IEnumerable<IFileElement> ListElements();
+        IEnumerable<IFileElement> ListElements(bool includeExternal = false);
         IErrorCollector Errors { get; }
         IFolderShortcutsSource FolderShortcuts { get; }
+        IEnumerable<Tuple<int, ScriptDocumentation.DocCommentLineType, string>> ListDocumentComments();
     }
 }

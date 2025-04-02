@@ -22,6 +22,8 @@ namespace StepBro.Core.Api
         public TypeReference DataType { get { return null; } }
 
         public object Reference { get { return this; } }
+        public string SourceFile { get; internal set; } = null;
+        public int SourceLine { get; internal set; } = -1;
 
         public override string ToString()
         {

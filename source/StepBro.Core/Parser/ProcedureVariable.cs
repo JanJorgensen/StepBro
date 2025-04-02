@@ -25,7 +25,7 @@ namespace StepBro.Core.Parser
             }
         }
 
-        public ProcedureVariable(bool isParameter, string name, TypeReference type, EntryModifiers modifiers)
+        public ProcedureVariable(bool isParameter, string name, TypeReference type, EntryModifiers modifiers, string file = null, int line = -1)
         {
             this.IsParameter = isParameter;
             this.Name = name;
@@ -39,6 +39,8 @@ namespace StepBro.Core.Parser
             {
                 this.VariableExpression = null;
             }
+            this.SourceFile = file;
+            this.SourceLine = line;
         }
 
         #region IIdentifierInfo
@@ -74,6 +76,10 @@ namespace StepBro.Core.Parser
                 return this.Name;
             }
         }
+
+        public string SourceFile { get; private set; }
+        
+        public int SourceLine { get; private set; }
 
         #endregion
 

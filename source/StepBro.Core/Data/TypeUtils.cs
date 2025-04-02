@@ -1,4 +1,6 @@
-﻿using StepBro.Core.Parser;
+﻿using StepBro.Core.Execution;
+using StepBro.Core.Parser;
+using StepBro.Core.ScriptData;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +12,7 @@ namespace StepBro.Core.Data
 {
     public static class TypeUtils
     {
-        public static bool TryParse(this string s, out bool result)
+        public static bool TryParseBool(this string s, out bool result)
         {
             if (Boolean.TryParse(s, out result)) return true;
             switch (s.ToLower())
@@ -119,15 +121,94 @@ namespace StepBro.Core.Data
             return method.IsDefined(typeof(ExtensionAttribute), true);
         }
 
+        public static string ToSimpleName(this FileElementType type)
+        {
+            switch (type)
+            {
+                case FileElementType.Using:
+                    return "using statement";
+                case FileElementType.Namespace:
+                    return "namespace";
+                case FileElementType.Documentation:
+                    return "documentation element";
+                case FileElementType.EnumDefinition:
+                    return "enum";
+                case FileElementType.ProcedureDeclaration:
+                    return "procedure";
+                case FileElementType.FileVariable:
+                    return "variable";
+                case FileElementType.Const:
+                    return "constant";
+                case FileElementType.Config:
+                    return "configuration value";
+                case FileElementType.TestList:
+                    return "testlist";
+                case FileElementType.Datatable:
+                    return "data table";
+                case FileElementType.Override:
+                    return "element override";
+                case FileElementType.TypeDef:
+                    return "type definition";
+                case FileElementType.UsingAlias:
+                    return "type alias";
+                case FileElementType.Unknown:
+                default:
+                    return "<unknown>";
+            }
+        }
+
         public static string TypeName(this Type type)
         {
+            string name = type.Name;
             if (type.IsConstructedGenericType)
             {
-                var gtd = type.GetGenericTypeDefinition().Name;
+                var gtd = type.GetGenericTypeDefinition().TypeName();
                 gtd = gtd.Substring(0, gtd.IndexOf('`'));
                 var gta = type.GetGenericArguments();
                 var args = String.Join(", ", gta.Select(ga => ga.TypeName()));
-                return $"{gtd}<{args}>";
+                name = $"{gtd}<{args}>";
+            }
+            else if (type == typeof(void)) name = "void";
+            else if (type == typeof(object)) name = "object";
+
+            if (type.IsNested)
+            {
+                name = type.DeclaringType.TypeName() + "." + name;
+            }
+
+            return name;
+        }
+
+        public static string TypeFullName(this Type type)
+        {
+            return type.Namespace + "." + type.TypeName();
+        }
+
+        public static string StepBroTypeName(this Type type)
+        {
+            if (type == typeof(Int64)) return "int";
+            if (type == typeof(String)) return "string";
+            if (type == typeof(Boolean)) return "bool";
+            if (type == typeof(Verdict)) return "verdict";
+            if ((type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(IProcedureReference<>)) ||
+                type == typeof(IProcedureReference))
+            {
+                return "IProcedureReference";
+            }
+            return type.TypeName();
+        }
+
+        public static string TypeNameSimple(this Type type)
+        {
+            if (type.IsConstructedGenericType)
+            {
+                if (type.GetGenericTypeDefinition() == typeof(IProcedureReference<>))
+                {
+                    return "procedure reference";
+                }
+                var gtd = type.GetGenericTypeDefinition().Name;
+                gtd = gtd[..gtd.IndexOf('`')];
+                return gtd;
             }
             else return type.Name;
         }
@@ -136,6 +217,12 @@ namespace StepBro.Core.Data
         {
             if (type.DynamicType != null) return type.DynamicType.ToString();
             return type.Type.TypeName();
+        }
+
+        public static string StepBroTypeName(this TypeReference type)
+        {
+            if (type.DynamicType != null) return type.DynamicType.ToString();   // TODO: Make simple.
+            return type.Type.StepBroTypeName();
         }
 
         public static IEnumerable<Type> SelfBasesAndInterfaces(this Type type, bool includeBaseClasses = true, bool includeInterfaces = true)
@@ -196,6 +283,11 @@ namespace StepBro.Core.Data
         public static bool IsContainer(this Type type)
         {
             return typeof(IValueContainer).IsAssignableFrom(type);
+        }
+
+        public static bool IsStatic(this PropertyInfo propertyInfo)
+        {
+            return propertyInfo.CanRead ? propertyInfo.GetMethod.IsStatic : propertyInfo.SetMethod.IsStatic;
         }
 
         public static bool IsAllGenericArgumentsKnown(this MethodInfo method, Type instance)

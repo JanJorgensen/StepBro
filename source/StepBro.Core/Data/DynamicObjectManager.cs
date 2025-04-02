@@ -1,4 +1,5 @@
-﻿using StepBro.Core.Tasks;
+﻿using StepBro.Core.Host;
+using StepBro.Core.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,9 +15,19 @@ namespace StepBro.Core.Data
         public DynamicObjectManager(out IService serviceAccess) :
             base("DynamicObjectManager", out serviceAccess)
         {
+            this.AddOptionalDependency(typeof(IHost));
         }
 
         public event EventHandler ObjectListChanged;
+
+        protected override void Start(ServiceManager manager, ITaskContext context)
+        {
+            var hostApplication = manager.Get<IHost>();
+            if (hostApplication != null)
+            {
+                this.RegisterObjectHost(hostApplication);
+            }
+        }
 
         protected override void Stop(ServiceManager manager, ITaskContext context)
         {
@@ -36,6 +47,7 @@ namespace StepBro.Core.Data
         {
             m_hosts.Add(host);
             host.ObjectContainerListChanged += this.Host_ObjectContainerListChanged;
+            this.UpdateContainersList();
         }
 
         public void DeRegisterObjectHost(IObjectHost host)
@@ -53,6 +65,12 @@ namespace StepBro.Core.Data
 
         private void Host_ObjectContainerListChanged(object sender, EventArgs e)
         {
+            this.UpdateContainersList();
+            this.ObjectListChanged?.Invoke(this, e);
+        }
+
+        private void UpdateContainersList()
+        {
             m_containers.Clear();
             foreach (var host in m_hosts)
             {
@@ -61,7 +79,6 @@ namespace StepBro.Core.Data
                     m_containers.Add(c);
                 }
             }
-            this.ObjectListChanged?.Invoke(this, e);
         }
 
         public ReadOnlyObservableCollection<IObjectContainer> GetObjectCollection()
@@ -73,6 +90,13 @@ namespace StepBro.Core.Data
         {
             return m_containers.FirstOrDefault(
                 oc => string.Equals(oc.FullName, id, System.StringComparison.InvariantCulture));
+        }
+
+        public T TryFindObject<T>(string id) where T : class
+        {
+            return m_containers.FirstOrDefault(
+                oc => string.Equals(oc.FullName, id, System.StringComparison.InvariantCulture) &&
+                oc.Object is T)?.Object as T;
         }
     }
 }

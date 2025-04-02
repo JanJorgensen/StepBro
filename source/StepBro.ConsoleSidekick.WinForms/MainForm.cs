@@ -10,6 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.IO;
 using System.Windows.Forms;
 using StepBro.UI.WinForms;
 
@@ -294,13 +295,6 @@ namespace StepBro.ConsoleSidekick.WinForms
         }
 
         #region USER INTERACTION - COMMANDS
-
-        private void toolStripComboBoxTool_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            toolStripComboBoxTool.ToolTipText =
-                "Select tool/object to use for the command prompt. Selected object: '" +
-                (toolStripComboBoxTool.SelectedItem as Variable).FullName + "'";
-        }
 
         private void toolStripComboBoxToolCommand_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -908,36 +902,6 @@ namespace StepBro.ConsoleSidekick.WinForms
 
             #endregion
 
-            #region Tool variables
-
-            var selectedTool = toolStripComboBoxTool.SelectedItem as Variable;
-            toolStripComboBoxTool.Items.Clear();
-            int selection = 0;
-            int i = 0;
-            foreach (var toolVar in commandObjectVariables)
-            {
-                toolStripComboBoxTool.Items.Add(toolVar);
-                if (selectedTool != null && toolVar.FullName == selectedTool.FullName)
-                {
-                    selection = i;
-                }
-                i++;
-            }
-            if (toolStripComboBoxTool.Items.Count > 0)
-            {
-                toolStripComboBoxTool.Enabled = true;
-                toolStripComboBoxToolCommand.Enabled = true;
-                toolStripComboBoxTool.SelectedIndex = selection;
-                toolStripComboBoxTool.SelectionLength = 0;
-            }
-            else
-            {
-                toolStripComboBoxTool.Enabled = false;
-                toolStripComboBoxToolCommand.Enabled = false;
-            }
-
-            #endregion
-
             #region Panel tool variables
 
             var panelVariables = m_fileElements.Where(e => e is PanelDefinitionVariable).Cast<PanelDefinitionVariable>().ToList();
@@ -981,7 +945,8 @@ namespace StepBro.ConsoleSidekick.WinForms
                     }
                     newToolBarList.Add(new Tuple<string, UI.WinForms.CustomToolBar.ToolBar>(toolbarVar.FullName, toolBar));
 
-                    toolBar.Setup(this, toolbarVar.FullName, toolbarVar.ToolBarDefinition.CloneAsPropertyBlockEntry() as PropertyBlock);
+                    toolBar.Setup(this, null, toolbarVar.FullName, toolbarVar.ToolBarDefinition.CloneAsPropertyBlockEntry() as PropertyBlock);
+                    toolBar.Height = toolStripMain.Height + 1;
                 }
 
                 //if (m_panelsDialog == null)
@@ -1353,7 +1318,7 @@ namespace StepBro.ConsoleSidekick.WinForms
             throw new NotImplementedException();
         }
 
-        ILogEntry ILogger.Log(string text)
+        ITimestampedData ILogger.Log(string text)
         {
             var log = new Log() { LogType = Log.Type.Normal, Text = text };
             m_pipe.Send(log);

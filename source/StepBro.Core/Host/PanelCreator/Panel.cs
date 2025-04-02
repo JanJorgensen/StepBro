@@ -42,6 +42,11 @@ namespace StepBro.PanelCreator
         {
         }
 
+        public PropertyBlockDecoder.Element TryGetDecoder()
+        {
+            return null;
+        }
+
         public void Setup(IScriptFile file, ILogger logger, PropertyBlock data)
         {
             var mainPanel = data.TryGetElement(MainElementName);

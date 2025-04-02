@@ -11,14 +11,13 @@ jobs:
     strategy:
       matrix:
         configuration: [Debug, Release]
+        os: [ubuntu-latest, windows-latest]
 
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     
     env:
-      Solution_Name: source\StepBro.sln
-      Test_Project_Path: source\Test\StepBro.Core.Test\StepBro.Core.Test.csproj
-      Wap_Project_Directory: your-wap-project-directory-name    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
-      Wap_Project_Path: your-wap-project-path                   # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
+      Solution_Name: source/StepBro.sln
+      Test_Project_Path: source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
   
   
   
@@ -32,15 +31,17 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
 
-    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
+    - name: Install dependencies
+      run: dotnet restore source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
+      
+    - name: Build
+      run: dotnet build source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj -c ${{ matrix.configuration }}
 
     # Execute all unit tests in the solution
     - name: Execute unit tests
-      run: dotnet test source\Test\StepBro.Core.Test\StepBro.Core.Test.csproj
+      run: dotnet test source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
   
   
   
@@ -51,14 +52,13 @@ jobs:
     strategy:
       matrix:
         configuration: [Debug, Release]
+        os: [ubuntu-latest, windows-latest]
 
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
 
     env:
-      Solution_Name: source\StepBro.sln
-      Test_Project_Path: source\Test\StepBro.Core.Test\StepBro.Core.Test.csproj
-      Wap_Project_Directory: your-wap-project-directory-name    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
-      Wap_Project_Path: your-wap-project-path                   # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
+      Solution_Name: source/StepBro.sln
+      Test_Project_Path: source/Test/StepBro.Core.Test/StepBro.Core.Test.csproj
 
 
 
@@ -72,28 +72,27 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
 
-    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
-
-    # Build StepBro so we can use it to test StepBro scripts
-    - name: Build StepBro
-      run: msbuild source/StepBro.sln -r -t:Clean`;Rebuild
+    - name: Install dependencies
+      run: dotnet restore source/StepBro.sln /p:EnableWindowsTargeting=true
+      
+    - name: Build
+      run: dotnet build source/StepBro.sln /p:EnableWindowsTargeting=true -c ${{ matrix.configuration }}
         
     # TODO: Out-commented because stepbro --version has exit code -1 for some reason, when it is fixed this can be re-added
     # - name: Run StepBro Version Check
     #   run: .\source\bin\stepbro.exe --version
         
     - name: Run StepBro Consoletest
-      run: .\source\bin\stepbro.exe ".\test files\smoketest\ConsoleTest.sbs" -v -e HelloStepBro --exitcode Verdict
+      run: ./source/bin/stepbro "./test files/smoketest/ConsoleTest.sbs" -v -e HelloStepBro --exitcode Verdict
 
     - name: Run StepBro Smoketest
-      run: .\source\bin\stepbro.exe ".\test files\smoketest\smoketest.sbs" -v -e AllTests -m FormalTest --exitcode SubVerdict
+      run: ./source/bin/stepbro "./test files/smoketest/smoketest.sbs" -v -e AllTests -m FormalTest --exitcode SubVerdict
 
     - name: Run SerialTestConnection test
-      run: .\source\bin\stepbro.exe ".\test files\ModuleTests\SerialTestConnection\SerialTestConnectionTests.sbs" -v -e SerialTestConnectionOfflineTests -m FormalTest --exitcode SubVerdict
+      run: ./source/bin/stepbro "./test files/ModuleTests/SerialTestConnection/SerialTestConnectionTests.sbs" -v -e SerialTestConnectionOfflineTests -m FormalTest --exitcode SubVerdict
 
     - name: Run ExecutionHelper test
-      run: .\source\bin\stepbro.exe ".\test files\ModuleTests\ExecutionHelper\ExecutionHelperTests.sbs" -v -e ExecutionHelperTests -m FormalTest --exitcode SubVerdict
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: ./source/bin/stepbro "./test files/ModuleTests/ExecutionHelper/ExecutionHelperTests.sbs" -v -e ExecutionHelperTests -m FormalTest --exitcode SubVerdict

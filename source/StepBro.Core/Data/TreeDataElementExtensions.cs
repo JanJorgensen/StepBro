@@ -107,7 +107,7 @@ namespace StepBro.Core.Data
                 if (sub != null && sub.HasValue)
                 {
                     string s = sub.Value;
-                    if (!TypeUtils.TryParse(s, out value))
+                    if (!TypeUtils.TryParseBool(s, out value))
                     {
                         throw new Exception("Error parsing element \"" + subElement + "\" at " + sub.DataOrigin + " as a boolean value. Value: " + s);
                     }

@@ -15,6 +15,12 @@ namespace StepBroCoreTest.Execution
     [TestClass]
     public class TestLayeredModuleUsage
     {
+        [TestInitialize]
+        public void Setup()
+        {
+            ServiceManager.Dispose();
+        }
+
         [TestMethod]
         public void ThreeCodeModulesSetup()
         {
@@ -43,7 +49,7 @@ namespace StepBroCoreTest.Execution
             var file = FileBuilder.ParseFiles(
                 (ILogger)null,
                 this.GetType().Assembly,
-                new Tuple<string, string>("myfile." + Main.StepBroFileExtension, f.ToString()))[0];
+                new Tuple<string, string>("myfile" + Constants.STEPBRO_FILE_EXTENSION, f.ToString()))[0];
 
             Assert.AreEqual(4, file.ListElements().Count());
             Assert.AreEqual(1, file.ListElements().Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Count());
