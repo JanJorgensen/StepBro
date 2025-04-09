@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static StepBro.Core.Data.PropertyBlockDecoder;
+using static StepBro.Core.General.ProjectUserData;
 
 namespace StepBro.Core.General
 {
@@ -149,7 +150,7 @@ namespace StepBro.Core.General
                             nameof(FolderConfiguration),
                             Doc(""),
                             new Flag<FolderConfiguration>(
-                                Constants.STEPBRO_FOLDER_CONFIG_FILE_ROOT, 
+                                Constants.STEPBRO_FOLDER_CONFIG_FILE_ROOT,
                                 Doc(""),
                                 (c, f) =>
                                 {
@@ -162,7 +163,7 @@ namespace StepBro.Core.General
                                     return null;    // No errors
                                 }),
                             new ArrayString<FolderConfiguration>(
-                                Constants.STEPBRO_FOLDER_CONFIG_FILE_LIBS, 
+                                Constants.STEPBRO_FOLDER_CONFIG_FILE_LIBS,
                                 Usage.Setting,
                                 Doc(""),
                                 (c, a) =>
@@ -171,7 +172,7 @@ namespace StepBro.Core.General
                                     return null;    // No errors
                                 }),
                             new ValueString<FolderConfiguration>(
-                                Constants.STEPBRO_FOLDER_CONFIG_FILE_SHORTCUT, 
+                                Constants.STEPBRO_FOLDER_CONFIG_FILE_SHORTCUT,
                                 Usage.Element,
                                 Doc(""),
                                 (c, v) =>
@@ -192,9 +193,18 @@ namespace StepBro.Core.General
                                 })
                         );
                 }
-
+                
                 var config = new FolderConfiguration(currentPath);
                 m_decoder.DecodeData(null, data, config, errors);
+
+                foreach (var sc in config.Shortcuts)
+                {
+                    string error = null;
+                    if (!sc.TryResolve(StepBro.Core.ServiceManager.Global.Get<IFolderManager>().ListShortcuts().Concat(config.Shortcuts), currentPath, ref error))
+                    {
+                        errors.Add(new Tuple<int, string>(-1, $"Error resolving shortcut \"{sc.Name}\". {error}"));
+                    }
+                }
                 return config;
             }
         }
