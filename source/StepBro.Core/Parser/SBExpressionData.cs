@@ -15,6 +15,7 @@ namespace StepBro.Core.Parser
         Identifier,
         Expression,
         ThisReference,
+        ApplicationObject,
         GlobalVariableReference,
         LocalVariableReference,
         HostApplicationVariableReference,

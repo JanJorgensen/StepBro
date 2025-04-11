@@ -64,6 +64,7 @@ EXECUTION : 'execution' ;
 EXPECT : 'expect' ;
 FAIL : 'fail' ;
 FALSE : 'false' ;
+FILEPATH : 'filepath' ;
 FOREACH : 'foreach' ;
 FOR : 'for' ;
 FUNCTION : 'function' ;

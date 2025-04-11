@@ -307,21 +307,24 @@ namespace StepBroCoreTest.Parser
         private long m_id;
         private long m_resetCounts = 0;
 
-        public DummyInstrumentClass([ObjectName] string objectName = "<no name>")
+        public DummyInstrumentClass([Implicit] IScriptFile home, [ObjectName] string objectName = "<no name>")
         {
+            if (home == null) throw new ArgumentNullException(nameof(home));
             m_id = m_nextInstanceID++;
             m_objectName = objectName;
         }
 
-        public DummyInstrumentClass(string[] names, [ObjectName] string objectName = "<no name>") : this()
+        public DummyInstrumentClass([Implicit] IScriptFile home, string[] names, [ObjectName] string objectName = "<no name>") : this(home)
         {
+            if (home == null) throw new ArgumentNullException(nameof(home));
             m_id = m_nextInstanceID++;
             m_objectName = objectName;
             m_names = names.ToList();
         }
 
-        public DummyInstrumentClass(long valueA, [ObjectName] string objectName = "<no name>") : this()
+        public DummyInstrumentClass([Implicit] IScriptFile home, long valueA, [ObjectName] string objectName = "<no name>") : this(home)
         {
+            if (home == null) throw new ArgumentNullException(nameof(home));
             m_id = m_nextInstanceID++;
             m_objectName = objectName;
             this.IntA = valueA;

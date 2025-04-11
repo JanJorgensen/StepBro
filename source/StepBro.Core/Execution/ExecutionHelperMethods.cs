@@ -289,6 +289,11 @@ internal static class ExecutionHelperMethods
         return (value >= lower && value <= upper);
     }
 
+    public static IScriptFile GetFileReference(int id)
+    {
+        return ServiceManager.Global.Get<ILoadedFilesManager>().ListFiles<ScriptFile>().FirstOrDefault(f => f.UniqueID == id);
+    }
+
     public static T GetFileConstant<T>(IScriptCallContext context, int fileID, int id)
     {
         ScriptFile file = null;

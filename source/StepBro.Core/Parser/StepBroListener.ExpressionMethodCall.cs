@@ -1,4 +1,5 @@
 ﻿using Antlr4.Runtime.Misc;
+using Newtonsoft.Json.Linq;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
@@ -170,7 +171,6 @@ namespace StepBro.Core.Parser
 
                     case SBExpressionType.TypeReference:
                         {
-                            //List<Type> argumentTypes = new List<Type>();
                             foreach (var constructor in left.DataType.Type.GetConstructors())
                             {
                                 List<SBExpressionData> suggestedAssignments = new List<SBExpressionData>();
@@ -223,25 +223,45 @@ namespace StepBro.Core.Parser
                             }
                             else
                             {
-                                // Handle none or more than one alternative
-                                if (matchingMethods.Count() > 0)
+
+                                foreach (var method in left.DataType.Type.GetMethods().Where(m => m.Name == "Create"))
                                 {
-                                    // Multiple methods can be used, all fit the call.
-                                    m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"Ambiguity in method resolve for constructor: {left.Token.Text}.");
+                                    List<SBExpressionData> suggestedAssignments = new List<SBExpressionData>();
+                                    var score = CheckArguments(method, false, false, null, null, null, null, null, null, arguments, suggestedAssignments, null);
+                                    if (score > 0)
+                                    {
+                                        matchingMethods.Add(new Tuple<MethodBase, int>(method, score));
+                                        suggestedAssignmentsForMatchingMethods.Add(suggestedAssignments);
+                                    }
                                 }
-                                else if (methods.Count() > 0 && matchingMethods.Count() == 0)
+
+                                bestMatch = GetBestMatch(matchingMethods);
+                                if (bestMatch >= 0)
                                 {
-                                    // The method exists, but no method fits with the given call
-                                    m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"No constructor could be found with matching parameters.");
+
                                 }
                                 else
                                 {
-                                    // The method does not exist
-                                    m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"No public constructor could be found.");
-                                }
+                                    // Handle none or more than one alternative
+                                    if (matchingMethods.Count() > 0)
+                                    {
+                                        // Multiple methods can be used, all fit the call.
+                                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"Ambiguity in method resolve for constructor: {left.Token.Text}.");
+                                    }
+                                    else if (methods?.Count() > 0 && matchingMethods.Count() == 0)
+                                    {
+                                        // The method exists, but no method fits with the given call
+                                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"No constructor could be found with matching parameters.");
+                                    }
+                                    else
+                                    {
+                                        // The method does not exist
+                                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"No public constructor could be found.");
+                                    }
 
-                                // Set the call type to error so we do not get an exception
-                                callType = ParansExpressionType.Error;
+                                    // Set the call type to error so we do not get an exception
+                                    callType = ParansExpressionType.Error;
+                                }
                             }
                         }
                         break;
@@ -462,6 +482,7 @@ namespace StepBro.Core.Parser
                         instance,
                         instanceName,
                         m_currentProcedure?.ContextReferenceInternal,
+                        null, // TODO: IScriptFile reference
                         extensionInstance,
                         arguments,
                         suggestedAssignments);
@@ -577,6 +598,7 @@ namespace StepBro.Core.Parser
                             instance,
                             instanceName,
                             m_currentProcedure?.ContextReferenceInternal,
+                            null, // TODO: IScriptFile reference
                             extensionInstance,
                             arguments,
                             suggestedAssignments);
@@ -910,7 +932,8 @@ namespace StepBro.Core.Parser
             return this.CheckArguments(
                 constructor, false, false,
                 null, null, null,
-                null, null, arguments, suggestedAssignmentsOut, propertyBlock);
+                null, null, null,
+                arguments, suggestedAssignmentsOut, propertyBlock);
         }
 
         internal int CheckMethodArguments(
@@ -919,6 +942,7 @@ namespace StepBro.Core.Parser
             List<ParameterData> procedureParameters,
             Expression instance, string instanceName,
             Expression contextReference,
+            Expression homeFileReference,
             Expression extensionInstance,
             List<SBExpressionData> arguments,
             List<SBExpressionData> suggestedAssignmentsOut,
@@ -939,7 +963,7 @@ namespace StepBro.Core.Parser
             return this.CheckArguments(
                 method, isProcedure, firstParIsThis,
                 procedureParameters, instance, instanceName,
-                contextReference, extensionInstance, arguments, suggestedAssignmentsOut, propertyBlock);
+                contextReference, homeFileReference, extensionInstance, arguments, suggestedAssignmentsOut, propertyBlock);
         }
 
         internal int CheckArguments(
@@ -948,6 +972,7 @@ namespace StepBro.Core.Parser
             List<ParameterData> procedureParameters,
             Expression instance, string instanceName,
             Expression contextReference,
+            Expression homeFileReference,
             Expression extensionInstance,
             List<SBExpressionData> arguments,
             List<SBExpressionData> suggestedAssignmentsOut,
@@ -1029,6 +1054,17 @@ namespace StepBro.Core.Parser
                                 suggestedAssignmentsOut.Add(new SBExpressionData(contextCreator));
                             }
                             continue;
+                        }
+                        else if (p.ParameterType.IsAssignableFrom(typeof(IScriptFile)))
+                        {
+                            if (m_isInVariableInitializer)
+                            {
+                                suggestedAssignmentsOut.Add(new SBExpressionData(m_variableInitializerParameterScriptFile));
+                            }
+                            else
+                            {
+                                throw new NotImplementedException();
+                            }
                         }
                         else
                         {

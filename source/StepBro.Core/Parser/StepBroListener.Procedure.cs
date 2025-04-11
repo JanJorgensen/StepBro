@@ -26,7 +26,7 @@ namespace StepBro.Core.Parser
         private List<ParameterData> m_parameters = null;
         private Stack<FileProcedure> m_procedureStack = new Stack<FileProcedure>();
         internal FileProcedure m_currentProcedure = null;   // The procedure currently being parsed.
-        private bool m_inFunctionScope = false;
+        internal bool m_inFunctionScope = false;
         private FileProcedure m_lastProcedure = null;       // The last procedure the parser ended parsing.
         private ProcedureParsingScope m_procedureBaseScope = null;
         private Stack<ProcedureParsingScope> m_scopeStack = new Stack<ProcedureParsingScope>();
@@ -1267,7 +1267,12 @@ namespace StepBro.Core.Parser
                     Expression.Convert(Expression.Constant(null), typeof(Logging.ILogger)));
             }
 
-            if (!m_currentProcedure.ReturnType.Type.IsAssignableFrom(code.Type))
+            var useableExpression = CheckAndConvertValueForAssignment(code, m_currentProcedure.ReturnType.Type);
+            if (useableExpression != null)
+            {
+                code = useableExpression;
+            }
+            else
             {
                 m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Expression data type is not compatible with the procedure return type.");
                 return;

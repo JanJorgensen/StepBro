@@ -5,6 +5,7 @@ using StepBro.Core.ScriptData;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
@@ -28,6 +29,8 @@ namespace StepBro.Core.Parser
         private TypeReference m_variableType;
         private TypeReference m_creatorType;
         private string m_variableName = "";
+        private bool m_isInVariableInitializer = false;
+        private ParameterExpression m_variableInitializerParameterScriptFile = null;
         private SBExpressionData m_variableInitializer = null;
         private List<VariableData> m_variables;
 
@@ -173,7 +176,11 @@ namespace StepBro.Core.Parser
                             else
                             {
                                 m_variableInitializer.NarrowGetValueType();
-                                if (m_variableInitializer.DataType.Type != m_variableType.Type)
+                                var useableAssignment = CheckAndConvertValueForAssignment(m_variableInitializer.ExpressionCode, m_variableType.Type);
+                                if (useableAssignment != null) {
+                                    m_variableInitializer = new SBExpressionData(useableAssignment);
+                                }
+                                else
                                 {
                                     string additional = " Value type: " + m_variableInitializer.DataType.Type.TypeNameSimple() + ".";
                                     if (m_variableInitializer.DataType.HasProcedureReference)
@@ -241,6 +248,8 @@ namespace StepBro.Core.Parser
         public override void EnterVariableInitializerExpression([NotNull] SBP.VariableInitializerExpressionContext context)
         {
             m_expressionData.PushStackLevel("VariableInitializerExpression @" + context.Start.Line.ToString() + ", " + context.Start.Column.ToString());
+            m_isInVariableInitializer = true;
+            m_variableInitializerParameterScriptFile = Expression.Parameter(typeof(IScriptFile), "file");
         }
 
         public override void ExitVariableInitializerExpression([NotNull] SBP.VariableInitializerExpressionContext context)
@@ -253,6 +262,7 @@ namespace StepBro.Core.Parser
                 m_variableInitializer = levelData.Stack.Pop();
                 m_variableInitializer = this.ResolveForGetOperation(m_variableInitializer, targetType: m_variableType, reportIfUnresolved: true);
             }
+            m_isInVariableInitializer = false;
         }
     }
 }

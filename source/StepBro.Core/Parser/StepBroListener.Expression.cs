@@ -862,6 +862,43 @@ namespace StepBro.Core.Parser
             }
         }
 
+        private Expression CheckAndConvertValueForAssignment(Expression expression, Type targetType)
+        {
+            if (targetType.IsAssignableFrom(expression.Type))
+            {
+                return expression;
+            }
+            else
+            {
+                MethodInfo convert_mi = expression.Type.TryGetConvertOperator(targetType);
+                if (convert_mi != null)
+                {
+                    var pars = convert_mi.GetParameters();
+                    if (pars.Length > 1)
+                    {
+                        if (pars[0].ParameterType == typeof(IScriptFile))
+                        {
+                            if (m_file != null)
+                            {
+                                return Expression.Call(
+                                    convert_mi,
+                                    Expression.Call(s_GetFileReference, Expression.Constant(m_file.UniqueID)),
+                                    expression);
+                            }
+                        }
+                        else
+                        {
+                            throw new ParsingErrorException("Unhandled parameters on Create function.");
+                        }
+                    }
+                    else if (pars.Length == 1)
+                    {
+                        return Expression.Call(convert_mi, expression);
+                    }
+                }
+            }
+            return null;    // No luck :-(
+        }
 
         #endregion
     }

@@ -11,6 +11,7 @@ namespace StepBro.Core.Data
         DotNetMethod,
         DotNetProperty,
         DotNetField,
+        ApplicationObject,
         /// <summary>
         /// A file (might be script file) by its name.
         /// </summary>

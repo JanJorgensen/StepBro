@@ -2,7 +2,10 @@
 using StepBro.Core.Execution;
 using System;
 using System.Collections;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
+using System.Threading;
 
 namespace StepBro.Core.Parser.BinaryOperators
 {
@@ -134,6 +137,14 @@ namespace StepBro.Core.Parser.BinaryOperators
                     }
                     else
                     {
+                        Type[] searchTypes = new Type[] { first.DataType.Type, last.DataType.Type };
+                        MethodInfo op = first.DataType.Type.GetMethod("op_Addition", (BindingFlags.Public | BindingFlags.Static), null, searchTypes, Array.Empty<ParameterModifier>());
+                        if (op != null)
+                        {
+                            return new SBExpressionData(Expression.Call(op, first.ExpressionCode, last.ExpressionCode));
+                        }
+                        // TODO: run through other operator methods to check if any can be used if converting any of the arguments.
+
                         throw new NotImplementedException();
                     }
 

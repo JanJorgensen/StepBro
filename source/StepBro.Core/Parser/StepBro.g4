@@ -269,6 +269,7 @@ primitiveType
     |   DATETIME
     |   TIMESPAN
     |   STRING
+    |   FILEPATH
     |	OBJECT
     ;
 
