@@ -2,11 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Mail;
-using System.Net;
 using System.Threading;
-using SharpCompress.Common;
-using StepBro.Core;
 using StepBro.Core.Addons;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
@@ -182,7 +178,6 @@ namespace StepBro.Core.Execution
             }
             return result;
         }
-
 
         [Public]
         public static string GetOutputFileFolder()
@@ -669,6 +664,7 @@ namespace StepBro.Core.Execution
         }
 
         #endregion
+
     }
 
     //[Public]
