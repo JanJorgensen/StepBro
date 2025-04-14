@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
@@ -29,7 +30,7 @@ namespace StepBro.Core.File
         string Name { get; }
         string Path { get; }
         public bool IsResolved { get; }
-        string ResolvedPath { get; }
+        FilePath ResolvedPath { get; }
     }
 
     public interface IFolderShortcutsSource
@@ -58,19 +59,19 @@ namespace StepBro.Core.File
         }
     }
 
-    public class FolderShortcut : IFolderShortcut
+    public class FolderShortcut : IFolderShortcut, IIdentifierInfo
     {
         private FolderShortcutOrigin m_origin;
         private string m_name;
         private string m_path;
-        private string m_resolvedPath;
+        private FilePath m_resolvedPath;
 
         public FolderShortcut(FolderShortcutOrigin origin, string name, string path, string resolved = null)
         {
             m_origin = origin;
             m_name = name;
             m_path = path;
-            m_resolvedPath = resolved;
+            m_resolvedPath = (resolved != null) ? new FilePath(resolved) : null;
         }
 
         public FolderShortcutOrigin Origin
@@ -97,7 +98,7 @@ namespace StepBro.Core.File
             }
         }
 
-        public string ResolvedPath
+        public FilePath ResolvedPath
         {
             get
             {
@@ -105,7 +106,19 @@ namespace StepBro.Core.File
             }
         }
 
-        public bool IsResolved {  get {  return m_resolvedPath != null; } }
+        public bool IsResolved { get { return m_resolvedPath != null; } }
+
+        string IIdentifierInfo.FullName => throw new NotImplementedException();
+
+        IdentifierType IIdentifierInfo.Type => IdentifierType.ApplicationObject;
+
+        TypeReference IIdentifierInfo.DataType => (TypeReference)typeof(FilePath);
+
+        object IIdentifierInfo.Reference => m_resolvedPath;
+
+        string IIdentifierInfo.SourceFile => null;
+
+        int IIdentifierInfo.SourceLine => -1;
 
         public bool TryResolve(IEnumerable<IFolderShortcut> shortcuts, string basePath, ref string errorMessage)
         {
@@ -117,7 +130,7 @@ namespace StepBro.Core.File
             }
             else
             {
-                m_resolvedPath = System.IO.Path.GetFullPath(resolved, basePath);
+                m_resolvedPath = new FilePath(System.IO.Path.GetFullPath(resolved, basePath));
                 return true;
             }
         }
@@ -294,7 +307,7 @@ namespace StepBro.Core.File
         {
             foreach (var sfname in Enum.GetNames(typeof(System.Environment.SpecialFolder)))
             {
-                var sf = (System.Environment.SpecialFolder)Enum.Parse(typeof(System.Environment.SpecialFolder),sfname);
+                var sf = (System.Environment.SpecialFolder)Enum.Parse(typeof(System.Environment.SpecialFolder), sfname);
                 var folder = System.Environment.GetFolderPath(sf);
                 if (!String.IsNullOrEmpty(folder))
                 {
@@ -308,7 +321,7 @@ namespace StepBro.Core.File
                 if (!String.IsNullOrEmpty(value) && value.Contains(System.IO.Path.DirectorySeparatorChar))
                 {
                     var key = ev.Key as string;
-                    if (!m_environmentShortcuts.ListShortcuts().Any(k => String.Equals(k.Name, key, StringComparison.InvariantCultureIgnoreCase)) && System.IO.Directory.Exists(value))
+                    if (!m_environmentShortcuts.ListShortcuts().Any(k => String.Equals(k.Name, key, StringComparison.InvariantCultureIgnoreCase)) && (System.IO.Directory.Exists(value) || System.IO.File.Exists(value)))
                     {
                         m_environmentShortcuts.AddShortcut(key, value, isResolved: true);
                     }

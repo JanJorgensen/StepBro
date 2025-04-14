@@ -1236,6 +1236,30 @@ namespace StepBroCoreTest.Parser
             var result = taskContext.CallProcedure(procedure);
             Assert.AreEqual(11L, result);
         }
+
+        [TestMethod]
+        public void FileParsing_FilePathVariable()
+        {
+            var source = new StringBuilder();
+            source.AppendLine("namespace SayMyName;");
+            source.AppendLine("filepath myFile = @\"[this]\\sub\\zup\\script.sbs\";");
+            source.AppendLine("public string UseVariable()");
+            source.AppendLine("{");
+            source.AppendLine("    return myFile;");
+            source.AppendLine("}");
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", source.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual("myfile.sbs", files[0].FileName);
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            var procedure = files[0].ListElements().FirstOrDefault(p => p.Name == "UseVariable") as IFileProcedure;
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+            var result = taskContext.CallProcedure(procedure);
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is string);
+        }
     }
 }
 

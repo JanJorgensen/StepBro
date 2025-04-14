@@ -4,6 +4,7 @@ using Antlr4.Runtime.Tree;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.File;
 using StepBro.Core.Host;
 using StepBro.Core.ScriptData;
 using System;
@@ -17,6 +18,7 @@ namespace StepBro.Core.Parser;
 
 internal partial class StepBroListener
 {
+    private static MethodInfo s_GetFileReference = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetFileReference));
     private static MethodInfo s_GetFileConstant = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetFileConstant));
     private static MethodInfo s_GetGlobalVariable = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetFileVariable));
     private static MethodInfo s_GetHostVariable = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetHostVariable));
@@ -30,7 +32,6 @@ internal partial class StepBroListener
     private static MethodInfo s_GetPartnerFromProcedure = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetPartnerReferenceFromProcedureReference));
     private static MethodInfo s_GetPartner = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetPartnerReference));
 
-    private static string s_ScriptUtilsFullNamePrefix = typeof(Execution.ScriptUtils).FullName + ".";
     private static SBExpressionData s_ScriptUtilsTypeData = new SBExpressionData(SBExpressionType.TypeReference, new TypeReference(typeof(Execution.ScriptUtils)));
 
     public override void ExitQualifiedName([NotNull] SBP.QualifiedNameContext context)
@@ -373,6 +374,15 @@ internal partial class StepBroListener
             //        }
             //    }
             //}
+            if (foundIdentifier == null)
+            {
+                foundIdentifier = m_file.FolderShortcuts.ListShortcuts().FirstOrDefault(fs => fs.Name == identifier) as IIdentifierInfo;
+            }
+        }
+
+        if (foundIdentifier == null)
+        {
+            foundIdentifier = ServiceManager.GlobalIfReady?.Get<IFolderManager>()?.ListShortcuts().FirstOrDefault(fs => fs.Name == identifier) as IIdentifierInfo;
         }
 
         if (foundIdentifier == null)
@@ -489,6 +499,11 @@ internal partial class StepBroListener
             {
                 return this.IdentifierToExpressionData(foundIdentifier, token);
             }
+            var foundScriptUtilsAccess = this.ResolveDotIdentifierTypeReference(s_ScriptUtilsTypeData, SBExpressionData.CreateIdentifier(identifier, token: token));
+            if (foundScriptUtilsAccess != null)
+            {
+                return foundScriptUtilsAccess;
+            }
         }
 
         if (reportUnresolved)
@@ -530,6 +545,29 @@ internal partial class StepBroListener
         else if (identifier.Type == IdentifierType.Variable || identifier.Type == IdentifierType.Parameter || identifier.Type == IdentifierType.LambdaParameter)
         {
             result = new SBExpressionData(SBExpressionType.LocalVariableReference, (TypeReference)identifier.DataType, (Expression)identifier.Reference, identifier);
+        }
+        else if (identifier.Type == IdentifierType.ApplicationObject)
+        {
+            if (identifier.Reference is IReconstructable value)
+            {
+                var reconstruction = value.GetReconstructor();
+                var context = (m_inFunctionScope) ? m_currentProcedure.ContextReferenceInternal : Expression.Constant(null, typeof(Execution.IScriptCallContext));
+                MethodCallExpression callExpression = null;
+                if (reconstruction.Item3 is string)
+                {
+                    callExpression = Expression.Call(reconstruction.Item2.Method, context, Expression.Convert(Expression.Constant((string)reconstruction.Item3), typeof(object)));
+                }
+                else if (reconstruction.Item3 is int)
+                {
+                    callExpression = Expression.Call(reconstruction.Item2.Method, context, Expression.Convert(Expression.Constant((int)reconstruction.Item3), typeof(object)));
+                }
+
+                return new SBExpressionData(Expression.Convert(callExpression, reconstruction.Item1));
+            }
+            else
+            {
+                return new SBExpressionData(SBExpressionType.ExpressionError);
+            }
         }
         else if (identifier.Type == IdentifierType.HostVariable)
         {

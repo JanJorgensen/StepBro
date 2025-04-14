@@ -14,6 +14,7 @@ namespace StepBro.Core.Parser.AssignmentOperators
         {
             switch (first.ReferencedType)
             {
+                case SBExpressionType.ApplicationObject:
                 case SBExpressionType.GlobalVariableReference:
                     break;
                 case SBExpressionType.LocalVariableReference:

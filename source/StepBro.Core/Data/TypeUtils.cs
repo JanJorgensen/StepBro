@@ -379,5 +379,29 @@ namespace StepBro.Core.Data
             var propertyInfo = typeof(Expression).GetProperty("DebugView", BindingFlags.Instance | BindingFlags.NonPublic);
             return propertyInfo.GetValue(exp) as string;
         }
+    
+    
+        public static MethodInfo TryGetConvertOperator(this Type typeIn, Type typeOut)
+        {
+            Type[] searchTypes = new Type[] { typeIn };
+            Type[] searchTypesWithHome = new Type[] { typeof(IScriptFile), typeIn };
+
+            MethodInfo convert_mi = typeOut.GetMethod("Create", (BindingFlags.Public | BindingFlags.Static), null, searchTypesWithHome, Array.Empty<ParameterModifier>());
+            if (convert_mi != null && convert_mi.ReturnType == typeOut) return convert_mi;
+
+            convert_mi = typeIn.GetMethod("op_Explicit", (BindingFlags.Public | BindingFlags.Static), null, searchTypes, Array.Empty<ParameterModifier>());
+            if (convert_mi != null && convert_mi.ReturnType == typeOut) return convert_mi;
+
+            convert_mi = typeIn.GetMethod("op_Implicit", (BindingFlags.Public | BindingFlags.Static), null, searchTypes, Array.Empty<ParameterModifier>());
+            if (convert_mi != null && convert_mi.ReturnType == typeOut) return convert_mi;
+
+            convert_mi = typeOut.GetMethod("op_Explicit", (BindingFlags.Public | BindingFlags.Static), null, searchTypes, Array.Empty<ParameterModifier>());
+            if (convert_mi != null && convert_mi.ReturnType == typeOut) return convert_mi;
+
+            convert_mi = typeOut.GetMethod("op_Implicit", (BindingFlags.Public | BindingFlags.Static), null, searchTypes, Array.Empty<ParameterModifier>());
+            if (convert_mi != null && convert_mi.ReturnType == typeOut) return convert_mi;
+
+            return null;
+        }
     }
 }
