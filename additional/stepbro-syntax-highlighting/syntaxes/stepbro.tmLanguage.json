@@ -44,7 +44,7 @@
                 },
                 {
                     "name": "keyword.other.types.stepbro",
-                    "match": "\\b(bool|void|testlist|int|integer|decimal|verdict|datetime|timespan|string|type|namespace|var|double|object)\\b"
+                    "match": "\\b(bool|void|testlist|int|integer|decimal|verdict|datetime|timespan|string|type|namespace|var|double|object|filepath)\\b"
                 },
                 {
                     "name": "keyword.other.step.stepbro",
