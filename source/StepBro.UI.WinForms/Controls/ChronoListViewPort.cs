@@ -294,7 +294,7 @@ namespace StepBro.UI.WinForms.Controls
             m_mouseDownLocation = e.Location;
             var line = (e.Location.Y / m_lineHeight);
             var index = m_topIndex + line;
-            if (index > m_lastShown) index = -1L;
+            if (index >= m_viewEntryCount || index > m_lastShown) index = -1L;
             this.MouseDownOnLine?.Invoke(this, new MouseOnLineEventArgs(e, line, index));
             if (!this.Focused)
             {
@@ -311,7 +311,7 @@ namespace StepBro.UI.WinForms.Controls
             base.OnMouseUp(e);
             var line = (e.Location.Y / m_lineHeight);
             var index = m_topIndex + line;
-            if (index > m_lastShown) index = -1L;
+            if (line >= m_viewEntryCount || index > m_lastShown) index = -1L;
             this.MouseUpOnLine?.Invoke(this, new MouseOnLineEventArgs(e, line, index));
         }
 
