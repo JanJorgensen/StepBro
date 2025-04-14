@@ -81,7 +81,7 @@ namespace StepBro.SimpleWorkbench
                 m_firstOptionLeft = radioButton1.Left;
                 m_firstOptionTop = radioButton1.Top;
                 m_optionsVerticalSpacing = radioButton2.Top - radioButton1.Top;
-                m_groupBoxEmptyHeight = groupBox.Height - (m_optionsVerticalSpacing * 2);
+                m_groupBoxEmptyHeight = groupBox.Height - (m_optionsVerticalSpacing * groupBox.Controls.Count) + 4;
                 groupBox.Controls.Clear();
 
                 m_initialValues = false;

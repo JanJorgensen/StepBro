@@ -37,10 +37,10 @@ namespace StepBro.SimpleWorkbench
                 labelHeader.Text = m_interactionData.HeaderText;
             }
 
-            buttonOK.Visible = m_interactionData.ShowOK;
-            buttonYes.Visible = m_interactionData.ShowYesNo;
-            buttonNo.Visible = m_interactionData.ShowYesNo;
-            buttonCancel.Visible = m_interactionData.ShowCancel;
+            buttonOK.Visible = m_interactionData.ShowOKButton;
+            buttonYes.Visible = m_interactionData.ShowYesNoButtons;
+            buttonNo.Visible = m_interactionData.ShowYesNoButtons;
+            buttonCancel.Visible = m_interactionData.ShowCancelButton;
             flowLayoutPanelBottom.Visible = (buttonOK.Visible | buttonYes.Visible | buttonNo.Visible | buttonCancel.Visible);
 
             if (interactionData.TimeoutTime != default(TimeSpan))
@@ -49,7 +49,6 @@ namespace StepBro.SimpleWorkbench
                 timeoutProgressBar.Start(interactionData.TimeoutTime);
             }
             else timeoutProgressBar.Visible = false;
-
 
             flowLayoutPanelSections.Controls.Clear();
             int sectionsHeight = 0;
