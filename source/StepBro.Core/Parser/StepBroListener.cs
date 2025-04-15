@@ -267,6 +267,12 @@ namespace StepBro.Core.Parser
                 }
                 else
                 {
+                    var casted = AssignmentExpressionCreateCastOrConvertIfNeeded(context, m_variableInitializer, m_variableType);
+                    if (casted != null)
+                    {
+                        m_variableInitializer = casted;
+                    }
+
                     if (!type.Type.IsAssignableFrom(m_variableInitializer.DataType.Type))
                     {
                         m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Assignment of incompatible type.");
@@ -279,6 +285,12 @@ namespace StepBro.Core.Parser
                 if (m_variableInitializer.IsConstant || m_variableInitializer.IsProcedureReference)
                 {
                     value = m_variableInitializer.Value;
+                }
+                else
+                {
+                    var lambdaExpr = Expression.Lambda(typeof(Func<object>), Expression.Convert(m_variableInitializer.ExpressionCode, typeof(object)));
+                    var @delegate = (Func<object>)lambdaExpr.Compile();
+                    value = @delegate();
                 }
 
                 if (m_override)
@@ -335,7 +347,7 @@ namespace StepBro.Core.Parser
                                 m_currentNamespace,
                                 m_variableName,
                                 @override: false,
-                                m_variableInitializer.Value));
+                                value));
                     }
                     else if (m_elementType == FileElementType.Config)
                     {
@@ -347,7 +359,7 @@ namespace StepBro.Core.Parser
                             m_lineFileElementAssociatedData,
                             context.Start.Line,
                             context.Start.Column,
-                            m_variableInitializer.Value);
+                            value);
                     }
                 }
                 //}

@@ -1241,10 +1241,12 @@ namespace StepBroCoreTest.Parser
         public void FileParsing_FilePathVariable()
         {
             var source = new StringBuilder();
+            source.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");
             source.AppendLine("namespace SayMyName;");
-            source.AppendLine("filepath myFile = @\"[this]\\sub\\zup\\script.sbs\";");
+            source.AppendLine("const filepath myFile = @\"[this]\\sub\\zup\\script.sbs\";");
             source.AppendLine("public string UseVariable()");
             source.AppendLine("{");
+            source.AppendLine("    " + nameof(DummyInstrumentClass) + ".ShowString(myFile);");
             source.AppendLine("    return myFile;");
             source.AppendLine("}");
 
