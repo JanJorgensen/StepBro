@@ -119,86 +119,7 @@ namespace StepBro.Core.Parser
             if (m_variableType != null)
             {
                 //m_variableInitializer = ResolveIfIdentifier(m_variableInitializer, m_inFunctionScope);
-                if (m_variableInitializer.IsError())
-                {
-                    if (m_variableType.Type != typeof(VarSpecifiedType))
-                    {
-                        object def = null;
-                        if (m_variableType.Type.IsValueType)
-                        {
-                            def = Activator.CreateInstance(m_variableType.Type);
-                        }
-                        m_variableInitializer = SBExpressionData.Constant(m_variableType, def);
-                    }
-                    else
-                    {
-                        // Just set the type to 'object' then.
-                        m_variableInitializer = SBExpressionData.Constant(TypeReference.TypeObject, null);
-                    }
-                }
-                if (m_variableInitializer.IsConstant && m_variableInitializer.Value == null)
-                {
-                    // Convert the null value to the type of the variable
-                    if (m_variableType.Type == typeof(string))
-                    {
-                        m_variableInitializer = SBExpressionData.Constant(TypeReference.TypeString, null);
-                    }
-                }
-                else if (m_variableInitializer.IsAwaitExpression)
-                {
-                    m_variableInitializer = new SBExpressionData(
-                        this.MakeAwaitOperation(
-                            m_variableInitializer.ExpressionCode, context, true, m_variableType.Type));
-                }
-                if (m_variableType.Type != typeof(VarSpecifiedType))
-                {
-                    if (m_variableInitializer.IsValueType &&
-                        m_variableInitializer.IsConstant &&
-                        m_variableInitializer.Value == null)
-                    {
-                        m_variableInitializer.NarrowGetValueType(m_variableType);
-                    }
-                    else if (m_variableType != m_variableInitializer.DataType && !m_variableType.Type.IsAssignableFrom(m_variableInitializer.DataType.Type))
-                    {
-                        m_variableInitializer = this.CastProcedureAssignmentArgumentIfNeeded(m_variableType, m_variableInitializer);
-                        if (m_variableInitializer.DataType.Type != m_variableType.Type)
-                        {
-                            if (m_variableInitializer.DataType.Type == typeof(object) && m_variableInitializer.SuggestsAutomaticTypeConversion)
-                            {
-                                m_variableInitializer = new SBExpressionData(
-                                    Expression.Convert(m_variableInitializer.ExpressionCode, m_variableType.Type));
-                            }
-                            else if (m_variableType.Type.IsPrimitive && m_variableType.Type.IsPrimitiveNarrowableIntType())
-                            {
-                                m_variableInitializer = new SBExpressionData(
-                                    Expression.Convert(m_variableInitializer.ExpressionCode, m_variableType.Type));
-                            }
-                            else
-                            {
-                                m_variableInitializer.NarrowGetValueType();
-                                var useableAssignment = CheckAndConvertValueForAssignment(m_variableInitializer.ExpressionCode, m_variableType.Type);
-                                if (useableAssignment != null) {
-                                    m_variableInitializer = new SBExpressionData(useableAssignment);
-                                }
-                                else
-                                {
-                                    string additional = " Value type: " + m_variableInitializer.DataType.Type.TypeNameSimple() + ".";
-                                    if (m_variableInitializer.DataType.HasProcedureReference)
-                                    {
-                                        additional = " Value: procedure " + (m_variableInitializer.DataType.DynamicType as IFileProcedure).Name + ".";
-                                    }
-                                    var message = "Value is not compatible with the variable type." + additional;
-                                    m_errors.SymanticError(
-                                        context.Start.Line,
-                                        context.Start.Column,
-                                        false,
-                                        message);
-                                    m_variableInitializer = null;
-                                }
-                            }
-                        }
-                    }
-                }
+                m_variableInitializer = AssignmentExpressionCreateCastOrConvertIfNeeded(context, m_variableInitializer, m_variableType);
 
                 SBExpressionData resolvedIdentifier = ResolveQualifiedIdentifier(m_variableName, true);
                 if (!resolvedIdentifier.IsUnknownIdentifier)
@@ -238,6 +159,99 @@ namespace StepBro.Core.Parser
                 m_variableName = null;
                 m_variableInitializer = null;
             }
+        }
+
+        private SBExpressionData AssignmentExpressionCreateCastOrConvertIfNeeded([NotNull] Antlr4.Runtime.ParserRuleContext context, SBExpressionData expression, TypeReference targetType)
+        {
+            if (expression.IsError())
+            {
+                if (targetType.Type != typeof(VarSpecifiedType))
+                {
+                    object def = null;
+                    if (targetType.Type.IsValueType)
+                    {
+                        def = Activator.CreateInstance(targetType.Type);
+                    }
+                    expression = SBExpressionData.Constant(targetType, def);
+                }
+                else
+                {
+                    // Just set the type to 'object' then.
+                    expression = SBExpressionData.Constant(TypeReference.TypeObject, null);
+                }
+                return expression;
+            }
+            if (expression.IsConstant && expression.Value == null)
+            {
+                // Convert the null value to the type of the variable
+                if (targetType.Type == typeof(string))
+                {
+                    expression = SBExpressionData.Constant(TypeReference.TypeString, null);
+                }
+            }
+            else if (expression.IsAwaitExpression)
+            {
+                expression = new SBExpressionData(
+                    this.MakeAwaitOperation(
+                        expression.ExpressionCode, context, true, targetType.Type));
+            }
+            if (targetType.Type != typeof(VarSpecifiedType))
+            {
+                if (expression.IsValueType &&
+                    expression.IsConstant &&
+                    expression.Value == null)
+                {
+                    expression.NarrowGetValueType(targetType);
+                }
+                else if (targetType != expression.DataType && !targetType.Type.IsAssignableFrom(expression.DataType.Type))
+                {
+                    expression = this.CastProcedureAssignmentArgumentIfNeeded(targetType, expression);
+                    if (expression.DataType.Type != targetType.Type)
+                    {
+                        if (expression.DataType.Type == typeof(object) && expression.SuggestsAutomaticTypeConversion)
+                        {
+                            expression = new SBExpressionData(
+                                Expression.Convert(expression.ExpressionCode, targetType.Type));
+                        }
+                        else if (targetType.Type.IsPrimitive && 
+                            targetType.Type.IsPrimitiveIntType() && 
+                            expression.DataType.Type.IsPrimitive &&
+                            expression.DataType.Type.IsPrimitiveIntType())
+                        {
+                            expression = new SBExpressionData(
+                                Expression.Convert(expression.ExpressionCode, targetType.Type));
+                        }
+                        else
+                        {
+                            expression.NarrowGetValueType();
+                            var useableAssignment = CheckAndConvertValueForAssignment(expression.ExpressionCode, targetType.Type);
+                            if (useableAssignment != null)
+                            {
+                                expression = new SBExpressionData(useableAssignment);
+                            }
+                            else
+                            {
+                                if (context != null)
+                                {
+                                    string additional = " Value type: " + expression.DataType.Type.TypeNameSimple() + ".";
+                                    if (expression.DataType.HasProcedureReference)
+                                    {
+                                        additional = " Value: procedure " + (expression.DataType.DynamicType as IFileProcedure).Name + ".";
+                                    }
+                                    var message = "Value is not compatible with the variable type." + additional;
+                                    m_errors.SymanticError(
+                                        context.Start.Line,
+                                        context.Start.Column,
+                                        false,
+                                        message);
+                                }
+                                expression = null;
+                            }
+                        }
+                    }
+                }
+            }
+            return expression;
         }
 
         public override void ExitVariableInitializerArray([NotNull] SBP.VariableInitializerArrayContext context)
