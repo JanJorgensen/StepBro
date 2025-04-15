@@ -1,5 +1,6 @@
 ﻿using System;
 using StepBro.Core.Execution;
+using StepBro.Core.File;
 using StepBro.Core.ScriptData;
 
 namespace StepBro.Core.Data
@@ -127,6 +128,7 @@ namespace StepBro.Core.Data
             if (type == typeof(DateTime)) return TypeDateTime;
             if (type == typeof(TimeSpan)) return TypeTimeSpan;
             if (type == typeof(Verdict)) return TypeVerdict;
+            if (type == typeof(FilePath)) return TypeFilePath;
             throw new NotSupportedException();
         }
 
@@ -139,6 +141,7 @@ namespace StepBro.Core.Data
         public static TypeReference TypeDateTime { get; } = new TypeReference(typeof(DateTime));
         public static TypeReference TypeTimeSpan { get; } = new TypeReference(typeof(TimeSpan));
         public static TypeReference TypeVerdict { get; } = new TypeReference(typeof(Verdict));
+        public static TypeReference TypeFilePath { get; } = new TypeReference(typeof(FilePath));
         public static TypeReference TypeObject { get; } = new TypeReference(typeof(object));
         public static TypeReference TypeProcedure { get; } = new TypeReference(typeof(IProcedureReference));
         public static TypeReference TypeFunction { get; } = new TypeReference(typeof(IFunctionReference));

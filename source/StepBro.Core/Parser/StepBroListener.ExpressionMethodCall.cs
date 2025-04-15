@@ -1160,6 +1160,7 @@ namespace StepBro.Core.Parser
                     else
                     {
                         TypeMatch matching = TypeMatch.NoTypeMatch;
+                        SBExpressionData convertedAssignment = null;
                         if (argPicker.Current.IsNamed)
                         {
                             if (argPicker.AllBeforeCurrentArePickedAndOthersUnpicked())
@@ -1211,7 +1212,22 @@ namespace StepBro.Core.Parser
                             suggestedAssignmentsOut.Add(argExpression);
                             continue;   // next parameter
                         }
-                        else if (argPicker.Current.DataType.Type == typeof(Int64) && p.ParameterType.IsPrimitiveNarrowableIntType())
+                        else if (!Object.ReferenceEquals(convertedAssignment = AssignmentExpressionCreateCastOrConvertIfNeeded(null, argPicker.Current, (TypeReference)p.ParameterType), argPicker.Current) && convertedAssignment != null)
+                        {
+                            argPicker.Pick();
+                            matchScore -= 30;   // The argument was converted; an exact match would be "better".
+                            suggestedAssignmentsOut.Add(convertedAssignment);
+                            //{
+                            //    var casted = AssignmentExpressionCreateCastOrConvertIfNeeded(null, extensionInstanceData, (TypeReference)p.ParameterType);
+                            //    if (!Object.ReferenceEquals(casted, extensionInstanceData))
+                            //    {
+
+                            //    }
+                            //}
+                            //break;
+
+                        }
+                        else if (argPicker.Current.DataType.Type == typeof(Int64) && p.ParameterType.IsPrimitiveIntType())
                         {
                             suggestedAssignmentsOut.Add(new SBExpressionData(Expression.Convert(argPicker.Pick().ExpressionCode, p.ParameterType)));
                             matchScore -= 5;
@@ -1249,7 +1265,9 @@ namespace StepBro.Core.Parser
 
                     if (argPicker.FindUnpicked(a => a.ParameterName == p.Name))
                     {
-                        suggestedAssignmentsOut.Add(argPicker.Pick());
+                        var assignment = argPicker.Pick();
+                        assignment = AssignmentExpressionCreateCastOrConvertIfNeeded(null, assignment, (TypeReference)p.ParameterType);
+                        suggestedAssignmentsOut.Add(assignment);
                         continue;   // next parameter
                     }
                     else

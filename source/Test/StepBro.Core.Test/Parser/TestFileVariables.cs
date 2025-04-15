@@ -10,6 +10,7 @@ using StepBro.Core.ScriptData;
 using StepBro.Core.Api;
 using StepBro.Core.Execution;
 using StepBro.ToolBarCreator;
+using StepBro.Core.File;
 
 namespace StepBroCoreTest.Parser
 {
@@ -407,6 +408,16 @@ namespace StepBroCoreTest.Parser
             if (context != null) context.Logger.Log("Work Method!");
 
             this.IntA *= 3; 
+        }
+
+        public static void ShowString([Implicit] ICallContext context, string text)
+        {
+            context.Logger.Log("String: " + text);
+        }
+
+        public static void ShowPath([Implicit] ICallContext context, FilePath path)
+        {
+            context.Logger.Log("FilePath: " + path.Value);
         }
     }
 }
