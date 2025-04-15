@@ -1217,15 +1217,6 @@ namespace StepBro.Core.Parser
                             argPicker.Pick();
                             matchScore -= 30;   // The argument was converted; an exact match would be "better".
                             suggestedAssignmentsOut.Add(convertedAssignment);
-                            //{
-                            //    var casted = AssignmentExpressionCreateCastOrConvertIfNeeded(null, extensionInstanceData, (TypeReference)p.ParameterType);
-                            //    if (!Object.ReferenceEquals(casted, extensionInstanceData))
-                            //    {
-
-                            //    }
-                            //}
-                            //break;
-
                         }
                         else if (argPicker.Current.DataType.Type == typeof(Int64) && p.ParameterType.IsPrimitiveIntType())
                         {
