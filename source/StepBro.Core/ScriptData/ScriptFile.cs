@@ -903,17 +903,26 @@ namespace StepBro.Core.ScriptData
 
         public IEnumerable<IFileElement> ListElements(bool includeExternal = false)
         {
-            foreach (var e in m_fileConfigVariables)
+            if (m_fileConfigVariables != null)
             {
-                yield return e;
+                foreach (var e in m_fileConfigVariables)
+                {
+                    yield return e;
+                }
             }
-            foreach (var e in m_fileScopeVariables)
+            if (m_fileScopeVariables != null)
             {
-                yield return e;
+                foreach (var e in m_fileScopeVariables)
+                {
+                    yield return e;
+                }
             }
-            foreach (var e in m_elements)
+            if (m_elements != null)
             {
-                yield return e;
+                foreach (var e in m_elements)
+                {
+                    yield return e;
+                }
             }
 
             if (includeExternal)
