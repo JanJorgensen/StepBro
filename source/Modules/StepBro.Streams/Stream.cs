@@ -22,6 +22,7 @@ namespace StepBro.Streams
         private bool m_specialLoggerEnabled = false;
         private Task m_lineReceiverTask = null;
         private bool m_stopReceiver = false;
+        private DateTime m_lineReceiverStopped = DateTime.MinValue;
         private ConcurrentQueue<TimestampedString> m_lineReceiveQueue = null;
         private LineReceivedHandler m_lineReceiver = null;
         private bool m_textCommandInterfaceEnabled = true;
@@ -230,6 +231,8 @@ namespace StepBro.Streams
         {
             if (m_lineReceiverTask == null)
             {
+                var timeSinceClose = DateTime.UtcNow - m_lineReceiverStopped;
+                if (timeSinceClose > TimeSpan.Zero) System.Threading.Thread.Sleep(100); // Hotfix for unresolved problem; #387.
                 m_stopReceiver = false;
                 m_lineReceiverTask = new Task(
                     LineReceiverTask,
@@ -244,10 +247,11 @@ namespace StepBro.Streams
         {
             if (m_lineReceiverTask != null)
             {
-                if (m_lineReceiverTask != null && !m_lineReceiverTask.IsCompleted)
+                if (!m_lineReceiverTask.IsCompleted)
                 {
                     m_stopReceiver = true;
                     m_lineReceiverTask.Wait();      // Important, to avoid having two running tasks if connecting again soon. 
+                    m_lineReceiverStopped = DateTime.UtcNow;
                 }
                 m_lineReceiverTask = null;
             }
