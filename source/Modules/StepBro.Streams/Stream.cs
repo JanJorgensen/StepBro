@@ -184,6 +184,9 @@ namespace StepBro.Streams
                 if (context != null && context.LoggingEnabled) context.Logger.Log($"Open ({this.GetTargetIdentification()})");
                 try
                 {
+                    var timeSinceClose = DateTime.UtcNow - m_lineReceiverStopped;
+                    if (timeSinceClose > TimeSpan.Zero) System.Threading.Thread.Sleep(100); // Hotfix for unresolved problem; #387.
+
                     var result = this.DoOpen(context);
 
                     if (this.IsOpen != wasOpen)
@@ -231,8 +234,6 @@ namespace StepBro.Streams
         {
             if (m_lineReceiverTask == null)
             {
-                var timeSinceClose = DateTime.UtcNow - m_lineReceiverStopped;
-                if (timeSinceClose > TimeSpan.Zero) System.Threading.Thread.Sleep(100); // Hotfix for unresolved problem; #387.
                 m_stopReceiver = false;
                 m_lineReceiverTask = new Task(
                     LineReceiverTask,
