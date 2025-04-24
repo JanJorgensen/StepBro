@@ -148,20 +148,23 @@ namespace StepBro.Process
             osProcess.StartInfo.CreateNoWindow = true;
             osProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
+            string wd = "";
+            if (!String.IsNullOrEmpty(workingDirectory))
+            {
+                wd = "(" + workingDirectory + ") ";
+                osProcess.StartInfo.WorkingDirectory = workingDirectory;
+            }
+
             if (context != null && context.LoggingEnabled)
             {
                 if (String.IsNullOrEmpty(arguments))
                 {
-                    context.Logger.Log($"Starting process: {filename}");
+                    context.Logger.Log($"Starting process: {wd}{filename}");
                 }
                 else
                 {
-                    context.Logger.Log($"Starting process: {filename} {arguments}");
+                    context.Logger.Log($"Starting process: {wd}{filename} {arguments}");
                 }
-            }
-            if (!String.IsNullOrEmpty(workingDirectory))
-            {
-                osProcess.StartInfo.WorkingDirectory = workingDirectory;
             }
 
             ObjectMonitorManager.Register(osProcess);
