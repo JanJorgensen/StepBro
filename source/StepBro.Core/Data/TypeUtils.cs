@@ -285,6 +285,17 @@ namespace StepBro.Core.Data
             return typeof(IValueContainer).IsAssignableFrom(type);
         }
 
+        public static bool HasBaseVariable(this IFileElementOverride element, IObjectContainer variable)
+        {
+            IFileElement fe = element;
+            while (fe != null)
+            {
+                if (fe is IFileVariable fv && Object.ReferenceEquals(fv.Value, variable)) return true;
+                fe = fe.BaseElement;
+            }
+            return false;
+        }
+
         public static bool IsStatic(this PropertyInfo propertyInfo)
         {
             return propertyInfo.CanRead ? propertyInfo.GetMethod.IsStatic : propertyInfo.SetMethod.IsStatic;

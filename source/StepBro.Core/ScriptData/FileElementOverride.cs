@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.ScriptData
 {
-    internal class FileElementOverride : FileElement
+    internal class FileElementOverride : FileElement, IFileElementOverride
     {
         private TypeReference m_datatype = null;
         private Tuple<string, IToken> m_asTypeData = null;
@@ -36,6 +36,8 @@ namespace StepBro.Core.ScriptData
         }
 
         public bool HasTypeOverride { get {  return m_asTypeData != null; } }
+
+        public TypeReference OverrideType {  get { return m_asType; } }
 
         internal override int ParseSignature(StepBroListener listener, bool reportErrors)
         {
