@@ -576,11 +576,11 @@ namespace StepBro.Core.ScriptData
             m_fileScopeVariables = new List<FileVariable>();
         }
 
-        public IEnumerable<IValueContainer> ListFileVariables()
+        public IEnumerable<IFileVariable> ListFileVariables()
         {
             foreach (var v in m_fileScopeVariables)
             {
-                yield return v.VariableOwnerAccess.Container;
+                yield return v;
             }
         }
         public IEnumerable<IValueContainer> ListConfigVariables()

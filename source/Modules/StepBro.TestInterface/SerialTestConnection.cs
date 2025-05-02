@@ -318,6 +318,7 @@ namespace StepBro.TestInterface
         }
 
         [ObjectName]
+        [ReadOnly(true)]
         public string Name
         {
             get { return m_name; }
@@ -346,6 +347,7 @@ namespace StepBro.TestInterface
 
         #region Properties
 
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public Stream Stream
         {
             get { return m_stream; }
@@ -388,7 +390,9 @@ namespace StepBro.TestInterface
         public char ResponseMultiLineChar { get; set; } = '*';
         public string ResponseErrorPrefix { get; set; } = ":ERROR";
         public TimeSpan CommandResponseTimeout { get; set; } = TimeSpan.FromMilliseconds(5000);
+        [Browsable(false)]
         public bool AsyncLogFlushOnSendCommand { get; set; } = true;
+        [Browsable(false)]
         public bool NoFlushOnNextCommand { get; set; } = false;
 
         #endregion
@@ -459,8 +463,10 @@ namespace StepBro.TestInterface
 
         #endregion
 
+        [Browsable(false)]
         public IParametersAccess Parameters { get { throw new NotImplementedException(); } }
 
+        [Browsable(false)]
         public IRemoteProcedures RemoteProcedures { get { return this; } }
 
         public IEnumerable<string> ListAvailableProfiles()
@@ -892,6 +898,7 @@ namespace StepBro.TestInterface
             return Invoke(cmd, arguments);
         }
 
+        [Browsable(false)]
         public IEnumerable<RemoteProcedureInfo> Procedures
         {
             get
@@ -1111,6 +1118,7 @@ namespace StepBro.TestInterface
             }
         }
 
+        [Browsable(false)]
         public List<Tuple<string, string>> UICommands
         {
             get
@@ -1119,8 +1127,10 @@ namespace StepBro.TestInterface
             }
         }
 
+        [Browsable(false)]
         private RemoteProcedureInfo LastProc { get { return m_remoteProcedures[m_remoteProcedures.Count - 1]; } }
 
+        [Browsable(false)]
         public ILineReader AsyncLog
         {
             get

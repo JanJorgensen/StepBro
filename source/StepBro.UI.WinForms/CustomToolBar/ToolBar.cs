@@ -259,6 +259,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
+        [ReadOnly(true)]
         public int Index { get { return m_index; } set { m_index = value; } }
 
         public new Color DefaultBackColor
@@ -404,6 +405,8 @@ namespace StepBro.UI.WinForms.CustomToolBar
             //}
             this.Items.Clear();
         }
+
+        [Browsable(false)]
         public ICoreAccess Core { get { return m_coreAccess; } }
 
         public void Setup(ILogger logger, IScriptFile homeDefinition, PropertyBlock definition)
@@ -488,6 +491,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         public uint Id => throw new NotImplementedException();
 
+        [Browsable(false)]
         public IToolBarElement ParentElement { get { return null; } }
 
         public string ElementName { get { return this.Name; } }

@@ -63,6 +63,7 @@ namespace StepBro.Streams
         /// <summary>
         /// Indicates whether the stream contains a finite amount of data (e.g. a file).
         /// </summary>
+        [Browsable(false)]
         public virtual bool IsFiniteStream { get { return false; } }
 
         public System.Text.Encoding Encoding
@@ -86,6 +87,7 @@ namespace StepBro.Streams
             this.Close(null);
         }
 
+        [ReadOnly(true)]
         public bool UseTextLineMode
         {
             get
@@ -428,6 +430,7 @@ namespace StepBro.Streams
             return null;
         }
 
+        [Browsable(false)]
         public bool TextCommandInputEnabled
         {
             get { return m_textCommandInterfaceEnabled; }

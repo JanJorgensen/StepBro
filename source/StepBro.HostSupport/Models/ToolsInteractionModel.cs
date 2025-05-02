@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Antlr4.Runtime.Misc;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
@@ -73,7 +74,7 @@ public partial class ToolsInteractionModel : ObservableObject
 
         public bool Equals(SelectableTool other)
         {
-            if (other  == null) return false;
+            if (other == null) return false;
             if (other.m_typeReference != m_typeReference) return false;
             if ((other.m_typeReference == null) != (m_typeReference == null)) return false;
             if (other.m_typeReference != null && !other.m_typeReference.Equals(m_typeReference)) return false;
@@ -102,6 +103,7 @@ public partial class ToolsInteractionModel : ObservableObject
     private ILoadedFilesManager m_loadedFilesManager;
     private ObservableCollection<SelectableTool> m_selectableTools = new ObservableCollection<SelectableTool>();
     private ObservableCollection<SelectableTool> m_textCommandTools = new ObservableCollection<SelectableTool>();
+    private List<IFileElementOverride> m_overrideDefinitions = null;
     private Dictionary<string, List<string>> m_textCommandHistory = new Dictionary<string, List<string>>();
     private ObservableCollection<string> m_currentTextCommandHistory = new ObservableCollection<string>();
     private ReadOnlyObservableCollection<string> m_currentTextCommandHistoryPublic = null;
@@ -170,8 +172,9 @@ public partial class ToolsInteractionModel : ObservableObject
 
     public bool Synchronize()
     {
-        m_selectableTools.Synchronize(Fetch(m_objectManager));
+        m_selectableTools.Synchronize(Fetch(m_objectManager, m_loadedFilesManager));
         m_textCommandTools.Synchronize(m_selectableTools.Where(t => t.HasEnabledTextCommandInput));
+        m_overrideDefinitions = m_loadedFilesManager.ListFiles<IScriptFile>().SelectMany(f => f.ListElements().Where(e => e is IFileElementOverride oe && oe.HasTypeOverride).Cast<IFileElementOverride>()).ToList();
 
         if (m_selectableTools.Count > 0)
         {
@@ -200,26 +203,50 @@ public partial class ToolsInteractionModel : ObservableObject
         return false;
     }
 
-    private static List<SelectableTool> Fetch(IDynamicObjectManager objectManager)
+    private static List<SelectableTool> Fetch(IDynamicObjectManager objectManager, ILoadedFilesManager filesManager)
     {
-        return objectManager.GetObjectCollection().Where(oc => oc.Object != null && oc.Object.GetType().IsClass && oc.Object.GetType() != typeof(String)).Select(o => new SelectableTool(null, o)).ToList();
+        var objects = objectManager.GetObjectCollection().Where(oc => oc.Object != null && oc.Object.GetType().IsClass && oc.Object.GetType() != typeof(String)).ToList();
+        var variables = filesManager.ListFiles<IScriptFile>().SelectMany(f => f.ListFileVariables());
+        return objects.Select(o => new SelectableTool(variables.FirstOrDefault(v => Object.ReferenceEquals(v.Value, o))?.DataType, o)).ToList();
     }
 
     public List<IFileProcedure> ListActivatableToolProcedures(SelectableTool tool)
     {
         System.Diagnostics.Debug.WriteLine($"Tool: {tool.ToolContainer.FullName}");
         var obj = tool.ToolContainer.Object;
-        var objType = obj.GetType();
+        var objType = (tool.ToolType != null) ? tool.ToolType : (TypeReference)(obj.GetType());
         var procedures = m_loadedFilesManager.ListFiles<IScriptFile>().SelectMany(f => f.ListElements()).Where(e => e.ElementType == FileElementType.ProcedureDeclaration).Cast<IFileProcedure>().ToList();
 
-        foreach (var proc in procedures)
-        {
-            if (proc.Parameters.Length == 1)
-            {
-                System.Diagnostics.Debug.WriteLine($"{proc.Name} {proc.Parameters.Length} {proc.Parameters[0].Value.Type.Name}");
-            }
-        }
+        procedures.Sort((p1, p2) => String.Compare(p1.Name, p2.Name));
 
-        return procedures.Where(p => p.IsFirstParameterThisReference && p.Parameters.Length == 1 && p.Parameters[0].Value.Type.IsAssignableFrom(objType)).ToList();
+        var matching = new Predicate<TypeReference>(t => 
+        {
+            if (t.IsAssignableFrom(objType))
+            {
+                return true;
+            }
+            else if (t.IsTypedef())
+            {
+                foreach (var oe in m_overrideDefinitions)
+                {
+                    if (oe.HasBaseVariable(tool.ToolContainer) && t.IsAssignableFrom(oe.OverrideType))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
+
+        return procedures.Where(p => p.IsFirstParameterThisReference && p.Parameters.Length == 1 && matching(p.Parameters[0].Value)).ToList();
+        //    if (proc.Parameters.Length == 1)
+        //    {
+        //        var par = proc.Parameters[0];
+
+        //        System.Diagnostics.Debug.WriteLine($"{proc.Name} {proc.Parameters.Length} {proc.Parameters[0].Value.Type.Name}");
+        //    }
+        //}
+
+        //return procedures.Where(p => p.IsFirstParameterThisReference && p.Parameters.Length == 1 && p.Parameters[0].Value.Type.IsAssignableFrom(objType.Type)).ToList();
     }
 }
