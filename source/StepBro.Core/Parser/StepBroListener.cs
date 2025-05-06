@@ -954,6 +954,26 @@ namespace StepBro.Core.Parser
             }
         }
 
+        #region Enum
+
+        public override void EnterEnumDeclaration([NotNull] SBP.EnumDeclarationContext context)
+        {
+        }
+
+        public override void ExitEnumParent([NotNull] SBP.EnumParentContext context)
+        {
+        }
+
+        public override void ExitEnumValue([NotNull] SBP.EnumValueContext context)
+        {
+        }
+
+        public override void ExitEnumDeclaration([NotNull] SBP.EnumDeclarationContext context)
+        {
+        }
+
+        #endregion
+
 #if (PRINT_TREE)
         private string m_indent = "";
 

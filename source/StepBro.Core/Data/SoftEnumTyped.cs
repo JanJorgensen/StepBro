@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 namespace StepBro.Core.Data
 {
     /// <summary>
-    /// Base class for SoftEnum, used to allow anonymous access to soft-enum values.
+    /// Base class for SoftEnum value, used to allow anonymous access to soft-enum values.
     /// </summary>
-    public class SoftEnumBase
+    public abstract class SoftEnum
     {
         SoftEnumType m_type;
         private string m_name;
         private int m_value;
         private int m_index;
 
-        internal SoftEnumBase(SoftEnumType type, string name, int value, int index)
+        internal SoftEnum(SoftEnumType type, string name, int value, int index)
         {
             m_type = type;
             m_name = name;
@@ -55,55 +55,62 @@ namespace StepBro.Core.Data
                 return m_index;
             }
         }
+
+        internal abstract SoftEnum CreateNew(string name, int value, int index);
     }
 
-    public class SoftEnum<TType> : SoftEnumBase where TType : SoftEnumType, new()
+    public class SoftEnumTyped<TType> : SoftEnum where TType : SoftEnumType, new()
     {
-        internal SoftEnum(TType type, string name, int value, int index) : base(type, name, value, index) { }
+        internal SoftEnumTyped(SoftEnumType type, string name, int value, int index) : base(type, name, value, index) { }
+
+        internal override SoftEnum CreateNew(string name, int value, int index)
+        {
+            return new SoftEnumTyped<TType>(this.Type, name, value, index);
+        }
 
         private static TType g_type = null;
-        public static SoftEnumType.ITypeCreator<TType> CreateType(string nameSpace, string name)
+        public static SoftEnumType.ICreator CreateType()
         {
             var type = CreateSoftEnumType();
-            return type.SetupSoftEnumType<TType>(nameSpace, name);
+            return type.SetupSoftEnumType<TType>();
         }
 
-        public static SoftEnumType.ITypeCreator<TType> CreateType()
-        {
-            return CreateType(typeof(TType).Namespace, typeof(TType).Name);
-        }
+        //public static SoftEnumType.ITypeCreator<TType> CreateType()
+        //{
+        //    return CreateType(typeof(TType).Namespace, typeof(TType).Name);
+        //}
 
         #region Conversion
 
-        public static SoftEnum<TType> FromString(string name)
+        public static SoftEnumTyped<TType> FromString(string name)
         {
             var type = GetSoftEnumType();
             return type.FromString<TType>(name);
         }
 
-        public static implicit operator SoftEnum<TType>(string name)
+        public static implicit operator SoftEnumTyped<TType>(string name)
         {
             return FromString(name);
         }
 
-        public static SoftEnum<TType> FromValue(int value)
+        public static SoftEnumTyped<TType> FromValue(int value)
         {
             var type = GetSoftEnumType();
             return type.FromValue<TType>(value);
         }
 
-        public static SoftEnum<TType> FromValue(long value)
+        public static SoftEnumTyped<TType> FromValue(long value)
         {
             var type = GetSoftEnumType();
             return type.FromValue<TType>((int)value);
         }
 
-        public static implicit operator SoftEnum<TType>(int value)
+        public static implicit operator SoftEnumTyped<TType>(int value)
         {
             return FromValue(value);
         }
 
-        public static implicit operator SoftEnum<TType>(long value)
+        public static implicit operator SoftEnumTyped<TType>(long value)
         {
             return FromValue(value);
         }

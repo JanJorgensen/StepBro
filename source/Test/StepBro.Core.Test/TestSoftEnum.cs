@@ -12,7 +12,7 @@ namespace StepBroCoreTest
     [TestClass]
     public class TestSoftEnum
     {
-        private class MySoftEnum : SoftEnumType { }
+        //private class MySoftEnum : SoftEnumType { }
 
         [TestMethod]
         public void TestTypeCreate()
@@ -22,7 +22,12 @@ namespace StepBroCoreTest
                 m_populatingNotificationReceived = false;
                 m_populatedNotificationReceived = false;
 
-                var creator = SoftEnum<MySoftEnum>.CreateType();
+                var t1 = SoftEnumType.CreateType("MyTestScript", "MySoftEnum");
+                var t2 = t1.GetType();
+                var type = typeof(SoftEnumTyped<>).MakeGenericType(t2);
+                //SoftEnum<>.CreateType()
+
+                var creator = SoftEnumTyped<MySoftEnum>.CreateType();
                 creator.Type.Populating += TheEnum_Populating;
                 creator.Type.Populated += TheEnum_Populated;
 
@@ -48,7 +53,7 @@ namespace StepBroCoreTest
             }
             finally
             {
-                SoftEnum<MySoftEnum>.Reset();
+                SoftEnumTyped<MySoftEnum>.Reset();
             }
         }
 
@@ -59,7 +64,7 @@ namespace StepBroCoreTest
             {
                 try
                 {
-                    using (var populator = SoftEnum<MySoftEnum>.CreateType().Populate(null))
+                    using (var populator = SoftEnumTyped<MySoftEnum>.CreateType().Populate(null))
                     {
                         populator.AddEntry("Anders", 1);
                         populator.AddEntry("Bent", 2);
@@ -69,24 +74,24 @@ namespace StepBroCoreTest
                 }
                 catch { }
 
-                Assert.AreEqual(3, SoftEnum<MySoftEnum>.FromString("Charles").Value);
-                Assert.AreEqual("Bent", SoftEnum<MySoftEnum>.FromValue(2).Name);
+                Assert.AreEqual(3, SoftEnumTyped<MySoftEnum>.FromString("Charles").Value);
+                Assert.AreEqual("Bent", SoftEnumTyped<MySoftEnum>.FromValue(2).Name);
 
-                SoftEnum<MySoftEnum> myValue1 = 2;
+                SoftEnumTyped<MySoftEnum> myValue1 = 2;
                 Assert.AreEqual(2, myValue1.Value);
                 Assert.AreEqual("Bent", myValue1.Name);
 
-                SoftEnum<MySoftEnum> myValue2 = "Charles";
+                SoftEnumTyped<MySoftEnum> myValue2 = "Charles";
                 Assert.AreEqual("Charles", myValue2.Name);
                 Assert.AreEqual(3, myValue2.Value);
 
-                SoftEnum<MySoftEnum> myValue3 = (SoftEnum<MySoftEnum>)"Dennis";
+                SoftEnumTyped<MySoftEnum> myValue3 = (SoftEnumTyped<MySoftEnum>)"Dennis";
                 Assert.AreEqual("Dennis", myValue3.Name);
                 Assert.AreEqual(4, myValue3.Value);
             }
             finally
             {
-                SoftEnum<MySoftEnum>.Reset();
+                SoftEnumTyped<MySoftEnum>.Reset();
             }
         }
 

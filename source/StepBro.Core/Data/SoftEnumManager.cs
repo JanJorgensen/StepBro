@@ -28,7 +28,12 @@ namespace StepBro.Core.Data
 
         public SoftEnumType TryGetType(string nameSpace, string name)
         {
-            return null;
+            var t1 = SoftEnumType.CreateType(nameSpace, name);
+            var t2 = t1.GetType();
+            var type = typeof(SoftEnumTyped<>).MakeGenericType(t2);
+
+            //return m_types.FirstOrDefault(t => t.;
+            throw new NotImplementedException();
         }
 
         internal void Clear()
