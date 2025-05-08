@@ -59,78 +59,63 @@ namespace StepBro.Core.Data
         internal abstract SoftEnum CreateNew(string name, int value, int index);
     }
 
-    public class SoftEnumTyped<TType> : SoftEnum where TType : SoftEnumType, new()
+    public class SoftEnum<TType> : SoftEnum where TType : SoftEnumType, new()
     {
-        internal SoftEnumTyped(SoftEnumType type, string name, int value, int index) : base(type, name, value, index) { }
+        internal SoftEnum(SoftEnumType type, string name, int value, int index) : base(type, name, value, index) { }
 
         internal override SoftEnum CreateNew(string name, int value, int index)
         {
-            return new SoftEnumTyped<TType>(this.Type, name, value, index);
+            return new SoftEnum<TType>(this.Type, name, value, index);
+        }
+
+        static internal SoftEnumType Create(ISoftEnumManager manager)
+        {
+            if (g_type != null) throw new TypeInitializationException(g_type.Name, null);
+            g_type = new TType();
+            g_type.Initialize(manager, new SoftEnum<TType>(g_type, null, -1, -1));
+            return g_type;
         }
 
         private static TType g_type = null;
-        public static SoftEnumType.ICreator CreateType()
-        {
-            var type = CreateSoftEnumType();
-            return type.SetupSoftEnumType<TType>();
-        }
-
-        //public static SoftEnumType.ITypeCreator<TType> CreateType()
-        //{
-        //    return CreateType(typeof(TType).Namespace, typeof(TType).Name);
-        //}
 
         #region Conversion
 
-        public static SoftEnumTyped<TType> FromString(string name)
+        public static SoftEnum<TType> FromString(string name)
         {
             var type = GetSoftEnumType();
             return type.FromString<TType>(name);
         }
 
-        public static implicit operator SoftEnumTyped<TType>(string name)
+        public static implicit operator SoftEnum<TType>(string name)
         {
             return FromString(name);
         }
 
-        public static SoftEnumTyped<TType> FromValue(int value)
+        public static SoftEnum<TType> FromValue(int value)
         {
             var type = GetSoftEnumType();
             return type.FromValue<TType>(value);
         }
 
-        public static SoftEnumTyped<TType> FromValue(long value)
+        public static SoftEnum<TType> FromValue(long value)
         {
             var type = GetSoftEnumType();
             return type.FromValue<TType>((int)value);
         }
 
-        public static implicit operator SoftEnumTyped<TType>(int value)
+        public static implicit operator SoftEnum<TType>(int value)
         {
             return FromValue(value);
         }
 
-        public static implicit operator SoftEnumTyped<TType>(long value)
+        public static implicit operator SoftEnum<TType>(long value)
         {
             return FromValue(value);
         }
 
         #endregion
 
-        private static TType CreateSoftEnumType()
-        {
-            if (g_type == null)
-            {
-                g_type = new TType();
-            }
-            else
-            {
-                throw new General.OperationNotAllowedException("The soft-enum type (" + typeof(TType).FullName + ") has already been created.");
-            }
-            return g_type;
-        }
-
-        private static TType GetSoftEnumType()
+        private static SoftEnumType GetSoftEnumType()
         {
             if (g_type == null)
             {

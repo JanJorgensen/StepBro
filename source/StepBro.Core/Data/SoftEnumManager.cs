@@ -26,14 +26,26 @@ namespace StepBro.Core.Data
             }
         }
 
-        public SoftEnumType TryGetType(string nameSpace, string name)
+        public SoftEnumType CreateOrGetType(string nameSpace, string name)
         {
-            var t1 = SoftEnumType.CreateType(nameSpace, name);
-            var t2 = t1.GetType();
-            var type = typeof(SoftEnumTyped<>).MakeGenericType(t2);
+            var type = this.ListTypes().FirstOrDefault(t => t.Namespace == nameSpace && t.Name == name);
+            if (type == null)
+            {
+                var createdType = SoftEnumType.CreateType(nameSpace, name);
+                var typeOfCreated = createdType.GetType();
+                var typeOfValue = typeof(SoftEnum<>).MakeGenericType(typeOfCreated);
 
-            //return m_types.FirstOrDefault(t => t.;
-            throw new NotImplementedException();
+                var createMethod = typeOfValue.GetMethod("Create", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic, new Type[] { typeof(ISoftEnumManager) });
+
+                type = (SoftEnumType)createMethod.Invoke(null, new object[] { (ISoftEnumManager)this });
+            }
+
+            return type;
+        }
+
+        public IEnumerable<SoftEnumType> ListTypes()
+        {
+            foreach (var t in m_types) {  yield return t; }
         }
 
         internal void Clear()

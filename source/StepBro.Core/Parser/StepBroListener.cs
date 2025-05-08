@@ -1,4 +1,4 @@
-﻿//#define PRINT_TREE
+﻿#define PRINT_TREE
 
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
@@ -15,6 +15,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Xml.Linq;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser
@@ -39,6 +40,7 @@ namespace StepBro.Core.Parser
         protected Stack<SBExpressionData> m_testListEntryArguments = null;
         //private SBExpressionData m_overrideVariable = null;
         private SBExpressionData m_fileElementReference = null;
+        private List<NamedData<int>> m_enumValues = null;
         private bool m_override = false;
 
         public StepBroListener(ErrorCollector errorCollector)
@@ -954,10 +956,34 @@ namespace StepBro.Core.Parser
             }
         }
 
+        public override void ExitElementName([NotNull] SBP.ElementNameContext context)
+        {
+            m_elementStart = context.Start;
+            string name = context.GetText();
+            if (m_file != null && m_file.TypeScanIncluded)
+            {
+                var definition = m_file.ListElements().FirstOrDefault(e => e.ElementType == FileElementType.EnumDefinition && e.Name == name);
+                if (definition != null)
+                {
+                    m_currentFileElement = definition as FileElement;
+                }
+                else
+                {
+                    throw new Exception("");    // TODO: convert to parsing error (internal error).
+                }
+            }
+            else
+            {
+                m_currentFileElement = new FileElementEnum(m_file, m_fileElementModifier, m_elementStart.Line, null, m_currentNamespace, name,          typen her !!            );
+            }
+
+        }
+
         #region Enum
 
         public override void EnterEnumDeclaration([NotNull] SBP.EnumDeclarationContext context)
         {
+            m_enumValues = new List<NamedData<int>>();
         }
 
         public override void ExitEnumParent([NotNull] SBP.EnumParentContext context)

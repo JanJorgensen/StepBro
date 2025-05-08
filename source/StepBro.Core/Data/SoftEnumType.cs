@@ -14,7 +14,7 @@ public class SoftEnumType
     private string m_name;
     private SoftEnum m_template = null;
     private SoftEnum[] m_values = null;
-    private IDisposable m_creator = null;
+    private ICreator m_creator = null;
     private ISoftEnumManager m_manager = SoftEnumManager.Instance;  // Default manager
 
     protected SoftEnumType()
@@ -27,12 +27,13 @@ public class SoftEnumType
 
     public string Name { get { return m_name; } }
 
-    internal void SetManager(ISoftEnumManager manager)
+    internal void Initialize(ISoftEnumManager manager, SoftEnum template)
     {
         m_manager = manager;
+        m_template = template;
     }
 
-    public static SoftEnumType CreateType(string @namespace, string name)
+    internal static SoftEnumType CreateType(string @namespace, string name)
     {
         var an = new AssemblyName("StepBro.Dynamic." + @namespace);
         AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
@@ -52,83 +53,106 @@ public class SoftEnumType
         return (SoftEnumType)Activator.CreateInstance(objectType); 
     }
 
-    public SoftEnumTyped<TType> FromString<TType>(string name) where TType : SoftEnumType, new()
+    public SoftEnum FromString(string name)
     {
         foreach (var val in m_values)
         {
-            if (val.Name == name) return val as SoftEnumTyped<TType>;
+            if (val.Name == name) return val;
         }
         return null;
     }
-
-    public SoftEnumTyped<TType> FromValue<TType>(int value) where TType : SoftEnumType, new()
+    public SoftEnum<TType> FromString<TType>(string name) where TType : SoftEnumType, new()
     {
         foreach (var val in m_values)
         {
-            if (val.Value == value) return val as SoftEnumTyped<TType>;
+            if (val.Name == name) return val as SoftEnum<TType>;
         }
         return null;
     }
 
-    public SoftEnumTyped<TType> FromIndex<TType>(int index) where TType : SoftEnumType, new()
+    public SoftEnum FromValue(int value)
     {
         foreach (var val in m_values)
         {
-            if (val.Index == index) return val as SoftEnumTyped<TType>;
+            if (val.Value == value) return val;
+        }
+        return null;
+    }
+    public SoftEnum<TType> FromValue<TType>(int value) where TType : SoftEnumType, new()
+    {
+        foreach (var val in m_values)
+        {
+            if (val.Value == value) return val as SoftEnum<TType>;
         }
         return null;
     }
 
-    public int ValueCount { get { return m_values.Length; } }
-
-    public IEnumerable<SoftEnumTyped<TType>> Values<TType>() where TType : SoftEnumType, new()
+    public SoftEnum FromIndex(int index)
     {
-        SoftEnum[] values = new SoftEnum[m_values.Length];
-        Array.Copy(m_values, values, m_values.Length);
-        foreach (var val in values)
+        foreach (var val in m_values)
         {
-            yield return val as SoftEnumTyped<TType>;
-        }
-    }
-
-    public static IEnumerable<SoftEnum> ListValues(SoftEnumType type)
-    {
-        SoftEnum[] values = new SoftEnum[type.m_values.Length];
-        Array.Copy(type.m_values, values, type.m_values.Length);
-        foreach (var val in values)
-        {
-            yield return val;
-        }
-    }
-
-    public static SoftEnum GetValue(SoftEnumType type, string name = "", int value = -1)
-    {
-        if (String.IsNullOrEmpty(name))
-        {
-            foreach (var val in type.m_values)
-            {
-                if (val.Value == value) return val;
-            }
-        }
-        else
-        {
-            foreach (var val in type.m_values)
-            {
-                if (val.Name == name) return val;
-            }
+            if (val.Index == index) return val;
         }
         return null;
     }
+    public SoftEnum<TType> FromIndex<TType>(int index) where TType : SoftEnumType, new()
+    {
+        foreach (var val in m_values)
+        {
+            if (val.Index == index) return val as SoftEnum<TType>;
+        }
+        return null;
+    }
+
+    public int ValueCount { get { return (m_values != null) ? m_values.Length : 0; } }
+
+    //public IEnumerable<SoftEnum<TType>> Values<TType>() where TType : SoftEnumType, new()
+    //{
+    //    SoftEnum[] values = new SoftEnum[m_values.Length];
+    //    Array.Copy(m_values, values, m_values.Length);
+    //    foreach (var val in values)
+    //    {
+    //        yield return val as SoftEnum<TType>;
+    //    }
+    //}
+
+    //public static IEnumerable<SoftEnum> ListValues(SoftEnumType type)
+    //{
+    //    SoftEnum[] values = new SoftEnum[type.m_values.Length];
+    //    Array.Copy(type.m_values, values, type.m_values.Length);
+    //    foreach (var val in values)
+    //    {
+    //        yield return val;
+    //    }
+    //}
+
+    //public static SoftEnum GetValue(SoftEnumType type, string name = "", int value = -1)
+    //{
+    //    if (String.IsNullOrEmpty(name))
+    //    {
+    //        foreach (var val in type.m_values)
+    //        {
+    //            if (val.Value == value) return val;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        foreach (var val in type.m_values)
+    //        {
+    //            if (val.Name == name) return val;
+    //        }
+    //    }
+    //    return null;
+    //}
 
     #region Creation and Populating
 
-    internal ICreator SetupSoftEnumType<T>() where T : SoftEnumType, new()
+    public ICreator Setup()
     {
         if (m_creator == null)
         {
-            var creator = Creator<T>.Create(this);
-            m_creator = creator;
-            return (ITypeCreator<T>)m_creator;
+            m_creator = new Creator(this);
+            return m_creator;
         }
         else
         {
@@ -171,12 +195,6 @@ public class SoftEnumType
             m_type = type;
         }
 
-        //public static Creator Create(SoftEnumType type)
-        //{
-        //    var creator = new Creator(type);
-        //    return creator;
-        //}
-
         public SoftEnumType Type { get { return m_type; } }
 
         public void NotifyPopylatorDispose()
@@ -208,15 +226,15 @@ public class SoftEnumType
             StepBro.Core.Logging.ILogger m_logger;
             List<SoftEnum> m_values = new List<SoftEnum>();
 
-            public ValuePopulator(Creator<TType> creator, StepBro.Core.Logging.ILogger logger)
+            public ValuePopulator(Creator creator, StepBro.Core.Logging.ILogger logger)
             {
                 m_creator = creator;
                 m_logger = logger;
             }
 
-            public SoftEnum<TType> AddEntry(string name, int value)
+            public SoftEnum AddEntry(string name, int value)
             {
-                var v = new SoftEnum<TType>((TType)m_creator.Type, name, value, m_values.Count);
+                var v = m_creator.Type.m_template.CreateNew(name, value, m_values.Count);
                 m_values.Add(v);
                 return v;
             }

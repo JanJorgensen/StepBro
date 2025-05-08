@@ -1262,6 +1262,36 @@ namespace StepBroCoreTest.Parser
             Assert.IsNotNull(result);
             Assert.IsTrue(result is string);
         }
+
+        [TestMethod]
+        public void FileParsing_Test()
+        {
+            string f1 =
+                """
+                namespace MySpace;
+                public enum MyValues
+                {
+                    Zero,
+                    Onne,
+                    Twoe,
+                    Threee,
+                    Last
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", f1.ToString()));
+
+            Assert.AreEqual(0, files[0].Errors.ErrorCount);
+
+            var procedure = files[0].ListElements().First(p => p.Name == "main") as IFileProcedure;
+            Assert.IsNotNull(procedure);
+
+            var taskContext = ExecutionHelper.ExeContext(services: FileBuilder.LastServiceManager.Manager);
+            var result = taskContext.CallProcedure(procedure);
+            Assert.AreEqual(11L, result);
+        }
+
     }
 }
 

@@ -115,7 +115,8 @@ ctorArguments : arguments ;
 
 // ENUM DECLARATION
 
-enumDeclaration : ENUM IDENTIFIER (COLON enumParent)? enumBody ;
+elementName : IDENTIFIER ;
+enumDeclaration : ENUM elementName (COLON enumParent)? enumBody ;
 enumParent : identifierOrQualified ;
 enumBody : OPEN_BRACE enumValues? CLOSE_BRACE ;
 enumValues : enumValue (COMMA enumValue)* COMMA? ;

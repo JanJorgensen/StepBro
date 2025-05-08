@@ -8,7 +8,7 @@ namespace StepBro.Core.Data
 {
     public interface ISoftEnumManager
     {
-        bool TryRegisterNewType(SoftEnumType type);
-        SoftEnumType TryGetType(string nameSpace, string name);
+        SoftEnumType CreateOrGetType(string nameSpace, string name);
+        IEnumerable<SoftEnumType> ListTypes();
     }
 }
