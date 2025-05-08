@@ -268,6 +268,7 @@ namespace StepBro.Core.Test.Parser
                 new Tuple<string, string>("mysub.sbs", f2.ToString()));
             Assert.AreEqual(2, files.Length);
             Assert.AreEqual(0, files[0].Errors.ErrorCount);
+            Assert.AreEqual(0, files[1].Errors.ErrorCount);
             var procedure = files[1].ListElements().FirstOrDefault(p => p.Name == "Setup") as IFileProcedure;
             Assert.IsNotNull(procedure);
 

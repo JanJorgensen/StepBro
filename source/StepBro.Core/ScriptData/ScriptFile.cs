@@ -1051,7 +1051,7 @@ namespace StepBro.Core.ScriptData
                         var resolved = resolver(m_fileUsings[i].Identifier.Name);
                         if (resolved != null && resolved.Item1 != null)
                         {
-                            m_fileUsings[i] = new UsingData(m_fileUsings[i].Line, m_fileUsings[i].IsPublic, m_fileUsings[i].Identifier.Name, IdentifierType.FileByName, resolved);
+                            m_fileUsings[i] = new UsingData(m_fileUsings[i].Line, m_fileUsings[i].IsPublic, m_fileUsings[i].Identifier.Name, IdentifierType.FileByName, resolved.Item1);
                             resolved.Item1.RegisterDependant(this);
                         }
                         else
