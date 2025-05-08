@@ -958,7 +958,7 @@ namespace StepBro.Core.ScriptData
             }
         }
 
-        public FolderConfiguration TryOpenFolderConfiguration(IConfigurationFileManager cfgManager, int usingLine, string file)
+        public FolderConfiguration TryOpenFolderConfiguration(IConfigurationFileManager cfgManager, string file)
         {
             var errors = new List<Tuple<int, string>>();
             var folderConfig = cfgManager.ReadFolderConfig(file, errors);
@@ -972,7 +972,7 @@ namespace StepBro.Core.ScriptData
                     else errortext = $"Config file '{file}' line {e.Item1}: {e.Item2}";
                 }
 
-                m_errors.ConfigError(usingLine, 0, errortext);
+                m_errors.ConfigError(errortext);
             }
             if (folderConfig != null)
             {
@@ -1032,13 +1032,13 @@ namespace StepBro.Core.ScriptData
                     }
                     else
                     {
-                        m_errors.UnresolvedUsing(m_namespaceUsings[i].Line, -1, m_namespaceUsings[i].Identifier.Name);
+                        m_errors.UnresolvedNamespaceUsing(m_namespaceUsings[i].Line, -1, m_namespaceUsings[i].Identifier.Name);
                     }
                 }
             }
         }
 
-        internal void ResolveFileUsings(Func<string, int, IScriptFile> resolver)
+        internal void ResolveFileUsings(Func<string, Tuple<IScriptFile, string>> resolver)
         {
             var c = m_fileUsings.Count;
             for (int i = 0; i < c; i++)
@@ -1047,15 +1047,16 @@ namespace StepBro.Core.ScriptData
                 {
                     try
                     {
-                        var resolved = resolver(m_fileUsings[i].Identifier.Name, m_fileUsings[i].Line);
-                        if (resolved != null)
+                        var path = m_fileUsings[i].Identifier.Name;
+                        var resolved = resolver(m_fileUsings[i].Identifier.Name);
+                        if (resolved != null && resolved.Item1 != null)
                         {
                             m_fileUsings[i] = new UsingData(m_fileUsings[i].Line, m_fileUsings[i].IsPublic, m_fileUsings[i].Identifier.Name, IdentifierType.FileByName, resolved);
-                            resolved.RegisterDependant(this);
+                            resolved.Item1.RegisterDependant(this);
                         }
                         else
                         {
-                            m_errors.UnresolvedUsing(m_fileUsings[i].Line, -1, m_fileUsings[i].Identifier.Name);
+                            m_errors.UnresolvedFileUsing(m_fileUsings[i].Line, -1, m_fileUsings[i].Identifier.Name, resolved?.Item2);
                         }
                     }
                     catch (Exception ex)

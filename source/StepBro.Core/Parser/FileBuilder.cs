@@ -629,7 +629,7 @@ namespace StepBro.Core.Parser
                     }
 
                     file.ResolveFileUsings(
-                        (fu, line) =>
+                        (fu) =>
                         {
                             string basefolder = Path.GetDirectoryName(file.GetFullPath());
                             var fuName = Path.GetFileName(fu);
@@ -639,7 +639,7 @@ namespace StepBro.Core.Parser
                             {
                                 if (!Object.ReferenceEquals(file, f) && String.Equals(fuName, f.FileName, StringComparison.InvariantCulture))
                                 {
-                                    return f;
+                                    return new Tuple<IScriptFile, string>(f, null);
                                 }
                             }
                             foreach (var f in filesManager.ListFiles<ScriptFile>())
@@ -648,7 +648,7 @@ namespace StepBro.Core.Parser
                                 {
                                     fileParsingStack.Enqueue(f);
                                     filesToParse.Insert(0, f);      // Put in front
-                                    return f;
+                                    return new Tuple<IScriptFile, string>(f, null);
                                 }
                             }
 
@@ -662,12 +662,7 @@ namespace StepBro.Core.Parser
                                 string path = shortcutsManager.ListShortcuts().ResolveShortcutPath(fu, ref error);
                                 if (String.IsNullOrEmpty(path))
                                 {
-                                    string errorText = ".";
-                                    if (!String.IsNullOrEmpty(error))
-                                    {
-                                        errorText = "; " + error;
-                                    }
-                                    file.ErrorsInternal.SymanticError(line, -1, false, $"Parsing '{file.FileName}': Unable to resolve using path \"{fu}\"{errorText}");
+                                    return new Tuple<IScriptFile, string>(null, error);
                                 }
                                 else
                                 {
@@ -700,7 +695,7 @@ namespace StepBro.Core.Parser
                                     var cfgFile = Path.GetFullPath(Path.Combine(basefolder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
                                     if (System.IO.File.Exists(cfgFile))
                                     {
-                                        var folderConfig = file.TryOpenFolderConfiguration(configFileManager, line, cfgFile);
+                                        var folderConfig = file.TryOpenFolderConfiguration(configFileManager, cfgFile);
 
 
                                         //var errors = new List<Tuple<int, string>>();
@@ -752,11 +747,11 @@ namespace StepBro.Core.Parser
 
                                     fileParsingStack.Enqueue(loadedFile);
                                     filesToParse.Add(loadedFile);
-                                    return loadedFile;
+                                    return new Tuple<IScriptFile, string>(loadedFile, null);
                                 }
                             }
 
-                            return null;    // Not found!
+                            return new Tuple<IScriptFile, string>(null, null);    // Not found!
                         }
                     );
                     file.ResolveNamespaceUsings(
@@ -814,7 +809,7 @@ namespace StepBro.Core.Parser
                             var cfgFile = Path.GetFullPath(Path.Combine(basefolder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
                             if (System.IO.File.Exists(cfgFile))
                             {
-                                var folderConfig = file.TryOpenFolderConfiguration(configFileManager, -1, cfgFile);
+                                var folderConfig = file.TryOpenFolderConfiguration(configFileManager, cfgFile);
                                 if (folderConfig != null && folderConfig.IsSearchRoot)
                                 {
                                     break;  // Don't search deeper now.
