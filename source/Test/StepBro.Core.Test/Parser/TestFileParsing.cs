@@ -1240,15 +1240,17 @@ namespace StepBroCoreTest.Parser
         [TestMethod]
         public void FileParsing_FilePathVariable()
         {
-            var source = new StringBuilder();
-            source.AppendLine("using " + typeof(DummyInstrumentClass).Namespace + ";");
-            source.AppendLine("namespace SayMyName;");
-            source.AppendLine("const filepath myFile = @\"[this]\\sub\\zup\\script.sbs\";");
-            source.AppendLine("public string UseVariable()");
-            source.AppendLine("{");
-            source.AppendLine("    " + nameof(DummyInstrumentClass) + ".ShowString(myFile);");
-            source.AppendLine("    return myFile;");
-            source.AppendLine("}");
+            string source =
+                $$"""
+                using {{typeof(DummyInstrumentClass).Namespace}};
+                namespace SayMyName;
+                const filepath myFile = @"[this]\sub\zup\script.sbs";
+                public string UseVariable()
+                {
+                    {{nameof(DummyInstrumentClass)}}.ShowString(myFile);
+                    return myFile;
+                }
+                """;
 
             var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
                 new Tuple<string, string>("myfile.sbs", source.ToString()));
@@ -1261,6 +1263,29 @@ namespace StepBroCoreTest.Parser
             var result = taskContext.CallProcedure(procedure);
             Assert.IsNotNull(result);
             Assert.IsTrue(result is string);
+        }
+
+        [TestMethod]
+        public void FileParsing_UsingPropertyAsMethod()
+        {
+            string source =
+                $$"""
+                using {{typeof(DummyInstrumentClass).Namespace}};
+                namespace ErrorCheck;
+                {{nameof(DummyInstrumentClass)}} tool = {{nameof(DummyInstrumentClass)}}(10);
+                procedure bool Func()
+                {
+                    return tool.BoolA();    // This should give an error.
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("myfile.sbs", source.ToString()));
+            Assert.AreEqual(1, files.Length);
+            Assert.AreEqual("myfile.sbs", files[0].FileName);
+            Assert.AreEqual(1, files[0].Errors.ErrorCount);         // The one error.        
+            Assert.IsTrue(files[0].Errors[0].Message.Contains("property \"BoolA\""));
+            Assert.IsTrue(files[0].Errors[0].Message.Contains("can not be used as a method"));
         }
     }
 }
