@@ -1,16 +1,11 @@
 ﻿using StepBro.Core.Api;
 using StepBro.Core.Data;
-using StepBro.Core.File;
 using StepBro.Core.Logging;
 using StepBro.Core.Tasks;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static StepBro.Core.Data.PropertyBlockDecoder;
-using static StepBro.Core.General.ProjectUserData;
 
 namespace StepBro.Core.General
 {
