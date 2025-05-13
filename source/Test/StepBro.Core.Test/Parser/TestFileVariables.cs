@@ -55,6 +55,32 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(AccessModifier.Private, var.AccessProtection);
         }
 
+        [TestMethod, Ignore]
+        public void ParseFileVariableNoPropertyBlockOrArgs()
+        {
+            var var = FileBuilder.ParseFileVariable<DummyInstrumentClass>(
+                null, new Type[] { typeof(DummyInstrumentClass) },
+                "private DummyInstrumentClass myVariable = DummyInstrumentClass;");
+            Assert.IsNotNull(var);
+            Assert.AreEqual("myVariable", var.Name);
+            Assert.ReferenceEquals(var.DataType, (TypeReference)typeof(DummyInstrumentClass));
+            Assert.IsTrue(var.IsReadonly);
+            Assert.AreEqual(AccessModifier.Private, var.AccessProtection);
+        }
+
+        [TestMethod, Ignore]
+        public void ParseFileVariableNoArgs()
+        {
+            var var = FileBuilder.ParseFileVariable<DummyInstrumentClass>(
+                null, new Type[] { typeof(DummyInstrumentClass) },
+                "private DummyInstrumentClass myVariable = DummyInstrumentClass();");
+            Assert.IsNotNull(var);
+            Assert.AreEqual("myVariable", var.Name);
+            Assert.ReferenceEquals(var.DataType, (TypeReference)typeof(DummyInstrumentClass));
+            Assert.IsTrue(var.IsReadonly);
+            Assert.AreEqual(AccessModifier.Private, var.AccessProtection);
+        }
+
         [TestMethod]
         public void ParseFileVariableWithEmptyPropertyBlockEmptyArgs()
         {

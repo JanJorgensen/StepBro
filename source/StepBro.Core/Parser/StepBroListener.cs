@@ -599,7 +599,7 @@ namespace StepBro.Core.Parser
                 }
                 else
                 {
-                    errors.ConfigError(startToken.Line, startToken.Column, $"No station properties file was found or loaded. When using the \"{Constants.VARIABLE_DEVICE_REFERENCE}\" keyword, that file is needed.");
+                    errors.ConfigError($"No station properties file was found or loaded. When using the \"{Constants.VARIABLE_DEVICE_REFERENCE}\" keyword, that file is needed.");
                 }
             }
 

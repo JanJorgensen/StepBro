@@ -167,6 +167,14 @@ namespace StepBro.Core.Parser
                     case SBExpressionType.Constant:
                     case SBExpressionType.GlobalVariableReference:
                         m_errors.SymanticError(context.Start.Line, -1, false, $"\"{left.ToString()}\" is not a method, procedure or delegate.");
+                        if (isCallStatement)
+                        {
+                            m_scopeStack.Peek().AddStatementCode(Expression.Empty());   // Add empty statement, to make the rest of the error handling easier.
+                        }
+                        else
+                        {
+                            m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError));
+                        }
                         return;
 
                     case SBExpressionType.TypeReference:
@@ -267,7 +275,15 @@ namespace StepBro.Core.Parser
                         break;
 
                     case SBExpressionType.Identifier:
-                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"\"{(string)(left.Value)}\" is unresolved.");
+                        m_errors.SymanticError(left.Token.Line, left.Token.Column, false, $"Identifier \"{(string)(left.Value)}\" is unresolved.");
+                        if (isCallStatement)
+                        {
+                            m_scopeStack.Peek().AddStatementCode(Expression.Empty());   // Add empty statement, to make the rest of the error handling easier.
+                        }
+                        else
+                        {
+                            m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError));
+                        }
                         return;
 
                     case SBExpressionType.Expression:
@@ -301,7 +317,15 @@ namespace StepBro.Core.Parser
                         }
                         else
                         {
-                            m_errors.SymanticError(context.Start.Line, -1, false, $"\"{left.ToString()}\" is not a procedure reference or a delegate.");
+                            m_errors.SymanticError(context.Start.Line, -1, false, $"The {left.ShortString()} is not a procedure reference or a delegate, and can not be used as a method.");
+                            if (isCallStatement)
+                            {
+                                m_scopeStack.Peek().AddStatementCode(Expression.Empty());   // Add empty statement, to make the rest of the error handling easier.
+                            }
+                            else
+                            {
+                                m_expressionData.Push(new SBExpressionData(SBExpressionType.ExpressionError));
+                            }
                             return;
                         }
                         break;

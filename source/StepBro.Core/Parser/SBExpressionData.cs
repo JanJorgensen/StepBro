@@ -245,6 +245,76 @@ namespace StepBro.Core.Parser
             return "SBExpressionData " + String.Join(", ", parts);
         }
 
+        public string ShortString()
+        {
+            switch (this.ReferencedType)
+            {
+                case SBExpressionType.Namespace:
+                    break;
+                case SBExpressionType.Constant:
+                    break;
+                case SBExpressionType.Identifier:
+                    break;
+                case SBExpressionType.Expression:
+                    break;
+                case SBExpressionType.ThisReference:
+                    break;
+                case SBExpressionType.ApplicationObject:
+                    break;
+                case SBExpressionType.GlobalVariableReference:
+                    break;
+                case SBExpressionType.LocalVariableReference:
+                    break;
+                case SBExpressionType.HostApplicationVariableReference:
+                    break;
+                case SBExpressionType.Indexing:
+                    break;
+                case SBExpressionType.TypeReference:
+                    break;
+                case SBExpressionType.GenericTypeDefinition:
+                    break;
+                case SBExpressionType.PropertyReference:
+                    if (this.Value != null && this.Value is PropertyInfo pi)
+                    {
+                        return "property \"" + pi.Name + "\"";
+                    }
+                    break;
+                case SBExpressionType.MethodReference:
+                    break;
+                case SBExpressionType.ScriptNamespace:
+                    break;
+                case SBExpressionType.ProcedureReference:
+                    break;
+                case SBExpressionType.ProcedurePartner:
+                    break;
+                case SBExpressionType.ProcedurePropertyReference:
+                    break;
+                case SBExpressionType.ProcedureCustomPropertyReference:
+                    break;
+                case SBExpressionType.TestListReference:
+                    break;
+                case SBExpressionType.FileElementOverride:
+                    break;
+                case SBExpressionType.DatatableReference:
+                    break;
+                case SBExpressionType.AwaitExpression:
+                    break;
+                case SBExpressionType.DynamicObjectMember:
+                    break;
+                case SBExpressionType.DynamicAsyncObjectMember:
+                    break;
+                case SBExpressionType.ExpressionError:
+                    break;
+                case SBExpressionType.UnknownIdentifier:
+                    break;
+                case SBExpressionType.UnsupportedOperation:
+                    break;
+                default:
+                    break;
+            }
+            throw new NotImplementedException();
+        }
+
         public bool IsNamed { get { return String.IsNullOrEmpty(ParameterName) == false; } }
 
         public bool IsValueType
