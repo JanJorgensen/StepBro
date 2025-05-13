@@ -27,11 +27,17 @@ namespace StepBro.Core.Test.Mocks
             throw new NotImplementedException();
         }
 
-        public FolderConfiguration ReadFolderConfig(string configFile, List<Tuple<int, string>> errors)
+        public FolderConfiguration ReadFolderConfig(string configFile, List<Tuple<string, int, string>> errors)
         {
             throw new NotImplementedException();
         }
-    
+
+        public FolderConfiguration GetFolderConfig(string folder)
+        {
+            throw new NotImplementedException();
+        }
+
+
         public void ResetFolderConfigurations() { }
     }
 }

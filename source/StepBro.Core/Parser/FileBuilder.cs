@@ -525,8 +525,6 @@ namespace StepBro.Core.Parser
             var shortcutsManager = ServiceManager.Global.Get<IFolderManager>();
             var configFileManager = ServiceManager.Global.Get<IConfigurationFileManager>();
 
-            configFileManager.ResetFolderConfigurations();
-
             var filesToParse = new List<ScriptFile>();
             if (topfile == null)
             {
@@ -634,6 +632,24 @@ namespace StepBro.Core.Parser
                             string basefolder = Path.GetDirectoryName(file.GetFullPath());
                             var fuName = Path.GetFileName(fu);
 
+                            if (file.FolderConfig == null)
+                            {
+                                var errors = new List<Tuple<string, int, string>>();
+                                file.FolderConfig = configFileManager.ReadFolderConfig(basefolder, errors);
+
+                                if (errors.Count > 0)
+                                {
+                                    var errortext = "";
+                                    foreach (var e in errors)
+                                    {
+                                        if (e.Item2 <= 0) errortext = $"Config file '{e.Item1}': {e.Item3}";
+                                        else errortext = $"Config file '{e.Item1}' line {e.Item2}: {e.Item3}";
+                                    }
+
+                                    file.ErrorsInternal.ConfigError(errortext);
+                                }
+                            }
+
                             // Check the already parsed or loaded files first.
                             foreach (var f in filesToParse)
                             {
@@ -659,7 +675,7 @@ namespace StepBro.Core.Parser
                             if (fu.Contains("["))     // It's a path using a folder shortcut.
                             {
                                 string error = null;
-                                string path = shortcutsManager.ListShortcuts().ResolveShortcutPath(fu, ref error);
+                                string path = file.FolderShortcuts.ListShortcuts().Concat(shortcutsManager.ListShortcuts()).ResolveShortcutPath(fu, ref error);
                                 if (String.IsNullOrEmpty(path))
                                 {
                                     return new Tuple<IScriptFile, string>(null, error);
@@ -683,58 +699,28 @@ namespace StepBro.Core.Parser
                             else
                             {
                                 // Start at the location of this file.
-                                while (basefolder != Path.GetPathRoot(basefolder))
+                                var folderConfig = file.FolderConfig;
+                                while (folderConfig != null)
                                 {
-                                    string path = Path.GetFullPath(Path.Combine(basefolder, fu));
+                                    string path = Path.GetFullPath(Path.Combine(folderConfig.Folder, fu));
                                     if (System.IO.File.Exists(path))
                                     {
                                         foundMatchingFile = path;
                                         break;
                                     }
 
-                                    var cfgFile = Path.GetFullPath(Path.Combine(basefolder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
-                                    if (System.IO.File.Exists(cfgFile))
+                                    foreach (var lib in folderConfig.LibFolders)
                                     {
-                                        var folderConfig = file.TryOpenFolderConfiguration(configFileManager, cfgFile);
-
-
-                                        //var errors = new List<Tuple<int, string>>();
-                                        //var folderConfig = configFileManager.ReadFolderConfig(cfgFile, errors);
-
-                                        //if (errors.Count > 0)
-                                        //{
-                                        //    var errortext = "";
-                                        //    foreach (var e in errors)
-                                        //    {
-                                        //        if (e.Item1 <= 0) errortext = $"Config file '{cfgFile}': {e.Item2}";
-                                        //        else errortext = $"Config file '{cfgFile}' line {e.Item1}: {e.Item2}";
-                                        //    }
-
-                                        //    file.ErrorsInternal.ConfigError(line, 0, errortext);
-                                        //}
-
-                                        if (folderConfig != null)
+                                        path = Path.GetFullPath(Path.Combine(folderConfig.Folder, lib, fu));
+                                        if (System.IO.File.Exists(path))
                                         {
-                                            //file.AddFolderConfig(folderConfig);
-
-                                            foreach (var lib in folderConfig.LibFolders)
-                                            {
-                                                path = Path.GetFullPath(Path.Combine(basefolder, lib, fu));
-                                                if (System.IO.File.Exists(path))
-                                                {
-                                                    foundMatchingFile = path;
-                                                    break;
-                                                }
-                                            }
-                                            if (folderConfig.IsSearchRoot)
-                                            {
-                                                break;  // Don't search deeper now.
-                                            }
+                                            foundMatchingFile = path;
+                                            break;
                                         }
                                     }
 
                                     // Not found yet; try the parent folder.
-                                    basefolder = Path.GetDirectoryName(basefolder);
+                                    folderConfig = folderConfig.ParentConfiguration;
                                 }
                             }
 
@@ -795,31 +781,6 @@ namespace StepBro.Core.Parser
                             return foundIdentifier;     // Is null if not found
                         }
                     );
-
-                }
-
-                foreach (var file in filesToParse)
-                {
-                    if (!file.AllFolderConfigsRead)
-                    {
-                        string basefolder = Path.GetDirectoryName(file.GetFullPath());
-
-                        while (basefolder != Path.GetPathRoot(basefolder))
-                        {
-                            var cfgFile = Path.GetFullPath(Path.Combine(basefolder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
-                            if (System.IO.File.Exists(cfgFile))
-                            {
-                                var folderConfig = file.TryOpenFolderConfiguration(configFileManager, cfgFile);
-                                if (folderConfig != null && folderConfig.IsSearchRoot)
-                                {
-                                    break;  // Don't search deeper now.
-                                }
-                            }
-
-                            // Not found yet; try the parent folder.
-                            basefolder = Path.GetDirectoryName(basefolder);
-                        }
-                    }
                 }
 
                 #endregion

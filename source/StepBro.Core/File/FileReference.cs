@@ -137,7 +137,8 @@ namespace StepBro.Core.File
 
         public override string ToString()
         {
-            return $"Shortcut {Name}: {Path}";
+            if (m_resolvedPath == null) return $"Shortcut {Name}: {Path}";
+            else return $"Shortcut {Name}: {Path} ({m_resolvedPath})";
         }
     }
 
