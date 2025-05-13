@@ -3,11 +3,16 @@ using StepBro.Core.Data;
 using StepBro.Core.File;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using static StepBro.Core.Data.PropertyBlockDecoder;
 
 namespace StepBro.Core.General
 {
+    /// <summary>
+    /// Reads a StepBro.cfg file from 
+    /// </summary>
     public class FolderConfiguration
     {
         private string m_folder;
@@ -44,6 +49,33 @@ namespace StepBro.Core.General
         }
 
         private static PropertyBlockDecoder.Block<object, FolderConfiguration> m_decoder = null;
+
+        public static FolderConfiguration Create(string folder, List<Tuple<string, int, string>> errors)
+        {
+            FolderConfiguration config = null;
+            var filepath = Path.GetFullPath(Path.Combine(folder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
+            if (System.IO.File.Exists(filepath))
+            {
+                PropertyBlock props;
+                try
+                {
+                    props = filepath.GetPropertyBlockFromFile();
+                }
+                catch
+                {
+                    errors.Add(new Tuple<string, int, string>(filepath, -1, $"Error reading configuration file."));
+                    return null;
+                }
+                var fileErrors = new List<Tuple<int, string>>();
+                config = FolderConfiguration.Create(props, folder, fileErrors);
+                foreach (var error in fileErrors) errors.Add(new Tuple<string, int, string>(filepath, error.Item1, error.Item2));
+            }
+            else
+            {
+                config = new FolderConfiguration(folder);       // Create empty file.
+            }
+            return config;
+        }
 
         public static FolderConfiguration Create(PropertyBlock data, string path, List<Tuple<int, string>> errors)
         {

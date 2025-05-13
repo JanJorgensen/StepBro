@@ -18,8 +18,7 @@ namespace StepBro.Core.General
     {
         string StationPropertiesFile { get; }
         PropertyBlock GetStationProperties();
-        FolderConfiguration ReadFolderConfig(string folder, List<Tuple<string, int, string>> errors);
-        FolderConfiguration GetFolderConfig(string folder);
+        FolderConfiguration GetOrReadFolderConfig(string folder, List<Tuple<string, int, string>> errors);
     }
 
     internal class ConfigurationFileManager : ServiceBase<IConfigurationFileManager, ConfigurationFileManager>, IConfigurationFileManager
@@ -76,48 +75,21 @@ namespace StepBro.Core.General
             return m_stationProperties;
         }
 
-        public FolderConfiguration ReadFolderConfig(string folder, List<Tuple<string, int, string>> errors)
+        public FolderConfiguration GetOrReadFolderConfig(string folder, List<Tuple<string, int, string>> errors)
         {
             var config = m_folderConfigs.FirstOrDefault(c => c.Folder == folder);
             if (config == null)     // If not already loaded, load it now.
             {
-                var filepath = Path.GetFullPath(Path.Combine(folder, Constants.STEPBRO_FOLDER_CONFIG_FILE));
-                if (System.IO.File.Exists(filepath))
-                {
-                    System.Diagnostics.Debug.WriteLine("OPENING CONFIG FILE IN " + folder);
-                    PropertyBlock props;
-                    try
-                    {
-                        props = filepath.GetPropertyBlockFromFile();
-                    }
-                    catch
-                    {
-                        errors.Add(new Tuple<string, int, string>(filepath, -1, $"Error reading configuration file."));
-                        return null;
-                    }
-                    var fileErrors = new List<Tuple<int, string>>();
-                    config = FolderConfiguration.Create(props, folder, fileErrors);
-                    foreach (var error in fileErrors) errors.Add(new Tuple<string, int, string>(filepath, error.Item1, error.Item2));
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("NO CONFIG FILE IN " + folder);
-                    config = new FolderConfiguration(folder);       // Create empty file.
-                }
+                config = FolderConfiguration.Create(folder, errors);
                 m_folderConfigs.Add(config);
 
                 var root = Path.GetDirectoryName(folder);
                 if (!config.IsSearchRoot && root != folder)
                 {
-                    config.ParentConfiguration = ReadFolderConfig(root, errors);
+                    config.ParentConfiguration = GetOrReadFolderConfig(root, errors);
                 }
             }
             return config;
-        }
-
-        public FolderConfiguration GetFolderConfig(string folder)
-        {
-            return null;
         }
     }
 }

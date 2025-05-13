@@ -22,22 +22,9 @@ namespace StepBro.Core.Test.Mocks
             return this.StationProperties;
         }
 
-        public FolderConfiguration ReadFolderConfig(ILogger logger, string configFile)
+        public FolderConfiguration GetOrReadFolderConfig(string configFile, List<Tuple<string, int, string>> errors)
         {
             throw new NotImplementedException();
         }
-
-        public FolderConfiguration ReadFolderConfig(string configFile, List<Tuple<string, int, string>> errors)
-        {
-            throw new NotImplementedException();
-        }
-
-        public FolderConfiguration GetFolderConfig(string folder)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public void ResetFolderConfigurations() { }
     }
 }

@@ -20,16 +20,9 @@ namespace StepBro.Core.Parser.Mocks
             throw new NotImplementedException();
         }
 
-        public FolderConfiguration ReadFolderConfig(string configFile, List<Tuple<string, int, string>> errors)
+        public FolderConfiguration GetOrReadFolderConfig(string configFile, List<Tuple<string, int, string>> errors)
         {
             return null; // Not implemented.
         }
-
-        public FolderConfiguration GetFolderConfig(string folder)
-        {
-            return null;
-        }
-
-        public void ResetFolderConfigurations() { }
     }
 }

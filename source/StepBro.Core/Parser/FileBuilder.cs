@@ -587,6 +587,25 @@ namespace StepBro.Core.Parser
                     }
                     file.SetDocumentComments(docComments);
 
+                    string basefolder = Path.GetDirectoryName(file.GetFullPath());
+                    if (file.FolderConfig == null)
+                    {
+                        var errors = new List<Tuple<string, int, string>>();
+                        file.FolderConfig = configFileManager.GetOrReadFolderConfig(basefolder, errors);
+
+                        if (errors.Count > 0)
+                        {
+                            var errortext = "";
+                            foreach (var e in errors)
+                            {
+                                if (e.Item2 <= 0) errortext = $"Config file '{e.Item1}': {e.Item3}";
+                                else errortext = $"Config file '{e.Item1}' line {e.Item2}: {e.Item3}";
+                            }
+
+                            file.ErrorsInternal.ConfigError(errortext);
+                        }
+                    }
+
                     var visitor = new StepBroTypeVisitor();
                     visitor.Visit(context);
 
@@ -629,13 +648,12 @@ namespace StepBro.Core.Parser
                     file.ResolveFileUsings(
                         (fu) =>
                         {
-                            string basefolder = Path.GetDirectoryName(file.GetFullPath());
                             var fuName = Path.GetFileName(fu);
 
                             if (file.FolderConfig == null)
                             {
                                 var errors = new List<Tuple<string, int, string>>();
-                                file.FolderConfig = configFileManager.ReadFolderConfig(basefolder, errors);
+                                file.FolderConfig = configFileManager.GetOrReadFolderConfig(basefolder, errors);
 
                                 if (errors.Count > 0)
                                 {
