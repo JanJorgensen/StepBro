@@ -1,20 +1,16 @@
 ﻿using StepBro.Core.Api;
+using StepBro.Core.ScriptData;
 using StepBro.HostSupport.Models;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using StepBro.Core.Tasks;
+using static StepBro.UI.WinForms.ButtonLogic;
 
 namespace StepBro.UI.WinForms.Controls
 {
     public partial class ToolInteractionView : UserControl
     {
+        ICoreAccess m_coreAccess = null;
         private bool m_handlingCheck = false;
+        private IExecutionAccess m_execution = null;
 
         public ToolInteractionView()
         {
@@ -24,6 +20,11 @@ namespace StepBro.UI.WinForms.Controls
         private ToolsInteractionModel Model { get { return this.DataContext as ToolsInteractionModel; } }
 
         public event EventHandler TextCommandToolSelected;
+
+        public void Bind(ICoreAccess coreAccess)
+        {
+            m_coreAccess = coreAccess;
+        }
 
         protected override void OnLoad(EventArgs e)
         {
@@ -57,6 +58,16 @@ namespace StepBro.UI.WinForms.Controls
             {
                 listViewToolSelection.SelectedIndices.Add(selectedIndex);
             }
+        }
+
+        protected override void OnHandleDestroyed(EventArgs e)
+        {
+            if (m_execution != null)
+            {
+                m_execution.CurrentStateChanged -= Execution_CurrentStateChanged;
+                m_execution = null;
+            }
+            base.OnHandleDestroyed(e);
         }
 
         protected override void OnSizeChanged(EventArgs e)
@@ -155,12 +166,12 @@ namespace StepBro.UI.WinForms.Controls
                     button.Name = "buttonFor" + proc.FullName.Replace('.', '_');
                     button.Size = new Size(200, 23);
                     button.Text = proc.Name;
+                    button.Tag = proc;
                     button.UseVisualStyleBackColor = true;
+                    button.Click += ToolProcedureButton_Click;
                     flowLayoutPanel.Controls.Add(button);
                 }
-                flowLayoutPanel.Controls.Add(propertyGrid);
-                //propertyGrid.Visible = true;
-                //propertyGrid.SelectedObject = this.Model.SelectedTool.ToolContainer.Object;
+                propertyGrid.SelectedObject = this.Model.SelectedTool.ToolContainer.Object;
 
                 this.ResizePanelControls();
             }
@@ -168,6 +179,47 @@ namespace StepBro.UI.WinForms.Controls
             {
                 System.Diagnostics.Debug.WriteLine($"ERROR {ex.Message}");
             }
+        }
+
+        private void ToolProcedureButton_Click(object sender, EventArgs e)
+        {
+            var proc = (IFileProcedure)((Button)sender).Tag;
+            if (m_execution != null)
+            {
+                return; // TODO: MessageBox?
+            }
+            m_execution = m_coreAccess.StartExecution(proc.FullName, null, this.Model.SelectedTool.ToolContainer.FullName, null);
+            if (m_execution != null)
+            {
+                m_execution.CurrentStateChanged += Execution_CurrentStateChanged;
+            }
+            else
+            {
+                // TODO: MessageBox?
+            }
+        }
+
+        private void Execution_CurrentStateChanged(object sender, EventArgs e)
+        {
+            this.BeginInvoke(this.HandleExecutionStateChange);
+        }
+
+        private void HandleExecutionStateChange()
+        {
+            if (m_execution != null)
+            {
+                System.Diagnostics.Debug.WriteLine("Execution_CurrentStateChanged; in GUI");
+                if (m_execution.State.HasEnded())
+                {
+                    m_execution.CurrentStateChanged -= Execution_CurrentStateChanged;
+                    m_execution = null;
+                }
+            }
+        }
+
+        private void flowLayoutPanel_Resize(object sender, EventArgs e)
+        {
+            this.ResizePanelControls();
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Xml.Linq;
 
 namespace StepBro.Core.Api
 {
@@ -66,6 +67,7 @@ namespace StepBro.Core.Api
         private Dictionary<string, NamespaceList> m_namespaceLookup = new Dictionary<string, NamespaceList>();
         private Dictionary<string, Type> m_typeLookup = new Dictionary<string, Type>();
         private List<Tuple<string, Type>> m_types = new List<Tuple<string, Type>>();
+        private List<Tuple<string, Type>> m_extensionTypes = new List<Tuple<string, Type>>();
         private Dictionary<string, IIdentifierInfo> m_lookup = new Dictionary<string, IIdentifierInfo>();
         private List<IAddonTypeHandler> m_specialTypeHandlers = new List<IAddonTypeHandler>();
         private List<IAddon> m_addons = new List<IAddon>();
@@ -311,7 +313,7 @@ namespace StepBro.Core.Api
 
                 foreach (var tt in thistype.SelfAndInterfaces())
                 {
-                    foreach (var t in m_types)
+                    foreach (var t in m_extensionTypes)
                     {
                         foreach (var method in t.Item2.GetMethods(BindingFlags.Public | BindingFlags.Static).Where(m => m.IsExtension() && m.Name == name))
                         {
@@ -436,6 +438,10 @@ namespace StepBro.Core.Api
                 }
 
                 m_types.Add(new Tuple<string, Type>(fullName, type));
+                if (type.GetMethods(BindingFlags.Public | BindingFlags.Static).Where(m => m.IsExtension()).Any())
+                {
+                    m_extensionTypes.Add(new Tuple<string, Type>(fullName, type));
+                }
             }
         }
 

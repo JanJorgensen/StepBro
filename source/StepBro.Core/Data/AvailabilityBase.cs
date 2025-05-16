@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace StepBro.Core.Data
 {
     public class AvailabilityBase : IAvailability
     {
+        [Browsable(false)]
         public bool IsStillValid { get { return !m_isDisposed; } }
 
         public event EventHandler Disposing;

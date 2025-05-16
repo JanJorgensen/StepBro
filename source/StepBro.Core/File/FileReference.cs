@@ -50,7 +50,7 @@ namespace StepBro.Core.File
     /// <summary>
     /// A delegate for a function that enumerates a list of available folder shortcuts.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>An enumeration of folder shortcuts.</returns>
     public delegate IEnumerable<IFolderShortcut> FolderShortcutsDelegate();
 
     /// <summary>

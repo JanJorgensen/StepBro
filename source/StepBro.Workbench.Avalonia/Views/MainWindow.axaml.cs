@@ -1,5 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using StepBro.Core.General;
+using StepBro.Core;
 using StepBro.HostSupport.Models;
 using StepBro.UI.Controls;
 
@@ -17,7 +19,9 @@ namespace StepBro.Workbench.Views
             InitializeComponent();
             this.DataContext = new HostAppModel();
             var logViewerModel = new LogViewerModel<LogViewEntry>(new LogViewEntryFactory());
-            this.AppModel.Initialize(logViewerModel);
+            IService m_textFileSystemService = null;
+            new TextFileSystem(out m_textFileSystemService);
+            this.AppModel.Initialize(logViewerModel, m_textFileSystemService);
             logViewerModel.Setup();
         }
 

@@ -80,6 +80,7 @@ namespace StepBro.SimpleWorkbench
 
         private ObservableCollection<IFileElement> m_fileElements = new ObservableCollection<IFileElement>();
         private Dictionary<string, TypeReference> m_variableTypes = new Dictionary<string, TypeReference>();
+        private List<IFileElementOverride> m_overrideDefinitions = new List<IFileElementOverride>();
 
         private Queue<ScriptExecutionData> m_executionQueue = new Queue<ScriptExecutionData>();
 
@@ -776,21 +777,32 @@ namespace StepBro.SimpleWorkbench
         {
             ToolStripMenuItem outputItem = null;
             var partners = procedure.ListPartners().ToList();
-            var thisVariables = new List<string>();
+            var matchingInstanceVariables = new List<string>();
 
-            if (procedure.Parameters.Length > 0 && procedure.IsFirstParameterThisReference)
+            if (procedure.Parameters.Length == 1 && procedure.IsFirstParameterThisReference)
             {
                 var par = procedure.Parameters[0];
                 foreach (var v in m_objectManager.GetObjectCollection())
                 {
                     if (par.Value.IsAssignableFrom(m_variableTypes[v.FullName]))
                     {
-                        thisVariables.Add(v.FullName);
+                        matchingInstanceVariables.Add(v.FullName);
+                    }
+                    else if (par.Value.IsTypedef())
+                    {
+                        foreach (var oe in m_overrideDefinitions)
+                        {
+                            if (oe.HasBaseVariable(v) && par.Value.IsAssignableFrom(oe.OverrideType))
+                            {
+                                matchingInstanceVariables.Add(v.FullName);
+                                break;
+                            }
+                        }
                     }
                 }
             }
 
-            if (partners.Count > 0 || thisVariables.Count > 0)
+            if (partners.Count > 0 || matchingInstanceVariables.Count > 0)
             {
                 outputItem = new ToolStripMenuItem();
                 outputItem.Name = "toolStripMenuProcedure" + procedure.Name;
@@ -839,9 +851,9 @@ namespace StepBro.SimpleWorkbench
                         outputItem.DropDownItems.Add(procedureExecutionOptionMenu);
                     }
                 }
-                else if (thisVariables.Count > 0)
+                else if (matchingInstanceVariables.Count > 0)
                 {
-                    foreach (var variable in thisVariables)
+                    foreach (var variable in matchingInstanceVariables)
                     {
                         string shortName = variable.Split('.').Last();
 
@@ -1060,7 +1072,7 @@ namespace StepBro.SimpleWorkbench
 
         private void toolStripDropDownButtonTool_Click(object sender, EventArgs e)
         {
-            var dialog = new ToolInteractionPopup();
+            var dialog = new ToolInteractionPopup(this);
             dialog.DataContext = m_toolsInteractionModel;
             dialog.Location = toolStripDropDownButtonTool.GetCurrentParent().PointToScreen(new Point(toolStripDropDownButtonTool.Bounds.X + 30, toolStripDropDownButtonTool.Bounds.Bottom));
             dialog.Show();
@@ -2041,6 +2053,11 @@ namespace StepBro.SimpleWorkbench
             foreach (var v in m_fileElements.Where(e => e.ElementType == FileElementType.FileVariable))
             {
                 m_variableTypes[v.FullName] = v.DataType;
+            }
+            m_overrideDefinitions.Clear();
+            foreach (var od in m_fileElements.Where(e => e is IFileElementOverride oe && oe.HasTypeOverride).Cast<IFileElementOverride>())
+            {
+                m_overrideDefinitions.Add(od);
             }
 
             var namespaces = m_fileElements.Select(e => NamespaceFromFullName(e.FullName)).Distinct().ToList();

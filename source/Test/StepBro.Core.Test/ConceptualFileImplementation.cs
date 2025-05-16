@@ -87,6 +87,11 @@ namespace StepBroCoreTest
         {
             throw new NotImplementedException();
         }
+        
+        public IEnumerable<IFileVariable> ListFileVariables()
+        {
+            throw new NotImplementedException();
+        }
 
         public IEnumerable<IFileElement> ListElements(bool includeExternal = false)
         {
