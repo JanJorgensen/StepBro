@@ -475,7 +475,7 @@ logModifier
     |   ERROR
     ;
 
-keywordType : CONFIG | OBJECT | OVERRIDE | PRIVATE | PUBLIC | VERDICT ;
+keywordType : CONFIG | OBJECT | OVERRIDE | PRIVATE | PUBLIC | VERDICT | FILEPATH ;
 
 keyword
     : BREAK | CONTINUE | DO | ELSE | ERROR | EXECUTION | EXPECT | FAIL

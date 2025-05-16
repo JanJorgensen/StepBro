@@ -140,6 +140,7 @@ namespace StepBro.Core.Parser
                     case "verdict": return TypeReference.TypeVerdict;
                     case "timespan": return TypeReference.TypeTimeSpan;
                     case "datetime": return TypeReference.TypeDateTime;
+                    case "filepath": return TypeReference.TypeFilePath;
                     case "object": return TypeReference.TypeObject;
                     case "procedure": return TypeReference.TypeProcedure;
                     case "function": return TypeReference.TypeFunction;
