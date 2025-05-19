@@ -30,6 +30,11 @@ namespace StepBro.Core.File
 
         public string Value { get { return m_filepath; } }
 
+        public FilePath ParentFolder()
+        {
+            return new FilePath(System.IO.Directory.GetParent(m_filepath).FullName);
+        }
+
         public override string ToString()
         {
             return m_filepath;
