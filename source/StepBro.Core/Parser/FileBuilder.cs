@@ -301,7 +301,7 @@ namespace StepBro.Core.Parser
 
             if (builder.Errors.ErrorCount > 0) throw new Exception("PARSING ERRORS");
 
-            return builder.File.ListFileVariables().FirstOrDefault() as IValueContainer<T>;
+            return builder.File.ListFileVariables().FirstOrDefault().Value as IValueContainer<T>;
         }
 
         internal static IValueContainer<T> ParseConfigValue<T>(string content)
