@@ -2,4 +2,4 @@ using System.Reflection;
 
 [assembly: AssemblyCompany("SchmutStein")]
 [assembly: AssemblyProduct("StepBro")]
-[assembly: AssemblyVersion("1.3.1")]
+[assembly: AssemblyVersion("1.4.0")]
