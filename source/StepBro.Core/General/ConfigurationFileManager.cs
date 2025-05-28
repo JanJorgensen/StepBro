@@ -72,6 +72,7 @@ namespace StepBro.Core.General
 
         public FolderConfiguration GetOrReadFolderConfig(string folder, List<Tuple<string, int, string>> errors)
         {
+            if (String.IsNullOrEmpty(folder)) throw new ArgumentException("Argument \"folder\" is null or empty.");
             var config = m_folderConfigs.FirstOrDefault(c => c.Folder == folder);
             if (config == null)     // If not already loaded, load it now.
             {
@@ -79,7 +80,7 @@ namespace StepBro.Core.General
                 m_folderConfigs.Add(config);
 
                 var root = Path.GetDirectoryName(folder);
-                if (!config.IsSearchRoot && root != folder)
+                if (root != null && !config.IsSearchRoot && root != folder)
                 {
                     config.ParentConfiguration = GetOrReadFolderConfig(root, errors);
                 }
