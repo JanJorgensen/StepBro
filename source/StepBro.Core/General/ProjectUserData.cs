@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Data;
+using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
 using System;
@@ -119,30 +120,42 @@ namespace StepBro.Core.General
                 m_topFile = m_loadedFilesManager.TopScriptFile;
                 if (m_topFile != null)
                 {
-                    m_userFilePath = Path.Combine(Path.GetDirectoryName(m_topFile.FilePath), Path.GetFileNameWithoutExtension(m_topFile.FilePath)) + ".user.json";
+                    var filenameWithoutExtension = Path.GetFileNameWithoutExtension(m_topFile.FilePath);
+                    m_userFilePath = Path.Combine(Path.GetDirectoryName(m_topFile.FilePath), filenameWithoutExtension + ".user.json");
 
                     if (System.IO.File.Exists(m_userFilePath))
                     {
-                        var data = JsonSerializer.Deserialize<Data>(System.IO.File.ReadAllText(m_userFilePath));
-                        if (data != null)
+                        try
                         {
-                            if (data.Shortcuts != null && data.Shortcuts.Count > 0)
+                            var data = JsonSerializer.Deserialize<Data>(System.IO.File.ReadAllText(m_userFilePath));
+                            if (data != null)
                             {
-                                for (int i = 0; i < data.Shortcuts.Count; i++)
+                                if (data.Shortcuts != null && data.Shortcuts.Count > 0)
                                 {
-                                    if (data.Shortcuts[i] is ProcedureShortcut ps)
+                                    for (int i = 0; i < data.Shortcuts.Count; i++)
                                     {
-                                        data.Shortcuts[i] = new ScriptElementShortcut { Element = ps.Element, Instance = ps.Instance, Partner = ps.Partner, Text = ps.Text };   // Convert to element of the future.
+                                        if (data.Shortcuts[i] is ProcedureShortcut ps)
+                                        {
+                                            data.Shortcuts[i] = new ScriptElementShortcut { Element = ps.Element, Instance = ps.Instance, Partner = ps.Partner, Text = ps.Text };   // Convert to element of the future.
+                                        }
                                     }
                                 }
+                                m_dataRead = true;
+                                m_data = data;
+                                if (m_data.HiddenToolbars != null)
+                                {
+                                    this.SaveElementSettingValue(ELEMENT_TOOLBARS, ELEMENT_TOOLBARS_HIDDEN, m_data.HiddenToolbars);
+                                    m_data.HiddenToolbars = null;
+                                }
                             }
-                            m_dataRead = true;
-                            m_data = data;
-                            if (m_data.HiddenToolbars != null)
-                            {
-                                this.SaveElementSettingValue(ELEMENT_TOOLBARS, ELEMENT_TOOLBARS_HIDDEN, m_data.HiddenToolbars);
-                                m_data.HiddenToolbars = null;
-                            }
+                        }
+                        catch (System.Text.Json.JsonException ex)
+                        {
+                            ServiceManager.Global.Get<ILogger>().LogError($"Error reading user data file. Error: {ex.Message}");
+                        }
+                        catch (System.Exception ex) 
+                        {
+                            ServiceManager.Global.Get<ILogger>().LogError($"Error using user data file. Error: {ex.Message}");
                         }
                     }
                 }
