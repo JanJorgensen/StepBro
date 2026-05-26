@@ -24,7 +24,7 @@ namespace StepBro.Core.General
         private ITextFileSystem m_fileSystem = null;
 
         public ConfigurationFileManager(out IService serviceAccess) :
-            base("ConfigurationFileManager", out serviceAccess, typeof(ILogger))
+            base("ConfigurationFileManager", out serviceAccess, typeof(ILogger), typeof(ITextFileSystem))
         {
             this.AddOptionalDependency(typeof(ITextFileSystem));
         }
