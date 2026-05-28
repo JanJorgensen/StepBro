@@ -18,6 +18,7 @@ public class TestLogViewer
         m_app = new HostAppModel();
         IService testFileSystemService = null;
         var mockFileSystem = new StepBro.Core.Test.Mocks.TextFileSystemMock(out testFileSystemService);
+        mockFileSystem.AddFile(System.Environment.GetEnvironmentVariable(StepBro.Core.Api.Constants.STEPBRO_STATION_PROPERTIES), "config bool Demo.UserPresent: false");
         m_logViewer = new LogViewerModel<LogViewTestEntry>(new LogViewTestEntryFactory());
         IService hostAccessService = null;
         var host = new HostAccess(m_app, out hostAccessService);

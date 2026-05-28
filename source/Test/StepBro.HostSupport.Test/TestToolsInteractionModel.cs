@@ -100,7 +100,7 @@ namespace StepBro.HostSupport.Test
             Assert.AreSame(selected.ToolContainer.Object, m_host.m_myTestDummy);
             Assert.AreEqual("myTestDummy", selected.PresentationFullName);
             Assert.AreEqual("myTestDummy", selected.PresentationName);
-            Assert.IsTrue(selected.HasTextCommandInput);
+            Assert.IsTrue(selected.HasEnabledTextCommandInput);
             m_host.m_myTestDummy.PropBool = false;
             Assert.IsFalse(selected.IsReadyForTextCommand);
             m_host.m_myTestDummy.PropBool = true;

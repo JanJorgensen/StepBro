@@ -12,7 +12,6 @@ public partial class ChronoListViewModel<TViewEntryType>
     public partial class ViewPortModel : ObservableObject
     {
         private ChronoListViewModel<TViewEntryType> m_view;
-        private IElementIndexer<TViewEntryType> m_source = null;
         private List<TViewEntryType> m_viewEntries = new List<TViewEntryType>(200);
         private int m_viewEntryCount = 0;
         private ChronoListViewDynamicSettings m_dynamicSettings = new ChronoListViewDynamicSettings();
@@ -31,7 +30,6 @@ public partial class ChronoListViewModel<TViewEntryType>
         internal ViewPortModel(ChronoListViewModel<TViewEntryType> view)
         {
             m_view = view;
-            m_source = view.Source;
             view.ViewChanged += View_ViewChanged;
         }
 
@@ -88,11 +86,11 @@ public partial class ChronoListViewModel<TViewEntryType>
             m_horizontalScrollPosition = m_newHorizontalScrollPosition;
 
             m_viewEntryCount = 0;
-
-            if (m_source != null)
+            var source = m_view.Source;
+            if (source != null)
             {
                 m_dynamicSettings.ZeroTime = m_view.ZeroTime;
-                var sourceState = m_source.GetState();
+                var sourceState = source.GetState();
                 long lastIndex = sourceState.LastIndex;
                 if (lastIndex >= 0L)
                 {
@@ -101,7 +99,7 @@ public partial class ChronoListViewModel<TViewEntryType>
                     long lastShown = 0;
                     while (i <= lastIndex)
                     {
-                        var entry = m_source.Get(i);
+                        var entry = source.Get(i);
                         if (entry == null) break;
                         lastShown = i;
                         m_viewEntries.Add(entry);
