@@ -9,7 +9,7 @@ namespace StepBro.Core.Data
 
     public interface IPropertyBlockDataScanner
     {
-        void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors);
+        void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors);
         PropertyBlockDecoder.Element TryGetDecoder();
     }
     public interface ISettableFromPropertyBlock : IPropertyBlockDataScanner

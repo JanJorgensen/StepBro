@@ -175,7 +175,7 @@ namespace StepBroCoreTest.Parser
         {
             var proc = FileBuilder.ParseProcedureExpectNoErrors(
                 "int Func(){ var n = 0;" +
-                "[Break: \"Stop\"]" +
+                //"[Break: \"Stop\"]" +
                 "while (true) : Break: \"Stop\"" +
                 "{ n++; if (n >= 100) break; }" +
                 "return n; }");

@@ -99,6 +99,7 @@
             // 
             // toolStripButtonParseFiles
             // 
+            toolStripButtonParseFiles.BackColor = Color.DarkOrange;
             toolStripButtonParseFiles.DisplayStyle = ToolStripItemDisplayStyle.Text;
             toolStripButtonParseFiles.Image = (Image)resources.GetObject("toolStripButtonParseFiles.Image");
             toolStripButtonParseFiles.ImageTransparentColor = Color.Magenta;

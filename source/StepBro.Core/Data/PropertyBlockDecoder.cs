@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StepBro.Core.ScriptData;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,24 +44,53 @@ namespace StepBro.Core.Data
                 this.EntryType = type;
             }
 
-            public bool TryDecode(PropertyBlockEntry entry, object parent, List<Tuple<int, string>> errors)
+            public bool TryDecode(object context, PropertyBlockEntry entry, object parent, List<Tuple<int, string>> errors)
             {
-                if (entry.BlockEntryType == this.EntryType &&
-                        (
-                            String.IsNullOrEmpty(this.TypeOrName) ||
-                            entry.TypeOrName == this.TypeOrName ||
-                            (this.AlternativeTypeOrName != null && entry.TypeOrName == this.AlternativeTypeOrName)
-                        )
-                   )
+                if (String.IsNullOrEmpty(this.TypeOrName) ||
+                    entry.TypeOrName == this.TypeOrName ||
+                    (this.AlternativeTypeOrName != null && entry.TypeOrName == this.AlternativeTypeOrName))
                 {
-                    this.TryCreateOrSet(parent, entry, errors);
-                    return true;    // There might be errors, but name and type did match.
+                    if (entry.BlockEntryType == this.EntryType)
+                    {
+                        this.TryCreateOrSet(context, parent, entry, errors);
+                        return true;    // There might be errors, but name and type did match.
+                    }
+                    else
+                    {
+                        if (entry.BlockEntryType == PropertyBlockEntryType.Value &&
+                            this.EntryType == PropertyBlockEntryType.Block &&
+                            context is IScriptFile file &&
+                            entry is PropertyBlockValue pv &&
+                            pv.IsStringOrIdentifier)
+                        {
+                            var value = pv.ValueAsString();
+                            var fileVariable = file.ListElements(true).Where(e => e.ElementType == FileElementType.FileVariable && e.Name == value || e.FullName == value).FirstOrDefault();
+                            if (fileVariable != null)
+                            {
+                                var ownerAccess = (fileVariable as FileVariable).VariableOwnerAccess;
+                                object props = null;
+                                if (ownerAccess.Tags.TryGetValue(ScriptFile.VARIABLE_CUSTOM_PROPS_TAG, out props) && props is PropertyBlock referenceData)
+                                {
+                                    if (referenceData != null)
+                                    {
+                                        var block = new PropertyBlock(entry.Line, entry.Name);
+                                        block.SpecifiedTypeName = entry.SpecifiedTypeName;
+                                        block.AddRange(referenceData);
+                                        System.Diagnostics.Debug.WriteLine("");
+
+                                        this.TryCreateOrSet(context, parent, block, errors);
+                                        return true;    // There might be errors, but name and type did match, and the reference was resolved.
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
-                return false;   // Not me...
+                return false;   // Not me or not resolved...
             }
 
-            protected abstract void TryCreateOrSet(object parent, PropertyBlockEntry entry, List<Tuple<int, string>> errors);
+            protected abstract void TryCreateOrSet(object context, object parent, PropertyBlockEntry entry, List<Tuple<int, string>> errors);
 
             public abstract IEnumerable<Element> ListChilds();
 
@@ -83,12 +113,12 @@ namespace StepBro.Core.Data
 
             public override string ParentType() { return nameof(TParent); }
 
-            protected override void TryCreateOrSet(object parent, PropertyBlockEntry entry, List<Tuple<int, string>> errors)
+            protected override void TryCreateOrSet(object context, object parent, PropertyBlockEntry entry, List<Tuple<int, string>> errors)
             {
                 var typedParent = parent as TParent;
                 if (parent == null || typedParent != null)
                 {
-                    this.TryCreateOrSet(entry, typedParent, errors);
+                    this.TryCreateOrSet(context, entry, typedParent, errors);
                 }
                 else
                 {
@@ -96,7 +126,7 @@ namespace StepBro.Core.Data
                 }
             }
 
-            protected abstract void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors);
+            protected abstract void TryCreateOrSet(object context, PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors);
         }
 
         public class Block<TParent, TThis> : Element<TParent> where TParent : class
@@ -153,14 +183,14 @@ namespace StepBro.Core.Data
                 foreach (var child in m_childs) yield return child;
             }
 
-            protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
+            protected override void TryCreateOrSet(object context, PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
             {
                 if (m_creator == null) return;
                 string name = entry.HasTypeSpecified ? entry.Name : null;
                 var data = m_creator(parent, name);
                 if (data != null)
                 {
-                    this.DecodeData(entry, data, errors);
+                    this.DecodeData(context, entry, data, errors);
                 }
                 else
                 {
@@ -168,14 +198,14 @@ namespace StepBro.Core.Data
                 }
             }
 
-            public void DecodeData(PropertyBlockEntry block, TThis home, List<Tuple<int, string>> errors)
+            public void DecodeData(object context, PropertyBlockEntry block, TThis home, List<Tuple<int, string>> errors)
             {
                 foreach (var child in (PropertyBlock)block)
                 {
                     bool found = false;
                     foreach (var check in m_childs)
                     {
-                        if (check.TryDecode(child, home, errors))
+                        if (check.TryDecode(context, child, home, errors))
                         {
                             found = true; break;
                         }
@@ -185,6 +215,14 @@ namespace StepBro.Core.Data
                         errors.Add(new Tuple<int, string>(child.Line, "Unknown element \"" + child.TypeOrName + "\" or wrong usage."));
                     }
                 }
+            }
+        }
+
+        public class Block<TParent, TThis, TValueReferenceType> : Block<TParent, TThis> where TParent : class
+        {
+            public Block(string name, string altName, DocString doc, Func<TParent, string, TThis> creator, params Element[] childs) :
+                base(name, altName, doc, creator, childs)
+            {
             }
         }
 
@@ -218,7 +256,7 @@ namespace StepBro.Core.Data
                 yield break;
             }
 
-            protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
+            protected override void TryCreateOrSet(object context, PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
             {
                 if (m_setter == null) return;
                 var arrayEntry = entry as PropertyBlockArray;
@@ -264,7 +302,7 @@ namespace StepBro.Core.Data
                 yield break;
             }
 
-            protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
+            protected override void TryCreateOrSet(object context, PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
             {
                 if (m_setter == null) return;
                 var arrayEntry = entry as PropertyBlockArray;
@@ -328,7 +366,7 @@ namespace StepBro.Core.Data
                 m_setter = setter;
             }
 
-            protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
+            protected override void TryCreateOrSet(object context, PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
             {
                 if (m_setter == null) return;
                 var valueEntry = entry as PropertyBlockValue;
@@ -368,7 +406,7 @@ namespace StepBro.Core.Data
                 m_setter = setter;
             }
 
-            protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
+            protected override void TryCreateOrSet(object context, PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
             {
                 if (m_setter == null) return;
                 var valueEntry = entry as PropertyBlockValue;
@@ -407,7 +445,7 @@ namespace StepBro.Core.Data
                 m_setter = setter;
             }
 
-            protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
+            protected override void TryCreateOrSet(object context, PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
             {
                 if (m_setter == null) return;
                 var valueEntry = entry as PropertyBlockValue;
@@ -450,7 +488,7 @@ namespace StepBro.Core.Data
                 m_setter = setter;
             }
 
-            protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
+            protected override void TryCreateOrSet(object context, PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
             {
                 if (m_setter == null) return;
                 var valueEntry = entry as PropertyBlockValue;
@@ -490,7 +528,7 @@ namespace StepBro.Core.Data
                 yield break;
             }
 
-            protected override void TryCreateOrSet(PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
+            protected override void TryCreateOrSet(object context, PropertyBlockEntry entry, TParent parent, List<Tuple<int, string>> errors)
             {
                 if (m_setter == null) return;
                 var flagEntry = entry as PropertyBlockFlag;

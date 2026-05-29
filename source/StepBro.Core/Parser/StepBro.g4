@@ -102,7 +102,8 @@ fileVariable
     ;
 
 constType : CONST | CONFIG ;
-constVariable : elementModifier? constType variableType variableDeclaratorId ASSIGNMENT variableInitializer SEMICOLON ;
+constOverride : OVERRIDE ;
+constVariable : elementModifier? constOverride? constType variableType variableDeclaratorId ASSIGNMENT variableInitializer SEMICOLON ;
 
 ctorClassType : type ;
 
@@ -268,6 +269,7 @@ primitiveType
     |   DATETIME
     |   TIMESPAN
     |   STRING
+    |   FILEPATH
     |	OBJECT
     ;
 
@@ -473,7 +475,7 @@ logModifier
     |   ERROR
     ;
 
-keywordType : CONFIG | OBJECT | OVERRIDE | PRIVATE | PUBLIC | VERDICT ;
+keywordType : CONFIG | OBJECT | OVERRIDE | PRIVATE | PUBLIC | VERDICT | FILEPATH ;
 
 keyword
     : BREAK | CONTINUE | DO | ELSE | ERROR | EXECUTION | EXPECT | FAIL

@@ -22,6 +22,7 @@ namespace StepBro.Streams
         private bool m_specialLoggerEnabled = false;
         private Task m_lineReceiverTask = null;
         private bool m_stopReceiver = false;
+        private DateTime m_lineReceiverStopped = DateTime.MinValue;
         private ConcurrentQueue<TimestampedString> m_lineReceiveQueue = null;
         private LineReceivedHandler m_lineReceiver = null;
         private bool m_textCommandInterfaceEnabled = true;
@@ -62,6 +63,7 @@ namespace StepBro.Streams
         /// <summary>
         /// Indicates whether the stream contains a finite amount of data (e.g. a file).
         /// </summary>
+        [Browsable(false)]
         public virtual bool IsFiniteStream { get { return false; } }
 
         public System.Text.Encoding Encoding
@@ -85,6 +87,7 @@ namespace StepBro.Streams
             this.Close(null);
         }
 
+        [ReadOnly(true)]
         public bool UseTextLineMode
         {
             get
@@ -183,6 +186,9 @@ namespace StepBro.Streams
                 if (context != null && context.LoggingEnabled) context.Logger.Log($"Open ({this.GetTargetIdentification()})");
                 try
                 {
+                    var timeSinceClose = DateTime.UtcNow - m_lineReceiverStopped;
+                    if (timeSinceClose > TimeSpan.Zero) System.Threading.Thread.Sleep(100); // Hotfix for unresolved problem; #387.
+
                     var result = this.DoOpen(context);
 
                     if (this.IsOpen != wasOpen)
@@ -244,10 +250,11 @@ namespace StepBro.Streams
         {
             if (m_lineReceiverTask != null)
             {
-                if (m_lineReceiverTask != null && !m_lineReceiverTask.IsCompleted)
+                if (!m_lineReceiverTask.IsCompleted)
                 {
                     m_stopReceiver = true;
                     m_lineReceiverTask.Wait();      // Important, to avoid having two running tasks if connecting again soon. 
+                    m_lineReceiverStopped = DateTime.UtcNow;
                 }
                 m_lineReceiverTask = null;
             }
@@ -423,6 +430,7 @@ namespace StepBro.Streams
             return null;
         }
 
+        [Browsable(false)]
         public bool TextCommandInputEnabled
         {
             get { return m_textCommandInterfaceEnabled; }

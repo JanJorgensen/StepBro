@@ -39,6 +39,7 @@ namespace StepBro.Core.Parser
         protected Stack<SBExpressionData> m_testListEntryArguments = null;
         //private SBExpressionData m_overrideVariable = null;
         private SBExpressionData m_fileElementReference = null;
+        private bool m_override = false;
 
         public StepBroListener(ErrorCollector errorCollector)
         {
@@ -74,10 +75,10 @@ namespace StepBro.Core.Parser
 
         public override void ExitUsingDeclarationWithIdentifier([NotNull] SBP.UsingDeclarationWithIdentifierContext context)
         {
-            var stack = m_expressionData.PopStackLevel();
+            var levelData = m_expressionData.PopStackLevel();
             if (!m_file.TypeScanIncluded)
             {
-                var identifierExpression = stack.Pop();
+                var identifierExpression = levelData.Stack.Pop();
                 if (identifierExpression.IsUnresolvedIdentifier)
                 {
                     var identifier = (string)identifierExpression.Value;
@@ -94,10 +95,10 @@ namespace StepBro.Core.Parser
 
         public override void ExitTypeAlias([NotNull] SBP.TypeAliasContext context)
         {
-            var stack = m_expressionData.PopStackLevel();
+            var levelData = m_expressionData.PopStackLevel();
             if (!m_file.TypeScanIncluded)
             {
-                var identifierExpression = stack.Pop();
+                var identifierExpression = levelData.Stack.Pop();
                 if (identifierExpression.IsUnresolvedIdentifier)
                 {
                     var identifier = (string)identifierExpression.Value;
@@ -239,6 +240,12 @@ namespace StepBro.Core.Parser
 
         public override void EnterConstVariable([NotNull] SBP.ConstVariableContext context)
         {
+            m_override = false;
+        }
+
+        public override void ExitConstOverride([NotNull] SBP.ConstOverrideContext context)
+        {
+            m_override = true;
         }
 
         public override void ExitConstType([NotNull] SBP.ConstTypeContext context)
@@ -252,66 +259,132 @@ namespace StepBro.Core.Parser
         {
             TypeReference type = m_variableType;
 
-            if (type.Type == typeof(VarSpecifiedType))
+            if (type != null)
             {
-                type = m_variableInitializer.DataType;
-            }
-            else
-            {
-                if (!type.Type.IsAssignableFrom(m_variableInitializer.DataType.Type))
+                if (type.Type == typeof(VarSpecifiedType))
                 {
-                    m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Assignment of incompatible type.");
-                    return;
+                    type = m_variableInitializer.DataType;
                 }
-            }
-
-            if (m_variableInitializer.IsConstant)
-            {
-                if (m_elementType == FileElementType.Const)
+                else
                 {
-                    m_file.AddElement(
-                        new FileConstant(
+                    var casted = AssignmentExpressionCreateCastOrConvertIfNeeded(context, m_variableInitializer, m_variableType);
+                    if (casted != null)
+                    {
+                        m_variableInitializer = casted;
+                    }
+
+                    if (!type.Type.IsAssignableFrom(m_variableInitializer.DataType.Type))
+                    {
+                        m_errors.SymanticError(context.Start.Line, context.Start.Column, false, "Assignment of incompatible type.");
+                        return;
+                    }
+                }
+
+                object value = null;
+
+                if (m_variableInitializer.IsConstant || m_variableInitializer.IsProcedureReference)
+                {
+                    value = m_variableInitializer.Value;
+                }
+                else
+                {
+                    var lambdaExpr = Expression.Lambda(typeof(Func<object>), Expression.Convert(m_variableInitializer.ExpressionCode, typeof(object)));
+                    var @delegate = (Func<object>)lambdaExpr.Compile();
+                    value = @delegate();
+                }
+
+                if (m_override)
+                {
+                    var element = new FileConstant(
                             m_file,
                             m_fileElementModifier,
                             context.Start.Line,
                             m_currentNamespace,
                             m_variableName,
-                            m_variableInitializer.Value));
+                            @override: true,
+                            value);
+                    m_file.AddElement(element);
+
+                    if (element.ParseBaseElement())
+                    {
+                        if (element.BaseElement is FileConfigValue cfg)
+                        {
+                            cfg.VariableOwnerAccess.SetValueOverride((int)ValueOverridePriorityLevel.FileOverride, true, value);
+                        }
+                        else if (element.BaseElement is FileConstant constant)
+                        {
+                            constant.OverrideValue = value;
+                        }
+                        else
+                        {
+                            m_errors.SymanticError(
+                                context.Start.Line,
+                                context.Start.Column,
+                                false,
+                                $"Could not find base {((m_elementType == FileElementType.Const) ? "constant" : "config value")} to override.");
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        m_errors.SymanticError(
+                            context.Start.Line,
+                            context.Start.Column,
+                            false,
+                            $"Could not find base {((m_elementType == FileElementType.Const) ? "constant" : "config value")} to override.");
+                        return;
+                    }
                 }
-                else if (m_elementType == FileElementType.Config)
+                else
                 {
-                    var id = m_file.CreateOrGetConfigVariable(
-                        m_currentNamespace,
-                        m_fileElementModifier,
-                        m_variableName,
-                        type,
-                        m_lineFileElementAssociatedData,
-                        context.Start.Line,
-                        context.Start.Column,
-                        m_variableInitializer.Value);
-                    //m_file.SetFileVariableModifier(id, m_fileElementModifier);
+                    if (m_elementType == FileElementType.Const)
+                    {
+                        m_file.AddElement(
+                            new FileConstant(
+                                m_file,
+                                m_fileElementModifier,
+                                context.Start.Line,
+                                m_currentNamespace,
+                                m_variableName,
+                                @override: false,
+                                value));
+                    }
+                    else if (m_elementType == FileElementType.Config)
+                    {
+                        var id = m_file.CreateOrGetConfigVariable(
+                            m_currentNamespace,
+                            m_fileElementModifier,
+                            m_variableName,
+                            type,
+                            m_lineFileElementAssociatedData,
+                            context.Start.Line,
+                            context.Start.Column,
+                            value);
+                    }
                 }
-            }
-            else
-            {
-                m_errors.SymanticError(
-                    context.Start.Line,
-                    context.Start.Column,
-                    false,
-                    "Assignment expression is not a constant value.");
-                return;
+                //}
+                //else
+                //{
+                //    m_errors.SymanticError(
+                //        context.Start.Line,
+                //        context.Start.Column,
+                //        false,
+                //        "Assignment expression is not a constant value.");
+                //}
             }
         }
 
         public override void EnterFileVariableWithPropertyBlock([NotNull] SBP.FileVariableWithPropertyBlockContext context)
         {
             m_variableModifier = VariableModifier.Static;
+            m_variableInitializerParameterScriptFile = Expression.Parameter(typeof(IScriptFile), "file");
         }
 
         public override void EnterFileVariableSimple([NotNull] SBP.FileVariableSimpleContext context)
         {
             m_variableModifier = VariableModifier.Static;
             this.CreateVariablesList();
+            m_variableInitializerParameterScriptFile = Expression.Parameter(typeof(IScriptFile), "file");
         }
 
         public override void ExitFileVariableSimple([NotNull] SBP.FileVariableSimpleContext context)
@@ -333,7 +406,7 @@ namespace StepBro.Core.Parser
                 var id = m_file.CreateOrGetFileVariable(
                     m_currentNamespace, m_fileElementModifier, variable.Name, type, false,
                     m_lineFileElementAssociatedData, context.Start.Line, context.Start.Column, codeHash,
-                    CreateVariableContainerValueAssignAction(variable.Initializer.ExpressionCode));
+                    CreateVariableContainerValueAssignAction(m_variableInitializerParameterScriptFile, variable.Initializer.ExpressionCode));
                 m_file.SetFileVariableModifier(id, m_fileElementModifier);
             }
             else
@@ -356,8 +429,9 @@ namespace StepBro.Core.Parser
 
             if (m_variableType.Type.IsValueType || m_variableType.Type == typeof(string))
             {
-                var code = Expression.Constant(Activator.CreateInstance(m_creatorType.Type), m_creatorType.Type);
-                createAction = CreateVariableContainerValueAssignAction(code);
+                createAction = CreateVariableContainerValueAssignAction(
+                    m_variableInitializerParameterScriptFile,
+                    Expression.Constant(Activator.CreateInstance(m_creatorType.Type), m_creatorType.Type));
                 resetAction = createAction;
             }
             else
@@ -369,29 +443,35 @@ namespace StepBro.Core.Parser
                 //}
                 //else
                 {
-                    // First check if there's a ctor with object name as parameter.
                     var ctor = m_creatorType.Type.GetConstructor(new Type[] { typeof(string) });
                     if (ctor != null && ObjectNameAttribute.IsObjectName(ctor.GetParameters()[0]))
                     {
-                        var code = Expression.New(ctor, Expression.Constant(m_variableName));
-                        createAction = CreateVariableContainerValueAssignAction(code);
+                        createAction = CreateVariableContainerValueAssignAction(
+                            m_variableInitializerParameterScriptFile,
+                            Expression.New(ctor, Expression.Constant(m_variableName)));
+                    }
+                    else if ((ctor = m_creatorType.Type.GetConstructor(new Type[] { })) != null)
+                    {
+                        createAction = CreateVariableContainerValueAssignAction(
+                            m_variableInitializerParameterScriptFile, Expression.New(ctor));
+                    }
+                    else if ((ctor = m_creatorType.Type.GetConstructor(new Type[] { typeof(IScriptFile) })) != null)
+                    {
+                        createAction = CreateVariableContainerValueAssignAction(
+                            m_variableInitializerParameterScriptFile,
+                            Expression.New(ctor, m_variableInitializerParameterScriptFile));
+                    }
+                    else if ((ctor = m_creatorType.Type.GetConstructor(new Type[] { typeof(IScriptFile), typeof(string) })) != null && ObjectNameAttribute.IsObjectName(ctor.GetParameters()[1]))
+                    {
+                        createAction = CreateVariableContainerValueAssignAction(
+                            m_variableInitializerParameterScriptFile,
+                            Expression.New(ctor, m_variableInitializerParameterScriptFile, Expression.Constant(m_variableName)));
                     }
                     else
                     {
-                        // else, try using the default ctor.
-                        ctor = m_creatorType.Type.GetConstructor(new Type[] { });
-                        if (ctor != null)
-                        {
-                            var code = Expression.New(ctor);
-                            createAction = CreateVariableContainerValueAssignAction(code);
-                        }
-                        else
-                        {
-                            var createMethods =
-                                m_creatorType.Type.GetMethods().Where(
-                                    m => String.Equals(m.Name, "Create", StringComparison.InvariantCulture) && m.IsStatic).ToArray();
-                            throw new NotImplementedException();
-                        }
+                        var methods = m_creatorType.Type.GetMethods();
+                        var createMethods = methods.Where(m => String.Equals(m.Name, "Create", StringComparison.InvariantCulture) && m.IsStatic).ToArray();
+                        throw new NotImplementedException();
                     }
                 }
 
@@ -452,13 +532,12 @@ namespace StepBro.Core.Parser
             m_variableName = null;
         }
 
-        internal static VariableContainerAction CreateVariableContainerValueAssignAction(Expression initExpression)
+        internal static VariableContainerAction CreateVariableContainerValueAssignAction(ParameterExpression fileArgument, Expression initExpression)
         {
             try
             {
                 LabelTarget returnLabel = Expression.Label(typeof(bool));
 
-                var parameterScriptFile = Expression.Parameter(typeof(IScriptFile), "file");
                 var parameterContainer = Expression.Parameter(typeof(IValueContainerOwnerAccess), "container");
                 var parameterLogger = Expression.Parameter(typeof(ILogger), "logger");
 
@@ -473,7 +552,7 @@ namespace StepBro.Core.Parser
                     Expression.Block(
                         callSetValue,
                         Expression.Label(returnLabel, Expression.Constant(true))),
-                    parameterScriptFile,
+                    fileArgument,
                     parameterContainer,
                     parameterLogger);
 
@@ -520,7 +599,7 @@ namespace StepBro.Core.Parser
                 }
                 else
                 {
-                    errors.ConfigError(startToken.Line, startToken.Column, $"No station properties file was found or loaded. When using the \"{Constants.VARIABLE_DEVICE_REFERENCE}\" keyword, that file is needed.");
+                    errors.ConfigError($"No station properties file was found or loaded. When using the \"{Constants.VARIABLE_DEVICE_REFERENCE}\" keyword, that file is needed.");
                 }
             }
 
@@ -755,8 +834,8 @@ namespace StepBro.Core.Parser
 
         public override void ExitTestListEntry([NotNull] SBP.TestListEntryContext context)
         {
-            var stack = m_expressionData.PopStackLevel();
-            var entryTarget = stack.Pop();
+            var levelData = m_expressionData.PopStackLevel();
+            var entryTarget = levelData.Stack.Pop();
             var referenceName = "";
             if (entryTarget.IsUnresolvedIdentifier)
             {
@@ -785,7 +864,7 @@ namespace StepBro.Core.Parser
             }
             if (entry != null && m_testListEntryArguments != null)
             {
-                foreach (var a in m_testListEntryArguments)
+                foreach (var a in m_testListEntryArguments.Reverse())
                 {
                     entry.Arguments.Add(a.ParameterName, a.Value);
                 }
@@ -806,7 +885,7 @@ namespace StepBro.Core.Parser
 
         public override void ExitOverrideReference([NotNull] SBP.OverrideReferenceContext context)
         {
-            m_fileElementReference = m_expressionData.Peek().Pop();
+            m_fileElementReference = m_expressionData.Peek().Stack.Pop();
             m_expressionData.PopStackLevel();
 
             m_currentFileElement.SetName(m_currentNamespace, m_fileElementReference.Value as string);

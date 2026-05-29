@@ -13,6 +13,8 @@ namespace StepBro.Core.Test.Mocks
         {
         }
 
+        public string StationPropertiesFile { get; } = string.Empty;
+
         public PropertyBlock StationProperties { get; set; } = null;
 
         public PropertyBlock GetStationProperties()
@@ -20,16 +22,9 @@ namespace StepBro.Core.Test.Mocks
             return this.StationProperties;
         }
 
-        public FolderConfiguration ReadFolderConfig(ILogger logger, string configFile)
+        public FolderConfiguration GetOrReadFolderConfig(string configFile, List<Tuple<string, int, string>> errors)
         {
             throw new NotImplementedException();
         }
-
-        public FolderConfiguration ReadFolderConfig(string configFile, List<Tuple<int, string>> errors)
-        {
-            throw new NotImplementedException();
-        }
-    
-        public void ResetFolderConfigurations() { }
     }
 }

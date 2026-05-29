@@ -8,6 +8,11 @@ namespace StepBro.Core.Data
         {
         }
 
+        protected override uint GetValueHashCode()
+        {
+            return 8376307;
+        }
+
         public override string ToString()
         {
             return "Flag: " + this.Name;

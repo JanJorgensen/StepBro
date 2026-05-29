@@ -125,7 +125,12 @@ namespace StepBro.Core.Addons
                             for (int i = 0; i < 3; i++) m_writer.WriteLine(""); // Empty lines
                         }
 
-                        m_writer.WriteLine($"--- GROUP: {group.Name} ---");
+                        var verdict = "";
+                        if (group.Verdict != Verdict.Unset)
+                        {
+                            verdict = " - " + group.Verdict.ToString();
+                        }
+                        m_writer.WriteLine($"--- GROUP: {group.Name}{verdict} ---");
                         if (!String.IsNullOrEmpty(group.Description))
                         {
                             m_writer.WriteLine($"Description:{group.Description}");

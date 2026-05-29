@@ -4,22 +4,23 @@ using Antlr4.Runtime.Tree;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
+using StepBro.Core.File;
 using StepBro.Core.Host;
 using StepBro.Core.ScriptData;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using static StepBro.Core.Data.PropertyBlockDecoder;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 
 namespace StepBro.Core.Parser;
 
 internal partial class StepBroListener
 {
-    private static MethodInfo s_GetGlobalVariable = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetGlobalVariable));
+    private static MethodInfo s_GetFileReference = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetFileReference));
+    private static MethodInfo s_GetFileConstant = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetFileConstant));
+    private static MethodInfo s_GetGlobalVariable = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetFileVariable));
     private static MethodInfo s_GetHostVariable = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetHostVariable));
     private static MethodInfo s_GetProcedure = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetProcedure));
     private static MethodInfo s_GetProcedureTyped = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetProcedureTyped));
@@ -31,8 +32,7 @@ internal partial class StepBroListener
     private static MethodInfo s_GetPartnerFromProcedure = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetPartnerReferenceFromProcedureReference));
     private static MethodInfo s_GetPartner = typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.GetPartnerReference));
 
-    private static string s_ScriptUtilsFullNamePrefix = typeof(Execution.ScriptUtils).FullName + ".";
-    private static SBExpressionData s_ScriptUtilsTypeData = new SBExpressionData(HomeType.Immediate, SBExpressionType.TypeReference, new TypeReference(typeof(Execution.ScriptUtils)));
+    private static SBExpressionData s_ScriptUtilsTypeData = new SBExpressionData(SBExpressionType.TypeReference, new TypeReference(typeof(Execution.ScriptUtils)));
 
     public override void ExitQualifiedName([NotNull] SBP.QualifiedNameContext context)
     {
@@ -323,6 +323,21 @@ internal partial class StepBroListener
         }
         if (m_file != null)
         {
+            if (String.Equals(identifier, m_file.Namespace, StringComparison.InvariantCulture))
+            {
+                return new SBExpressionData(SBExpressionType.ScriptNamespace, "", identifier, token);
+            }
+            else
+            {
+                foreach (var fu in m_file.ListResolvedFileUsings())
+                {
+                    if (String.Equals(identifier, fu.Namespace, StringComparison.InvariantCulture))
+                    {
+                        return new SBExpressionData(SBExpressionType.ScriptNamespace, "", identifier, token);
+                    }
+                }
+            }
+
             var identifiers = m_file.LookupIdentifier(identifier, predicate);
             if (identifiers != null)
             {
@@ -343,6 +358,7 @@ internal partial class StepBroListener
                     foundIdentifier = identifiers[0];       // NOTE: This might not always be the best solution.
                 }
             }
+
             if (foundIdentifier == null)
             {
                 foundIdentifier = this.TryGetFileElementInScope(m_file?.Usings, identifier);
@@ -358,6 +374,15 @@ internal partial class StepBroListener
             //        }
             //    }
             //}
+            if (foundIdentifier == null)
+            {
+                foundIdentifier = m_file.FolderShortcuts.ListShortcuts().FirstOrDefault(fs => fs.Name == identifier) as IIdentifierInfo;
+            }
+        }
+
+        if (foundIdentifier == null)
+        {
+            foundIdentifier = ServiceManager.GlobalIfReady?.Get<IFolderManager>()?.ListShortcuts().FirstOrDefault(fs => fs.Name == identifier) as IIdentifierInfo;
         }
 
         if (foundIdentifier == null)
@@ -441,10 +466,12 @@ internal partial class StepBroListener
             {
                 if (identifiers.Count > 1)
                 {
-                    string fileName = (m_file.FileName != null ? m_file.FileName : "");
-                    int lineNumber = (token != null ? token.Line : -1);
-                    throw new ParsingErrorException(fileName, lineNumber, identifier, $"More than one alternative.");
+                    return new SBExpressionData(
+                        SBExpressionType.TypeReference,
+                        (TypeReference)identifiers[0].DataType,
+                        value: identifiers.Select(i => i.DataType.Type).ToList());
                 }
+
                 return this.IdentifierToExpressionData(identifiers[0], token);
             }
 
@@ -472,6 +499,11 @@ internal partial class StepBroListener
             {
                 return this.IdentifierToExpressionData(foundIdentifier, token);
             }
+            var foundScriptUtilsAccess = this.ResolveDotIdentifierTypeReference(s_ScriptUtilsTypeData, SBExpressionData.CreateIdentifier(identifier, token: token));
+            if (foundScriptUtilsAccess != null)
+            {
+                return foundScriptUtilsAccess;
+            }
         }
 
         if (reportUnresolved)
@@ -493,14 +525,13 @@ internal partial class StepBroListener
         SBExpressionData result = null;
         if (identifier.Type == IdentifierType.DotNetType)
         {
-            result = new SBExpressionData(HomeType.Immediate, SBExpressionType.TypeReference, (TypeReference)identifier.DataType, null, null);
+            result = new SBExpressionData(SBExpressionType.TypeReference, (TypeReference)identifier.DataType);
         }
         else if (identifier.Type == IdentifierType.DotNetMethod)
         {
             var methods = new List<MethodInfo>();
             methods.Add(identifier.Reference as MethodInfo);
             result = new SBExpressionData(
-                HomeType.Immediate,
                 SBExpressionType.MethodReference,   // Expression type
                 null,                               // Data type
                 null,                               // The instance expression
@@ -509,11 +540,34 @@ internal partial class StepBroListener
         }
         else if (identifier.Type == IdentifierType.DotNetNamespace)
         {
-            result = new SBExpressionData(HomeType.Immediate, SBExpressionType.Namespace, null, null, identifier.Reference);
+            result = new SBExpressionData(SBExpressionType.Namespace, value: identifier.Reference);
         }
         else if (identifier.Type == IdentifierType.Variable || identifier.Type == IdentifierType.Parameter || identifier.Type == IdentifierType.LambdaParameter)
         {
-            result = new SBExpressionData(HomeType.Immediate, SBExpressionType.LocalVariableReference, (TypeReference)identifier.DataType, (Expression)identifier.Reference, identifier);
+            result = new SBExpressionData(SBExpressionType.LocalVariableReference, (TypeReference)identifier.DataType, (Expression)identifier.Reference, identifier);
+        }
+        else if (identifier.Type == IdentifierType.ApplicationObject)
+        {
+            if (identifier.Reference is IReconstructable value)
+            {
+                var reconstruction = value.GetReconstructor();
+                var context = (m_inFunctionScope) ? m_currentProcedure.ContextReferenceInternal : Expression.Constant(null, typeof(Execution.IScriptCallContext));
+                MethodCallExpression callExpression = null;
+                if (reconstruction.Item3 is string)
+                {
+                    callExpression = Expression.Call(reconstruction.Item2.Method, context, Expression.Convert(Expression.Constant((string)reconstruction.Item3), typeof(object)));
+                }
+                else if (reconstruction.Item3 is int)
+                {
+                    callExpression = Expression.Call(reconstruction.Item2.Method, context, Expression.Convert(Expression.Constant((int)reconstruction.Item3), typeof(object)));
+                }
+
+                return new SBExpressionData(Expression.Convert(callExpression, reconstruction.Item1));
+            }
+            else
+            {
+                return new SBExpressionData(SBExpressionType.ExpressionError);
+            }
         }
         else if (identifier.Type == IdentifierType.HostVariable)
         {
@@ -521,7 +575,6 @@ internal partial class StepBroListener
             var getHostVariableTyped = s_GetHostVariable.MakeGenericMethod(container.Object.GetType());
             var context = (m_inFunctionScope) ? m_currentProcedure.ContextReferenceInternal : Expression.Constant(null, typeof(Execution.IScriptCallContext));
             result = new SBExpressionData(
-                HomeType.Immediate,
                 SBExpressionType.Expression,
                 identifier.DataType,
                 Expression.Call(
@@ -537,11 +590,23 @@ internal partial class StepBroListener
             switch (element.ElementType)
             {
                 case FileElementType.Const:
-                    result = new SBExpressionData(
-                        HomeType.Immediate,
-                        SBExpressionType.Constant,
-                        element.DataType,
-                        Expression.Constant(((FileConstant)element).Value), ((FileConstant)element).Value);
+                    {
+                        var constantElement = element as FileConstant;
+                        var getConstantTyped = s_GetFileConstant.MakeGenericMethod(constantElement.DataType.Type);
+                        int fileID = (m_inFunctionScope && Object.ReferenceEquals(constantElement.ParentFile, m_file)) ? -1 : ((ScriptFile)constantElement.ParentFile).UniqueID;
+                        var context = (m_inFunctionScope) ? m_currentProcedure.ContextReferenceInternal : Expression.Constant(null, typeof(Execution.IScriptCallContext));
+
+                        result = new SBExpressionData(
+                            SBExpressionType.Expression,
+                            constantElement.DataType,
+                            Expression.Call(
+                                getConstantTyped,
+                                context,
+                                Expression.Constant(fileID),
+                                Expression.Constant(constantElement.UniqueID)),
+                            constantElement,                                                         // Make access to the file element, and thereby the declared type.
+                            instanceName: identifier.Name);
+                    }
                     break;
                 case FileElementType.Config:
                     {
@@ -551,7 +616,6 @@ internal partial class StepBroListener
                         var getGlobalVariableTyped = s_GetGlobalVariable.MakeGenericMethod(container.DataType.Type);
                         var context = (m_inFunctionScope) ? m_currentProcedure.ContextReferenceInternal : Expression.Constant(null, typeof(Execution.IScriptCallContext));
                         result = new SBExpressionData(
-                            HomeType.Immediate,
                             SBExpressionType.GlobalVariableReference,
                             (TypeReference)containerType,
                             Expression.Call(
@@ -579,7 +643,6 @@ internal partial class StepBroListener
                             Expression.Constant(procedure.UniqueID));
 
                         result = new SBExpressionData(
-                            HomeType.Immediate,
                             SBExpressionType.ProcedureReference,
                             procedure.DataType,
                             getProc,
@@ -595,7 +658,6 @@ internal partial class StepBroListener
                         var getGlobalVariableTyped = s_GetGlobalVariable.MakeGenericMethod(container.DataType.Type);
                         var context = (m_inFunctionScope) ? m_currentProcedure.ContextReferenceInternal : Expression.Constant(null, typeof(Execution.IScriptCallContext));
                         result = new SBExpressionData(
-                            HomeType.Immediate,
                             SBExpressionType.GlobalVariableReference,
                             (TypeReference)containerType,
                             Expression.Call(
@@ -623,7 +685,6 @@ internal partial class StepBroListener
                         }
 
                         result = new SBExpressionData(
-                            HomeType.Immediate,
                             SBExpressionType.TestListReference,
                             new TypeReference(typeof(ITestList), list),
                             getList,
@@ -636,7 +697,6 @@ internal partial class StepBroListener
                         var overrider = element;
 
                         result = new SBExpressionData(
-                            HomeType.Immediate,
                             SBExpressionType.FileElementOverride,
                             new TypeReference(typeof(IFileElement), overrider),
                             null,
@@ -649,7 +709,6 @@ internal partial class StepBroListener
                         var typedef = element as FileElementTypeDef;
 
                         result = new SBExpressionData(
-                            HomeType.Immediate,
                             SBExpressionType.TypeReference,
                             typedef.DataType,
                             null,
@@ -662,7 +721,6 @@ internal partial class StepBroListener
                         var aliasType = element as FileElementUsingAlias;
 
                         result = new SBExpressionData(
-                            HomeType.Immediate,
                             SBExpressionType.TypeReference,
                             aliasType.DataType,
                             null,
@@ -690,15 +748,15 @@ internal partial class StepBroListener
             case IdentifierType.UnresolvedType:
                 throw new NotImplementedException();    // TODO: Handle error
             case IdentifierType.DotNetNamespace:
-                leftAsExpData = new SBExpressionData(HomeType.Immediate, SBExpressionType.Namespace, null, null, left.Reference);
+                leftAsExpData = new SBExpressionData(SBExpressionType.Namespace, null, null, left.Reference);
                 break;
             case IdentifierType.DotNetType:
-                leftAsExpData = new SBExpressionData(HomeType.Immediate, SBExpressionType.TypeReference, left.DataType);
+                leftAsExpData = new SBExpressionData(SBExpressionType.TypeReference, left.DataType);
                 break;
             //case IdentifierType.FileByName:
             //    break;
             case IdentifierType.FileNamespace:
-                leftAsExpData = new SBExpressionData(HomeType.Immediate, SBExpressionType.ScriptNamespace, null, null, left.Reference);
+                leftAsExpData = new SBExpressionData(SBExpressionType.ScriptNamespace, null, null, left.Reference);
                 break;
             default:
                 throw new NotImplementedException();
@@ -750,7 +808,6 @@ internal partial class StepBroListener
                 break;
             case SBExpressionType.DynamicObjectMember:
                 result = new SBExpressionData(
-                    HomeType.Immediate,
                     SBExpressionType.DynamicObjectMember,
                     value: ((string)left.Value) + "." + (string)right.Value,        // Just concatenate the name of the member
                     instanceCode: left.InstanceCode,                                // Same instance reference
@@ -769,23 +826,32 @@ internal partial class StepBroListener
         var rightString = right.Value as string;
         if (left.NamespaceList.TryGetSubList(rightString, ref subs))
         {
-            return new SBExpressionData(HomeType.Immediate, SBExpressionType.Namespace, null, null, subs);
+            return new SBExpressionData(SBExpressionType.Namespace, null, null, subs);
         }
         else
         {
             // If the class is static we will not be adding it (At least for now) - Static classes have been giving issues in other cases and does not seem to be used
-            var type = left.NamespaceList.ListTypes(false).FirstOrDefault(ti => ti.Name == rightString && !(ti.IsAbstract && ti.IsSealed));
-            if (type != null)
+            //var type = left.NamespaceList.ListTypes(false).FirstOrDefault(ti => ti.Name == rightString && !(ti.IsAbstract && ti.IsSealed));
+
+            var types = left.NamespaceList.ListTypes(false).Where(ti => ti.Name == rightString).ToArray();
+            var gtName = rightString + "`";
+            var genericTypedefs = left.NamespaceList.ListTypes(false).Where(ti => ti.Name.StartsWith(gtName)).ToList();
+            if (genericTypedefs.Count > 0)
             {
-                return new SBExpressionData(HomeType.Immediate, SBExpressionType.TypeReference, (TypeReference)type, token: right.Token);
+                return new SBExpressionData(
+                    SBExpressionType.GenericTypeDefinition,
+                    (types != null && types.Length > 0) ? (TypeReference)types[0] : (TypeReference)null,
+                    value: genericTypedefs,
+                    token: right.Token);
             }
             else
             {
-                var gtName = rightString + "`";
-                var genericTypedefs = left.NamespaceList.ListTypes(false).Where(ti => ti.Name.StartsWith(gtName)).ToList();
-                if (genericTypedefs.Count > 0)
+                if (types != null && types.Length > 0)
                 {
-                    return new SBExpressionData(HomeType.Immediate, SBExpressionType.GenericTypeDefinition, (TypeReference)null, value: genericTypedefs, token: right.Token);
+                    return new SBExpressionData(
+                        SBExpressionType.TypeReference,
+                        (TypeReference)types[0],
+                        token: right.Token);
                 }
                 else
                 {
@@ -807,7 +873,6 @@ internal partial class StepBroListener
             left.DataType.Type.GetMethod("GetTypedValue"),
             Expression.Constant(null, typeof(StepBro.Core.Logging.ILogger)));
         var instance = new SBExpressionData(
-            HomeType.Immediate,
             SBExpressionType.Expression,
             variableDataType,
             getValue,
@@ -831,7 +896,7 @@ internal partial class StepBroListener
             try
             {
                 var value = Enum.Parse(leftType, rightString);
-                return new SBExpressionData(HomeType.Immediate, SBExpressionType.Constant, left.DataType, Expression.Constant(value), value, token: right.Token);
+                return new SBExpressionData(SBExpressionType.Constant, left.DataType, Expression.Constant(value), value, token: right.Token);
             }
             catch
             {
@@ -850,7 +915,6 @@ internal partial class StepBroListener
             if (methods.Count > 0)
             {
                 return new SBExpressionData(
-                    HomeType.Immediate,
                     SBExpressionType.MethodReference,   // Expression type
                     left.DataType,                      // Data type
                     left.ExpressionCode,                // The instance expression
@@ -862,7 +926,6 @@ internal partial class StepBroListener
             {
                 var expression = properties[0].IsStatic() ? Expression.Property(null, properties[0]) : null;    // In case an instance property is specified, no expression can be set.
                 return new SBExpressionData(
-                    HomeType.Immediate,
                     SBExpressionType.PropertyReference,         // Expression type
                     (TypeReference)properties[0].PropertyType,  // Data type
                     expression,                                 // The property access expression (or null)
@@ -878,7 +941,6 @@ internal partial class StepBroListener
             if (nestedTypes.Length == 1)
             {
                 return new SBExpressionData(
-                    HomeType.Immediate,
                     SBExpressionType.TypeReference,             // Expression type
                     (TypeReference)nestedTypes[0],              // Data type
                     null,                                       // No expression to a type.
@@ -896,9 +958,45 @@ internal partial class StepBroListener
 
     private SBExpressionData ResolveDotIdentifierInstanceReference(SBExpressionData left, SBExpressionData right, bool includeBaseAndInterfaces)
     {
-        var leftType = left.DataType.Type;
+        var leftType = left.DataType?.Type;
         var rightString = right.Value as string;
         bool nativeOnly = false;    // Whether to skip file elements.
+
+        if (left.ReferencedType == SBExpressionType.ScriptNamespace)
+        {
+            var theNamespace = (string)(left.Value);
+
+            var filesInNamespace = m_file.ListResolvedFileUsings().Where(f => f.Namespace == theNamespace).ToList();
+            if (String.Equals(theNamespace, m_file.Namespace, StringComparison.InvariantCulture))
+            {
+                filesInNamespace.Insert(0, m_file);
+            }
+
+            foreach (var file in filesInNamespace)
+            {
+                var found = file.ListPublicElements(theNamespace, false).Where(e => e.Name == rightString).ToList();
+                if (found.Count == 1)
+                {
+                    return this.IdentifierToExpressionData(found[0], right.Token);
+                }
+                else
+                {
+                    var line = (left.Token != null) ? left.Token.Line : 0;
+                    var column = (left.Token != null) ? left.Token.Column : 0;
+                    if (found.Count == 0)
+                    {
+                        m_errors.SymanticError(line, column, false, $"No elements named \"{rightString}\" could be found in the namespace \"{theNamespace}\" ");
+                        return new SBExpressionData(SBExpressionType.ExpressionError);
+                    }
+                    else
+                    {
+                        m_errors.SymanticError(line, column, false, $"More than one element named \"{rightString}\" could be found in the namespace \"{theNamespace}\".");
+                        return new SBExpressionData(SBExpressionType.ExpressionError);
+                    }
+                }
+            }
+        }
+
         if (rightString.StartsWith('@'))
         {
             nativeOnly = true;
@@ -934,7 +1032,6 @@ internal partial class StepBroListener
                     Expression.Constant(rightString));
 
                 return new SBExpressionData(
-                    HomeType.Immediate,
                     SBExpressionType.Expression,
                     partnerProcedure.DataType,
                     getPartnerProc,
@@ -970,7 +1067,6 @@ internal partial class StepBroListener
             if (properties.Count == 1)
             {
                 return new SBExpressionData(
-                    HomeType.Immediate,
                     SBExpressionType.PropertyReference,                         // Expression type
                     (TypeReference)properties[0].PropertyType,                  // Data type
                     Expression.Property(left.ExpressionCode, properties[0]),    // The property access expression
@@ -1034,7 +1130,6 @@ internal partial class StepBroListener
             //}
 
             return new SBExpressionData(
-                HomeType.Immediate,
                 SBExpressionType.DynamicObjectMember,
                 value: rightString,                 // Name of method
                 instanceCode: left.ExpressionCode,      // Instance reference
@@ -1043,7 +1138,6 @@ internal partial class StepBroListener
         if (typeof(IDynamicAsyncStepBroObject).IsAssignableFrom(left.DataType.Type))
         {
             return new SBExpressionData(
-                HomeType.Immediate,
                 SBExpressionType.DynamicAsyncObjectMember,
                 value: rightString,                 // Name of method
                 instanceCode: left.ExpressionCode,      // Instance reference

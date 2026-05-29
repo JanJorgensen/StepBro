@@ -8,7 +8,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 {
     internal interface IMenuItemHost
     {
-        void Add(ToolStripMenuItem item);
+        void Add(ToolStripItem item);
         void Add(ToolStripTextBox item);
     }
 }

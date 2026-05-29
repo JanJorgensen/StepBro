@@ -15,6 +15,11 @@ namespace StepBro.Core.Data
             m_verdict = verdict;
         }
 
+        protected override uint GetValueHashCode()
+        {
+            return (uint)m_verdict.GetHashCode();
+        }
+
         public Verdict Verdict { get { return m_verdict; } }
 
         public override void GetTestString(StringBuilder text)

@@ -57,7 +57,9 @@ namespace StepBro.UI.WinForms.Test
             }
             IService m_hostService = null;
             m_hostAccess = new HostAccess(out m_hostService);
-            StepBroMain.Initialize(m_hostService);
+            IService m_textFileSystemService = null;
+            new TextFileSystem(out m_textFileSystemService);
+            StepBroMain.Initialize(m_hostService, m_textFileSystemService);
 
             customPanelContainer.SetCoreAccess(this);
 

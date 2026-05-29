@@ -20,6 +20,23 @@ namespace StepBro.Core.Data
             BlockEntryType = type;
         }
 
+        public override int GetHashCode()
+        {
+            uint hash = 8376253;
+            if (!String.IsNullOrEmpty(m_name))
+            {
+                hash = CRC.CombineHashCodes(hash, CRC.GetStringHash(m_name));
+            }
+            if (!String.IsNullOrEmpty(m_specifiedDataType))
+            {
+                hash = CRC.CombineHashCodes(hash, CRC.GetStringHash(m_specifiedDataType));
+            }
+            hash = CRC.CombineHashCodes(hash, this.GetValueHashCode());
+            return (int)hash;
+        }
+
+        protected abstract uint GetValueHashCode();
+
         public int Line { get { return m_line; } }
 
         public string Name

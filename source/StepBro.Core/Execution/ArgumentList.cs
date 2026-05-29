@@ -43,6 +43,12 @@ namespace StepBro.Core.Execution
             m_parent = parent;
         }
 
+        public ArgumentList(ArgumentList parent, ArgumentList arguments)
+        {
+            m_parent = parent;
+            m_arguments.AddRange(arguments.Select(a => new NamedArgument(a.Name, a.Value)));
+        }
+
         public ArgumentList(object[] firstUnnamed, NamedArgument[] named)
         {
             m_parent = null;

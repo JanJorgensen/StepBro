@@ -139,7 +139,7 @@ namespace StepBro.UI.WinForms.Controls
                 long lastShown = 0;
                 try
                 {
-                    while (entryIndex <= lastIndex)
+                    while (entryIndex <= lastIndex && y < this.Height)
                     {
                         var entry = m_source.Get(entryIndex);
                         if (entry == null) break;
@@ -176,9 +176,9 @@ namespace StepBro.UI.WinForms.Controls
                     m_lastShown = lastShown;
                     m_viewEntryCount = viewIndex;
                 }
-                catch
+                catch (Exception ex)
                 {
-
+                    System.Diagnostics.Debug.WriteLine("OnPaint exception!! - " + ex.GetType().Name + ", " + ex.Message);
                 }
             }
         }
@@ -198,7 +198,7 @@ namespace StepBro.UI.WinForms.Controls
             m_mouseDownLocation = e.Location;
             var line = (e.Location.Y / m_lineHeight);
             var index = m_topIndex + line;
-            if (index > m_lastShown) index = -1L;
+            if (line >= m_viewEntryCount || index > m_lastShown) index = -1L;
             this.MouseDownOnLine?.Invoke(this, new MouseOnLineEventArgs(e, line, index));
             if (!this.Focused)
             {
@@ -215,7 +215,7 @@ namespace StepBro.UI.WinForms.Controls
             base.OnMouseUp(e);
             var line = (e.Location.Y / m_lineHeight);
             var index = m_topIndex + line;
-            if (index > m_lastShown) index = -1L;
+            if (line >= m_viewEntryCount || index > m_lastShown) index = -1L;
             this.MouseUpOnLine?.Invoke(this, new MouseOnLineEventArgs(e, line, index));
         }
 

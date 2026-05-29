@@ -1,4 +1,5 @@
-﻿using StepBro.Core.General;
+﻿using StepBro.Core.Data;
+using StepBro.Core.General;
 using StepBro.Core.ScriptData;
 using System;
 using System.Collections.Generic;
@@ -60,6 +61,18 @@ namespace StepBro.UI.WinForms.Controls
                 m_fileManager.FileClosed += this.FileManager_FileClosed;
                 refreshTimer.Stop();
             }
+        }
+
+        public class StationPropertiesData
+        {
+            internal StationPropertiesData(string file, PropertyBlock props)
+            {
+                this.File = file;
+                this.Properties = props;
+            }
+
+            public string File { get; private set; }
+            public PropertyBlock Properties { get; private set; }
         }
 
         public class SelectionEventArgs : EventArgs
@@ -128,14 +141,32 @@ namespace StepBro.UI.WinForms.Controls
             try
             {
                 treeView.Nodes.Clear();
+
+                // The Station Properties
+                var configFileManager = StepBro.Core.Main.GetService<IConfigurationFileManager>();
+
+                if (!String.IsNullOrEmpty(configFileManager.StationPropertiesFile))
+                {
+                    var stationPropFileNode = new TreeNode
+                    {
+                        ImageIndex = 1,
+                        SelectedImageIndex = 1,
+                        Text = System.IO.Path.GetFileName(configFileManager.StationPropertiesFile),
+                        Tag = new StationPropertiesData(configFileManager.StationPropertiesFile, configFileManager.GetStationProperties())
+                    };
+                    treeView.Nodes.Add(stationPropFileNode);
+                }
+
+                // The Loaded Files root
                 var loadedFilesNode = new TreeNode
                 {
                     ImageIndex = 0,
                     SelectedImageIndex = 0,
                     Text = "Loaded Files"
                 };
-
                 treeView.Nodes.Add(loadedFilesNode);
+
+                // The Loaded Files file nodes
                 foreach (var file in m_fileManager.ListFiles<ILoadedFile>())
                 {
                     TreeNode fileNode;

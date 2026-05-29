@@ -230,13 +230,18 @@ namespace StepBro.Streams
 
         public override string ReadLineDirect()
         {
-            var line = m_port.ReadLine();
+            try
+            {
+                var line = m_port.ReadLine();
+                return line;
+            }
+            catch { return null; }
+
             //m_asyncLogger?.LogCommReceived(line);
             //if (m_specialLogging != null && m_specialLogging.Enabled)
             //{
             //    m_specialLogging.LogReceived(line);
             //}
-            return line;
         }
 
         public override void DiscardInBuffer()

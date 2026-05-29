@@ -45,6 +45,10 @@ namespace StepBro.Core.ScriptData
         /// </summary>
         Config,
         /// <summary>
+        /// A const/config override value.
+        /// </summary>
+        ConstOverride,
+        /// <summary>
         /// A list of test procedure and test list references.
         /// </summary>
         TestList,

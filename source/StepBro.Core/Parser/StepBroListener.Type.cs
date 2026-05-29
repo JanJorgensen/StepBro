@@ -6,6 +6,7 @@ using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using SBP = StepBro.Core.Parser.Grammar.StepBro;
 using static System.Net.Mime.MediaTypeNames;
+using StepBro.Core.File;
 
 namespace StepBro.Core.Parser
 {
@@ -58,6 +59,7 @@ namespace StepBro.Core.Parser
                     case SBP.DATETIME: type = typeof(DateTime); break;
                     case SBP.TIMESPAN: type = typeof(TimeSpan); break;
                     case SBP.STRING: type = typeof(string); break;
+                    case SBP.FILEPATH: type = typeof(FilePath); break;
                     case SBP.OBJECT: type = typeof(object); break;
                     default:
                         throw new NotImplementedException();
@@ -76,6 +78,7 @@ namespace StepBro.Core.Parser
                     case SBP.DATETIME: type = typeof(List<DateTime>); break;
                     case SBP.TIMESPAN: type = typeof(List<TimeSpan>); break;
                     case SBP.STRING: type = typeof(List<string>); break;
+                    case SBP.FILEPATH: type = typeof(List<FilePath>); break;
                     case SBP.OBJECT: type = typeof(List<object>); break;
                     default:
                         throw new NotImplementedException();
@@ -94,6 +97,7 @@ namespace StepBro.Core.Parser
                     case SBP.DATETIME: type = typeof(List<List<DateTime>>); break;
                     case SBP.TIMESPAN: type = typeof(List<List<TimeSpan>>); break;
                     case SBP.STRING: type = typeof(List<List<string>>); break;
+                    case SBP.FILEPATH: type = typeof(List<List<FilePath>>); break;
                     case SBP.OBJECT: type = typeof(List<List<object>>); break;
                     default:
                         throw new NotImplementedException();
@@ -136,6 +140,7 @@ namespace StepBro.Core.Parser
                     case "verdict": return TypeReference.TypeVerdict;
                     case "timespan": return TypeReference.TypeTimeSpan;
                     case "datetime": return TypeReference.TypeDateTime;
+                    case "filepath": return TypeReference.TypeFilePath;
                     case "object": return TypeReference.TypeObject;
                     case "procedure": return TypeReference.TypeProcedure;
                     case "function": return TypeReference.TypeFunction;
@@ -179,7 +184,7 @@ namespace StepBro.Core.Parser
                 else
                 {
                     var types = this.ResolveQualifiedType(declaration.TypeName, reportErrors, token);
-                    if (types != null && types.ReferencedType == SBExpressionType.GenericTypeDefinition)
+                    if (types != null && (types.ReferencedType == SBExpressionType.GenericTypeDefinition || types.ReferencedType == SBExpressionType.TypeReference))
                     {
                         var foundTypes = (List<Type>)types.Value;
                         System.Diagnostics.Debug.Assert(foundTypes != null);

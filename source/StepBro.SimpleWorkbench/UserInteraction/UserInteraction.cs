@@ -1,4 +1,5 @@
 ﻿using StepBro.Core.Api;
+using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Host;
 using System;
@@ -13,9 +14,6 @@ namespace StepBro.SimpleWorkbench
     {
         private List<Tuple<string, int>> m_selectionsMade = new List<Tuple<string, int>>();
         private System.Threading.ManualResetEvent m_closeEvent;
-        private bool m_userClose = false;
-        private UserResponse m_userResponse;
-        private UserResponse m_defaultUserResponse = UserResponse.Cancel;
 
         public UserInteraction()
         {
@@ -28,10 +26,9 @@ namespace StepBro.SimpleWorkbench
         public event EventHandler OnClose;
 
 
-        public void NotifyClose(UserResponse userResponse)
+        public override void NotifyClose(UserResponse userResponse)
         {
-            m_userResponse = userResponse;
-            m_userClose = true;
+            base.NotifyClose(userResponse);
             m_closeEvent.Set();
         }
 
@@ -69,52 +66,64 @@ namespace StepBro.SimpleWorkbench
             }
         }
 
-        public override UserResponse Open([Implicit] ICallContext context, TimeSpan timeout = default, UserResponse defaultAnswer = UserResponse.OK)
+        public override StepBro.Core.Tasks.IAsyncResult<UserResponse> Show([Implicit] ICallContext context, TimeSpan timeout = default, UserResponse defaultAnswer = UserResponse.OK)
         {
-            m_defaultUserResponse = defaultAnswer;
-            var userResponse = defaultAnswer;
-
-            if (timeout == TimeSpan.Zero)
+            return new StepBro.Core.Tasks.TaskToAsyncResult<UserResponse>(System.Threading.Tasks.Task.Run(() =>
             {
-                timeout = TimeSpan.FromSeconds(60);
-            }
-            var entryTime = DateTime.UtcNow;
-            bool stopRequested = false;
-
-            this.OnOpen?.Invoke(this, new EventArgs());
-
-            while (!m_userClose && !m_closeEvent.WaitOne(0) && (DateTime.UtcNow - entryTime) < timeout)
-            {
-                if (context.StopRequested())
+                this.TimeoutTime = timeout;
+                string interactionText = String.IsNullOrEmpty(this.HeaderText) ? "User interaction" : $"User interaction \"{this.HeaderText}\"";
+                string timeoutText = "";
+                if (timeout != default(TimeSpan))
                 {
-                    stopRequested = true;
-                    break;
+                    timeoutText = "Timeout: " + StringUtils.ObjectToString(timeout) + ".";
                 }
-                if (m_closeEvent.WaitOne(0))
+                context.Logger.Log($"{interactionText}. {timeoutText}");
+
+                m_defaultUserResponse = defaultAnswer;
+                var userResponse = defaultAnswer;
+
+                if (timeout == TimeSpan.Zero)
                 {
-                    break;
+                    timeout = TimeSpan.FromSeconds(60);
                 }
-            }
+                bool stopRequested = false;
 
-            string interactionText = String.IsNullOrEmpty(this.HeaderText) ? "User interaction" : $"User interaction \"{this.HeaderText}\"";
+                this.SetOpenedFlag();
+                this.OnOpen?.Invoke(this, new EventArgs());
+                var entryTime = DateTime.UtcNow;
 
-            if (m_userClose)
-            {
-                userResponse = m_userResponse;
-                context.Logger.LogUserAction($"{interactionText}. User pressed '{m_userResponse}'.");
-            }
-            else if (stopRequested)
-            {
-                context.Logger.LogUserAction($"{interactionText}. User requested script execution stop.");
-            }
-            else  // Timeout
-            {
-                context.Logger.LogUserAction($"{interactionText}. Timeout; '{m_userResponse}' selected.");
-            }
+                while (!m_userClose && !m_closeEvent.WaitOne(0) && (DateTime.UtcNow - entryTime) < timeout)
+                {
+                    if (context.StopRequested())
+                    {
+                        stopRequested = true;
+                        break;
+                    }
+                    if (m_closeEvent.WaitOne(0))
+                    {
+                        break;
+                    }
+                }
 
-            this.OnClose?.Invoke(this, new EventArgs());
+                if (m_userClose)
+                {
+                    userResponse = m_userResponse;
+                    context.Logger.LogUserAction($"{interactionText}. User pressed '{m_userResponse}'.");
+                }
+                else if (stopRequested)
+                {
+                    userResponse = UserResponse.StopRequested;
+                    context.Logger.LogUserAction($"{interactionText}. User requested script execution stop.");
+                }
+                else  // Timeout
+                {
+                    context.Logger.LogUserAction($"{interactionText}. Timeout; '{userResponse}' selected.");
+                }
 
-            return userResponse;
+                this.OnClose?.Invoke(this, new EventArgs());
+
+                return userResponse;
+            }));
         }
 
         #endregion

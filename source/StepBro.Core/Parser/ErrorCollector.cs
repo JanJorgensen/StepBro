@@ -108,6 +108,13 @@ namespace StepBro.Core.Parser
             if (m_throwOnSyntax) throw new Exception(msg);
         }
 
+        public void GeneralError(bool justWarning, string description)
+        {
+            var err = new ErrorData(-1, -1, description, justWarning);
+            m_errors.Add(err);
+            this.NotifyAdd(err);
+        }
+
         public void SymanticError(int line, int charPositionInLine, bool justWarning, string description)
         {
             var err = new ErrorData(line, charPositionInLine, description, justWarning);
@@ -131,13 +138,18 @@ namespace StepBro.Core.Parser
             this.SymanticError((token != null) ? token.Line : -1, (token != null) ? token.Column : -1, false, $"Unresolved identifier: \"{name}\".");
         }
 
-        public void UnresolvedUsing(int line, int charPositionInLine, string @using)
+        public void UnresolvedFileUsing(int line, int charPositionInLine, string @using, string message = null)
         {
-            this.SymanticError(line, charPositionInLine, false, $"Unable to find/resolve using: \"{@using}\".");
+            if (message == null) message = "Tip: Remove quotation marks if it's a namespace and not a file.";
+            this.SymanticError(line, charPositionInLine, false, $"Unable to find or resolve file: \"{@using}\". {(String.IsNullOrEmpty(message) ? "" : message)}");
         }
-        public void ConfigError(int line, int charPositionInLine, string error)
+        public void UnresolvedNamespaceUsing(int line, int charPositionInLine, string @using)
         {
-            this.SymanticError(line, charPositionInLine, false, $"Configuration error: {error}.");
+            this.SymanticError(line, charPositionInLine, false, $"Unknown namespace: \"{@using}\". Tip: Add quotation marks if it's a file.");
+        }
+        public void ConfigError(string error)
+        {
+            this.GeneralError(false, $"Configuration error: {error}.");
         }
 
         public void IncompatibleDataType(int line, int charPositionInLine, string type, string expectedType)

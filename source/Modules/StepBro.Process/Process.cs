@@ -145,20 +145,26 @@ namespace StepBro.Process
             }
             osProcess.StartInfo.UseShellExecute = useShell;
 
+            osProcess.StartInfo.CreateNoWindow = true;
+            osProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+            string wd = "";
+            if (!String.IsNullOrEmpty(workingDirectory))
+            {
+                wd = "(" + workingDirectory + ") ";
+                osProcess.StartInfo.WorkingDirectory = workingDirectory;
+            }
+
             if (context != null && context.LoggingEnabled)
             {
                 if (String.IsNullOrEmpty(arguments))
                 {
-                    context.Logger.Log($"Starting process: {filename}");
+                    context.Logger.Log($"Starting process: {wd}{filename}");
                 }
                 else
                 {
-                    context.Logger.Log($"Starting process: {filename} {arguments}");
+                    context.Logger.Log($"Starting process: {wd}{filename} {arguments}");
                 }
-            }
-            if (!String.IsNullOrEmpty(workingDirectory))
-            {
-                osProcess.StartInfo.WorkingDirectory = workingDirectory;
             }
 
             ObjectMonitorManager.Register(osProcess);
@@ -357,10 +363,11 @@ namespace StepBro.Process
             }
         }
 
+        private string m_name = "Process";
         public string Name
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => m_name;
+            set => m_name = value;
         }
 
         public bool AwaitStart([Implicit] StepBro.Core.Execution.ICallContext context, TimeSpan timeout = default)

@@ -145,7 +145,7 @@ namespace StepBro.Core.Parser
                         parametersToSkip++;   // Skip this argument because it is implicit.
                     }
 
-                    var parameterIndex = m_argumentIndex + parametersToSkip;
+                    var parameterIndex = m_expressionData.Peek().ArgumentIndex + parametersToSkip;      // TODO: Check if this works
                     var resolverMethodData = new PrivateMethodInfoForLambdaResolver(method, parameterIndex);
 
                     if (parameters.Length > parameterIndex) // If enough parameters
@@ -319,7 +319,7 @@ namespace StepBro.Core.Parser
                         m_lambdaLeftExpression.RemoveMethod(methodGenericTypedef);
                         m_lambdaLeftExpression.AddMethod(method);
                         bool isExtension = method.IsExtension();
-                        var parameterIndex = m_argumentIndex + (isExtension ? 1 : 0);
+                        var parameterIndex = m_expressionData.Peek().ArgumentIndex + (isExtension ? 1 : 0);     // TODO: check if this works.
                         delegateType = method.GetParameters()[parameterIndex].ParameterType;
                     }
                 }

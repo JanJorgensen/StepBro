@@ -86,6 +86,30 @@ namespace StepBroCoreTest.Parser
             Assert.AreEqual(1, FileBuilder.LastInstance.Errors.ErrorCount);
         }
 
+        [TestMethod]
+        public void TestProcedureReturnInNestedIfStatement()
+        {
+            var proc = FileBuilder.ParseProcedureExpectNoErrors(
+                """
+                void Main()
+                {
+                    bool b = true;
+                    if (b == true)
+                    {
+                        log("Do stuff.");
+                        if (b == true) 
+                        {
+                            return;
+                        }
+                    }
+                    log("Should not execute this.");
+                }
+                """);
+            Assert.AreEqual(typeof(void), proc.ReturnType.Type);
+        }
+
+
+        //----------------------------------------------------------------------------------------------------------------------------------
 
         public interface ISomeInterface
         {

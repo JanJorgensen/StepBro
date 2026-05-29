@@ -11,6 +11,7 @@ namespace StepBro.Core.Data
         DotNetMethod,
         DotNetProperty,
         DotNetField,
+        ApplicationObject,
         /// <summary>
         /// A file (might be script file) by its name.
         /// </summary>
@@ -85,7 +86,7 @@ namespace StepBro.Core.Data
             this.FullName = fullName;
             this.Type = type;
             this.DataType = dataType;
-            this.Reference = dataType.DynamicType;
+            this.Reference = dataType?.DynamicType;
         }
 
         public override string ToString()

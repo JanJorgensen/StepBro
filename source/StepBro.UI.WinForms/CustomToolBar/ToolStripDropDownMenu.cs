@@ -34,7 +34,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             this.Text = title;
         }
 
-        public void Add(ToolStripMenuItem item)
+        public void Add(ToolStripItem item)
         {
             this.DropDownItems.Add(item);
         }

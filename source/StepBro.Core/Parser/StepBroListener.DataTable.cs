@@ -86,8 +86,8 @@ namespace StepBro.Core.Parser
                 var walker = new Antlr4.Runtime.Tree.ParseTreeWalker();
                 m_expressionData.PushStackLevel("VariableType");
                 walker.Walk(this, cellContext);
-                var stack = m_expressionData.PopStackLevel();
-                var expressionValue = stack.Pop();
+                var levelData = m_expressionData.PopStackLevel();
+                var expressionValue = levelData.Stack.Pop();
                 if (expressionValue.IsConstant)
                 {
                     type = expressionValue.DataType;

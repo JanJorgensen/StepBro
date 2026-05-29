@@ -107,7 +107,12 @@ namespace StepBro.Core.Addons
 
                     foreach (var group in report.ListGroups())
                     {
-                        m_writer.WriteLine("##[group] " + group.Name);
+                        string verdict = "";
+                        if (group.Verdict != Verdict.Unset)
+                        {
+                            verdict = " - " + group.Verdict.ToString();
+                        }
+                        m_writer.WriteLine("##[group] " + group.Name + verdict);
                         if (!String.IsNullOrEmpty(group.Description))
                         {
                             m_writer.WriteLine(indent.Peek() + "  Description: " + group.Description);
@@ -248,7 +253,7 @@ namespace StepBro.Core.Addons
                 }
                 if (measurements.Count > 0)
                 {
-                    m_writer.WriteLine("##[section]"+ indent.Peek() + "Measurements");
+                    m_writer.WriteLine("##[section]" + indent.Peek() + "Measurements");
 
                     indent.Push(indent.Peek() + "    ");
                     var indentString = indent.Peek();

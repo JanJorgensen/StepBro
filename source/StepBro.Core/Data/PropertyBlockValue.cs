@@ -28,6 +28,12 @@ namespace StepBro.Core.Data
 
         public object Value { get { return m_value; } set { m_value = value; } }
 
+        protected override uint GetValueHashCode()
+        {
+            if (m_value == null) return 8376343;
+            if (m_value is string) return CRC.GetStringHash((string)m_value);
+            return (uint)m_value.GetHashCode();
+        }
 
         [JsonIgnore]
         public bool IsStringOrIdentifier { get { return m_value is string || m_value is Identifier; } }

@@ -285,6 +285,17 @@ namespace StepBro.Core.Data
             return typeof(IValueContainer).IsAssignableFrom(type);
         }
 
+        public static bool HasBaseVariable(this IFileElementOverride element, IObjectContainer variable)
+        {
+            IFileElement fe = element;
+            while (fe != null)
+            {
+                if (fe is IFileVariable fv && Object.ReferenceEquals(fv.Value, variable)) return true;
+                fe = fe.BaseElement;
+            }
+            return false;
+        }
+
         public static bool IsStatic(this PropertyInfo propertyInfo)
         {
             return propertyInfo.CanRead ? propertyInfo.GetMethod.IsStatic : propertyInfo.SetMethod.IsStatic;
@@ -360,9 +371,11 @@ namespace StepBro.Core.Data
             yield return element;
         }
 
-        public static bool IsPrimitiveNarrowableIntType(this Type type)
+        public static bool IsPrimitiveIntType(this Type type)
         {
-            return (type == typeof(Int32) ||
+            return (
+                type == typeof(Int64) ||
+                type == typeof(Int32) ||
                 type == typeof(UInt32) ||
                 type == typeof(UInt64) ||
                 type == typeof(Int16) ||
@@ -378,6 +391,38 @@ namespace StepBro.Core.Data
 
             var propertyInfo = typeof(Expression).GetProperty("DebugView", BindingFlags.Instance | BindingFlags.NonPublic);
             return propertyInfo.GetValue(exp) as string;
+        }
+    
+    
+        public static MethodInfo TryGetConvertOperator(this Type typeIn, Type typeOut)
+        {
+            Type[] searchTypes = new Type[] { typeIn };
+            Type[] searchTypesWithHome = new Type[] { typeof(IScriptFile), typeIn };
+
+            var inMethods = typeIn.GetMethods(BindingFlags.Public | BindingFlags.Static);
+            var outMethods = typeOut.GetMethods(BindingFlags.Public | BindingFlags.Static);
+
+            MethodInfo convert_mi = typeOut.GetMethod("Create", (BindingFlags.Public | BindingFlags.Static), null, searchTypesWithHome, Array.Empty<ParameterModifier>());
+            if (convert_mi != null && convert_mi.ReturnType == typeOut) 
+                return convert_mi;
+
+            convert_mi = typeIn.GetMethod("op_Explicit", (BindingFlags.Public | BindingFlags.Static), null, searchTypes, Array.Empty<ParameterModifier>());
+            if (convert_mi != null && convert_mi.ReturnType == typeOut && convert_mi.GetParameters().Length == 1 && convert_mi.GetParameters()[0].ParameterType == typeIn) 
+                return convert_mi;
+
+            convert_mi = typeIn.GetMethod("op_Implicit", (BindingFlags.Public | BindingFlags.Static), null, searchTypes, Array.Empty<ParameterModifier>());
+            if (convert_mi != null && convert_mi.ReturnType == typeOut && convert_mi.GetParameters().Length == 1 && convert_mi.GetParameters()[0].ParameterType == typeIn) 
+                return convert_mi;
+
+            convert_mi = typeOut.GetMethod("op_Explicit", (BindingFlags.Public | BindingFlags.Static), null, searchTypes, Array.Empty<ParameterModifier>());
+            if (convert_mi != null && convert_mi.ReturnType == typeOut && convert_mi.GetParameters().Length == 1 && convert_mi.GetParameters()[0].ParameterType == typeIn) 
+                return convert_mi;
+
+            convert_mi = typeOut.GetMethod("op_Implicit", (BindingFlags.Public | BindingFlags.Static), null, searchTypes, Array.Empty<ParameterModifier>());
+            if (convert_mi != null && convert_mi.ReturnType == typeOut && convert_mi.GetParameters().Length == 1 && convert_mi.GetParameters()[0].ParameterType == typeIn) 
+                return convert_mi;
+
+            return null;
         }
     }
 }

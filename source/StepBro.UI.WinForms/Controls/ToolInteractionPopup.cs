@@ -1,4 +1,5 @@
-﻿using StepBro.HostSupport.Models;
+﻿using StepBro.Core.Api;
+using StepBro.HostSupport.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,9 +14,17 @@ namespace StepBro.UI.WinForms.Controls
 {
     public partial class ToolInteractionPopup : Form
     {
+        ICoreAccess m_coreAccess = null;
+
         public ToolInteractionPopup()
         {
             InitializeComponent();
+        }
+
+        public ToolInteractionPopup(ICoreAccess coreAccess) : this()
+        {
+            m_coreAccess = coreAccess;
+            toolInteractionView.Bind(coreAccess);
         }
 
         protected override void OnLoad(EventArgs e)

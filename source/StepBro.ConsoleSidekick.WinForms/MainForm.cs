@@ -945,7 +945,7 @@ namespace StepBro.ConsoleSidekick.WinForms
                     }
                     newToolBarList.Add(new Tuple<string, UI.WinForms.CustomToolBar.ToolBar>(toolbarVar.FullName, toolBar));
 
-                    toolBar.Setup(this, toolbarVar.FullName, toolbarVar.ToolBarDefinition.CloneAsPropertyBlockEntry() as PropertyBlock);
+                    toolBar.Setup(this, null, toolbarVar.FullName, toolbarVar.ToolBarDefinition.CloneAsPropertyBlockEntry() as PropertyBlock);
                     toolBar.Height = toolStripMain.Height + 1;
                 }
 

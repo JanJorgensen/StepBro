@@ -13,21 +13,16 @@ namespace StepBro.Core.Parser.Mocks
         {
         }
 
+        public string StationPropertiesFile { get { return null; } }
+
         public PropertyBlock GetStationProperties()
         {
             throw new NotImplementedException();
         }
 
-        public FolderConfiguration ReadFolderConfig(ILogger logger, string configFile)
-        {
-            throw new NotImplementedException();
-        }
-
-        public FolderConfiguration ReadFolderConfig(string configFile, List<Tuple<int, string>> errors)
+        public FolderConfiguration GetOrReadFolderConfig(string configFile, List<Tuple<string, int, string>> errors)
         {
             return null; // Not implemented.
         }
-
-        public void ResetFolderConfigurations() { }
     }
 }

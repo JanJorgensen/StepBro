@@ -9,6 +9,8 @@ using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Api;
 using StepBro.Core.Execution;
+using StepBro.ToolBarCreator;
+using StepBro.Core.File;
 
 namespace StepBroCoreTest.Parser
 {
@@ -46,6 +48,32 @@ namespace StepBroCoreTest.Parser
             var var = FileBuilder.ParseFileVariable<DummyInstrumentClass>(
                 null, new Type[] { typeof(DummyInstrumentClass) },
                 "private DummyInstrumentClass myVariable = DummyInstrumentClass{ }");
+            Assert.IsNotNull(var);
+            Assert.AreEqual("myVariable", var.Name);
+            Assert.ReferenceEquals(var.DataType, (TypeReference)typeof(DummyInstrumentClass));
+            Assert.IsTrue(var.IsReadonly);
+            Assert.AreEqual(AccessModifier.Private, var.AccessProtection);
+        }
+
+        [TestMethod, Ignore]
+        public void ParseFileVariableNoPropertyBlockOrArgs()
+        {
+            var var = FileBuilder.ParseFileVariable<DummyInstrumentClass>(
+                null, new Type[] { typeof(DummyInstrumentClass) },
+                "private DummyInstrumentClass myVariable = DummyInstrumentClass;");
+            Assert.IsNotNull(var);
+            Assert.AreEqual("myVariable", var.Name);
+            Assert.ReferenceEquals(var.DataType, (TypeReference)typeof(DummyInstrumentClass));
+            Assert.IsTrue(var.IsReadonly);
+            Assert.AreEqual(AccessModifier.Private, var.AccessProtection);
+        }
+
+        [TestMethod, Ignore]
+        public void ParseFileVariableNoArgs()
+        {
+            var var = FileBuilder.ParseFileVariable<DummyInstrumentClass>(
+                null, new Type[] { typeof(DummyInstrumentClass) },
+                "private DummyInstrumentClass myVariable = DummyInstrumentClass();");
             Assert.IsNotNull(var);
             Assert.AreEqual("myVariable", var.Name);
             Assert.ReferenceEquals(var.DataType, (TypeReference)typeof(DummyInstrumentClass));
@@ -214,6 +242,46 @@ namespace StepBroCoreTest.Parser
             //Assert.AreEqual(44L, result);
         }
 
+        [TestMethod]
+        public void TestFileVariableOverride()
+        {
+            string f1 =
+                """
+                using StepBro.ToolBarCreator;
+                using "file2.sbs";
+                override toolbar
+                {
+                    Button ExtraFun: { Color: Red },
+                    Button NoFun : { Color: Green }
+                }
+                """;
+            string f2 =
+                """
+                using StepBro.ToolBarCreator;
+                ToolBar toolbar = ToolBar()
+                {
+                    Label title: "Aero Battery",
+                    Button Serious: { Color: Yellow }
+                }
+                """;
+
+            var files = FileBuilder.ParseFiles((ILogger)null, this.GetType().Assembly,
+                new Tuple<string, string>("file1.sbs", f1),
+                new Tuple<string, string>("file2.sbs", f2));
+
+            var variable = files[1].ListElements().First(p => p.Name == "toolbar") as FileVariable;
+            Assert.IsNotNull(variable);
+            var toolbar = variable.VariableOwnerAccess.Container.GetValue() as ToolBar;
+            Assert.IsNotNull(toolbar);
+            Assert.AreEqual("toolbar", toolbar.Name);
+            var elements = toolbar.Definition;
+            Assert.AreEqual(4, elements.Count);
+            Assert.AreEqual("title", elements[0].Name);
+            Assert.AreEqual("Serious", elements[1].Name);
+            Assert.AreEqual("ExtraFun", elements[2].Name);
+            Assert.AreEqual("NoFun", elements[3].Name);
+        }
+
 
 
         internal IFileProcedure CreateTestFile(string returnStatement)
@@ -266,27 +334,30 @@ namespace StepBroCoreTest.Parser
         private long m_id;
         private long m_resetCounts = 0;
 
-        public DummyInstrumentClass([ObjectName] string objectName = "<no name>")
+        public DummyInstrumentClass([Implicit] IScriptFile home, [ObjectName] string objectName = "<no name>")
         {
+            if (home == null) throw new ArgumentNullException(nameof(home));
             m_id = m_nextInstanceID++;
             m_objectName = objectName;
         }
 
-        public DummyInstrumentClass(string[] names, [ObjectName] string objectName = "<no name>") : this()
+        public DummyInstrumentClass([Implicit] IScriptFile home, string[] names, [ObjectName] string objectName = "<no name>") : this(home)
         {
+            if (home == null) throw new ArgumentNullException(nameof(home));
             m_id = m_nextInstanceID++;
             m_objectName = objectName;
             m_names = names.ToList();
         }
 
-        public DummyInstrumentClass(long valueA, [ObjectName] string objectName = "<no name>") : this()
+        public DummyInstrumentClass([Implicit] IScriptFile home, long valueA, [ObjectName] string objectName = "<no name>") : this(home)
         {
+            if (home == null) throw new ArgumentNullException(nameof(home));
             m_id = m_nextInstanceID++;
             m_objectName = objectName;
             this.IntA = valueA;
         }
 
-        public void PreScanData(PropertyBlock data, List<Tuple<int, string>> errors)
+        public void PreScanData(IScriptFile file, PropertyBlock data, List<Tuple<int, string>> errors)
         {
         }
 
@@ -363,6 +434,16 @@ namespace StepBroCoreTest.Parser
             if (context != null) context.Logger.Log("Work Method!");
 
             this.IntA *= 3; 
+        }
+
+        public static void ShowString([Implicit] ICallContext context, string text)
+        {
+            context.Logger.Log("String: " + text);
+        }
+
+        public static void ShowPath([Implicit] ICallContext context, FilePath path)
+        {
+            context.Logger.Log("FilePath: " + path.Value);
         }
     }
 }

@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Tasks;
-using static StepBro.Core.Data.PropertyBlockDecoder;
 
 namespace StepBro.Core.File
 {
+    /// <summary>
+    /// The different basic categories for owners of folder shortcuts.
+    /// </summary>
     public enum FolderShortcutOrigin
     {
         Root,
@@ -23,15 +23,21 @@ namespace StepBro.Core.File
         //Context
     }
 
+    /// <summary>
+    /// Interface for a folder shortcut specification object.
+    /// </summary>
     public interface IFolderShortcut
     {
         FolderShortcutOrigin Origin { get; }
         string Name { get; }
         string Path { get; }
         public bool IsResolved { get; }
-        string ResolvedPath { get; }
+        FilePath ResolvedPath { get; }
     }
 
+    /// <summary>
+    /// An interface for an object that has access to a list of foldet shortcuts (<seealso cref="IFolderShortcut"/> objects).
+    /// </summary>
     public interface IFolderShortcutsSource
     {
         /// <summary>
@@ -41,8 +47,15 @@ namespace StepBro.Core.File
         IEnumerable<IFolderShortcut> ListShortcuts();
     }
 
+    /// <summary>
+    /// A delegate for a function that enumerates a list of available folder shortcuts.
+    /// </summary>
+    /// <returns>An enumeration of folder shortcuts.</returns>
     public delegate IEnumerable<IFolderShortcut> FolderShortcutsDelegate();
 
+    /// <summary>
+    /// A helper class that "converts" a <seealso cref="FolderShortcutsDelegate"/> to a <seealso cref="IFolderShortcutsSource"/> interface.
+    /// </summary>
     public class FolderShortcutsFromDelegate : IFolderShortcutsSource
     {
         private readonly FolderShortcutsDelegate m_delegate;
@@ -58,19 +71,22 @@ namespace StepBro.Core.File
         }
     }
 
-    public class FolderShortcut : IFolderShortcut
+    /// <summary>
+    /// A named file system folder reference, that can be used as basis for file path specifications. 
+    /// </summary>
+    public class FolderShortcut : IFolderShortcut, IIdentifierInfo
     {
         private FolderShortcutOrigin m_origin;
         private string m_name;
         private string m_path;
-        private string m_resolvedPath;
+        private FilePath m_resolvedPath;
 
         public FolderShortcut(FolderShortcutOrigin origin, string name, string path, string resolved = null)
         {
             m_origin = origin;
             m_name = name;
             m_path = path;
-            m_resolvedPath = resolved;
+            m_resolvedPath = (resolved != null) ? new FilePath(resolved) : null;
         }
 
         public FolderShortcutOrigin Origin
@@ -81,6 +97,9 @@ namespace StepBro.Core.File
             }
         }
 
+        /// <summary>
+        ///  The name of the shortcut.
+        /// </summary>
         public string Name
         {
             get
@@ -89,6 +108,9 @@ namespace StepBro.Core.File
             }
         }
 
+        /// <summary>
+        /// The specified file path for the shortcut.
+        /// </summary>
         public string Path
         {
             get
@@ -97,7 +119,10 @@ namespace StepBro.Core.File
             }
         }
 
-        public string ResolvedPath
+        /// <summary>
+        /// The resulting absolute filepath for the shortcut.
+        /// </summary>
+        public FilePath ResolvedPath
         {
             get
             {
@@ -105,8 +130,30 @@ namespace StepBro.Core.File
             }
         }
 
-        public bool IsResolved {  get {  return m_resolvedPath != null; } }
+        /// <summary>
+        /// Whether the shortcut is successfully resolved.
+        /// </summary>
+        public bool IsResolved { get { return m_resolvedPath != null; } }
 
+        string IIdentifierInfo.FullName => throw new NotImplementedException();
+
+        IdentifierType IIdentifierInfo.Type => IdentifierType.ApplicationObject;
+
+        TypeReference IIdentifierInfo.DataType => (TypeReference)typeof(FilePath);
+
+        object IIdentifierInfo.Reference => m_resolvedPath;
+
+        string IIdentifierInfo.SourceFile => null;
+
+        int IIdentifierInfo.SourceLine => -1;
+
+        /// <summary>
+        /// Tries to resolve the specified shortcut path, using the specified list of other shortcuts and the specified base path for the shortcut owner.
+        /// </summary>
+        /// <param name="shortcuts"></param>
+        /// <param name="basePath">The base path for the object that ownes the shortcut.</param>
+        /// <param name="errorMessage">Either a short description of the reason for failing to resolve the specified path, or <code>null</code> if succeeded to resolve the path.</param>
+        /// <returns>Whether the shortcut path was successfully resolved.</returns>
         public bool TryResolve(IEnumerable<IFolderShortcut> shortcuts, string basePath, ref string errorMessage)
         {
             string resolved = shortcuts.ResolveShortcutPath(m_path, ref errorMessage);
@@ -117,20 +164,27 @@ namespace StepBro.Core.File
             }
             else
             {
-                m_resolvedPath = System.IO.Path.GetFullPath(resolved, basePath);
+                m_resolvedPath = new FilePath(System.IO.Path.GetFullPath(resolved, basePath));
                 return true;
             }
         }
 
         public override string ToString()
         {
-            return $"Shortcut {Name}: {Path}";
+            if (m_resolvedPath == null) return $"Shortcut {Name}: {Path}";
+            else return $"Shortcut {Name}: {Path} ({m_resolvedPath})";
         }
     }
 
     public static class FileReferenceUtils
     {
-        public static NamedString SplitPath(this string source)
+        /// <summary>
+        /// Splits a string into a base shortcut reference and a specified path.
+        /// </summary>
+        /// <remarks>If the specified path is not using </remarks>
+        /// <param name="source">The file path string.</param>
+        /// <returns>A named string, where the name part is the shortcut base (if any) and the value part is the specified relative or absolute file path contibution.</returns>
+        public static NamedString SplitShortcutPath(this string source)
         {
             if (string.IsNullOrEmpty(source))
             {
@@ -153,6 +207,15 @@ namespace StepBro.Core.File
             }
         }
 
+        /// <summary>
+        /// Resolves the specified shortcut path to the absolute path.
+        /// </summary>
+        /// <remarks>This specified path can be a relative path, a path using another shortcut or an already absolute path.</remarks>
+        /// <param name="shortcuts">The known folder shortcuts that can be used for resolving the specified path.</param>
+        /// <param name="path">The path to resolve to an absolute path.</param>
+        /// <param name="errorMessage">Either a short description of the reason for failing to resolve the specified path, or <code>null</code> if succeeded to resolve the path.</param>
+        /// <returns>The resolved path string, or <code>null</code> if failing to resolve the specified path.</returns>
+        /// <exception cref="ArgumentException"></exception>
         public static string ResolveShortcutPath(this IEnumerable<IFolderShortcut> shortcuts, string path, ref string errorMessage)
         {
             if (String.IsNullOrEmpty(path))
@@ -160,7 +223,7 @@ namespace StepBro.Core.File
                 throw new ArgumentException("Empty path argument.");
             }
 
-            var splittedPath = FileReferenceUtils.SplitPath(path);
+            var splittedPath = FileReferenceUtils.SplitShortcutPath(path);
 
             if (String.IsNullOrEmpty(splittedPath.Name))
             {
@@ -294,7 +357,7 @@ namespace StepBro.Core.File
         {
             foreach (var sfname in Enum.GetNames(typeof(System.Environment.SpecialFolder)))
             {
-                var sf = (System.Environment.SpecialFolder)Enum.Parse(typeof(System.Environment.SpecialFolder),sfname);
+                var sf = (System.Environment.SpecialFolder)Enum.Parse(typeof(System.Environment.SpecialFolder), sfname);
                 var folder = System.Environment.GetFolderPath(sf);
                 if (!String.IsNullOrEmpty(folder))
                 {
@@ -308,7 +371,7 @@ namespace StepBro.Core.File
                 if (!String.IsNullOrEmpty(value) && value.Contains(System.IO.Path.DirectorySeparatorChar))
                 {
                     var key = ev.Key as string;
-                    if (!m_environmentShortcuts.ListShortcuts().Any(k => String.Equals(k.Name, key, StringComparison.InvariantCultureIgnoreCase)) && System.IO.Directory.Exists(value))
+                    if (!m_environmentShortcuts.ListShortcuts().Any(k => String.Equals(k.Name, key, StringComparison.InvariantCultureIgnoreCase)) && (System.IO.Directory.Exists(value) || System.IO.File.Exists(value)))
                     {
                         m_environmentShortcuts.AddShortcut(key, value, isResolved: true);
                     }

@@ -2,6 +2,7 @@
 using StepBro.Core.ScriptData;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StepBro.Core.Data
 {
@@ -10,7 +11,7 @@ namespace StepBro.Core.Data
         IValueContainer Container { get; }
         void SetUniqueID(int id);
         void SetValue(object value, ILogger logger);
-        void SetValueOverride(bool doOverride, object value);
+        void SetValueOverride(int level, bool doOverride, object value);
         bool UsingValueOverride { get; }
         object OverrideValue { get; }
         bool DataCreated { get; }
@@ -23,6 +24,7 @@ namespace StepBro.Core.Data
         int FileLine { get; set; }
         int FileColumn { get; set; }
         int CodeHash { get; set; }
+        int DataHash { get; set; }
         Dictionary<string, object> Tags { get; set; }
     }
 
@@ -63,9 +65,9 @@ namespace StepBro.Core.Data
                 m_container.SetValue(value, logger, true);
                 m_dataIsSet = (value != null);
             }
-            public void SetValueOverride(bool doOverride, object value)
+            public void SetValueOverride(int level, bool doOverride, object value)
             {
-                m_container.SetValueOverride(doOverride, value);
+                m_container.SetValueOverride(level, doOverride, value);
             }
             public bool UsingValueOverride { get { return m_container.UsingValueOverride; } }
             public object OverrideValue { get { return m_container.OverrideValue; } }
@@ -86,6 +88,7 @@ namespace StepBro.Core.Data
             public int FileLine { get; set; }
             public int FileColumn { get; set; }
             public int CodeHash { get; set; }
+            public int DataHash { get; set; } = 0;
             public Dictionary<string, object> Tags { get; set; } = null;
 
             public bool IsStillValid { get { return disposedValue == false; } }
@@ -125,8 +128,7 @@ namespace StepBro.Core.Data
         private readonly string m_name;
         private readonly TypeReference m_declaredType;
         private T m_value;
-        private bool m_useOverrideValue = false;
-        private T m_overrideValue;
+        private List<Tuple<bool, T>> m_overrideValues = null;
         private readonly bool m_readonly;
         private AccessModifier m_access = AccessModifier.None;
         private int m_valueChangeIndex = 0;
@@ -252,7 +254,11 @@ namespace StepBro.Core.Data
 
         public object GetValue(ILogger logger = null)
         {
-            return m_useOverrideValue ? m_overrideValue : m_value;
+            if (m_overrideValues != null)
+            {
+                return m_overrideValues.First(ov => ov.Item1).Item2;
+            }
+            return m_value;
         }
 
         public void SetValue(object value, ILogger logger = null)
@@ -312,7 +318,11 @@ namespace StepBro.Core.Data
 
         public T GetTypedValue(ILogger logger = null)
         {
-            return m_useOverrideValue ? m_overrideValue : m_value;
+            if (m_overrideValues != null && m_overrideValues.Count > 0)
+            {
+                return m_overrideValues.First(ov => ov.Item1).Item2;
+            }
+            return m_value;
         }
 
         public T Modify(ValueContainerModifier<T> modifier, ILogger logger = null)
@@ -330,33 +340,56 @@ namespace StepBro.Core.Data
             }
         }
 
-        private void SetValueOverride(bool doOverride, object value)
+        private void SetValueOverride(int level, bool doOverride, object value)
         {
-            m_useOverrideValue = doOverride;
-            if (typeof(T).IsPrimitive)
+            bool change = false;
+            if (doOverride)
             {
-                if (m_value != null && m_value.Equals(value)) return;
+                T current = this.GetTypedValue();
+                if (typeof(T).IsPrimitive)
+                {
+                    if (current == null || !current.Equals(value)) change = true;
+                }
+                else
+                {
+                    if (current == null) change = (value != null);
+                    else change = (value != null || !Object.ReferenceEquals(current, value));
+                }
+
+                if (m_overrideValues == null) m_overrideValues = new List<Tuple<bool, T>>();
+                while (m_overrideValues.Count < (level + 1)) m_overrideValues.Add(new Tuple<bool, T>(false, default(T)));
+                m_overrideValues[level] = new Tuple<bool, T>(true, (T)value);
             }
             else
             {
-                if (m_value == null)
+                if (m_overrideValues == null || level >= m_overrideValues.Count) return;
+                m_overrideValues[m_overrideValues.Count - 1] = new Tuple<bool, T>(false, default(T));
+                while (m_overrideValues.Count > 0 && m_overrideValues[m_overrideValues.Count - 1].Item1 == false)
                 {
-                    if (value == null) return;
-                }
-                else if (value == null || Object.ReferenceEquals(m_value, value))
-                {
-                    return;
+                    m_overrideValues.RemoveAt(m_overrideValues.Count - 1);
                 }
             }
 
-            m_overrideValue = (T)value;
-            m_valueChangeIndex++;
-            this.ValueChanged?.Invoke(this, EventArgs.Empty);
-            this.ObjectReplaced?.Invoke(this, EventArgs.Empty);
+            if (change)
+            {
+                m_valueChangeIndex++;
+                this.ValueChanged?.Invoke(this, EventArgs.Empty);
+                this.ObjectReplaced?.Invoke(this, EventArgs.Empty);
+            }
         }
 
-        bool UsingValueOverride { get { return m_useOverrideValue; } }
-        object OverrideValue { get { return m_overrideValue; } }
+        bool UsingValueOverride { get { return (m_overrideValues != null && m_overrideValues.Count > 0); } }
+        object OverrideValue
+        {
+            get
+            {
+                if (m_overrideValues != null && m_overrideValues.Count > 0)
+                {
+                    return m_overrideValues.First(ov => ov.Item1 == true).Item2;
+                }
+                return default(T);
+            }
+        }
     }
 
     public static class VariableContainer
