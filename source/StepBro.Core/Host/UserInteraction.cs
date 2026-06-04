@@ -128,6 +128,7 @@ namespace StepBro.Core.Host
         public UserResponse Result { get { return m_userResponse; } }
 
         public abstract int GetSelection([Implicit] ICallContext context, string tag);
+        public abstract void SetSelection([Implicit] ICallContext context, string tag, string selection);
         public string GetSelectionText([Implicit] ICallContext context, string tag)
         {
             var index = GetSelection(context, tag);

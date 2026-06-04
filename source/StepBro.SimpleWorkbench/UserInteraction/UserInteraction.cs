@@ -1,4 +1,5 @@
-﻿using StepBro.Core.Api;
+﻿using CommandLine;
+using StepBro.Core.Api;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.Host;
@@ -66,6 +67,20 @@ namespace StepBro.SimpleWorkbench
             }
         }
 
+        public override void SetSelection([Implicit] ICallContext context, string tag, string selection)
+        {
+            var tagIndex = this.FindSelectionEntry(tag);
+            var section = m_sections.First(s => s is SectionSingleSelection ss && ss.Tag == tag) as SectionSingleSelection;
+            if (section != null)
+            {
+                var index = section.Options.IndexOf(selection);
+                if (index >= 0)
+                {
+                    m_selectionsMade[tagIndex] = new Tuple<string, int>(tag, index);
+                }
+            }
+        }
+
         public override StepBro.Core.Tasks.IAsyncResult<UserResponse> Show([Implicit] ICallContext context, TimeSpan timeout = default, UserResponse defaultAnswer = UserResponse.OK)
         {
             return new StepBro.Core.Tasks.TaskToAsyncResult<UserResponse>(System.Threading.Tasks.Task.Run(() =>
@@ -92,17 +107,17 @@ namespace StepBro.SimpleWorkbench
                 this.OnOpen?.Invoke(this, new EventArgs());
                 var entryTime = DateTime.UtcNow;
 
-                while (!m_userClose && !m_closeEvent.WaitOne(0) && (DateTime.UtcNow - entryTime) < timeout)
+                while (!m_userClose && !m_closeEvent.WaitOne(100) && (DateTime.UtcNow - entryTime) < timeout)
                 {
                     if (context.StopRequested())
                     {
                         stopRequested = true;
                         break;
                     }
-                    if (m_closeEvent.WaitOne(0))
-                    {
-                        break;
-                    }
+                    //if (m_closeEvent.WaitOne(0))
+                    //{
+                    //    break;
+                    //}
                 }
 
                 if (m_userClose)
