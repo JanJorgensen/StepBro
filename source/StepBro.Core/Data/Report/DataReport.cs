@@ -97,7 +97,7 @@ namespace StepBro.Core
             {
                 if (context != null && context.Logger is LoggerScope)
                 {
-                    var end = ((LoggerScope)context.Logger).Logger.GetLast();
+                    var end = ((LoggerScope)context.Logger).Logger.GetLast() as LogEntry;
                     m_currentGroup.Lock(end);
                 }
                 else
@@ -235,7 +235,7 @@ namespace StepBro.Core
                 {
                     if (context != null && context.Logger is LoggerScope)
                     {
-                        var end = ((LoggerScope)context.Logger).Logger.GetLast();
+                        var end = ((LoggerScope)context.Logger).Logger.GetLast() as LogEntry;
                         m_currentGroup.Lock(end);
                     }
                     else

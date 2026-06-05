@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestModule", "Modules\TestM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.HostSupport", "StepBro.HostSupport\StepBro.HostSupport.csproj", "{F1DE2E15-94C8-4D2A-9A93-94AFDD740920}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.HostSupport.Test", "Test\StepBro.HostSupport.Test\StepBro.HostSupport.Test.csproj", "{F35E7015-9188-04FC-7765-5A03EF3D9458}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,10 @@ Global
 		{F1DE2E15-94C8-4D2A-9A93-94AFDD740920}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1DE2E15-94C8-4D2A-9A93-94AFDD740920}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1DE2E15-94C8-4D2A-9A93-94AFDD740920}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F35E7015-9188-04FC-7765-5A03EF3D9458}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F35E7015-9188-04FC-7765-5A03EF3D9458}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F35E7015-9188-04FC-7765-5A03EF3D9458}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F35E7015-9188-04FC-7765-5A03EF3D9458}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

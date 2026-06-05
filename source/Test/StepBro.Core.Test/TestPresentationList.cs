@@ -10,12 +10,12 @@ namespace StepBro.Core.Test
     {
         class PresentationEntry
         {
-            public PresentationEntry(LogEntry logEntry, long index)
+            public PresentationEntry(ITimestampedData logEntry, long index)
             {
                 this.LogEntry = logEntry;
                 this.SourceIndex = index;
             }
-            public LogEntry LogEntry { get; private set; }
+            public ITimestampedData LogEntry { get; private set; }
             public long SourceIndex { get; private set; }
             public override string ToString()
             {
@@ -23,13 +23,13 @@ namespace StepBro.Core.Test
             }
         }
 
-        class PresentationList : PresentationListForListData<LogEntry, PresentationEntry>
+        class PresentationList : PresentationListForListData<ITimestampedData, PresentationEntry>
         {
-            public PresentationList(IDataListSource<LogEntry> source) : base(source, 10000, 1000)
+            public PresentationList(IDataListSource<ITimestampedData> source) : base(source, 10000, 1000)
             {
             }
 
-            public override void CreatePresentationEntry(LogEntry entry, long sourceIndex, Action<PresentationEntry> adder)
+            public override void CreatePresentationEntry(ITimestampedData entry, long sourceIndex, Action<PresentationEntry> adder)
             {
                 adder(new PresentationEntry(entry, sourceIndex));
             }
@@ -58,14 +58,15 @@ namespace StepBro.Core.Test
 
             var presentation = new PresentationList(logger);
 
-            Predicate<LogEntry> filter = (LogEntry entry) =>
+            Predicate<ITimestampedData> filter = (ITimestampedData entry) =>
             {
-                return entry.Text.Substring(entry.Text.Length - 3).Contains('3');
+                var e = entry as LogEntry;
+                return e.Text.Substring(e.Text.Length - 3).Contains('3');
             };
             presentation.Reset(filter, Int64.MaxValue);
 
             var firstPresented = presentation.Get(0L);
-            Assert.AreEqual("Bent000003", firstPresented.LogEntry.Text);
+            Assert.AreEqual("Bent000003", (firstPresented.LogEntry as LogEntry).Text);
             var state = presentation.GetState();
 
             Assert.AreEqual(6775L, state.EffectiveCount);

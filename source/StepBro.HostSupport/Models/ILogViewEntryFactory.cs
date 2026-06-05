@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace StepBro.HostSupport.Models
 {
-    public interface ILogViewEntryFactory<TViewEntryType>
+    public interface IChronoListViewEntryFactory<TViewEntryType>
     {
-        void CreatePresentationEntry(LogEntry entry, long sourceIndex, Action<TViewEntryType> adder);
+        void CreatePresentationEntry(ITimestampedData entry, long sourceIndex, Action<TViewEntryType> adder);
     }
 }

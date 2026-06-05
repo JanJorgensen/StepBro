@@ -12,9 +12,9 @@ public class LogViewTestEntry : ITimestampedViewEntry
 {
     LogEntry m_entry;
 
-    public LogViewTestEntry(LogEntry entry)
+    public LogViewTestEntry(ITimestampedData entry)
     {
-        m_entry = entry;
+        m_entry = entry as LogEntry;
     }
 
     public DateTime TimeStamp => m_entry.Timestamp;
@@ -43,11 +43,16 @@ public class LogViewTestEntry : ITimestampedViewEntry
         }
         return text.ToString();
     }
+
+    public override string ToString()
+    {
+        return "ViewEntry " + m_entry.ToString();
+    }
 }
 
-public class LogViewTestEntryFactory : ILogViewEntryFactory<LogViewTestEntry>
+public class LogViewTestEntryFactory : IChronoListViewEntryFactory<LogViewTestEntry>
 {
-    public void CreatePresentationEntry(LogEntry entry, long sourceIndex, Action<LogViewTestEntry> adder)
+    public void CreatePresentationEntry(ITimestampedData entry, long sourceIndex, Action<LogViewTestEntry> adder)
     {
         adder(new LogViewTestEntry(entry));
     }

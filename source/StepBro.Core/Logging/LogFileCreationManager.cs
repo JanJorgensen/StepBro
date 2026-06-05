@@ -44,10 +44,10 @@ namespace StepBro.Core.Logging
 
             private void LoggerThread()
             {
-                LogEntry entry = StepBro.Core.Main.Logger.GetFirst().Item2;
+                LogEntry entry = StepBro.Core.Main.Logger.GetFirst().Item2 as LogEntry;
                 if (!m_includePast)
                 {
-                    entry = StepBro.Core.Main.Logger.GetLast();
+                    entry = StepBro.Core.Main.Logger.GetLast() as LogEntry;
                     // Start at the beginning of a scope.
                     while (entry.IndentLevel > 2)
                     {

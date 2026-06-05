@@ -64,12 +64,14 @@ public class TestLogViewer
         viewPort.LineHeight = 10;
         Assert.IsTrue(viewPort.IsInvalidated);      // Invalidated during setup.
 
+        var initialLogEntryCount = listView.Source.GetState().EffectiveCount;
+
         listView.RequestUpdate();
         Assert.IsTrue(viewPort.IsInvalidated);
         var viewPortEntries = viewPort.Refresh();
         Assert.IsFalse(viewPort.IsInvalidated);
         var entryCount = viewPortEntries.Count;
-        Assert.AreEqual(2, entryCount);
+        Assert.AreEqual(initialLogEntryCount, entryCount);
 
         m_app.RootLogger.Log("Activity A");
         Assert.IsFalse(viewPort.IsInvalidated);
@@ -78,8 +80,8 @@ public class TestLogViewer
         viewPortEntries = viewPort.Refresh();
         Assert.IsFalse(viewPort.IsInvalidated);
         entryCount = viewPortEntries.Count;
-        Assert.AreEqual(3, entryCount);
-        Assert.AreEqual("Activity A", viewPortEntries[2].LogEntry.Text);
+        Assert.AreEqual(initialLogEntryCount + 1, entryCount);
+        Assert.AreEqual("Activity A", viewPortEntries[(int)initialLogEntryCount].LogEntry.Text);
         Assert.IsFalse(viewPort.IsViewFilled());
 
         for (int i = 0; i < 7; i++)

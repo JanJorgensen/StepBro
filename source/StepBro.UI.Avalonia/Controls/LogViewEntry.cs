@@ -18,8 +18,8 @@ public class LogViewEntry : ChronoTimestampedListViewEntry
     protected LogEntry m_entry;
     protected long m_sourceIndex;
 
-    //private static Pen s_parentPen = new Pen(Color.Orange, 3.0f);
-    //private static Pen s_siblingPen = new Pen(Color.Yellow, 1.0f);
+    private static Pen s_parentPen = new Pen(Brushes.Orange, 3.0f);
+    private static Pen s_siblingPen = new Pen(Brushes.Yellow, 1.0f);
 
     public LogViewEntry(LogEntry entry, long index) : base()
     {
@@ -59,50 +59,46 @@ public class LogViewEntry : ChronoTimestampedListViewEntry
         return m_entry.Text;
     }
 
-    protected override void PaintRest(DrawingContext context, ChronoListViewPort.IView view, ref Rect rect, EntryMarkState selected)
+    protected override void PaintRest(DrawingContext context, ChronoListViewPort.IView view, ref Rect rect, EntryMarkState markings)
     {
+        var color = ((markings & EntryMarkState.Selected) != EntryMarkState.None) ? Brushes.White : GetDefaultEntryTypeColor(m_entry.EntryType);
+        var fontSize = view.FontSize;
+        string headerText = this.GetHeaderText();
+        var headerWidth = view.ViewSettings.LineHeaderWidth * fontSize;
+        var w = DrawTextField(context, view, color, headerText, rect, headerWidth);
+        if ((w / fontSize) > headerWidth)
+        {
+            headerWidth = w;
+            view.ViewSettings.LineHeaderWidth = headerWidth / fontSize;
+        }
+        rect = new Rect(new Point(rect.X + headerWidth + 4 + (m_entry.IndentLevel * fontSize * 4.0), rect.Y), rect.BottomRight);
+
+        if ((markings & EntryMarkState.Parent) != EntryMarkState.None)
+        {
+            //pe.Graphics.DrawLine(s_parentPen, new Point(rect.X - 3, rect.Top), new Point(rect.X - 3, rect.Bottom));           // TODO
+        }
+        if ((markings & EntryMarkState.Sibling) != EntryMarkState.None)
+        {
+            //pe.Graphics.DrawLine(s_siblingPen, new Point(rect.X - 3, rect.Top), new Point(rect.X - 3, rect.Bottom));          // TODO
+        }
+
+        var location = this.GetLocationText();
+        var text = this.GetDetailsText();
+        if (location != null)
+        {
+            w = DrawTextField(context, view, color, location, rect);
+            if (text != null)
+            {
+                rect = new Rect(new Point(rect.X + w + fontSize, rect.Y), rect.BottomRight);
+                w = DrawTextField(context, view, color, "-", rect);
+                rect = new Rect(new Point(rect.X + w + fontSize, rect.Y), rect.BottomRight);
+            }
+        }
+        if (text != null)
+        {
+            w = DrawTextField(context, view, color, text, rect);
+        }
     }
-
-    //protected override void PaintRest(PaintEventArgs pe, ChronoListViewPort.IView view, ref Rectangle rect, EntryMarkState markings)
-    //{
-    //    var color = ((markings & EntryMarkState.Selected) != EntryMarkState.None) ? Brushes.White : GetDefaultEntryTypeColor(m_entry.EntryType);
-
-    //    string headerText = this.GetHeaderText();
-    //    var width = view.ViewSettings.LineHeaderWidth;
-    //    var w = DrawTextField(pe.Graphics, view.NormalFont, color, headerText, ChronoListViewEntry.NormalStringFormat, ref rect, width);
-    //    if (w > width)
-    //    {
-    //        width = w;
-    //        view.ViewSettings.LineHeaderWidth = width;
-    //    }
-    //    rect.X += width + 4 + (m_entry.IndentLevel * 40);
-
-    //    if ((markings & EntryMarkState.Parent) != EntryMarkState.None)
-    //    {
-    //        pe.Graphics.DrawLine(s_parentPen, new Point(rect.X - 3, rect.Top), new Point(rect.X - 3, rect.Bottom));
-    //    }
-    //    if ((markings & EntryMarkState.Sibling) != EntryMarkState.None)
-    //    {
-    //        pe.Graphics.DrawLine(s_siblingPen, new Point(rect.X - 3, rect.Top), new Point(rect.X - 3, rect.Bottom));
-    //    }
-
-    //    var location = this.GetLocationText();
-    //    var text = this.GetDetailsText();
-    //    if (location != null)
-    //    {
-    //        w = DrawTextField(pe.Graphics, view.NormalFont, color, location, ChronoListViewEntry.NormalStringFormat, ref rect);
-    //        if (text != null)
-    //        {
-    //            rect.X += w + 15;
-    //            w = DrawTextField(pe.Graphics, view.NormalFont, color, "-", ChronoListViewEntry.NormalStringFormat, ref rect);
-    //            rect.X += w + 15;
-    //        }
-    //    }
-    //    if (text != null)
-    //    {
-    //        w = DrawTextField(pe.Graphics, view.NormalFont, color, text, ChronoListViewEntry.NormalStringFormat, ref rect);
-    //    }
-    //}
 
     public static IBrush GetDefaultEntryTypeColor(LogEntry.Type type)
     {
@@ -138,10 +134,10 @@ public class LogViewEntry : ChronoTimestampedListViewEntry
 }
 
 
-public class LogViewEntryFactory : ILogViewEntryFactory<LogViewEntry>
+public class LogViewEntryFactory : IChronoListViewEntryFactory<ChronoListViewEntry>
 {
-    public void CreatePresentationEntry(LogEntry entry, long sourceIndex, Action<LogViewEntry> adder)
+    public void CreatePresentationEntry(ITimestampedData entry, long sourceIndex, Action<ChronoListViewEntry> adder)
     {
-        adder(new LogViewEntry(entry, sourceIndex));
+        adder(new LogViewEntry(entry as LogEntry, sourceIndex));
     }
 }

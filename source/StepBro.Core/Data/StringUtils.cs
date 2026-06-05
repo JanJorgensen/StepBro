@@ -18,9 +18,20 @@ namespace StepBro.Core.Data
         private const long TicksPerHalfMillisecond = TimeSpan.TicksPerMillisecond / 2;
         private const long TicksPerMillisecond = TimeSpan.TicksPerMillisecond;
 
+        public static string ToHMSTimestamp(this TimeSpan time)
+        {
+            return String.Concat((time.Hours + (time.Days * 24)).ToString("00"), ":", time.Minutes.ToString("00"), ":", time.Seconds.ToString("00"), ".", time.Milliseconds.ToString("000"));
+        }
+
         public static string ToMinutesTimestamp(this TimeSpan time)
         {
-            return String.Concat(time.Minutes.ToString("00"), ":", time.Seconds.ToString("00"), ".", time.Milliseconds.ToString("000"));
+            return String.Concat((time.Hours + (time.Days * 24) * 60 + time.Minutes).ToString(), ":", time.Seconds.ToString("00"), ".", time.Milliseconds.ToString("000"));
+        }
+
+        public static string ToHMSTimestamp(this DateTime time, DateTime zero)
+        {
+            if (time >= zero) return (time - zero).ToHMSTimestamp();
+            else return "-" + ((zero - time).ToHMSTimestamp());
         }
 
         public static string ToMinutesTimestamp(this DateTime time, DateTime zero)

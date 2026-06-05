@@ -9,7 +9,7 @@ namespace StepBro.HostSupport.Models
 {
     internal class FileViewModel : ItemViewModel
     {
-        public FileViewModel(ILoadedFile file) : base("LoadedFile_" + file.FilePath.Replace(' ','_'))
+        public FileViewModel(ILoadedFile file) : base(ViewType.LoadedScriptFileDocument, "LoadedFile_" + file.FilePath.Replace(' ','_'))
         {
 
         }

@@ -816,10 +816,12 @@ namespace StepBro.Core.Parser
                 {
                     var file = filesToCheck.Dequeue();
                     bool addNow = true;
+                    System.Diagnostics.Debug.WriteLine($"Get file usings for {file.FileName}");
                     foreach (var fu in file.ListReferencedScriptFiles())
                     {
                         if (!sortedAfterDependencies.Contains(fu))
                         {
+                            System.Diagnostics.Debug.WriteLine($"  Not found: {fu.FileName}");
                             filesToCheck.Enqueue(file); // Put back in queue.
                             addNow = false;
                             break;

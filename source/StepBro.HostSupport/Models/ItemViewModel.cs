@@ -9,11 +9,22 @@ namespace StepBro.HostSupport.Models
 {
     public partial class ItemViewModel : ObservableObject
     {
+        public enum ViewType
+        {
+            FileDocument,               // A file (not script file). Default placed in the documents panel, but can be moved to the secondary panel.
+            LoadedScriptFileDocument,   // A file registered in the  Default placed in the documents panel, but can be moved to the secondary panel.
+            ExecutionLog,               // Can be placed in either the documents, the secondary or the bottom panel.
+            StepBroView,                // Problems, Calculator, Object Command view
+            ObjectToolPanel             // Custom panel created by a plugin/addon.
+        }
+
         private string m_title = null;
         private bool m_isModified = false;
+        private ViewType m_type;
         //private ImageSource imageSource;
-        public ItemViewModel(string serializationID)
+        public ItemViewModel(ViewType type, string serializationID)
         {
+            m_type = type;
             m_serializationID = serializationID;
         }
 
@@ -64,6 +75,11 @@ namespace StepBro.HostSupport.Models
         [ObservableProperty]
         private bool m_isSelected = false;
 
+        /// <summary>
+        /// Gets or sets the index of the item in its parent container.
+        /// </summary>
+        [ObservableProperty]
+        private int m_tabIndex = -1;
 
 
         ///// <summary>

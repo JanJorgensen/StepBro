@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
-using System.Windows.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StepBro.Core;
 using StepBro.Core.Data;
 using StepBro.Core.Execution;
 using StepBro.Core.General;
+using StepBro.Core.Host.Presentation;
 using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading;
+using System.Windows.Input;
 using static StepBro.Core.Data.PropertyBlockDecoder;
 using StepBroMain = StepBro.Core.Main;
 
@@ -23,7 +24,7 @@ namespace StepBro.HostSupport.Models;
 /// </summary>
 public partial class HostAppModel : ObservableObject
 {
-    public static readonly string WG_PRIMARY = "PRIMARY";
+    public static readonly string WG_PRIMARY = "PRIMARY";       // The Primary Window Group is only for the selected "Tool" in the side bar (like in VS Code).
     public static readonly string WG_SECONDARY = "SECONDARY";
     public static readonly string WG_DOCUMENT = "DOCUMENT";
     public static readonly string WG_BOTTOM = "BOTTOM";
@@ -50,7 +51,7 @@ public partial class HostAppModel : ObservableObject
     private RelayCommand m_commandShowExecutionLogView;
     private ICommand m_commandShowCalculatorTool;
 
-    private readonly ItemViewModel m_executionLogView = null;
+    //private readonly ItemViewModel m_executionLogView = null;
     private readonly ItemViewModel m_problemsView = null;
 
     //private readonly PropertiesViewModel m_propertiesViewModel = null;
@@ -74,6 +75,7 @@ public partial class HostAppModel : ObservableObject
     //private readonly CustomPanelManager m_panelManager = null;
     private ToolsInteractionModel m_toolsInteractionModel = null;
 
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // OBJECT
     /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,11 +87,16 @@ public partial class HostAppModel : ObservableObject
     {
         g_syncContext = SynchronizationContext.Current;         // The CTOR MUST then be called from the UI thread !!!!
 
-        m_executionLogView = new ItemViewModel("ExecutionLogView") { Title = "EXECUTION LOG", SupportedWindowGroups = [WG_DOCUMENT, WG_SECONDARY, WG_BOTTOM] };
-        m_problemsView = new ItemViewModel("ProblemsView") { Title = "PROBLEMS", SupportedWindowGroups = [WG_BOTTOM] };
+        m_problemsView = new ItemViewModel(ItemViewModel.ViewType.StepBroView, "ProblemsView") { Title = "PROBLEMS", SupportedWindowGroups = [WG_BOTTOM] };
+
+        m_itemViews.CollectionChanged += ItemViews_CollectionChanged;
     }
 
-    public void Initialize(object logViewerModel, params IService[] hostServices)
+    private void ItemViews_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+    }
+
+    public void Initialize(ItemViewModel logViewerModel, params IService[] hostServices)
     {
         //var cmd = ApplicationCommands.Save;
 
@@ -97,9 +104,10 @@ public partial class HostAppModel : ObservableObject
         //m_panelManager = new CustomPanelManager(out panelManagerService);
 
         StepBroMain.Initialize(hostServices);
-        m_executionLogView.DataContext = logViewerModel;
 
-        m_itemViews.Add(m_executionLogView);
+        UserDataStationManager.LoadUserSettingsOnStation();
+
+        m_itemViews.Add(logViewerModel);
         m_itemViews.Add(m_problemsView);
 
         //m_propertiesViewModel = new PropertiesViewModel();
@@ -122,7 +130,7 @@ public partial class HostAppModel : ObservableObject
 
         //m_commandLineOptions = StepBro.Core.General.CommandLineParser.Parse<CommandLineOptions>(null, Environment.GetCommandLineArgs(), System.Console.Out);
 
-        m_commandShowExecutionLogView = new RelayCommand(() => { this.ShowView(m_executionLogView, true); });
+        m_commandShowExecutionLogView = new RelayCommand(() => { this.ShowView(logViewerModel, true); });
 
         //this.UpdateCustomPanelsMenu();
     }
@@ -594,9 +602,7 @@ public partial class HostAppModel : ObservableObject
             ILoadedFile file = new LoadedFileBase(name, LoadedFileType.ClearText);
             if (initialText == null)
             {
-                file.OffDiskFileContent = "procedure void MyProcedure()" + Environment.NewLine +
-                    "{" + Environment.NewLine +
-                    "}" + Environment.NewLine;
+                file.OffDiskFileContent = "<text here>";
             }
             file.RegisterDependant(this);
             StepBroMain.GetLoadedFilesManager().RegisterLoadedFile(file);

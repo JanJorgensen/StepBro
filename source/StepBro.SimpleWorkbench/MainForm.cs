@@ -551,7 +551,7 @@ namespace StepBro.SimpleWorkbench
                     {
                         m_outputFormatter = m_outputAddon.Create(options, writer);
 
-                        var logEntry = StepBroMain.Logger.GetFirst().Item2;
+                        var logEntry = StepBroMain.Logger.GetFirst().Item2 as LogEntry;
                         var zeroTime = logEntry.Timestamp;
                         while (logEntry != null)
                         {

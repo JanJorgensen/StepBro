@@ -3,9 +3,9 @@ using System;
 
 namespace StepBro.Core.Logging
 {
-    public class Logger : IDisposable, IDataListSource<LogEntry>
+    public class Logger : IDisposable, IDataListSource<ITimestampedData>
     {
-        private class LogWalker : IDataWalker<LogEntry>
+        private class LogWalker : IDataWalker<ITimestampedData>
         {
             private Logger m_parent;
             private LogEntry m_current;
@@ -20,11 +20,11 @@ namespace StepBro.Core.Logging
                 m_name = "LoggerWalker";
             }
 
-            public LogEntry CurrentEntry { get { return m_current; } }
+            public ITimestampedData CurrentEntry { get { return m_current; } }
 
             public long CurrentIndex { get { return m_currentIndex; } }
 
-            public LogEntry GetNext()
+            public ITimestampedData GetNext()
             {
                 if (m_current.Next != null)
                 {
@@ -43,7 +43,7 @@ namespace StepBro.Core.Logging
                 return m_current.Next != null;
             }
 
-            public IDataWalker<LogEntry> Dublicate()
+            public IDataWalker<ITimestampedData> Dublicate()
             {
                 var walker = new LogWalker(m_parent, m_current, m_currentIndex);
                 walker.m_name = m_name + "Derived";
@@ -130,15 +130,15 @@ namespace StepBro.Core.Logging
 
         public bool IsDebugging { get; set; } = false;
 
-        public Tuple<long, LogEntry> GetFirst()
+        public Tuple<long, ITimestampedData> GetFirst()
         {
             lock (m_sync)
             {
-                return new Tuple<long, LogEntry>(m_history.FirstIndex, m_history.FirstEntry);
+                return new Tuple<long, ITimestampedData>(m_history.FirstIndex, m_history.FirstEntry);
             }
         }
 
-        public LogEntry GetLast()
+        public ITimestampedData GetLast()
         {
             lock (m_sync)
             {
@@ -161,7 +161,7 @@ namespace StepBro.Core.Logging
             }
         }
 
-        public LogEntry Get(long index)
+        public ITimestampedData Get(long index)
         {
             return m_history.Get(index);
         }
@@ -178,7 +178,7 @@ namespace StepBro.Core.Logging
             }
         }
 
-        public IDataWalker<LogEntry> WalkFrom(long first)
+        public IDataWalker<ITimestampedData> WalkFrom(long first)
         {
             if (first < 0) first = m_history.FirstIndex;
             var entry = m_history.Get(first);

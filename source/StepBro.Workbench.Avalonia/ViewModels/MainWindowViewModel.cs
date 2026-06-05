@@ -1,6 +1,8 @@
-﻿namespace StepBro.Workbench.ViewModels
+﻿using StepBro.HostSupport.Models;
+
+namespace StepBro.Workbench.ViewModels
 {
-    public partial class MainWindowViewModel : ViewModelBase
+    public partial class MainWindowViewModel : HostAppModel
     {
 #pragma warning disable CA1822 // Mark members as static
         public string Greeting => "Welcome to the Workbench!";

@@ -8,36 +8,38 @@ namespace StepBro.Core.Logging
 {
     public static class LogFilters
     {
-        public static bool ShowAll(LogEntry entry)
+        public static bool ShowAll(ITimestampedData entry)
         {
             return true;
         }
-        public static bool Normal(LogEntry entry)
+        public static bool Normal(ITimestampedData entry)
         {
-            if (entry.EntryType == LogEntry.Type.Component) return false;
-            return (entry.EntryType != LogEntry.Type.Post || entry.IndentLevel < 3) && (entry.Text != null || entry.Location != null);
+            var e = entry as LogEntry;
+            if (e.EntryType == LogEntry.Type.Component) return false;
+            return (e.EntryType != LogEntry.Type.Post || e.IndentLevel < 3) && (e.Text != null || e.Location != null);
         }
 
-        public static bool Level2Max(LogEntry entry)
+        public static bool Level2Max(ITimestampedData entry)
         {
-            return (entry.IndentLevel < 2);
+            return ((entry as LogEntry).IndentLevel < 2);
         }
-        public static bool Level3Max(LogEntry entry)
+        public static bool Level3Max(ITimestampedData entry)
         {
-            return (entry.IndentLevel < 3);
+            return ((entry as LogEntry).IndentLevel < 3);
         }
-        public static bool Level4Max(LogEntry entry)
+        public static bool Level4Max(ITimestampedData entry)
         {
-            return (entry.IndentLevel < 4);
+            return ((entry as LogEntry).IndentLevel < 4);
         }
-        public static bool Level5Max(LogEntry entry)
+        public static bool Level5Max(ITimestampedData entry)
         {
-            return (entry.IndentLevel < 5);
+            return ((entry as LogEntry).IndentLevel < 5);
         }
 
-        public static bool NormalWithoutDetailedAndComm(LogEntry entry)
+        public static bool NormalWithoutDetailedAndComm(ITimestampedData entry)
         {
-            switch (entry.EntryType)
+            var e = (LogEntry)entry;
+            switch (e.EntryType)
             {   
                 case LogEntry.Type.Normal:
                 case LogEntry.Type.Pre:
@@ -48,7 +50,7 @@ namespace StepBro.Core.Logging
                 case LogEntry.Type.Failure:
                 case LogEntry.Type.UserAction:
                 case LogEntry.Type.System:
-                    return entry.Text != null || entry.Location != null;
+                    return e.Text != null || e.Location != null;
                 case LogEntry.Type.Component:
                 case LogEntry.Type.Post:
                 case LogEntry.Type.Detail:

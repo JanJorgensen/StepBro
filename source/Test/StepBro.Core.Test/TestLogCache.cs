@@ -11,7 +11,7 @@ namespace StepBro.Core.Test
         public void InitialState()
         {
             var logger = new Logger("", false, "UnitTest", "Go!");
-            var cache = new DataCache<LogEntry>(logger, 20, 10);
+            var cache = new DataCache<ITimestampedData>(logger, 20, 10);
             
             var loggerState = logger.GetState();
             Assert.AreEqual(1L, loggerState.EffectiveCount);
@@ -26,7 +26,7 @@ namespace StepBro.Core.Test
         public void OnlyFewLogEntries()
         {
             var logger = new Logger("", false, "UnitTest", "Go!");
-            var cache = new DataCache<LogEntry>(logger, 20, 10);
+            var cache = new DataCache<ITimestampedData>(logger, 20, 10);
 
             var first = cache.Get(0L);
             Assert.IsNotNull(first);
@@ -72,7 +72,7 @@ namespace StepBro.Core.Test
 
             entry = cache.Get(15L);         // Get one of the cached entries.
             Assert.IsNotNull(entry);
-            Assert.AreEqual("Entry16", entry.Text);
+            Assert.AreEqual("Entry16", (entry as LogEntry).Text);
             range = cache.CachedRange();
             Assert.AreEqual(0L, range.Item1);
             Assert.AreEqual(16L, range.Item2);

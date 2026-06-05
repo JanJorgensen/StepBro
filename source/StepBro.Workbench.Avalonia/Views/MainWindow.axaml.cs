@@ -1,9 +1,12 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using StepBro.Core.General;
 using StepBro.Core;
+using StepBro.Core.General;
+using StepBro.Core.Logging;
 using StepBro.HostSupport.Models;
 using StepBro.UI.Controls;
+using StepBro.Workbench.ViewModels;
+using System.Threading;
 
 namespace StepBro.Workbench.Views
 {
@@ -13,23 +16,52 @@ namespace StepBro.Workbench.Views
         private bool m_xBottomShown = true;
         private bool m_xLeftShown = true;
         private bool m_xRightShown = true;
+        private bool m_closing = false;
 
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new HostAppModel();
-            var logViewerModel = new LogViewerModel<LogViewEntry>(new LogViewEntryFactory());
+        }
+
+        private MainWindowViewModel AppModel { get { return this.DataContext as MainWindowViewModel; } }
+
+        protected override void OnLoaded(RoutedEventArgs e)
+        {
+            var logViewerModel = new LogViewerModel<ChronoListViewEntry>(new LogViewEntryFactory());
             IService m_textFileSystemService = null;
             new TextFileSystem(out m_textFileSystemService);
             this.AppModel.Initialize(logViewerModel, m_textFileSystemService);
             logViewerModel.Setup();
+            logViewer.DataContext = logViewerModel;
+
+            threadLogger = this.AppModel.RootLogger.LogEntering("Workbench", "Crazy Logging");
+
+            var logger = new System.Threading.Thread(LoggerThread);
+            logger.Start();
+
+            this.UpdatePanels();
         }
 
-        private HostAppModel AppModel { get { return this.DataContext as HostAppModel; } }
+        ILogger threadLogger = null;
 
-        protected override void OnLoaded(RoutedEventArgs e)
+        void LoggerThread()
         {
-            this.UpdatePanels();
+            System.Random rnd = new System.Random();
+            while (!m_closing)
+            {
+                Thread.Sleep(50);
+
+                for (int i = 0; i < 10; i++)
+                {
+                    threadLogger.Log("Spunk " + StepBro.Core.Data.AlphaID.Create((uint)rnd.Next(2000000000), 5));
+                }
+            }
+        }
+
+        protected override void OnClosing(WindowClosingEventArgs e)
+        {
+            base.OnClosing(e);
+            m_closing = true;
         }
 
         void checkBox_Layout(object sender, RoutedEventArgs e)
@@ -76,7 +108,7 @@ namespace StepBro.Workbench.Views
             System.Diagnostics.Debug.WriteLine("Button");
         }
 
-        private void panelAlignmentSelector_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+        private void panelAlignmentSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             this.UpdatePanels();
             //var port = new StepBro.UI.Controls.ChronoListViewPort();
