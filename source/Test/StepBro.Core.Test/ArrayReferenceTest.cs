@@ -35,16 +35,14 @@ namespace StepBroCoreTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void TestLengthWrong1()
         {
-            var arr = new ArrayReference<int>(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }, 0, 9);
+            Assert.Throws<ArgumentOutOfRangeException>(() => { var arr = new ArrayReference<int>(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }, 0, 9); });
         }
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void TestLengthWrong2()
         {
-            var arr = new ArrayReference<int>(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }, 1, 8);
+            Assert.Throws<ArgumentOutOfRangeException>(() => { var arr = new ArrayReference<int>(new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }, 1, 8); });
         }
     }
 
