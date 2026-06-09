@@ -164,7 +164,7 @@ public class LogViewerModel<TViewEntryType> : ItemViewModel where TViewEntryType
     {
         m_viewEntryCreator = viewEntryCreator;
         m_listView = new ChronoListViewModel<TViewEntryType>();
-        this.Title = "EXECUTION LOG";
+        this.Title = "LOG";
         this.SupportedWindowGroups = [HostAppModel.WG_DOCUMENT, HostAppModel.WG_SECONDARY, HostAppModel.WG_BOTTOM];
         this.DataContext = this;
 

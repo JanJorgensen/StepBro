@@ -17,34 +17,32 @@ namespace StepBro.Workbench.Views
         private bool m_xLeftShown = true;
         private bool m_xRightShown = true;
         private bool m_closing = false;
+        private ILogger m_threadLogger = null;
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private MainWindowViewModel AppModel { get { return this.DataContext as MainWindowViewModel; } }
+        private MainWindowViewModel Model { get { return this.DataContext as MainWindowViewModel; } }
 
         protected override void OnLoaded(RoutedEventArgs e)
         {
-            var logViewerModel = new LogViewerModel<ChronoListViewEntry>(new LogViewEntryFactory());
-            IService m_textFileSystemService = null;
-            new TextFileSystem(out m_textFileSystemService);
-            this.AppModel.Initialize(logViewerModel, m_textFileSystemService);
-            logViewerModel.Setup();
-            logViewer.DataContext = logViewerModel;
-
-            threadLogger = this.AppModel.RootLogger.LogEntering("Workbench", "Crazy Logging");
-
-            var logger = new System.Threading.Thread(LoggerThread);
-            logger.Start();
-
             this.UpdatePanels();
+
+            if (m_threadLogger != null)
+            {
+                var logger = new System.Threading.Thread(LoggerThread);
+                logger.Start();
+            }
         }
 
-        ILogger threadLogger = null;
+        internal void StartLogging()
+        {
+            m_threadLogger = this.Model.StepBroHostModel?.RootLogger.LogEntering("Workbench", "Crazy Logging");
+        }
 
-        void LoggerThread()
+        private void LoggerThread()
         {
             System.Random rnd = new System.Random();
             while (!m_closing)
@@ -53,7 +51,7 @@ namespace StepBro.Workbench.Views
 
                 for (int i = 0; i < 10; i++)
                 {
-                    threadLogger.Log("Spunk " + StepBro.Core.Data.AlphaID.Create((uint)rnd.Next(2000000000), 5));
+                    m_threadLogger.Log("Spunk " + StepBro.Core.Data.AlphaID.Create((uint)rnd.Next(2000000000), 5));
                 }
             }
         }

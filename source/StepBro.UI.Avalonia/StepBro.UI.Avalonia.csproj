@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="12.0.4" />
-    <PackageReference Include="Avalonia.AvaloniaEdit" Version="12.0.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
   </ItemGroup>
 

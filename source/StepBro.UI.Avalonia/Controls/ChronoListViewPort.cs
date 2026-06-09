@@ -7,7 +7,6 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
 using Avalonia.Threading;
-using AvaloniaEdit.Utils;
 using StepBro.Core.Data;
 using StepBro.HostSupport;
 using StepBro.HostSupport.Models;

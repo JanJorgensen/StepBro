@@ -11,16 +11,27 @@
         Icon="/Assets/StepBro.Workbench.ico"
         Title="StepBro Workbench">
 
-<!--  <Design.DataContext>
-    --><!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) --><!--
+  <Design.DataContext>
     <vm:MainWindowViewModel/>
   </Design.DataContext>
--->
+
   <DockPanel>
     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="LightGray">
       <Button Name="mainMenu" Background="Transparent">
         <Image Height="20" Width="20" Source="/Assets/menu.png"/>
+        <Button.ContextMenu>
+          <ContextMenu>
+            <MenuItem Header="_File">
+              <MenuItem Header="_Open..."/>
+              <Separator/>
+              <MenuItem Header="_Exit"/>
+            </MenuItem>
+            <MenuItem Header="_Edit">
+              <MenuItem Header="Copy"/>
+              <MenuItem Header="Paste"/>
+            </MenuItem>
+          </ContextMenu>
+        </Button.ContextMenu>
       </Button>
       <CheckBox Name="checkBoxPrimaryLeft" IsChecked="true" Margin="5 0 0 0" IsCheckedChanged="CheckBoxPrimaryOnLeft_Click">Primary on Left</CheckBox>
       <CheckBox Name="checkBoxLeft" IsChecked="true" Margin="5 0 0 0" IsCheckedChanged="checkBox_Layout">Left</CheckBox>
@@ -103,7 +114,6 @@
         <DockPanel Name="xMid" Grid.Column="1" Grid.Row="0">
           <TabControl SelectedIndex="0" >
             <TabItem Header="Execution Log">
-              <lib:LogViewer Name="logViewer"></lib:LogViewer>
             </TabItem>
             <TabItem Header="PCM02.Workbench.sbs">
               <StackPanel>

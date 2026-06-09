@@ -43,7 +43,10 @@ namespace StepBro.UI.WinForms.Controls
 
         public static ImageList Images { get { return m_imageList; } }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public object HostTopFileDependancyObject { get; set; } = null;
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public object HostDependancyObject { get; set; } = null;
 
         protected override void OnLoad(EventArgs e)

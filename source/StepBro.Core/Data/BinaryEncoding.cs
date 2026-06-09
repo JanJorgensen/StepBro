@@ -23,9 +23,13 @@ namespace StepBro.Core.Data
         public BinaryEncoding(Endianness endianness, System.Text.Encoding textEncoding = null)
         {
             m_endianness = endianness;
-            if (textEncoding == null)
+            if (textEncoding != null)
             {
-                textEncoding = System.Text.Encoding.Latin1;
+                m_textEncoding = textEncoding;
+            }
+            else
+            {
+                m_textEncoding = System.Text.Encoding.Latin1;
             }
         }
 

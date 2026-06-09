@@ -3,6 +3,7 @@ using StepBro.Core.Data;
 using StepBro.HostSupport;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -163,6 +164,7 @@ namespace StepBro.UI.WinForms.Controls
         public event MouseOnLineEventHandler MouseDownOnLine;
         public event MouseOnLineEventHandler MouseUpOnLine;
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int HorizontalScrollPosition
         {
             get { return m_horizontalScrollPosition; }

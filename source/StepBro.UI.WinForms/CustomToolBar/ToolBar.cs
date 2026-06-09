@@ -260,6 +260,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
         }
 
         [ReadOnly(true)]
+        [DefaultValue(0)]
         public int Index { get { return m_index; } set { m_index = value; } }
 
         public new Color DefaultBackColor

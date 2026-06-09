@@ -87,13 +87,7 @@ public partial class HostAppModel : ObservableObject
     {
         g_syncContext = SynchronizationContext.Current;         // The CTOR MUST then be called from the UI thread !!!!
 
-        m_problemsView = new ItemViewModel(ItemViewModel.ViewType.StepBroView, "ProblemsView") { Title = "PROBLEMS", SupportedWindowGroups = [WG_BOTTOM] };
-
-        m_itemViews.CollectionChanged += ItemViews_CollectionChanged;
-    }
-
-    private void ItemViews_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-    {
+        m_problemsView = new ItemViewModel(ItemViewModel.ViewType.StepBroView, "ProblemsView") { Title = "PROBLEMS", SupportedWindowGroups = [WG_BOTTOM], DataContext = m_errors };
     }
 
     public void Initialize(ItemViewModel logViewerModel, params IService[] hostServices)

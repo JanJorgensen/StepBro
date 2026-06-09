@@ -41,14 +41,6 @@ namespace StepBro.HostSupport.Test
         [TestMethod]
         public void LoadOneScriptfile()
         {
-            //var logViewerModel = new LogViewerModel<LogViewTestEntry>(new LogViewTestEntryFactory());
-            //IService textFileSystemService = null;
-            //new TextFileSystem(out textFileSystemService);
-            //var hostAppModel = new HostAppModel();
-            //hostAppModel.Initialize(logViewerModel, textFileSystemService);
-            //logViewerModel.Setup();
-
-
             Assert.AreEqual(InitialViewCount, appModel.Views.Count);   // Log view and Problems view.
 
             var file = appModel.LoadScriptFile("c:/examples/scripts/Demo Procedure.sbs");

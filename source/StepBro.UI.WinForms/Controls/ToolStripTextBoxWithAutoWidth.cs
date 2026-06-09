@@ -2,6 +2,7 @@
 using StepBro.ToolBarCreator;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -40,6 +41,7 @@ namespace StepBro.UI.WinForms.Controls
             }
         }
 
+        [DefaultValue("")]
         public new string Text
         {
             get
@@ -78,6 +80,7 @@ namespace StepBro.UI.WinForms.Controls
             base.Text = text;
         }
 
+        [DefaultValue(40)]
         public new int Width
         {
             get { return base.Width; }
@@ -89,6 +92,7 @@ namespace StepBro.UI.WinForms.Controls
 
         #region IResizeable members
 
+        [DefaultValue(300)]
         public int MaxWidth
         {
             get { return m_maxWidth; }
@@ -112,6 +116,7 @@ namespace StepBro.UI.WinForms.Controls
             return this.GetPreferredSize(new Size(m_maxWidth, this.Height)).Width;
         }
 
+        [DefaultValue(null)]
         public string WidthGroup { get { return m_widthGroup; } set { m_widthGroup = value; } }
 
         #endregion

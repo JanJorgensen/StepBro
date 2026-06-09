@@ -62,21 +62,25 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
+        [DefaultValue(null)]
         public string Instance
         {
             get { return (m_logic.StartAction.TargetObject != null) ? m_logic.StartAction.TargetObject : (string)m_parent.TryGetChildProperty("Instance"); }
             set { m_logic.StartAction.TargetObject = value; m_logic.UpdateMode(); }
         }
+        [DefaultValue(null)]
         public string Procedure
         {
             get { return m_logic.StartAction.FileElementName; }
             set { m_logic.StartAction.FileElementName = value; m_logic.UpdateMode(); }
         }
+        [DefaultValue(null)]
         public string Partner
         {
             get { return m_logic.StartAction.Partner; }
             set { m_logic.StartAction.Partner = value; m_logic.UpdateMode(); }
         }
+        [DefaultValue(null)]
         public string ObjectCommand
         {
             get { return m_logic.StartAction.ObjectCommand; }
@@ -130,6 +134,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
+        [DefaultValue("")]
         public new string Text
         {
             get { return base.Text; }
@@ -162,6 +167,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             base.Text = text;
         }
 
+        [DefaultValue(40)]
         public new int Width
         {
             get { return base.Width; }
@@ -173,6 +179,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
 
         #region IResizeable members
 
+        [DefaultValue(300)]
         public int MaxWidth
         {
             get { return m_maxWidth; }
@@ -205,6 +212,7 @@ namespace StepBro.UI.WinForms.CustomToolBar
             }
         }
 
+        [DefaultValue(null)]
         public string WidthGroup { get { return m_widthGroup; } set { m_widthGroup = value; } }
 
         #endregion

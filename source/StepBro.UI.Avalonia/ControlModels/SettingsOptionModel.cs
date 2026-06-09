@@ -9,7 +9,7 @@ namespace StepBro.UI.ControlModels
     public partial class SettingsOptionModel : ObservableObject
     {
         [ObservableProperty]
-        private Bitmap? m_optionIcon = null;
+        private Bitmap m_optionIcon = null;
 
         //ImageHelper.LoadFromResource(new Uri("avares://LoadingImages/Assets/abstract.jpg"));
 
@@ -22,7 +22,7 @@ namespace StepBro.UI.ControlModels
         public bool OptionValueIsFalse { get { return this.OptionValue == false; } }
 
         [ObservableProperty]
-        private string? m_optionName = "Name";
+        private string m_optionName = "Name";
 
         [ObservableProperty]
         private string m_optionSettingName = "Setting";
