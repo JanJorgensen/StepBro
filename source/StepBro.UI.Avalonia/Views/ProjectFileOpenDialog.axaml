@@ -1,0 +1,70 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="StepBro.UI.ProjectFileOpenDialog"
+        Title="ProjectFileOpenDialog"
+        BorderThickness="5"
+        Background="LightGray">
+    <DockPanel>
+        <Panel DockPanel.Dock="Top" Margin="5 0 5 5" >
+              <Label Margin="5 5 5 5" FontSize="25">StepBro</Label>
+              <Label Margin="5 5 5 5" HorizontalAlignment="Center" FontSize="22" >Open File / Project</Label>
+        </Panel>
+
+        <DockPanel DockPanel.Dock="Bottom">
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                    <Button Margin="5 5 5 5">Select File On Disk</Button>
+                    <CheckBox Margin="5 5 5 5"></CheckBox>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Margin="5 5 5 5">OK</Button>
+                    <Button Margin="5 5 5 5">Cancel / Do not open file</Button>
+                </StackPanel>
+            <StackPanel></StackPanel>
+        </DockPanel>
+
+        <Grid ColumnDefinitions="*,10,*">
+            <DockPanel Grid.Column="0" Margin="5 5 5 5">
+                <DockPanel DockPanel.Dock="Top">
+                    <Label DockPanel.Dock="Left" Margin="5 8 5 2" FontSize="20">Resent Files</Label>
+                    <Button DockPanel.Dock="Right">Add to favorites</Button>
+                    <Panel/>
+                </DockPanel>
+                <ListBox BorderThickness="2">
+                    <ListBoxItem>AAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                </ListBox>
+            </DockPanel>
+            <Panel Grid.Column="1"></Panel>
+            <DockPanel Grid.Column="2" Margin="5 5 5 5">
+                <DockPanel DockPanel.Dock="Top">
+                    <Label DockPanel.Dock="Left" Margin="5 8 5 2" FontSize="20">Favorites</Label>
+                </DockPanel>
+                <ListBox BorderThickness="2">
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                    <ListBoxItem>AAAAAAAAAA</ListBoxItem>
+                </ListBox>
+            </DockPanel>
+        </Grid>
+
+    </DockPanel>
+</Window>
