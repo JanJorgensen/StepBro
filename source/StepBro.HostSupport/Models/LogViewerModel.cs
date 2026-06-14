@@ -11,19 +11,19 @@ using System.Threading.Tasks;
 
 namespace StepBro.HostSupport.Models;
 
-public class LogViewerModel<TViewEntryType> : ItemViewModel where TViewEntryType : class, ITimestampedViewEntry
+public class LogViewerModel : ItemViewModel
 {
-    private class ViewPresentationList : PresentationListForListData<ITimestampedData, TViewEntryType>
+    private class ViewPresentationList : PresentationListForListData<ITimestampedData, ITimestampedViewEntry>
     {
-        private IChronoListViewEntryFactory<TViewEntryType> m_viewEntryCreator;
+        private IChronoListViewEntryFactory m_viewEntryCreator;
 
-        public ViewPresentationList(IDataListSource<ITimestampedData> source, IChronoListViewEntryFactory<TViewEntryType> viewEntryCreator) :
+        public ViewPresentationList(IDataListSource<ITimestampedData> source, IChronoListViewEntryFactory viewEntryCreator) :
             base(source, 1000000, 50)
         {
             m_viewEntryCreator = viewEntryCreator;
         }
 
-        public override void CreatePresentationEntry(ITimestampedData entry, long sourceIndex, Action<TViewEntryType> adder)
+        public override void CreatePresentationEntry(ITimestampedData entry, long sourceIndex, Action<ITimestampedViewEntry> adder)
         {
             m_viewEntryCreator.CreatePresentationEntry(entry, sourceIndex, adder);
             //if ((entry.EntryType & LogEntry.Type.Special) != LogEntry.Type.Special)
@@ -37,13 +37,13 @@ public class LogViewerModel<TViewEntryType> : ItemViewModel where TViewEntryType
             //}
         }
 
-        public override LogEntry PresentationToSource(TViewEntryType entry)
+        public override LogEntry PresentationToSource(ITimestampedViewEntry entry)
         {
             return entry.DataObject as LogEntry;
         }
     }
 
-    private class PresentationListSearchingForFirstSource : PresentationListForListData<ITimestampedData, TViewEntryType>
+    private class PresentationListSearchingForFirstSource : PresentationListForListData<ITimestampedData, ITimestampedViewEntry>
     {
         private class EmptySource : IDataListSource<ITimestampedData>
         {
@@ -73,11 +73,11 @@ public class LogViewerModel<TViewEntryType> : ItemViewModel where TViewEntryType
             }
         }
 
-        private LogViewerModel<TViewEntryType> m_parent;
+        private LogViewerModel m_parent;
         private IDataListSource<ITimestampedData> m_source;
         private long m_lastBefore;
 
-        public PresentationListSearchingForFirstSource(LogViewerModel<TViewEntryType> parent, IDataListSource<ITimestampedData> source, long lastBefore) :
+        public PresentationListSearchingForFirstSource(LogViewerModel parent, IDataListSource<ITimestampedData> source, long lastBefore) :
             base(new EmptySource(), 100, 10)
         {
             m_parent = parent;
@@ -85,11 +85,11 @@ public class LogViewerModel<TViewEntryType> : ItemViewModel where TViewEntryType
             m_lastBefore = lastBefore;
         }
 
-        public override void CreatePresentationEntry(ITimestampedData entry, long sourceIndex, Action<TViewEntryType> adder)
+        public override void CreatePresentationEntry(ITimestampedData entry, long sourceIndex, Action<ITimestampedViewEntry> adder)
         {
         }
 
-        public override LogEntry PresentationToSource(TViewEntryType entry)
+        public override LogEntry PresentationToSource(ITimestampedViewEntry entry)
         {
             return null;
         }
@@ -147,10 +147,10 @@ public class LogViewerModel<TViewEntryType> : ItemViewModel where TViewEntryType
     private delegate bool SkipChecker(LogEntry entry);
 
     private IDataListSource<ITimestampedData> m_source = null;
-    private PresentationListForListData<ITimestampedData, TViewEntryType> m_presentationList = null;
-    private IChronoListViewEntryFactory<TViewEntryType> m_viewEntryCreator = null;
+    private PresentationListForListData<ITimestampedData, ITimestampedViewEntry> m_presentationList = null;
+    private IChronoListViewEntryFactory m_viewEntryCreator = null;
     private long m_lastEntryIndexBeforeClear = -1L;
-    private ChronoListViewModel<TViewEntryType> m_listView = null;
+    private ChronoListViewModel m_listView = null;
     private static ITimestampedData s_lastEntryBeforeClear = null;
     private NewLogStart m_zeroStartSource = null;
     private int m_visibleLevels = 1000;
@@ -160,10 +160,10 @@ public class LogViewerModel<TViewEntryType> : ItemViewModel where TViewEntryType
     private string m_searchText = "";
     private bool m_quickSearchActivated = false;
 
-    public LogViewerModel(IChronoListViewEntryFactory<TViewEntryType> viewEntryCreator) : base(ViewType.ExecutionLog, "LogViewer")
+    public LogViewerModel(IChronoListViewEntryFactory viewEntryCreator) : base(ViewType.ExecutionLog, "LogViewer")
     {
         m_viewEntryCreator = viewEntryCreator;
-        m_listView = new ChronoListViewModel<TViewEntryType>();
+        m_listView = new ChronoListViewModel();
         this.Title = "LOG";
         this.SupportedWindowGroups = [HostAppModel.WG_DOCUMENT, HostAppModel.WG_SECONDARY, HostAppModel.WG_BOTTOM];
         this.DataContext = this;
@@ -181,7 +181,7 @@ public class LogViewerModel<TViewEntryType> : ItemViewModel where TViewEntryType
         //this.SetupFromHeadMode();
     }
 
-    public ChronoListViewModel<TViewEntryType> ListViewModel { get { return m_listView; } }
+    public ChronoListViewModel ListViewModel { get { return m_listView; } }
 
     public string SearchText
     {

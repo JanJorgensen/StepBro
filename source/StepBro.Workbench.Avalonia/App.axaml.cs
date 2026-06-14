@@ -31,7 +31,7 @@ namespace StepBro.Workbench
             {
                 var mainViewModel = new MainWindowViewModel();
                 mainViewModel.StepBroHostModel = new HostAppModel();
-                var logViewerModel = new LogViewerModel<ChronoListViewEntry>(new LogViewEntryFactory());
+                var logViewerModel = new LogViewerModel(new LogViewEntryFactory());
                 IService m_textFileSystemService = null;
                 new TextFileSystem(out m_textFileSystemService);
                 mainViewModel.StepBroHostModel.Initialize(logViewerModel, m_textFileSystemService);

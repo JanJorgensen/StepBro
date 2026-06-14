@@ -31,9 +31,9 @@ namespace StepBro.UI.Controls
             IBrush NormalTextColor { get; }
         }
 
-        ChronoListViewModel<ChronoListViewEntry>.ViewPortModel m_model = null;
+        ChronoListViewModel.ViewPortModel m_model = null;
         private bool m_dataInvalidated = true;
-        IList<ChronoListViewEntry> m_entries = null;
+        IList<ITimestampedViewEntry> m_entries = null;
         private ChronoListViewDynamicSettings m_viewSettings = null;
         private Avalonia.Point m_mouseDownLocation = new Avalonia.Point();
         private Typeface m_normalFont = Typeface.Default;
@@ -59,7 +59,7 @@ namespace StepBro.UI.Controls
             this.InvalidateVisual();
         }
 
-        public void Setup(ChronoListViewModel<ChronoListViewEntry>.ViewPortModel model)
+        public void Setup(ChronoListViewModel.ViewPortModel model)
         {
             this.DataContext = m_model = model;
             m_viewSettings = model.ViewSettings;
@@ -153,7 +153,7 @@ namespace StepBro.UI.Controls
                 var lineHeight = m_model.LineHeight;
                 try
                 {
-                    foreach (var entry in m_entries)
+                    foreach (ChronoListViewEntry entry in m_entries)
                     {
                         if (entry == null) break;
 

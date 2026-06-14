@@ -15,7 +15,7 @@ namespace StepBro.HostSupport.Test
         [TestInitialize]
         public void Setup()
         {
-            var logViewerModel = new LogViewerModel<LogViewTestEntry>(new LogViewTestEntryFactory());
+            var logViewerModel = new LogViewerModel(new LogViewTestEntryFactory());
             IService testFileSystemService = null;
             var mockFileSystem = new StepBro.Core.Test.Mocks.TextFileSystemMock(out testFileSystemService);
             mockFileSystem.AddSomeScriptFiles();

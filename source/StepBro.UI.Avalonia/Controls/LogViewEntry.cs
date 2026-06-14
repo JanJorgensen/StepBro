@@ -134,9 +134,9 @@ public class LogViewEntry : ChronoTimestampedListViewEntry
 }
 
 
-public class LogViewEntryFactory : IChronoListViewEntryFactory<ChronoListViewEntry>
+public class LogViewEntryFactory : IChronoListViewEntryFactory
 {
-    public void CreatePresentationEntry(ITimestampedData entry, long sourceIndex, Action<ChronoListViewEntry> adder)
+    public void CreatePresentationEntry(ITimestampedData entry, long sourceIndex, Action<ITimestampedViewEntry> adder)
     {
         adder(new LogViewEntry(entry as LogEntry, sourceIndex));
     }

@@ -10,7 +10,7 @@ namespace StepBro.UI.Controls;
 
 public partial class ChronoListView : UserControl
 {
-    ChronoListViewModel<ChronoListViewEntry> m_model = null;
+    ChronoListViewModel m_model = null;
 
     public ChronoListView()
     {
@@ -27,7 +27,7 @@ public partial class ChronoListView : UserControl
     protected override void OnDataContextChanged(EventArgs e)
     {
         base.OnDataContextChanged(e);
-        if (this.DataContext is ChronoListViewModel<ChronoListViewEntry> model)
+        if (this.DataContext is ChronoListViewModel model)
         {
             m_model = model;
             viewPort.Setup(model.ViewPort);

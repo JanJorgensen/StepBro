@@ -16,7 +16,7 @@ public partial class LogViewer : UserControl
     protected override void OnDataContextChanged(EventArgs e)
     {
         base.OnDataContextChanged(e);
-        if (this.DataContext is LogViewerModel<ChronoListViewEntry> model)
+        if (this.DataContext is LogViewerModel model)
         {
             listView.DataContext = model.ListViewModel;
         }

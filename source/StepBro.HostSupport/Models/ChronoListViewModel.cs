@@ -12,9 +12,9 @@ using System.Windows.Input;
 
 namespace StepBro.HostSupport.Models;
 
-public partial class ChronoListViewModel<TViewEntryType> : ObservableObject where TViewEntryType : class, ITimestampedViewEntry
+public partial class ChronoListViewModel : ObservableObject
 {
-    private IPresentationList<TViewEntryType> m_presentationSource = null;
+    private IPresentationList<ITimestampedViewEntry> m_presentationSource = null;
     private ViewPortModel m_viewPort = null;
 
     private DateTime m_zeroTime;
@@ -25,11 +25,11 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
     private int m_verticalScrollValue = 0;
     private bool m_updateVerticalScroll = false;
     private long m_currentEntryIndex = -1L;
-    private TViewEntryType m_currentEntry = null;
+    private ITimestampedViewEntry m_currentEntry = null;
     private List<long> m_selectedEntries = new List<long>();
     private long m_lastSingleSelectionEntry = -1L;
     private long m_rangeSelectionEnd = -1L;
-    private Func<long, TViewEntryType, long, TViewEntryType, EntryMarkState> m_searchMatchChecker = null;
+    private Func<long, ITimestampedViewEntry, long, ITimestampedViewEntry, EntryMarkState> m_searchMatchChecker = null;
 
     private RelayCommand m_commandGotoHome;
     private RelayCommand m_commandGotoEnd;
@@ -49,7 +49,7 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
 
     public DateTime ZeroTime { get { return m_zeroTime; } set { m_zeroTime = value; } }
 
-    public IElementIndexer<TViewEntryType> Source { get { return m_presentationSource; } }
+    public IElementIndexer<ITimestampedViewEntry> Source { get { return m_presentationSource; } }
 
     public ViewPortModel ViewPort {  get { return m_viewPort; } }
 
@@ -75,7 +75,7 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
     [ObservableProperty]
     private int m_horizontalScrollValue = 0;
 
-    public void Setup(IPresentationList<TViewEntryType> model)
+    public void Setup(IPresentationList<ITimestampedViewEntry> model)
     {
         m_presentationSource = model;
         m_topEntry = 0;
@@ -175,13 +175,13 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         this.ViewChanged?.Invoke(this, new ViewChangedEventArgs(m_topEntry, 0 - this.HorizontalScrollValue));
     }
 
-    public void SetupSearchMatchChecker(Func<long, TViewEntryType, long, TViewEntryType, EntryMarkState> matchChecker)
+    public void SetupSearchMatchChecker(Func<long, ITimestampedViewEntry, long, ITimestampedViewEntry, EntryMarkState> matchChecker)
     {
         m_searchMatchChecker = matchChecker;
         this.RequestViewPortUpdate();
     }
 
-    public EntryMarkState GetEntryMarkState(long index, TViewEntryType entry)
+    public EntryMarkState GetEntryMarkState(long index, ITimestampedViewEntry entry)
     {
         var selectionState = EntryMarkState.None;
         if (m_selectedEntries.Count > 0)

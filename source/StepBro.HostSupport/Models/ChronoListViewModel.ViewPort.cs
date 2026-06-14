@@ -7,13 +7,13 @@ using System.Collections.Generic;
 
 namespace StepBro.HostSupport.Models;
 
-public partial class ChronoListViewModel<TViewEntryType>
+public partial class ChronoListViewModel
 {
     public partial class ViewPortModel : ObservableObject
     {
-        private ChronoListViewModel<TViewEntryType> m_view;
-        private IElementIndexer<TViewEntryType> m_source = null;
-        private List<TViewEntryType> m_viewEntries = new List<TViewEntryType>(200);
+        private ChronoListViewModel m_view;
+        private IElementIndexer<ITimestampedViewEntry> m_source = null;
+        private List<ITimestampedViewEntry> m_viewEntries = new List<ITimestampedViewEntry>(200);
         private int m_viewEntryCount = 0;
         private ChronoListViewDynamicSettings m_viewSettings = new ChronoListViewDynamicSettings();
         private Point m_mouseDownLocation = new Point();
@@ -28,7 +28,7 @@ public partial class ChronoListViewModel<TViewEntryType>
         private int m_newHorizontalScrollPosition = 0;
 
 
-        internal ViewPortModel(ChronoListViewModel<TViewEntryType> view)
+        internal ViewPortModel(ChronoListViewModel view)
         {
             m_view = view;
             m_source = view.Source;
@@ -47,7 +47,7 @@ public partial class ChronoListViewModel<TViewEntryType>
         [ObservableProperty]
         private int m_lineHeight = 20;
 
-        public ChronoListViewModel<TViewEntryType> View { get { return m_view; } }
+        public ChronoListViewModel View { get { return m_view; } }
 
         public ChronoListViewDynamicSettings ViewSettings { get { return m_viewSettings; } }
 
@@ -82,7 +82,7 @@ public partial class ChronoListViewModel<TViewEntryType>
             this.Invalidated?.Invoke(this, EventArgs.Empty);
         }
 
-        public IList<TViewEntryType> Refresh()
+        public IList<ITimestampedViewEntry> Refresh()
         {
             m_viewEntries.Clear();
             m_invalidated = false;

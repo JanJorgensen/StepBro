@@ -50,9 +50,9 @@ public class LogViewTestEntry : ITimestampedViewEntry
     }
 }
 
-public class LogViewTestEntryFactory : IChronoListViewEntryFactory<LogViewTestEntry>
+public class LogViewTestEntryFactory : IChronoListViewEntryFactory
 {
-    public void CreatePresentationEntry(ITimestampedData entry, long sourceIndex, Action<LogViewTestEntry> adder)
+    public void CreatePresentationEntry(ITimestampedData entry, long sourceIndex, Action<ITimestampedViewEntry> adder)
     {
         adder(new LogViewTestEntry(entry));
     }
