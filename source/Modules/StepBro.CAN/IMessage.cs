@@ -22,6 +22,7 @@ namespace StepBro.CAN
     {
         MessageType Type { get; }
         uint ID { get; set; }
+        int DataLength { get; }
         byte[] Data { get; set; }
         DateTime Timestamp { get; }
     }

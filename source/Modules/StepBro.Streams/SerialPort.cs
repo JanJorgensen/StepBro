@@ -39,7 +39,7 @@ namespace StepBro.Streams
     }
 
     [Public]
-    public class SerialPort : Stream, INameable
+    public class SerialPort : Stream, INameable, IComponentLoggerSource
     {
         public delegate void OpenPortFailureExplorer(ICallContext context, Exception ex);
         private static OpenPortFailureExplorer s_OpenPortFailureExplorer = null;

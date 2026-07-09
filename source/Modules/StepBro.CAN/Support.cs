@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StepBro.Core.Logging;
+using System;
 using System.Text;
 
 namespace StepBro.CAN
@@ -82,15 +83,36 @@ namespace StepBro.CAN
                 var s = new StringBuilder();
                 string HexAlphabet = "0123456789ABCDEF";
                 bool first = true;
-                foreach (byte B in message.Data)
+                int c = message.DataLength;
+                for (int i = 0; i < c; i++)
                 {
+                    var b = message.Data[i];
                     if (first) first = false;
                     else s.Append(" ");
-                    s.Append(HexAlphabet[(int)(B >> 4)]);
-                    s.Append(HexAlphabet[(int)(B & 0xF)]);
+                    s.Append(HexAlphabet[(int)(b >> 4)]);
+                    s.Append(HexAlphabet[(int)(b & 0xF)]);
                 }
                 return s.ToString();
             }
+        }
+    
+    
+        public static string CreateMessageLogText(this IMessage message)
+        {
+            return $"{message.ID.ToString("X08")} - {message.Data.Length.ToString().PadLeft(2)}   {message.GetDataAsString()}";
+        }
+
+        public static bool DecodeMessageLogText(this string text, out uint id, out byte[] data)
+        {
+            var parts = text.Split(' ');
+            if (!uint.TryParse(parts[0], out id))
+            {
+                data = null;
+                return false;
+            }
+
+            data = null;
+            return false;
         }
     }
 }

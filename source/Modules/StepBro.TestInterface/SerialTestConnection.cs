@@ -1008,7 +1008,7 @@ namespace StepBro.TestInterface
             var commandstring = command.GetAndMarkActive();
             m_loopbackAnswers?.TryGetValue(commandstring, out commandstring);
             if (m_nextResponse != null) commandstring = m_nextResponse;
-            if (command.Logger != null) command.Logger.LogCommSent(commandstring);
+            //if (command.Logger != null) command.Logger.LogCommSent(commandstring);
             m_currentExecutingCommand = command;
             DoSendDirect(commandstring);
         }

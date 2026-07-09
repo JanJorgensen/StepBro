@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using StepBro.Core.Api;
-using StepBro.Core.Execution;
+using StepBro.Core.Logging;
 
 namespace StepBro.CAN
 {
@@ -8,6 +8,6 @@ namespace StepBro.CAN
     public interface IDriver : StepBro.Core.Devices.IDriver
     {
         IEnumerable<IAdapter> ListAdapters();
-        IAdapter GetAdapter([Implicit] ICallContext context, string identification = "");
+        IAdapter GetAdapter([Implicit] ILogger logger, string identification = "");
     }
 }

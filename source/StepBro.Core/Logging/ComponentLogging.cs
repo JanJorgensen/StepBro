@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace StepBro.Core.Logging
 {
     public interface IComponentLoggerSource
     {
+        const string CAT_TEXT = "TEXT";
+
         string Name { get; }
         /// <summary>
         /// Set the enabled state of the logger source.
@@ -16,6 +19,10 @@ namespace StepBro.Core.Logging
         /// <returns>Whether the source changed the enabled state to the requested value.</returns>
         bool SetEnabled(bool value);
         bool Enabled { get; }
+        /// <summary>
+        /// The type of data for communication logging.
+        /// </summary>
+        string CommDataCategory { get; }
     }
 
     public interface IComponentLoggerService
@@ -29,21 +36,37 @@ namespace StepBro.Core.Logging
         bool Enabled { get; set; }
         event EventHandler EnabledChanged;
         string Name { get; }
-        DateTime LogState(string message);
-        DateTime LogSent(string message);
-        DateTime LogReceived(string message);
-        DateTime LogError(string text);
+        void LogState(string text);
+        void LogSent(string message);
+        void LogReceived(string message);
+        void LogError(string text);
     }
 
     internal class ComponentLoggerService : ServiceBase<IComponentLoggerService, ComponentLoggerService>, IComponentLoggerService
     {
         private class Logger : IComponentLogging
         {
-            IComponentLoggerSource m_source;
+            private IComponentLoggerSource m_source;
+            private ILoggerScope m_asyncLogger = null;
 
-            public Logger(IComponentLoggerSource source)
+            private Logger(IComponentLoggerSource source)
             {
                 m_source = source;
+            }
+
+            private void SetupLogger()
+            {
+                if (m_asyncLogger == null)
+                {
+                    m_asyncLogger = ((ILoggerScope)Core.Main.GetService<ILogger>()).LogEntering(LogEntry.Type.Component, m_source.Name, m_source.CommDataCategory, null);
+                }
+            }
+
+            public static Logger Create(IComponentLoggerSource source)
+            {
+                var logger = new Logger(source);
+                logger.SetupLogger();
+                return logger;
             }
 
             public string Name { get { return m_source.Name; } }
@@ -69,24 +92,24 @@ namespace StepBro.Core.Logging
             {
             }
 
-            public DateTime LogError(string text)
+            public void LogState(string text)
             {
-                return default(DateTime);
+                m_asyncLogger.Log(text);
             }
 
-            public DateTime LogReceived(string message)
+            public void LogSent(string message)
             {
-                return default(DateTime);
+                m_asyncLogger.LogCommSent(message);
             }
 
-            public DateTime LogSent(string message)
+            public void LogReceived(string message)
             {
-                return default(DateTime);
+                m_asyncLogger.LogCommReceived(message);
             }
 
-            public DateTime LogState(string message)
+            public void LogError(string text)
             {
-                return default(DateTime);
+                m_asyncLogger.LogError(text);
             }
         }
 
@@ -101,7 +124,7 @@ namespace StepBro.Core.Logging
 
         public IComponentLogging CreateComponentLogger(IComponentLoggerSource source)
         {
-            var logger = new Logger(source);
+            var logger = Logger.Create(source);
             m_loggers.Add(logger);
             return logger as IComponentLogging;
         }

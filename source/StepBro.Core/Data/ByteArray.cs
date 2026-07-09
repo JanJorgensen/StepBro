@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StepBro.Core.Data
+namespace StepBro
 {
     [Public]
     public class ByteArray : IEnumerable
@@ -91,6 +91,13 @@ namespace StepBro.Core.Data
         public static implicit operator ByteArray(byte[] data)
         {
             return new ByteArray(data);
+        }
+
+        public byte[] ToArray()
+        {
+            var array = new byte[this.Length];
+            Array.Copy(m_data, this.Start, array, 0, this.Length);
+            return array;
         }
     }
 
