@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using StepBro;
 using StepBro.Core.Data;
 using StepBro.Core.Parser;
 using StepBro.Core.ScriptData;

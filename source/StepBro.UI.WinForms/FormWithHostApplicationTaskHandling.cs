@@ -14,7 +14,7 @@ namespace StepBro.UI.WinForms
         private System.ComponentModel.IContainer components = null;
         private HostApplicationTaskHandler m_taskHandler;
         private System.Windows.Forms.Timer m_timer = null;
-        private StateChange m_taskWorkingState = StateChange.Idle;
+        private IHostTaskHandler.StateChange m_taskWorkingState = IHostTaskHandler.StateChange.Idle;
         private string m_taskWorkingText = "Ready";
         private int m_animationIndex = 0;
         private const int ANIMATION_STEPS = 4;
@@ -22,7 +22,7 @@ namespace StepBro.UI.WinForms
         public FormWithHostApplicationTaskHandling() : base()
         {
             components = new System.ComponentModel.Container();
-            m_taskHandler = new HostApplicationTaskHandler();
+            m_taskHandler = new HostApplicationTaskHandler(SynchronizationContext.Current);
             m_taskHandler.StateChangeEvent += TaskHandler_StateChangeEvent;
         }
 
@@ -55,24 +55,24 @@ namespace StepBro.UI.WinForms
             {
                 m_animationIndex = 0;
             }
-            m_taskWorkingState = StateChange.StillWorking;
+            m_taskWorkingState = IHostTaskHandler.StateChange.StillWorking;
             this.UpdateTaskWorkingState();
         }
 
-        private void TaskHandler_StateChangeEvent(object sender, StateChangedEventArgs e)
+        private void TaskHandler_StateChangeEvent(object sender, IHostTaskHandler.StateChangedEventArgs e)
         {
             switch (e.State)
             {
-                case StateChange.Idle:
+                case IHostTaskHandler.StateChange.Idle:
                     m_taskWorkingText = "Ready";
-                    m_taskWorkingState = StateChange.Idle;
+                    m_taskWorkingState = IHostTaskHandler.StateChange.Idle;
                     this.UpdateTaskWorkingState();
                     if (m_timer != null && m_timer.Enabled)
                     {
                         m_timer.Stop();
                     }
                     break;
-                case StateChange.StartingNew:
+                case IHostTaskHandler.StateChange.StartingNew:
                     m_taskWorkingText = e.WorkingText;
                     if (m_timer != null)
                     {
@@ -82,13 +82,13 @@ namespace StepBro.UI.WinForms
                             m_timer.Start();
                         }
                     }
-                    if (m_taskWorkingState == StateChange.Idle)
+                    if (m_taskWorkingState == IHostTaskHandler.StateChange.Idle)
                     {
-                        m_taskWorkingState = StateChange.StartingNew;
+                        m_taskWorkingState = IHostTaskHandler.StateChange.StartingNew;
                         this.UpdateTaskWorkingState();
                     }
                     break;
-                case StateChange.StillWorking:
+                case IHostTaskHandler.StateChange.StillWorking:
                     // Will never be sent from the HostApplicationTaskHandler.
                     break;
                 default:
@@ -99,7 +99,7 @@ namespace StepBro.UI.WinForms
         private void UpdateTaskWorkingState()
         {
             string text = m_taskWorkingText;
-            if (m_timer != null && m_taskWorkingState != StateChange.Idle)
+            if (m_timer != null && m_taskWorkingState != IHostTaskHandler.StateChange.Idle)
             {
                 switch (m_animationIndex)
                 {
@@ -128,15 +128,15 @@ namespace StepBro.UI.WinForms
         /// </summary>
         /// <param name="change">The </param>
         /// <param name="workingText"></param>
-        protected virtual void OnTaskHandlingStateChanged(StateChange change, string workingText)
+        protected virtual void OnTaskHandlingStateChanged(IHostTaskHandler.StateChange change, string workingText)
         {
         }
 
-        protected void AddTask<TState>(
-            HostApplicationTaskHandler.Task<TState> task, 
-            HostApplicationTaskHandler.Priority priority,
+        protected void AddTask(
+            IHostTaskHandler.Task task,
+            IHostTaskHandler.Priority priority,
             string workingText, 
-            string purposeText) where TState : struct, System.Enum
+            string purposeText)
         {
             m_taskHandler.AddTask(task, priority, workingText, purposeText);
         }
