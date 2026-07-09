@@ -14,33 +14,33 @@ namespace StepBro.Core.Data
             "BU","DU","FU","GU","HU","JU","KU","LU","MU","NU","PU","RU","SU","TU","VU"
         };
 
-        static private readonly int[] IDWeight;
+        static private readonly uint[] IDWeight;
 
         static AlphaID()
         {
-            List<int> weights = new List<int>();
-            int w = IDStrings.Length;
+            List<uint> weights = new List<uint>();
+            uint w = (uint)IDStrings.Length;
             weights.Add(0);
             for (int i = 1; i < 10; i++)
             {
                 weights.Add(w);
-                w *= IDStrings.Length;
+                w *= (uint)IDStrings.Length;
             }
             IDWeight = weights.ToArray();
         }
 
-        public static string Create(int value, int width)
+        public static string Create(uint value, int width)
         {
             StringBuilder s = new StringBuilder(2 * width);
 
-            int rest = value;
+            uint rest = value;
             for (int i = width - 1; i >= 0; i--)
             {
-                int w = IDWeight[i];
+                uint w = IDWeight[i];
                 if (w == 0) s.Append(IDStrings[rest]);
                 else
                 {
-                    int v = rest / w;
+                    uint v = rest / w;
                     rest = rest - w * v;
                     s.Append(IDStrings[v]);
                 }

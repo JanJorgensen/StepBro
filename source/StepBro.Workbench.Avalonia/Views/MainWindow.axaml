@@ -12,8 +12,6 @@
         Title="StepBro Workbench">
 
   <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
     <vm:MainWindowViewModel/>
   </Design.DataContext>
 
@@ -21,11 +19,23 @@
     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Background="LightGray">
       <Button Name="mainMenu" Background="Transparent">
         <Image Height="20" Width="20" Source="/Assets/menu.png"/>
+        <Button.ContextMenu>
+          <ContextMenu>
+            <MenuItem Header="_File">
+              <MenuItem Header="_Open..."/>
+              <Separator/>
+              <MenuItem Header="_Exit"/>
+            </MenuItem>
+            <MenuItem Header="_Edit">
+              <MenuItem Header="Copy"/>
+              <MenuItem Header="Paste"/>
+            </MenuItem>
+          </ContextMenu>
+        </Button.ContextMenu>
       </Button>
-      <CheckBox Name="checkBoxPrimaryLeft" IsChecked="true" Margin="5 0 0 0" Checked="CheckBoxPrimaryOnLeft_Click" Unchecked="CheckBoxPrimaryOnLeft_Click">Primary on Left</CheckBox>
-      <CheckBox Name="checkBoxLeft" IsChecked="true" Margin="5 0 0 0" Checked="checkBox_Layout" Unchecked="checkBox_Layout">Left</CheckBox>
-      <CheckBox Name="checkBoxRight" IsChecked="false" Margin="5 0 0 0" Checked="checkBox_Layout" Unchecked="checkBox_Layout">Right</CheckBox>
-      <CheckBox Name="checkBoxBottom" IsChecked="true" Margin="5 0 0 0" Checked="checkBox_Layout" Unchecked="checkBox_Layout">Bottom</CheckBox>
+      <CheckBox Name="checkBoxPrimaryLeft" IsChecked="true" Margin="5 0 0 0" IsCheckedChanged="CheckBoxPrimaryOnLeft_Click">Primary on Left</CheckBox>
+      <CheckBox Name="checkBoxSecondaryPanel" IsChecked="false" Margin="5 0 0 0" IsCheckedChanged="checkBox_Layout">Secondary</CheckBox>
+      <CheckBox Name="checkBoxBottomPanel" IsChecked="true" Margin="5 0 0 0" IsCheckedChanged="checkBox_Layout">Bottom</CheckBox>
       <ComboBox Name="panelAlignmentSelector" Margin="5 0 0 0" SelectedIndex="2" SelectionChanged="panelAlignmentSelector_SelectionChanged">
         <ComboBoxItem>Left</ComboBoxItem>
         <ComboBoxItem>Right</ComboBoxItem>
@@ -34,6 +44,11 @@
       </ComboBox>
       <Button Click="Button_Click" Margin="5 0 0 0">Do it!</Button>
     </StackPanel>
+    <WrapPanel DockPanel.Dock="Top" Name="ToolbarContainer" Orientation="Horizontal" MinHeight="5" Background="WhiteSmoke">
+        <Button Margin="0 1 0 1">Open</Button>
+        <Button Margin="0 1 0 1">Close</Button>
+        <Button Margin="0 1 0 1">Setup</Button>
+    </WrapPanel>
     <StackPanel DockPanel.Dock="Bottom" Height="20" Background="LightGray"></StackPanel>
 
     <DockPanel Name="outer">
@@ -41,12 +56,15 @@
         <Panel Name="primarySideMenuLine" DockPanel.Dock="Right" Width="2" Background="Gray"></Panel>
         <DockPanel>
           <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-            <Button Height="32" Width="32" Margin="4" Background="LightSkyBlue">
+            <Button Name="filesSelector" Height="32" Width="32" Margin="4" Background="{Binding PrimaryFileExplorerButtonBackground}" Command="{Binding PrimaryFileExplorerCommand}">
+              <Image Height="24" Width="24" Source="/Assets/files.png"/>
+            </Button>
+            <Button Height="32" Width="32" Margin="4" Background="Transparent">
               <Image Height="24" Width="24" Source="/Assets/files.png"/>
             </Button>
           </StackPanel>
           <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical">
-            <Button Height="32" Width="32" Margin="4" Background="Transparent">
+            <Button Name="settingsSelector" Height="32" Width="32" Margin="4" Background="{Binding PrimarySettingsButtonBackground}" Command="{Binding PrimarySettingsCommand}">
               <Image Height="24" Width="24" Source="/Assets/settings.png"/>
             </Button>
           </StackPanel>
@@ -66,44 +84,46 @@
 
         <DockPanel Name="xLeft" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2">
           <Panel Name="xLeftSplitterSpacing" DockPanel.Dock="Right" Width="6" Background="Red"></Panel>
-          <StackPanel Name="xLeftContent" Orientation="Vertical">
-            <DockPanel Name="primaryPanel">
-              <TreeView Name="SolutionExplorer" IsVisible="True">
-              </TreeView>
-              <StackPanel Margin="1" Name="Settings" Orientation="Vertical" IsVisible="True">
-                <StackPanel Orientation="Vertical">
-                  <Button Background="Transparent" Padding="1" Margin="1" HorizontalAlignment="Stretch">
-                    <DockPanel>
-                      <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
-                        <Image Height="16" Width="16" Source="/Assets/dock left on.png"/>
-                        <Label>Left</Label>
-                        <Panel Width="6"/>
-                      </StackPanel>
-                      <StackPanel DockPanel.Dock="Right">
-                        <Label>Primary Panel Location</Label>
-                      </StackPanel>
-                      <Panel/>
-                    </DockPanel>
-                  </Button>
-                  <Button Background="Transparent" Padding="1" Margin="1" HorizontalAlignment="Stretch">
-                    <DockPanel>
-                      <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
-                        <Image Height="16" Width="16" Source="/Assets/dock right on.png"/>
-                        <Label>Right</Label>
-                      </StackPanel>
-                    </DockPanel>
-                  </Button>
-                  <lib:SettingsOption></lib:SettingsOption>
-                </StackPanel>
-              </StackPanel>
+          <DockPanel Name="xLeftContent">
+              <Panel>
+            <DockPanel Name="filesPanel" IsVisible="{Binding PrimaryFileExplorerSelected}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Label DockPanel.Dock="Top" Background="LightSkyBlue">Files</Label>
+                <Panel DockPanel.Dock="Top" Height="1" Background="Black"></Panel>
+                <lib:ProjectExplorerView></lib:ProjectExplorerView>
             </DockPanel>
-          </StackPanel>
+            <StackPanel Margin="0" Name="settingsPanel" Orientation="Vertical" IsVisible="{Binding PrimarySettingsSelected}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Label Background="LightSkyBlue">Settings</Label>
+                <Panel Height="1" Background="Black"></Panel>
+                <Button Background="Transparent" Padding="1" Margin="1" HorizontalAlignment="Stretch">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                            <Image Height="16" Width="16" Source="/Assets/dock left on.png"/>
+                            <Label>Left</Label>
+                            <Panel Width="6"/>
+                        </StackPanel>
+                        <StackPanel DockPanel.Dock="Right">
+                            <Label>Primary Panel Location</Label>
+                        </StackPanel>
+                        <Panel/>
+                    </DockPanel>
+                </Button>
+                <Button Background="Transparent" Padding="1" Margin="1" HorizontalAlignment="Stretch">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                            <Image Height="16" Width="16" Source="/Assets/dock right on.png"/>
+                            <Label>Right</Label>
+                        </StackPanel>
+                    </DockPanel>
+                </Button>
+                <lib:SettingsOption></lib:SettingsOption>
+            </StackPanel>
+            </Panel>
+          </DockPanel>
         </DockPanel>
         <GridSplitter Name="xSplitterLeft" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Width="1" Background="Gray" HorizontalAlignment="Right" VerticalAlignment="Stretch"></GridSplitter>
         <DockPanel Name="xMid" Grid.Column="1" Grid.Row="0">
           <TabControl SelectedIndex="0" >
             <TabItem Header="Execution Log">
-              <lib:LogViewer Name="logViewer"></lib:LogViewer>
             </TabItem>
             <TabItem Header="PCM02.Workbench.sbs">
               <StackPanel>

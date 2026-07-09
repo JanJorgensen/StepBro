@@ -1,5 +1,6 @@
 ﻿using StepBro.Core.Tasks;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,102 +9,67 @@ using System.Threading.Tasks;
 
 namespace StepBro.Core.Host
 {
-    public class HostApplicationTaskHandler
+    public class HostApplicationTaskHandler : IHostTaskHandler
     {
-
-        public enum Priority
-        {
-            Low,
-            Normal,
-            High
-        }
-
-        public enum TaskAction
-        {
-            Continue,
-            ContinueOnHostDomain = Continue,
-            ContinueOnWorkerThreadDomain,
-            Delay100ms,
-            Delay500ms,
-            Finish,
-            Cancel,
-        }
 
         private struct TaskData
         {
-            public TaskData(TaskCaller caller, TaskStateProxy state, Priority priority, string workingText, string purposeText)
+            public TaskData(IHostTaskHandler.Task task, IHostTaskHandler.Priority priority, string workingText, string purposeText)
             {
-                this.caller = caller;
-                this.state = state;
+                this.task = task;
                 this.priority = priority;
                 this.workingText = workingText;
                 this.purposeText = purposeText;
             }
-            public TaskCaller caller;
-            public TaskStateProxy state;
-            public Priority priority;
+            public IHostTaskHandler.Task task;
+            public IHostTaskHandler.Priority priority;
             public string workingText;
             public string purposeText;
         }
 
-        public delegate TaskAction Task<TState>(ref TState state, ref int index, ITaskStateReporting reporting);
-
-        private abstract class TaskCaller
+        private class SingleThreadContext() : SynchronizationContext
         {
-            public abstract TaskAction CallTask(ITaskStateReporting reporting);
-        }
-
-        private class TaskCaller<TState> : TaskCaller where TState : struct, System.Enum
-        {
-            private Task<TState> m_task;
-            private TState m_state;
-            private int m_index;
-
-            public TaskCaller(Task<TState> task)
+            public override void Send(SendOrPostCallback task, object state)
             {
-                m_task = task;
-                m_state = default(TState);
+                task(state);
             }
-
-            public override TaskAction CallTask(ITaskStateReporting reporting)
+            public override void Post(SendOrPostCallback task, object state)
             {
-                return m_task(ref m_state, ref m_index, reporting);
+                task(state);
             }
         }
 
         private SynchronizationContext m_synchronizationContext = null;
         private Queue<TaskData> m_actions = new Queue<TaskData>();
-        private TaskAction m_currentAction = TaskAction.Continue;
+        private IHostTaskHandler.TaskState m_taskState = IHostTaskHandler.TaskState.Init;
+        private TaskStateProxy m_taskStateAccess = null;
+        private int m_taskIndexValue = 0;
+        private IHostTaskHandler.TaskHandlingAction m_currentHandlingAction = IHostTaskHandler.TaskHandlingAction.Continue;
         private DateTime m_currentActionTimerExpiryTime = DateTime.MinValue;
         private System.Threading.Tasks.Task m_workerTask = null;
+        private object m_sync = new object();
 
-        public enum StateChange { Idle, StartingNew, StillWorking }
-
-        public class StateChangedEventArgs : EventArgs
+        public HostApplicationTaskHandler(SynchronizationContext mainContext)
         {
-            private StateChange m_change;
-            private string m_workingText;
-            public StateChangedEventArgs(StateChange change, string workingText)
-            {
-                m_change = change;
-                m_workingText = workingText;
-            }
-            public StateChange State { get { return m_change; } }
-            public string WorkingText { get { return m_workingText; } }
+            m_synchronizationContext = mainContext;
         }
 
-        public event EventHandler<StateChangedEventArgs> StateChangeEvent;
+        public event EventHandler<IHostTaskHandler.StateChangedEventArgs> StateChangeEvent;
 
-        public void AddTask<TState>(Task<TState> task, Priority priority, string workingText, string purposeText) where TState : struct, System.Enum
+        public void AddTask(IHostTaskHandler.Task task, IHostTaskHandler.Priority priority, string workingText, string purposeText)
         {
-            var caller = new TaskCaller<TState>(task);
             // TODO: Register task or make queue public somehow, to be able to show whats going on.
 
-            var stateProxy = new TaskStateProxy(TaskExecutionState.AwaitingStartCondition, BreakOption.Stop);
-            m_actions.Enqueue(new TaskData(caller, stateProxy, priority, workingText, purposeText));
-            if (m_actions.Count == 1)
+            bool runAction = false;
+            lock (m_sync)
             {
-                this.StateChangeEvent?.Invoke(this, new StateChangedEventArgs(StateChange.StartingNew, workingText));
+                runAction = (m_actions.Count == 0);
+                m_actions.Enqueue(new TaskData(task, priority, workingText, purposeText));
+            }
+            if (runAction)
+            {
+                m_taskState = IHostTaskHandler.TaskState.Init;
+                this.StateChangeEvent?.Invoke(this, new IHostTaskHandler.StateChangedEventArgs(IHostTaskHandler.StateChange.StartingNew, workingText));
                 RequestHostDomainHandling(this.HostDomainHandling);
             }
         }
@@ -127,47 +93,45 @@ namespace StepBro.Core.Host
         {
             if (m_actions.Count > 0)
             {
-                if (m_currentAction == TaskAction.Delay100ms || m_currentAction == TaskAction.Delay500ms)
+                if (m_currentHandlingAction == IHostTaskHandler.TaskHandlingAction.Delay100ms || m_currentHandlingAction == IHostTaskHandler.TaskHandlingAction.Delay500ms)
                 {
                     if (DateTime.UtcNow < m_currentActionTimerExpiryTime)
                     {
-                        m_currentAction = TaskAction.ContinueOnHostDomain;
+                        m_currentHandlingAction = IHostTaskHandler.TaskHandlingAction.ContinueOnHostDomain;
                         RequestHostDomainHandling(this.HostDomainHandling);
                         Thread.Sleep(10);   // TODO: Create an OS timer to do this instead.
                         return;
                     }
                 }
-                var task = m_actions.Peek();
-                var caller = task.caller;
-                var stateReporter = task.state;
 
-                m_currentAction = caller.CallTask(null);
+                m_currentHandlingAction = m_actions.Peek().task(ref m_taskState, ref m_taskIndexValue, null);
                 if (isOnWorkerThread)
                 {
                     m_workerTask = null;
                 }
 
-                switch (m_currentAction)
+                switch (m_currentHandlingAction)
                 {
-                    case TaskAction.ContinueOnHostDomain:
+                    case IHostTaskHandler.TaskHandlingAction.ContinueOnHostDomain:
                         RequestHostDomainHandling(this.HostDomainHandling);
                         break;
-                    case TaskAction.ContinueOnWorkerThreadDomain:
+                    case IHostTaskHandler.TaskHandlingAction.ContinueOnWorkerThreadDomain:
                         m_workerTask = new System.Threading.Tasks.Task(this.WorkerTaskHandling, null);
                         m_workerTask.Start();
                         // Now get out of here without touching anything; the worker task will arrive in a moment!
                         break;
-                    case TaskAction.Delay100ms:
-                    case TaskAction.Delay500ms:
-                        m_currentActionTimerExpiryTime = DateTime.UtcNow + ((m_currentAction == TaskAction.Delay100ms) ? TimeSpan.FromMilliseconds(100) : TimeSpan.FromMilliseconds(500));
+                    case IHostTaskHandler.TaskHandlingAction.Delay100ms:
+                    case IHostTaskHandler.TaskHandlingAction.Delay500ms:
+                        m_currentActionTimerExpiryTime = DateTime.UtcNow + ((m_currentHandlingAction == IHostTaskHandler.TaskHandlingAction.Delay100ms) ? TimeSpan.FromMilliseconds(100) : TimeSpan.FromMilliseconds(500));
                         RequestHostDomainHandling(this.HostDomainHandling);
                         break;
-                    case TaskAction.Finish:
-                    case TaskAction.Cancel:
+                    case IHostTaskHandler.TaskHandlingAction.Finish:
+                    case IHostTaskHandler.TaskHandlingAction.Cancel:
                         m_actions.Dequeue();
                         if (m_actions.Count > 0)
                         {
-                            this.StateChangeEvent?.Invoke(this, new StateChangedEventArgs(StateChange.StartingNew, m_actions.Peek().workingText));
+                            m_taskState = IHostTaskHandler.TaskState.Init;
+                            this.StateChangeEvent?.Invoke(this, new IHostTaskHandler.StateChangedEventArgs(IHostTaskHandler.StateChange.StartingNew, m_actions.Peek().workingText));
                             RequestHostDomainHandling(this.HostDomainHandling);
                         }
                         else
@@ -179,7 +143,7 @@ namespace StepBro.Core.Host
                             }
                             else
                             {
-                                this.StateChangeEvent?.Invoke(this, new StateChangedEventArgs(StateChange.Idle, "Idle"));
+                                this.StateChangeEvent?.Invoke(this, new IHostTaskHandler.StateChangedEventArgs(IHostTaskHandler.StateChange.Idle, "Idle"));
                             }
                         }
                         break;
@@ -189,16 +153,12 @@ namespace StepBro.Core.Host
             }
             else
             {
-                this.StateChangeEvent?.Invoke(this, new StateChangedEventArgs(StateChange.Idle, "Idle"));
+                this.StateChangeEvent?.Invoke(this, new IHostTaskHandler.StateChangedEventArgs(IHostTaskHandler.StateChange.Idle, "Idle"));
             }
         }
 
         protected void RequestHostDomainHandling(SendOrPostCallback action, object state = null)
         {
-            if (m_synchronizationContext == null)
-            {
-                m_synchronizationContext = SynchronizationContext.Current;
-            }
             m_synchronizationContext.Post(action, state);
         }
     }

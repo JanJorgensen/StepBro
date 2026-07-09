@@ -345,7 +345,7 @@ namespace StepBro.Streams
                         {
                             context.Logger.Log("ReadLine : " + StringUtils.ObjectToString(line));
                         }
-                        if (this.CommLogging && m_asyncLogger != null)
+                        else if (this.CommLogging && m_asyncLogger != null)
                         {
                             m_asyncLogger.LogCommReceived(line);
                         }
@@ -471,6 +471,9 @@ namespace StepBro.Streams
             }
             else return true;
         }
+
+        string IComponentLoggerSource.CommDataCategory { get { return IComponentLoggerSource.CAT_TEXT; } }
+
 
         #endregion
     }

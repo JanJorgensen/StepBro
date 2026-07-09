@@ -12,6 +12,7 @@ namespace StepBro.Core.General
         StepBroScript,
         ClearText,
         CSharp,
-        Python
+        Python,
+        Bitmap
     }
 }

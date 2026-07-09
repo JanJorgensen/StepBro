@@ -1,108 +1,20 @@
-﻿using StepBro.Core.Data;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using StepBro.Core.Data;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using System.Windows.Input;
-using System.Drawing;
 
 namespace StepBro.HostSupport.Models;
 
-public partial class ChronoListViewModel<TViewEntryType> : ObservableObject where TViewEntryType : class, ITimestampedViewEntry
+public partial class ChronoListViewModel : ObservableObject
 {
-    public enum TimestampFormat
-    {
-        Seconds,
-        SecondsDelta,
-        HoursMinutesSeconds,
-        LocalTime,
-        LocalDateTime
-    }
-
-    public class DynamicViewSettings
-    {
-        private bool m_valueChanged = false;
-        private DateTime m_zeroTime;
-        private TimestampFormat m_timeFormat = TimestampFormat.Seconds;
-        private int m_timestampWidth = 0;   // The width of the widest seen timestamp.
-        private int m_lineHeaderWidth = 0;    // The right side of the widest line header (timestamp and type)
-
-        public bool ValueChanged()
-        {
-            if (m_valueChanged)
-            {
-                m_valueChanged = false;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public void Reset()
-        {
-            m_timestampWidth = 0;
-            m_lineHeaderWidth = 0;
-        }
-
-        public DateTime ZeroTime
-        {
-            get { return m_zeroTime; }
-            set
-            {
-                if (value != m_zeroTime)
-                {
-                    m_zeroTime = value;
-                    m_valueChanged = true;
-                }
-            }
-        }
-
-        public TimestampFormat TimeFormat
-        {
-            get { return m_timeFormat; }
-            set
-            {
-                if (value != m_timeFormat)
-                {
-                    m_timeFormat = value;
-                    m_valueChanged = true;
-                }
-            }
-        }
-
-        public int TimeStampWidth
-        {
-            get { return m_timestampWidth; }
-            set
-            {
-                if (value != m_timestampWidth)
-                {
-                    m_timestampWidth = value;
-                    m_valueChanged = true;
-                }
-            }
-        }
-        public int LineHeaderWidth
-        {
-            get { return m_lineHeaderWidth; }
-            set
-            {
-                if (value != m_lineHeaderWidth)
-                {
-                    m_lineHeaderWidth = value;
-                    m_valueChanged = true;
-                }
-            }
-        }
-    }
-
-    private LogViewerModel<TViewEntryType> m_logViewModel = null;
-    private IPresentationList<TViewEntryType> m_presentationSource = null;
+    private IPresentationList<ITimestampedViewEntry> m_presentationSource = null;
     private ViewPortModel m_viewPort = null;
 
     private DateTime m_zeroTime;
@@ -113,22 +25,22 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
     private int m_verticalScrollValue = 0;
     private bool m_updateVerticalScroll = false;
     private long m_currentEntryIndex = -1L;
-    private TViewEntryType m_currentEntry = null;
+    private ITimestampedViewEntry m_currentEntry = null;
     private List<long> m_selectedEntries = new List<long>();
     private long m_lastSingleSelectionEntry = -1L;
     private long m_rangeSelectionEnd = -1L;
-    private Func<long, TViewEntryType, long, TViewEntryType, EntryMarkState> m_searchMatchChecker = null;
+    private Func<long, ITimestampedViewEntry, long, ITimestampedViewEntry, EntryMarkState> m_searchMatchChecker = null;
 
-    private RelayCommand<object> m_commandGotoHome;
-    private RelayCommand<object> m_commandGotoEnd;
-    private RelayCommand<object> m_commandMoveUp;
-    private RelayCommand<object> m_commandMoveDown;
-    private RelayCommand<object> m_commandMovePageUp;
-    private RelayCommand<object> m_commandMovePageDown;
-    private RelayCommand<object> m_commandSelectUp;
-    private RelayCommand<object> m_commandSelectDown;
-    private RelayCommand<object> m_commandSelectPageUp;
-    private RelayCommand<object> m_commandSelectPageDown;
+    private RelayCommand m_commandGotoHome;
+    private RelayCommand m_commandGotoEnd;
+    private RelayCommand m_commandMoveUp;
+    private RelayCommand m_commandMoveDown;
+    private RelayCommand m_commandMovePageUp;
+    private RelayCommand m_commandMovePageDown;
+    private RelayCommand m_commandSelectUp;
+    private RelayCommand m_commandSelectDown;
+    private RelayCommand m_commandSelectPageUp;
+    private RelayCommand m_commandSelectPageDown;
 
     public ChronoListViewModel()
     {
@@ -137,7 +49,7 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
 
     public DateTime ZeroTime { get { return m_zeroTime; } set { m_zeroTime = value; } }
 
-    public IElementIndexer<TViewEntryType> Source { get { return m_presentationSource; } }
+    public IElementIndexer<ITimestampedViewEntry> Source { get { return m_presentationSource; } }
 
     public ViewPortModel ViewPort {  get { return m_viewPort; } }
 
@@ -161,15 +73,11 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
     }
 
     [ObservableProperty]
-    private int m_viewPortMaxLinesVisible = 10;
-
-    [ObservableProperty]
     private int m_horizontalScrollValue = 0;
 
-    public void Setup(LogViewerModel<TViewEntryType> model)
+    public void Setup(IPresentationList<ITimestampedViewEntry> model)
     {
-        m_logViewModel = model;
-        m_presentationSource = m_logViewModel.PresentationList;
+        m_presentationSource = model;
         m_topEntry = 0;
         m_viewPort = new ViewPortModel(this);
     }
@@ -262,18 +170,18 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         m_viewDirty = false;
         if (m_headMode)
         {
-            m_topEntry = Math.Max(0L, m_lastIndex - (this.ViewPortMaxLinesVisible - 1L));
+            m_topEntry = Math.Max(0L, m_lastIndex - (m_viewPort.MaxLinesVisible - 1L));
         }
         this.ViewChanged?.Invoke(this, new ViewChangedEventArgs(m_topEntry, 0 - this.HorizontalScrollValue));
     }
 
-    public void SetupSearchMatchChecker(Func<long, TViewEntryType, long, TViewEntryType, EntryMarkState> matchChecker)
+    public void SetupSearchMatchChecker(Func<long, ITimestampedViewEntry, long, ITimestampedViewEntry, EntryMarkState> matchChecker)
     {
         m_searchMatchChecker = matchChecker;
         this.RequestViewPortUpdate();
     }
 
-    public EntryMarkState GetEntryMarkState(long index, TViewEntryType entry)
+    public EntryMarkState GetEntryMarkState(long index, ITimestampedViewEntry entry)
     {
         var selectionState = EntryMarkState.None;
         if (m_selectedEntries.Count > 0)
@@ -342,7 +250,7 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
 
         if (updateView)
         {
-            if (index >= 0 && (index < m_topEntry || index > (m_topEntry + (this.ViewPortMaxLinesVisible - 2))))
+            if (index >= 0 && (index < m_topEntry || index > (m_topEntry + (m_viewPort.MaxLinesVisible - 2))))
             {
                 if (index < m_topEntry)
                 {
@@ -350,7 +258,7 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
                 }
                 else
                 {
-                    m_topEntry = Math.Max(0L, index - (this.ViewPortMaxLinesVisible - 5));  // Set selection in bottom.
+                    m_topEntry = Math.Max(0L, index - (m_viewPort.MaxLinesVisible - 5));  // Set selection in bottom.
                 }
                 m_updateVerticalScroll = true;
                 this.VerticalScrollValue = (int)m_topEntry;
@@ -371,9 +279,13 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         {
             if (m_commandGotoHome == null)
             {
-                m_commandGotoHome = new RelayCommand<object>(
-                    (param) =>
+                m_commandGotoHome = new RelayCommand(
+                    () =>
                     {
+                        if (this.HeadMode && m_currentEntryIndex > 0L)
+                        {
+                            this.SetCurrentEntry(0, true);
+                        }
                     }
                 );
             }
@@ -387,8 +299,8 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         {
             if (m_commandGotoEnd == null)
             {
-                m_commandGotoEnd = new RelayCommand<object>(
-                    (param) =>
+                m_commandGotoEnd = new RelayCommand(
+                    () =>
                     {
                     }
                 );
@@ -403,8 +315,8 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         {
             if (m_commandMoveUp == null)
             {
-                m_commandMoveUp = new RelayCommand<object>(
-                    (param) =>
+                m_commandMoveUp = new RelayCommand(
+                    () =>
                     {
                     }
                 );
@@ -419,8 +331,8 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         {
             if (m_commandMoveDown == null)
             {
-                m_commandMoveDown = new RelayCommand<object>(
-                    (param) =>
+                m_commandMoveDown = new RelayCommand(
+                    () =>
                     {
                     }
                 );
@@ -435,8 +347,8 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         {
             if (m_commandMovePageUp == null)
             {
-                m_commandMovePageUp = new RelayCommand<object>(
-                    (param) =>
+                m_commandMovePageUp = new RelayCommand(
+                    () =>
                     {
                     }
                 );
@@ -451,8 +363,8 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         {
             if (m_commandMovePageDown == null)
             {
-                m_commandMovePageDown = new RelayCommand<object>(
-                    (param) =>
+                m_commandMovePageDown = new RelayCommand(
+                    () =>
                     {
                     }
                 );
@@ -467,8 +379,8 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         {
             if (m_commandSelectUp == null)
             {
-                m_commandSelectUp = new RelayCommand<object>(
-                    (param) =>
+                m_commandSelectUp = new RelayCommand(
+                    () =>
                     {
                     }
                 );
@@ -483,8 +395,8 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         {
             if (m_commandSelectDown == null)
             {
-                m_commandSelectDown = new RelayCommand<object>(
-                    (param) =>
+                m_commandSelectDown = new RelayCommand(
+                    () =>
                     {
                     }
                 );
@@ -499,8 +411,8 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         {
             if (m_commandSelectPageUp == null)
             {
-                m_commandSelectPageUp = new RelayCommand<object>(
-                    (param) =>
+                m_commandSelectPageUp = new RelayCommand(
+                    () =>
                     {
                     }
                 );
@@ -515,8 +427,8 @@ public partial class ChronoListViewModel<TViewEntryType> : ObservableObject wher
         {
             if (m_commandSelectPageDown == null)
             {
-                m_commandSelectPageDown = new RelayCommand<object>(
-                    (param) =>
+                m_commandSelectPageDown = new RelayCommand(
+                    () =>
                     {
                     }
                 );

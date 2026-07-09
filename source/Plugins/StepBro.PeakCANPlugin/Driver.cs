@@ -51,10 +51,10 @@ namespace StepBro.CAN
         public string Version => throw new NotImplementedException();
 
         [Public]
-        public IAdapter GetAdapter([Implicit] ICallContext context, string identification = "")
+        public IAdapter GetAdapter([Implicit] ILogger logger, string identification = "")
         {
-            if (context != null) context.Logger.Log("GetAdapter: " + identification);
-            if (String.IsNullOrEmpty(identification)) return this.GetAdapter(context, "USBBUS1");
+            if (logger != null) logger.Log("GetAdapter: " + identification);
+            if (String.IsNullOrEmpty(identification)) return this.GetAdapter(logger, "USBBUS1");
             foreach (var a in g_adapters)
             {
                 if (a.Identification.Equals(identification, StringComparison.InvariantCultureIgnoreCase))
@@ -79,15 +79,6 @@ namespace StepBro.CAN
             switch (identification)
             {
                 case "NONEBUS": return PCANBasic.PCAN_NONEBUS;
-                case "PCAN_ISABUS1": return PCANBasic.PCAN_ISABUS1;
-                case "PCAN_ISABUS2": return PCANBasic.PCAN_ISABUS2;
-                case "PCAN_ISABUS3": return PCANBasic.PCAN_ISABUS3;
-                case "PCAN_ISABUS4": return PCANBasic.PCAN_ISABUS4;
-                case "ISABUS5": return PCANBasic.PCAN_ISABUS5;
-                case "ISABUS6": return PCANBasic.PCAN_ISABUS6;
-                case "ISABUS7": return PCANBasic.PCAN_ISABUS7;
-                case "ISABUS8": return PCANBasic.PCAN_ISABUS8;
-                case "DNGBUS1": return PCANBasic.PCAN_DNGBUS1;
                 case "PCIBUS1": return PCANBasic.PCAN_PCIBUS1;
                 case "PCIBUS2": return PCANBasic.PCAN_PCIBUS2;
                 case "PCIBUS3": return PCANBasic.PCAN_PCIBUS3;
@@ -120,8 +111,6 @@ namespace StepBro.CAN
                 case "USBBUS14": return PCANBasic.PCAN_USBBUS14;
                 case "USBBUS15": return PCANBasic.PCAN_USBBUS15;
                 case "USBBUS16": return PCANBasic.PCAN_USBBUS16;
-                case "PCCBUS1": return PCANBasic.PCAN_PCCBUS1;
-                case "PCCBUS2": return PCANBasic.PCAN_PCCBUS2;
                 case "LANBUS1": return PCANBasic.PCAN_LANBUS1;
                 case "LANBUS2": return PCANBasic.PCAN_LANBUS2;
                 case "LANBUS3": return PCANBasic.PCAN_LANBUS3;
@@ -176,15 +165,13 @@ namespace StepBro.CAN
         }
     }
 
-    internal class PCANAdapter : IAdapter, IComponentLoggerSource
+    internal class PCANAdapter : IAdapter
     {
         private readonly PCAN m_parent;
         private readonly string m_identification;
         private readonly TPCANHandle m_handle;
         private readonly PCANChannel m_onlyChannel;
         private bool m_discovered = false;
-        private bool m_componentLoggingEnabled = false;
-        private IComponentLogging m_componentLogging = null;
 
         internal PCANAdapter(PCAN parent, string identification, TPCANHandle handle)
         {
@@ -228,7 +215,7 @@ namespace StepBro.CAN
             }
         }
 
-        public IChannel GetChannel([Implicit] ICallContext context, int index)
+        public IChannel GetChannel([Implicit] ILogger logger, int index)
         {
             if (index != 0) throw new ArgumentOutOfRangeException("index");
 
@@ -240,11 +227,7 @@ namespace StepBro.CAN
             m_discovered = wasDiscovered;
         }
 
-        string IComponentLoggerSource.Name { get { return "PeakCAN " + m_identification; } }
-
-        bool IComponentLoggerSource.Enabled { get { return m_componentLoggingEnabled; } }
-
-        Core.Devices.IDriver Core.Devices.IDevice.Driver => throw new NotImplementedException();
+        Core.Devices.IDriver Core.Devices.IDevice.Driver { get { return this.Driver; } }
 
         public bool IsDiscovered => throw new NotImplementedException();
 
@@ -252,25 +235,15 @@ namespace StepBro.CAN
 
         public bool IsCreated => throw new NotImplementedException();
 
-        bool IComponentLoggerSource.SetEnabled(bool value)
-        {
-            if (value != m_componentLoggingEnabled)
-            {
-                if (value && m_componentLogging == null)
-                {
-                    m_componentLogging = Core.Main.GetService<IComponentLoggerService>().CreateComponentLogger(this);
-                }
-                m_componentLoggingEnabled = value;
-                return true;
-            }
-            else return true;
-        }
     }
 
-    internal class PCANChannel : IChannel
+    [Public]
+    public class PCANChannel : IChannel, IDisposable, IComponentLoggerSource
     {
+        private const string DEFAULT_NAME = "CANChannel";
         private readonly PCANAdapter m_parent;
         private readonly TPCANHandle m_handle;   // Only one channel per adapter, thus also saving handle here.
+        private string m_objectName = DEFAULT_NAME;
         private ChannelMode m_mode;
         private Baudrate m_baudrate;
         private bool m_open = false;
@@ -281,6 +254,8 @@ namespace StepBro.CAN
         private List<IReceiveEntity> m_receivers = null;
         private readonly object m_receiveLock = new object();
         private readonly ReceiveQueue m_noQueueReceived = new ReceiveQueue("default");
+        private IComponentLogging m_componentLogging = null;
+        private bool m_componentLoggingEnabled = false;
         private TimedDataQueue<MessageTransmitter> m_timerActions = new TimedDataQueue<MessageTransmitter>();
 
         internal PCANChannel(PCANAdapter adapter)
@@ -290,6 +265,13 @@ namespace StepBro.CAN
             m_handle = adapter.Handle;
             m_receivers = new List<IReceiveEntity>();
             m_receivers.Add(m_noQueueReceived);
+        }
+
+        public static PCANChannel Create([Implicit] ILogger logger, [ObjectName] string name = null)
+        {
+            var channel = PCAN.Driver.GetAdapter(null).GetChannel(null, 0) as PCANChannel;
+            if (name != null) channel.m_objectName = name;
+            return channel;
         }
 
         private TPCANStatus UpdateStatusFromOperation(TPCANStatus status)
@@ -315,7 +297,7 @@ namespace StepBro.CAN
             }
         }
 
-        public void Setup([Implicit] ICallContext context, Baudrate baudrate, ChannelMode mode)
+        public void Setup([Implicit] ILogger logger, Baudrate baudrate, ChannelMode mode)
         {
             m_baudrate = baudrate;
             m_mode = mode;
@@ -342,8 +324,13 @@ namespace StepBro.CAN
                         result = PCANBasic.Read(m_handle, out msg, out timestamp);
                         if (this.UpdateStatusFromOperation(result) == TPCANStatus.PCAN_ERROR_OK)
                         {
-                            System.Diagnostics.Debug.WriteLine("CAN In: " + msg.ID.ToString());
-                            this.PutReceivedInQueue(new PCANMessage(msg, timestamp));
+                            var stdMsg = new PCANMessage(msg, timestamp);
+                            //System.Diagnostics.Debug.WriteLine("CAN In: " + msg.ID.ToString());
+                            if (m_componentLogging.Enabled)
+                            {
+                                m_componentLogging.LogReceived(stdMsg.CreateMessageLogText());
+                            }
+                            this.PutReceivedInQueue(stdMsg);
                         }
                     }
                     else
@@ -367,6 +354,63 @@ namespace StepBro.CAN
                     if (rq.TryAddHandover(message)) return;
                 }
             }
+        }
+
+        #region Component Logger
+        bool IComponentLoggerSource.SetEnabled(bool value)
+        {
+            if (value != m_componentLoggingEnabled)
+            {
+                m_componentLoggingEnabled = value;
+                return true;
+            }
+            else return true;
+        }
+
+        bool IComponentLoggerSource.Enabled { get { return m_componentLoggingEnabled; } }
+
+        string IComponentLoggerSource.CommDataCategory { get { return "CAN"; } }
+
+
+        [Public]
+        public bool LoggingEnabled
+        {
+            get
+            {
+                return m_componentLoggingEnabled;
+            }
+            set
+            {
+                m_componentLoggingEnabled = value;
+            }
+        }
+
+        #endregion
+
+        [ObjectName]
+        public string Name
+        {
+            get { return m_objectName; }
+            set
+            {
+                if (String.IsNullOrWhiteSpace(value)) throw new ArgumentException();
+                if (m_objectName != null && m_objectName != DEFAULT_NAME) throw new InvalidOperationException("The object is already named.");
+                m_objectName = value;
+            }
+        }
+
+        public MessageDataDecoder Decoder { get; set; } = null;
+
+        public StepBro.CAN.Baudrate BaudRate
+        {
+            get { return m_baudrate; }
+            set { m_baudrate = value; }
+        }
+
+        public StepBro.CAN.ChannelMode Mode
+        {
+            get { return m_mode; }
+            set { m_mode = value; }
         }
 
         public bool IsOpen
@@ -397,7 +441,7 @@ namespace StepBro.CAN
         {
             if (!m_open)
             {
-                TPCANStatus result = PCANBasic.Initialize(m_handle, ToPCANBaudrate(m_baudrate), TPCANType.PCAN_TYPE_ISA, 0, 0);
+                TPCANStatus result = PCANBasic.Initialize(m_handle, ToPCANBaudrate(m_baudrate));
                 result = this.UpdateStatusFromOperation(result);
                 m_parent.SetDiscovered(result == TPCANStatus.PCAN_ERROR_OK);
                 if (result == TPCANStatus.PCAN_ERROR_OK)
@@ -407,11 +451,20 @@ namespace StepBro.CAN
                         context.Logger.Log("Opened successfully");
                     }
                     m_open = true;
+                    if (m_componentLogging == null)
+                    {
+                        m_componentLogging = Core.Main.GetService<IComponentLoggerService>().CreateComponentLogger(this);
+                        if (m_componentLoggingEnabled)
+                        {
+                            m_componentLogging.Enabled = true;
+                        }
+                    }
 
                     if (m_receiverThread == null)
                     {
                         m_receiverThread = new Thread(new ThreadStart(this.ReceiveThreadHandler));
                         m_receiverThread.Start();
+
                         //Core.Main.ServiceManager.Get<>
                     }
 
@@ -431,10 +484,7 @@ namespace StepBro.CAN
             {
                 this.Flush();
                 m_open = false;
-                while (m_receiverThread != null)
-                {
-                    System.Threading.Thread.Sleep(100);
-                }
+                m_receiverThread.Join();
                 m_timerActions.DeactivateAll();
                 TPCANStatus result = PCANBasic.Uninitialize(m_handle);
                 if (this.UpdateStatusFromOperation(result) == TPCANStatus.PCAN_ERROR_OK)
@@ -665,10 +715,7 @@ namespace StepBro.CAN
 
         public void Dispose()
         {
-            if (m_open)
-            {
-
-            }
+            this.Close(null);
         }
     }
 
@@ -719,9 +766,11 @@ namespace StepBro.CAN
             else
             {
                 m_msg.DATA = data;
-                m_msg.LEN = (byte)8;
+                m_msg.LEN = (byte)length;
             }
         }
+
+        public int DataLength { get { return m_msg.LEN; } }
 
         public byte[] Data
         {

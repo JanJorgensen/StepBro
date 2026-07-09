@@ -8,22 +8,23 @@ namespace StepBro.UI.WinForms.Controls
 {
     public partial class LogViewer : UserControl
     {
-        private class PresentationList : PresentationListForListData<LogEntry, ChronoListViewEntry>
+        private class PresentationList : PresentationListForListData<ITimestampedData, ChronoListViewEntry>
         {
-            public PresentationList(IDataListSource<LogEntry> source) :
+            public PresentationList(IDataListSource<ITimestampedData> source) :
                 base(source, 1000000, 50)
             {
             }
 
-            public override void CreatePresentationEntry(LogEntry entry, long sourceIndex, Action<ChronoListViewEntry> adder)
+            public override void CreatePresentationEntry(ITimestampedData entry, long sourceIndex, Action<ChronoListViewEntry> adder)
             {
-                if ((entry.EntryType & LogEntry.Type.Special) != LogEntry.Type.Special)
+                var e = entry as LogEntry;
+                if ((e.EntryType & LogEntry.Type.Special) != LogEntry.Type.Special)
                 {
-                    adder(new LogViewEntry(entry, sourceIndex));
+                    adder(new LogViewEntry(e, sourceIndex));
                 }
                 else
                 {
-                    adder(new LogViewEntrySpecial(entry, sourceIndex));     // TODO: Get reference to the special handler for this data type.
+                    adder(new LogViewEntrySpecial(e, sourceIndex));     // TODO: Get reference to the special handler for this data type.
                     // TODO: Maybe the special handler could throw in a decoded/translated entry.
                 }
             }
@@ -34,21 +35,21 @@ namespace StepBro.UI.WinForms.Controls
             }
         }
 
-        private class PresentationListSearchingForFirstSource : PresentationListForListData<LogEntry, ChronoListViewEntry>
+        private class PresentationListSearchingForFirstSource : PresentationListForListData<ITimestampedData, ChronoListViewEntry>
         {
-            private class EmptySource : IDataListSource<LogEntry>
+            private class EmptySource : IDataListSource<ITimestampedData>
             {
-                public LogEntry Get(long index)
+                public ITimestampedData Get(long index)
                 {
                     return null;
                 }
 
-                public Tuple<long, LogEntry> GetFirst()
+                public Tuple<long, ITimestampedData> GetFirst()
                 {
-                    return new Tuple<long, LogEntry>(-1L, null);
+                    return new Tuple<long, ITimestampedData>(-1L, null);
                 }
 
-                public LogEntry GetLast()
+                public ITimestampedData GetLast()
                 {
                     return null;
                 }
@@ -58,17 +59,17 @@ namespace StepBro.UI.WinForms.Controls
                     return new IndexerStateSnapshot(-1L, -1L, 0L);
                 }
 
-                public IDataWalker<LogEntry> WalkFrom(long start = -1)
+                public IDataWalker<ITimestampedData> WalkFrom(long start = -1)
                 {
                     return null;
                 }
             }
 
             private LogViewer m_parent;
-            private IDataListSource<LogEntry> m_source;
+            private IDataListSource<ITimestampedData> m_source;
             private long m_lastBefore;
 
-            public PresentationListSearchingForFirstSource(LogViewer parent, IDataListSource<LogEntry> source, long lastBefore) :
+            public PresentationListSearchingForFirstSource(LogViewer parent, IDataListSource<ITimestampedData> source, long lastBefore) :
                 base(new EmptySource(), 100, 10)
             {
                 m_parent = parent;
@@ -76,7 +77,7 @@ namespace StepBro.UI.WinForms.Controls
                 m_lastBefore = lastBefore;
             }
 
-            public override void CreatePresentationEntry(LogEntry entry, long sourceIndex, Action<ChronoListViewEntry> adder)
+            public override void CreatePresentationEntry(ITimestampedData entry, long sourceIndex, Action<ChronoListViewEntry> adder)
             {
             }
 
@@ -94,25 +95,25 @@ namespace StepBro.UI.WinForms.Controls
             }
         }
 
-        private class NewLogStart : IDataListSource<LogEntry>
+        private class NewLogStart : IDataListSource<ITimestampedData>
         {
-            private IDataListSource<LogEntry> m_source;
-            private LogEntry m_firstEntry;
+            private IDataListSource<ITimestampedData> m_source;
+            private ITimestampedData m_firstEntry;
             private long m_firstIndex;
 
-            public NewLogStart(IDataListSource<LogEntry> source, LogEntry first, long firstIndex)
+            public NewLogStart(IDataListSource<ITimestampedData> source, ITimestampedData first, long firstIndex)
             {
                 m_source = source;
                 m_firstEntry = first;
                 m_firstIndex = firstIndex;
             }
 
-            public Tuple<long, LogEntry> GetFirst()
+            public Tuple<long, ITimestampedData> GetFirst()
             {
-                return new Tuple<long, LogEntry>(m_firstIndex, m_firstEntry);
+                return new Tuple<long, ITimestampedData>(m_firstIndex, m_firstEntry);
             }
 
-            public LogEntry GetLast()
+            public ITimestampedData GetLast()
             {
                 return m_source.GetLast();
             }
@@ -123,13 +124,13 @@ namespace StepBro.UI.WinForms.Controls
                 return new IndexerStateSnapshot(m_firstIndex, sourceState.LastIndex, sourceState.LastIndex - m_firstIndex + 1L);
             }
 
-            public IDataWalker<LogEntry> WalkFrom(long start = -1)
+            public IDataWalker<ITimestampedData> WalkFrom(long start = -1)
             {
                 if (start < 0L) start = m_firstIndex;
                 return m_source.WalkFrom(start);
             }
 
-            public LogEntry Get(long index)
+            public ITimestampedData Get(long index)
             {
                 return m_source.Get(index);
             }
@@ -137,13 +138,13 @@ namespace StepBro.UI.WinForms.Controls
 
         private delegate bool SkipChecker(LogEntry entry);
 
-        private IDataListSource<LogEntry> m_source = null;
-        private PresentationListForListData<LogEntry, ChronoListViewEntry> m_presentationList = null;
+        private IDataListSource<ITimestampedData> m_source = null;
+        private PresentationListForListData<ITimestampedData, ChronoListViewEntry> m_presentationList = null;
         private long m_lastEntryIndexBeforeClear = -1L;
         private static LogEntry s_lastEntryBeforeClear = null;
         private NewLogStart m_zeroStartSource = null;
         private int m_visibleLevels = 1000;
-        private Predicate<LogEntry>[] m_filter = null;
+        private Predicate<ITimestampedData>[] m_filter = null;
         private ToolStripMenuItem m_selectedSkipOption = null;
         private bool m_enoughCharsInSearchText = false;
         private bool m_markSearchMatches = true;
@@ -176,23 +177,23 @@ namespace StepBro.UI.WinForms.Controls
 
         #region Filters
 
-        private bool LevelFilter(LogEntry entry)
+        private bool LevelFilter(ITimestampedData entry)
         {
-            return (entry.IndentLevel < m_visibleLevels);
+            return ((entry as LogEntry).IndentLevel < m_visibleLevels);
         }
 
-        private bool CombinedFilter(LogEntry entry)
+        private bool CombinedFilter(ITimestampedData entry)
         {
             foreach (var f in m_filter)
             {
-                if (f(entry) == false) return false;
+                if (f((entry as LogEntry)) == false) return false;
             }
             return true;
         }
 
         private void CreateFilter()
         {
-            var filter = new List<Predicate<LogEntry>>();
+            var filter = new List<Predicate<ITimestampedData>>();
             if (m_visibleLevels < 1000)
             {
                 filter.Add(this.LevelFilter);
@@ -283,7 +284,7 @@ namespace StepBro.UI.WinForms.Controls
         private void toolStripButtonClear_Click(object sender, EventArgs e)
         {
             m_lastEntryIndexBeforeClear = m_source.GetState().LastIndex;
-            s_lastEntryBeforeClear = m_source.Get(m_lastEntryIndexBeforeClear);
+            s_lastEntryBeforeClear = m_source.Get(m_lastEntryIndexBeforeClear) as LogEntry;
             m_presentationList = new PresentationListSearchingForFirstSource(this, m_source, m_lastEntryIndexBeforeClear);
             logView.Setup(m_presentationList);
         }
@@ -581,13 +582,14 @@ namespace StepBro.UI.WinForms.Controls
             // Maybe do nothing; The menu item can be read by the skip operation.
         }
 
-        private bool SearchMatching(LogEntry entry)
+        private bool SearchMatching(ITimestampedData entry)
         {
             var text = toolStripTextBoxQuickSearch.Text;
             if (String.IsNullOrEmpty(text)) return false;
             if (entry == null) return false;
-            if (entry.Location != null && entry.Location.Contains(text, StringComparison.InvariantCultureIgnoreCase)) return true;
-            if (entry.Text != null && entry.Text.Contains(text, StringComparison.InvariantCultureIgnoreCase)) return true;
+            var e = entry as LogEntry;
+            if (e.Location != null && e.Location.Contains(text, StringComparison.InvariantCultureIgnoreCase)) return true;
+            if (e.Text != null && e.Text.Contains(text, StringComparison.InvariantCultureIgnoreCase)) return true;
             return false;
         }
 

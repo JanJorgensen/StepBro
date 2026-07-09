@@ -1,9 +1,14 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
-using StepBro.Core.General;
 using StepBro.Core;
+using StepBro.Core.General;
+using StepBro.Core.Logging;
 using StepBro.HostSupport.Models;
 using StepBro.UI.Controls;
+using StepBro.Workbench.ViewModels;
+using System;
+using System.Threading;
 
 namespace StepBro.Workbench.Views
 {
@@ -13,23 +18,68 @@ namespace StepBro.Workbench.Views
         private bool m_xBottomShown = true;
         private bool m_xLeftShown = true;
         private bool m_xRightShown = true;
+        private bool m_closing = false;
+        private ILogger m_threadLogger = null;
 
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new HostAppModel();
-            var logViewerModel = new LogViewerModel<LogViewEntry>(new LogViewEntryFactory());
-            IService m_textFileSystemService = null;
-            new TextFileSystem(out m_textFileSystemService);
-            this.AppModel.Initialize(logViewerModel, m_textFileSystemService);
-            logViewerModel.Setup();
         }
 
-        private HostAppModel AppModel { get { return this.DataContext as HostAppModel; } }
+        private MainWindowViewModel Model { get { return this.DataContext as MainWindowViewModel; } }
 
         protected override void OnLoaded(RoutedEventArgs e)
         {
             this.UpdatePanels();
+
+            if (m_threadLogger != null)
+            {
+                var logger = new System.Threading.Thread(LoggerThread);
+                logger.Start();
+            }
+        }
+
+        protected override void OnDataContextChanged(EventArgs e)
+        {
+            base.OnDataContextChanged(e);
+            if (this.Model != null)
+            {
+                this.Model.PropertyChanged += Model_PropertyChanged;
+            }
+        }
+
+        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine($"Prop change: {e.PropertyName}");
+            if (e.PropertyName == nameof(MainWindowViewModel.PrimaryPanelVisible))
+            {
+                this.UpdatePanels();
+            }
+        }
+
+        internal void StartLogging()
+        {
+            m_threadLogger = this.Model.StepBroHostModel?.RootLogger.LogEntering("Workbench", "Crazy Logging");
+        }
+
+        private void LoggerThread()
+        {
+            System.Random rnd = new System.Random();
+            while (!m_closing)
+            {
+                Thread.Sleep(50);
+
+                for (int i = 0; i < 10; i++)
+                {
+                    m_threadLogger.Log("Spunk " + StepBro.Core.Data.AlphaID.Create((uint)rnd.Next(2000000000), 5));
+                }
+            }
+        }
+
+        protected override void OnClosing(WindowClosingEventArgs e)
+        {
+            base.OnClosing(e);
+            m_closing = true;
         }
 
         void checkBox_Layout(object sender, RoutedEventArgs e)
@@ -48,10 +98,10 @@ namespace StepBro.Workbench.Views
             {
                 m_primaryOnLeft = onLeft;
 
-                // Switch the enable flags for left and right panels.
-                bool leftOn = checkBoxLeft.IsChecked.GetValueOrDefault(true);
-                checkBoxLeft.IsChecked = checkBoxRight.IsChecked.GetValueOrDefault(true);
-                checkBoxRight.IsChecked = leftOn;
+                //// Switch the enable flags for left and right panels.
+                //bool leftOn = checkBoxLeft.IsChecked.GetValueOrDefault(true);
+                //checkBoxLeft.IsChecked = checkBoxRight.IsChecked.GetValueOrDefault(true);
+                //checkBoxRight.IsChecked = leftOn;
 
                 this.UpdatePanels();
 
@@ -76,7 +126,7 @@ namespace StepBro.Workbench.Views
             System.Diagnostics.Debug.WriteLine("Button");
         }
 
-        private void panelAlignmentSelector_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+        private void panelAlignmentSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             this.UpdatePanels();
             //var port = new StepBro.UI.Controls.ChronoListViewPort();
@@ -84,7 +134,7 @@ namespace StepBro.Workbench.Views
 
         private void UpdatePanels()
         {
-            if (panelAlignmentSelector != null && checkBoxBottom != null && checkBoxLeft != null && checkBoxRight != null)
+            if (panelAlignmentSelector != null && checkBoxBottomPanel != null && checkBoxSecondaryPanel != null)
             {
                 System.Diagnostics.Debug.WriteLine("panelAlignmentSelector " + panelAlignmentSelector.SelectedIndex.ToString());
 
@@ -96,12 +146,12 @@ namespace StepBro.Workbench.Views
                 //xBottom
                 //xSplitterBottom
 
-                bool leftOn = checkBoxLeft.IsChecked.GetValueOrDefault(true);
-                bool rightOn = checkBoxRight.IsChecked.GetValueOrDefault(true);
+                bool leftOn = m_primaryOnLeft ? this.Model.PrimaryPanelVisible : checkBoxSecondaryPanel.IsChecked.GetValueOrDefault(true);
+                bool rightOn = m_primaryOnLeft ? checkBoxSecondaryPanel.IsChecked.GetValueOrDefault(true) : this.Model.PrimaryPanelVisible;
 
-                if (checkBoxBottom.IsChecked.GetValueOrDefault(true) != m_xBottomShown)
+                if (checkBoxBottomPanel.IsChecked.GetValueOrDefault(true) != m_xBottomShown)
                 {
-                    if (checkBoxBottom.IsChecked.GetValueOrDefault(true))
+                    if (checkBoxBottomPanel.IsChecked.GetValueOrDefault(true))
                     {
                         m_xBottomShown = true;
                         mainGrid.Children.Add(xBottom);
@@ -176,5 +226,24 @@ namespace StepBro.Workbench.Views
             }
         }
 
+        private void SettingsSelector_Click(object? sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("SettingsSelector");
+        }
+
+        private void FilesSelector_Click(object? sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("FilesSelector Click");
+        }
+
+        private void FilesSelector_PointerPressed(object? sender, PointerPressedEventArgs e)    // TODO: Why does this not work?
+        {
+            System.Diagnostics.Debug.WriteLine("FilesSelector Pressed");
+        }
+
+        //private void FilesSelector_PointerPressed(object? sender, PointerPressedEventArgs e)
+        //{
+        //    System.Diagnostics.Debug.WriteLine("FilesSelector Pressed");
+        //}
     }
 }

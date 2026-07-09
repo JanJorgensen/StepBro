@@ -14,7 +14,7 @@ namespace StepBro.Core.Test.Mocks
     public class TextFileSystemMock : ServiceBase<ITextFileSystem, TextFileSystemMock>, ITextFileSystem
     {
         private string m_basePath = "";
-        private List<NamedData<Tuple<string,DateTime>>> m_files = new List<NamedData<Tuple<string, DateTime>>>();
+        private List<NamedData<Tuple<string, DateTime>>> m_files = new List<NamedData<Tuple<string, DateTime>>>();
 
         public TextFileSystemMock(out IService serviceAccess) :
             base("TextFileSystem", out serviceAccess, typeof(ILogger), typeof(IConfigurationFileManager))
@@ -94,6 +94,44 @@ namespace StepBro.Core.Test.Mocks
         public string SearchFile(string startpath, string name, IFolderShortcutsSource shortcuts)
         {
             return TextFileSystem.SearchFile(this, startpath, name, shortcuts);
+        }
+
+
+        public void AddSomeScriptFiles()
+        {
+            var stationPropertiesFileName = System.Environment.GetEnvironmentVariable(StepBro.Core.Api.Constants.STEPBRO_STATION_PROPERTIES);
+            if (!String.IsNullOrEmpty(stationPropertiesFileName))
+            {
+                var stationProps = """
+                config bool Demo.UserPresent: true,
+                config string Demo.UserName: "Jan"
+                """;
+                this.AddFile(stationPropertiesFileName, stationProps);
+            }
+
+
+            var file1 = """
+                // Place the cursor on the line below and press Ctrl+Shift+F5 to execute the procedure.
+                procedure void HelloStepBro()
+                {
+                    log("Hello World!");  // See the execution log (the Output view). The line in the log from this statement starts with the number of this line.
+                }
+
+
+                // This procedure calls the procedure named 'GetName', to get a name.
+                procedure void CallOtherProcedure()
+                {
+                    string name = GetName();
+                    log("The name is: " + name);
+                }
+
+                // No parameters, returns string with name.
+                procedure string GetName()
+                {
+                    return "Peter";
+                }
+                """;
+            this.AddFile("c:/examples/scripts/Demo Procedure.sbs", file1);
         }
     }
 }

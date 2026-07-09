@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using StepBro.Core.Api;
 using StepBro.Core.Execution;
+using StepBro.Core.Logging;
 
 namespace StepBro.CAN
 {
@@ -18,10 +19,10 @@ namespace StepBro.CAN
     }
 
     [Public]
-    public interface IChannel : IDisposable
+    public interface IChannel : IDisposable, IMessageDataDecoder
     {
         IAdapter Adapter { get; }
-        void Setup([Implicit] ICallContext context, Baudrate baudrate, ChannelMode mode);
+        void Setup([Implicit] ILogger logger, Baudrate baudrate, ChannelMode mode);
         //CANUSB.CANUSB_ACCEPTANCE_CODE_ALL,
         //CANUSB.CANUSB_ACCEPTANCE_MASK_ALL,
         //CANUSB.CANUSB_FLAG_TIMESTAMP);

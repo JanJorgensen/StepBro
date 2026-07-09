@@ -7,15 +7,15 @@ using System.Collections.Generic;
 
 namespace StepBro.HostSupport.Models;
 
-public partial class ChronoListViewModel<TViewEntryType>
+public partial class ChronoListViewModel
 {
     public partial class ViewPortModel : ObservableObject
     {
-        private ChronoListViewModel<TViewEntryType> m_view;
-        private IElementIndexer<TViewEntryType> m_source = null;
-        private List<TViewEntryType> m_viewEntries = new List<TViewEntryType>(200);
+        private ChronoListViewModel m_view;
+        private IElementIndexer<ITimestampedViewEntry> m_source = null;
+        private List<ITimestampedViewEntry> m_viewEntries = new List<ITimestampedViewEntry>(200);
         private int m_viewEntryCount = 0;
-        private DynamicViewSettings m_viewSettings = new DynamicViewSettings();
+        private ChronoListViewDynamicSettings m_viewSettings = new ChronoListViewDynamicSettings();
         private Point m_mouseDownLocation = new Point();
         private DateTime m_lastViewScroll = DateTime.MinValue;
 
@@ -28,7 +28,7 @@ public partial class ChronoListViewModel<TViewEntryType>
         private int m_newHorizontalScrollPosition = 0;
 
 
-        internal ViewPortModel(ChronoListViewModel<TViewEntryType> view)
+        internal ViewPortModel(ChronoListViewModel view)
         {
             m_view = view;
             m_source = view.Source;
@@ -46,6 +46,10 @@ public partial class ChronoListViewModel<TViewEntryType>
 
         [ObservableProperty]
         private int m_lineHeight = 20;
+
+        public ChronoListViewModel View { get { return m_view; } }
+
+        public ChronoListViewDynamicSettings ViewSettings { get { return m_viewSettings; } }
 
         public int MaxLinesVisible { get { return this.Height / this.LineHeight; } }
         public int MaxLinesPartlyVisible { get { return (this.Height + (this.LineHeight - 1)) / this.LineHeight; } }
@@ -78,7 +82,7 @@ public partial class ChronoListViewModel<TViewEntryType>
             this.Invalidated?.Invoke(this, EventArgs.Empty);
         }
 
-        public IList<TViewEntryType> Refresh()
+        public IList<ITimestampedViewEntry> Refresh()
         {
             m_viewEntries.Clear();
             m_invalidated = false;
@@ -91,7 +95,7 @@ public partial class ChronoListViewModel<TViewEntryType>
             {
                 m_viewSettings.ZeroTime = m_view.ZeroTime;
                 var sourceState = m_source.GetState();
-                long lastIndex = sourceState.LastIndex;
+                long lastIndex = Math.Min(sourceState.LastIndex, m_topIndex + this.MaxLinesPartlyVisible - 1);
                 if (lastIndex >= 0L)
                 {
                     long i = m_topIndex;

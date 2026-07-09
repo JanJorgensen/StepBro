@@ -23,7 +23,7 @@ namespace StepBroCoreTest.Parser
             var var = FileBuilder.ParseFileVariable<long>(null, null, "protected int myVariable = 10 * 3;");
             Assert.IsNotNull(var);
             Assert.AreEqual("myVariable", var.Name);
-            Assert.ReferenceEquals(var.DataType, TypeReference.TypeInt64);
+            Assert.IsTrue(Object.ReferenceEquals(var.DataType, TypeReference.TypeInt64));
             Assert.IsFalse(var.IsReadonly);
             Assert.AreEqual(AccessModifier.Protected, var.AccessProtection);
         }
@@ -50,7 +50,7 @@ namespace StepBroCoreTest.Parser
                 "private DummyInstrumentClass myVariable = DummyInstrumentClass{ }");
             Assert.IsNotNull(var);
             Assert.AreEqual("myVariable", var.Name);
-            Assert.ReferenceEquals(var.DataType, (TypeReference)typeof(DummyInstrumentClass));
+            Assert.AreEqual(typeof(DummyInstrumentClass), var.DataType.Type);
             Assert.IsTrue(var.IsReadonly);
             Assert.AreEqual(AccessModifier.Private, var.AccessProtection);
         }
@@ -63,7 +63,7 @@ namespace StepBroCoreTest.Parser
                 "private DummyInstrumentClass myVariable = DummyInstrumentClass;");
             Assert.IsNotNull(var);
             Assert.AreEqual("myVariable", var.Name);
-            Assert.ReferenceEquals(var.DataType, (TypeReference)typeof(DummyInstrumentClass));
+            Assert.AreEqual(typeof(DummyInstrumentClass), var.DataType.Type);
             Assert.IsTrue(var.IsReadonly);
             Assert.AreEqual(AccessModifier.Private, var.AccessProtection);
         }
@@ -76,7 +76,7 @@ namespace StepBroCoreTest.Parser
                 "private DummyInstrumentClass myVariable = DummyInstrumentClass();");
             Assert.IsNotNull(var);
             Assert.AreEqual("myVariable", var.Name);
-            Assert.ReferenceEquals(var.DataType, (TypeReference)typeof(DummyInstrumentClass));
+            Assert.AreEqual(typeof(DummyInstrumentClass), var.DataType.Type);
             Assert.IsTrue(var.IsReadonly);
             Assert.AreEqual(AccessModifier.Private, var.AccessProtection);
         }
@@ -89,7 +89,7 @@ namespace StepBroCoreTest.Parser
                 "private DummyInstrumentClass myVariable = DummyInstrumentClass(){ }");
             Assert.IsNotNull(var);
             Assert.AreEqual("myVariable", var.Name);
-            Assert.ReferenceEquals(var.DataType, (TypeReference)typeof(DummyInstrumentClass));
+            Assert.AreEqual(typeof(DummyInstrumentClass), var.DataType.Type);
             Assert.IsTrue(var.IsReadonly);
             Assert.AreEqual(AccessModifier.Private, var.AccessProtection);
         }
@@ -377,7 +377,7 @@ namespace StepBroCoreTest.Parser
                     errors = true;
                 }
             }
-            if ( !errors )
+            if (!errors)
             {
                 var extra = data["ExtraData"] as PropertyBlock;
                 if (extra != null)
@@ -398,7 +398,7 @@ namespace StepBroCoreTest.Parser
         public long IntA { get; set; } = 0L;
         public List<string> Names { get { return m_names; } set { m_names = value; } }
 
-        [ObjectName] 
+        [ObjectName]
         public string Name { get { return m_objectName; } set { m_objectName = value; } }
 
         public void Dispose()
@@ -433,7 +433,7 @@ namespace StepBroCoreTest.Parser
         {
             if (context != null) context.Logger.Log("Work Method!");
 
-            this.IntA *= 3; 
+            this.IntA *= 3;
         }
 
         public static void ShowString([Implicit] ICallContext context, string text)

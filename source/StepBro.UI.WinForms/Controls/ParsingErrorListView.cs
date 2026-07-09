@@ -1,6 +1,7 @@
 ﻿using StepBro.Core.General;
 using StepBro.Core.ScriptData;
 using System;
+using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace StepBro.Core.Controls
@@ -26,6 +27,7 @@ namespace StepBro.Core.Controls
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool AutoParseFiles
         {
             get { return m_autoParseFiles; }

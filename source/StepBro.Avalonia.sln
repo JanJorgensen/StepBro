@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35506.116
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.11822.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.Workbench.Avalonia", "StepBro.Workbench.Avalonia\StepBro.Workbench.Avalonia.csproj", "{17B283A8-59C5-4A6A-9C1F-688A292E1DA2}"
 EndProject
@@ -24,6 +24,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestModule", "Modules\TestModule\TestModule.csproj", "{603F66C1-B635-4344-A61C-8F85FA5106A9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.HostSupport", "StepBro.HostSupport\StepBro.HostSupport.csproj", "{F1DE2E15-94C8-4D2A-9A93-94AFDD740920}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepBro.HostSupport.Test", "Test\StepBro.HostSupport.Test\StepBro.HostSupport.Test.csproj", "{F35E7015-9188-04FC-7765-5A03EF3D9458}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,10 @@ Global
 		{F1DE2E15-94C8-4D2A-9A93-94AFDD740920}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1DE2E15-94C8-4D2A-9A93-94AFDD740920}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1DE2E15-94C8-4D2A-9A93-94AFDD740920}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F35E7015-9188-04FC-7765-5A03EF3D9458}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F35E7015-9188-04FC-7765-5A03EF3D9458}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F35E7015-9188-04FC-7765-5A03EF3D9458}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F35E7015-9188-04FC-7765-5A03EF3D9458}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,5 +87,8 @@ Global
 		{FDA75657-9CC9-463F-B891-11AD23B3E74B} = {8D464C09-F052-4A6D-B228-68A8767E668D}
 		{344CA6F7-5FE9-456F-8908-E7CA8114FE71} = {8D464C09-F052-4A6D-B228-68A8767E668D}
 		{603F66C1-B635-4344-A61C-8F85FA5106A9} = {8D464C09-F052-4A6D-B228-68A8767E668D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {25E1606A-C806-4E86-964B-3D9527F11F36}
 	EndGlobalSection
 EndGlobal

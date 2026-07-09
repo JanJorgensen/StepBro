@@ -2,14 +2,20 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Controls.Shapes;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
-using AvaloniaEdit.Utils;
+using Avalonia.Threading;
 using StepBro.Core.Data;
 using StepBro.HostSupport;
+using StepBro.HostSupport.Models;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Globalization;
+using System.Reflection;
 using static StepBro.Core.Data.PropertyBlockDecoder;
 
 namespace StepBro.UI.Controls
@@ -19,144 +25,77 @@ namespace StepBro.UI.Controls
         public interface IView
         {
             int HorizontalScrollPosition { get; }
-            DynamicViewSettings ViewSettings { get; }
+            ChronoListViewDynamicSettings ViewSettings { get; }
             Typeface NormalFont { get; }
             double FontSize { get; }
             IBrush NormalTextColor { get; }
         }
 
-        public enum TimestampFormat
-        {
-            Seconds,
-            SecondsDelta,
-            HoursMinutesSeconds,
-            LocalTime,
-            LocalDateTime
-        }
-
-        public class DynamicViewSettings
-        {
-            private bool m_valueChanged = false;
-            private DateTime m_zeroTime;
-            private TimestampFormat m_timeFormat = TimestampFormat.Seconds;
-            private int m_timestampWidth = 0;   // The width of the widest seen timestamp.
-            private int m_lineHeaderWidth = 0;    // The right side of the widest line header (timestamp and type)
-
-            public bool ValueChanged()
-            {
-                if (m_valueChanged)
-                {
-                    m_valueChanged = false;
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            public void Reset()
-            {
-                m_timestampWidth = 0;
-                m_lineHeaderWidth = 0;
-            }
-
-            public DateTime ZeroTime
-            {
-                get { return m_zeroTime; }
-                set
-                {
-                    if (value != m_zeroTime)
-                    {
-                        m_zeroTime = value;
-                        m_valueChanged = true;
-                    }
-                }
-            }
-
-            public TimestampFormat TimeFormat
-            {
-                get { return m_timeFormat; }
-                set
-                {
-                    if (value != m_timeFormat)
-                    {
-                        m_timeFormat = value;
-                        m_valueChanged = true;
-                    }
-                }
-            }
-
-            public int TimeStampWidth
-            {
-                get { return m_timestampWidth; }
-                set
-                {
-                    if (value != m_timestampWidth)
-                    {
-                        m_timestampWidth = value;
-                        m_valueChanged = true;
-                    }
-                }
-            }
-            public int LineHeaderWidth
-            {
-                get { return m_lineHeaderWidth; }
-                set
-                {
-                    if (value != m_lineHeaderWidth)
-                    {
-                        m_lineHeaderWidth = value;
-                        m_valueChanged = true;
-                    }
-                }
-            }
-        }
-
-        private IChronoListViewer m_viewer = null;
-        private IElementIndexer<ChronoListViewEntry> m_source = null;
-        private int m_lineHeight = 20;
-        private ChronoListViewEntry[] m_viewEntries = new ChronoListViewEntry[200];
-        private int m_viewEntryCount = 0;
+        ChronoListViewModel.ViewPortModel m_model = null;
+        private bool m_dataInvalidated = true;
+        IList<ITimestampedViewEntry> m_entries = null;
+        private ChronoListViewDynamicSettings m_viewSettings = null;
+        private Avalonia.Point m_mouseDownLocation = new Avalonia.Point();
+        private Typeface m_normalFont = Typeface.Default;
+        private double m_fontSize = 1.0;
+        public const int TicksPerSecond = 60;
+        private readonly DispatcherTimer m_timer = new() { Interval = new TimeSpan(0, 0, 0, 0, 100) };
         private int m_horizontalScrollPosition = 0;
-        private DynamicViewSettings m_viewSettings = new DynamicViewSettings();
-        private Point m_mouseDownLocation = new Point();
-        private DateTime m_lastViewScroll = DateTime.MinValue;
 
-        private long m_topIndex = 0L;
-        private long m_lastShown = -1L;
 
         public ChronoListViewPort()
         {
+            this.Focusable = true;
         }
 
-        public void SetDataSource(IChronoListViewer viewer)
+        protected override void OnSizeChanged(SizeChangedEventArgs e)
         {
-            m_viewer = viewer;
-            m_source = viewer.Source;
+            base.OnSizeChanged(e);
+            if (m_model != null)
+            {
+                m_model.Height = (int)this.Bounds.Height;
+            }
+            m_dataInvalidated = true;
+            this.InvalidateVisual();
         }
 
+        public void Setup(ChronoListViewModel.ViewPortModel model)
+        {
+            this.DataContext = m_model = model;
+            m_viewSettings = model.ViewSettings;
+            model.PropertyChanged += Model_PropertyChanged;
+            model.Invalidated += Model_Invalidated;
+            m_timer.Tick += TimerTick;
+            m_timer.Start();
+        }
 
+        private void TimerTick(object sender, EventArgs e)
+        {
+            m_model.View.RequestUpdate();
+        }
 
+        private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(m_model.HorizontalScrollPosition))
+            {
+                m_horizontalScrollPosition = m_model.HorizontalScrollPosition;
+            }
+        }
 
-        //public class MouseOnLineEventArgs : MouseEventArgs
-        //{
-        //    private readonly int m_line;
-        //    private readonly long m_index;
+        private void Model_Invalidated(object sender, EventArgs e)
+        {
+            m_dataInvalidated = true;
+            this.InvalidateVisual();
+        }
 
-        //    public MouseOnLineEventArgs(MouseEventArgs args, int line, long index) : base(args.Button, args.Clicks, args.X, args.Y, args.Delta)
-        //    {
-        //        m_line = line;
-        //        m_index = index;
-        //    }
-
-        //    public int Line { get { return m_line; } }
-        //    public long Index { get { return m_index; } }
-        //}
-        //public delegate void MouseOnLineEventHandler(object sender, MouseOnLineEventArgs e);
-
-        //public event MouseOnLineEventHandler MouseDownOnLine;
-        //public event MouseOnLineEventHandler MouseUpOnLine;
+        protected override void OnLoaded(RoutedEventArgs e)
+        {
+            base.OnLoaded(e);
+            m_normalFont = new Typeface(new FontFamily("Consolas"));
+            m_fontSize = 12.0;
+            m_model.LineHeight = (int)(m_fontSize + 2.0);
+            this.InvalidateVisual();
+        }
 
         public int HorizontalScrollPosition
         {
@@ -167,41 +106,13 @@ namespace StepBro.UI.Controls
             }
         }
 
-        public DynamicViewSettings ViewSettings { get { return m_viewSettings; } }
+        public ChronoListViewDynamicSettings ViewSettings { get { return m_viewSettings; } }
 
-        public Typeface NormalFont { get { return this.CreateTypeface(); } }
+        public Typeface NormalFont { get { return m_normalFont; } }
 
-        public double FontSize { get { return TextElement.GetFontSize(this); } }
+        public double FontSize { get { return m_fontSize; } }
 
         public IBrush NormalTextColor { get { return Brushes.White; } }
-
-        public int MaxLinesVisible { get { return (int)(this.Height / m_lineHeight); } }
-        public int MaxLinesPartlyVisible { get { return (int)((this.Height + (m_lineHeight - 1)) / m_lineHeight); } }
-
-        public long TopEntryIndex { get { return m_topIndex; } }
-        public long LastShownEntryIndex { get { return m_lastShown; } }
-
-        public DateTime LastViewScrollTime { get { return m_lastViewScroll; } }
-
-        public bool ViewJustScrolled { get { return (DateTime.UtcNow - m_lastViewScroll) < TimeSpan.FromMilliseconds(500); } }
-
-        public bool IsViewFilled()
-        {
-            return (m_viewEntryCount >= this.MaxLinesPartlyVisible);
-        }
-
-        public void RequestUpdate(long topEntry, int horizontalScrollPosition)
-        {
-            //System.Diagnostics.Debug.Assert(!this.InvokeRequired);
-            System.Diagnostics.Debug.WriteLine("ChronoListViewPort.RequestUpdate");
-            if (topEntry != m_topIndex)
-            {
-                m_lastViewScroll = DateTime.UtcNow;
-            }
-            m_topIndex = topEntry;
-            m_horizontalScrollPosition = horizontalScrollPosition;
-            this.InvalidateVisual();
-        }
 
         //protected override void OnFontChanged(EventArgs e)
         //{
@@ -209,31 +120,26 @@ namespace StepBro.UI.Controls
         //    m_lineHeight = this.Font.Height;
         //}
 
-
-
-
         public override void Render(DrawingContext context)
         {
+            Rect windowRect = this.Bounds;
             context.FillRectangle(Brushes.White, this.Bounds);
-            var typeface = this.CreateTypeface();
             var emSize = TextElement.GetFontSize(this);
-            var penWhite = new Pen(Brushes.White, 20, lineCap: PenLineCap.Square);
+            var penWhite = new Pen(Brushes.White, 1, lineCap: PenLineCap.Square);
             var penBlack = new Pen(Brushes.Black);
 
-            Rect windowRect = new Rect(Bounds.Size);
-
             Rect rect;
-            if (m_source == null)
+            
+            if (m_model != null && (m_entries == null || m_dataInvalidated))
             {
-                m_viewEntryCount = 0;
-                return;
+                m_entries = m_model.Refresh();
+                m_dataInvalidated = false;
             }
-            m_viewSettings.ZeroTime = m_viewer.ZeroTime;
-            var sourceState = m_source.GetState();
-            long lastIndex = sourceState.LastIndex;
-            if (m_source == null || lastIndex < 0L)
+
+            if (m_entries == null || m_entries.Count == 0)
             {
-                m_viewEntryCount = 0;
+                var formattedText = new FormattedText("So empty!", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, this.NormalFont, this.FontSize, Brushes.LightGray);
+                context.DrawText(formattedText, windowRect.TopLeft);
                 return;
             }
 
@@ -242,48 +148,41 @@ namespace StepBro.UI.Controls
             {
                 first = false;
                 int y = 0;
-                context.FillRectangle(Brushes.Yellow, windowRect);
-                var entryIndex = m_topIndex;
-                int viewIndex = 0;
-                long lastShown = 0;
+                context.FillRectangle(Brushes.Black, windowRect);
+                var entryIndex = m_model.TopEntryIndex;
+                var lineHeight = m_model.LineHeight;
                 try
                 {
-                    while (entryIndex <= lastIndex)
+                    foreach (ChronoListViewEntry entry in m_entries)
                     {
-                        var entry = m_source.Get(entryIndex);
                         if (entry == null) break;
-                        lastShown = entryIndex;
-                        m_viewEntries[viewIndex] = entry;
 
-                        var selectionState = m_viewer.GetEntryMarkState(entryIndex, entry);
-                        rect = new Rect(m_horizontalScrollPosition, y, 10000, m_lineHeight);
+                        var selectionState = m_model.View.GetEntryMarkState(entryIndex, entry);
+                        rect = new Rect(m_horizontalScrollPosition, y, windowRect.Width, lineHeight);
                         if ((selectionState & EntryMarkState.Selected) != EntryMarkState.None)
                         {
                             context.FillRectangle(Brushes.Blue, rect);
                             if ((selectionState & EntryMarkState.SearchMatch) != EntryMarkState.None)
                             {
-                                var r = new Rect(m_horizontalScrollPosition, y + 1, this.ViewSettings.TimeStampWidth + 2, m_lineHeight - 1);
+                                var r = new Rect(m_horizontalScrollPosition, y + 1, this.ViewSettings.TimeStampWidth + 2, lineHeight - 1);
                                 context.FillRectangle(Brushes.Purple, r);
                             }
                         }
                         else if ((selectionState & EntryMarkState.SearchMatch) != EntryMarkState.None)
                         {
-                            var r = new Rect(m_horizontalScrollPosition, y + 1, 10000, m_lineHeight - 1);
+                            var r = new Rect(m_horizontalScrollPosition, y + 1, 10000, lineHeight - 1);
                             context.FillRectangle(Brushes.Purple, r);
                         }
                         if ((selectionState & EntryMarkState.Current) != EntryMarkState.None)
                         {
-                            context.DrawLine(penWhite, new Point(0, y - 1), new Point(windowRect.Right, y - 1));
-                            context.DrawLine(penWhite, new Point(0, y + m_lineHeight), new Point(windowRect.Right, y + m_lineHeight));
+                            context.DrawLine(penWhite, new Avalonia.Point(0, y), new Avalonia.Point(windowRect.Right, y));
+                            context.DrawLine(penWhite, new Avalonia.Point(0, y + lineHeight + 1.0), new Avalonia.Point(windowRect.Right, y + lineHeight + 1.0));
                         }
                         entry.DoPaint(context, this, ref rect, selectionState);
 
                         entryIndex++;
-                        y += m_lineHeight;
-                        viewIndex++;
+                        y += lineHeight;
                     }
-                    m_lastShown = lastShown;
-                    m_viewEntryCount = viewIndex;
                 }
                 catch
                 {
@@ -292,5 +191,63 @@ namespace StepBro.UI.Controls
             }
 
         }
+
+        #region Mouse handling
+
+        protected override void OnPointerMoved(PointerEventArgs e)
+        {
+            base.OnPointerMoved(e);
+        }
+
+        protected override void OnPointerPressed(PointerPressedEventArgs e)
+        {
+            base.OnPointerPressed(e);
+            m_mouseDownLocation = e.GetPosition(this);
+            if (e.KeyModifiers == KeyModifiers.None)
+            {
+                long line = ((long)(m_mouseDownLocation.Y) / m_model.LineHeight);
+                long index = m_model.TopEntryIndex + line;
+                if (line >= m_entries.Count) index = -1L;
+
+                if (!m_model.View.HeadMode || !m_model.ViewJustScrolled)
+                {
+                    m_model.View.HeadMode = false;
+                    m_model.View.SetCurrentEntry(index, true);
+                }
+                else
+                {
+                    m_model.View.HeadMode = false;
+                }
+
+            }
+        }
+
+        protected override void OnPointerReleased(PointerReleasedEventArgs e)
+        {
+            base.OnPointerReleased(e);
+        }
+
+        protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+        {
+            base.OnPointerCaptureLost(e);
+        }
+
+        protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
+        {
+            base.OnPointerWheelChanged(e);
+            if (e.KeyModifiers == KeyModifiers.Control)
+            {
+                var size = m_fontSize + e.Delta.Y * 0.8;
+                if (size > 6.0 && size < 25.0)
+                {
+                    m_fontSize = size;
+                    m_model.LineHeight = (int)(m_fontSize + 2.0);
+                    m_dataInvalidated = true;
+                    this.InvalidateVisual();
+                }
+            }
+        }
+
+        #endregion
     }
 }

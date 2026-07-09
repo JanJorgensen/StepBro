@@ -25,8 +25,8 @@ namespace StepBroCoreTest.Generators
             var filepath = Path.Combine(folder, "wide procedure hierarchy" + Constants.STEPBRO_FILE_EXTENSION);
             var lines = new List<string>();
 
-            var secondlevel = new Func<int, string>(a => "ProcL2" + StepBro.Core.Data.AlphaID.Create(a, 4));
-            var thirdlevel = new Func<int, string>(a => "ProcL3" + StepBro.Core.Data.AlphaID.Create(a, 4));
+            var secondlevel = new Func<int, string>(a => "ProcL2" + StepBro.Core.Data.AlphaID.Create((uint)a, 4));
+            var thirdlevel = new Func<int, string>(a => "ProcL3" + StepBro.Core.Data.AlphaID.Create((uint)a, 4));
 
             for (int i = 0; i < l3width; i++)
             {

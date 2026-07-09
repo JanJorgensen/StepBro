@@ -10,6 +10,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace StepBro.UI.Controls
 {
@@ -21,60 +22,21 @@ namespace StepBro.UI.Controls
 
         public abstract string GetTextForSearchMatching(bool includeExtraFields);
 
-        public abstract void DoPaint(DrawingContext context, ChronoListViewPort.IView view, ref Avalonia.Rect rect, EntryMarkState selected);
+        public abstract void DoPaint(DrawingContext context, ChronoListViewPort.IView view, ref Avalonia.Rect rect, EntryMarkState markings);
 
-
-        //public static int GetWidth(System.Drawing.Graphics graphics, Font font, string s)
-        //{
-        //    return (int)Math.Ceiling(graphics.MeasureString("<>" + s, font).Width - graphics.MeasureString("<>", font).Width);
-        //}
-
-        //public static int GetWidth(System.Drawing.Graphics graphics, Font font, string s, StringFormat format)
-        //{
-        //    return (int)Math.Ceiling(graphics.MeasureString("<>" + s, font, -1, format).Width - graphics.MeasureString("<>", font, -1, format).Width);
-        //}
-
-        public static FormattedText CreateFormattedText(string text, Typeface typeface, double? emSize, IBrush foreground)
-        {
-            return new FormattedText(
-                text,
-                CultureInfo.CurrentCulture,
-                FlowDirection.LeftToRight,
-                typeface,
-                emSize.GetValueOrDefault(),
-                foreground);
-        }
-
-        public static int DrawTextField(
+        public static double DrawTextField(
             DrawingContext context, 
             ChronoListViewPort.IView view, 
-            IBrush color, string s, ref Rect rect, int width = 0)
+            IBrush color, string s, Rect rect, double width = 0)
         {
-            var ts = TextShaper.Current;
-            ShapedBuffer shaped = ts.ShapeText(s, new TextShaperOptions(view.NormalFont.GlyphTypeface, view.FontSize));
-            var strWidth = (int)(new ShapedTextRun(shaped, new GenericTextRunProperties(view.NormalFont, view.FontSize)).Size.Width);
-
+            var formattedText = new FormattedText(s, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, view.NormalFont, view.FontSize, color);
+            var strWidth = formattedText.WidthIncludingTrailingWhitespace;
             if (strWidth > width)
             {
                 width = strWidth;
             }
-            context.DrawText(
-                CreateFormattedText(
-                    s, 
-                    view.NormalFont, 
-                    view.FontSize, 
-                    Brushes.Black), 
-                new Point((rect.X + width) - strWidth, rect.Y));    // Possibly right-aligned.
+            context.DrawText(formattedText, rect.TopLeft);
             return width;
         }
-
-        //static ChronoListViewEntry()
-        //{
-        //    m_NormalStringFormat = new StringFormat(StringFormatFlags.MeasureTrailingSpaces | StringFormatFlags.NoClip | StringFormatFlags.NoWrap);
-        //}
-
-        //private static StringFormat m_NormalStringFormat;
-        //public static StringFormat NormalStringFormat { get { return m_NormalStringFormat; } }
-
     }
 }

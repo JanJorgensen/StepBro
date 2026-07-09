@@ -14,10 +14,10 @@ namespace StepBroCoreTest.Parser
     [TestClass]
     public class TestDatatable
     {
-        [TestMethod][ExpectedException(typeof(NoColumnsDefinedException))]
+        [TestMethod]
         public void TestEmptyTable()
         {
-            FileBuilder.ParseDatatable("datatable MyTable;\r\n");
+            Assert.Throws<NoColumnsDefinedException>(() => { FileBuilder.ParseDatatable("datatable MyTable;\r\n"); });
         }
 
         [TestMethod]

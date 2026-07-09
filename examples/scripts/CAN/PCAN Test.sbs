@@ -1,4 +1,16 @@
-﻿using StepBro.CAN;
+using StepBro.CAN;
+
+PCANChannel can = PCANChannel()
+{
+    BaudRate = Baudrate.BR250K,
+    Mode = ChannelMode.Extended,
+    LoggingEnabled = true
+}
+
+procedure void Test()
+{
+    can.Open();
+}
 
 procedure void OpenCAN()
 {
@@ -7,6 +19,13 @@ procedure void OpenCAN()
         channel.Setup(Baudrate.BR250K, ChannelMode.Extended);
         channel.Open();
         var status = channel.CreateStatusReceiver("status", m => m.ID == 0x620);
+        status = channel.CreateStatusReceiver("status", m => m.ID == 0x620);
+        status = channel.CreateStatusReceiver("status", m => m.ID == 0x620);
+        status = channel.CreateStatusReceiver("status", m => m.ID == 0x620);
+        status = channel.CreateStatusReceiver("status", m => m.ID == 0x620);
+
+
+
         var heartbeat = channel.SetupPeriodicTransmit("heartbeat", MessageType.Standard, 0x720, [5].ToByteArray(), 2.5s, true);
         
         while ( status.TotalCount < 2000 )

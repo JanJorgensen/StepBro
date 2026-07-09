@@ -1,5 +1,6 @@
 ﻿using StepBro.Core;
 using StepBro.Core.General;
+using StepBro.Core.Logging;
 using StepBro.HostSupport.Models;
 using System.Linq;
 using StepBroMain = StepBro.Core.Main;
@@ -10,7 +11,7 @@ namespace StepBro.HostSupport.Test;
 public class TestLogViewer
 {
     private HostAppModel m_app = null;
-    private LogViewerModel<LogViewTestEntry> m_logViewer = null;
+    private LogViewerModel m_logViewer = null;
 
     [TestInitialize]
     public void Setup()
@@ -18,7 +19,7 @@ public class TestLogViewer
         m_app = new HostAppModel();
         IService testFileSystemService = null;
         var mockFileSystem = new StepBro.Core.Test.Mocks.TextFileSystemMock(out testFileSystemService);
-        m_logViewer = new LogViewerModel<LogViewTestEntry>(new LogViewTestEntryFactory());
+        m_logViewer = new LogViewerModel(new LogViewTestEntryFactory());
         IService hostAccessService = null;
         var host = new HostAccess(m_app, out hostAccessService);
         m_app.Initialize(m_logViewer, testFileSystemService, hostAccessService);
@@ -64,12 +65,14 @@ public class TestLogViewer
         viewPort.LineHeight = 10;
         Assert.IsTrue(viewPort.IsInvalidated);      // Invalidated during setup.
 
+        var initialLogEntryCount = listView.Source.GetState().EffectiveCount;
+
         listView.RequestUpdate();
         Assert.IsTrue(viewPort.IsInvalidated);
         var viewPortEntries = viewPort.Refresh();
         Assert.IsFalse(viewPort.IsInvalidated);
         var entryCount = viewPortEntries.Count;
-        Assert.AreEqual(2, entryCount);
+        Assert.AreEqual(initialLogEntryCount, entryCount);
 
         m_app.RootLogger.Log("Activity A");
         Assert.IsFalse(viewPort.IsInvalidated);
@@ -78,8 +81,8 @@ public class TestLogViewer
         viewPortEntries = viewPort.Refresh();
         Assert.IsFalse(viewPort.IsInvalidated);
         entryCount = viewPortEntries.Count;
-        Assert.AreEqual(3, entryCount);
-        Assert.AreEqual("Activity A", viewPortEntries[2].LogEntry.Text);
+        Assert.AreEqual(initialLogEntryCount + 1, entryCount);
+        Assert.AreEqual("Activity A", (viewPortEntries[(int)initialLogEntryCount].DataObject as LogEntry).Text);
         Assert.IsFalse(viewPort.IsViewFilled());
 
         for (int i = 0; i < 7; i++)
@@ -93,13 +96,13 @@ public class TestLogViewer
         entryCount = viewPortEntries.Count;
         Assert.AreEqual(10, entryCount);
         Assert.IsFalse(viewPort.IsViewFilled());
-        Assert.AreEqual("Activity B 0", viewPortEntries[3].LogEntry.Text);
-        Assert.AreEqual("Activity B 1", viewPortEntries[4].LogEntry.Text);
-        Assert.AreEqual("Activity B 2", viewPortEntries[5].LogEntry.Text);
-        Assert.AreEqual("Activity B 3", viewPortEntries[6].LogEntry.Text);
-        Assert.AreEqual("Activity B 4", viewPortEntries[7].LogEntry.Text);
-        Assert.AreEqual("Activity B 5", viewPortEntries[8].LogEntry.Text);
-        Assert.AreEqual("Activity B 6", viewPortEntries[9].LogEntry.Text);
+        Assert.AreEqual("Activity B 0", (viewPortEntries[3] as LogViewTestEntry).LogEntry.Text);
+        Assert.AreEqual("Activity B 1", (viewPortEntries[4] as LogViewTestEntry).LogEntry.Text);
+        Assert.AreEqual("Activity B 2", (viewPortEntries[5] as LogViewTestEntry).LogEntry.Text);
+        Assert.AreEqual("Activity B 3", (viewPortEntries[6] as LogViewTestEntry).LogEntry.Text);
+        Assert.AreEqual("Activity B 4", (viewPortEntries[7] as LogViewTestEntry).LogEntry.Text);
+        Assert.AreEqual("Activity B 5", (viewPortEntries[8] as LogViewTestEntry).LogEntry.Text);
+        Assert.AreEqual("Activity B 6", (viewPortEntries[9] as LogViewTestEntry).LogEntry.Text);
 
         m_app.RootLogger.Log("Activity C");
         Assert.IsFalse(viewPort.IsInvalidated);
@@ -110,15 +113,15 @@ public class TestLogViewer
         entryCount = viewPortEntries.Count;
         Assert.AreEqual(10, entryCount);
         Assert.IsFalse(viewPort.IsViewFilled());
-        Assert.AreEqual("Activity A", viewPortEntries[1].LogEntry.Text);    // Now scrolled one line up.
-        Assert.AreEqual("Activity B 0", viewPortEntries[2].LogEntry.Text);
-        Assert.AreEqual("Activity B 1", viewPortEntries[3].LogEntry.Text);
-        Assert.AreEqual("Activity B 2", viewPortEntries[4].LogEntry.Text);
-        Assert.AreEqual("Activity B 3", viewPortEntries[5].LogEntry.Text);
-        Assert.AreEqual("Activity B 4", viewPortEntries[6].LogEntry.Text);
-        Assert.AreEqual("Activity B 5", viewPortEntries[7].LogEntry.Text);
-        Assert.AreEqual("Activity B 6", viewPortEntries[8].LogEntry.Text);
-        Assert.AreEqual("Activity C", viewPortEntries[9].LogEntry.Text);
+        Assert.AreEqual("Activity A", (viewPortEntries[1] as LogViewTestEntry).LogEntry.Text);    // Now scrolled one line up.
+        Assert.AreEqual("Activity B 0", (viewPortEntries[2] as LogViewTestEntry).LogEntry.Text);
+        Assert.AreEqual("Activity B 1", (viewPortEntries[3] as LogViewTestEntry).LogEntry.Text);
+        Assert.AreEqual("Activity B 2", (viewPortEntries[4] as LogViewTestEntry).LogEntry.Text);
+        Assert.AreEqual("Activity B 3", (viewPortEntries[5] as LogViewTestEntry).LogEntry.Text);
+        Assert.AreEqual("Activity B 4", (viewPortEntries[6] as LogViewTestEntry).LogEntry.Text);
+        Assert.AreEqual("Activity B 5", (viewPortEntries[7] as LogViewTestEntry).LogEntry.Text);
+        Assert.AreEqual("Activity B 6", (viewPortEntries[8] as LogViewTestEntry).LogEntry.Text);
+        Assert.AreEqual("Activity C", (viewPortEntries[9] as LogViewTestEntry).LogEntry.Text);
         listView.RequestUpdate();
         Assert.IsFalse(viewPort.IsInvalidated);
     }

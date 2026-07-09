@@ -19,7 +19,7 @@ namespace StepBro.Core.Test.Parser
             var var = FileBuilder.ParseConfigValue<long>("public config int MAX_TEMPERATURE = 10 * 3;");
             Assert.IsNotNull(var);
             Assert.AreEqual("MAX_TEMPERATURE", var.Name);
-            Assert.ReferenceEquals(var.DataType, TypeReference.TypeInt64);
+            Assert.IsTrue(Object.ReferenceEquals(var.DataType, TypeReference.TypeInt64));
             Assert.IsTrue(var.IsReadonly);
             Assert.AreEqual(AccessModifier.Public, var.AccessProtection);
         }

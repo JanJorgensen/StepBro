@@ -27,47 +27,48 @@ namespace StepBroCoreTest.Utils
             Assert.Fail(description);
         }
 
-        public static string LogEntryToString(LogEntry entry)
+        public static string LogEntryToString(ITimestampedData entry)
         {
-            if (String.IsNullOrEmpty(entry.Location))
+            var e = entry as LogEntry;
+            if (String.IsNullOrEmpty(e.Location))
             {
-                if (String.IsNullOrEmpty(entry.Text))
+                if (String.IsNullOrEmpty(e.Text))
                 {
                     return String.Format("{0} - {1}",
-                        entry.IndentLevel,
-                        entry.EntryType);
+                        e.IndentLevel,
+                        e.EntryType);
                 }
                 else
                 {
                     return String.Format("{0} - {1} - {2}",
-                        entry.IndentLevel,
-                        entry.EntryType,
-                        entry.Text);
+                        e.IndentLevel,
+                        e.EntryType,
+                        e.Text);
                 }
             }
             else
             {
-                if (String.IsNullOrEmpty(entry.Text))
+                if (String.IsNullOrEmpty(e.Text))
                 {
                     return String.Format("{0} - {1} - {2}",
-                        entry.IndentLevel,
-                        entry.EntryType,
-                        entry.Location);
+                        e.IndentLevel,
+                        e.EntryType,
+                        e.Location);
                 }
                 else
                 {
                     return String.Format("{0} - {1} - {2} - {3}",
-                        entry.IndentLevel,
-                        entry.EntryType,
-                        entry.Location,
-                        entry.Text);
+                        e.IndentLevel,
+                        e.EntryType,
+                        e.Location,
+                        e.Text);
                 }
             }
         }
 
-        private static IEnumerable<LogEntry> ListEntries(LogEntry first)
+        private static IEnumerable<LogEntry> ListEntries(ITimestampedData first)
         {
-            LogEntry e = first;
+            LogEntry e = first as LogEntry;
             while (e != null)
             {
                 yield return e;

@@ -38,6 +38,7 @@ public partial class ChronoListView : UserControl, IChronoListViewer
         viewPort.MouseWheel += ViewPort_MouseWheel;
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public DateTime ZeroTime { get { return m_zeroTime; } set { m_zeroTime = value; } }
 
     public IElementIndexer<ChronoListViewEntry> Source { get { return m_presentationSource; } }
@@ -52,6 +53,7 @@ public partial class ChronoListView : UserControl, IChronoListViewer
         timerUpdate.Start();
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool HeadMode
     {
         get { return m_headMode; }

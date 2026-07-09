@@ -406,7 +406,7 @@ namespace StepBro.Core.Parser
                 var id = m_file.CreateOrGetFileVariable(
                     m_currentNamespace, m_fileElementModifier, variable.Name, type, false,
                     m_lineFileElementAssociatedData, context.Start.Line, context.Start.Column, codeHash,
-                    CreateVariableContainerValueAssignAction(m_variableInitializerParameterScriptFile, variable.Initializer.ExpressionCode));
+                    CreateVariableContainerValueAssignAction(m_variableInitializerParameterScriptFile, variable.Initializer.ExpressionCode, Expression.Parameter(typeof(ILogger), "logger")));
                 m_file.SetFileVariableModifier(id, m_fileElementModifier);
             }
             else
@@ -427,11 +427,14 @@ namespace StepBro.Core.Parser
             VariableContainerAction initAction = null;
             VariableContainerAction resetAction = null;
 
+            var parameterLogger = Expression.Parameter(typeof(ILogger), "logger");
+
             if (m_variableType.Type.IsValueType || m_variableType.Type == typeof(string))
             {
                 createAction = CreateVariableContainerValueAssignAction(
                     m_variableInitializerParameterScriptFile,
-                    Expression.Constant(Activator.CreateInstance(m_creatorType.Type), m_creatorType.Type));
+                    Expression.Constant(Activator.CreateInstance(m_creatorType.Type), m_creatorType.Type),
+                    parameterLogger);
                 resetAction = createAction;
             }
             else
@@ -448,30 +451,87 @@ namespace StepBro.Core.Parser
                     {
                         createAction = CreateVariableContainerValueAssignAction(
                             m_variableInitializerParameterScriptFile,
-                            Expression.New(ctor, Expression.Constant(m_variableName)));
+                            Expression.New(ctor, Expression.Constant(m_variableName)),
+                            parameterLogger);
                     }
                     else if ((ctor = m_creatorType.Type.GetConstructor(new Type[] { })) != null)
                     {
                         createAction = CreateVariableContainerValueAssignAction(
-                            m_variableInitializerParameterScriptFile, Expression.New(ctor));
+                            m_variableInitializerParameterScriptFile, Expression.New(ctor), parameterLogger);
                     }
                     else if ((ctor = m_creatorType.Type.GetConstructor(new Type[] { typeof(IScriptFile) })) != null)
                     {
                         createAction = CreateVariableContainerValueAssignAction(
                             m_variableInitializerParameterScriptFile,
-                            Expression.New(ctor, m_variableInitializerParameterScriptFile));
+                            Expression.New(ctor, m_variableInitializerParameterScriptFile),
+                            parameterLogger);
                     }
                     else if ((ctor = m_creatorType.Type.GetConstructor(new Type[] { typeof(IScriptFile), typeof(string) })) != null && ObjectNameAttribute.IsObjectName(ctor.GetParameters()[1]))
                     {
                         createAction = CreateVariableContainerValueAssignAction(
                             m_variableInitializerParameterScriptFile,
-                            Expression.New(ctor, m_variableInitializerParameterScriptFile, Expression.Constant(m_variableName)));
+                            Expression.New(ctor, m_variableInitializerParameterScriptFile, Expression.Constant(m_variableName)),
+                            parameterLogger);
                     }
                     else
                     {
+                        MethodCallExpression objectCreator = null;
                         var methods = m_creatorType.Type.GetMethods();
                         var createMethods = methods.Where(m => String.Equals(m.Name, "Create", StringComparison.InvariantCulture) && m.IsStatic).ToArray();
-                        throw new NotImplementedException();
+
+                        foreach (var method in createMethods) 
+                        {
+                            if (method.ReturnParameter.ParameterType == m_creatorType.Type)
+                            {
+                                var parameters = method.GetParameters();
+                                if (parameters.Length == 0)
+                                {
+                                    objectCreator = Expression.Call(method);
+                                    break;
+                                }
+                                else if (parameters.Length == 1 && parameters[0].ParameterType == typeof(ILogger))
+                                {
+                                    objectCreator = Expression.Call(method, parameterLogger);
+                                    break;
+                                }
+                                else if (parameters.Length == 2 && parameters[0].ParameterType == typeof(ILogger) && parameters[1].ParameterType == typeof(String) && ObjectNameAttribute.IsObjectName(parameters[1]))
+                                {
+                                    objectCreator = Expression.Call(method, parameterLogger, Expression.Constant(m_variableName));
+                                    break;
+                                }
+                            }
+                        }
+                        if (objectCreator != null)
+                        {
+                            try
+                            {
+                                LabelTarget returnLabel = Expression.Label(typeof(bool));
+
+                                var parameterContainer = Expression.Parameter(typeof(IValueContainerOwnerAccess), "container");
+
+                                var callSetValue = Expression.Call(
+                                    parameterContainer,
+                                    typeof(IValueContainerOwnerAccess).GetMethod("SetValue", new Type[] { typeof(object), typeof(ILogger) }),
+                                    Expression.Convert(objectCreator, typeof(object)),
+                                    parameterLogger);
+
+                                var lambdaExpr = Expression.Lambda(
+                                    typeof(VariableContainerAction),
+                                    Expression.Block(
+                                        callSetValue,
+                                        Expression.Label(returnLabel, Expression.Constant(true))),
+                                    m_variableInitializerParameterScriptFile,
+                                    parameterContainer,
+                                    parameterLogger);
+
+                                var @delegate = lambdaExpr.Compile();
+                                createAction = (VariableContainerAction)@delegate;
+                            }
+                            catch (Exception)
+                            {
+                                throw;
+                            }
+                        }
                     }
                 }
 
@@ -485,7 +545,6 @@ namespace StepBro.Core.Parser
 
                     var parameterFile = Expression.Parameter(typeof(IScriptFile), "file");
                     var parameterContainer = Expression.Parameter(typeof(IValueContainerOwnerAccess), "container");
-                    var parameterLogger = Expression.Parameter(typeof(ILogger), "logger");
 
                     var callSetValue = Expression.Call(
                         typeof(ExecutionHelperMethods).GetMethod(nameof(ExecutionHelperMethods.ResetFileVariable), new Type[] { typeof(IValueContainerOwnerAccess), typeof(ILogger) }),
@@ -532,14 +591,13 @@ namespace StepBro.Core.Parser
             m_variableName = null;
         }
 
-        internal static VariableContainerAction CreateVariableContainerValueAssignAction(ParameterExpression fileArgument, Expression initExpression)
+        internal static VariableContainerAction CreateVariableContainerValueAssignAction(ParameterExpression fileArgument, Expression initExpression, ParameterExpression parameterLogger)
         {
             try
             {
                 LabelTarget returnLabel = Expression.Label(typeof(bool));
 
                 var parameterContainer = Expression.Parameter(typeof(IValueContainerOwnerAccess), "container");
-                var parameterLogger = Expression.Parameter(typeof(ILogger), "logger");
 
                 var callSetValue = Expression.Call(
                     parameterContainer,

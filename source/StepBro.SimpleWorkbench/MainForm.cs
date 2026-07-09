@@ -1,32 +1,34 @@
 using ActiproSoftware.UI.WinForms.Controls.Docking;
 using ActiproSoftware.UI.WinForms.Drawing;
+using Antlr4.Runtime;
+using FastColoredTextBoxNS;
 using StepBro.Core;
+using StepBro.Core.Addons;
 using StepBro.Core.Api;
 using StepBro.Core.Controls;
 using StepBro.Core.Data;
+using StepBro.Core.DocCreation;
 using StepBro.Core.File;
 using StepBro.Core.General;
+using StepBro.Core.Host;
+using StepBro.Core.Host.Presentation;
+using StepBro.Core.Logging;
 using StepBro.Core.ScriptData;
 using StepBro.Core.Tasks;
-using System.Collections.ObjectModel;
+using StepBro.HostSupport.Models;
 using StepBro.UI.WinForms;
 using StepBro.UI.WinForms.Controls;
+using StepBro.UI.WinForms.Dialogs;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using static StepBro.Core.Host.HostApplicationTaskHandler;
+using static StepBro.Core.Host.IHostTaskHandler;
 using static StepBro.SimpleWorkbench.Shortcuts;
-using StepBroMain = StepBro.Core.Main;
-using StepBro.Core.Logging;
-using FastColoredTextBoxNS;
-using StepBro.UI.WinForms.Dialogs;
-using StepBro.Core.Addons;
-using StepBro.Core.DocCreation;
-using Antlr4.Runtime;
 using Lexer = StepBro.Core.Parser.Grammar.StepBroLexer;
-using StepBro.Core.Host.Presentation;
-using StepBro.HostSupport.Models;
-using System.IO;
+using StepBroMain = StepBro.Core.Main;
 
 namespace StepBro.SimpleWorkbench
 {
@@ -141,7 +143,7 @@ namespace StepBro.SimpleWorkbench
             }
 
             // If no tasks are started in ParseCommandLineOptions(), this task will make sure the activity indicator is stopped.
-            this.AddTask<TaskNoState>(ApplicationStartupIndicationTask, Priority.Low, "Starting application", "Starting application");
+            this.AddTask(ApplicationStartupIndicationTask, IHostTaskHandler.Priority.Low, "Starting application", "Starting application");
 
             m_logviewer = new LogViewer();
             m_toolWindowExecutionLog = new ToolWindow(dockManager, "ExecutionLogView", "Execution Log", null, m_logviewer);
@@ -209,14 +211,14 @@ namespace StepBro.SimpleWorkbench
             toolStripDropDownButtonTool.DropDownItems.Clear();
         }
 
-        private TaskAction ApplicationStartupIndicationTask(ref TaskNoState state, ref int index, ITaskStateReporting reporting)
+        private TaskHandlingAction ApplicationStartupIndicationTask(ref TaskState state, ref int index, ITaskStateReporting reporting)
         {
             if (!m_appLoadFinished)
             {
-                return TaskAction.Delay100ms;
+                return TaskHandlingAction.Delay100ms;
             }
             // else...
-            return TaskAction.Finish;
+            return TaskHandlingAction.Finish;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -551,7 +553,7 @@ namespace StepBro.SimpleWorkbench
                     {
                         m_outputFormatter = m_outputAddon.Create(options, writer);
 
-                        var logEntry = StepBroMain.Logger.GetFirst().Item2;
+                        var logEntry = StepBroMain.Logger.GetFirst().Item2 as LogEntry;
                         var zeroTime = logEntry.Timestamp;
                         while (logEntry != null)
                         {
@@ -1921,8 +1923,6 @@ namespace StepBro.SimpleWorkbench
             toolStripStatusLabelApplicationTaskState.Text = workingText;
         }
 
-        private enum TaskNoState { First, Next }
-
         #region Script File Loading
 
         //private void LoadedFiles_FileLoaded(object sender, LoadedFileEventArgs args)
@@ -1942,7 +1942,7 @@ namespace StepBro.SimpleWorkbench
         //    }
         //}
 
-        private TaskAction ScriptFileLoadingTask(ref TaskNoState state, ref int index, ITaskStateReporting reporting)
+        private TaskHandlingAction ScriptFileLoadingTask(ref TaskState state, ref int index, ITaskStateReporting reporting)
         {
             m_targetFileFullPath = System.IO.Path.GetFullPath(m_targetFile);
             try
@@ -1967,64 +1967,64 @@ namespace StepBro.SimpleWorkbench
             {
                 m_mainLogger.LogError("Loading script file failed: " + ex.GetType().Name + ", " + ex.Message);
             }
-            return TaskAction.Finish;
+            return TaskHandlingAction.Finish;
         }
 
         private void StartScriptFileLoading()
         {
-            this.AddTask<TaskNoState>(ScriptFileLoadingTask, Priority.Normal, "Loading script file", "Load script file.");
+            this.AddTask(ScriptFileLoadingTask, Priority.Normal, "Loading script file", "Load script file.");
         }
 
         #endregion
 
         #region File Parsing
 
-        private enum FileParsingState { Init, Parse, Errors, Finish }
+        //private enum FileParsingState { Init, Parse, Errors, Finish }
 
-        private TaskAction FileParsingTask(ref FileParsingState state, ref int index, ITaskStateReporting reporting)
+        private TaskHandlingAction FileParsingTask(ref TaskState state, ref int index, ITaskStateReporting reporting)
         {
             switch (state)
             {
-                case FileParsingState.Init:
+                case TaskState.Init:
                     if (m_file == null)
                     {
-                        return TaskAction.Cancel;
+                        return TaskHandlingAction.Cancel;
                     }
 
-                    state = FileParsingState.Parse;
-                    return TaskAction.ContinueOnWorkerThreadDomain;
+                    state = TaskState.Work;
+                    return TaskHandlingAction.ContinueOnWorkerThreadDomain;
 
-                case FileParsingState.Parse:
+                case TaskState.Work:
                     var parsingSuccess = StepBroMain.ParseFiles(true);
                     if (parsingSuccess)
                     {
-                        state = FileParsingState.Finish;
+                        state = TaskState.Finish;
                     }
                     else
                     {
-                        state = FileParsingState.Errors;
+                        state = TaskState.Failure;
                     }
                     break;
 
-                case FileParsingState.Errors:
+                case TaskState.Failure:
                     {
                         m_toolWindowExecutionLog.Activate();
                     }
-                    return TaskAction.Finish;
+                    return TaskHandlingAction.Finish;
 
-                case FileParsingState.Finish:
+                case TaskState.Finish:
                     this.UpdateAfterSuccessfulFileParsing();
-                    return TaskAction.Finish;
+                    return TaskHandlingAction.Finish;
 
                 default:
                     break;
             }
-            return TaskAction.Continue;
+            return TaskHandlingAction.Continue;
         }
 
         private void StartFileParsing()
         {
-            this.AddTask<FileParsingState>(FileParsingTask, Priority.Normal, "Parsing files", "Parse the script files.");
+            this.AddTask(FileParsingTask, Priority.Normal, "Parsing files", "Parse the script files.");
         }
 
         private void UpdateAfterSuccessfulFileParsing()
@@ -2124,18 +2124,16 @@ namespace StepBro.SimpleWorkbench
             return executionData;
         }
 
-        private enum ScriptExecutionState { Init, Running, Finish }
-
-        private TaskAction ScriptExecutionTask(ref ScriptExecutionState state, ref int index, ITaskStateReporting reporting)
+        private TaskHandlingAction ScriptExecutionTask(ref TaskState state, ref int index, ITaskStateReporting reporting)
         {
             switch (state)
             {
-                case ScriptExecutionState.Init:
+                case TaskState.Init:
                     {
                         toolStripStatusLabelExecutionResult.Text = String.Empty;
                         if (m_file == null || StepBroMain.LastParsingErrorCount > 0)
                         {
-                            return TaskAction.Cancel;
+                            return TaskHandlingAction.Cancel;
                         }
                         var data = m_executionQueue.Peek();
                         var element = data.Element;
@@ -2170,7 +2168,7 @@ namespace StepBro.SimpleWorkbench
                                 if (partner == null)
                                 {
                                     data.Errors.Add($"Error: The specified file element does not have a partner named \"{data.Partner}\".");
-                                    return TaskAction.Cancel;
+                                    return TaskHandlingAction.Cancel;
                                 }
                             }
                             else
@@ -2191,14 +2189,14 @@ namespace StepBro.SimpleWorkbench
                                         else
                                         {
                                             data.Errors.Add($"Error: Target object '{data.Object}' was not found in the list of global variables.");
-                                            return TaskAction.Cancel;
+                                            return TaskHandlingAction.Cancel;
                                         }
                                     }
                                 }
                                 else
                                 {
                                     data.Errors.Add($"Error: Target element (type {element.ElementType}) is not a supported type for execution.");
-                                    return TaskAction.Cancel;
+                                    return TaskHandlingAction.Cancel;
                                 }
                             }
 
@@ -2230,19 +2228,19 @@ namespace StepBro.SimpleWorkbench
                             //ConsoleWriteErrorLine($"Error: File element named '{targetElement}' was not found.");
                         }
 
-                        state = ScriptExecutionState.Running;
+                        state = TaskState.Work;
                     }
-                    return TaskAction.ContinueOnWorkerThreadDomain;
+                    return TaskHandlingAction.ContinueOnWorkerThreadDomain;
 
-                case ScriptExecutionState.Running:
+                case TaskState.Work:
                     while (!m_executionQueue.Peek().Execution.Task.Ended())
                     {
                         Thread.Sleep(200);
                     }
-                    state = ScriptExecutionState.Finish;
+                    state = TaskState.Finish;
                     break;
 
-                case ScriptExecutionState.Finish:
+                case TaskState.Finish:
                     {
                         var executionJob = m_executionQueue.Dequeue();
                         toolStripButtonStopScriptExecution.Enabled = false;
@@ -2267,12 +2265,12 @@ namespace StepBro.SimpleWorkbench
                             }
                         }
                     }
-                    return TaskAction.Finish;
+                    return TaskHandlingAction.Finish;
 
                 default:
                     break;
             }
-            return TaskAction.Continue;
+            return TaskHandlingAction.Continue;
         }
 
         private void StartScriptExecution(ScriptExecutionData executionData)
@@ -2282,7 +2280,7 @@ namespace StepBro.SimpleWorkbench
         }
         private void StartScriptExecution()
         {
-            this.AddTask<ScriptExecutionState>(ScriptExecutionTask, Priority.Normal, "Executing script", "Execute script.");
+            this.AddTask(ScriptExecutionTask, Priority.Normal, "Executing script", "Execute script.");
         }
 
 

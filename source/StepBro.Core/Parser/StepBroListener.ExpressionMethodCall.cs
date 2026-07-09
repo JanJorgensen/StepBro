@@ -1079,6 +1079,10 @@ namespace StepBro.Core.Parser
                             }
                             continue;
                         }
+                        else if (p.ParameterType.IsAssignableFrom(typeof(ILogger)))
+                        {
+                            suggestedAssignmentsOut.Add(new SBExpressionData(Expression.Property(contextReference, typeof(Execution.ICallContext).GetProperty("Logger"))));
+                        }
                         else if (p.ParameterType.IsAssignableFrom(typeof(IScriptFile)))
                         {
                             if (m_isInVariableInitializer)
@@ -1264,6 +1268,13 @@ namespace StepBro.Core.Parser
                         {
                             suggestedAssignmentsOut.Add(
                                 new SBExpressionData(Expression.New(typeof(Identifier).GetConstructor(new Type[] { typeof(string) }), argPicker.Pick().ExpressionCode)));
+                            matchScore -= 40;    // Matching an integer is not as good as matching the exact same type.
+                            continue;   // next parameter
+                        }
+                        else if (argPicker.Current.DataType.Type == typeof(ByteArray) && p.ParameterType == typeof(Byte[]))
+                        {
+                            suggestedAssignmentsOut.Add(
+                                new SBExpressionData(Expression.Call(argPicker.Pick().ExpressionCode, typeof(ByteArray).GetMethod("ToArray"))));
                             matchScore -= 40;    // Matching an integer is not as good as matching the exact same type.
                             continue;   // next parameter
                         }
